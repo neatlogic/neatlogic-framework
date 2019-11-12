@@ -8,48 +8,43 @@
 		id,
 		name,
 		desc_name AS descName
-		FROM flow_module
+		FROM module
 		WHERE `status`=1 AND is_active = 1
 		AND SUBSTRING(refer, 1, 1) = '1'
 	</select>
 
 	<select id="getModuleStatusByName" parameterType="java.lang.String" resultType="java.lang.Integer">
-		SELECT `status` FROM flow_module WHERE name = #{value}
+		SELECT `status` FROM module WHERE name = #{value}
 	</select>
 
 	<resultMap id="flowModuleResultMap" type="codedriver.framework.dto.ModuleVo">
-		<id column="id" property="id" />
-		<result column="name" property="name" />
-		<result column="desc_name" property="descName" />
+		<!-- <id column="id" property="id" /> -->
+		<id column="name" property="name" />
+		<result column="description" property="description" />
 		<result column="status" property="status" />
 		<result column="error" property="error" />
-		<result column="color" property="color" />
+		<!-- <result column="color" property="color" /> -->
 		<result column="is_active" property="isActive" />
-		<result column="init_time" property="initTime" />
+		<!-- <result column="init_time" property="initTime" /> -->
 		<result column="url_mapping" property="urlMapping" />
 		<result column="config_path" property="configPath" />
-		<result column="startup" property="startUp" />
-		<result column="version_path" property="versionPath" />
+		<result column="startup" property="startup" />
+		<!-- <result column="version_path" property="versionPath" /> -->
 		<result column="version" property="version" />
 	</resultMap>
 
 	<select id="getAllModuleList" resultMap="flowModuleResultMap">
 		SELECT
-		id,
 		name,
-		desc_name,
-		status,
-		error,
-		color,
-		is_active,
-		date_format(init_time, '%Y-%m-%d %H:%i:%s') as init_time,
+		description,
 		url_mapping,
+		is_active,
+		status,		
+		version,
 		config_path,
 		startup,
-		version,
-		version_path
-		FROM
-		flow_module
+		error
+		FROM module
 		ORDER BY startup
 	</select>
 
@@ -59,19 +54,19 @@
 
 	<select id="getModuleById" parameterType="int" resultMap="flowModuleResultMap">
 		SELECT *
-		FROM flow_module
+		FROM module
 		WHERE id = #{id}
 	</select>
 
 	<select id="getModuleByName" parameterType="String" resultMap="flowModuleResultMap">
 		SELECT *
-		FROM flow_module
+		FROM module
 		WHERE name = #{name}
 	</select>
 
 	<select id="selectModuleNameById" parameterType="int" resultType="String">
 		SELECT name
-		FROM flow_module
+		FROM module
 		WHERE id = #{id}
 	</select>
 
@@ -83,7 +78,7 @@
 		desc_name AS descName,
 		is_show AS isShow,
 		`version` 
-		FROM flow_module
+		FROM module
 		WHERE `status`=1
 		AND is_active = 1
 		AND is_show = 1
@@ -96,7 +91,7 @@
 		icon,
 		desc_name AS descName,
 		is_show AS isShow
-		FROM flow_module
+		FROM module
 		WHERE id IN
 		<foreach collection="moduleIdList" item="item" open="(" separator="," close=")">
 			#{item}
@@ -112,7 +107,7 @@
 		m.name,
 		m.desc_name AS descName,
 		m.is_show AS isShow
-		FROM flow_module m
+		FROM module m
 		join flow_rest_component c on m.name = c.module
 		WHERE
 		`status`=1
@@ -124,13 +119,13 @@
 		<selectKey resultType="Long" keyProperty="id" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
-		INSERT INTO flow_module
+		INSERT INTO module
 		(name , desc_name ,status,is_active,init_time,config_path,url_mapping,startup)
 		VALUES(#{name} , #{descName},#{status},#{isActive},now(),#{configPath},#{urlMapping},#{startUp})
 	</insert>
 
 	<update id="updateModule" parameterType="codedriver.framework.dto.ModuleVo">
-		UPDATE flow_module
+		UPDATE module
 		SET name = #{name},
 		desc_name = #{descName}
 		status = #{status},

@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.ScheduleMapper">
+	<select id="getAllJobClassList" resultType="codedriver.framework.scheduler.dto.JobClassVo">
+		SELECT 
+		a.id, a.name, classpath as classPath, module_name 
+		FROM schedule_job_class a 
+		JOIN module b ON a.module_name = b.name AND b.is_active = 1 AND b.status = 1
+		WHERE a.type IN
+		<foreach collection="typeList" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		order by a.name
+	</select>
+
+	<select id="getJobClassList" resultType="codedriver.framework.scheduler.dto.JobClassVo">
+		SELECT 
+		a.id AS id,
+		a.`name` AS name,
+		a.classpath AS classPath,
+		a.module_name AS moduleName,
+		a.`type` AS type,
+		b.description AS moduleDesc
+		FROM schedule_job_class a 
+		LEFT JOIN module b ON a.module_name = b.name
+		<include refid="searchScheduleJobClassSql" />
+		ORDER by a.id
+		limit #{startNum}, #{pageSize}
+	</select>
+
+	<select id="getJobClass" resultType="codedriver.framework.scheduler.dto.JobClassVo">
+		SELECT 
+		a.id AS id,
+		a.`name` AS name,
+		a.classpath AS classPath,
+		a.module_name AS moduleName,
+		a.`type` AS type,
+		b.description AS moduleDesc
+		FROM schedule_job_class a 
+		LEFT JOIN module b ON a.module_name = b.name
+		WHERE
+		1=1
+		<if test="id != null">
+			AND a.id=#{id}
+		</if>
+	</select>
+
+	<select id="getJobClassCount" resultType="int">
+		SELECT 
+		count(1)
+		FROM schedule_job_class a 
+		LEFT JOIN module b ON a.module_name = b.name
+		<include refid="searchScheduleJobClassSql" />
+	</select>
+
+	<select id="getJobClassVoCount" resultType="int">
+		SELECT 
+		count(1)
+		FROM schedule_job_class a
+		WHERE a.id=#{id}
+	</select>
+
+	<resultMap id="scheduleMap" type="codedriver.framework.scheduler.dto.JobVo">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="cron" property="cron" />
+		<result column="repeat" property="repeat" />
+		<result column="execCount" property="execCount" />
+		<result column="interval" property="interval" />
+		<result column="isActive" property="isActive" />
+        <result column="needAudit" property="needAudit"/>
+		<result column="isPrivate" property="isPrivate" />
+		<result column="status" property="status" />
+		<result column="beginTime" property="beginTime" />
+		<result column="endTime" property="endTime" />
+		<result column="pauseTime" property="pauseTime" />
+		<result column="lastFireTime" property="lastFireTime" />
+		<result column="lastFinishTime" property="lastFinishTime" />
+		<result column="serverId" property="serverId" />
+		<result column="nextFireTime" property="nextFireTime" />
+		<association property="jobClass" javaType="codedriver.framework.scheduler.dto.JobClassVo">
+			<id column="classId" property="id" />
+			<result column="className" property="name" />
+			<result column="classPath" property="classPath" />
+			<result column="moduleDesc" property="moduleDesc" />
+			<result column="moduleName" property="moduleName" />
+			<result column="classType" property="type" />
+		</association>
+		<collection property="propList" ofType="codedriver.framework.scheduler.dto.JobPropVo">
+			<id column="propId" property="id" />
+			<result column="propName" property="name" />
+			<result column="propValue" property="value" />
+		</collection>
+	</resultMap>
+
+	<sql id="searchScheduleJobSql">
+		WHERE 1=1
+		<if test="name != null and name != ''">
+			AND a.name like CONCAT('%',#{name}, '%')
+		</if>
+		<if test="classId != null">
+			AND b.id = #{classId}
+		</if>
+	</sql>
+
+	<sql id="searchScheduleJobClassSql">
+		WHERE 1=1
+		<if test="name != null and name != ''">
+			AND a.name like CONCAT('%', #{name}, '%')
+		</if>
+		<if test="moduleId != null">
+			AND a.module_name=#{moduleName}
+		</if>
+		<if test="type != null">
+			AND a.type=#{type}
+		</if>
+	</sql>
+
+	<sql id="jobDetailSql">
+		a.id,
+		a.name,
+		a.cron,
+		a.repeat,
+		a.interval,
+		a.is_active as isActive,
+		a.need_audit as needAudit,
+		a.is_private as isPrivate,
+		a.status as status,
+		a.server_id as serverId,
+		DATE_FORMAT(a.begin_time, '%Y-%m-%d %H:%i:%s') as
+		beginTime,
+		DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s')
+		as endTime,
+		DATE_FORMAT(a.lastfire_time, '%Y-%m-%d %H:%i:%s') as lastFireTime,
+		DATE_FORMAT(a.pause_time, '%Y-%m-%d %H:%i:%s') as pauseTime,
+		DATE_FORMAT(a.lastfinish_time, '%Y-%m-%d %H:%i:%s') as lastFinishTime,
+		DATE_FORMAT(a.nextfire_time, '%Y-%m-%d %H:%i:%s') as nextFireTime,
+		a.exec_count as execCount,
+		b.id AS classId,
+		b.name AS className,
+		b.classpath AS classPath,
+		b.module_name AS moduleName,
+		b.type AS classType,
+		c.description AS moduleDesc
+	</sql>
+
+	<select id="searchJobCount" resultType="int">
+		SELECT
+		count(1)
+		FROM schedule_job a
+		JOIN schedule_job_class b ON a.class_id = b.id
+		JOIN module c ON b.module_name = c.name AND c.status = 1
+		<include refid="searchScheduleJobSql" />
+	</select>
+
+	<select id="searchJob" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		FROM schedule_job a
+		JOIN schedule_job_class b ON a.class_id = b.id
+		JOIN module c ON b.module_name = c.name AND c.status = 1
+		<include refid="searchScheduleJobSql" />
+		ORDER by b.module_name, a.name
+		limit #{startNum}, #{pageSize}
+	</select>
+
+	<select id="getJobByClassId" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		FROM schedule_job a
+		JOIN schedule_job_class b ON a.class_id = b.id
+		JOIN module c ON b.module_name = c.name
+		WHERE a.is_active = 1
+		AND a.class_id = #{classId}
+		AND a.server_id = #{serverId}
+	</select>
+
+	<select id="getJobById" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		,
+		d.prop_name as propName,
+		d.prop_value as propValue,
+		d.id as propId
+		FROM schedule_job a
+		JOIN schedule_job_class b ON a.class_id = b.id
+		JOIN module c ON b.module_name = c.name
+		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
+		WHERE a.id = #{value}
+	</select>
+	
+	<select id="getJobByName" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		,
+		d.prop_name as propName,
+		d.prop_value as propValue,
+		d.id as propId
+		FROM schedule_job a
+		JOIN schedule_job_class b ON a.class_id = b.id
+	    JOIN module c ON b.module_name = c.name
+		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
+		WHERE 1=1
+		<if test="name != null and name != ''">
+		and a.name = #{name}
+		</if>
+		<if test="id != null and id != ''">
+		and a.id!=#{id}
+		</if>
+	</select>
+	
+	<insert id="insertJobProp">
+		INSERT schedule_job_prop (job_id, prop_name, prop_value)
+		VALUES (#{jobId}, #{name}, #{value})
+	</insert>
+
+	<insert id="insertJob">
+		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+		INSERT INTO schedule_job
+		(
+		name,
+		class_id,
+		begin_time,
+		end_time,
+		`repeat`,
+		cron,
+		`interval`,
+		status,
+		is_active,
+		need_audit,
+		is_private,
+		server_id
+		) VALUES (
+		#{name},
+		#{classId},
+		#{beginTime},
+		#{endTime},
+		#{repeat},
+		#{cron},
+		#{interval},
+		-2,
+		#{isActive},
+		#{needAudit},
+		#{isPrivate},
+		#{serverId}
+		)
+	</insert>
+
+	<insert id="insertJobClass">
+		INSERT INTO schedule_job_class (id,name, classpath, module_name, type) VALUES (#{id}, #{name}, #{classPath}, #{moduleName}, #{type})
+	</insert>
+
+	<update id="updateJobProp">
+		UPDATE schedule_job_prop
+		SET
+		prop_name = #{name},
+		prop_value = #{value}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateJobClass">
+		UPDATE schedule_job_class 
+		SET
+		name = #{name},
+		classpath = #{classPath},
+		module_name = #{moduleName}
+		<if test="type != null and type != ''">
+			,type = #{type}
+		</if>
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateJobClassType">
+		UPDATE schedule_job_class 
+		SET
+		type = #{type}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateJob">
+		UPDATE schedule_job
+		SET
+		name = #{name},
+		begin_time = #{beginTime},
+		end_time = #{endTime},
+		`repeat` = #{repeat},
+		cron = #{cron},
+		`interval` = #{interval},
+		server_id = #{serverId},
+		status = -2,
+		is_active = #{isActive},
+		need_audit = #{needAudit},
+		exec_count = 0,
+		nextfire_time = null,
+		lastfinish_time = null,
+		lastfire_time = null
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateScheduleJobTimeById">
+		UPDATE schedule_job
+		SET
+		nextfire_time = #{nextFireTime},
+		lastfinish_time = #{lastFinishTime},
+		lastfire_time = #{lastFireTime},
+		exec_count = exec_count + 1
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateJobStatus">
+		UPDATE schedule_job
+		SET status = #{status}
+		<if test="status == 0">
+			,exec_count = 0
+		</if>
+		WHERE
+		id = #{id}
+	</update>
+
+	<!-- <update id="resetJobStatus">
+		UPDATE schedule_job SET status =-2,exec_count = 0 WHERE server_id = #{value} 
+	</update> -->
+
+    <update id="resetJobStatusNotStart">
+		UPDATE schedule_job 
+		SET
+		status= CASE status WHEN 1 THEN -2 WHEN 0 THEN -3 ELSE -2 END,
+		exec_count = CASE status WHEN -2 THEN 0 END
+		WHERE server_id = #{value}
+	</update>
+
+	<delete id="deleteJobClass">
+		DELETE FROM schedule_job_class WHERE id = #{value}
+	</delete>
+
+	<delete id="deleteJobPropByJobId">
+		DELETE FROM schedule_job_prop WHERE job_id = #{value}
+	</delete>
+
+	<delete id="deleteJob">
+		DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.id = b.job_id WHERE a.id = #{value}
+	</delete>
+
+</mapper>

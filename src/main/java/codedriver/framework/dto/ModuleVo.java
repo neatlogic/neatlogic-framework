@@ -18,21 +18,21 @@ public class ModuleVo {
 	public static final int BALANTFLOW_MODULE_MONITOR_ID = 15;
 	public static final int BALANTFLOW_MODULE_OCTOPUS_ID = 19;
 
-	private Long id;
+//	private Long id;
 	private String name;
-	private String descName;
-	private Integer status;
+	private String description;
+	private String status;
 	private String statusText;
 	private Integer isActive;
 	private String configPath;
-	private String initTime;
+//	private String initTime;
 	private String error;
-	private String color;
+//	private String color;
 	private String urlMapping;
-	private String icon;
-	private String versionPath;
+//	private String icon;
+//	private String versionPath;
 	private String version;
-	private int startUp;
+	private int startup;
 	private Integer widgetCount;
 	private int isShow;
 
@@ -41,13 +41,13 @@ public class ModuleVo {
 	private int startNum;
 
 
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
+//	public String getColor() {
+//		return color;
+//	}
+//
+//	public void setColor(String color) {
+//		this.color = color;
+//	}
 
 	public String getUrlMapping() {
 		return urlMapping;
@@ -73,29 +73,29 @@ public class ModuleVo {
 		this.configPath = configPath;
 	}
 
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
-	public String getInitTime() {
-		return initTime;
-	}
-
-	public void setInitTime(String initTime) {
-		this.initTime = initTime;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	public String getIcon() {
+//		return icon;
+//	}
+//
+//	public void setIcon(String icon) {
+//		this.icon = icon;
+//	}
+//
+//	public String getInitTime() {
+//		return initTime;
+//	}
+//
+//	public void setInitTime(String initTime) {
+//		this.initTime = initTime;
+//	}
+//
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 
 	public String getName() {
 		return name;
@@ -105,22 +105,22 @@ public class ModuleVo {
 		this.name = name;
 	}
 
-	public Integer getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
 	public String getStatusText() {
 		if (this.status != null) {
-			if (this.status == -1) {
-				statusText = "加载失败";
-			} else if (this.status == 0) {
-				statusText = "未加载";
-			} else {
+			if (this.status.equals("success")) {
 				statusText = "加载成功";
+			} else if (this.status.equals("failed")) {
+				statusText = "加载失败";
+			} else {
+				statusText = "未加载";
 			}
 		}
 		return statusText;
@@ -138,12 +138,12 @@ public class ModuleVo {
 		this.isActive = isActive;
 	}
 
-	public int getStartUp() {
-		return startUp;
+	public int getStartup() {
+		return startup;
 	}
 
-	public void setStartUp(int startUp) {
-		this.startUp = startUp;
+	public void setStartup(int startup) {
+		this.startup = startup;
 	}
 
 	public Integer getWidgetCount() {
@@ -178,12 +178,12 @@ public class ModuleVo {
 		this.startNum = startNum;
 	}
 
-	public String getDescName() {
-		return descName;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDescName(String descName) {
-		this.descName = descName;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 
@@ -195,13 +195,13 @@ public class ModuleVo {
 		this.isShow = isShow;
 	}
 
-	public String getVersionPath() {
-		return versionPath;
-	}
-
-	public void setVersionPath(String versionPath) {
-		this.versionPath = versionPath;
-	}
+//	public String getVersionPath() {
+//		return versionPath;
+//	}
+//
+//	public void setVersionPath(String versionPath) {
+//		this.versionPath = versionPath;
+//	}
 
 	public String getVersion() {
 		return version;

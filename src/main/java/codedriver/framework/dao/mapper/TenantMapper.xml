@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
+	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">
+		SELECT
+		`uuid`,
+		`name`
+		FROM
+		`tenant`
+		WHERE `uuid` = #{value}
+	</select>
+
+</mapper>
+

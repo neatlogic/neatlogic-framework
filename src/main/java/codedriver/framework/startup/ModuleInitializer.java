@@ -137,6 +137,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					}
 
 					ServletRegistration.Dynamic sr = context.addServlet(module.get("name").toString(), new DispatcherServlet(appContext));
+					sr.setLoadOnStartup(1);
 					String urlmapping = module.get("url_mapping").toString();
 					if (urlmapping.indexOf(",") > -1) {
 						String[] urls = urlmapping.split(",");

@@ -17,6 +17,9 @@ public class Config {
 	
 	private static final String CONFIG_FILE = "config.properties";
 	public static final String SEPARATOR = System.getProperty("file.separator");
+
+	public static String JWT_SECRET = "techsure#codedriver$secret";
+
 	public static String REST_AUDIT_PATH;
 	public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 	public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";

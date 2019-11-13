@@ -2,14 +2,14 @@ package codedriver.framework.restful.dto;
 
 import java.util.List;
 
-public class RestComponentVo {
+public class ApiComponentVo {
 	private String id;
 	private String name;
 	private String config;
 	private Integer isActive;
 	private String module;
 	
-	private List<RestInterfaceVo> interfaceList;
+	private List<ApiVo> interfaceList;
 
 	public String getConfig() {
 		return config;
@@ -19,11 +19,11 @@ public class RestComponentVo {
 		this.config = config;
 	}
 
-	public List<RestInterfaceVo> getInterfaceList() {
+	public List<ApiVo> getInterfaceList() {
 		return interfaceList;
 	}
 
-	public void setInterfaceList(List<RestInterfaceVo> interfaceList) {
+	public void setInterfaceList(List<ApiVo> interfaceList) {
 		this.interfaceList = interfaceList;
 	}
 

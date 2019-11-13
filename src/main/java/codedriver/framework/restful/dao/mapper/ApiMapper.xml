@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.restful.dao.mapper.ApiMapper">
+	
+	<select id="getApiByComponentId" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
+		SELECT
+		`id`,
+		`name`,
+		`component_id` AS componentId,
+		`username`,
+		`password`,
+		`config`,
+		`is_active` AS isActive,
+		`token`,
+		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`description`,
+		`authtype`,
+		`type`
+		FROM `api`
+		WHERE
+		component_id = #{value}
+	</select>
+	
+	<select id="getApiByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
+		SELECT
+		`id`,
+		`name`,
+		`component_id` AS componentId,
+		`username`,
+		`password`,
+		`config`,
+		`is_active` AS isActive,
+		`token`,
+		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`description`,
+		`authtype`,
+		`type`
+		FROM `api`
+		WHERE
+		token = #{value}
+	</select>
+	
+	<update id="updateApiComponentIdById" parameterType="codedriver.framework.restful.dto.ApiVo">
+		UPDATE `api`
+		SET
+		component_id = #{componentId}
+		WHERE
+		id = #{id}
+	</update>
+	
+	<insert id="replaceApiComponent" parameterType="codedriver.framework.restful.dto.ApiComponentVo">
+		REPLACE INTO `api_component`
+		(id, name, config, module)
+		VALUES
+		(#{id}, #{name}, #{config}, #{module})
+	</insert>
+	
+	<insert id="insertApi" parameterType="codedriver.framework.restful.dto.ApiVo">
+		<selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+		INSERT INTO `api`
+		(
+		name,
+		`is_active`,
+		`component_id`,
+		`config`,
+		`token`,
+		`description`,
+		`expire`,
+		`username`,
+		`password`,
+		`authtype`,
+		`type`,
+		`qps`,
+		`need_audit`
+		) VALUES (
+		#{name},
+		#{isActive},
+		#{componentId},
+		#{config},
+		#{token},
+		#{description},
+		#{expire},
+		#{username},
+		#{password},
+		#{authtype},
+		#{type},
+		#{qps},
+		#{needAudit}
+		)
+	</insert>
+	
+	<delete id="deleteAllApiComponent">
+		DELETE FROM `api_component`
+	</delete>
+
+</mapper>

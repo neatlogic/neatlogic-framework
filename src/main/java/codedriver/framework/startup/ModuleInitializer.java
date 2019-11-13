@@ -31,7 +31,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 	private static Connection dbConnection;
 	private static Driver driver;
 	private static String driverName;
-	private final static String getModuleSql = "SELECT `name`, `description`, `url_mapping`, `config_path`, `is_active`, `version`, `startup` FROM `module`";
+	private final static String getModuleSql = "SELECT `name`, `description`, `url_mapping`, `config_path`, `is_active`, `version` FROM `module`";
 	private final static String updateModuleSql = "UPDATE `module` SET `status` = ?,`error` = ? WHERE `name` = ?";
 
 	static {
@@ -112,7 +112,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				module.put("url_mapping", rs.getString("url_mapping"));
 				module.put("is_active", rs.getInt("is_active"));
 				module.put("config_path", rs.getString("config_path"));
-				module.put("startup", rs.getInt("startup"));
 				moduleList.add(module);
 			}
 			rs.close();
@@ -138,7 +137,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					}
 
 					ServletRegistration.Dynamic sr = context.addServlet(module.get("name").toString(), new DispatcherServlet(appContext));
-					sr.setLoadOnStartup(Integer.parseInt(module.get("startup").toString()));
 					String urlmapping = module.get("url_mapping").toString();
 					if (urlmapping.indexOf(",") > -1) {
 						String[] urls = urlmapping.split(",");

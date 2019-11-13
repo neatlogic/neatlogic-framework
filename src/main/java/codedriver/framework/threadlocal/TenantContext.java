@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class TenantContext implements Serializable {
 	private static ThreadLocal<TenantContext> instance = new ThreadLocal<TenantContext>();
 	private String tenantUuid;
+	private Boolean useDefaultDatasource = false;
 
 	public static TenantContext init() {
 		TenantContext context = new TenantContext();
@@ -27,7 +28,11 @@ public class TenantContext implements Serializable {
 	}
 
 	public String getTenantUuid() {
-		return tenantUuid;
+		if (useDefaultDatasource) {
+			return null;
+		} else {
+			return tenantUuid;
+		}
 	}
 
 	public void setTenantUuid(String tenantUuid) {
@@ -40,5 +45,13 @@ public class TenantContext implements Serializable {
 
 	public void release() {
 		instance.remove();
+	}
+
+	public Boolean getUseDefaultDatasource() {
+		return useDefaultDatasource;
+	}
+
+	public void setUseDefaultDatasource(Boolean useDefaultDatasource) {
+		this.useDefaultDatasource = useDefaultDatasource;
 	}
 }

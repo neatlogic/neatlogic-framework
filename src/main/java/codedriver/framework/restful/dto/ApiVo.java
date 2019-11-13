@@ -7,7 +7,7 @@ import java.util.List;
 
 import codedriver.framework.common.dto.BasePageVo;
 
-public class RestInterfaceVo extends BasePageVo {
+public class ApiVo extends BasePageVo {
 
 	public enum Type {
 		OBJECT("object", "对象模式"), STREAM("stream", "流模式");

@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.FileWorker;
 
-public class RestInterfaceAuditVo extends BasePageVo {
+public class ApiAuditVo extends BasePageVo {
 	private Long id;
 	private Integer interfaceId;
 	private String ip;
@@ -25,7 +25,7 @@ public class RestInterfaceAuditVo extends BasePageVo {
 	private String errorPath;
 	private String resultPath;
 
-	public RestInterfaceAuditVo() {
+	public ApiAuditVo() {
 		this.setPageSize(20);
 	}
 

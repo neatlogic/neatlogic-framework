@@ -211,7 +211,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		//执行状态为-2的还原为1，并重新加入到任务计划中;-3的还原为0(最后没有加载的模块或者类下的job的状态可能为-3，-2)
 		for (JobVo job : jobList) {
 			if (job.getStatus().equals(-2)) {
-				JobObject jobObject = job.buildJobObject();
+				JobObject jobObject = JobObject.buildJobObject(job);
 				loadJob(jobObject);
 				job.setStatus(1);
 			} else if (job.getStatus().equals(-3)) {

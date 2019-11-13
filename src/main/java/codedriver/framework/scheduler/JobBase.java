@@ -149,7 +149,7 @@ public abstract class JobBase implements IJob {
                 jobBaseMap.get(jobClassName).executeInternal(context);
             }
         } else {
-            JobObject jobObject = jobVo.buildJobObject();
+            JobObject jobObject = JobObject.buildJobObject(jobVo);
             scheduleManager.deleteJob(jobObject);
         }
     }

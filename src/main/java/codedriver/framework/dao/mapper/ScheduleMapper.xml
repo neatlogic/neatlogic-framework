@@ -167,9 +167,14 @@
 	<select id="getJobByClassId" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
+		,
+		d.prop_name AS propName,
+		d.prop_value AS propValue,
+		d.id AS propId
 		FROM schedule_job a
 		JOIN schedule_job_class b ON a.class_id = b.id
 		JOIN module c ON b.module_name = c.name
+		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
 		WHERE a.is_active = 1
 		AND a.class_id = #{classId}
 		AND a.server_id = #{serverId}

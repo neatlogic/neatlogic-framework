@@ -251,17 +251,4 @@ public class JobVo extends BasePageVo {
 	public void setSort(String sort) {
 		this.sort = sort;
 	}
-	
-	public JobObject buildJobObject() {
-		JobObject jobObject = new JobObject();
-		jobObject.setJobId(id);
-		jobObject.setJobGroup("FRAMEWORK");
-		jobObject.setCron(cron);
-		jobObject.setEndTime(endTime);
-		jobObject.setStartTime(beginTime);
-		jobObject.setInterval(interval);
-		jobObject.setRepeat(repeat);
-		jobObject.setJobClassName(jobClass.getClassPath());
-		return jobObject;
-	}
 }

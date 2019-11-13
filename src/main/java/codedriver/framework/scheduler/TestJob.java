@@ -2,6 +2,8 @@ package codedriver.framework.scheduler;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -24,6 +26,13 @@ public class TestJob extends JobBase {//  implements IJob
 		@Param(name="p_5", dataType="String", controlValue="v5", description="p5", required=true)})
 	@Override
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		JobDetail jobDetail = context.getJobDetail();
+		JobDataMap jobDataMap = jobDetail.getJobDataMap();
+		System.out.println(jobDataMap.getString("p_1"));
+		System.out.println(jobDataMap.getString("p_2"));
+		System.out.println(jobDataMap.getString("p_3"));
+		System.out.println(jobDataMap.getString("p_4"));
+		System.out.println(jobDataMap.getString("p_5"));
 		System.out.println("一分钟执行一次");
 		logger.info("一分钟执行一次");
 	}

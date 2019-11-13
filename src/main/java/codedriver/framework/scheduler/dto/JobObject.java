@@ -1,6 +1,7 @@
 package codedriver.framework.scheduler.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import org.quartz.JobDataMap;
 
@@ -107,5 +108,26 @@ public class JobObject {
 
 	public void setServerId(Integer serverId) {
 		this.serverId = serverId;
+	}
+	
+	public static JobObject buildJobObject(JobVo jobVo) {
+		JobObject jobObject = new JobObject();
+		jobObject.setJobId(jobVo.getId());
+		jobObject.setJobGroup("FRAMEWORK");
+		jobObject.setCron(jobVo.getCron());
+		jobObject.setEndTime(jobVo.getEndTime());
+		jobObject.setStartTime(jobVo.getBeginTime());
+		jobObject.setInterval(jobVo.getInterval());
+		jobObject.setRepeat(jobVo.getRepeat());
+		jobObject.setJobClassName(jobVo.getJobClass().getClassPath());
+		List<JobPropVo> propList = jobVo.getPropList();
+		if(propList != null && propList.size() > 0) {
+			JobDataMap jobDataMap = new JobDataMap();
+			for(JobPropVo prop : propList) {
+				jobDataMap.put(prop.getName(), prop.getValue());
+			}
+			jobObject.setJobDataMap(jobDataMap);
+		}
+		return jobObject;
 	}
 }

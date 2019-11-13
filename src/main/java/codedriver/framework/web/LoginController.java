@@ -39,19 +39,25 @@ public class LoginController {
 	private TenantService tenantService;
 
 	@RequestMapping(value = "/check")
-	public void dispatcherForPost(@RequestBody JSONObject jsonObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void dispatcherForPost(@RequestBody String json, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JSONObject returnObj = new JSONObject();
+		JSONObject jsonObj = JSONObject.parseObject(json);
 		TenantContext tenantContext = TenantContext.init();
+
 		try {
 			String userId = jsonObj.getString("userid");
 			String password = jsonObj.getString("password");
 			String tenant = jsonObj.getString("tenant");
 			if (StringUtils.isNotBlank(tenant)) {
+				// 使用master库
+				tenantContext.setUseDefaultDatasource(true);
 				TenantVo tenantVo = tenantService.getTenantByUuid(tenant);
 				if (tenantVo == null) {
 					throw new RuntimeException("找不到租户：" + tenant);
 				}
 				tenantContext.setTenantUuid(tenant);
+				// 还原回租户库
+				tenantContext.setUseDefaultDatasource(false);
 			}
 
 			UserVo userVo = new UserVo();
@@ -88,8 +94,8 @@ public class LoginController {
 				byte[] rawHmac = mac.doFinal((jwthead + "." + jwtbody).getBytes());
 				String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
 
-				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer " + jwthead + "." + jwtbody + "." + jwtsign);
-				Cookie tenantCookie = new Cookie("codedriver_tenant", "tenant");
+				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
+				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
 			} else {

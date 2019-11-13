@@ -14,11 +14,11 @@
 
 	<select id="getUserByUserIdAndPassword" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap">
 		SELECT
-		`user_id` AS userId,
-		`user_name` AS userName,
-		`email`,
-		`password`,
-		`is_active` AS isActive,
+		a.`user_id` AS userId,
+		a.`user_name` AS userName,
+		a.`email`,
+		a.`password`,
+		a.`is_active` AS isActive,
 		b.`role_name` AS roleName
 		FROM
 		`user` a LEFT JOIN user_role b ON a.`user_id` = b.`user_id`

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Example;
@@ -21,7 +22,6 @@ import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
-import codedriver.framework.threadlocal.UserContext;
 
 public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());

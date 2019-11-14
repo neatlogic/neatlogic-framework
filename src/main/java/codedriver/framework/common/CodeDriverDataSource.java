@@ -2,7 +2,7 @@ package codedriver.framework.common;
 
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
-import codedriver.framework.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class CodeDriverDataSource extends AbstractRoutingDataSource {
 	@Override

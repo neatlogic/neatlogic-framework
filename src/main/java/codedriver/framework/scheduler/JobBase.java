@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -82,9 +81,6 @@ public abstract class JobBase implements IJob {
         JobDetail jobDetail = context.getJobDetail();
         JobKey jobKey = jobDetail.getKey();
         String tenantUuid = jobKey.getGroup();
-//		JobDataMap jobDataMap = jobDetail.getJobDataMap();
-//		String tenantUuid = jobDataMap.getString("tenantUuid");
-		System.out.println(JobBase.class.getName() + ":" + tenantUuid);
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		tenantContext.setUseDefaultDatasource(false);
         Long jobId = Long.parseLong(context.getJobDetail().getKey().getName());
@@ -237,15 +233,6 @@ public abstract class JobBase implements IJob {
             		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
             	}           	
             }
-//            boolean isInt = dataType.equals("int")||dataType.equals("Integer");
-//            boolean isLong = dataType.equals("long")||dataType.equals("Long");
-//            if (isInt||isLong){
-//                try{
-//                	String testStr = new BigDecimal(jobProp.getValue()).toString();
-//                }catch (Exception e){
-//                    return false;
-//                }
-//            }
             paramMap.remove(jobProp.getName(), param);
         }
         // 检查是否有必传参数没传

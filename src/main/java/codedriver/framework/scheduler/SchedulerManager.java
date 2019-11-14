@@ -28,14 +28,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
-import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
-import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
@@ -61,8 +60,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	
 	@PostConstruct
 	public final void init() {
-		//将任务状态为1改为-2,0改为-3
-//		scheduleMapper.resetJobStatusNotStart(Config.SCHEDULE_SERVER_ID);
 		datasourceList = datasourceMapper.getAllDatasource();
 	}
 
@@ -75,7 +72,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
 			return;
 		}
-		Scheduler scheduler = schedulerFactoryBean.getScheduler();
+		if(jobObject.getCron() == null && jobObject.getRepeat() != null && jobObject.getRepeat() < 1) {
+			return;
+		}
 		JobVo jobVo = scheduleMapper.getJobById(jobObject.getJobId());
 		IJob job = iJobMap.get(jobObject.getJobClassName());
 		try {
@@ -84,6 +83,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					return;
 				}
 			}
+			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			if (scheduler.getJobDetail(new JobKey(jobObject.getJobId().toString(), jobObject.getJobGroup())) != null) {
 				scheduler.deleteJob(new JobKey(jobObject.getJobId().toString(), jobObject.getJobGroup()));
 			}
@@ -96,7 +96,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				if (jobObject.getInterval() != null && jobObject.getInterval() > 0) {						
 					ssb = ssb.withIntervalInSeconds(jobObject.getInterval());//默认												
 				}
-				if (jobObject.getRepeat() != null && jobObject.getRepeat() > 1) { 
+				if (jobObject.getRepeat() != null && jobObject.getRepeat() > 0) { 
 					ssb = ssb.withRepeatCount(jobObject.getRepeat() - 1); 
 				} else {
 					ssb = ssb.repeatForever();
@@ -188,61 +188,52 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		JobClassVo jobClassVo = null;
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
-			IJob jobClass = entry.getValue();				
+			IJob jobClass = entry.getValue();
 			if (jobClass.getJobClassId() == null) {
 				continue;
 			}
-			try {
-				iJobMap.put(jobClass.getClassName(), jobClass);
-				int id = jobClass.getJobClassId();
-				String name = jobClass.getJobClassName();
-				String classPath = jobClass.getClassName();
-				
-				jobClassVo = new JobClassVo();
-				jobClassVo.setId(id);
-				jobClassVo.setName(name);
-				jobClassVo.setClassPath(classPath);
-				jobClassVo.setModuleName(moduleName);
+			iJobMap.put(jobClass.getClassName(), jobClass);
+			
+			jobClassVo = new JobClassVo();
+			jobClassVo.setId(jobClass.getJobClassId());
+			jobClassVo.setName(jobClass.getJobClassName());
+			jobClassVo.setClassPath(jobClass.getClassName());
+			jobClassVo.setModuleName(moduleName);
 
-				if ((scheduleMapper.getJobClassVoCount(jobClassVo)) > 0) {
-					scheduleMapper.updateJobClass(jobClassVo);
-				} else {
-					jobClassVo.setType(0);
-					scheduleMapper.insertJobClass(jobClassVo);
-				}
-				for(DatasourceVo datasourceVo : datasourceList) {
-					System.out.println(SchedulerManager.class.getName()+":"+datasourceVo.getTenantUuid());
-					tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
-					tenantContext.setUseDefaultDatasource(false);
-					List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClass.getJobClassId(), Config.SCHEDULE_SERVER_ID);
-					System.out.println(jobList.size());
-					if (jobList != null && jobList.size() > 0) {
-						loadJob(jobList, jobClassVo);
-					}
-				}
-				
-			} catch (ClassNotFoundException | SchedulerException e) {
-				logger.error(e.getMessage(), e);
+			if ((scheduleMapper.getJobClassVoCount(jobClassVo)) > 0) {
+				scheduleMapper.updateJobClass(jobClassVo);
+			} else {
+				jobClassVo.setType(0);
+				scheduleMapper.insertJobClass(jobClassVo);
 			}
+			for(DatasourceVo datasourceVo : datasourceList) {
+				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo));
+			}		
 		}
 	}
 
-	protected void loadJob(List<JobVo> jobList, JobClassVo jobClassVo) throws SchedulerException, ClassNotFoundException {		
-		//执行状态为-2的还原为1，并重新加入到任务计划中;-3的还原为0(最后没有加载的模块或者类下的job的状态可能为-3，-2)
+	protected void loadJob(String tenantUuid, JobClassVo jobClassVo) {
+		TenantContext tenantContext = TenantContext.init(tenantUuid);
+		tenantContext.setUseDefaultDatasource(false);
+		List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClassVo.getId(), Config.SCHEDULE_SERVER_ID);
 		for (JobVo job : jobList) {
-//			if (job.getStatus().equals(-2)) {
-//				job.setJobClass(jobClassVo);
-//				JobObject jobObject = JobObject.buildJobObject(job);
-//				loadJob(jobObject);
-//				job.setStatus(1);
-//			} else if (job.getStatus().equals(-3)) {
-//				job.setStatus(0);				
-//			}
-//			scheduleMapper.updateJobStatus(job);
 			job.setJobClass(jobClassVo);
 			JobObject jobObject = JobObject.buildJobObject(job);
 			loadJob(jobObject);
 		}
 	}
 
+	class ScheduleLoadJobRunner implements Runnable {
+
+		private String tenantUuid;
+		private JobClassVo jobClassVo;
+		public ScheduleLoadJobRunner(String _tenantUuid,JobClassVo _jobClassVo) {
+			tenantUuid = _tenantUuid;
+			jobClassVo = _jobClassVo;
+		}
+		@Override
+		public void run() {
+			loadJob(tenantUuid, jobClassVo);			
+		}		
+	}
 }

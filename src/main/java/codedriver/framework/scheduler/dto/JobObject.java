@@ -120,7 +120,7 @@ public class JobObject {
 		jobObject.setEndTime(jobVo.getEndTime());
 		jobObject.setStartTime(jobVo.getBeginTime());
 		jobObject.setInterval(jobVo.getInterval());
-		jobObject.setRepeat(jobVo.getRepeat());
+		jobObject.setRepeat(jobVo.getRepeat() == null ? null : (jobVo.getRepeat() - jobVo.getExecCount()));
 		jobObject.setJobClassName(jobVo.getJobClass().getClassPath());
 		JobDataMap jobDataMap = new JobDataMap();
 		List<JobPropVo> propList = jobVo.getPropList();
@@ -129,8 +129,6 @@ public class JobObject {
 				jobDataMap.put(prop.getName(), prop.getValue());
 			}		
 		}
-//		System.out.println(TenantContext.get().getTenantUuid());
-//		jobDataMap.put("tenantUuid",TenantContext.get().getTenantUuid());
 		jobObject.setJobDataMap(jobDataMap);
 		return jobObject;
 	}

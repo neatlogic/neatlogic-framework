@@ -73,7 +73,7 @@
 		d.id AS propId
 		FROM schedule_job a
 		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
-		WHERE a.is_active = 1
+		WHERE a.is_active = 1 AND a.status = 1
 		AND a.class_id = #{classId}
 		AND a.server_id = #{serverId}
 	</select>

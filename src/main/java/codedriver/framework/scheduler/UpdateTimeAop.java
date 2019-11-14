@@ -25,7 +25,6 @@ public class UpdateTimeAop {
     }
 	
 	private void updateJobTime(JobExecutionContext jobContext) {
-		System.out.println(UpdateTimeAop.class.getName() + ":"+TenantContext.get().getTenantUuid());
 		JobVo schedule = new JobVo();
 		schedule.setLastFinishTime(new Date());
 		schedule.setLastFireTime(jobContext.getFireTime());

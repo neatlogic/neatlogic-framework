@@ -17,7 +17,7 @@ public class Config {
 	
 	private static final String CONFIG_FILE = "config.properties";
 	public static final String SEPARATOR = System.getProperty("file.separator");
-
+    public static final String TENANT_UUID = "tenantUuid";
 	public static String JWT_SECRET = "techsure#codedriver$secret";
 
 	public static String REST_AUDIT_PATH;
@@ -42,7 +42,7 @@ public class Config {
 		}
 		try {
 			String scheduleAuditPath = getProperty(CONFIG_FILE, "schedule.audit.path");
-			SCHEDULE_AUDIT_PATH = TECHSURE_HOME + File.separator + (scheduleAuditPath.endsWith(SEPARATOR) ? scheduleAuditPath : scheduleAuditPath + SEPARATOR);
+			SCHEDULE_AUDIT_PATH = TECHSURE_HOME + File.separator + TENANT_UUID + File.separator  + (scheduleAuditPath.endsWith(SEPARATOR) ? scheduleAuditPath : scheduleAuditPath + SEPARATOR);
 		} catch (Exception ex) {
 			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.audit.path变量");
 			throw ex;

@@ -1,5 +1,6 @@
 package codedriver.framework.scheduler;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,11 +27,16 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
-import codedriver.framework.dao.mapper.ScheduleMapper;
+import codedriver.framework.dao.mapper.TenantMapper;
+import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.dto.TenantVo;
+import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
@@ -48,10 +54,16 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	@Autowired
 	private ModuleMapper moduleMapper;
 
+	@Autowired
+	private DatasourceMapper datasourceMapper;
+	
+	private List<DatasourceVo> datasourceList = new ArrayList<>();
+	
 	@PostConstruct
 	public final void init() {
 		//将任务状态为1改为-2,0改为-3
-		scheduleMapper.resetJobStatusNotStart(Config.SCHEDULE_SERVER_ID);
+//		scheduleMapper.resetJobStatusNotStart(Config.SCHEDULE_SERVER_ID);
+		datasourceList = datasourceMapper.getAllDatasource();
 	}
 
 	public static IJob getInstance(String jobClassName){
@@ -159,6 +171,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
+		TenantContext tenantContext = TenantContext.init();
+		tenantContext.setUseDefaultDatasource(true);
 		ApplicationContext context = event.getApplicationContext();
 		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
 		String moduleName = null;
@@ -196,28 +210,38 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					jobClassVo.setType(0);
 					scheduleMapper.insertJobClass(jobClassVo);
 				}
-
-				List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClass.getJobClassId(), Config.SCHEDULE_SERVER_ID);
-				if (jobList != null && jobList.size() > 0) {
-					loadJob(jobList);
+				for(DatasourceVo datasourceVo : datasourceList) {
+					System.out.println(SchedulerManager.class.getName()+":"+datasourceVo.getTenantUuid());
+					tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
+					tenantContext.setUseDefaultDatasource(false);
+					List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClass.getJobClassId(), Config.SCHEDULE_SERVER_ID);
+					System.out.println(jobList.size());
+					if (jobList != null && jobList.size() > 0) {
+						loadJob(jobList, jobClassVo);
+					}
 				}
+				
 			} catch (ClassNotFoundException | SchedulerException e) {
 				logger.error(e.getMessage(), e);
 			}
 		}
 	}
 
-	protected void loadJob(List<JobVo> jobList) throws SchedulerException, ClassNotFoundException {		
+	protected void loadJob(List<JobVo> jobList, JobClassVo jobClassVo) throws SchedulerException, ClassNotFoundException {		
 		//执行状态为-2的还原为1，并重新加入到任务计划中;-3的还原为0(最后没有加载的模块或者类下的job的状态可能为-3，-2)
 		for (JobVo job : jobList) {
-			if (job.getStatus().equals(-2)) {
-				JobObject jobObject = JobObject.buildJobObject(job);
-				loadJob(jobObject);
-				job.setStatus(1);
-			} else if (job.getStatus().equals(-3)) {
-				job.setStatus(0);				
-			}
-			scheduleMapper.updateJobStatus(job);
+//			if (job.getStatus().equals(-2)) {
+//				job.setJobClass(jobClassVo);
+//				JobObject jobObject = JobObject.buildJobObject(job);
+//				loadJob(jobObject);
+//				job.setStatus(1);
+//			} else if (job.getStatus().equals(-3)) {
+//				job.setStatus(0);				
+//			}
+//			scheduleMapper.updateJobStatus(job);
+			job.setJobClass(jobClassVo);
+			JobObject jobObject = JobObject.buildJobObject(job);
+			loadJob(jobObject);
 		}
 	}
 

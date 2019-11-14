@@ -15,18 +15,22 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.dao.mapper.ScheduleJobAuditMapper;
-import codedriver.framework.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
+import codedriver.framework.scheduler.dao.mapper.ScheduleJobAuditMapper;
+import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
@@ -75,6 +79,14 @@ public abstract class JobBase implements IJob {
         if (!jobBaseMap.containsKey(jobClassName)) {
             return;
         }
+        JobDetail jobDetail = context.getJobDetail();
+        JobKey jobKey = jobDetail.getKey();
+        String tenantUuid = jobKey.getGroup();
+//		JobDataMap jobDataMap = jobDetail.getJobDataMap();
+//		String tenantUuid = jobDataMap.getString("tenantUuid");
+		System.out.println(JobBase.class.getName() + ":" + tenantUuid);
+		TenantContext tenantContext = TenantContext.init(tenantUuid);
+		tenantContext.setUseDefaultDatasource(false);
         Long jobId = Long.parseLong(context.getJobDetail().getKey().getName());
         JobVo jobVo = scheduleMapper.getJobById(jobId);         
         if (jobVo.getServerId() == Config.SCHEDULE_SERVER_ID) {
@@ -181,6 +193,7 @@ public abstract class JobBase implements IJob {
     private String getFilePath() {
         Calendar calendar = Calendar.getInstance();
         String path = Config.SCHEDULE_AUDIT_PATH + File.separator + calendar.get(Calendar.YEAR) + File.separator + (calendar.get(Calendar.MONTH) +1)+ File.separator + calendar.get(Calendar.DAY_OF_MONTH) + File.separator;
+        path = path.replace(Config.TENANT_UUID,TenantContext.get().getTenantUuid());
         return path;
     }
 

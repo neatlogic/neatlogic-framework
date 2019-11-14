@@ -13,9 +13,9 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dto.JobPropVo;
 
-@Transactional
-public interface IJob extends Job{
 
+public interface IJob extends Job{
+	@Transactional
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
 	
 	/**

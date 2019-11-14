@@ -6,10 +6,12 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 
@@ -27,7 +29,10 @@ public class TestJob extends JobBase {//  implements IJob
 	@Override
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		JobDetail jobDetail = context.getJobDetail();
-		JobDataMap jobDataMap = jobDetail.getJobDataMap();
+		JobKey jobKey = jobDetail.getKey();
+		System.out.println(jobKey.getGroup());
+		System.out.println(TenantContext.get().getTenantUuid());
+		JobDataMap jobDataMap = jobDetail.getJobDataMap();		
 		System.out.println(jobDataMap.getString("p_1"));
 		System.out.println(jobDataMap.getString("p_2"));
 		System.out.println(jobDataMap.getString("p_3"));

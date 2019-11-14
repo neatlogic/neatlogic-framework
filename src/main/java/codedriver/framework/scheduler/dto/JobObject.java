@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.quartz.JobDataMap;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+
 public class JobObject {
 	private Long jobId;
 	private String jobGroup;
@@ -113,21 +115,23 @@ public class JobObject {
 	public static JobObject buildJobObject(JobVo jobVo) {
 		JobObject jobObject = new JobObject();
 		jobObject.setJobId(jobVo.getId());
-		jobObject.setJobGroup("FRAMEWORK");
+		jobObject.setJobGroup(TenantContext.get().getTenantUuid());
 		jobObject.setCron(jobVo.getCron());
 		jobObject.setEndTime(jobVo.getEndTime());
 		jobObject.setStartTime(jobVo.getBeginTime());
 		jobObject.setInterval(jobVo.getInterval());
 		jobObject.setRepeat(jobVo.getRepeat());
 		jobObject.setJobClassName(jobVo.getJobClass().getClassPath());
+		JobDataMap jobDataMap = new JobDataMap();
 		List<JobPropVo> propList = jobVo.getPropList();
-		if(propList != null && propList.size() > 0) {
-			JobDataMap jobDataMap = new JobDataMap();
+		if(propList != null && propList.size() > 0) {		
 			for(JobPropVo prop : propList) {
 				jobDataMap.put(prop.getName(), prop.getValue());
-			}
-			jobObject.setJobDataMap(jobDataMap);
+			}		
 		}
+//		System.out.println(TenantContext.get().getTenantUuid());
+//		jobDataMap.put("tenantUuid",TenantContext.get().getTenantUuid());
+		jobObject.setJobDataMap(jobDataMap);
 		return jobObject;
 	}
 }

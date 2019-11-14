@@ -8,8 +8,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.dao.mapper.ScheduleMapper;
+import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.dto.JobVo;
 
 @RootComponent
@@ -24,6 +25,7 @@ public class UpdateTimeAop {
     }
 	
 	private void updateJobTime(JobExecutionContext jobContext) {
+		System.out.println(UpdateTimeAop.class.getName() + ":"+TenantContext.get().getTenantUuid());
 		JobVo schedule = new JobVo();
 		schedule.setLastFinishTime(new Date());
 		schedule.setLastFireTime(jobContext.getFireTime());

@@ -207,7 +207,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			}
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, null));
-			}		
+			}	
 		}
 	}
 

@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.common.util.FileWorker;
+import codedriver.framework.common.util.FileUtil;
 
 public class ApiAuditVo extends BasePageVo {
 	private Long id;
@@ -59,12 +59,12 @@ public class ApiAuditVo extends BasePageVo {
 				if (this.paramPath.contains("||")) {
 					String[] pathArray = this.paramPath.split("\\|\\|");
 					if (pathArray.length == 2) {
-						param = FileWorker.readZipContent(pathArray[0], pathArray[1]);
+						param = FileUtil.readZipContent(pathArray[0], pathArray[1]);
 					} else {
 						param = "压缩文件路径不完整";
 					}
 				} else {
-					param = FileWorker.readContent(this.paramPath);
+					param = FileUtil.readContent(this.paramPath);
 					;
 				}
 
@@ -123,12 +123,12 @@ public class ApiAuditVo extends BasePageVo {
 				if (this.errorPath.contains("||")) {
 					String[] pathArray = this.errorPath.split("\\|\\|");
 					if (pathArray.length == 2) {
-						error = FileWorker.readZipContent(pathArray[0], pathArray[1]);
+						error = FileUtil.readZipContent(pathArray[0], pathArray[1]);
 					} else {
 						error = "压缩文件路径不完整";
 					}
 				} else {
-					error = FileWorker.readContent(this.errorPath);
+					error = FileUtil.readContent(this.errorPath);
 					;
 				}
 			}
@@ -206,12 +206,12 @@ public class ApiAuditVo extends BasePageVo {
 				if (this.resultPath.contains("||")) {
 					String[] pathArray = this.resultPath.split("\\|\\|");
 					if (pathArray.length == 2) {
-						result = FileWorker.readZipContent(pathArray[0], pathArray[1]);
+						result = FileUtil.readZipContent(pathArray[0], pathArray[1]);
 					} else {
 						result = "压缩文件路径不完整";
 					}
 				} else {
-					result = FileWorker.readContent(this.resultPath);
+					result = FileUtil.readContent(this.resultPath);
 					;
 				}
 

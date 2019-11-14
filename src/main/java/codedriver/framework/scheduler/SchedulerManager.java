@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
@@ -171,8 +172,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		TenantContext tenantContext = TenantContext.init();
-		tenantContext.setUseDefaultDatasource(true);
 		ApplicationContext context = event.getApplicationContext();
 		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
 		String moduleName = null;
@@ -207,14 +206,17 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				scheduleMapper.insertJobClass(jobClassVo);
 			}
 			for(DatasourceVo datasourceVo : datasourceList) {
-				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo));
+				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, null));
 			}		
 		}
 	}
 
-	protected void loadJob(String tenantUuid, JobClassVo jobClassVo) {
+	protected void loadJob(String tenantUuid, JobClassVo jobClassVo, Integer oldScheduleServerId) {
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		tenantContext.setUseDefaultDatasource(false);
+		if(oldScheduleServerId != null) {
+			scheduleMapper.updateServerId(Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
+		}
 		List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClassVo.getId(), Config.SCHEDULE_SERVER_ID);
 		for (JobVo job : jobList) {
 			job.setJobClass(jobClassVo);
@@ -223,17 +225,38 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 
+	/**
+	 * 
+	* @Description: TODO 接管其他服务器的job
+	* @param @param oldScheduleServerId 旧服务器id
+	* @return void
+	 */
+	protected void loadJob(Integer oldScheduleServerId) {
+		JobClassVo jobClassVo = null;
+		for(Entry<String, IJob> entry : iJobMap.entrySet()) {
+			IJob jobClass = entry.getValue();
+			jobClassVo = new JobClassVo();
+			jobClassVo.setId(jobClass.getJobClassId());
+			jobClassVo.setName(jobClass.getJobClassName());
+			jobClassVo.setClassPath(jobClass.getClassName());
+			for(DatasourceVo datasourceVo : datasourceList) {
+				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, oldScheduleServerId));
+			}
+		}
+	}
 	class ScheduleLoadJobRunner implements Runnable {
 
+		private Integer oldScheduleServerId;
 		private String tenantUuid;
 		private JobClassVo jobClassVo;
-		public ScheduleLoadJobRunner(String _tenantUuid,JobClassVo _jobClassVo) {
+		public ScheduleLoadJobRunner(String _tenantUuid,JobClassVo _jobClassVo, Integer _oldScheduleServerId) {
 			tenantUuid = _tenantUuid;
 			jobClassVo = _jobClassVo;
+			oldScheduleServerId = _oldScheduleServerId;
 		}
 		@Override
 		public void run() {
-			loadJob(tenantUuid, jobClassVo);			
+			loadJob(tenantUuid, jobClassVo, oldScheduleServerId);			
 		}		
 	}
 }

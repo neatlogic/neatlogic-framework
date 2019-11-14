@@ -1,7 +1,5 @@
 package codedriver.framework.scheduler.dao.mapper;
 
-import java.util.List;
-
 import codedriver.framework.scheduler.dto.ScheduleJobAuditVo;
 
 public interface ScheduleJobAuditMapper {

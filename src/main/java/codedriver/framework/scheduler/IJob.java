@@ -8,8 +8,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dto.JobPropVo;
 

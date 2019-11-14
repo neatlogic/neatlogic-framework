@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.scheduler.dto.JobClassVo;
-import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
 public interface ScheduleMapper {
@@ -18,8 +17,9 @@ public interface ScheduleMapper {
 	public int updateJobStatus(JobVo jobVo);
 	public int updateJobClass(JobClassVo jobClass);
 	public int updateScheduleJobTimeById(JobVo scheduleJobVo);
-	public int resetJobStatusNotStart(Integer serverId);
+	public int updateServerId(@Param("newServerId") Integer newServerId, @Param("oldServerId") Integer oldServerId);
 	
 	//INSERT
 	public int insertJobClass(JobClassVo jobClass);
+	
 }

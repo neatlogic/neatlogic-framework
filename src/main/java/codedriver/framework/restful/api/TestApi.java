@@ -29,7 +29,7 @@ public class TestApi extends ApiComponentBase {
 
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
-		return "OK1";
+		return "OK";
 	}
 
 }

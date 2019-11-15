@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="codedriver.framework.dao.mapper.LabelMapper">
-
-	<select id="getRoleNameListByLabel" parameterType="java.lang.String" resultType="java.lang.String">
-		SELECT DISTINCT role_name FROM label_role WHERE label = #{value}
-	</select>
-	
-</mapper>

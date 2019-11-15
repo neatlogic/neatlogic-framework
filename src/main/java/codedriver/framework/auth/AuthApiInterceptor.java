@@ -2,14 +2,12 @@ package codedriver.framework.auth;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.support.AopUtils;
 
-import com.alibaba.druid.util.StringUtils;
-
 import codedriver.framework.common.AuthAction;
-import codedriver.framework.common.ReturnJson;
-import codedriver.framework.exception.ApiNotFoundExceptionMessage;
 import codedriver.framework.exception.ApiRuntimeException;
+import codedriver.framework.exception.AuthActionExceptionMessage;
 
 
 
@@ -22,7 +20,6 @@ public class AuthApiInterceptor implements MethodInterceptor {
         Boolean isAuth = false;
         if(null != targetClass) {
         	AuthAction action = targetClass.getAnnotation(AuthAction.class);
-        	
         	if(null != action && !StringUtils.isEmpty(action.name())) {
         		String actionName = action.name();
         		//判断用户角色是否拥有接口权限
@@ -32,7 +29,7 @@ public class AuthApiInterceptor implements MethodInterceptor {
         	}
         }
         if(!isAuth) {
-			throw new ApiRuntimeException(new ApiNotFoundExceptionMessage("123"));
+			throw new ApiRuntimeException(new AuthActionExceptionMessage());
 		}
         //执行具体业务逻辑
         return invocation.proceed();

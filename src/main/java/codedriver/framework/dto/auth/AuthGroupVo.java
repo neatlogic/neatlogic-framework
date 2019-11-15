@@ -2,26 +2,25 @@ package codedriver.framework.dto.auth;
 
 import java.util.List;
 
-import codedriver.framework.dto.PageVo;
+import codedriver.framework.common.dto.BasePageVo;
 
-public class LabelVo extends PageVo{
-	private String label;
+public class AuthGroupVo extends BasePageVo{
+	private String name;
 	private String desc;
-	private String labelIntro;
-	private Integer labelIsActive = 1;
+	private String intro;
+	private Integer isActive = 1;
 	private String moduleName;
 	private String roleName;
 	private String apiComponentId;
-	private Integer urlIsActive = 1;
 	
 	private List<String> roleList;
 
-	public String getLabel() {
-		return label;
+	public String getName() {
+		return name;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDesc() {
@@ -32,20 +31,20 @@ public class LabelVo extends PageVo{
 		this.desc = desc;
 	}
 
-	public String getLabelIntro() {
-		return labelIntro;
+	public String getIntro() {
+		return intro;
 	}
 
-	public void setLabelIntro(String labelIntro) {
-		this.labelIntro = labelIntro;
+	public void setIntro(String intro) {
+		this.intro = intro;
 	}
 
-	public Integer getLabelIsActive() {
-		return labelIsActive;
+	public Integer getIsActive() {
+		return isActive;
 	}
 
-	public void setLabelIsActive(Integer labelIsActive) {
-		this.labelIsActive = labelIsActive;
+	public void setIsActive(Integer isActive) {
+		this.isActive = isActive;
 	}
 
 	public String getModuleName() {
@@ -72,14 +71,6 @@ public class LabelVo extends PageVo{
 		this.apiComponentId = apiComponentId;
 	}
 
-	public Integer getUrlIsActive() {
-		return urlIsActive;
-	}
-
-	public void setUrlIsActive(Integer urlIsActive) {
-		this.urlIsActive = urlIsActive;
-	}
-
 	public List<String> getRoleList() {
 		return roleList;
 	}
@@ -87,6 +78,6 @@ public class LabelVo extends PageVo{
 	public void setRoleList(List<String> roleList) {
 		this.roleList = roleList;
 	}
-	
+
 	
 }

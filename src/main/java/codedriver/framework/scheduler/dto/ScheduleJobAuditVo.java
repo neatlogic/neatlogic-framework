@@ -14,6 +14,11 @@ import java.io.IOException;
 public class ScheduleJobAuditVo extends BasePageVo {
     private static final Logger logger = LoggerFactory.getLogger(ScheduleJobAuditVo.class);
 
+    public final static String PROCESSING = "processing";
+    
+    public final static String SUCCESS = "success";
+    
+    public final static String ERROR = "error";
     private Long id;
 
     private Long jobId;
@@ -34,37 +39,7 @@ public class ScheduleJobAuditVo extends BasePageVo {
 
     private int isErrEmpty = 0;
 
-    private String state = JobAuditState.PROCEED.getName();
-
-
-    public enum JobAuditState{
-        PROCEED("proceed","进行中"),FINISH("finish","完成"),FAULT("fault","异常");
-        private String name;
-        private String value;
-
-        private JobAuditState(String _name,String _value){
-            this.name = _name;
-            this.value = _value;
-        }
-
-        public String getName(){
-            return name;
-        }
-
-        public String getValue(){
-            return value;
-        }
-
-        public static String getValue(String _name){
-            for(JobAuditState s:JobAuditState.values()){
-                if(s.getName().equals(_name)){
-                    return s.getValue();
-                }
-            }
-            return "";
-        }
-    }
-
+    private String state = PROCESSING;
 
     public ScheduleJobAuditVo() {
         this.setPageSize(20);

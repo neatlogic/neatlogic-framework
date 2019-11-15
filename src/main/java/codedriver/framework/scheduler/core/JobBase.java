@@ -78,13 +78,8 @@ public abstract class JobBase implements IJob {
                 scheduleJobAuditMapper.insertScheduleJobAudit(auditVo);
                 String path = getFilePath();
                 File logFile = new File(path + auditVo.getId() + ".log");
-                File errFile = new File(path + auditVo.getId() + ".err");
-
                 auditVo.setLogPath(logFile.getPath());
-                auditVo.setErrPath(errFile.getPath());
-
                 OutputStreamWriter logOut = null;
-                OutputStreamWriter errOut = null;
 
                 try {
                     if (!logFile.getParentFile().exists()) {
@@ -96,28 +91,17 @@ public abstract class JobBase implements IJob {
                     }
                     logOut = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
 
-                    if (!errFile.getParentFile().exists()) {
-                        errFile.getParentFile().mkdirs();
-                    }
-                    if (!errFile.exists()) {
-                        errFile.createNewFile();
-                    }
-                    errOut = new OutputStreamWriter(new FileOutputStream(errFile, true), "UTF-8");
-
                     if (logOut != null) {
                         context.put("logOutput", logOut);
                     }
 
-                    if (errOut != null) {
-                        context.put("errOutput", errOut);
-                    }
-                    job.executeInternal(context);
-                    auditVo.setState(ScheduleJobAuditVo.JobAuditState.FINISH.getName());
+                    job.executeInternal(context);                   
+                    auditVo.setState(ScheduleJobAuditVo.SUCCESS);                    
                 } catch (Exception ex) {
                     try {
-                        auditVo.setState(ScheduleJobAuditVo.JobAuditState.FAULT.getName());
+                        auditVo.setState(ScheduleJobAuditVo.ERROR);
                         logger.error(ex.getMessage(), ex);
-                        errOut.write(ExceptionUtils.getStackTrace(ex));
+                        logOut.write(ExceptionUtils.getStackTrace(ex));
                     } catch (IOException e) {
                         logger.error(e.getMessage(), e);
                     }
@@ -127,14 +111,6 @@ public abstract class JobBase implements IJob {
                         try {
                             logOut.flush();
                             logOut.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (errOut != null) {
-                        try {
-                            errOut.flush();
-                            errOut.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

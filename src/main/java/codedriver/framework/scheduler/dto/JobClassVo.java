@@ -9,7 +9,6 @@ public class JobClassVo extends BasePageVo {
 	public final static String ONCE_TYPE = "once";//只允许配一次
 	public final static String SYSTEM_TYPE = "system";//系统级别，服务器挂后，正在运行中的job将不会被转移到其他服务器
 	
-//	private Integer id;
 	private String type;	
 	private String name;
 	private String classpath;	
@@ -27,14 +26,6 @@ public class JobClassVo extends BasePageVo {
 	public void setType(String type) {
 		this.type = type;
 	}
-
-//	public Integer getId() {
-//		return id;
-//	}
-//
-//	public void setId(Integer id) {
-//		this.id = id;
-//	}
 
 	public String getModuleDesc() {
 		return moduleDesc;
@@ -72,7 +63,5 @@ public class JobClassVo extends BasePageVo {
 	public String toString() {
 		return "JobClassVo [type=" + type + ", name=" + name + ", classpath=" + classpath + ", moduleName=" + moduleName + ", moduleDesc=" + moduleDesc + "]";
 	}
-	
-	
 
 }

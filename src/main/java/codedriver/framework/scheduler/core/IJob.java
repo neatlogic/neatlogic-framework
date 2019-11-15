@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dto.JobPropVo;
 
-
+@Transactional
 public interface IJob extends Job{
-	@Transactional
+	
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
 	
 	/**
@@ -21,7 +21,7 @@ public interface IJob extends Job{
 	* @Time:2019年11月15日
 	* @Description: job类型(flow级别的，task级别的,， once只允许配一次，system级别的)
 	* @param @return 
-	* @return Integer
+	* @return String
 	 */
 	public abstract String getType();
 	/**

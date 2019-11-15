@@ -18,9 +18,6 @@
         <if test="logPath != null">
             , log_path = #{logPath}
         </if>
-        <if test="errPath != null">
-            , err_path = #{errPath}
-        </if>
         WHERE id = #{id}
     </update>
 </mapper>

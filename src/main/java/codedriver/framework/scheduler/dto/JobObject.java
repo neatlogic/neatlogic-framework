@@ -121,7 +121,7 @@ public class JobObject {
 		jobObject.setStartTime(jobVo.getBeginTime());
 		jobObject.setInterval(jobVo.getInterval());
 		jobObject.setRepeat(jobVo.getRepeat() == null ? null : (jobVo.getRepeat() - jobVo.getExecCount()));
-		jobObject.setJobClassName(jobVo.getJobClass().getClassPath());
+		jobObject.setJobClassName(jobVo.getJobClass().getClasspath());
 		JobDataMap jobDataMap = new JobDataMap();
 		List<JobPropVo> propList = jobVo.getPropList();
 		if(propList != null && propList.size() > 0) {		

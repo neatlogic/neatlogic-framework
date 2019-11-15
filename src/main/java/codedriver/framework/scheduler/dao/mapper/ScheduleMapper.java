@@ -11,10 +11,9 @@ public interface ScheduleMapper {
 	//SELECT
 	public JobVo getJobById(Long jobId);
 	public int getJobClassVoCount(JobClassVo jobClass);
-	public List<JobVo> getJobByClassId(@Param("classId")Integer classId, @Param("serverId")Integer serverId);
+	public List<JobVo> getJobByClasspath(@Param("classpath")String classpath, @Param("serverId")Integer serverId);
 
 	//UPDATE
-	public int updateJobStatus(JobVo jobVo);
 	public int updateJobClass(JobClassVo jobClass);
 	public int updateScheduleJobTimeById(JobVo scheduleJobVo);
 	public int updateServerId(@Param("newServerId") Integer newServerId, @Param("oldServerId") Integer oldServerId);

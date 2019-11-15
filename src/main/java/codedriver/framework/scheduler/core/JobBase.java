@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -22,7 +20,6 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
@@ -48,9 +45,6 @@ public abstract class JobBase implements IJob {
 	protected static ScheduleJobAuditMapper scheduleJobAuditMapper;
 
 	@Autowired
-	private ApplicationContext applicationContext;
-
-	@Autowired
 	public void setScheduleMapper(ScheduleMapper schMapper) {
 		scheduleMapper = schMapper;
 	}
@@ -65,17 +59,10 @@ public abstract class JobBase implements IJob {
 		scheduleJobAuditMapper = schJobAuditMapper;
 	}
 
-	private static Map<String, IJob> jobBaseMap = new HashMap<String, IJob>();
-
-	@PostConstruct
-	public final void init() {
-		jobBaseMap.put(this.getClass().getName(), (IJob) applicationContext.getBean("job-" + this.getJobClassId()));
-	}
-
     @Override
-    public final void execute(JobExecutionContext context) throws JobExecutionException {
-    	String jobClassName = this.getClass().getName();
-        if (!jobBaseMap.containsKey(jobClassName)) {
+    public final void execute(JobExecutionContext context) throws JobExecutionException {    	
+    	IJob job = SchedulerManager.getInstance(this.getClassName());
+        if (job == null) {
             return;
         }
         JobDetail jobDetail = context.getJobDetail();
@@ -124,7 +111,7 @@ public abstract class JobBase implements IJob {
                     if (errOut != null) {
                         context.put("errOutput", errOut);
                     }
-                    jobBaseMap.get(jobClassName).executeInternal(context);
+                    job.executeInternal(context);
                     auditVo.setState(ScheduleJobAuditVo.JobAuditState.FINISH.getName());
                 } catch (Exception ex) {
                     try {
@@ -154,7 +141,7 @@ public abstract class JobBase implements IJob {
                     }
                 }
             }else {
-                jobBaseMap.get(jobClassName).executeInternal(context);
+            	job.executeInternal(context);
             }
         } else {
             JobObject jobObject = JobObject.buildJobObject(jobVo);
@@ -167,14 +154,8 @@ public abstract class JobBase implements IJob {
 	 */
 	@Override
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
-
-	/**
-	 * 获取类定义的id，对应的定义表：schedule_jobclass。
-	 *
-	 */
 	@Override
-	public abstract Integer getJobClassId();
-
+	public abstract String getType();
 	@Override
 	public abstract String getJobClassName();
 
@@ -239,7 +220,7 @@ public abstract class JobBase implements IJob {
         for(Entry<String, Param> entry : paramMap.entrySet()) {
         	Param param = entry.getValue();
         	if(param.required() == true) {
-        		throw new RuntimeException("jobClass为" + this.getClass().getName()+","+param.name()+"是必填参数");
+        		throw new RuntimeException("jobClass为" + this.getClassName()+","+param.name()+"是必填参数");
         	}
         }
         return true;

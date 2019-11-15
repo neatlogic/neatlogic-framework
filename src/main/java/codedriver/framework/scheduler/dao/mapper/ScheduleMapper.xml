@@ -6,7 +6,7 @@
 		SELECT 
 		count(1)
 		FROM schedule_job_class a
-		WHERE a.id=#{id}
+		WHERE a.classpath=#{classpath}
 	</select>
 
 	<resultMap id="scheduleMap" type="codedriver.framework.scheduler.dto.JobVo">
@@ -64,7 +64,7 @@
 		a.exec_count as execCount
 	</sql>
 
-	<select id="getJobByClassId" resultMap="scheduleMap">
+	<select id="getJobByClasspath" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
 		,
@@ -74,7 +74,7 @@
 		FROM schedule_job a
 		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
 		WHERE a.is_active = 1 AND a.status = 1
-		AND a.class_id = #{classId}
+		AND a.classpath = #{classpath}
 		AND a.server_id = #{serverId}
 	</select>
 
@@ -91,19 +91,19 @@
 	</select>
 
 	<insert id="insertJobClass">
-		INSERT INTO schedule_job_class (id,name, classpath, module_name, type) VALUES (#{id}, #{name}, #{classPath}, #{moduleName}, #{type})
+		INSERT INTO schedule_job_class (name, classpath, module_name, type) VALUES (#{name}, #{classpath}, #{moduleName}, #{type})
 	</insert>
 
 	<update id="updateJobClass">
 		UPDATE schedule_job_class 
 		SET
 		name = #{name},
-		classpath = #{classPath},
+		classpath = #{classpath},
 		module_name = #{moduleName}
 		<if test="type != null and type != ''">
 			,type = #{type}
 		</if>
-		WHERE id = #{id}
+		WHERE classpath = #{classpath}
 	</update>
 
 	<update id="updateScheduleJobTimeById">
@@ -116,21 +116,11 @@
 		WHERE id = #{id}
 	</update>
 
-	<update id="updateJobStatus">
-		UPDATE schedule_job
-		SET status = #{status}
-		<if test="status == 0">
-			,exec_count = 0
-		</if>
-		WHERE
-		id = #{id}
-	</update>
-
     <update id="updateServerId">
 		UPDATE schedule_job 
 		SET
-		server_id = #{value}
-		WHERE server_id = #{value}
+		server_id = #{newServerId}
+		WHERE server_id = #{oldServerId}
 	</update>
 
 </mapper>

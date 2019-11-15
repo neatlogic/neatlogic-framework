@@ -3,10 +3,16 @@ package codedriver.framework.scheduler.dto;
 import codedriver.framework.common.dto.BasePageVo;
 
 public class JobClassVo extends BasePageVo {
-	private Integer id;
-	private Integer type;	
+	
+	public final static String FLOW_TYPE = "flow";//flow级别
+	public final static String TASK_TYPE = "task";//task级别
+	public final static String ONCE_TYPE = "once";//只允许配一次
+	public final static String SYSTEM_TYPE = "system";//系统级别，服务器挂后，正在运行中的job将不会被转移到其他服务器
+	
+//	private Integer id;
+	private String type;	
 	private String name;
-	private String classPath;	
+	private String classpath;	
 	private String moduleName;
 	private String moduleDesc;
 
@@ -14,21 +20,21 @@ public class JobClassVo extends BasePageVo {
 		this.setPageSize(20);
 	}
 
-	public Integer getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
+//	public Integer getId() {
+//		return id;
+//	}
+//
+//	public void setId(Integer id) {
+//		this.id = id;
+//	}
 
 	public String getModuleDesc() {
 		return moduleDesc;
@@ -46,12 +52,12 @@ public class JobClassVo extends BasePageVo {
 		this.name = name;
 	}
 
-	public String getClassPath() {
-		return classPath;
+	public String getClasspath() {
+		return classpath;
 	}
 
-	public void setClassPath(String classPath) {
-		this.classPath = classPath;
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
 	}
 
 	public String getModuleName() {
@@ -64,7 +70,7 @@ public class JobClassVo extends BasePageVo {
 
 	@Override
 	public String toString() {
-		return "JobClassVo [id=" + id + ", type=" + type + ", name=" + name + ", classPath=" + classPath + ", moduleName=" + moduleName + ", moduleDesc=" + moduleDesc + "]";
+		return "JobClassVo [type=" + type + ", name=" + name + ", classpath=" + classpath + ", moduleName=" + moduleName + ", moduleDesc=" + moduleDesc + "]";
 	}
 	
 	

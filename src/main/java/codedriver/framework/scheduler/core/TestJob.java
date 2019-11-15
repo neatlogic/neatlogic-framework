@@ -11,18 +11,17 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
+import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
-@Component("job-2801")
 @DisallowConcurrentExecution
-public class TestJob extends JobBase {//  implements IJob
+public class TestJob extends JobBase {
 
 	private Logger logger = LoggerFactory.getLogger(TestJob.class.getName());
 	
@@ -59,13 +58,13 @@ public class TestJob extends JobBase {//  implements IJob
 	}
 
 	@Override
-	public Integer getJobClassId() {
-		return 2801;
+	public String getJobClassName() {
+		return "测试Job";
 	}
 
 	@Override
-	public String getJobClassName() {
-		return "测试Job";
+	public String getType() {
+		return JobClassVo.SYSTEM_TYPE;
 	}
 
 }

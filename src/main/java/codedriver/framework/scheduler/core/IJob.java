@@ -17,14 +17,13 @@ public interface IJob extends Job{
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
 	
 	/**
-	* @Author: chenqiwei
-	* @Time:Dec 6, 2018
-	* @Description: 模块id 
+	* @Author: linbq
+	* @Time:2019年11月15日
+	* @Description: job类型(flow级别的，task级别的,， once只允许配一次，system级别的)
 	* @param @return 
 	* @return Integer
 	 */
-	public abstract Integer getJobClassId();
-	
+	public abstract String getType();
 	/**
 	* @Author: chenqiwei
 	* @Time:Dec 6, 2018

@@ -64,8 +64,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		datasourceList = datasourceMapper.getAllDatasource();
 	}
 
-	public static IJob getInstance(String jobClassName){
-		return iJobMap.get(jobClassName);
+	public static IJob getInstance(String className){
+		return iJobMap.get(className);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -186,23 +186,18 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 		JobClassVo jobClassVo = null;
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
+		iJobMap.putAll(myMap);
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
-			IJob jobClass = entry.getValue();
-			if (jobClass.getJobClassId() == null) {
-				continue;
-			}
-			iJobMap.put(jobClass.getClassName(), jobClass);
-			
+			IJob jobClass = entry.getValue();		
 			jobClassVo = new JobClassVo();
-			jobClassVo.setId(jobClass.getJobClassId());
 			jobClassVo.setName(jobClass.getJobClassName());
-			jobClassVo.setClassPath(jobClass.getClassName());
+			jobClassVo.setClasspath(jobClass.getClassName());
 			jobClassVo.setModuleName(moduleName);
-
+			jobClassVo.setType(jobClass.getType());
+			
 			if ((scheduleMapper.getJobClassVoCount(jobClassVo)) > 0) {
 				scheduleMapper.updateJobClass(jobClassVo);
 			} else {
-				jobClassVo.setType(0);
 				scheduleMapper.insertJobClass(jobClassVo);
 			}
 			for(DatasourceVo datasourceVo : datasourceList) {
@@ -217,7 +212,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		if(oldScheduleServerId != null) {
 			scheduleMapper.updateServerId(Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
 		}
-		List<JobVo> jobList = scheduleMapper.getJobByClassId(jobClassVo.getId(), Config.SCHEDULE_SERVER_ID);
+		List<JobVo> jobList = scheduleMapper.getJobByClasspath(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID);
 		for (JobVo job : jobList) {
 			job.setJobClass(jobClassVo);
 			JobObject jobObject = JobObject.buildJobObject(job);
@@ -233,12 +228,14 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	 */
 	protected void loadJob(Integer oldScheduleServerId) {
 		JobClassVo jobClassVo = null;
-		for(Entry<String, IJob> entry : iJobMap.entrySet()) {
+		for(Entry<String, IJob> entry : iJobMap.entrySet()) {		
 			IJob jobClass = entry.getValue();
+			if(jobClass.getType() == JobClassVo.SYSTEM_TYPE) {
+				continue;
+			}
 			jobClassVo = new JobClassVo();
-			jobClassVo.setId(jobClass.getJobClassId());
 			jobClassVo.setName(jobClass.getJobClassName());
-			jobClassVo.setClassPath(jobClass.getClassName());
+			jobClassVo.setClasspath(jobClass.getClassName());
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, oldScheduleServerId));
 			}

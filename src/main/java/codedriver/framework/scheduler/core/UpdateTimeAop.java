@@ -18,7 +18,7 @@ public class UpdateTimeAop {
 	@Autowired
 	private ScheduleMapper scheduleMapper;
 	
-	@After("execution(* codedriver.framework.scheduler.IJob.executeInternal(..))")  
+	@After("execution(* codedriver.framework.scheduler.core.IJob.executeInternal(..))")  
     public void after(JoinPoint joinPoint) {
         updateJobTime((JobExecutionContext)joinPoint.getArgs()[0]);
     }

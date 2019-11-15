@@ -56,7 +56,6 @@ public class TestJob extends JobBase {
 				System.out.println(prop.getName() + ":" + prop.getValue());
 			}
 		}
-//		int i = 1/0;
 		logger.info("一分钟执行一次");
 		
 		OutputStreamWriter logOut = (OutputStreamWriter) context.get("logOutput");

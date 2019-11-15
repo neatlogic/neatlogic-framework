@@ -16,7 +16,7 @@ public interface ScheduleMapper {
 	//UPDATE
 	public int updateJobClass(JobClassVo jobClass);
 	public int updateScheduleJobTimeById(JobVo scheduleJobVo);
-	public int updateServerId(@Param("newServerId") Integer newServerId, @Param("oldServerId") Integer oldServerId);
+	public int updateServerId(@Param("classpath") String classpath, @Param("newServerId") Integer newServerId, @Param("oldServerId") Integer oldServerId);
 	
 	//INSERT
 	public int insertJobClass(JobClassVo jobClass);

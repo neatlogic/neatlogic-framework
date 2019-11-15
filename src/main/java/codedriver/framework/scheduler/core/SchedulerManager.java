@@ -210,7 +210,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		tenantContext.setUseDefaultDatasource(false);
 		if(oldScheduleServerId != null) {
-			scheduleMapper.updateServerId(Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
+			scheduleMapper.updateServerId(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
 		}
 		List<JobVo> jobList = scheduleMapper.getJobByClasspath(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID);
 		for (JobVo job : jobList) {

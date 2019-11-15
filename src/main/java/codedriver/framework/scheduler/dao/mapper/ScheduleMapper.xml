@@ -120,7 +120,7 @@
 		UPDATE schedule_job 
 		SET
 		server_id = #{newServerId}
-		WHERE server_id = #{oldServerId}
+		WHERE server_id = #{oldServerId} and classpath = #{classpath}
 	</update>
 
 </mapper>

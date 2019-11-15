@@ -14,7 +14,7 @@ public class TestApi extends ApiComponentBase {
 
 	@Override
 	public String getToken() {
-		return "/test";
+		return "test";
 	}
 
 	@Override

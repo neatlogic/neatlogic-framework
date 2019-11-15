@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.service.TenantService;
 import codedriver.framework.service.UserService;
-import codedriver.framework.threadlocal.TenantContext;
 
 @Controller
 @RequestMapping("/login/")
@@ -74,7 +74,7 @@ public class LoginController {
 				JSONObject jwtBodyObj = new JSONObject();
 				jwtBodyObj.put("userid", checkUserVo.getUserId());
 				jwtBodyObj.put("username", checkUserVo.getUserName());
-				jwtBodyObj.put("tenant", checkUserVo.getTenant());
+				jwtBodyObj.put("tenant", tenant);
 				if (checkUserVo.getRoleList() != null && checkUserVo.getRoleList().size() > 0) {
 					JSONArray roleList = new JSONArray();
 					for (String role : checkUserVo.getRoleList()) {

@@ -3,7 +3,7 @@
 <mapper namespace="codedriver.framework.dao.mapper.LabelMapper">
 
 	<select id="getRoleNameListByLabel" parameterType="java.lang.String" resultType="java.lang.String">
-		SELECT DISTINCT role_name FROM flow_label_role WHERE label = #{value}
+		SELECT DISTINCT role_name FROM label_role WHERE label = #{value}
 	</select>
 	
 </mapper>

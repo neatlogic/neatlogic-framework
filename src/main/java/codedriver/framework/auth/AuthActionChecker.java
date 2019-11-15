@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.LabelMapper;
-import codedriver.framework.threadlocal.UserContext;
 
 
 @RootComponent
@@ -19,12 +20,12 @@ public class AuthActionChecker {
 	}
 
 	public static Boolean check(String action) {
-		UserContext context = UserContext.get();
-		if (context != null) {
+		UserContext Ucontext = UserContext.get();
+		if (Ucontext != null) {
 			List<String> roleNameList = labelMapper.getRoleNameListByLabel(action);
 			if (roleNameList != null && roleNameList.size() > 0) {
 				for (String roleName : roleNameList) {
-					if (context.getRoleNameList().contains(roleName)) {
+					if (Ucontext.getRoleNameList().contains(roleName)) {
 						return true;
 					}
 				}

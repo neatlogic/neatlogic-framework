@@ -27,20 +27,12 @@
 	<aop:aspectj-autoproxy expose-proxy="true" />
 	<mvc:annotation-driven />
 
-	<!-- 启动处理器拦截器 -->
-	<mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**/*" />
-			<bean class="codedriver.framework.auth.AuthInterceptor" />
-		</mvc:interceptor>
-	</mvc:interceptors>
-
-	<bean id="testInterceptor" class="codedriver.framework.auth.TestInterceptor"/>
-
+	<!-- 启动Api方法拦截器 -->
+	<bean id="AuthApiInterceptor" class="codedriver.framework.auth.AuthApiInterceptor"/>
     <aop:config proxy-target-class="true">
         <!--切点-->
-        <aop:pointcut id="test" expression="execution(* codedriver.framework.restful.api.*.myDoService(..))"/>
+        <aop:pointcut id="apiAction" expression="execution(* codedriver.framework.restful.api.*.myDoService(..))||execution(* codedriver.framework.tenant.api.*.*.myDoService(..))"/>
         <!--拦截-->
-        <aop:advisor advice-ref="testInterceptor" pointcut-ref="test"/>
+        <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/>
     </aop:config>
 </beans>

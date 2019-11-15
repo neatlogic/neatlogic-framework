@@ -12,8 +12,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.threadlocal.UserContext;
 
 public final class ReturnJson {
 

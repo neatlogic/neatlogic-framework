@@ -14,8 +14,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.common.util.FileWorker;
+import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
@@ -24,7 +25,6 @@ import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
-import codedriver.framework.threadlocal.UserContext;
 
 public abstract class MyJsonStreamApiComponentBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
 	private static Logger logger = LoggerFactory.getLogger(MyJsonStreamApiComponentBase.class);

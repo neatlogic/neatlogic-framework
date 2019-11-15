@@ -31,8 +31,8 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
-public class FileWorker {
-	private static Logger logger = LoggerFactory.getLogger(FileWorker.class);
+public class FileUtil {
+	private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
 	/**
 	 * 

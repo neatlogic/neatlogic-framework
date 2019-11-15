@@ -20,12 +20,12 @@ public class AuthActionChecker {
 	}
 
 	public static Boolean check(String action) {
-		UserContext Ucontext = UserContext.get();
-		if (Ucontext != null) {
+		UserContext userContext = UserContext.get();
+		if (userContext != null) {
 			List<String> roleNameList = labelMapper.getRoleNameListByLabel(action);
 			if (roleNameList != null && roleNameList.size() > 0) {
 				for (String roleName : roleNameList) {
-					if (Ucontext.getRoleNameList().contains(roleName)) {
+					if (userContext.getRoleNameList().contains(roleName)) {
 						return true;
 					}
 				}

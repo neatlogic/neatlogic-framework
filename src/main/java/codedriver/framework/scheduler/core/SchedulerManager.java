@@ -36,6 +36,7 @@ import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
@@ -200,6 +201,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			} else {
 				scheduleMapper.insertJobClass(jobClassVo);
 			}
+			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo, null));
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, null));
 			}	
@@ -208,7 +210,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 	protected void loadJob(String tenantUuid, JobClassVo jobClassVo, Integer oldScheduleServerId) {
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
-		tenantContext.setUseDefaultDatasource(false);
 		if(oldScheduleServerId != null) {
 			scheduleMapper.updateServerId(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
 		}
@@ -236,6 +237,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			jobClassVo = new JobClassVo();
 			jobClassVo.setName(jobClass.getJobClassName());
 			jobClassVo.setClasspath(jobClass.getClassName());
+			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo, oldScheduleServerId));
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo, oldScheduleServerId));
 			}

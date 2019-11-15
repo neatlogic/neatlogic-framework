@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -38,16 +39,17 @@ public class LoginController {
 	@Autowired
 	private TenantService tenantService;
 
-	@RequestMapping(value = "/check")
-	public void dispatcherForPost(@RequestBody String json, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/check/{tenant}")
+	public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JSONObject returnObj = new JSONObject();
 		JSONObject jsonObj = JSONObject.parseObject(json);
 		TenantContext tenantContext = TenantContext.init();
-
 		try {
 			String userId = jsonObj.getString("userid");
 			String password = jsonObj.getString("password");
-			String tenant = jsonObj.getString("tenant");
+			if (StringUtils.isBlank(tenant)) {
+				tenant = request.getHeader("Tenant");
+			}
 			if (StringUtils.isNotBlank(tenant)) {
 				// 使用master库
 				tenantContext.setUseDefaultDatasource(true);
@@ -95,9 +97,15 @@ public class LoginController {
 				String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
 
 				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
+				authCookie.setPath("/");
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
+				tenantCookie.setPath("/");
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
+				response.setContentType(Config.RESPONSE_TYPE_JSON);
+				returnObj.put("Status", "OK");
+				returnObj.put("JwtToken", jwthead + "." + jwtbody + "." + jwtsign);
+				response.getWriter().print(returnObj);
 			} else {
 				throw new RuntimeException("用户验证失败");
 			}

@@ -57,7 +57,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
 		String module = "";
 		for (ModuleVo vo : moduleList) {
-			if (context.getDisplayName().indexOf(vo.getName()) > -1) {
+			if (context.getId().equals(vo.getName())) {
 				module = vo.getName();
 			}
 		}

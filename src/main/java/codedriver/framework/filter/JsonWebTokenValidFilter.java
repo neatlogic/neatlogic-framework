@@ -66,39 +66,43 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		}
 		if (StringUtils.isBlank(authorization)) {
 			authorization = request.getHeader("Authorization");
-			if (StringUtils.isNotBlank(authorization)) {
-				if (authorization.startsWith("Bearer")) {
-					String jwt = authorization.substring(7);
-					String[] jwtParts = jwt.split("\\.");
-					if (jwtParts.length == 3) {
-						SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET.getBytes(), "HmacSHA1");
-						Mac mac;
-						try {
-							mac = Mac.getInstance("HmacSHA1");
-							mac.init(signingKey);
-							byte[] rawHmac = mac.doFinal((jwtParts[0] + "." + jwtParts[1]).getBytes());
-							String result = Base64.getUrlEncoder().encodeToString(rawHmac);
-							if (result.equals(jwtParts[2])) {
-								isAuth = true;
-							}
-						} catch (NoSuchAlgorithmException | InvalidKeyException e) {
-							e.printStackTrace();
+		}
+		if (StringUtils.isNotBlank(authorization)) {
+			if (authorization.startsWith("Bearer")) {
+				String jwt = authorization.substring(7);
+				String[] jwtParts = jwt.split("\\.");
+				if (jwtParts.length == 3) {
+					SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET.getBytes(), "HmacSHA1");
+					Mac mac;
+					try {
+						mac = Mac.getInstance("HmacSHA1");
+						mac.init(signingKey);
+						byte[] rawHmac = mac.doFinal((jwtParts[0] + "." + jwtParts[1]).getBytes());
+						String result = Base64.getUrlEncoder().encodeToString(rawHmac);
+						if (result.equals(jwtParts[2])) {
+							isAuth = true;
 						}
-						if (isAuth) {
-							String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
-							JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-							TenantContext.init(jwtBodyObj.getString("tenant"));
-							UserContext.init(jwtBodyObj, request, response);
-						}
-
+					} catch (NoSuchAlgorithmException | InvalidKeyException e) {
+						e.printStackTrace();
 					}
+					if (isAuth) {
+						String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
+						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+						TenantContext.init(jwtBodyObj.getString("tenant"));
+						UserContext.init(jwtBodyObj, request, response);
+					}
+
 				}
 			}
 		}
 		if (isAuth) {
 			filterChain.doFilter(request, response);
 		} else {
-			response.sendRedirect("/index");
+			JSONObject redirectObj = new JSONObject();
+			redirectObj.put("Status", "failed");
+			redirectObj.put("Message", "认证失败");
+			response.setContentType(Config.RESPONSE_TYPE_JSON);
+			response.getWriter().print(redirectObj.toJSONString());
 		}
 	}
 }

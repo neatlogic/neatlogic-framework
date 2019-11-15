@@ -1,14 +1,14 @@
 package codedriver.framework.restful.api;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.AuthAction;
 import codedriver.framework.restful.core.ApiComponentBase;
 
 @Service
+@AuthAction(name = "SYSTEM_MENU_EDIT")
 public class TestApi extends ApiComponentBase {
 	
 
@@ -29,7 +29,7 @@ public class TestApi extends ApiComponentBase {
 
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
-		return "OK";
+		return "OK1";
 	}
 
 }

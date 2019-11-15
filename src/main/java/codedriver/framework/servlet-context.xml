@@ -27,5 +27,20 @@
 	<aop:aspectj-autoproxy expose-proxy="true" />
 	<mvc:annotation-driven />
 
+	<!-- 启动处理器拦截器 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/*" />
+			<bean class="codedriver.framework.auth.AuthInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
 
+	<bean id="testInterceptor" class="codedriver.framework.auth.TestInterceptor"/>
+
+    <aop:config proxy-target-class="true">
+        <!--切点-->
+        <aop:pointcut id="test" expression="execution(* codedriver.framework.restful.api.*.myDoService(..))"/>
+        <!--拦截-->
+        <aop:advisor advice-ref="testInterceptor" pointcut-ref="test"/>
+    </aop:config>
 </beans>

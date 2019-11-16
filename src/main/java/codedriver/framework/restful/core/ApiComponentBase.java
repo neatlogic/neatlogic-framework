@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -52,14 +53,15 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 			throw e;
 		} finally {
 			if (interfaceVo.getNeedAudit() != null && interfaceVo.getNeedAudit().equals(1)) {
-				
+
 			}
 		}
 		return result;
 	}
 
+	@Override
 	public final String getId() {
-		return this.getClass().getName();
+		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
 
 	@Override

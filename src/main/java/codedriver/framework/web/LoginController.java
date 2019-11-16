@@ -76,7 +76,7 @@ public class LoginController {
 				JSONObject jwtBodyObj = new JSONObject();
 				jwtBodyObj.put("userid", checkUserVo.getUserId());
 				jwtBodyObj.put("username", checkUserVo.getUserName());
-				jwtBodyObj.put("tenant", checkUserVo.getTenant());
+				jwtBodyObj.put("tenant", tenant);
 				if (checkUserVo.getRoleList() != null && checkUserVo.getRoleList().size() > 0) {
 					JSONArray roleList = new JSONArray();
 					for (String role : checkUserVo.getRoleList()) {

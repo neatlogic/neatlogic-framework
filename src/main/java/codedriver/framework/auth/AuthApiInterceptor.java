@@ -20,7 +20,7 @@ public class AuthApiInterceptor implements MethodInterceptor {
         Boolean isAuth = false;
         if(null != targetClass) {
         	AuthAction action = targetClass.getAnnotation(AuthAction.class);
-        	if(null != action && !StringUtils.isEmpty(action.name())) {
+        	if(null != action && !StringUtils.isBlank(action.name())) {
         		String actionName = action.name();
         		//判断用户角色是否拥有接口权限
         		if (AuthActionChecker.check(actionName)) {

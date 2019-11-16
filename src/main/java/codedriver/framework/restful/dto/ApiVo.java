@@ -1,5 +1,6 @@
 package codedriver.framework.restful.dto;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,7 +8,9 @@ import java.util.List;
 
 import codedriver.framework.common.dto.BasePageVo;
 
-public class ApiVo extends BasePageVo {
+public class ApiVo extends BasePageVo implements Serializable {
+
+	private static final long serialVersionUID = 3689437871016436622L;
 
 	public enum Type {
 		OBJECT("object", "对象模式"), STREAM("stream", "流模式");

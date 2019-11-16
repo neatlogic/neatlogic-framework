@@ -72,12 +72,19 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 				restComponentVo.setModule(module);
 				apiMapper.replaceApiComponent(restComponentVo);
 				// restMapper.activeRestInterfaceByComponentId(component.getId());
-				if (StringUtils.isNotBlank(component.getToken())) {
-					ApiVo restInterfaceVo = apiMapper.getApiByToken(component.getToken());
+				String token = component.getToken();
+				if (StringUtils.isNotBlank(token)) {
+					if (token.startsWith("/")) {
+						token = token.substring(1);
+					}
+					if (token.endsWith("/")) {
+						token = token.substring(0, token.length() - 1);
+					}
+					ApiVo restInterfaceVo = apiMapper.getApiByToken(token);
 					if (restInterfaceVo == null) {
 						restInterfaceVo = new ApiVo();
 						restInterfaceVo.setAuthtype("token");
-						restInterfaceVo.setToken(component.getToken());
+						restInterfaceVo.setToken(token);
 						restInterfaceVo.setComponentId(component.getId());
 						restInterfaceVo.setExpire("");
 						restInterfaceVo.setName(component.getName());
@@ -112,12 +119,19 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 				restComponentVo.setModule(module);
 				apiMapper.replaceApiComponent(restComponentVo);
 				// restMapper.activeRestInterfaceByComponentId(component.getId());
-				if (StringUtils.isNotBlank(component.getToken())) {
-					ApiVo restInterfaceVo = apiMapper.getApiByToken(component.getToken());
+				String token = component.getToken();
+				if (StringUtils.isNotBlank(token)) {
+					if (token.startsWith("/")) {
+						token = token.substring(1);
+					}
+					if (token.endsWith("/")) {
+						token = token.substring(0, token.length() - 1);
+					}
+					ApiVo restInterfaceVo = apiMapper.getApiByToken(token);
 					if (restInterfaceVo == null) {
 						restInterfaceVo = new ApiVo();
 						restInterfaceVo.setAuthtype("");
-						restInterfaceVo.setToken(component.getToken());
+						restInterfaceVo.setToken(token);
 						restInterfaceVo.setComponentId(component.getId());
 						restInterfaceVo.setExpire("");
 						restInterfaceVo.setName(component.getName());

@@ -61,13 +61,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			tenant = request.getHeader("Tenant");
 			if (StringUtils.isNotBlank(tenant)) {
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
+				tenantCookie.setPath("/");
 				response.addCookie(tenantCookie);
 			}
 		}
+		
 		if (StringUtils.isBlank(authorization)) {
 			authorization = request.getHeader("Authorization");
 		}
-		if (StringUtils.isNotBlank(authorization)) {
+		if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
 			if (authorization.startsWith("Bearer")) {
 				String jwt = authorization.substring(7);
 				String[] jwtParts = jwt.split("\\.");
@@ -88,7 +90,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 					if (isAuth) {
 						String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
 						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-						TenantContext.init(jwtBodyObj.getString("tenant"));
+						TenantContext.init(tenant);
 						UserContext.init(jwtBodyObj, request, response);
 					}
 

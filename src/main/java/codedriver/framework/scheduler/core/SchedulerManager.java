@@ -193,12 +193,12 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			jobClassVo = new JobClassVo();
 			jobClassVo.setName(jobClass.getJobClassName());
 			jobClassVo.setClasspath(jobClass.getClassName());
-			jobClassVo.setModuleName(moduleName);
-			jobClassVo.setType(jobClass.getType());
+			jobClassVo.setModuleName(moduleName);			
 			
 			if ((scheduleMapper.getJobClassVoCount(jobClassVo)) > 0) {
 				scheduleMapper.updateJobClass(jobClassVo);
 			} else {
+				jobClassVo.setType(jobClass.getType());
 				scheduleMapper.insertJobClass(jobClassVo);
 			}
 			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo, null));

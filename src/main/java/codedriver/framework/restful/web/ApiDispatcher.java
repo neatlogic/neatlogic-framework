@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.ApiNotFoundExceptionMessage;
 import codedriver.framework.exception.ApiRuntimeException;
@@ -55,6 +57,8 @@ public class ApiDispatcher {
 	}
 
 	private void doIt(HttpServletRequest request, String token, String json, JSONObject jsonObj, String action) throws Exception {
+		TenantContext c = TenantContext.get();
+		System.out.print(c.getTenantUuid());
 		ApiVo interfaceVo = apiService.getApiByToken(token);
 		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
 			throw new ApiRuntimeException(new ApiNotFoundExceptionMessage(token));

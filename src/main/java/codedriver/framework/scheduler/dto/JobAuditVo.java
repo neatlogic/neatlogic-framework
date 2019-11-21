@@ -9,10 +9,11 @@ import codedriver.framework.common.dto.BasePageVo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 
 
-public class ScheduleJobAuditVo extends BasePageVo {
-    private static final Logger logger = LoggerFactory.getLogger(ScheduleJobAuditVo.class);
+public class JobAuditVo extends BasePageVo {
+    private static final Logger logger = LoggerFactory.getLogger(JobAuditVo.class);
 
     public final static String PROCESSING = "processing";
     
@@ -23,36 +24,29 @@ public class ScheduleJobAuditVo extends BasePageVo {
 
     private Long jobId;
 
-    private String startTime;
+    private Date startTime;
 
-    private String endTime;
+    private Date endTime;
 
     private String logPath;
 
-    private String errPath;
-
     private String logContent;
-
-    private String errContent;
 
     private int isLogEmpty = 0;
 
-    private int isErrEmpty = 0;
-
     private String state = PROCESSING;
 
-    public ScheduleJobAuditVo() {
+    public JobAuditVo() {
         this.setPageSize(20);
     }
 
-    public ScheduleJobAuditVo(Long _jobId) {
+    public JobAuditVo(Long _jobId) {
         this.jobId = _jobId;
     }
 
-    public ScheduleJobAuditVo(Long _id, String _logPath, String _errPath) {
+    public JobAuditVo(Long _id, String _logPath, String _errPath) {
         this.id = _id;
         this.logPath = _logPath;
-        this.errPath = _errPath;
     }
 
     public Long getId() {
@@ -79,27 +73,19 @@ public class ScheduleJobAuditVo extends BasePageVo {
         this.logPath = logPath;
     }
 
-    public String getErrPath() {
-        return errPath;
-    }
-
-    public void setErrPath(String errPath) {
-        this.errPath = errPath;
-    }
-
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
@@ -146,20 +132,6 @@ public class ScheduleJobAuditVo extends BasePageVo {
         this.logContent = logContent;
     }
 
-    public String getErrContent() {
-        if(errContent==null){
-            if(errPath!=null){
-                errContent = readContent(errPath);
-            }
-        }
-
-        return errContent;
-    }
-
-    public void setErrContent(String errContent) {
-        this.errContent = errContent;
-    }
-
     public int getIsLogEmpty() {
         if(readContent(logPath) != null && !"".equals(readContent(logPath))){
             isLogEmpty = 1;
@@ -169,17 +141,6 @@ public class ScheduleJobAuditVo extends BasePageVo {
 
     public void setIsLogEmpty(int isLogEmpty) {
         this.isLogEmpty = isLogEmpty;
-    }
-
-    public int getIsErrEmpty() {
-        if(readContent(errPath) != null && !"".equals(readContent(errPath))){
-            isErrEmpty = 1;
-        }
-        return isErrEmpty;
-    }
-
-    public void setIsErrEmpty(int isErrEmpty) {
-        this.isErrEmpty = isErrEmpty;
     }
 
     public String getState() {

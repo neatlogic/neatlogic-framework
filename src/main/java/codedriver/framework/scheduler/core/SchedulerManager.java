@@ -37,7 +37,7 @@ import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.TenantVo;
-import codedriver.framework.scheduler.dao.mapper.ScheduleMapper;
+import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
@@ -51,7 +51,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	@Autowired
 	private SchedulerFactoryBean schedulerFactoryBean;
 	@Autowired
-	private ScheduleMapper scheduleMapper;
+	private SchedulerMapper schedulerMapper;
 	@Autowired
 	private ModuleMapper moduleMapper;
 
@@ -77,7 +77,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		if(jobObject.getCron() == null && jobObject.getRepeat() != null && jobObject.getRepeat() < 1) {
 			return;
 		}
-		JobVo jobVo = scheduleMapper.getJobById(jobObject.getJobId());
+		JobVo jobVo = schedulerMapper.getJobById(jobObject.getJobId());
 		IJob job = iJobMap.get(jobObject.getJobClassName());
 		try {
 			if (jobVo != null && job != null){
@@ -91,19 +91,27 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			}
 			
 			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId().toString(), jobObject.getJobGroup());
-			if (jobObject.getCron() != null && CronExpression.isValidExpression(jobObject.getCron())) {
-				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
-			} else if((jobObject.getInterval() != null && jobObject.getInterval() > 0) || (jobObject.getRepeat() != null && jobObject.getRepeat() > 1)){
-				SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
-				if (jobObject.getInterval() != null && jobObject.getInterval() > 0) {						
-					ssb = ssb.withIntervalInSeconds(jobObject.getInterval());//默认												
-				}
-				if (jobObject.getRepeat() != null && jobObject.getRepeat() > 0) { 
-					ssb = ssb.withRepeatCount(jobObject.getRepeat() - 1); 
-				} else {
-					ssb = ssb.repeatForever();
-				}
-				triggerBuilder.withSchedule(ssb);
+			if (JobVo.CRON_TRIGGER.equals(jobObject.getTriggerType())) {
+				if(jobObject.getCron() != null && CronExpression.isValidExpression(jobObject.getCron())) {
+					triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
+				}else {
+					return;
+				}				
+			} else if(JobVo.SIMPLE_TRIGGER.equals(jobObject.getTriggerType())){
+				if((jobObject.getInterval() != null && jobObject.getInterval() > 0) || (jobObject.getRepeat() != null && jobObject.getRepeat() > 1)) {
+					SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
+					if (jobObject.getInterval() != null && jobObject.getInterval() > 0) {						
+						ssb = ssb.withIntervalInSeconds(jobObject.getInterval());//默认												
+					}
+					if (jobObject.getRepeat() != null && jobObject.getRepeat() > 0) { 
+						ssb = ssb.withRepeatCount(jobObject.getRepeat() - 1); 
+					} else {
+						ssb = ssb.repeatForever();
+					}
+					triggerBuilder.withSchedule(ssb);
+				}else {
+					return;
+				}				
 			}else {
 				return;
 			}
@@ -195,11 +203,11 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			jobClassVo.setClasspath(jobClass.getClassName());
 			jobClassVo.setModuleName(moduleName);			
 			
-			if ((scheduleMapper.getJobClassVoCount(jobClassVo)) > 0) {
-				scheduleMapper.updateJobClass(jobClassVo);
+			if (schedulerMapper.getJobClassByClasspath(jobClassVo) != null) {
+				schedulerMapper.updateJobClass(jobClassVo);
 			} else {
 				jobClassVo.setType(jobClass.getType());
-				scheduleMapper.insertJobClass(jobClassVo);
+				schedulerMapper.insertJobClass(jobClassVo);
 			}
 			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo, null));
 			for(DatasourceVo datasourceVo : datasourceList) {
@@ -211,11 +219,11 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	protected void loadJob(String tenantUuid, JobClassVo jobClassVo, Integer oldScheduleServerId) {
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		if(oldScheduleServerId != null) {
-			scheduleMapper.updateServerId(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
+			schedulerMapper.updateServerId(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID, oldScheduleServerId);
 		}
-		List<JobVo> jobList = scheduleMapper.getJobByClasspath(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID);
+		List<JobVo> jobList = schedulerMapper.getJobByClasspath(jobClassVo.getClasspath(), Config.SCHEDULE_SERVER_ID);
 		for (JobVo job : jobList) {
-			job.setJobClass(jobClassVo);
+			job.setClasspath(jobClassVo.getClasspath());
 			JobObject jobObject = JobObject.buildJobObject(job);
 			loadJob(jobObject);
 		}
@@ -231,9 +239,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		JobClassVo jobClassVo = null;
 		for(Entry<String, IJob> entry : iJobMap.entrySet()) {		
 			IJob jobClass = entry.getValue();
-			if(jobClass.getType() == JobClassVo.SYSTEM_TYPE) {
-				continue;
-			}
 			jobClassVo = new JobClassVo();
 			jobClassVo.setName(jobClass.getJobClassName());
 			jobClassVo.setClasspath(jobClass.getClassName());

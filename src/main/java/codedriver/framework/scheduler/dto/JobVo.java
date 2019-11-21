@@ -7,21 +7,29 @@ import java.util.List;
 import codedriver.framework.common.dto.BasePageVo;
 
 public class JobVo extends BasePageVo {
+	
+	public final static String RUNNING = "running";
+	public final static String STOP = "stop";
+	public final static String NOT_LOADED = "not_loaded";
+	
+	public final static String YES = "yes";
+	public final static String NO = "no";
+	
+	public final static String SIMPLE_TRIGGER = "simple";
+	public final static String CRON_TRIGGER = "cron";
 	private Long id;
 	private Integer repeat;
-	private Integer status;
-	private Integer classId;
+	private String status;
+	private String classpath;
 	private Integer interval;
-	private Integer isActive;
-	private Integer needAudit;
-	private Integer moduleId;
+	private String isActive;
+	private String needAudit;
 	private Integer isPrivate = 0;
-	private Integer triggerType;
+	private String triggerType;
 	private Integer serverId;
 	private int execCount;
 	private String name;
 	private String cron;
-	private String sort;
 	private String intervalUnit;
 	private String intervalText;
 	private Date beginTime;
@@ -30,7 +38,6 @@ public class JobVo extends BasePageVo {
 	private Date nextFireTime;
 	private Date lastFireTime;
 	private Date lastFinishTime;
-	private JobClassVo jobClass;
 	private List<JobPropVo> propList;
 
 	public JobVo() {
@@ -61,11 +68,11 @@ public class JobVo extends BasePageVo {
 		this.isPrivate = isPrivate;
 	}
 
-	public Integer getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
@@ -77,19 +84,11 @@ public class JobVo extends BasePageVo {
 		this.execCount = execCount;
 	}
 
-	public Integer getModuleId() {
-		return moduleId;
-	}
-
-	public void setModuleId(Integer moduleId) {
-		this.moduleId = moduleId;
-	}
-
-	public Integer getTriggerType() {
+	public String getTriggerType() {
 		return triggerType;
 	}
 
-	public void setTriggerType(Integer triggerType) {
+	public void setTriggerType(String triggerType) {
 		this.triggerType = triggerType;
 	}
 
@@ -109,12 +108,12 @@ public class JobVo extends BasePageVo {
 		this.id = id;
 	}
 
-	public Integer getClassId() {
-		return classId;
+	public String getClasspath() {
+		return classpath;
 	}
 
-	public void setClassId(Integer classId) {
-		this.classId = classId;
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
 	}
 
 	public String getName() {
@@ -131,14 +130,6 @@ public class JobVo extends BasePageVo {
 
 	public void setCron(String cron) {
 		this.cron = cron;
-	}
-
-	public JobClassVo getJobClass() {
-		return jobClass;
-	}
-
-	public void setJobClass(JobClassVo jobClass) {
-		this.jobClass = jobClass;
 	}
 
 	public Integer getRepeat() {
@@ -180,19 +171,19 @@ public class JobVo extends BasePageVo {
 		this.interval = interval;
 	}
 
-	public Integer getIsActive() {
+	public String getIsActive() {
 		return isActive;
 	}
 
-	public void setIsActive(Integer isActive) {
+	public void setIsActive(String isActive) {
 		this.isActive = isActive;
 	}
 
-	public Integer getNeedAudit() {
+	public String getNeedAudit() {
 		return needAudit;
 	}
 
-	public void setNeedAudit(Integer needAudit) {
+	public void setNeedAudit(String needAudit) {
 		this.needAudit = needAudit;
 	}
 
@@ -242,13 +233,5 @@ public class JobVo extends BasePageVo {
 
 	public void setLastFinishTime(Date lastFinishTime) {
 		this.lastFinishTime = lastFinishTime;
-	}
-
-	public String getSort() {
-		return sort;
-	}
-
-	public void setSort(String sort) {
-		this.sort = sort;
 	}
 }

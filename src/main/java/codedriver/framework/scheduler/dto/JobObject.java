@@ -17,6 +17,7 @@ public class JobObject {
 	private Date endTime;
 	private String jobClassName;
 	private Integer serverId;
+	private String triggerType;
 	private JobDataMap jobDataMap = new JobDataMap();
 
 	public JobObject(Long _jobId, String _jobGroup) {
@@ -112,6 +113,14 @@ public class JobObject {
 		this.serverId = serverId;
 	}
 	
+	public String getTriggerType() {
+		return triggerType;
+	}
+
+	public void setTriggerType(String triggerType) {
+		this.triggerType = triggerType;
+	}
+
 	public static JobObject buildJobObject(JobVo jobVo) {
 		JobObject jobObject = new JobObject();
 		jobObject.setJobId(jobVo.getId());
@@ -121,8 +130,10 @@ public class JobObject {
 		jobObject.setStartTime(jobVo.getBeginTime());
 		jobObject.setInterval(jobVo.getInterval());
 		jobObject.setRepeat(jobVo.getRepeat() == null ? null : (jobVo.getRepeat() - jobVo.getExecCount()));
-		jobObject.setJobClassName(jobVo.getJobClass().getClasspath());
+		jobObject.setJobClassName(jobVo.getClasspath());
+		jobObject.setTriggerType(jobVo.getTriggerType());
 		JobDataMap jobDataMap = new JobDataMap();
+		jobDataMap.put("execCount",jobVo.getExecCount());
 		List<JobPropVo> propList = jobVo.getPropList();
 		if(propList != null && propList.size() > 0) {		
 			for(JobPropVo prop : propList) {

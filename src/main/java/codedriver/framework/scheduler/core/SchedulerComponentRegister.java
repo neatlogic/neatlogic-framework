@@ -12,9 +12,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.stereotype.Component;
 @Component
-public class ScheduleComponentRegister implements BeanDefinitionRegistryPostProcessor{
+public class SchedulerComponentRegister implements BeanDefinitionRegistryPostProcessor{
 
-	Logger logger = LoggerFactory.getLogger(ScheduleComponentRegister.class);
+	Logger logger = LoggerFactory.getLogger(SchedulerComponentRegister.class);
 	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {

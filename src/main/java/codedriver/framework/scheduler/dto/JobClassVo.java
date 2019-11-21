@@ -7,7 +7,6 @@ public class JobClassVo extends BasePageVo {
 	public final static String FLOW_TYPE = "flow";//flow级别
 	public final static String TASK_TYPE = "task";//task级别
 	public final static String ONCE_TYPE = "once";//只允许配一次
-	public final static String SYSTEM_TYPE = "system";//系统级别，服务器挂后，正在运行中的job将不会被转移到其他服务器
 	
 	private String type;	
 	private String name;

@@ -11,6 +11,7 @@ public class UserVo {
 	private String tenant;
 	private String email;
 	private String password;
+	private String roleName;
 	private List<String> roleList;
 
 	public String getUserId() {
@@ -57,6 +58,14 @@ public class UserVo {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
 	}
 
 	public List<String> getRoleList() {

@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.dto.BasePageVo;
 
 import java.io.File;
@@ -27,9 +29,9 @@ public class JobAuditVo extends BasePageVo {
     private Date startTime;
 
     private Date endTime;
-
+    @JSONField(serialize = false)
     private String logPath;
-
+    @JSONField(serialize = false)
     private String logContent;
 
     private int isLogEmpty = 0;

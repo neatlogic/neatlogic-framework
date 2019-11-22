@@ -152,45 +152,44 @@ public abstract class JobBase implements IJob {
 
     @Override
     public boolean valid(List<JobPropVo> propVoList) {
-	    if (propVoList == null || propVoList.size() == 0){
-	    	return true;
-	    }
 	    Map<String, Param> paramMap = initProp();
         if (paramMap.isEmpty()){
         	return true;
         }
-        for (JobPropVo jobProp : propVoList){       	
-            if (jobProp.getValue() == null || "".equals(jobProp.getValue())){
-            	continue;
-            }
-            Param param = paramMap.get(jobProp.getName());
-            if(param == null) {
-            	continue;
-            }
-            String dataType = param.dataType();
-            if("int".equals(dataType) || "Integer".equals(dataType)) {
-            	try {
-            		Integer.parseInt(jobProp.getValue());
-            	}catch(NumberFormatException e) {
-            		logger.error(e.getMessage(), e);
-            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
-            	}            	
-            }else if("long".equals(dataType) || "Long".equals(dataType)) {
-            	try {
-            		Long.parseLong(jobProp.getValue());
-            	}catch(NumberFormatException e) {
-            		logger.error(e.getMessage(), e);
-            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
-            	}           	
-            }else if("double".equals(dataType) || "Double".equals(dataType)) {
-            	try {
-            		Double.parseDouble(dataType);
-            	}catch(NumberFormatException e) {
-            		logger.error(e.getMessage(), e);
-            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
-            	}           	
-            }
-            paramMap.remove(jobProp.getName(), param);
+        if (propVoList != null && propVoList.size() > 0){
+	        for (JobPropVo jobProp : propVoList){       	
+	            if (jobProp.getValue() == null || "".equals(jobProp.getValue())){
+	            	continue;
+	            }
+	            Param param = paramMap.get(jobProp.getName());
+	            if(param == null) {
+	            	continue;
+	            }
+	            String dataType = param.dataType();
+	            if("int".equals(dataType) || "Integer".equals(dataType)) {
+	            	try {
+	            		Integer.parseInt(jobProp.getValue());
+	            	}catch(NumberFormatException e) {
+	            		logger.error(e.getMessage(), e);
+	            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+	            	}            	
+	            }else if("long".equals(dataType) || "Long".equals(dataType)) {
+	            	try {
+	            		Long.parseLong(jobProp.getValue());
+	            	}catch(NumberFormatException e) {
+	            		logger.error(e.getMessage(), e);
+	            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+	            	}           	
+	            }else if("double".equals(dataType) || "Double".equals(dataType)) {
+	            	try {
+	            		Double.parseDouble(dataType);
+	            	}catch(NumberFormatException e) {
+	            		logger.error(e.getMessage(), e);
+	            		throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+	            	}           	
+	            }
+	            paramMap.remove(jobProp.getName(), param);
+	        }
         }
         // 检查是否有必传参数没传
         for(Entry<String, Param> entry : paramMap.entrySet()) {
@@ -203,7 +202,7 @@ public abstract class JobBase implements IJob {
     }
 
     @Override
-    public final Map<String, Param> initProp() {
+    public Map<String, Param> initProp() {
     	Map<String, Param> paramMap = new HashMap<>();
         try {
             Method method = this.getClass().getDeclaredMethod("executeInternal", JobExecutionContext.class);

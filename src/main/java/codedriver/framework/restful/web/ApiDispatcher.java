@@ -225,7 +225,9 @@ public class ApiDispatcher {
 			jsonObj.put("Error", 500);
 			jsonObj.put("Status", "ERROR");
 			jsonObj.put("Message", ExceptionUtils.getStackTrace(ex));
-			logger.error(ex.getCause().getMessage(), ex.getCause());
+			Throwable a = ex.getCause();
+//			logger.error(ex.getCause().getMessage(), ex.getCause());
+			logger.error(ex.getMessage(), ex);
 		}
 		if (!response.isCommitted()) {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);

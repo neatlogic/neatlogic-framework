@@ -28,7 +28,7 @@ import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
 @DisallowConcurrentExecution
-public class TestJob extends JobBase {
+public class TestJob extends JobBase implements IJob {
 
 	private Logger logger = LoggerFactory.getLogger(TestJob.class.getName());
 	

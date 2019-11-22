@@ -5,13 +5,13 @@
 	<resultMap id="scheduleMap" type="codedriver.framework.scheduler.dto.JobVo">
 		<id column="id" property="id" />
 		<result column="name" property="name" />
+		<result column="classpath" property="classpath" />
 		<result column="cron" property="cron" />
 		<result column="repeat" property="repeat" />
 		<result column="exec_count" property="execCount" />
 		<result column="interval" property="interval" />
 		<result column="is_active" property="isActive" />
         <result column="need_audit" property="needAudit"/>
-		<result column="is_private" property="isPrivate" />
 		<result column="status" property="status" />
 		<result column="begin_time" property="beginTime" />
 		<result column="end_time" property="endTime" />
@@ -31,12 +31,12 @@
 	<sql id="jobDetailSql">
 		a.id,
 		a.name,
+		a.classpath,
 		a.cron,
 		a.repeat,
 		a.interval,
 		a.is_active,
 		a.need_audit,
-		a.is_private,
 		a.status,
 		a.server_id,
 		a.trigger_type,
@@ -293,7 +293,6 @@
 		`status`,
 		is_active,
 		need_audit,
-		is_private,
 		server_id
 		) VALUES (
 		#{name},
@@ -306,7 +305,6 @@
 		#{status},
 		#{isActive},
 		#{needAudit},
-		#{isPrivate},
 		#{serverId}
 		)
 	</insert>

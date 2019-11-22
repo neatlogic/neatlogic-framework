@@ -1,6 +1,5 @@
 package codedriver.framework.scheduler.dto;
 
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -24,14 +23,13 @@ public class JobVo extends BasePageVo {
 	private Integer interval;
 	private String isActive;
 	private String needAudit;
-	private Integer isPrivate = 0;
 	private String triggerType;
 	private Integer serverId;
 	private int execCount;
 	private String name;
 	private String cron;
-	private String intervalUnit;
-	private String intervalText;
+//	private String intervalUnit;
+//	private String intervalText;
 	private Date beginTime;
 	private Date endTime;
 	private Date pauseTime;
@@ -53,19 +51,14 @@ public class JobVo extends BasePageVo {
 	}
 
 	public List<JobPropVo> getPropList() {
+		if(propList == null || propList.size() == 0 ) {
+			return null;
+		}
 		return propList;
 	}
 
 	public void setPropList(List<JobPropVo> propList) {
 		this.propList = propList;
-	}
-
-	public Integer getIsPrivate() {
-		return isPrivate;
-	}
-
-	public void setIsPrivate(Integer isPrivate) {
-		this.isPrivate = isPrivate;
 	}
 
 	public String getStatus() {
@@ -92,13 +85,13 @@ public class JobVo extends BasePageVo {
 		this.triggerType = triggerType;
 	}
 
-	public String getIntervalUnit() {
-		return intervalUnit;
-	}
-
-	public void setIntervalUnit(String intervalUnit) {
-		this.intervalUnit = intervalUnit;
-	}
+//	public String getIntervalUnit() {
+//		return intervalUnit;
+//	}
+//
+//	public void setIntervalUnit(String intervalUnit) {
+//		this.intervalUnit = intervalUnit;
+//	}
 
 	public Long getId() {
 		return id;
@@ -141,31 +134,31 @@ public class JobVo extends BasePageVo {
 	}
 
 	public Integer getInterval() {
-		if (intervalUnit != null && !"".equals(intervalUnit)) {
-			if (intervalUnit.equalsIgnoreCase("m")) {
-				interval = interval * 60;
-			} else if (intervalUnit.equalsIgnoreCase("h")) {
-				interval = interval * 60 * 60;
-			}
-		}
+//		if (intervalUnit != null && !"".equals(intervalUnit)) {
+//			if (intervalUnit.equalsIgnoreCase("m")) {
+//				interval = interval * 60;
+//			} else if (intervalUnit.equalsIgnoreCase("h")) {
+//				interval = interval * 60 * 60;
+//			}
+//		}
 		return interval;
 	}
 
-	public String getIntervalText() {
-		intervalText = "";
-		if (interval != null) {
-			float i = interval;
-			DecimalFormat df = new DecimalFormat("#.00");
-			if (interval > 36000) {
-				intervalText = df.format(i / 60 / 60) + "小时";
-			} else if (interval > 600) {
-				intervalText = df.format(i / 60) + "分钟";
-			} else {
-				intervalText = interval + "秒";
-			}
-		}
-		return intervalText;
-	}
+//	public String getIntervalText() {
+//		intervalText = "";
+//		if (interval != null) {
+//			float i = interval;
+//			DecimalFormat df = new DecimalFormat("#.00");
+//			if (interval > 36000) {
+//				intervalText = df.format(i / 60 / 60) + "小时";
+//			} else if (interval > 600) {
+//				intervalText = df.format(i / 60) + "分钟";
+//			} else {
+//				intervalText = interval + "秒";
+//			}
+//		}
+//		return intervalText;
+//	}
 
 	public void setInterval(Integer interval) {
 		this.interval = interval;
@@ -233,5 +226,10 @@ public class JobVo extends BasePageVo {
 
 	public void setLastFinishTime(Date lastFinishTime) {
 		this.lastFinishTime = lastFinishTime;
+	}
+	
+	public static void main(String[] args) {
+		Date date = new Date();
+		System.out.println(date.getTime());
 	}
 }

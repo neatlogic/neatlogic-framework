@@ -37,6 +37,7 @@ import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.TenantVo;
+import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
@@ -81,6 +82,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		IJob job = iJobMap.get(jobObject.getJobClassName());
 		try {
 			if (jobVo != null && job != null){
+				Map<String, Param> paramMap = job.initProp();
 				if (!job.valid(jobVo.getPropList())){
 					return;
 				}

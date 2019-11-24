@@ -12,9 +12,9 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
+import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.quartz.impl.JobDetailImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,7 @@ import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
+@PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 public class TestJob extends JobBase implements IJob {
 
@@ -42,8 +43,16 @@ public class TestJob extends JobBase implements IJob {
 		@Param(name="p_5", dataType="String", controlValue="v5", description="p5", required=true)})
 	@Override
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+		
+//		System.out.println("睡眠中");
+//		long begin = System.currentTimeMillis();
+//		long time = 0;
+//		while (time < 23000) {
+//			time = System.currentTimeMillis() - begin;
+//		}
+//		System.out.println("醒来");
+		
 		JobDetail jobDetail = context.getJobDetail();
-		System.err.println(jobDetail.toString());
 		JobKey jobKey = jobDetail.getKey();
 		System.out.println(jobKey.getGroup());
 		System.out.println(TenantContext.get().getTenantUuid());
@@ -53,28 +62,34 @@ public class TestJob extends JobBase implements IJob {
 		System.out.println(jobDataMap.getString("p_3"));
 		System.out.println(jobDataMap.getString("p_4"));
 		System.out.println(jobDataMap.getString("p_5"));
+//		int count = jobDataMap.getInt("execCount");
+//		System.err.println("jobDetail count: "+count);
+//		jobDataMap.put("execCount",count+1);
 		System.out.println("一分钟执行一次");
 		String jobId = jobKey.getName();
 		JobVo jobVo = scheduleMapper.getJobById(Long.valueOf(jobId));
-		int execCount = jobDataMap.getIntValue("execCount");
-		System.err.println("第"+execCount+"次");
-		((JobDetailImpl)jobDetail).setJobDataMap(jobDataMap);
 		Trigger trigger = context.getTrigger();
+//		JobDataMap jobDataMap2 = trigger.getJobDataMap();
+//		int count2 = jobDataMap2.getInt("execCount");
+//		System.err.println("trigger count: "+count2);
+//		jobDataMap2.put("execCount",count2+1);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		if(trigger instanceof SimpleTrigger) {
 			SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
 			int times = simpleTrigger.getTimesTriggered();
+			System.err.println("==========================:"+simpleTrigger.toString());
 			System.err.println("---------------------times:"+times+"次");
-		}else if(trigger instanceof CronTrigger) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			System.err.println("---------------------PreviousFireTime:"+sdf.format(simpleTrigger.getPreviousFireTime()));
+			System.err.println("---------------------NextFireTime:"+(simpleTrigger.getNextFireTime() == null ? "null" : sdf.format(simpleTrigger.getNextFireTime())));	
+		}else if(trigger instanceof CronTrigger) {			
 			CronTrigger cronTrigger = (CronTrigger) trigger;
 			System.err.println("---------------------PreviousFireTime:"+sdf.format(cronTrigger.getPreviousFireTime()));
-			System.err.println("---------------------NextFireTime:"+sdf.format(cronTrigger.getNextFireTime()));			
-			System.err.println("---------------------FireTime:"+sdf.format(context.getFireTime()));
-			System.err.println("---------------------NextFireTime:"+sdf.format(context.getNextFireTime()));
-			System.err.println("---------------------LastFireTime:"+sdf.format(jobVo.getLastFireTime()));
-			System.err.println("---------------------NextFireTime:"+sdf.format(jobVo.getNextFireTime()));
+			System.err.println("---------------------NextFireTime:"+(cronTrigger.getNextFireTime() == null ? "null" : sdf.format(cronTrigger.getNextFireTime())));					
 		}
-
+		System.err.println("---------------------FireTime:"+sdf.format(context.getFireTime()));
+		System.err.println("---------------------NextFireTime:"+(context.getNextFireTime() == null ? "null" : sdf.format(context.getNextFireTime())));
+		System.err.println("---------------------LastFireTime:"+sdf.format(jobVo.getLastFireTime()));
+		System.err.println("---------------------NextFireTime:"+sdf.format(jobVo.getNextFireTime()));
 		
 		List<JobPropVo> propList = jobVo.getPropList();
 		if(propList != null && !propList.isEmpty()) {
@@ -90,6 +105,7 @@ public class TestJob extends JobBase implements IJob {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+//		int i = 1/0;
 	}
 
 	@Override

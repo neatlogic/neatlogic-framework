@@ -37,6 +37,8 @@ public class JobAuditVo extends BasePageVo {
     private int isLogEmpty = 0;
 
     private String state = PROCESSING;
+    
+    private Integer serverId;
 
     public JobAuditVo() {
         this.setPageSize(20);
@@ -46,6 +48,11 @@ public class JobAuditVo extends BasePageVo {
         this.jobId = _jobId;
     }
 
+    public JobAuditVo(Long _jobId, Integer _serverId) {
+        this.jobId = _jobId;
+        this.serverId = _serverId;
+    }
+    
     public JobAuditVo(Long _id, String _logPath, String _errPath) {
         this.id = _id;
         this.logPath = _logPath;
@@ -152,4 +159,12 @@ public class JobAuditVo extends BasePageVo {
     public void setState(String state) {
         this.state = state;
     }
+
+	public Integer getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(Integer serverId) {
+		this.serverId = serverId;
+	}
 }

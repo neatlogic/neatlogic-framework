@@ -10,8 +10,8 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 public class JobObject {
 	private Long jobId;
 	private String jobGroup;
-	private Integer repeat;
-	private Integer interval;
+	private int repeat;
+	private int interval;
 	private String cron;
 	private Date startTime;
 	private Date endTime;
@@ -57,19 +57,19 @@ public class JobObject {
 		this.jobGroup = jobGroup;
 	}
 
-	public Integer getRepeat() {
+	public int getRepeat() {
 		return repeat;
 	}
 
-	public void setRepeat(Integer repeat) {
+	public void setRepeat(int repeat) {
 		this.repeat = repeat;
 	}
 
-	public Integer getInterval() {
+	public int getInterval() {
 		return interval;
 	}
 
-	public void setInterval(Integer interval) {
+	public void setInterval(int interval) {
 		this.interval = interval;
 	}
 
@@ -128,8 +128,8 @@ public class JobObject {
 		jobObject.setCron(jobVo.getCron());
 		jobObject.setEndTime(jobVo.getEndTime());
 		jobObject.setStartTime(jobVo.getBeginTime());
-		jobObject.setInterval(jobVo.getInterval());
-		jobObject.setRepeat(jobVo.getRepeat() == null ? null : (jobVo.getRepeat() - jobVo.getExecCount()));
+		jobObject.setInterval(jobVo.getInterval() == null ? 0 : jobVo.getInterval());
+		jobObject.setRepeat(jobVo.getRepeat() == null ? -1 : jobVo.getRepeat());
 		jobObject.setJobClassName(jobVo.getClasspath());
 		jobObject.setTriggerType(jobVo.getTriggerType());
 		JobDataMap jobDataMap = new JobDataMap();

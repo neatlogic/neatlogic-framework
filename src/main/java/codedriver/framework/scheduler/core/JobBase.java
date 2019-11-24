@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -27,9 +28,9 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.service.SchedulerService;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 
 /**
@@ -39,90 +40,132 @@ public abstract class JobBase implements IJob {
 
 	Logger logger = LoggerFactory.getLogger(JobBase.class);
 	protected static SchedulerMapper schedulerMapper;
-
-	protected static SchedulerManager scheduleManager;
+		
+	protected static SchedulerService schedulerService;
 
 	@Autowired
-	public void setScheduleMapper(SchedulerMapper schMapper) {
+	public void setSchedulerMapper(SchedulerMapper schMapper) {
 		schedulerMapper = schMapper;
 	}
 
 	@Autowired
-	private void setScheduleManager(SchedulerManager schManager) {
-		scheduleManager = schManager;
+	protected void setSchedulerService(SchedulerService schService) {
+		schedulerService = schService;
 	}
-
     @Override
     public final void execute(JobExecutionContext context) throws JobExecutionException {    	
-    	IJob job = SchedulerManager.getInstance(this.getClassName());
-        if (job == null) {
-            return;
-        }
-        JobDetail jobDetail = context.getJobDetail();
+    	
+        JobDetail jobDetail = context.getJobDetail();       
         JobKey jobKey = jobDetail.getKey();
         String tenantUuid = jobKey.getGroup();
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		tenantContext.setUseDefaultDatasource(false);
-        Long jobId = Long.parseLong(context.getJobDetail().getKey().getName());
-        JobVo jobVo = schedulerMapper.getJobById(jobId);         
-        if (jobVo.getServerId() == Config.SCHEDULE_SERVER_ID) {
-            if (JobVo.YES.equals(jobVo.getNeedAudit())) {
-                JobAuditVo auditVo = new JobAuditVo(jobId);
-                schedulerMapper.insertJobAudit(auditVo);
-                String path = getFilePath();
-                File logFile = new File(path + auditVo.getId() + ".log");
-                auditVo.setLogPath(logFile.getPath());
-                OutputStreamWriter logOut = null;
-
-                try {
-                    if (!logFile.getParentFile().exists()) {
-                        logFile.getParentFile().mkdirs();
-                    }
-
-                    if (!logFile.exists()) {
-                        logFile.createNewFile();
-                    }
-                    logOut = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
-
-                    if (logOut != null) {
-                        context.put("logOutput", logOut);
-                    }
-
-                    job.executeInternal(context);                   
-                    auditVo.setState(JobAuditVo.SUCCESS);                    
-                } catch (Exception ex) {
-                    try {
-                        auditVo.setState(JobAuditVo.ERROR);
-                        logger.error(ex.getMessage(), ex);
-                        logOut.write(ExceptionUtils.getStackTrace(ex));
-                    } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                } finally {
-                    schedulerMapper.updateJobAudit(auditVo);
-                    if (logOut != null) {
-                        try {
-                            logOut.flush();
-                            logOut.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }else {
-            	job.executeInternal(context);
-            }
-            JobVo schedule = new JobVo();
-    		schedule.setLastFinishTime(new Date());
-    		schedule.setLastFireTime(context.getFireTime());
-    		schedule.setNextFireTime(context.getNextFireTime());
-    		schedule.setId(jobId);
-    		schedule.setExecCount(jobVo.getExecCount()+1);
-    		schedulerMapper.updateJobById(schedule);
-        } else {
-            JobObject jobObject = JobObject.buildJobObject(jobVo);
-            scheduleManager.deleteJob(jobObject);
+        Long jobId = Long.parseLong(jobKey.getName());
+        
+        IJob job = SchedulerManager.getInstance(this.getClassName());
+        if (job == null) {
+        	System.out.println("组件不存在");
+        	schedulerService.stopJob(jobId);
+            return;
         }
+        JobVo jobVo = schedulerMapper.getJobById(jobId);
+        if(jobVo == null) {
+        	System.out.println("定时作业已经不存在");
+        	schedulerService.stopJob(jobId);
+            return;
+        }
+        if (!JobVo.RUNNING.equals(jobVo.getStatus())) {
+        	System.out.println("不在运行状态");
+        	schedulerService.stopJob(jobId);
+            return;
+        }
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+        int execCount = jobDataMap.getInt("execCount");
+		System.err.println("jobDetail count: "+execCount);
+		
+		Date fireTime = context.getFireTime();
+		Date nextFireTime = jobVo.getNextFireTime();
+    	if(execCount < jobVo.getExecCount() || (nextFireTime != null && nextFireTime.after(fireTime))) {
+    		jobDataMap.put("execCount",jobVo.getExecCount());
+    		System.out.println("跳过一次");
+    		return;
+    	}
+    	// TODO 抢锁
+		int count = schedulerService.getJobLock(jobId, Config.SCHEDULE_SERVER_ID);       		
+		if(count == 0) {
+			jobDataMap.put("execCount",jobVo.getExecCount() + 1);
+			System.out.println("抢不到锁");
+			return;
+		}
+		try {
+			JobVo jobVo2 = schedulerMapper.getJobById(jobId);
+			if(jobVo2.getExecCount() > jobVo.getExecCount()) {
+				jobDataMap.put("execCount",jobVo2.getExecCount());
+				System.out.println("抢到锁后发现已经被运行");
+				return;
+			}
+			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
+				jobDataMap.put("execCount",jobVo.getExecCount() + 1);
+	            JobAuditVo auditVo = new JobAuditVo(jobId, Config.SCHEDULE_SERVER_ID);
+	            schedulerMapper.insertJobAudit(auditVo);
+	            String path = getFilePath();
+	            File logFile = new File(path + auditVo.getId() + ".log");
+	            auditVo.setLogPath(logFile.getPath());
+	            OutputStreamWriter logOut = null;
+
+	            try {
+	                if (!logFile.getParentFile().exists()) {
+	                    logFile.getParentFile().mkdirs();
+	                }
+	                if (!logFile.exists()) {
+	                    logFile.createNewFile();
+	                }
+	                logOut = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
+	                if (logOut != null) {
+	                    context.put("logOutput", logOut);
+	                }
+
+	                job.executeInternal(context);                   
+	                auditVo.setState(JobAuditVo.SUCCESS);                    
+	            } catch (Exception ex) {
+	                try {
+	                    auditVo.setState(JobAuditVo.ERROR);
+	                    logger.error(ex.getMessage(), ex);
+	                    logOut.write(ExceptionUtils.getStackTrace(ex));
+	                } catch (IOException e) {
+	                    logger.error(e.getMessage(), e);
+	                }
+	            } finally {
+	                schedulerMapper.updateJobAudit(auditVo);
+	                if (logOut != null) {
+	                    try {
+	                        logOut.flush();
+	                        logOut.close();
+	                    } catch (IOException e) {
+	                        e.printStackTrace();
+	                    }
+	                }
+	            }
+	        }else {
+	        	job.executeInternal(context);
+	        }
+	        JobVo schedule = new JobVo();
+			schedule.setLastFinishTime(new Date());
+			schedule.setLastFireTime(fireTime);
+			if(context.getNextFireTime() != null) {
+				schedule.setNextFireTime(context.getNextFireTime());
+			}else {
+				schedule.setStatus(JobVo.STOP);
+				schedulerService.stopJob(jobId);
+			}    		
+			schedule.setId(jobId);
+			schedule.setExecCount(jobVo.getExecCount()+1);
+			
+			schedulerMapper.updateJobById(schedule);
+		}finally {
+			System.out.println("释放锁");
+			schedulerMapper.updateJobLock(jobId, JobVo.RELEASE_LOCK);
+		}
     }
 
 	/**

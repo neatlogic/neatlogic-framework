@@ -16,6 +16,9 @@ public class JobVo extends BasePageVo {
 	
 	public final static String SIMPLE_TRIGGER = "simple";
 	public final static String CRON_TRIGGER = "cron";
+	
+	public final static String GET_LOCK = "run";
+	public final static String RELEASE_LOCK = "wait";
 	private Long id;
 	private Integer repeat;
 	private String status;

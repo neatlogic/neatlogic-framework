@@ -196,6 +196,12 @@
         WHERE sja.id = #{id}
 	</select>
 	
+	<select id="getNewJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
+		SELECT 
+		server_id AS serverId, job_id AS jobId, tenant_uuid AS tenantUuid
+		FROM server_new_job 
+		WHERE server_id=#{serverId}
+	</select>
 	<update id="updateJobById">
 		UPDATE schedule_job
 		SET
@@ -325,7 +331,10 @@
     <insert id="insertJobLock">
     	INSERT INTO schedule_job_lock(job_id) VALUES(#{jobId})
     </insert>
-      
+    
+    <insert id="insertServerNewJob">
+    INSERT INTO server_new_job(server_id, job_id, tenant_uuid) VALUES(#{serverId}, #{jobId}, #{tenantUuid})
+    </insert>
     <delete id="deleteJobById">
     DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.id = b.job_id WHERE a.id = #{id}
     </delete>

@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -29,6 +32,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
@@ -39,6 +43,7 @@ import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.dto.ServerNewJobVo;
 import codedriver.framework.scheduler.service.SchedulerService;
 
 @RootComponent
@@ -55,14 +60,30 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	private ModuleMapper moduleMapper;
 	@Autowired
 	private DatasourceMapper datasourceMapper;
-//	@Autowired
-//	private SchedulerService schedulerService;
 	
 	private List<DatasourceVo> datasourceList = new ArrayList<>();
 	
 	@PostConstruct
 	public final void init() {
 		datasourceList = datasourceMapper.getAllDatasource();
+		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
+		Runnable newJobRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				//检查newjob
+				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
+				for(ServerNewJobVo newJob : newJobList) {
+					//TODO 加载newJob
+					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
+					tenantContext.setUseDefaultDatasource(false);
+					JobVo jobVo = schedulerMapper.getJobById(newJob.getJobId());
+					loadJob(jobVo);
+				}				
+			}
+			
+		};
+		newJobService.scheduleWithFixedDelay(newJobRunnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
 	}
 
 	public static IJob getInstance(String className){

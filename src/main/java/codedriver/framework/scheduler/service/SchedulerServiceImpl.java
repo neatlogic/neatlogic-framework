@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.exception.ApiRuntimeException;
 
@@ -17,6 +19,7 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.dto.ServerNewJobVo;
 import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 
 @Service
@@ -30,6 +33,9 @@ public class SchedulerServiceImpl implements SchedulerService{
 	
 	@Autowired 
 	private SchedulerMapper schedulerMapper;
+	
+//	@Autowired 
+//	private ServerMapper serverMapper;
 	
 	@Override
 	public List<JobVo> searchJobList(JobVo jobVo) {
@@ -79,6 +85,16 @@ public class SchedulerServiceImpl implements SchedulerService{
 			}
 			if(JobVo.RUNNING.equals(job.getIsActive())) {
 				schedulerManager.loadJob(job);
+//				TenantContext tenant = TenantContext.get();
+//				tenant.setUseDefaultDatasource(true);
+//				List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
+//				for(ServerClusterVo server : serverList) {
+//					int serverId = server.getServerId();
+//					if(Config.SCHEDULE_SERVER_ID == serverId) {
+//						continue;
+//					}
+//					schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, job.getId(), tenant.getTenantUuid()));
+//				}				
 			}			
 		}
 		return count;

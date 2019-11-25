@@ -8,6 +8,7 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.dto.ServerNewJobVo;
 
 public interface SchedulerMapper {
 	//SELECT
@@ -16,6 +17,7 @@ public interface SchedulerMapper {
 	public int searchJobCount(JobVo jobVo);
 	public List<JobVo> searchJobList(JobVo jobVo);	
 	public JobVo getJobByName(JobVo job);
+	public List<ServerNewJobVo> getNewJobByServerId(int serverId);
 	
 	public JobClassVo getJobClassByClasspath(JobClassVo jobClassVo);
 	public int searchJobClassCount(JobClassVo jobClassVo);
@@ -35,6 +37,7 @@ public interface SchedulerMapper {
 	public int insertJobClass(JobClassVo jobClass);	
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
 	public int insertJobLock(Long jobId);
+	public void insertServerNewJob(ServerNewJobVo serverNewJobVo);
 	//DELETE
 	public int deleteJobById(Long jobId);
 	public int deleteJobPropByJobId(Long jobId);

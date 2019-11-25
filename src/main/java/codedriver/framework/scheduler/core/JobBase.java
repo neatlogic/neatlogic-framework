@@ -19,6 +19,8 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 import codedriver.framework.scheduler.service.SchedulerService;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 
@@ -38,7 +41,7 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
  */
 public abstract class JobBase implements IJob {
 
-	Logger logger = LoggerFactory.getLogger(JobBase.class);
+	private Logger logger = LoggerFactory.getLogger(JobBase.class);
 	protected static SchedulerMapper schedulerMapper;
 		
 	protected static SchedulerService schedulerService;
@@ -64,18 +67,20 @@ public abstract class JobBase implements IJob {
         
         IJob job = SchedulerManager.getInstance(this.getClassName());
         if (job == null) {
-        	System.out.println("组件不存在");
+        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
+			logger.error(message.toString());
+        	System.out.println(message.toString());
         	schedulerService.stopJob(jobId);
             return;
         }
-        JobVo jobVo = schedulerMapper.getJobById(jobId);
-        if(jobVo == null) {
-        	System.out.println("定时作业已经不存在");
+        JobVo getLockBeforeJob = schedulerMapper.getJobById(jobId);
+        if(getLockBeforeJob == null) {
+        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobId + " 不存在");
+			logger.error(message.toString());
         	schedulerService.stopJob(jobId);
             return;
         }
-        if (!JobVo.RUNNING.equals(jobVo.getStatus())) {
-        	System.out.println("不在运行状态");
+        if (!JobVo.RUNNING.equals(getLockBeforeJob.getStatus())) {
         	schedulerService.stopJob(jobId);
             return;
         }
@@ -84,24 +89,21 @@ public abstract class JobBase implements IJob {
 		System.err.println("jobDetail count: "+execCount);
 		
 		Date fireTime = context.getFireTime();
-		Date nextFireTime = jobVo.getNextFireTime();
-    	if(execCount < jobVo.getExecCount() || (nextFireTime != null && nextFireTime.after(fireTime))) {
-    		jobDataMap.put("execCount",jobVo.getExecCount());
-    		System.out.println("跳过一次");
+		Date nextFireTime = getLockBeforeJob.getNextFireTime();
+    	if(execCount < getLockBeforeJob.getExecCount() || (nextFireTime != null && nextFireTime.after(fireTime))) {
+    		jobDataMap.put("execCount",getLockBeforeJob.getExecCount());
     		return;
     	}
-    	// TODO 抢锁
+    	// 抢锁
 		int count = schedulerService.getJobLock(jobId, Config.SCHEDULE_SERVER_ID);       		
 		if(count == 0) {
-			jobDataMap.put("execCount",jobVo.getExecCount() + 1);
-			System.out.println("抢不到锁");
+			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 			return;
 		}
 		try {
-			JobVo jobVo2 = schedulerMapper.getJobById(jobId);
-			if(jobVo2.getExecCount() > jobVo.getExecCount()) {
-				jobDataMap.put("execCount",jobVo2.getExecCount());
-				System.out.println("抢到锁后发现已经被运行");
+			JobVo getLockAfterJob = schedulerMapper.getJobById(jobId);
+			if(getLockAfterJob.getExecCount() > getLockBeforeJob.getExecCount()) {
+				jobDataMap.put("execCount",getLockAfterJob.getExecCount());
 				return;
 			}
 //			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
@@ -153,18 +155,30 @@ public abstract class JobBase implements IJob {
 	        JobVo schedule = new JobVo();
 			schedule.setLastFinishTime(new Date());
 			schedule.setLastFireTime(fireTime);
-			if(context.getNextFireTime() != null) {
-				schedule.setNextFireTime(context.getNextFireTime());
+			Trigger trigger = context.getTrigger();
+			if(trigger instanceof SimpleTrigger) {
+				if(getLockBeforeJob.getRepeat() == getLockBeforeJob.getExecCount()+1) {
+					schedule.setStatus(JobVo.STOP);
+					schedulerService.stopJob(jobId);
+				}else if(context.getNextFireTime() == null){
+					getLockBeforeJob.setExecCount(getLockBeforeJob.getExecCount()+1);
+					schedulerService.loadJob(getLockBeforeJob);
+				}else {
+					schedule.setNextFireTime(context.getNextFireTime());
+				}
 			}else {
-				schedule.setStatus(JobVo.STOP);
-				schedulerService.stopJob(jobId);
+				if(context.getNextFireTime() == null) {
+					schedule.setStatus(JobVo.STOP);
+					schedulerService.stopJob(jobId);
+				}else {
+					schedule.setNextFireTime(context.getNextFireTime());								
+				} 
 			}    		
 			schedule.setId(jobId);
-			schedule.setExecCount(jobVo.getExecCount()+1);
+			schedule.setExecCount(getLockBeforeJob.getExecCount()+1);
 			
 			schedulerMapper.updateJobById(schedule);
 		}finally {
-			System.out.println("释放锁");
 			schedulerMapper.updateJobLock(jobId, JobVo.RELEASE_LOCK);
 		}
     }

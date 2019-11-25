@@ -104,51 +104,52 @@ public abstract class JobBase implements IJob {
 				System.out.println("抢到锁后发现已经被运行");
 				return;
 			}
-			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
-				jobDataMap.put("execCount",jobVo.getExecCount() + 1);
-	            JobAuditVo auditVo = new JobAuditVo(jobId, Config.SCHEDULE_SERVER_ID);
-	            schedulerMapper.insertJobAudit(auditVo);
-	            String path = getFilePath();
-	            File logFile = new File(path + auditVo.getId() + ".log");
-	            auditVo.setLogPath(logFile.getPath());
-	            OutputStreamWriter logOut = null;
-
-	            try {
-	                if (!logFile.getParentFile().exists()) {
-	                    logFile.getParentFile().mkdirs();
-	                }
-	                if (!logFile.exists()) {
-	                    logFile.createNewFile();
-	                }
-	                logOut = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
-	                if (logOut != null) {
-	                    context.put("logOutput", logOut);
-	                }
-
-	                job.executeInternal(context);                   
-	                auditVo.setState(JobAuditVo.SUCCESS);                    
-	            } catch (Exception ex) {
-	                try {
-	                    auditVo.setState(JobAuditVo.ERROR);
-	                    logger.error(ex.getMessage(), ex);
-	                    logOut.write(ExceptionUtils.getStackTrace(ex));
-	                } catch (IOException e) {
-	                    logger.error(e.getMessage(), e);
-	                }
-	            } finally {
-	                schedulerMapper.updateJobAudit(auditVo);
-	                if (logOut != null) {
-	                    try {
-	                        logOut.flush();
-	                        logOut.close();
-	                    } catch (IOException e) {
-	                        e.printStackTrace();
-	                    }
-	                }
-	            }
-	        }else {
-	        	job.executeInternal(context);
-	        }
+//			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
+//				jobDataMap.put("execCount",jobVo.getExecCount() + 1);
+//	            JobAuditVo auditVo = new JobAuditVo(jobId, Config.SCHEDULE_SERVER_ID);
+//	            schedulerMapper.insertJobAudit(auditVo);
+//	            String path = getFilePath();
+//	            File logFile = new File(path + auditVo.getId() + ".log");
+//	            auditVo.setLogPath(logFile.getPath());
+//	            OutputStreamWriter logOut = null;
+//
+//	            try {
+//	                if (!logFile.getParentFile().exists()) {
+//	                    logFile.getParentFile().mkdirs();
+//	                }
+//	                if (!logFile.exists()) {
+//	                    logFile.createNewFile();
+//	                }
+//	                logOut = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
+//	                if (logOut != null) {
+//	                    context.put("logOutput", logOut);
+//	                }
+//
+//	                job.executeInternal(context);                   
+//	                auditVo.setState(JobAuditVo.SUCCESS);                    
+//	            } catch (Exception ex) {
+//	                try {
+//	                    auditVo.setState(JobAuditVo.ERROR);
+//	                    logger.error(ex.getMessage(), ex);
+//	                    logOut.write(ExceptionUtils.getStackTrace(ex));
+//	                } catch (IOException e) {
+//	                    logger.error(e.getMessage(), e);
+//	                }
+//	            } finally {
+//	                schedulerMapper.updateJobAudit(auditVo);
+//	                if (logOut != null) {
+//	                    try {
+//	                        logOut.flush();
+//	                        logOut.close();
+//	                    } catch (IOException e) {
+//	                        e.printStackTrace();
+//	                    }
+//	                }
+//	            }
+//	        }else {
+//	        	job.executeInternal(context);
+//	        }
+			job.executeInternal(context);
 	        JobVo schedule = new JobVo();
 			schedule.setLastFinishTime(new Date());
 			schedule.setLastFireTime(fireTime);
@@ -186,12 +187,12 @@ public abstract class JobBase implements IJob {
 		return this.getClass().getName();
 	}
 
-    private String getFilePath() {
-        Calendar calendar = Calendar.getInstance();
-        String path = Config.SCHEDULE_AUDIT_PATH + File.separator + calendar.get(Calendar.YEAR) + File.separator + (calendar.get(Calendar.MONTH) +1)+ File.separator + calendar.get(Calendar.DAY_OF_MONTH) + File.separator;
-        path = path.replace(Config.TENANT_UUID,TenantContext.get().getTenantUuid());
-        return path;
-    }
+//    private String getFilePath() {
+//        Calendar calendar = Calendar.getInstance();
+//        String path = Config.SCHEDULE_AUDIT_PATH + File.separator + calendar.get(Calendar.YEAR) + File.separator + (calendar.get(Calendar.MONTH) +1)+ File.separator + calendar.get(Calendar.DAY_OF_MONTH) + File.separator;
+//        path = path.replace(Config.TENANT_UUID,TenantContext.get().getTenantUuid());
+//        return path;
+//    }
 
     @Override
     public boolean valid(List<JobPropVo> propVoList) {

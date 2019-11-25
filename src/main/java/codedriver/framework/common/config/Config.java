@@ -16,6 +16,8 @@ public class Config {
 	public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
 	public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
 	public static final int SCHEDULE_SERVER_ID;
+	public static final int SERVER_HEARTBEAT_RATE;//默认3分钟
+	public static final int SERVER_HEARTBEAT_THRESHOLD;//默认5
 	public static String CODEDRIVER_HOME;
 	
 	private static final String CONFIG_FILE = "config.properties";
@@ -29,6 +31,18 @@ public class Config {
 			SCHEDULE_SERVER_ID = Integer.parseInt(getProperty(CONFIG_FILE, "schedule.server.id", "1"));
 		} catch (Exception ex) {
 			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
+			throw ex;
+		}
+		try {
+			SERVER_HEARTBEAT_RATE = Integer.parseInt(getProperty(CONFIG_FILE, "server.heartbeat.rate", "3"));
+		} catch (Exception ex) {
+			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.heart.rate变量");
+			throw ex;
+		}
+		try {
+			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(getProperty(CONFIG_FILE, "server.heartbeat.threshold", "5"));
+		} catch (Exception ex) {
+			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.heart.threshold变量");
 			throw ex;
 		}
 	}

@@ -8,7 +8,7 @@ import codedriver.framework.server.dto.ServerClusterVo;
 
 public interface ServerMapper {
 	//SELECT
-	List<ServerClusterVo> getInactivatedServer(int currentServerId, int threshold);
+	List<ServerClusterVo> getInactivatedServer(@Param("currentServerId")int currentServerId, @Param("threshold")int threshold);
 	List<ServerClusterVo> getServerByStatus(String status);
 	
 	//UPDATE

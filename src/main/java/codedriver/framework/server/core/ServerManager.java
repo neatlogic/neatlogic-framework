@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -23,7 +25,7 @@ import codedriver.framework.server.dao.mapper.ServerMapper;
 import codedriver.framework.server.dto.ServerClusterVo;
 @RootComponent
 public class ServerManager implements ApplicationListener<ContextRefreshedEvent>{
-	
+	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
 	
@@ -31,6 +33,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	
 	@PostConstruct
 	public final void init() {
+		System.out.println("心跳启动");
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.insertServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
@@ -38,29 +41,35 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 
 			@Override
 			public void run() {
-				List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
-				for(ServerClusterVo server : list) {
-					server.setStatus(ServerClusterVo.STOP);
-					
-					int count = serverMapper.updateServerByServerId(server);
-					if(count == 1) {
-						serverMapper.deleteCounterByServerId(server.getServerId());
-						for(ServerObserver observer : set) {
-							CommonThreadPool.execute(new ServerObserverThread(observer, server.getServerId()));
+				try {
+					System.out.println("心跳1");
+					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
+					for(ServerClusterVo server : list) {
+						server.setStatus(ServerClusterVo.STOP);
+						
+						int count = serverMapper.updateServerByServerId(server);
+						if(count == 1) {
+							serverMapper.deleteCounterByServerId(server.getServerId());
+							for(ServerObserver observer : set) {
+								CommonThreadPool.execute(new ServerObserverThread(observer, server.getServerId()));
+							}
 						}
 					}
-				}
-				serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
-				List<ServerClusterVo> startupServerList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
-				for(ServerClusterVo server : startupServerList) {
-					int serverId = server.getServerId();
-					if(serverId == Config.SCHEDULE_SERVER_ID) {
-						continue;
+					serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
+					List<ServerClusterVo> startupServerList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
+					for(ServerClusterVo server : startupServerList) {
+						int serverId = server.getServerId();
+						if(serverId == Config.SCHEDULE_SERVER_ID) {
+							continue;
+						}
+						int count = serverMapper.counterIncrease(Config.SCHEDULE_SERVER_ID, serverId);
+						if(count == 0) {
+							serverMapper.insertServerCounter(Config.SCHEDULE_SERVER_ID, serverId);
+						}
 					}
-					int count = serverMapper.counterIncrease(Config.SCHEDULE_SERVER_ID, serverId);
-					if(count == 0) {
-						serverMapper.insertServerCounter(Config.SCHEDULE_SERVER_ID, serverId);
-					}
+					System.out.println("心跳2");
+				}catch(Exception e) {
+					logger.error(e.getMessage(),e);
 				}
 				
 			}		

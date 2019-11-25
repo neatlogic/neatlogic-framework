@@ -1,4 +1,4 @@
-package codedriver.framework.server;
+package codedriver.framework.server.core;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,22 +11,19 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.server.dao.mapper.ServerMapper;
 import codedriver.framework.server.dto.ServerClusterVo;
-import codedriver.framework.server.dto.ServerNewJobVo;
 @RootComponent
 public class ServerManager implements ApplicationListener<ContextRefreshedEvent>{
-
-	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
+	
 	@Autowired
 	private ServerMapper serverMapper;
 	
@@ -34,14 +31,14 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	
 	@PostConstruct
 	public final void init() {
-		ServerClusterVo server = new ServerClusterVo(null, 1, ServerClusterVo.STARTUP);
+		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.insertServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
 		Runnable runnable = new Runnable() {
 
 			@Override
 			public void run() {
-				List<ServerClusterVo> list = serverMapper.getInactivatedServer(1, 5);
+				List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
 				for(ServerClusterVo server : list) {
 					server.setStatus(ServerClusterVo.STOP);
 					
@@ -49,26 +46,26 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					if(count == 1) {
 						serverMapper.deleteCounterByServerId(server.getServerId());
 						for(ServerObserver observer : set) {
-							observer.whenServerInactivated(server.getServerId());
+							CommonThreadPool.execute(new ServerObserverThread(observer, server.getServerId()));
 						}
 					}
 				}
-				serverMapper.resetCounterByToServerId(1);//Config.SCHEDULE_SERVER_ID
+				serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
 				List<ServerClusterVo> startupServerList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
 				for(ServerClusterVo server : startupServerList) {
-					int count = serverMapper.counterIncrease(1, server.getServerId());
+					int serverId = server.getServerId();
+					if(serverId == Config.SCHEDULE_SERVER_ID) {
+						continue;
+					}
+					int count = serverMapper.counterIncrease(Config.SCHEDULE_SERVER_ID, serverId);
 					if(count == 0) {
-						serverMapper.insertServerCounter(1, server.getServerId());
+						serverMapper.insertServerCounter(Config.SCHEDULE_SERVER_ID, serverId);
 					}
 				}
-				//TODO 检查newjob
-				List<ServerNewJobVo> newJobList = serverMapper.getNewJobByServerId(1);
-				for(ServerNewJobVo newJob : newJobList) {
-					//TODO 加载newJob
-				}
+				
 			}		
 		};
-		heartbeatService.scheduleAtFixedRate(runnable, 1, 3, TimeUnit.MINUTES);
+		heartbeatService.scheduleAtFixedRate(runnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
 	}
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {

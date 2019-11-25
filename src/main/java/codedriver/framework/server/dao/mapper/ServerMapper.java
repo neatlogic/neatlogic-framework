@@ -5,13 +5,11 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.server.dto.ServerClusterVo;
-import codedriver.framework.server.dto.ServerNewJobVo;
 
 public interface ServerMapper {
 	//SELECT
 	List<ServerClusterVo> getInactivatedServer(int currentServerId, int threshold);
 	List<ServerClusterVo> getServerByStatus(String status);
-	List<ServerNewJobVo> getNewJobByServerId(int currentServerId);
 	
 	//UPDATE
 	int updateServerByServerId(ServerClusterVo server);

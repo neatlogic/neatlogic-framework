@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.server.dao.mapper.ServerMapper">
+
+	<select id="getInactivatedServer" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	SELECT 
+	scl.`ip`AS ip, scl.`server_id` AS serverId,scl.`status` 
+	FROM server_cluster scl
+	JOIN server_counter scof ON scof.`from_server_id`=scl.`server_id` AND scof.`to_server_id`=#{currentServerId} AND scof.`counter`=0
+	JOIN server_counter scot ON scot.`to_server_id`=sc1.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` > #{threshold}
+	WHERE scl.`status`='startup'
+	</select>
+	
+	<select id="getStartupServer" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	SELECT 
+	scl.`ip`, scl.`server_id`,scl.`status` 
+	FROM server_cluster scl
+	WHERE scl.`status`=#{status}
+	</select>
+	
+	<select id="getNewJobByServerId" resultType="codedriver.framework.server.dto.ServerNewJobVo">
+	SELECT 
+	server_id AS serverId, job_id AS jobId, tenant_uuid AS tenantUuid
+	FROM server_new_job 
+	WHERE server_id=#{serverId}
+	</select>
+	<update id="updateServerByServerId">
+	UPDATE server_cluster 
+	SET 
+	<if test="ip != null">
+	ip=#{ip},
+	</if>
+	<if test="status != null">
+	status=#{status},
+	</if>
+	server_id=#{serverId}
+	WHERE server_id=#{serverId}
+	</update>
+	
+	<update id="resetCounterByToServerId">
+	UPDATE server_counter 
+	SET 
+	counter=0
+	WHERE to_server_id=#{toServerId}
+	</update>
+	
+	<update id="counterIncrease">
+	UPDATE server_counter
+	SET
+	counter=counter+1
+	WHERE from_server_id=#{fromServerId}
+	AND to_server_id=#{toServerId}
+	</update>		
+	
+	<insert id="insertServer">
+	REPLACE INTO server_cluster(ip, server_id, status) VALUES(#{ip}, #{serverId}, #{status})
+	</insert>
+	
+	<insert id="insertServerCounter">
+	INSERT INTO server_counter(from_server_id, to_server_id, counter) VALUES(#{fromServerId}, #{toServerId}, 1)
+	</insert>
+	
+	<delete id="deleteCounterByServerId">
+	DELETE FROM server_counter WHERE from_server_id=#{serverId} OR to_server_id=#{serverId}
+	</delete>
+</mapper>

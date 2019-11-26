@@ -77,7 +77,6 @@ public class TestJob extends JobBase implements IJob {
 		if(trigger instanceof SimpleTrigger) {
 			SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
 			int times = simpleTrigger.getTimesTriggered();
-			System.err.println("==========================:"+simpleTrigger.toString());
 			System.err.println("---------------------times:"+times+"次");
 			System.err.println("---------------------PreviousFireTime:"+sdf.format(simpleTrigger.getPreviousFireTime()));
 			System.err.println("---------------------NextFireTime:"+(simpleTrigger.getNextFireTime() == null ? "null" : sdf.format(simpleTrigger.getNextFireTime())));	
@@ -99,12 +98,12 @@ public class TestJob extends JobBase implements IJob {
 		}
 		logger.info("一分钟执行一次");
 		
-		OutputStreamWriter logOut = (OutputStreamWriter) context.get("logOutput");
-		try {
-			logOut.write("success");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		OutputStreamWriter logOut = (OutputStreamWriter) context.get("logOutput");
+//		try {
+//			logOut.write("success");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 //		int i = 1/0;
 	}
 

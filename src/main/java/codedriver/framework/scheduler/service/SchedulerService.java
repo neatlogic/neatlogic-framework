@@ -18,7 +18,7 @@ public interface SchedulerService {
 
 	int saveJobClass(JobClassVo jobClassVo);
 
-	int getJobLock(Long jobId, int scheduleServerId);
+	boolean getJobLock(Long jobId);
 	
 	public void loadJob(JobVo job);
 	

@@ -17,8 +17,6 @@ public class JobVo extends BasePageVo {
 	public final static String SIMPLE_TRIGGER = "simple";
 	public final static String CRON_TRIGGER = "cron";
 	
-	public final static String GET_LOCK = "run";
-	public final static String RELEASE_LOCK = "wait";
 	private Long id;
 	private Integer repeat;
 	private String status;
@@ -31,11 +29,8 @@ public class JobVo extends BasePageVo {
 	private int execCount;
 	private String name;
 	private String cron;
-//	private String intervalUnit;
-//	private String intervalText;
 	private Date beginTime;
 	private Date endTime;
-	private Date pauseTime;
 	private Date nextFireTime;
 	private Date lastFireTime;
 	private Date lastFinishTime;
@@ -88,14 +83,6 @@ public class JobVo extends BasePageVo {
 		this.triggerType = triggerType;
 	}
 
-//	public String getIntervalUnit() {
-//		return intervalUnit;
-//	}
-//
-//	public void setIntervalUnit(String intervalUnit) {
-//		this.intervalUnit = intervalUnit;
-//	}
-
 	public Long getId() {
 		return id;
 	}
@@ -137,31 +124,8 @@ public class JobVo extends BasePageVo {
 	}
 
 	public Integer getInterval() {
-//		if (intervalUnit != null && !"".equals(intervalUnit)) {
-//			if (intervalUnit.equalsIgnoreCase("m")) {
-//				interval = interval * 60;
-//			} else if (intervalUnit.equalsIgnoreCase("h")) {
-//				interval = interval * 60 * 60;
-//			}
-//		}
 		return interval;
 	}
-
-//	public String getIntervalText() {
-//		intervalText = "";
-//		if (interval != null) {
-//			float i = interval;
-//			DecimalFormat df = new DecimalFormat("#.00");
-//			if (interval > 36000) {
-//				intervalText = df.format(i / 60 / 60) + "小时";
-//			} else if (interval > 600) {
-//				intervalText = df.format(i / 60) + "分钟";
-//			} else {
-//				intervalText = interval + "秒";
-//			}
-//		}
-//		return intervalText;
-//	}
 
 	public void setInterval(Integer interval) {
 		this.interval = interval;
@@ -197,14 +161,6 @@ public class JobVo extends BasePageVo {
 
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
-	}
-
-	public Date getPauseTime() {
-		return pauseTime;
-	}
-
-	public void setPauseTime(Date pauseTime) {
-		this.pauseTime = pauseTime;
 	}
 
 	public Date getNextFireTime() {

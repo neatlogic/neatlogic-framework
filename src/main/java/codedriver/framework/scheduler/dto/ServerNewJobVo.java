@@ -1,6 +1,7 @@
 package codedriver.framework.scheduler.dto;
 
 public class ServerNewJobVo {
+	private Long id;
 	private Integer serverId;
 	private Long jobId;
 	private String tenantUuid;
@@ -11,6 +12,12 @@ public class ServerNewJobVo {
 		this.serverId = serverId;
 		this.jobId = jobId;
 		this.tenantUuid = tenantUuid;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	public Integer getServerId() {
 		return serverId;

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
+import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
@@ -26,20 +27,25 @@ public interface SchedulerMapper {
 	public int searchJobAuditCount(JobAuditVo jobAuditVo);
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
 	public JobAuditVo getJobAuditLogById(Long auditId);
+	
+	public JobLockVo getJobLockById(Long jobId);
 	//UPDATE
 	public int updateJobById(JobVo job);
 	public int updateJobClass(JobClassVo jobClass);
 	public int updateJobAudit(JobAuditVo scheduleJobAudit);
-	public int updateJobLock(@Param("jobId")Long jobId, @Param("lock")String lock);	
+	public int updateJobLockByJobId(JobLockVo jobLock);
+	public int updateJobLockByServerId(JobLockVo jobLock);
 	//INSERT	
 	public int insertJob(JobVo job);
 	public int insertJobProp(JobPropVo jobProp);
 	public int insertJobClass(JobClassVo jobClass);	
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
-	public int insertJobLock(Long jobId);
+	public int insertJobLock(JobLockVo jobLock);
 	public void insertServerNewJob(ServerNewJobVo serverNewJobVo);
 	//DELETE
 	public int deleteJobById(Long jobId);
 	public int deleteJobPropByJobId(Long jobId);
 	public int deleteJobLock(Long jobId);
+	public int deleteServerNewJobById(Long id);
+	
 }

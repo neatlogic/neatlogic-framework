@@ -35,6 +35,7 @@ import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 import codedriver.framework.scheduler.service.SchedulerService;
 import codedriver.framework.scheduler.dto.JobAuditVo;
+import codedriver.framework.scheduler.dto.JobLockVo;
 
 /**
  * 定时任务处理模块基类，所新增的定时任务类必须继承此类，新Job类必须实现接口内的2个方法。
@@ -94,9 +95,8 @@ public abstract class JobBase implements IJob {
     		jobDataMap.put("execCount",getLockBeforeJob.getExecCount());
     		return;
     	}
-    	// 抢锁
-		int count = schedulerService.getJobLock(jobId, Config.SCHEDULE_SERVER_ID);       		
-		if(count == 0) {
+    	// 抢锁       		
+		if(!schedulerService.getJobLock(jobId)) {
 			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 			return;
 		}
@@ -107,7 +107,7 @@ public abstract class JobBase implements IJob {
 				return;
 			}
 //			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
-//				jobDataMap.put("execCount",jobVo.getExecCount() + 1);
+
 //	            JobAuditVo auditVo = new JobAuditVo(jobId, Config.SCHEDULE_SERVER_ID);
 //	            schedulerMapper.insertJobAudit(auditVo);
 //	            String path = getFilePath();
@@ -152,6 +152,7 @@ public abstract class JobBase implements IJob {
 //	        	job.executeInternal(context);
 //	        }
 			job.executeInternal(context);
+			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 	        JobVo schedule = new JobVo();
 			schedule.setLastFinishTime(new Date());
 			schedule.setLastFireTime(fireTime);
@@ -179,7 +180,7 @@ public abstract class JobBase implements IJob {
 			
 			schedulerMapper.updateJobById(schedule);
 		}finally {
-			schedulerMapper.updateJobLock(jobId, JobVo.RELEASE_LOCK);
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.RELEASE_LOCK));
 		}
     }
 

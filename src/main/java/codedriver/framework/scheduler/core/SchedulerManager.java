@@ -41,6 +41,7 @@ import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
+import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
@@ -71,10 +72,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 			@Override
 			public void run() {
-				//检查newjob
 				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
 				for(ServerNewJobVo newJob : newJobList) {
-					//TODO 加载newJob
+					schedulerMapper.deleteServerNewJobById(newJob.getId());
 					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
 					tenantContext.setUseDefaultDatasource(false);
 					JobVo jobVo = schedulerMapper.getJobById(newJob.getJobId());
@@ -164,6 +164,27 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 	
+	private void loadJob(String tenantUuid, JobClassVo jobClassVo) {
+		TenantContext tenantContext = TenantContext.init(tenantUuid);
+		tenantContext.setUseDefaultDatasource(false);
+		List<JobVo> jobList = schedulerMapper.getJobByClasspath(jobClassVo.getClasspath());
+		for (JobVo job : jobList) {
+			loadJob(job);
+		}
+	}
+	
+	public void releaseLock(int serverId) {
+		JobLockVo jobLock = new JobLockVo(JobLockVo.RELEASE_LOCK, serverId);
+		TenantContext tenantContext = TenantContext.init();
+		tenantContext.setUseDefaultDatasource(true);
+		schedulerMapper.updateJobLockByServerId(jobLock);
+		for(DatasourceVo datasourceVo : datasourceList) {
+			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
+			tenantContext.setUseDefaultDatasource(false);
+			schedulerMapper.updateJobLockByServerId(jobLock);
+		}
+	}
+	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
@@ -200,16 +221,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			}	
 		}
 	}
-
-	private void loadJob(String tenantUuid, JobClassVo jobClassVo) {
-		TenantContext tenantContext = TenantContext.init(tenantUuid);
-		tenantContext.setUseDefaultDatasource(false);
-		List<JobVo> jobList = schedulerMapper.getJobByClasspath(jobClassVo.getClasspath());
-		for (JobVo job : jobList) {
-			loadJob(job);
-		}
-	}
-
 
 	class ScheduleLoadJobRunner implements Runnable {
 

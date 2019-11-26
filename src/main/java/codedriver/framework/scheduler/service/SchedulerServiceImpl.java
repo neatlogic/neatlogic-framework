@@ -17,6 +17,7 @@ import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
+import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
@@ -78,7 +79,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		}
 		count = schedulerMapper.insertJob(job);		
 		if(count == 1) {
-			schedulerMapper.insertJobLock(job.getId());
+			schedulerMapper.insertJobLock(new JobLockVo(job.getId(), JobLockVo.RELEASE_LOCK));
 			for(JobPropVo jobProp : job.getPropList()) {
 				jobProp.setJobId(job.getId());
 				schedulerMapper.insertJobProp(jobProp);
@@ -113,15 +114,13 @@ public class SchedulerServiceImpl implements SchedulerService{
 	}
 
 	@Override
-	public int getJobLock(Long jobId, int serverId) {
-		int count = schedulerMapper.updateJobLock(jobId, JobVo.GET_LOCK);
-		if(count > 0) {
-			JobVo jobVo = new JobVo();
-			jobVo.setId(jobId);
-			jobVo.setServerId(serverId);
-			schedulerMapper.updateJobById(jobVo);
-		}
-		return count;
+	public boolean getJobLock(Long jobId) {
+		JobLockVo jobLock = schedulerMapper.getJobLockById(jobId);
+		if(jobLock != null && JobLockVo.RELEASE_LOCK.equals(jobLock.getLock())) {
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.GET_LOCK, Config.SCHEDULE_SERVER_ID));
+			return true;
+		}		
+		return false;
 	}
 
 	@Override
@@ -140,7 +139,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		jobVo.setStatus(JobVo.STOP);
 		schedulerMapper.updateJobById(jobVo);
 		schedulerManager.deleteJob(jobId);
-		schedulerMapper.updateJobLock(jobId, JobVo.RELEASE_LOCK);
+		schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.RELEASE_LOCK));
 	}
 	
 	@Override

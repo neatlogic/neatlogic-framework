@@ -15,7 +15,6 @@
 		<result column="status" property="status" />
 		<result column="begin_time" property="beginTime" />
 		<result column="end_time" property="endTime" />
-		<result column="pause_time" property="pauseTime" />
 		<result column="last_fire_time" property="lastFireTime" />
 		<result column="last_finish_time" property="lastFinishTime" />
 		<result column="server_id" property="serverId" />
@@ -43,7 +42,6 @@
 		a.begin_time,
 		a.end_time,
 		a.last_fire_time,
-		a.pause_time,
 		a.last_finish_time,
 		a.next_fire_time,
 		a.exec_count
@@ -198,10 +196,21 @@
 	
 	<select id="getNewJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
 		SELECT 
-		server_id AS serverId, job_id AS jobId, tenant_uuid AS tenantUuid
+		id, server_id AS serverId, job_id AS jobId, tenant_uuid AS tenantUuid
 		FROM server_new_job 
 		WHERE server_id=#{serverId}
 	</select>
+	
+	<select id="getJobLockById" resultType="codedriver.framework.scheduler.dto.JobLockVo">
+		SELECT 
+		`job_id` AS jobId, 
+		`lock`, 
+		`server_id` AS serverId
+		FROM schedule_job_lock 
+		WHERE job_id=#{jobId}
+		FOR UPDATE
+	</select>
+	
 	<update id="updateJobById">
 		UPDATE schedule_job
 		SET
@@ -275,8 +284,18 @@
         WHERE id = #{id}
     </update>
     
-	<update id="updateJobLock">
-		UPDATE `schedule_job_lock` SET `lock`=#{lock} WHERE `job_id`=#{jobId}
+	<update id="updateJobLockByJobId">
+		UPDATE `schedule_job_lock` 
+		SET 
+		<if test="serverId != null">
+		`server_id`=#{serverId},
+		</if>
+		`lock`=#{lock}
+		WHERE `job_id`=#{jobId}
+	</update>
+	
+	<update id="updateJobLockByServerId">
+		UPDATE `schedule_job_lock` SET `lock`=#{lock}  WHERE `server_id`=#{serverId}
 	</update>
 		
 	<insert id="insertJob">
@@ -329,12 +348,13 @@
     </insert>
     
     <insert id="insertJobLock">
-    	INSERT INTO schedule_job_lock(job_id) VALUES(#{jobId})
+    	INSERT INTO schedule_job_lock(job_id, lock) VALUES(#{jobId}, #{lock})
     </insert>
     
     <insert id="insertServerNewJob">
     INSERT INTO server_new_job(server_id, job_id, tenant_uuid) VALUES(#{serverId}, #{jobId}, #{tenantUuid})
     </insert>
+    
     <delete id="deleteJobById">
     DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.id = b.job_id WHERE a.id = #{id}
     </delete>
@@ -345,5 +365,9 @@
 	
 	<delete id="deleteJobLock">
 		DELETE FROM schedule_job_lock WHERE job_id=#{jobId}
+	</delete>
+	
+	<delete id="deleteServerNewJobById">
+	DELETE FROM server_new_job WHERE id=#{id}
 	</delete>
 </mapper>

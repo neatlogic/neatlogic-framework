@@ -2,8 +2,6 @@ package codedriver.framework.scheduler.dao.mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;

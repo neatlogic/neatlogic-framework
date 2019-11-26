@@ -45,7 +45,6 @@ import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
-import codedriver.framework.scheduler.service.SchedulerService;
 
 @RootComponent
 public class SchedulerManager implements ApplicationListener<ContextRefreshedEvent> {

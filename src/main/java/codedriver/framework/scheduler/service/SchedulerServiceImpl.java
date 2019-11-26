@@ -73,31 +73,20 @@ public class SchedulerServiceImpl implements SchedulerService{
 			logger.error(message.toString());
 			throw new ApiRuntimeException(message);
 		}
-		int count = 0;
+		
 		if(job.getId() != null) {
 			deleteJob(job.getId());					
 		}
-		count = schedulerMapper.insertJob(job);		
-		if(count == 1) {
-			schedulerMapper.insertJobLock(new JobLockVo(job.getId(), JobLockVo.RELEASE_LOCK));
-			for(JobPropVo jobProp : job.getPropList()) {
-				jobProp.setJobId(job.getId());
-				schedulerMapper.insertJobProp(jobProp);
-			}
-			if(JobVo.RUNNING.equals(job.getIsActive())) {
-				schedulerManager.loadJob(job);
-//				TenantContext tenant = TenantContext.get();
-//				tenant.setUseDefaultDatasource(true);
-//				List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
-//				for(ServerClusterVo server : serverList) {
-//					int serverId = server.getServerId();
-//					if(Config.SCHEDULE_SERVER_ID == serverId) {
-//						continue;
-//					}
-//					schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, job.getId(), tenant.getTenantUuid()));
-//				}				
-			}			
+		int count = schedulerMapper.insertJob(job);
+		schedulerMapper.insertJobLock(new JobLockVo(job.getId(), JobLockVo.RELEASE_LOCK));
+		for(JobPropVo jobProp : job.getPropList()) {
+			jobProp.setJobId(job.getId());
+			schedulerMapper.insertJobProp(jobProp);
 		}
+		if(JobVo.RUNNING.equals(job.getIsActive())) {
+			schedulerManager.loadJob(job);				
+		}			
+		
 		return count;
 	}
 
@@ -116,7 +105,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public boolean getJobLock(Long jobId) {
 		JobLockVo jobLock = schedulerMapper.getJobLockById(jobId);
-		if(jobLock != null && JobLockVo.RELEASE_LOCK.equals(jobLock.getLock())) {
+		if(jobLock != null && (JobLockVo.RELEASE_LOCK.equals(jobLock.getLock()) || jobLock.getServerId() == Config.SCHEDULE_SERVER_ID)) {
 			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.GET_LOCK, Config.SCHEDULE_SERVER_ID));
 			return true;
 		}		

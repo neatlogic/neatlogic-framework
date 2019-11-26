@@ -39,7 +39,7 @@ public interface SchedulerMapper {
 	public int insertJobClass(JobClassVo jobClass);	
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
 	public int insertJobLock(JobLockVo jobLock);
-	public void insertServerNewJob(ServerNewJobVo serverNewJobVo);
+	public int insertServerNewJob(ServerNewJobVo serverNewJobVo);
 	//DELETE
 	public int deleteJobById(Long jobId);
 	public int deleteJobPropByJobId(Long jobId);

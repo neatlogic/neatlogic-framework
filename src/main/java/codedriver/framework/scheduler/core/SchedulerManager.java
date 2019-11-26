@@ -140,8 +140,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				triggerBuilder.startNow();
 			}
 			triggerBuilder.endAt(jobObject.getEndTime());
-			triggerBuilder.startAt(jobObject.getStartTime());
-			triggerBuilder.endAt(jobObject.getEndTime());
 			Trigger trigger = triggerBuilder.build();
 			Class clazz = Class.forName(jobObject.getJobClassName());
 			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).usingJobData(jobObject.getJobDataMap()).build();
@@ -172,11 +170,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 	
-	public void releaseLock(int serverId) {
+	public void releaseLock(Integer serverId) {
 		JobLockVo jobLock = new JobLockVo(JobLockVo.RELEASE_LOCK, serverId);
 		TenantContext tenantContext = TenantContext.init();
-		tenantContext.setUseDefaultDatasource(true);
-		schedulerMapper.updateJobLockByServerId(jobLock);
 		for(DatasourceVo datasourceVo : datasourceList) {
 			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
 			tenantContext.setUseDefaultDatasource(false);
@@ -214,7 +210,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				jobClassVo.setType(jobClass.getType());
 				schedulerMapper.insertJobClass(jobClassVo);
 			}
-			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo));
+//			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo));
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo));
 			}	

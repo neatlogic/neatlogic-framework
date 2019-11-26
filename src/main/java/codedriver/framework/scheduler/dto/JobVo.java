@@ -26,7 +26,7 @@ public class JobVo extends BasePageVo {
 	private String needAudit;
 	private String triggerType;
 	private Integer serverId;
-	private int execCount;
+	private Integer execCount;
 	private String name;
 	private String cron;
 	private Date beginTime;
@@ -67,11 +67,11 @@ public class JobVo extends BasePageVo {
 		this.status = status;
 	}
 
-	public int getExecCount() {
+	public Integer getExecCount() {
 		return execCount;
 	}
 
-	public void setExecCount(int execCount) {
+	public void setExecCount(Integer execCount) {
 		this.execCount = execCount;
 	}
 
@@ -185,10 +185,5 @@ public class JobVo extends BasePageVo {
 
 	public void setLastFinishTime(Date lastFinishTime) {
 		this.lastFinishTime = lastFinishTime;
-	}
-	
-	public static void main(String[] args) {
-		Date date = new Date();
-		System.out.println(date.getTime());
 	}
 }

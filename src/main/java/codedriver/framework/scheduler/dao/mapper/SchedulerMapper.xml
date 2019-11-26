@@ -223,6 +223,9 @@
 		<if test="endTime != null">
 		end_time = #{endTime},
 		</if>
+		<if test="triggerType != null">
+		`trigger_type`=#{triggerType},
+		</if>
 		<if test="repeat != null">
 		`repeat` = #{repeat},
 		</if>
@@ -308,6 +311,7 @@
 		classpath,
 		begin_time,
 		end_time,
+		`trigger_type`,
 		`repeat`,
 		cron,
 		`interval`,
@@ -320,6 +324,7 @@
 		#{classpath},
 		#{beginTime},
 		#{endTime},
+		#{triggerType},
 		#{repeat},
 		#{cron},
 		#{interval},
@@ -348,7 +353,7 @@
     </insert>
     
     <insert id="insertJobLock">
-    	INSERT INTO schedule_job_lock(job_id, lock) VALUES(#{jobId}, #{lock})
+    	INSERT INTO `schedule_job_lock`(`job_id`, `lock`, `server_id`) VALUES(#{jobId}, #{lock}, #{serverId})
     </insert>
     
     <insert id="insertServerNewJob">

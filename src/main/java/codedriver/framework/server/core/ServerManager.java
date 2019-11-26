@@ -40,11 +40,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	@PostConstruct
 	public final void init() {
 		System.out.println("心跳启动");
-		if(getServerLock(Config.SCHEDULE_SERVER_ID)) {
-			for(ServerObserver observer : set) {
-				CommonThreadPool.execute(new ServerObserverThread(observer, Config.SCHEDULE_SERVER_ID));
-			}
-		}
+		getServerLock(Config.SCHEDULE_SERVER_ID);
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.insertServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);

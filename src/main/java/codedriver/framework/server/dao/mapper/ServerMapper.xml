@@ -6,8 +6,8 @@
 	SELECT 
 	scl.`ip`, scl.`server_id` AS serverId, scl.`status`
 	FROM server_cluster scl
-	JOIN server_counter scof ON scof.`from_server_id`=scl.`server_id` AND scof.`to_server_id`=#{currentServerId} AND scof.`counter`=0
-	JOIN server_counter scot ON scot.`to_server_id`=scl.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` > #{threshold}
+	<!-- JOIN server_counter scof ON scof.`from_server_id`=scl.`server_id` AND scof.`to_server_id`=#{currentServerId} AND scof.`counter`=0 -->
+	JOIN server_counter scot ON scot.`to_server_id`=scl.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` >= #{threshold}
 	WHERE scl.`status`='startup'
 	</select>
 	
@@ -18,6 +18,13 @@
 	WHERE scl.`status`=#{status}
 	</select>
 	
+	<select id="getServerByServerId" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	SELECT 
+	scl.`ip`, scl.`server_id` AS serverId,scl.`status` 
+	FROM server_cluster scl
+	WHERE scl.`server_id`=#{serverId}
+	FOR UPDATE
+	</select>
 	<update id="updateServerByServerId">
 	UPDATE server_cluster 
 	SET 

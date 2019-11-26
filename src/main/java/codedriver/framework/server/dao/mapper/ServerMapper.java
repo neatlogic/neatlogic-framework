@@ -10,7 +10,7 @@ public interface ServerMapper {
 	//SELECT
 	List<ServerClusterVo> getInactivatedServer(@Param("currentServerId")int currentServerId, @Param("threshold")int threshold);
 	List<ServerClusterVo> getServerByStatus(String status);
-	
+	ServerClusterVo getServerByServerId(Integer serverId);
 	//UPDATE
 	int updateServerByServerId(ServerClusterVo server);
 	int resetCounterByToServerId(int toServerId);
@@ -22,5 +22,5 @@ public interface ServerMapper {
 	
 	//DELETE
 	int deleteCounterByServerId(int serverId);
-	
+		
 }

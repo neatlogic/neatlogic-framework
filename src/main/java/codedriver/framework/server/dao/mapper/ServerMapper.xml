@@ -6,7 +6,6 @@
 	SELECT 
 	scl.`ip`, scl.`server_id` AS serverId, scl.`status`
 	FROM server_cluster scl
-	<!-- JOIN server_counter scof ON scof.`from_server_id`=scl.`server_id` AND scof.`to_server_id`=#{currentServerId} AND scof.`counter`=0 -->
 	JOIN server_counter scot ON scot.`to_server_id`=scl.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` >= #{threshold}
 	WHERE scl.`status`='startup'
 	</select>
@@ -24,6 +23,14 @@
 	FROM server_cluster scl
 	WHERE scl.`server_id`=#{serverId}
 	FOR UPDATE
+	</select>
+	
+	<select id="getServerCounterIncreaseByFromServerId" resultType="codedriver.framework.server.dto.ServerCounterVo">
+	SELECT 
+	${fromServerId} AS fromServerId, scl.`server_id` AS toServerId, IFNULL(sco.`counter` + 1, 1) AS counter 
+	FROM `server_cluster` scl
+	LEFT JOIN `server_counter` sco ON sco.`to_server_id`=scl.`server_id` AND sco.`from_server_id`=#{fromServerId}
+	WHERE scl.`status`='startup' AND scl.`server_id` != #{fromServerId}
 	</select>
 	<update id="updateServerByServerId">
 	UPDATE server_cluster 
@@ -43,14 +50,6 @@
 	SET 
 	counter=0
 	WHERE to_server_id=#{toServerId}
-	</update>
-	
-	<update id="counterIncrease">
-	UPDATE server_counter
-	SET
-	counter=counter+1
-	WHERE from_server_id=#{fromServerId}
-	AND to_server_id=#{toServerId}
 	</update>		
 	
 	<insert id="insertServer">
@@ -58,7 +57,7 @@
 	</insert>
 	
 	<insert id="insertServerCounter">
-	INSERT INTO server_counter(from_server_id, to_server_id, counter) VALUES(#{fromServerId}, #{toServerId}, 1)
+	REPLACE INTO server_counter(from_server_id, to_server_id, counter) VALUES(#{fromServerId}, #{toServerId}, #{counter})
 	</insert>
 	
 	<delete id="deleteCounterByServerId">

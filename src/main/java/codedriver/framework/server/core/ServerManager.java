@@ -27,6 +27,7 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.server.dao.mapper.ServerMapper;
 import codedriver.framework.server.dto.ServerClusterVo;
+import codedriver.framework.server.dto.ServerCounterVo;
 @RootComponent
 public class ServerManager implements ApplicationListener<ContextRefreshedEvent>{
 	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
@@ -39,7 +40,6 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	
 	@PostConstruct
 	public final void init() {
-		System.out.println("心跳启动");
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.insertServer(server);
@@ -49,7 +49,6 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 			@Override
 			public void run() {
 				try {
-					System.out.println("一次心跳开始");
 					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);					
 					for(ServerClusterVo server : list) {						
 						if(getServerLock(server.getServerId())) {
@@ -59,25 +58,17 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 						}						
 					}
 					serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
-					List<ServerClusterVo> startupServerList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
-					for(ServerClusterVo server : startupServerList) {
-						int serverId = server.getServerId();
-						if(serverId == Config.SCHEDULE_SERVER_ID) {
-							continue;
-						}
-						int count = serverMapper.counterIncrease(Config.SCHEDULE_SERVER_ID, serverId);
-						if(count == 0) {
-							serverMapper.insertServerCounter(Config.SCHEDULE_SERVER_ID, serverId);
-						}
+					List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
+					for(ServerCounterVo serverCounter : serverCounterList) {
+						serverMapper.insertServerCounter(serverCounter);
 					}
-					System.out.println("一次心跳结束");
 				}catch(Exception e) {
 					logger.error(e.getMessage(),e);
 				}
 				
 			}		
 		};
-		heartbeatService.scheduleAtFixedRate(runnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
+		heartbeatService.scheduleAtFixedRate(runnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
 	}
 	
 	public boolean getServerLock(Integer serverId) {

@@ -16,7 +16,6 @@ public class JobObject {
 	private Date startTime;
 	private Date endTime;
 	private String jobClassName;
-	private Integer serverId;
 	private String triggerType;
 	private JobDataMap jobDataMap = new JobDataMap();
 
@@ -103,14 +102,6 @@ public class JobObject {
 
 	public void setJobClassName(String jobClassName) {
 		this.jobClassName = jobClassName;
-	}
-
-	public Integer getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(Integer serverId) {
-		this.serverId = serverId;
 	}
 	
 	public String getTriggerType() {

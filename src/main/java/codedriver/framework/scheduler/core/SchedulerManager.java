@@ -64,12 +64,14 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	
 	@PostConstruct
 	public final void init() {
+		System.out.println("定时检查newJob启动");
 		datasourceList = datasourceMapper.getAllDatasource();
 		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
 		Runnable newJobRunnable = new Runnable() {
 
 			@Override
 			public void run() {
+				System.out.println("一次检查newJob开始");
 				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
 				for(ServerNewJobVo newJob : newJobList) {
 					schedulerMapper.deleteServerNewJobById(newJob.getId());
@@ -77,11 +79,12 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					tenantContext.setUseDefaultDatasource(false);
 					JobVo jobVo = schedulerMapper.getJobByUuid(newJob.getJobUuid());
 					loadJob(jobVo);
-				}				
+				}
+				System.out.println("一次检查newJob结束");
 			}
 			
 		};
-		newJobService.scheduleWithFixedDelay(newJobRunnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
+		newJobService.scheduleWithFixedDelay(newJobRunnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
 	}
 
 	public static IJob getInstance(String className){

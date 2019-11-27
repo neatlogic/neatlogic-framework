@@ -2,6 +2,9 @@ package codedriver.framework.scheduler.dto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.dto.BasePageVo;
 
@@ -17,7 +20,7 @@ public class JobVo extends BasePageVo {
 	public final static String SIMPLE_TRIGGER = "simple";
 	public final static String CRON_TRIGGER = "cron";
 	
-	private Long id;
+	private String uuid;
 	private Integer repeat;
 	private String status;
 	private String classpath;
@@ -83,12 +86,15 @@ public class JobVo extends BasePageVo {
 		this.triggerType = triggerType;
 	}
 
-	public Long getId() {
-		return id;
+	public synchronized String getUuid() {
+		return uuid;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setUuid(String uuid) {
+		if(StringUtils.isBlank(uuid)) {
+			uuid = UUID.randomUUID().toString().replace("-", "");
+		}
+		this.uuid = uuid;
 	}
 
 	public String getClasspath() {

@@ -3,14 +3,14 @@ package codedriver.framework.scheduler.dto;
 public class ServerNewJobVo {
 	private Long id;
 	private Integer serverId;
-	private Long jobId;
+	private String jobUuid;
 	private String tenantUuid;
 	
 	public ServerNewJobVo() {
 	}
-	public ServerNewJobVo(Integer serverId, Long jobId, String tenantUuid) {
+	public ServerNewJobVo(Integer serverId, String jobUuid, String tenantUuid) {
 		this.serverId = serverId;
-		this.jobId = jobId;
+		this.jobUuid = jobUuid;
 		this.tenantUuid = tenantUuid;
 	}
 	public Long getId() {
@@ -25,11 +25,11 @@ public class ServerNewJobVo {
 	public void setServerId(Integer serverId) {
 		this.serverId = serverId;
 	}
-	public Long getJobId() {
-		return jobId;
+	public String getJobUuid() {
+		return jobUuid;
 	}
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
+	public void setJobUuid(String jobUuid) {
+		this.jobUuid = jobUuid;
 	}
 	public String getTenantUuid() {
 		return tenantUuid;

@@ -1,8 +1,6 @@
 package codedriver.framework.dto;
 
 public class TenantVo {
-	
-	public final static String DISABLE_UUID = "master";
 	private String uuid;
 	private String name;
 

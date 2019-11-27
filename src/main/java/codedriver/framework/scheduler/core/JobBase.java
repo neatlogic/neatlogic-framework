@@ -64,25 +64,25 @@ public abstract class JobBase implements IJob {
         String tenantUuid = jobKey.getGroup();
 		TenantContext tenantContext = TenantContext.init(tenantUuid);
 		tenantContext.setUseDefaultDatasource(false);
-        Long jobId = Long.parseLong(jobKey.getName());
+        String jobUuid = jobKey.getName();
         
         IJob job = SchedulerManager.getInstance(this.getClassName());
         if (job == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
 			logger.error(message.toString());
         	System.out.println(message.toString());
-        	schedulerService.stopJob(jobId);
+        	schedulerService.stopJob(jobUuid);
             return;
         }
-        JobVo getLockBeforeJob = schedulerMapper.getJobById(jobId);
+        JobVo getLockBeforeJob = schedulerMapper.getJobByUuid(jobUuid);
         if(getLockBeforeJob == null) {
-        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobId + " 不存在");
+        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
 			logger.error(message.toString());
-        	schedulerService.stopJob(jobId);
+        	schedulerService.stopJob(jobUuid);
             return;
         }
         if (!JobVo.RUNNING.equals(getLockBeforeJob.getStatus())) {
-        	schedulerService.stopJob(jobId);
+        	schedulerService.stopJob(jobUuid);
             return;
         }
         JobDataMap jobDataMap = jobDetail.getJobDataMap();
@@ -96,12 +96,12 @@ public abstract class JobBase implements IJob {
     		return;
     	}
     	// 抢锁       		
-		if(!schedulerService.getJobLock(jobId)) {
+		if(!schedulerService.getJobLock(jobUuid)) {
 			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 			return;
 		}
 		try {
-			JobVo getLockAfterJob = schedulerMapper.getJobById(jobId);
+			JobVo getLockAfterJob = schedulerMapper.getJobByUuid(jobUuid);
 			if(getLockAfterJob.getExecCount() > getLockBeforeJob.getExecCount()) {
 				jobDataMap.put("execCount",getLockAfterJob.getExecCount());
 				return;
@@ -151,7 +151,11 @@ public abstract class JobBase implements IJob {
 //	        }else {
 //	        	job.executeInternal(context);
 //	        }
+			JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);
+            schedulerMapper.insertJobAudit(auditVo);
 			job.executeInternal(context);
+			auditVo.setState(JobAuditVo.SUCCESS);
+			schedulerMapper.updateJobAudit(auditVo);
 			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 	        JobVo schedule = new JobVo();
 			schedule.setLastFinishTime(new Date());
@@ -160,7 +164,7 @@ public abstract class JobBase implements IJob {
 			if(trigger instanceof SimpleTrigger) {
 				if(getLockBeforeJob.getRepeat() == getLockBeforeJob.getExecCount()+1) {
 					schedule.setStatus(JobVo.STOP);
-					schedulerService.stopJob(jobId);
+					schedulerService.stopJob(jobUuid);
 				}else if(context.getNextFireTime() == null){
 					getLockBeforeJob.setExecCount(getLockBeforeJob.getExecCount()+1);
 					schedulerService.loadJob(getLockBeforeJob);
@@ -170,17 +174,17 @@ public abstract class JobBase implements IJob {
 			}else {
 				if(context.getNextFireTime() == null) {
 					schedule.setStatus(JobVo.STOP);
-					schedulerService.stopJob(jobId);
+					schedulerService.stopJob(jobUuid);
 				}else {
 					schedule.setNextFireTime(context.getNextFireTime());								
 				} 
 			}    		
-			schedule.setId(jobId);
+			schedule.setUuid(jobUuid);
 			schedule.setExecCount(getLockBeforeJob.getExecCount()+1);
 			
 			schedulerMapper.updateJobById(schedule);
 		}finally {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.RELEASE_LOCK));
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobUuid, JobLockVo.RELEASE_LOCK));
 		}
     }
 

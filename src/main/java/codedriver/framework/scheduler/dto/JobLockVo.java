@@ -4,7 +4,7 @@ public class JobLockVo {
 	public final static String GET_LOCK = "run";
 	public final static String RELEASE_LOCK = "wait";
 	
-	private Long jobId;
+	private String jobUuid;
 	private String lock;
 	private Integer serverId;
 	public JobLockVo() {
@@ -13,20 +13,20 @@ public class JobLockVo {
 		this.lock = lock;
 		this.serverId = serverId;
 	}
-	public JobLockVo(Long jobId, String lock) {
-		this.jobId = jobId;
+	public JobLockVo(String jobUuid, String lock) {
+		this.jobUuid = jobUuid;
 		this.lock = lock;
 	}
-	public JobLockVo(Long jobId, String lock, Integer serverId) {
-		this.jobId = jobId;
+	public JobLockVo(String jobUuid, String lock, Integer serverId) {
+		this.jobUuid = jobUuid;
 		this.lock = lock;
 		this.serverId = serverId;
 	}
-	public Long getJobId() {
-		return jobId;
+	public String getJobUuid() {
+		return jobUuid;
 	}
-	public void setJobId(Long jobId) {
-		this.jobId = jobId;
+	public void setJobUuid(String jobUuid) {
+		this.jobUuid = jobUuid;
 	}
 	public String getLock() {
 		return lock;

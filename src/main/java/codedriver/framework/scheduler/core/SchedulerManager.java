@@ -37,7 +37,6 @@ import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
-import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
@@ -76,7 +75,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					schedulerMapper.deleteServerNewJobById(newJob.getId());
 					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
 					tenantContext.setUseDefaultDatasource(false);
-					JobVo jobVo = schedulerMapper.getJobById(newJob.getJobId());
+					JobVo jobVo = schedulerMapper.getJobByUuid(newJob.getJobUuid());
 					loadJob(jobVo);
 				}				
 			}
@@ -149,10 +148,10 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 	
-	public void deleteJob(Long jobId) {
+	public void deleteJob(String uuid) {
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
-			JobKey jobKey = new JobKey(jobId.toString(), TenantContext.get().getTenantUuid());
+			JobKey jobKey = new JobKey(uuid, TenantContext.get().getTenantUuid());
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);
 			}			
@@ -210,7 +209,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				jobClassVo.setType(jobClass.getType());
 				schedulerMapper.insertJobClass(jobClassVo);
 			}
-//			CommonThreadPool.execute(new ScheduleLoadJobRunner(TenantVo.DISABLE_UUID,jobClassVo));
 			for(DatasourceVo datasourceVo : datasourceList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo));
 			}	

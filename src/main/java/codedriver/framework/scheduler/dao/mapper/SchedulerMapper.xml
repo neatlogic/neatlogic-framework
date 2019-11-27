@@ -3,7 +3,7 @@
 <mapper namespace="codedriver.framework.scheduler.dao.mapper.SchedulerMapper">
 	
 	<resultMap id="scheduleMap" type="codedriver.framework.scheduler.dto.JobVo">
-		<id column="id" property="id" />
+		<id column="uuid" property="uuid" />
 		<result column="name" property="name" />
 		<result column="classpath" property="classpath" />
 		<result column="cron" property="cron" />
@@ -28,7 +28,7 @@
 	</resultMap>
 
 	<sql id="jobDetailSql">
-		a.id,
+		a.uuid,
 		a.name,
 		a.classpath,
 		a.cron,
@@ -71,7 +71,7 @@
 			AND a.type=#{type}
 		</if>
 	</sql>
-	<select id="getJobById" resultMap="scheduleMap">
+	<select id="getJobByUuid" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
 		,
@@ -79,8 +79,8 @@
 		d.prop_value,
 		d.id as prop_id
 		FROM schedule_job a
-		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
-		WHERE a.id = #{value}
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+		WHERE a.uuid = #{uuid}
 	</select>
 
 	<select id="getJobByClasspath" resultMap="scheduleMap">
@@ -91,7 +91,7 @@
 		d.prop_value,
 		d.id AS prop_id
 		FROM schedule_job a
-		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.is_active = 'yes' AND a.status = 'running'
 		AND a.classpath = #{classpath}
 	</select>
@@ -120,13 +120,13 @@
 		d.prop_value,
 		d.id AS prop_id
 		FROM schedule_job a
-		LEFT JOIN schedule_job_prop d ON a.id = d.job_id
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE 1=1
 		<if test="name != null and name != ''">
 		and a.name = #{name}
 		</if>
-		<if test="id != null and id != ''">
-		and a.id!=#{id}
+		<if test="uuid != null and uuid != ''">
+		and a.uuid!=#{uuid}
 		</if>
 	</select>
 	
@@ -165,19 +165,19 @@
 	</select>
 	
 	<select id="searchJobAuditCount" resultType="int">
-		SELECT count(1) FROM schedule_job_audit WHERE job_id = #{jobId}
+		SELECT count(1) FROM schedule_job_audit WHERE job_uuid = #{jobUuid}
 	</select>
 	
 	<select id="searchJobAuditList" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
 		SELECT
         sja.id AS id,
-        sja.job_id AS jobId,
+        sja.job_uuid AS jobUuid,
         sja.start_time AS startTime,
         sja.end_time AS endTime,
         sja.log_path AS logPath,
         sja.state AS state
         FROM schedule_job_audit sja
-        WHERE sja.job_id = #{jobId}
+        WHERE sja.job_uuid = #{jobUuid}
         ORDER BY sja.id DESC
         LIMIT #{startNum},#{pageSize}
 	</select>
@@ -185,7 +185,7 @@
 	<select id="getJobAuditLogById" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
 		SELECT
         sja.id AS id,
-        sja.job_id AS jobId,
+        sja.job_uuid AS jobUuid,
         sja.start_time AS startTime,
         sja.end_time AS endTime,
         sja.log_path AS logPath,
@@ -196,18 +196,18 @@
 	
 	<select id="getNewJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
 		SELECT 
-		id, server_id AS serverId, job_id AS jobId, tenant_uuid AS tenantUuid
+		id, server_id AS serverId, job_uuid AS jobUuid, tenant_uuid AS tenantUuid
 		FROM server_new_job 
 		WHERE server_id=#{serverId}
 	</select>
 	
-	<select id="getJobLockById" resultType="codedriver.framework.scheduler.dto.JobLockVo">
+	<select id="getJobLockByUuid" resultType="codedriver.framework.scheduler.dto.JobLockVo">
 		SELECT 
-		`job_id` AS jobId, 
+		`job_uuid` AS jobUuid, 
 		`lock`, 
 		`server_id` AS serverId
 		FROM schedule_job_lock 
-		WHERE job_id=#{jobId}
+		WHERE job_uuid=#{jobUuid}
 		FOR UPDATE
 	</select>
 	
@@ -259,9 +259,9 @@
 		<if test="lastFireTime != null">
 		last_fire_time = #{lastFireTime},
 		</if>
-		id = #{id}
+		uuid = #{uuid}
 		WHERE
-		id = #{id}
+		uuid = #{uuid}
 	</update>
 	
 	<update id="updateJobClass">
@@ -294,7 +294,7 @@
 		`server_id`=#{serverId},
 		</if>
 		`lock`=#{lock}
-		WHERE `job_id`=#{jobId}
+		WHERE `job_uuid`=#{jobUuid}
 	</update>
 	
 	<update id="updateJobLockByServerId">
@@ -302,11 +302,9 @@
 	</update>
 		
 	<insert id="insertJob">
-		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-			select LAST_INSERT_ID() as id
-		</selectKey>
 		INSERT INTO schedule_job
 		(
+		`uuid`,
 		`name`,
 		classpath,
 		begin_time,
@@ -320,6 +318,7 @@
 		need_audit,
 		server_id
 		) VALUES (
+		#{uuid},
 		#{name},
 		#{classpath},
 		#{beginTime},
@@ -336,40 +335,40 @@
 	</insert>
 	
 	<insert id="insertJobProp">
-		INSERT schedule_job_prop (job_id, prop_name, prop_value)
-		VALUES (#{jobId}, #{name}, #{value})
+		INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
+		VALUES (#{jobUuid}, #{name}, #{value})
 	</insert>
 	
 	<insert id="insertJobClass">
 		INSERT INTO schedule_job_class (name, classpath, module_name, type) VALUES (#{name}, #{classpath}, #{moduleName}, #{type})
 	</insert>
 
-	<insert id="insertJobAudit">
-      <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+	<insert id="insertJobAudit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+      <!-- <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
         SELECT LAST_INSERT_ID() AS id
-      </selectKey>
-        INSERT INTO schedule_job_audit (job_id,start_time,state,server_id)
-        VALUES (#{jobId},now(),#{state},#{serverId})
+      </selectKey> -->
+        INSERT INTO schedule_job_audit (job_uuid,start_time,state,server_id)
+        VALUES (#{jobUuid},now(),#{state},#{serverId})
     </insert>
     
     <insert id="insertJobLock">
-    	INSERT INTO `schedule_job_lock`(`job_id`, `lock`, `server_id`) VALUES(#{jobId}, #{lock}, #{serverId})
+    	INSERT INTO `schedule_job_lock`(`job_uuid`, `lock`, `server_id`) VALUES(#{jobUuid}, #{lock}, #{serverId})
     </insert>
     
     <insert id="insertServerNewJob">
-    INSERT INTO server_new_job(server_id, job_id, tenant_uuid) VALUES(#{serverId}, #{jobId}, #{tenantUuid})
+    INSERT INTO server_new_job(server_id, job_uuid, tenant_uuid) VALUES(#{serverId}, #{jobUuid}, #{tenantUuid})
     </insert>
     
-    <delete id="deleteJobById">
-    DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.id = b.job_id WHERE a.id = #{id}
+    <delete id="deleteJobByUuid">
+    DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid WHERE a.uuid = #{uuid}
     </delete>
 
-	<delete id="deleteJobPropByJobId">
-		DELETE FROM schedule_job_prop WHERE job_id = #{jobId}
+	<delete id="deleteJobPropByJobUuid">
+		DELETE FROM schedule_job_prop WHERE job_uuid = #{jobUuid}
 	</delete>
 	
 	<delete id="deleteJobLock">
-		DELETE FROM schedule_job_lock WHERE job_id=#{jobId}
+		DELETE FROM schedule_job_lock WHERE job_uuid=#{jobUuid}
 	</delete>
 	
 	<delete id="deleteServerNewJobById">

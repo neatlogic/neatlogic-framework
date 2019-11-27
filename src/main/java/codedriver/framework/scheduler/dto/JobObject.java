@@ -8,7 +8,7 @@ import org.quartz.JobDataMap;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class JobObject {
-	private Long jobId;
+	private String jobId;
 	private String jobGroup;
 	private int repeat;
 	private int interval;
@@ -20,7 +20,7 @@ public class JobObject {
 	private String triggerType;
 	private JobDataMap jobDataMap = new JobDataMap();
 
-	public JobObject(Long _jobId, String _jobGroup) {
+	public JobObject(String _jobId, String _jobGroup) {
 		this.jobId = _jobId;
 		this.jobGroup = _jobGroup;
 	}
@@ -29,11 +29,11 @@ public class JobObject {
 
 	}
 
-	public Long getJobId() {
+	public String getJobId() {
 		return jobId;
 	}
 
-	public void setJobId(Long jobId) {
+	public void setJobId(String jobId) {
 		this.jobId = jobId;
 	}
 
@@ -123,7 +123,7 @@ public class JobObject {
 
 	public static JobObject buildJobObject(JobVo jobVo) {
 		JobObject jobObject = new JobObject();
-		jobObject.setJobId(jobVo.getId());
+		jobObject.setJobId(jobVo.getUuid());
 		jobObject.setJobGroup(TenantContext.get().getTenantUuid());
 		jobObject.setCron(jobVo.getCron());
 		jobObject.setEndTime(jobVo.getEndTime());

@@ -11,7 +11,7 @@ import codedriver.framework.scheduler.dto.ServerNewJobVo;
 
 public interface SchedulerMapper {
 	//SELECT
-	public JobVo getJobById(Long jobId);	
+	public JobVo getJobByUuid(String uuid);	
 	public List<JobVo> getJobByClasspath(String classpath);
 	public int searchJobCount(JobVo jobVo);
 	public List<JobVo> searchJobList(JobVo jobVo);	
@@ -26,7 +26,7 @@ public interface SchedulerMapper {
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
 	public JobAuditVo getJobAuditLogById(Long auditId);
 	
-	public JobLockVo getJobLockById(Long jobId);
+	public JobLockVo getJobLockByUuid(String uuid);
 	//UPDATE
 	public int updateJobById(JobVo job);
 	public int updateJobClass(JobClassVo jobClass);
@@ -41,9 +41,9 @@ public interface SchedulerMapper {
 	public int insertJobLock(JobLockVo jobLock);
 	public int insertServerNewJob(ServerNewJobVo serverNewJobVo);
 	//DELETE
-	public int deleteJobById(Long jobId);
-	public int deleteJobPropByJobId(Long jobId);
-	public int deleteJobLock(Long jobId);
+	public int deleteJobByUuid(String uuid);
+	public int deleteJobPropByJobUuid(String jobUuid);
+	public int deleteJobLock(String jobUuid);
 	public int deleteServerNewJobById(Long id);
 	
 }

@@ -24,7 +24,7 @@ public class JobAuditVo extends BasePageVo {
     public final static String ERROR = "error";
     private Long id;
 
-    private Long jobId;
+    private String jobUuid;
 
     private Date startTime;
 
@@ -44,12 +44,12 @@ public class JobAuditVo extends BasePageVo {
         this.setPageSize(20);
     }
 
-    public JobAuditVo(Long _jobId) {
-        this.jobId = _jobId;
+    public JobAuditVo(String _jobUuid) {
+        this.jobUuid = _jobUuid;
     }
 
-    public JobAuditVo(Long _jobId, Integer _serverId) {
-        this.jobId = _jobId;
+    public JobAuditVo(String _jobUUid, Integer _serverId) {
+        this.jobUuid = _jobUUid;
         this.serverId = _serverId;
     }
     
@@ -66,12 +66,12 @@ public class JobAuditVo extends BasePageVo {
         this.id = id;
     }
 
-    public Long getJobId() {
-        return jobId;
+    public String getJobUuid() {
+        return jobUuid;
     }
 
-    public void setJobId(Long jobId) {
-        this.jobId = jobId;
+    public void setJobUuid(String jobUuid) {
+        this.jobUuid = jobUuid;
     }
 
     public String getLogPath() {

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.exception.ApiRuntimeException;
@@ -34,9 +33,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 	
 	@Autowired 
 	private SchedulerMapper schedulerMapper;
-	
-//	@Autowired 
-//	private ServerMapper serverMapper;
 	
 	@Override
 	public List<JobVo> searchJobList(JobVo jobVo) {
@@ -73,14 +69,12 @@ public class SchedulerServiceImpl implements SchedulerService{
 			logger.error(message.toString());
 			throw new ApiRuntimeException(message);
 		}
-		
-		if(job.getId() != null) {
-			deleteJob(job.getId());					
-		}
+		String uuid = job.getUuid();
+		deleteJob(uuid);						
 		int count = schedulerMapper.insertJob(job);
-		schedulerMapper.insertJobLock(new JobLockVo(job.getId(), JobLockVo.RELEASE_LOCK));
+		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.RELEASE_LOCK));
 		for(JobPropVo jobProp : job.getPropList()) {
-			jobProp.setJobId(job.getId());
+			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
 		}
 		if(JobVo.RUNNING.equals(job.getIsActive())) {
@@ -103,10 +97,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 	}
 
 	@Override
-	public boolean getJobLock(Long jobId) {
-		JobLockVo jobLock = schedulerMapper.getJobLockById(jobId);
+	public boolean getJobLock(String uuid) {
+		JobLockVo jobLock = schedulerMapper.getJobLockByUuid(uuid);
 		if(jobLock != null && (JobLockVo.RELEASE_LOCK.equals(jobLock.getLock()) || jobLock.getServerId() == Config.SCHEDULE_SERVER_ID)) {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.GET_LOCK, Config.SCHEDULE_SERVER_ID));
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(uuid, JobLockVo.GET_LOCK, Config.SCHEDULE_SERVER_ID));
 			return true;
 		}		
 		return false;
@@ -115,28 +109,28 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public void loadJob(JobVo jobVo) {
 		JobVo updateJob = new JobVo();
-		updateJob.setId(jobVo.getId());
+		updateJob.setUuid(jobVo.getUuid());
 		updateJob.setStatus(JobVo.RUNNING);
 		schedulerMapper.updateJobById(updateJob);
 		schedulerManager.loadJob(jobVo);
 	}
 	
 	@Override
-	public void stopJob(Long jobId) {
+	public void stopJob(String uuid) {
 		JobVo jobVo = new JobVo();
-		jobVo.setId(jobId);
+		jobVo.setUuid(uuid);
 		jobVo.setStatus(JobVo.STOP);
 		schedulerMapper.updateJobById(jobVo);
-		schedulerManager.deleteJob(jobId);
-		schedulerMapper.updateJobLockByJobId(new JobLockVo(jobId, JobLockVo.RELEASE_LOCK));
+		schedulerManager.deleteJob(uuid);
+		schedulerMapper.updateJobLockByJobId(new JobLockVo(uuid, JobLockVo.RELEASE_LOCK));
 	}
 	
 	@Override
-	public void deleteJob(Long jobId) {
-		schedulerMapper.deleteJobLock(jobId);
-		schedulerManager.deleteJob(jobId);
-		schedulerMapper.deleteJobById(jobId);
-		schedulerMapper.deleteJobPropByJobId(jobId);
+	public void deleteJob(String uuid) {
+		schedulerMapper.deleteJobLock(uuid);
+		schedulerManager.deleteJob(uuid);
+		schedulerMapper.deleteJobByUuid(uuid);
+		schedulerMapper.deleteJobPropByJobUuid(uuid);
 	}
 	
 

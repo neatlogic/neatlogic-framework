@@ -18,12 +18,12 @@ public interface SchedulerService {
 
 	int saveJobClass(JobClassVo jobClassVo);
 
-	boolean getJobLock(Long jobId);
+	boolean getJobLock(String uuid);
 	
 	public void loadJob(JobVo job);
 	
-	public void stopJob(Long jobId);
+	public void stopJob(String uuid);
 	
-	public void deleteJob(Long jobId);
+	public void deleteJob(String uuid);
 	
 }

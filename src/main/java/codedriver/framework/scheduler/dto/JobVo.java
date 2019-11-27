@@ -87,13 +87,13 @@ public class JobVo extends BasePageVo {
 	}
 
 	public synchronized String getUuid() {
+		if(StringUtils.isBlank(uuid)) {
+			uuid = UUID.randomUUID().toString().replace("-", "");
+		}
 		return uuid;
 	}
 
 	public void setUuid(String uuid) {
-		if(StringUtils.isBlank(uuid)) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
-		}
 		this.uuid = uuid;
 	}
 

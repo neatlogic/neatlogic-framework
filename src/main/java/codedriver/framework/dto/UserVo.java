@@ -5,14 +5,25 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
-public class UserVo {
+import codedriver.framework.common.dto.BasePageVo;
+
+public class UserVo extends BasePageVo{
+	
 	private String userId;
 	private String userName;
 	private String tenant;
 	private String email;
 	private String password;
 	private String roleName;
+	private Integer isActive;
+	private String phone;
+	private String dept;
+	private String company;
+	private String position;
 	private List<String> roleList;
+	private List<RoleVo> roleVoList;
+	private List<String> teamUuidList;
+	private List<TeamVo> teamList;
 
 	public String getUserId() {
 		return userId;
@@ -66,6 +77,46 @@ public class UserVo {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}	
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public Integer getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Integer isActive) {
+		this.isActive = isActive;
 	}
 
 	public List<String> getRoleList() {
@@ -75,5 +126,30 @@ public class UserVo {
 	public void setRoleList(List<String> roleList) {
 		this.roleList = roleList;
 	}
+
+	public List<String> getTeamUuidList() {
+		return teamUuidList;
+	}
+
+	public void setTeamUuidList(List<String> teamUuidList) {
+		this.teamUuidList = teamUuidList;
+	}
+
+	public List<RoleVo> getRoleVoList() {
+		return roleVoList;
+	}
+
+	public void setRoleVoList(List<RoleVo> roleVoList) {
+		this.roleVoList = roleVoList;
+	}
+
+	public List<TeamVo> getTeamList() {
+		return teamList;
+	}
+
+	public void setTeamList(List<TeamVo> teamList) {
+		this.teamList = teamList;
+	}
+
 
 }

@@ -7,46 +7,49 @@
 		<result column="name" property="name" />
 		<result column="classpath" property="classpath" />
 		<result column="cron" property="cron" />
-		<result column="repeat" property="repeat" />
-		<result column="exec_count" property="execCount" />
-		<result column="interval" property="interval" />
+		
 		<result column="is_active" property="isActive" />
         <result column="need_audit" property="needAudit"/>
-		<result column="status" property="status" />
+		
 		<result column="begin_time" property="beginTime" />
 		<result column="end_time" property="endTime" />
-		<result column="last_fire_time" property="lastFireTime" />
-		<result column="last_finish_time" property="lastFinishTime" />
-		<result column="server_id" property="serverId" />
-		<result column="trigger_type" property="triggerType" />
-		<result column="next_fire_time" property="nextFireTime" />
+		<association property="jobStatus" resultMap="jobStatusMap"/>
 		<collection property="propList" ofType="codedriver.framework.scheduler.dto.JobPropVo">
 			<id column="prop_id" property="id" />
 			<result column="prop_name" property="name" />
 			<result column="prop_value" property="value" />
 		</collection>
 	</resultMap>
+	
+	<resultMap id="jobStatusMap" type="codedriver.framework.scheduler.dto.JobStatusVo">
+		<id column="job_uuid" property="jobUuid" />
+		<result column="status" property="status" />
+		<result column="next_fire_time" property="nextFireTime" />
+		<result column="last_fire_time" property="lastFireTime" />
+		<result column="last_finish_time" property="lastFinishTime" />
+		<result column="exec_count" property="execCount" />
+	</resultMap>
 
 	<sql id="jobDetailSql">
 		a.uuid,
 		a.name,
 		a.classpath,
-		a.cron,
-		a.repeat,
-		a.interval,
-		a.is_active,
-		a.need_audit,
-		a.status,
-		a.server_id,
-		a.trigger_type,
 		a.begin_time,
 		a.end_time,
-		a.last_fire_time,
-		a.last_finish_time,
-		a.next_fire_time,
-		a.exec_count
+		a.cron,
+		a.is_active,
+		a.need_audit		
 	</sql>
-
+	
+	<sql id="jobStatusSql">
+		sjs.job_uuid,
+		sjs.status,
+		sjs.last_fire_time,
+		sjs.last_finish_time,
+		sjs.next_fire_time,
+		sjs.exec_count
+	</sql>
+	
 	<sql id="searchScheduleJobSql">
 		WHERE
 		1=1
@@ -79,10 +82,17 @@
 		d.prop_value,
 		d.id as prop_id
 		FROM schedule_job a
+		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.uuid = #{uuid}
 	</select>
-
+	
+	<select id="getJobStatusByJobUuid" resultMap="jobStatusMap">
+		SELECT
+		<include refid="jobStatusSql"/>
+		FROM schedule_job_status sjs
+		WHERE sjs.job_uuid = #{jobUuid}
+	</select>
 	<select id="getJobByClasspath" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
@@ -90,7 +100,8 @@
 		d.prop_name,
 		d.prop_value,
 		d.id AS prop_id
-		FROM schedule_job a
+		FROM schedule_job a		
+		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.is_active = 'yes' AND a.status = 'running'
 		AND a.classpath = #{classpath}
@@ -106,7 +117,8 @@
 	<select id="searchJobList" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
-		FROM schedule_job a
+		FROM schedule_job a		
+		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
 		<include refid="searchScheduleJobSql" />
 		ORDER by a.name
 		limit #{startNum}, #{pageSize}
@@ -120,6 +132,7 @@
 		d.prop_value,
 		d.id AS prop_id
 		FROM schedule_job a
+		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE 1=1
 		<if test="name != null and name != ''">
@@ -217,26 +230,17 @@
 		<if test="name != null">
 		name = #{name},
 		</if>
+		<if test="classpath != null">
+		classpath = #{classpath},
+		</if>
 		<if test="beginTime != null">
 		begin_time = #{beginTime},
 		</if>
 		<if test="endTime != null">
 		end_time = #{endTime},
 		</if>
-		<if test="triggerType != null">
-		`trigger_type`=#{triggerType},
-		</if>
-		<if test="repeat != null">
-		`repeat` = #{repeat},
-		</if>
 		<if test="cron != null">
 		cron = #{cron},
-		</if>
-		<if test="interval != null">
-		`interval` = #{interval},
-		</if>
-		<if test="serverId != null">
-		server_id = #{serverId},
 		</if>
 		<if test="status != null">
 		status = #{status},
@@ -247,9 +251,17 @@
 		<if test="needAudit != null">
 		need_audit = #{needAudit},
 		</if>
-		<if test="execCount != null">
-		exec_count = #{execCount},
-		</if>
+		uuid = #{uuid}
+		WHERE
+		uuid = #{uuid}
+	</update>
+	
+	<update id="updateJobStatusByJobUuid">
+		UPDATE schedule_job_status
+		SET
+		<if test="status != null">
+		status = #{status},
+		</if>		
 		<if test="nextFireTime != null">
 		next_fire_time = #{nextFireTime},
 		</if>
@@ -259,9 +271,12 @@
 		<if test="lastFireTime != null">
 		last_fire_time = #{lastFireTime},
 		</if>
-		uuid = #{uuid}
+		<if test="execCount != null">
+		exec_count = #{execCount},
+		</if>
+		job_uuid = #{jobUuid}
 		WHERE
-		uuid = #{uuid}
+		job_uuid = #{jobUuid}
 	</update>
 	
 	<update id="updateJobClass">
@@ -309,28 +324,29 @@
 		classpath,
 		begin_time,
 		end_time,
-		`trigger_type`,
-		`repeat`,
 		cron,
-		`interval`,
-		`status`,
 		is_active,
-		need_audit,
-		server_id
+		need_audit
 		) VALUES (
 		#{uuid},
 		#{name},
 		#{classpath},
 		#{beginTime},
 		#{endTime},
-		#{triggerType},
-		#{repeat},
 		#{cron},
-		#{interval},
-		#{status},
 		#{isActive},
-		#{needAudit},
-		#{serverId}
+		#{needAudit}
+		)
+	</insert>
+	
+	<insert id="insertJobStatus">
+		REPLACE INTO schedule_job_status
+		(
+		`uuid`,
+		`status`
+		) VALUES (
+		#{uuid},	
+		#{status}
 		)
 	</insert>
 	
@@ -360,16 +376,21 @@
     </insert>
     
     <delete id="deleteJobByUuid">
-    DELETE a, b FROM schedule_job a LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid WHERE a.uuid = #{uuid}
+    DELETE a, b, sjs, sjl 
+    FROM schedule_job a 
+    LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid
+    LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_uuid 
+    LEFT JOIN schedule_job_lock sjl ON a.uuid = sjl.job_uuid 
+    WHERE a.uuid = #{uuid}
     </delete>
 
-	<delete id="deleteJobPropByJobUuid">
+	<!-- <delete id="deleteJobPropByJobUuid">
 		DELETE FROM schedule_job_prop WHERE job_uuid = #{jobUuid}
 	</delete>
 	
 	<delete id="deleteJobLock">
 		DELETE FROM schedule_job_lock WHERE job_uuid=#{jobUuid}
-	</delete>
+	</delete> -->
 	
 	<delete id="deleteServerNewJobById">
 	DELETE FROM server_new_job WHERE id=#{id}

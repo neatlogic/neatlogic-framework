@@ -18,7 +18,6 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
@@ -42,6 +41,7 @@ import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
 
@@ -72,14 +72,16 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			@Override
 			public void run() {
 				System.out.println("一次检查newJob开始");
-				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
-				for(ServerNewJobVo newJob : newJobList) {
-					schedulerMapper.deleteServerNewJobById(newJob.getId());
-					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
-					tenantContext.setUseDefaultDatasource(false);
-					JobVo jobVo = schedulerMapper.getJobByUuid(newJob.getJobUuid());
-					loadJob(jobVo);
-				}
+				//TODO
+//				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
+//				for(ServerNewJobVo newJob : newJobList) {
+//					schedulerMapper.deleteServerNewJobById(newJob.getId());
+//					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
+//					tenantContext.setUseDefaultDatasource(false);
+//					JobVo jobVo = schedulerMapper.getJobByUuid(newJob.getJobUuid());
+//					JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
+//					loadJob(jobObject);
+//				}
 				System.out.println("一次检查newJob结束");
 			}
 			
@@ -91,50 +93,33 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		return iJobMap.get(className);
 	}
 
-	public void loadJob(JobVo jobVo) {	
-		JobObject jobObject = JobObject.buildJobObject(jobVo);
+	public void loadJob(JobObject jobObject) {	
+//		JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
 			return;
 		}
-		IJob job = SchedulerManager.getInstance(jobObject.getJobClassName());
+//		IJob job = SchedulerManager.getInstance(jobObject.getJobClassName());
 		try {
-			if (jobVo != null && job != null){
-				Map<String, Param> paramMap = job.initProp();
-				if (!job.valid(jobVo.getPropList())){
-					return;
-				}
-			}
-			JobKey jobKey = new JobKey(jobObject.getJobId().toString(), jobObject.getJobGroup());
+//			if (jobVo != null && job != null){
+//				Map<String, Param> paramMap = job.initProp();
+//				if (!job.valid(jobVo.getPropList())){
+//					return;
+//				}
+//			}
+			JobKey jobKey = new JobKey(jobObject.getJobId(), jobObject.getJobGroup());
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);
 			}
 			
-			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId().toString(), jobObject.getJobGroup()).usingJobData(jobObject.getJobDataMap());
-			if (JobVo.CRON_TRIGGER.equals(jobObject.getTriggerType())) {
-				if(CronExpression.isValidExpression(jobObject.getCron())) {
-					triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
-				}else {
-					return;
-				}				
-			} else if(JobVo.SIMPLE_TRIGGER.equals(jobObject.getTriggerType())){
-				if(jobObject.getInterval() > 0 || jobObject.getRepeat() > 1) {
-					SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
-					if (jobObject.getInterval() > 0) {						
-						ssb = ssb.withIntervalInSeconds(jobObject.getInterval());//默认												
-					}
-					if (jobObject.getRepeat() > 0) { 
-						ssb = ssb.withRepeatCount(jobObject.getRepeat() - 1); 
-					} else {
-						ssb = ssb.repeatForever();
-					}
-					triggerBuilder.withSchedule(ssb);
-				}else {
-					return;
-				}				
+			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId(), jobObject.getJobGroup()).usingJobData(jobObject.getJobDataMap());
+			
+			if(CronExpression.isValidExpression(jobObject.getCron())) {
+				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
 			}else {
 				return;
-			}
+			}				
+			schedulerMapper.insertJobStatus(new JobStatusVo(jobObject.getJobId(), JobStatusVo.RUNNING));
 			Date startTime = jobObject.getStartTime();
 			if(startTime != null && startTime.after(new Date())) {
 				triggerBuilder.startAt(startTime);
@@ -145,16 +130,18 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			Trigger trigger = triggerBuilder.build();
 			Class clazz = Class.forName(jobObject.getJobClassName());
 			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).usingJobData(jobObject.getJobDataMap()).build();
-		    scheduler.scheduleJob(jobDetail, trigger);			
+		    scheduler.scheduleJob(jobDetail, trigger);
+		    
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 	
-	public void deleteJob(String uuid) {
+	public void deleteJob(JobObject jobObject) {
 		try {
+			schedulerMapper.updateJobStatusByJobUuid(new JobStatusVo(jobObject.getJobId(), JobStatusVo.STOP));
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
-			JobKey jobKey = new JobKey(uuid, TenantContext.get().getTenantUuid());
+			JobKey jobKey = new JobKey(jobObject.getJobId(), jobObject.getJobGroup());
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);
 			}			
@@ -168,7 +155,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		tenantContext.setUseDefaultDatasource(false);
 		List<JobVo> jobList = schedulerMapper.getJobByClasspath(jobClassVo.getClasspath());
 		for (JobVo job : jobList) {
-			loadJob(job);
+			JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
+			loadJob(jobObject);
 		}
 	}
 	

@@ -31,6 +31,7 @@ import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobPropVo;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 import codedriver.framework.scheduler.service.SchedulerService;
@@ -74,36 +75,36 @@ public abstract class JobBase implements IJob {
         	schedulerService.stopJob(jobUuid);
             return;
         }
-        JobVo getLockBeforeJob = schedulerMapper.getJobByUuid(jobUuid);
-        if(getLockBeforeJob == null) {
+        JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
+        if(lockBeforeJobStatus == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
 			logger.error(message.toString());
         	schedulerService.stopJob(jobUuid);
             return;
         }
-        if (!JobVo.RUNNING.equals(getLockBeforeJob.getStatus())) {
+        if (!JobStatusVo.RUNNING.equals(lockBeforeJobStatus.getStatus())) {
         	schedulerService.stopJob(jobUuid);
             return;
         }
-        JobDataMap jobDataMap = jobDetail.getJobDataMap();
-        int execCount = jobDataMap.getInt("execCount");
-		System.err.println("jobDetail count: "+execCount);
+//        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+//        int execCount = jobDataMap.getInt("execCount");
+//		System.err.println("jobDetail count: "+execCount);
 		
 		Date fireTime = context.getFireTime();
-		Date nextFireTime = getLockBeforeJob.getNextFireTime();
-    	if(execCount < getLockBeforeJob.getExecCount() || (nextFireTime != null && nextFireTime.after(fireTime))) {
-    		jobDataMap.put("execCount",getLockBeforeJob.getExecCount());
+		Date nextFireTime = lockBeforeJobStatus.getNextFireTime();
+    	if(nextFireTime != null && nextFireTime.after(fireTime)) {
+//    		jobDataMap.put("execCount",getLockBeforeJob.getExecCount());
     		return;
     	}
     	// 抢锁       		
 		if(!schedulerService.getJobLock(jobUuid)) {
-			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
+//			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 			return;
 		}
 		try {
-			JobVo getLockAfterJob = schedulerMapper.getJobByUuid(jobUuid);
-			if(getLockAfterJob.getExecCount() > getLockBeforeJob.getExecCount()) {
-				jobDataMap.put("execCount",getLockAfterJob.getExecCount());
+			JobStatusVo lockAfterJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
+			if(lockAfterJobStatus.getExecCount() != lockAfterJobStatus.getExecCount()) {
+//				jobDataMap.put("execCount",getLockAfterJob.getExecCount());
 				return;
 			}
 //			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
@@ -156,33 +157,21 @@ public abstract class JobBase implements IJob {
 			job.executeInternal(context);
 			auditVo.setState(JobAuditVo.SUCCESS);
 			schedulerMapper.updateJobAudit(auditVo);
-			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
-	        JobVo schedule = new JobVo();
-			schedule.setLastFinishTime(new Date());
-			schedule.setLastFireTime(fireTime);
-			Trigger trigger = context.getTrigger();
-			if(trigger instanceof SimpleTrigger) {
-				if(getLockBeforeJob.getRepeat() == getLockBeforeJob.getExecCount()+1) {
-					schedule.setStatus(JobVo.STOP);
-					schedulerService.stopJob(jobUuid);
-				}else if(context.getNextFireTime() == null){
-					getLockBeforeJob.setExecCount(getLockBeforeJob.getExecCount()+1);
-					schedulerService.loadJob(getLockBeforeJob);
-				}else {
-					schedule.setNextFireTime(context.getNextFireTime());
-				}
-			}else {
-				if(context.getNextFireTime() == null) {
-					schedule.setStatus(JobVo.STOP);
-					schedulerService.stopJob(jobUuid);
-				}else {
-					schedule.setNextFireTime(context.getNextFireTime());								
-				} 
-			}    		
-			schedule.setUuid(jobUuid);
-			schedule.setExecCount(getLockBeforeJob.getExecCount()+1);
+//			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
+	        JobStatusVo jobStatus = new JobStatusVo();
+	        jobStatus.setLastFinishTime(new Date());
+	        jobStatus.setLastFireTime(fireTime);
 			
-			schedulerMapper.updateJobById(schedule);
+			if(context.getNextFireTime() != null) {
+				jobStatus.setNextFireTime(context.getNextFireTime());
+			}else {				
+				jobStatus.setStatus(JobStatusVo.STOP);
+				schedulerService.stopJob(jobUuid);
+			} 			   		
+			jobStatus.setJobUuid(jobUuid);
+			jobStatus.setExecCount(lockBeforeJobStatus.getExecCount()+1);
+			
+			schedulerMapper.updateJobStatusByJobUuid(jobStatus);
 		}finally {
 			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobUuid, JobLockVo.RELEASE_LOCK));
 		}

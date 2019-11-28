@@ -10,45 +10,22 @@ import codedriver.framework.common.dto.BasePageVo;
 
 public class JobVo extends BasePageVo {
 	
-	public final static String RUNNING = "running";
-	public final static String STOP = "stop";
-	public final static String NOT_LOADED = "not_loaded";
-	
 	public final static String YES = "yes";
 	public final static String NO = "no";
 	
-	public final static String SIMPLE_TRIGGER = "simple";
-	public final static String CRON_TRIGGER = "cron";
-	
-	private String uuid;
-	private Integer repeat;
-	private String status;
+	private String uuid;	
 	private String classpath;
-	private Integer interval;
 	private String isActive;
 	private String needAudit;
-	private String triggerType;
-	private Integer serverId;
-	private Integer execCount;
 	private String name;
 	private String cron;
 	private Date beginTime;
 	private Date endTime;
-	private Date nextFireTime;
-	private Date lastFireTime;
-	private Date lastFinishTime;
+	private JobStatusVo jobStatus;
 	private List<JobPropVo> propList;
 
 	public JobVo() {
 		this.setPageSize(20);
-	}
-
-	public Integer getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(Integer serverId) {
-		this.serverId = serverId;
 	}
 
 	public List<JobPropVo> getPropList() {
@@ -60,30 +37,6 @@ public class JobVo extends BasePageVo {
 
 	public void setPropList(List<JobPropVo> propList) {
 		this.propList = propList;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public Integer getExecCount() {
-		return execCount;
-	}
-
-	public void setExecCount(Integer execCount) {
-		this.execCount = execCount;
-	}
-
-	public String getTriggerType() {
-		return triggerType;
-	}
-
-	public void setTriggerType(String triggerType) {
-		this.triggerType = triggerType;
 	}
 
 	public synchronized String getUuid() {
@@ -121,22 +74,6 @@ public class JobVo extends BasePageVo {
 		this.cron = cron;
 	}
 
-	public Integer getRepeat() {
-		return repeat;
-	}
-
-	public void setRepeat(Integer repeat) {
-		this.repeat = repeat;
-	}
-
-	public Integer getInterval() {
-		return interval;
-	}
-
-	public void setInterval(Integer interval) {
-		this.interval = interval;
-	}
-
 	public String getIsActive() {
 		return isActive;
 	}
@@ -169,27 +106,12 @@ public class JobVo extends BasePageVo {
 		this.endTime = endTime;
 	}
 
-	public Date getNextFireTime() {
-		return nextFireTime;
+	public JobStatusVo getJobStatus() {
+		return jobStatus;
 	}
 
-	public void setNextFireTime(Date nextFireTime) {
-		this.nextFireTime = nextFireTime;
+	public void setJobStatus(JobStatusVo jobStatus) {
+		this.jobStatus = jobStatus;
 	}
 
-	public Date getLastFireTime() {
-		return lastFireTime;
-	}
-
-	public void setLastFireTime(Date lastFireTime) {
-		this.lastFireTime = lastFireTime;
-	}
-
-	public Date getLastFinishTime() {
-		return lastFinishTime;
-	}
-
-	public void setLastFinishTime(Date lastFinishTime) {
-		this.lastFinishTime = lastFinishTime;
-	}
 }

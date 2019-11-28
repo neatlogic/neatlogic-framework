@@ -3,7 +3,7 @@ package codedriver.framework.scheduler.dto;
 public class JobPropVo {
 
 	private Long id;
-	private String jobUUid;
+	private String jobUuid;
 	private String name;
 	private String value;
 	
@@ -30,10 +30,10 @@ public class JobPropVo {
 		this.id = id;
 	}
 	public String getJobUuid() {
-		return jobUUid;
+		return jobUuid;
 	}
-	public void setJobUuid(String jobUUid) {
-		this.jobUUid = jobUUid;
+	public void setJobUuid(String jobUuid) {
+		this.jobUuid = jobUuid;
 	}
 	public String getName() {
 		return name;

@@ -22,6 +22,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
@@ -40,37 +41,48 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	
 	@PostConstruct
 	public final void init() {
+		//服务器重启时，先重置与自己相关的数据
 		getServerLock(Config.SCHEDULE_SERVER_ID);
+		//重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.insertServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
-		Runnable runnable = new Runnable() {
+		CodeDriverThread runnable = new CodeDriverThread() {
 
 			@Override
-			public void run() {
+			protected void execute() {
 				try {
+					//查找故障服务器
 					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);					
 					for(ServerClusterVo server : list) {						
 						if(getServerLock(server.getServerId())) {
+							//如果抢到锁，开始处理
 							for(ServerObserver observer : set) {
 								CommonThreadPool.execute(new ServerObserverThread(observer, server.getServerId()));
 							}
 						}						
 					}
+					//将自己的计数器清零
 					serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
+					//查出正常服务器及计数器加一后的值
 					List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
 					for(ServerCounterVo serverCounter : serverCounterList) {
+						//重新插入数据
 						serverMapper.insertServerCounter(serverCounter);
 					}
 				}catch(Exception e) {
 					logger.error(e.getMessage(),e);
-				}
-				
+				}				
 			}		
 		};
 		heartbeatService.scheduleAtFixedRate(runnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
 	}
-	
+	/**
+	 * 
+	* @Description: 将故障服务器状态设置为停止，删除与该服务器相关的计数器数据 
+	* @param serverId 故障服务器id
+	* @return boolean
+	 */
 	public boolean getServerLock(Integer serverId) {
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -94,8 +106,9 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
-		Map<String, ServerObserver> map = context.getBeansOfType(ServerObserver.class);
-		for(Entry<String, ServerObserver> entry : map.entrySet()) {
+		//找出所有实现ServerObserver接口的类
+		Map<String, ServerObserver> serverObserverMap = context.getBeansOfType(ServerObserver.class);
+		for(Entry<String, ServerObserver> entry : serverObserverMap.entrySet()) {
 			set.add(entry.getValue());
 		}
 	}

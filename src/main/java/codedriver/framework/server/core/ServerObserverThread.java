@@ -1,6 +1,8 @@
 package codedriver.framework.server.core;
 
-public class ServerObserverThread implements Runnable{
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+
+public class ServerObserverThread extends CodeDriverThread {
 
 	private ServerObserver observer;
 	private Integer serverId;
@@ -9,9 +11,9 @@ public class ServerObserverThread implements Runnable{
 		this.observer = observer;
 		this.serverId = serverId;
 	}
-	
+
 	@Override
-	public void run() {
+	protected void execute() {
 		observer.whenServerInactivated(serverId);		
 	}
 

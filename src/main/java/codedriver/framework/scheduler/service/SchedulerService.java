@@ -20,10 +20,4 @@ public interface SchedulerService {
 
 	boolean getJobLock(String uuid);
 	
-	public void loadJob(JobVo job);
-	
-	public void stopJob(String uuid);
-	
-	public void deleteJob(String uuid);
-	
 }

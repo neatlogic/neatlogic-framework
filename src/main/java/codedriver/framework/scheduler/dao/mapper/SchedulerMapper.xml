@@ -134,13 +134,7 @@
 		FROM schedule_job a
 		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-		WHERE 1=1
-		<if test="name != null and name != ''">
-		and a.name = #{name}
-		</if>
-		<if test="uuid != null and uuid != ''">
-		and a.uuid!=#{uuid}
-		</if>
+		WHERE a.name = #{name}
 	</select>
 	
 	<select id="getJobClassByClasspath" resultType="codedriver.framework.scheduler.dto.JobClassVo">

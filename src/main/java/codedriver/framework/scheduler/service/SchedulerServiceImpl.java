@@ -28,8 +28,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	private Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 	
-	@Autowired
-	private SchedulerManager schedulerManager;
+
 	
 	@Autowired 
 	private SchedulerMapper schedulerMapper;
@@ -63,25 +62,21 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	@Override
 	public int saveJob(JobVo job) {
+		String uuid = job.getUuid();
+		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
 			SchedulerExceptionMessage message = new SchedulerExceptionMessage("名称："+ job.getName() + " 已存在");
 			logger.error(message.toString());
 			throw new ApiRuntimeException(message);
 		}
-		String uuid = job.getUuid();
-		deleteJob(uuid);						
+		job.setUuid(null);						
 		int count = schedulerMapper.insertJob(job);
-		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.RELEASE_LOCK));
+		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.RELEASE_LOCK, Config.SCHEDULE_SERVER_ID));
 		for(JobPropVo jobProp : job.getPropList()) {
 			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
-		}
-		if(JobVo.YES.equals(job.getIsActive())) {
-			JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
-			schedulerManager.loadJob(jobObject);				
-		}			
-		
+		}		
 		return count;
 	}
 
@@ -106,27 +101,5 @@ public class SchedulerServiceImpl implements SchedulerService{
 		}		
 		return false;
 	}
-
-	@Override
-	public void loadJob(JobVo jobVo) {
-		JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
-		schedulerManager.loadJob(jobObject);
-	}
-	
-	@Override
-	public void stopJob(String uuid) {
-		JobVo job = schedulerMapper.getJobByUuid(uuid);
-		JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
-		schedulerManager.deleteJob(jobObject);
-	}
-	
-	@Override
-	public void deleteJob(String uuid) {
-		JobVo job = schedulerMapper.getJobByUuid(uuid);
-		JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
-		schedulerManager.deleteJob(jobObject);
-		schedulerMapper.deleteJobByUuid(uuid);
-	}
-	
 
 }

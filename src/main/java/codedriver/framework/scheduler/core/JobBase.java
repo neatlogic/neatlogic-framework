@@ -46,6 +46,8 @@ public abstract class JobBase implements IJob {
 	private Logger logger = LoggerFactory.getLogger(JobBase.class);
 	protected static SchedulerMapper schedulerMapper;
 		
+	protected static SchedulerManager schedulerManager;
+	
 	protected static SchedulerService schedulerService;
 
 	@Autowired
@@ -53,6 +55,11 @@ public abstract class JobBase implements IJob {
 		schedulerMapper = schMapper;
 	}
 
+	@Autowired
+	protected void setSchedulerManager(SchedulerManager schManager) {
+		schedulerManager = schManager;
+	}
+	
 	@Autowired
 	protected void setSchedulerService(SchedulerService schService) {
 		schedulerService = schService;
@@ -72,18 +79,18 @@ public abstract class JobBase implements IJob {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
 			logger.error(message.toString());
         	System.out.println(message.toString());
-        	schedulerService.stopJob(jobUuid);
+        	schedulerManager.stopJob(jobUuid);
             return;
         }
         JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
         if(lockBeforeJobStatus == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
 			logger.error(message.toString());
-        	schedulerService.stopJob(jobUuid);
+        	schedulerManager.stopJob(jobUuid);
             return;
         }
         if (!JobStatusVo.RUNNING.equals(lockBeforeJobStatus.getStatus())) {
-        	schedulerService.stopJob(jobUuid);
+        	schedulerManager.stopJob(jobUuid);
             return;
         }
 //        JobDataMap jobDataMap = jobDetail.getJobDataMap();
@@ -166,7 +173,7 @@ public abstract class JobBase implements IJob {
 				jobStatus.setNextFireTime(context.getNextFireTime());
 			}else {				
 				jobStatus.setStatus(JobStatusVo.STOP);
-				schedulerService.stopJob(jobUuid);
+				schedulerManager.deleteJob(jobUuid);
 			} 			   		
 			jobStatus.setJobUuid(jobUuid);
 			jobStatus.setExecCount(lockBeforeJobStatus.getExecCount()+1);

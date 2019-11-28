@@ -59,7 +59,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	private ModuleMapper moduleMapper;
 	@Autowired
 	private DatasourceMapper datasourceMapper;
-	
+//	@Autowired 
+//	private ServerMapper serverMapper;
 	private List<DatasourceVo> datasourceList = new ArrayList<>();
 	
 	@PostConstruct
@@ -132,6 +133,18 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).usingJobData(jobObject.getJobDataMap()).build();
 		    scheduler.scheduleJob(jobDetail, trigger);
 		    
+//			TenantContext tenant = TenantContext.get();
+//			String tenantUuid = tenant.getTenantUuid();
+//			tenant.setUseDefaultDatasource(true);
+//			List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
+//			for(ServerClusterVo server : serverList) {
+//				int serverId = server.getServerId();
+//				if(Config.SCHEDULE_SERVER_ID == serverId) {
+//					continue;
+//				}
+//				schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObject.getJobId(), tenantUuid));
+//			}
+			
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}

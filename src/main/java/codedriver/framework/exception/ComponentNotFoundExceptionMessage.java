@@ -1,6 +1,6 @@
 package codedriver.framework.exception;
 
-public class ComponentNotFoundExceptionMessage extends FrameworkExceptionMessageBase {
+public class ComponentNotFoundExceptionMessage implements IApiExceptionMessage {
 	private String componentId;
 
 	public ComponentNotFoundExceptionMessage(String _componentId) {
@@ -13,7 +13,7 @@ public class ComponentNotFoundExceptionMessage extends FrameworkExceptionMessage
 	}
 
 	@Override
-	protected String myGetErrorCode() {
+	public String getErrorCode() {
 		return "02";
 	}
 

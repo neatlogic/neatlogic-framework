@@ -1,9 +1,9 @@
 package codedriver.framework.exception;
 
-public class AnonymousExceptionMessage extends FrameworkExceptionMessageBase {
+public class AnonymousExceptionMessage implements IApiExceptionMessage {
 
 	@Override
-	protected String myGetErrorCode() {
+	public String getErrorCode() {
 		return "01";
 	}
 

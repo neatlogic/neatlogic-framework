@@ -7,8 +7,8 @@ import org.springframework.aop.support.AopUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.auth.param.AuthParamFactory;
 import codedriver.framework.common.AuthAction;
+import codedriver.framework.common.apiparam.ApiParamFactory;
 import codedriver.framework.exception.ApiRuntimeException;
 import codedriver.framework.exception.AuthActionExceptionMessage;
 import codedriver.framework.exception.AuthParamsExceptionMessage;
@@ -55,7 +55,7 @@ public class AuthApiInterceptor implements MethodInterceptor {
 						}
 						//参数类型校验
 						String param = paramJson.getString(p.name());
-						if(param!=null && !AuthParamFactory.getAuthInstance(p.type()).doAuth(param)) {
+						if(param!=null && !ApiParamFactory.getAuthInstance(p.type()).doAuth(param)) {
 							throw new ApiRuntimeException(new AuthParamsExceptionMessage(p.name(),p.type()));
 						}
 					}

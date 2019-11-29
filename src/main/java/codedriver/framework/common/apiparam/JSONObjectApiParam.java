@@ -1,17 +1,19 @@
-package codedriver.framework.auth.param;
+package codedriver.framework.common.apiparam;
 
-public class LongApiParam extends ApiParamBase {
+import com.alibaba.fastjson.JSONObject;
+
+public class JSONObjectApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
 
-		return "整形参数认证";
+		return "json参数认证";
 	}
 
 	@Override
 	public boolean doAuth(String param) {
 		try {
-			Long.valueOf(param);
+			JSONObject.parseObject(param);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -20,7 +22,7 @@ public class LongApiParam extends ApiParamBase {
 
 	@Override
 	public ApiParamType getAuthType() {
-		return ApiParamType.LONG;
+		return ApiParamType.JSONOBJECT;
 	}
 
 }

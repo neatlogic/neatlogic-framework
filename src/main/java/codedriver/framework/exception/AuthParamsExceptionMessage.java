@@ -1,6 +1,6 @@
 package codedriver.framework.exception;
 
-import codedriver.framework.auth.param.ApiParamType;
+import codedriver.framework.common.apiparam.ApiParamType;
 
 public class AuthParamsExceptionMessage implements IApiExceptionMessage {
 	private String paramName ="";

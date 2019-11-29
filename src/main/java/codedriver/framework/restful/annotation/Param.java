@@ -6,8 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.auth.param.ApiParamBase;
-import codedriver.framework.auth.param.ApiParamType;
+import codedriver.framework.common.apiparam.ApiParamBase;
+import codedriver.framework.common.apiparam.ApiParamType;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,4 +1,4 @@
-package codedriver.framework.auth.param;
+package codedriver.framework.common.apiparam;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
-public class AuthParamFactory {
+public class ApiParamFactory {
 	private static Map<ApiParamType, ApiParamBase> authParamMap = new HashMap<ApiParamType, ApiParamBase>();
 	
 	static {

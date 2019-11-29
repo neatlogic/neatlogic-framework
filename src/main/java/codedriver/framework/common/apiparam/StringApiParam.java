@@ -1,4 +1,4 @@
-package codedriver.framework.auth.param;
+package codedriver.framework.common.apiparam;
 
 public class StringApiParam extends ApiParamBase {
 

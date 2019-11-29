@@ -2,7 +2,7 @@ package codedriver.framework.exception;
 
 import codedriver.framework.auth.param.AuthParamType;
 
-public class AuthParamsExceptionMessage extends FrameworkExceptionMessageBase {
+public class AuthParamsExceptionMessage implements IApiExceptionMessage {
 	private String paramName ="";
 	private AuthParamType paramType = null;
 	
@@ -16,7 +16,7 @@ public class AuthParamsExceptionMessage extends FrameworkExceptionMessageBase {
 	}
 	
 	@Override
-	protected String myGetErrorCode() {
+	public String getErrorCode() {
 		return "05";
 	}
 

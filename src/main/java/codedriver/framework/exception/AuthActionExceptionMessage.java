@@ -1,13 +1,13 @@
 package codedriver.framework.exception;
 
-public class AuthActionExceptionMessage extends FrameworkExceptionMessageBase {
+public class AuthActionExceptionMessage implements IApiExceptionMessage {
 	private String actionMsg ="";
 	public AuthActionExceptionMessage(String _actionMsg) {
 		this.actionMsg = _actionMsg;
 	}
 	
 	@Override
-	protected String myGetErrorCode() {
+	public String getErrorCode() {
 		return "04";
 	}
 

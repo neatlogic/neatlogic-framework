@@ -27,9 +27,9 @@ import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.exception.ApiNotFoundExceptionMessage;
-import codedriver.framework.exception.ApiRuntimeException;
-import codedriver.framework.exception.ComponentNotFoundExceptionMessage;
+import codedriver.framework.exception.type.ApiNotFoundExceptionMessage;
+import codedriver.framework.exception.type.ApiRuntimeException;
+import codedriver.framework.exception.type.ComponentNotFoundExceptionMessage;
 import codedriver.framework.restful.core.ApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.JsonStreamApiComponent;

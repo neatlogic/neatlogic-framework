@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantModuleMapper">
-	<cache eviction="LRU" flushInterval="60000" size="1024" readOnly="true" />
+	<cache eviction="LRU" flushInterval="300000" size="1024" readOnly="true" />
 	
 	<resultMap id="tenantModuleMap" type="codedriver.framework.dto.TenantModuleVo">
 		<id property="tenantUuid" column="tenant_uuid" />
@@ -17,7 +17,7 @@
 		</collection>
 	</resultMap>
 
-	<select id="getAllTenantModule" resultMap="tenantModuleMap">
+	<select id="getAllTenantModule" resultMap="tenantModuleMap" useCache="true">
 		SELECT 
 		  tm.`tenant_uuid`,
 		  tm.`module_name` ,

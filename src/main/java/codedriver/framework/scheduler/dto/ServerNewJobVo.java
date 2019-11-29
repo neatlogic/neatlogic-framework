@@ -3,15 +3,13 @@ package codedriver.framework.scheduler.dto;
 public class ServerNewJobVo {
 	private Long id;
 	private Integer serverId;
-	private String jobUuid;
-	private String tenantUuid;
+	private byte[] jobObject;
 	
 	public ServerNewJobVo() {
 	}
-	public ServerNewJobVo(Integer serverId, String jobUuid, String tenantUuid) {
+	public ServerNewJobVo(Integer serverId, byte[] jobObject) {
 		this.serverId = serverId;
-		this.jobUuid = jobUuid;
-		this.tenantUuid = tenantUuid;
+		this.jobObject = jobObject;
 	}
 	public Long getId() {
 		return id;
@@ -25,16 +23,10 @@ public class ServerNewJobVo {
 	public void setServerId(Integer serverId) {
 		this.serverId = serverId;
 	}
-	public String getJobUuid() {
-		return jobUuid;
+	public byte[] getJobObject() {
+		return jobObject;
 	}
-	public void setJobUuid(String jobUuid) {
-		this.jobUuid = jobUuid;
-	}
-	public String getTenantUuid() {
-		return tenantUuid;
-	}
-	public void setTenantUuid(String tenantUuid) {
-		this.tenantUuid = tenantUuid;
+	public void setJobObject(byte[] jobObject) {
+		this.jobObject = jobObject;
 	}
 }

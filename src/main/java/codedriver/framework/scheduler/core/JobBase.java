@@ -37,6 +37,7 @@ import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 import codedriver.framework.scheduler.service.SchedulerService;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
+import codedriver.framework.scheduler.dto.JobObject;
 
 /**
  * 定时任务处理模块基类，所新增的定时任务类必须继承此类，新Job类必须实现接口内的2个方法。
@@ -69,61 +70,61 @@ public abstract class JobBase implements IJob {
     	
         JobDetail jobDetail = context.getJobDetail();       
         JobKey jobKey = jobDetail.getKey();
-        String tenantUuid = jobKey.getGroup();
-		TenantContext tenantContext = TenantContext.init(tenantUuid);
-		tenantContext.setUseDefaultDatasource(false);
-        String jobUuid = jobKey.getName();
-        
+        //从job组名中获取租户uuid,切换到租户的数据源
+        String groupName = jobKey.getGroup();
+        int index = groupName.indexOf(JobObject.DELIMITER);
+        String tenantUuid = groupName.substring(0,index);
+		TenantContext.init(tenantUuid).setUseDefaultDatasource(false);	
+        String jobUuid = jobKey.getName();        
         IJob job = SchedulerManager.getInstance(this.getClassName());
         if (job == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
 			logger.error(message.toString());
         	System.out.println(message.toString());
-        	schedulerManager.stopJob(jobUuid);
+        	schedulerManager.deleteJob(jobUuid);
             return;
         }
+        //抢锁前 获取定时作业状态信息
         JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
         if(lockBeforeJobStatus == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
 			logger.error(message.toString());
-        	schedulerManager.stopJob(jobUuid);
+        	schedulerManager.deleteJob(jobUuid);
             return;
         }
+        // 如果定时作业状态不是运行中，就停止定时调度
         if (!JobStatusVo.RUNNING.equals(lockBeforeJobStatus.getStatus())) {
-        	schedulerManager.stopJob(jobUuid);
+        	schedulerManager.deleteJob(jobUuid);
             return;
         }
-//        JobDataMap jobDataMap = jobDetail.getJobDataMap();
-//        int execCount = jobDataMap.getInt("execCount");
-//		System.err.println("jobDetail count: "+execCount);
 		
-		Date fireTime = context.getFireTime();
-		Date nextFireTime = lockBeforeJobStatus.getNextFireTime();
+		Date fireTime = context.getFireTime();//本次执行激活时间
+		Date nextFireTime = lockBeforeJobStatus.getNextFireTime();//数据库中记录的下次激活时间
+		//如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
     	if(nextFireTime != null && nextFireTime.after(fireTime)) {
-//    		jobDataMap.put("execCount",getLockBeforeJob.getExecCount());
     		return;
     	}
-    	// 抢锁       		
+    	//抢不到锁，则放弃执行业务逻辑       		
 		if(!schedulerService.getJobLock(jobUuid)) {
-//			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
 			return;
 		}
 		try {
+			//抢到锁后，再次获取定时作业状态信息
 			JobStatusVo lockAfterJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
-			if(lockAfterJobStatus.getExecCount() != lockAfterJobStatus.getExecCount()) {
-//				jobDataMap.put("execCount",getLockAfterJob.getExecCount());
+			//如果抢锁前后获取到的执行次数不相等，则放弃执行业务逻辑
+			if(!lockAfterJobStatus.getExecCount().equals(lockAfterJobStatus.getExecCount())) {
 				return;
 			}
-//			if (JobVo.YES.equals(jobVo.getNeedAudit())) {
+			if (JobVo.YES.equals(lockBeforeJobStatus.getNeedAudit())) {
 
-//	            JobAuditVo auditVo = new JobAuditVo(jobId, Config.SCHEDULE_SERVER_ID);
-//	            schedulerMapper.insertJobAudit(auditVo);
+	            JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);
+	            schedulerMapper.insertJobAudit(auditVo);
 //	            String path = getFilePath();
 //	            File logFile = new File(path + auditVo.getId() + ".log");
 //	            auditVo.setLogPath(logFile.getPath());
 //	            OutputStreamWriter logOut = null;
-//
-//	            try {
+
+	            try {
 //	                if (!logFile.getParentFile().exists()) {
 //	                    logFile.getParentFile().mkdirs();
 //	                }
@@ -134,19 +135,19 @@ public abstract class JobBase implements IJob {
 //	                if (logOut != null) {
 //	                    context.put("logOutput", logOut);
 //	                }
-//
-//	                job.executeInternal(context);                   
-//	                auditVo.setState(JobAuditVo.SUCCESS);                    
-//	            } catch (Exception ex) {
+
+	                job.executeInternal(context);                   
+	                auditVo.setState(JobAuditVo.SUCCESS);                    
+	            } catch (Exception ex) {
 //	                try {
-//	                    auditVo.setState(JobAuditVo.ERROR);
-//	                    logger.error(ex.getMessage(), ex);
+	                    auditVo.setState(JobAuditVo.ERROR);
+	                    logger.error(ex.getMessage(), ex);
 //	                    logOut.write(ExceptionUtils.getStackTrace(ex));
 //	                } catch (IOException e) {
 //	                    logger.error(e.getMessage(), e);
 //	                }
-//	            } finally {
-//	                schedulerMapper.updateJobAudit(auditVo);
+	            } finally {
+	                schedulerMapper.updateJobAudit(auditVo);
 //	                if (logOut != null) {
 //	                    try {
 //	                        logOut.flush();
@@ -155,16 +156,11 @@ public abstract class JobBase implements IJob {
 //	                        e.printStackTrace();
 //	                    }
 //	                }
-//	            }
-//	        }else {
-//	        	job.executeInternal(context);
-//	        }
-			JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);
-            schedulerMapper.insertJobAudit(auditVo);
-			job.executeInternal(context);
-			auditVo.setState(JobAuditVo.SUCCESS);
-			schedulerMapper.updateJobAudit(auditVo);
-//			jobDataMap.put("execCount",getLockBeforeJob.getExecCount() + 1);
+	            }
+	        }else {
+	        	job.executeInternal(context);
+	        }
+			//执行完业务逻辑后，更新定时作业状态信息
 	        JobStatusVo jobStatus = new JobStatusVo();
 	        jobStatus.setLastFinishTime(new Date());
 	        jobStatus.setLastFireTime(fireTime);
@@ -180,7 +176,7 @@ public abstract class JobBase implements IJob {
 			
 			schedulerMapper.updateJobStatusByJobUuid(jobStatus);
 		}finally {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobUuid, JobLockVo.RELEASE_LOCK));
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobUuid, JobLockVo.WAIT));
 		}
     }
 
@@ -189,10 +185,6 @@ public abstract class JobBase implements IJob {
 	 */
 	@Override
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
-	@Override
-	public abstract String getType();
-	@Override
-	public abstract String getJobClassName();
 
 	/**
 	 * 获取类名

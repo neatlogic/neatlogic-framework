@@ -78,11 +78,13 @@
 		SELECT
 		<include refid="jobDetailSql" />
 		,
+		<include refid="jobStatusSql" />
+		,
 		d.prop_name,
 		d.prop_value,
 		d.id as prop_id
 		FROM schedule_job a
-		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.uuid = #{uuid}
 	</select>
@@ -96,15 +98,17 @@
 	<select id="getJobByClasspath" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
-		,
-		d.prop_name,
-		d.prop_value,
-		d.id AS prop_id
 		FROM schedule_job a		
-		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
-		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-		WHERE a.is_active = 'yes' AND a.status = 'running'
-		AND a.classpath = #{classpath}
+		JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		AND sjs.status = 'running'		
+		UNION
+		SELECT
+		<include refid="jobDetailSql" />
+		FROM schedule_job a		
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		AND sjs.job_uuid IS NULL		
 	</select>
 	
 	<select id="searchJobCount" resultType="int">
@@ -117,8 +121,10 @@
 	<select id="searchJobList" resultMap="scheduleMap">
 		SELECT
 		<include refid="jobDetailSql" />
+		,
+		<include refid="jobStatusSql" />
 		FROM schedule_job a		
-		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
 		<include refid="searchScheduleJobSql" />
 		ORDER by a.name
 		limit #{startNum}, #{pageSize}
@@ -128,11 +134,13 @@
 		SELECT
 		<include refid="jobDetailSql" />
 		,
+		<include refid="jobStatusSql" />
+		,
 		d.prop_name,
 		d.prop_value,
 		d.id AS prop_id
 		FROM schedule_job a
-		LEFT JOIN schedule_job_status sjs ON sjs.jobUuid=a.uuid
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.name = #{name}
 	</select>
@@ -203,7 +211,7 @@
 	
 	<select id="getNewJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
 		SELECT 
-		id, server_id AS serverId, job_uuid AS jobUuid, tenant_uuid AS tenantUuid
+		id, server_id AS serverId, job_object AS jobObject
 		FROM server_new_job 
 		WHERE server_id=#{serverId}
 	</select>
@@ -336,11 +344,15 @@
 	<insert id="insertJobStatus">
 		REPLACE INTO schedule_job_status
 		(
-		`uuid`,
-		`status`
+		`job_uuid`,
+		`job_group`,
+		`status`,
+		`need_audit`
 		) VALUES (
-		#{uuid},	
-		#{status}
+		#{jobUuid},
+		#{jobGroup},
+		#{status},
+		#{needAudit}
 		)
 	</insert>
 	
@@ -354,9 +366,6 @@
 	</insert>
 
 	<insert id="insertJobAudit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-      <!-- <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-        SELECT LAST_INSERT_ID() AS id
-      </selectKey> -->
         INSERT INTO schedule_job_audit (job_uuid,start_time,state,server_id)
         VALUES (#{jobUuid},now(),#{state},#{serverId})
     </insert>
@@ -366,7 +375,7 @@
     </insert>
     
     <insert id="insertServerNewJob">
-    INSERT INTO server_new_job(server_id, job_uuid, tenant_uuid) VALUES(#{serverId}, #{jobUuid}, #{tenantUuid})
+    INSERT INTO server_new_job(server_id, job_object) VALUES(#{serverId}, #{jobObject, jdbcType=BLOB})
     </insert>
     
     <delete id="deleteJobByUuid">

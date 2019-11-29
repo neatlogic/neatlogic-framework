@@ -1,8 +1,8 @@
 package codedriver.framework.scheduler.dto;
 
 public class JobLockVo {
-	public final static String GET_LOCK = "run";
-	public final static String RELEASE_LOCK = "wait";
+	public final static String RUN = "run";
+	public final static String WAIT = "wait";
 	
 	private String jobUuid;
 	private String lock;

@@ -1,12 +1,15 @@
 package codedriver.framework.scheduler.dto;
 
+import java.io.Serializable;
 import java.util.Date;
-
-import org.quartz.JobDataMap;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
-public class JobObject {
+public class JobObject implements Serializable {	
+	/** 
+	* @Fields serialVersionUID : TODO 
+	*/
+	private static final long serialVersionUID = -8409651508383155447L;
 	public final static String FRAMEWORK = "FRAMEWORK";
 	public final static String DELIMITER = "(_)";
 	private String jobId;
@@ -15,7 +18,7 @@ public class JobObject {
 	private Date startTime;
 	private Date endTime;
 	private String jobClassName;
-	private JobDataMap jobDataMap = new JobDataMap();
+	private String needAudit;
 
 	public JobObject(String _jobId, String _jobGroup) {
 		this.jobId = _jobId;
@@ -36,18 +39,6 @@ public class JobObject {
 
 	public String getJobGroup() {
 		return jobGroup;
-	}
-
-	public JobDataMap getJobDataMap() {
-		return jobDataMap;
-	}
-
-	public void addJobData(String key, Object value) {
-		jobDataMap.put(key, value);
-	}
-
-	public void setJobDataMap(JobDataMap jobDataMap) {
-		this.jobDataMap = jobDataMap;
 	}
 
 	public void setJobGroup(String jobGroup) {
@@ -86,14 +77,23 @@ public class JobObject {
 		this.jobClassName = jobClassName;
 	}
 
-	public static JobObject buildJobObject(JobVo jobVo, String groupName) {
+	public String getNeedAudit() {
+		return needAudit;
+	}
+
+	public void setNeedAudit(String needAudit) {
+		this.needAudit = needAudit;
+	}
+
+	public static JobObject buildJobObject(JobBaseVo jobBaseVo, String groupName) {
 		JobObject jobObject = new JobObject();
-		jobObject.setJobId(jobVo.getUuid());
+		jobObject.setJobId(jobBaseVo.getUuid());
 		jobObject.setJobGroup(TenantContext.get().getTenantUuid() + DELIMITER + groupName);
-		jobObject.setCron(jobVo.getCron());
-		jobObject.setEndTime(jobVo.getEndTime());
-		jobObject.setStartTime(jobVo.getBeginTime());
-		jobObject.setJobClassName(jobVo.getClasspath());
+		jobObject.setCron(jobBaseVo.getCron());
+		jobObject.setEndTime(jobBaseVo.getEndTime());
+		jobObject.setStartTime(jobBaseVo.getBeginTime());
+		jobObject.setJobClassName(jobBaseVo.getClasspath());
+		jobObject.setNeedAudit(jobBaseVo.getNeedAudit());
 		return jobObject;
 	}
 }

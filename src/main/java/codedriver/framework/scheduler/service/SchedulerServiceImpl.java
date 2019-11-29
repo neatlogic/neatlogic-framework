@@ -12,12 +12,10 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.exception.ApiRuntimeException;
 
-import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
-import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
@@ -72,7 +70,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		}
 		job.setUuid(null);						
 		int count = schedulerMapper.insertJob(job);
-		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.RELEASE_LOCK, Config.SCHEDULE_SERVER_ID));
+		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.WAIT, Config.SCHEDULE_SERVER_ID));
 		for(JobPropVo jobProp : job.getPropList()) {
 			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
@@ -95,8 +93,11 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public boolean getJobLock(String uuid) {
 		JobLockVo jobLock = schedulerMapper.getJobLockByUuid(uuid);
-		if(jobLock != null && (JobLockVo.RELEASE_LOCK.equals(jobLock.getLock()) || jobLock.getServerId() == Config.SCHEDULE_SERVER_ID)) {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(uuid, JobLockVo.GET_LOCK, Config.SCHEDULE_SERVER_ID));
+		if(jobLock == null) {
+			return false;
+		}
+		if(JobLockVo.WAIT.equals(jobLock.getLock()) || jobLock.getServerId().intValue() == Config.SCHEDULE_SERVER_ID) {
+			schedulerMapper.updateJobLockByJobId(new JobLockVo(uuid, JobLockVo.RUN, Config.SCHEDULE_SERVER_ID));
 			return true;
 		}		
 		return false;

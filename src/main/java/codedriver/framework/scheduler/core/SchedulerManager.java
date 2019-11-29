@@ -28,10 +28,12 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.SerializerUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
@@ -44,10 +46,12 @@ import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.dto.ServerNewJobVo;
+import codedriver.framework.server.dao.mapper.ServerMapper;
+import codedriver.framework.server.dto.ServerClusterVo;
 
 @RootComponent
 public class SchedulerManager implements ApplicationListener<ContextRefreshedEvent> {
-	Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
+	private Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
 	private static Map<String, IJob> iJobMap = new HashMap<>();
 
@@ -59,8 +63,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	private ModuleMapper moduleMapper;
 	@Autowired
 	private DatasourceMapper datasourceMapper;
-//	@Autowired 
-//	private ServerMapper serverMapper;
+	@Autowired 
+	private ServerMapper serverMapper;
+	
 	private List<DatasourceVo> datasourceList = new ArrayList<>();
 	
 	@PostConstruct
@@ -68,41 +73,46 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		System.out.println("定时检查newJob启动");
 		datasourceList = datasourceMapper.getAllDatasource();
 		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
-		Runnable newJobRunnable = new Runnable() {
+		CodeDriverThread newJobRunnable = new CodeDriverThread() {
 
 			@Override
-			public void run() {
-				System.out.println("一次检查newJob开始");
-				//TODO
-//				List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
-//				for(ServerNewJobVo newJob : newJobList) {
-//					schedulerMapper.deleteServerNewJobById(newJob.getId());
-//					TenantContext tenantContext = TenantContext.init(newJob.getTenantUuid());
-//					tenantContext.setUseDefaultDatasource(false);
-//					JobVo jobVo = schedulerMapper.getJobByUuid(newJob.getJobUuid());
-//					JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
-//					loadJob(jobObject);
-//				}
-				System.out.println("一次检查newJob结束");
+			protected void execute() {
+				String oldThreadName = Thread.currentThread().getName();
+				try {
+					Thread.currentThread().setName("NEW_JOB_CHECK");
+					System.out.println("一次检查newJob开始");
+					System.out.println(TenantContext.get());
+					List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
+					for(ServerNewJobVo newJob : newJobList) {
+						schedulerMapper.deleteServerNewJobById(newJob.getId());
+						JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
+						if(jobObject != null) {
+							loadJob(jobObject);
+						}					
+					}
+					System.out.println("一次检查newJob结束");
+				}catch(Exception e) {
+					logger.error(e.getMessage(), e);
+				}finally {
+					Thread.currentThread().setName(oldThreadName);
+				}			
 			}
 			
 		};
-		newJobService.scheduleWithFixedDelay(newJobRunnable, 1, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
+		newJobService.scheduleWithFixedDelay(newJobRunnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
 	}
 
 	public static IJob getInstance(String className){
 		return iJobMap.get(className);
 	}
 
-	public void loadJob(JobObject jobObject) {	
-//		JobObject jobObject = JobObject.buildJobObject(jobVo, JobObject.FRAMEWORK);
+	public void loadJob(JobObject jobObject) {
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
 			return;
 		}
 //		IJob job = SchedulerManager.getInstance(jobObject.getJobClassName());
 		try {
 //			if (jobVo != null && job != null){
-//				Map<String, Param> paramMap = job.initProp();
 //				if (!job.valid(jobVo.getPropList())){
 //					return;
 //				}
@@ -113,14 +123,16 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				scheduler.deleteJob(jobKey);
 			}
 			
-			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId(), jobObject.getJobGroup()).usingJobData(jobObject.getJobDataMap());
+			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId(), jobObject.getJobGroup());
 			
 			if(CronExpression.isValidExpression(jobObject.getCron())) {
 				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
 			}else {
 				return;
-			}				
-			schedulerMapper.insertJobStatus(new JobStatusVo(jobObject.getJobId(), JobStatusVo.RUNNING));
+			}
+			JobStatusVo jobStatus = new JobStatusVo(jobObject.getJobId(), jobObject.getJobGroup(), JobStatusVo.RUNNING, jobObject.getNeedAudit());
+			TenantContext.get().setUseDefaultDatasource(false);
+			schedulerMapper.insertJobStatus(jobStatus);
 			Date startTime = jobObject.getStartTime();
 			if(startTime != null && startTime.after(new Date())) {
 				triggerBuilder.startAt(startTime);
@@ -130,31 +142,35 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			triggerBuilder.endAt(jobObject.getEndTime());
 			Trigger trigger = triggerBuilder.build();
 			Class clazz = Class.forName(jobObject.getJobClassName());
-			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).usingJobData(jobObject.getJobDataMap()).build();
+			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
 		    scheduler.scheduleJob(jobDetail, trigger);
 		    
-//			TenantContext tenant = TenantContext.get();
-//			String tenantUuid = tenant.getTenantUuid();
-//			tenant.setUseDefaultDatasource(true);
-//			List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
-//			for(ServerClusterVo server : serverList) {
-//				int serverId = server.getServerId();
-//				if(Config.SCHEDULE_SERVER_ID == serverId) {
-//					continue;
-//				}
-//				schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObject.getJobId(), tenantUuid));
-//			}
-			
+		    byte[] jobObjectByteArray = SerializerUtil.getByteArrayByObject(jobObject);
+			TenantContext.get().setUseDefaultDatasource(true);
+			List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
+			for(ServerClusterVo server : serverList) {
+				int serverId = server.getServerId();
+				if(Config.SCHEDULE_SERVER_ID == serverId) {
+					continue;
+				}
+				schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObjectByteArray));
+			}
+			TenantContext.get().setUseDefaultDatasource(false);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 	
-	public void deleteJob(JobObject jobObject) {
+	public void deleteJob(String jobUuid) {
 		try {
-			schedulerMapper.updateJobStatusByJobUuid(new JobStatusVo(jobObject.getJobId(), JobStatusVo.STOP));
+//			TenantContext.get().setUseDefaultDatasource(false);
+			JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
+			if(jobStatus == null) {
+				return;
+			}
+			schedulerMapper.updateJobStatusByJobUuid(new JobStatusVo(jobUuid, JobStatusVo.STOP));
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
-			JobKey jobKey = new JobKey(jobObject.getJobId(), jobObject.getJobGroup());
+			JobKey jobKey = new JobKey(jobStatus.getJobUuid(), jobStatus.getJobGroup());
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);
 			}			
@@ -163,10 +179,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 	
-	private void loadJob(String tenantUuid, JobClassVo jobClassVo) {
-		TenantContext tenantContext = TenantContext.init(tenantUuid);
-		tenantContext.setUseDefaultDatasource(false);
-		List<JobVo> jobList = schedulerMapper.getJobByClasspath(jobClassVo.getClasspath());
+	private void loadJob(String classpath) {
+		TenantContext.get().setUseDefaultDatasource(false);
+		List<JobVo> jobList = schedulerMapper.getJobByClasspath(classpath);
 		for (JobVo job : jobList) {
 			JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
 			loadJob(jobObject);
@@ -174,7 +189,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	}
 	
 	public void releaseLock(Integer serverId) {
-		JobLockVo jobLock = new JobLockVo(JobLockVo.RELEASE_LOCK, serverId);
+		JobLockVo jobLock = new JobLockVo(JobLockVo.WAIT, serverId);
 		TenantContext tenantContext = TenantContext.init();
 		for(DatasourceVo datasourceVo : datasourceList) {
 			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
@@ -200,36 +215,52 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		JobClassVo jobClassVo = null;
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
 		iJobMap.putAll(myMap);
+		TenantContext tenant = TenantContext.get();
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
-			IJob jobClass = entry.getValue();		
+			IJob jobClass = entry.getValue();
+			if(!(jobClass instanceof IPublicJob)) {
+				continue;
+			}
+			IPublicJob publicJobClass = (IPublicJob) jobClass;
 			jobClassVo = new JobClassVo();
-			jobClassVo.setName(jobClass.getJobClassName());
-			jobClassVo.setClasspath(jobClass.getClassName());
-			jobClassVo.setModuleName(moduleName);			
-			
+			jobClassVo.setName(publicJobClass.getJobClassName());
+			jobClassVo.setClasspath(publicJobClass.getClassName());
+			jobClassVo.setModuleName(moduleName);
+			tenant.setUseDefaultDatasource(true);
 			if (schedulerMapper.getJobClassByClasspath(jobClassVo) != null) {
 				schedulerMapper.updateJobClass(jobClassVo);
 			} else {
-				jobClassVo.setType(jobClass.getType());
+				jobClassVo.setType(publicJobClass.getType());
 				schedulerMapper.insertJobClass(jobClassVo);
 			}
 			for(DatasourceVo datasourceVo : datasourceList) {
-				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),jobClassVo));
+				CommonThreadPool.execute(new ScheduleLoadJobRunner(datasourceVo.getTenantUuid(),publicJobClass.getClassName()));
 			}	
 		}
 	}
 
-	class ScheduleLoadJobRunner implements Runnable {
+	class ScheduleLoadJobRunner extends CodeDriverThread {
 
 		private String tenantUuid;
-		private JobClassVo jobClassVo;
-		public ScheduleLoadJobRunner(String _tenantUuid,JobClassVo _jobClassVo) {
+		private String classpath;
+		public ScheduleLoadJobRunner(String _tenantUuid,String _classpath) {
 			tenantUuid = _tenantUuid;
-			jobClassVo = _jobClassVo;
+			classpath = _classpath;
 		}
+		
 		@Override
-		public void run() {
-			loadJob(tenantUuid, jobClassVo);			
+		protected void execute() {
+			String oldThreadName = Thread.currentThread().getName();
+			try {
+				Thread.currentThread().setName("SCHEDULER_LOAD_JOB");
+				System.out.println(tenantContext);
+				tenantContext = TenantContext.init(tenantUuid);				
+				loadJob(classpath);
+			}catch(Exception e) {
+				logger.error(e.getMessage(), e);
+			}finally {
+				Thread.currentThread().setName(oldThreadName);
+			}						
 		}		
 	}
 }

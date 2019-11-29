@@ -1,9 +1,6 @@
 package codedriver.framework.scheduler.core;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
@@ -15,43 +12,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.dao.mapper.DatasourceMapper;
-import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobObject;
+import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
 @DisallowConcurrentExecution
-public class TestJob extends JobBase {
+public class TestPublicJob extends JobBase implements IPublicJob {
 
-	private Logger logger = LoggerFactory.getLogger(TestJob.class);
+	private Logger logger = LoggerFactory.getLogger(TestPublicJob.class.getName());
+	
 	@Autowired
 	private SchedulerMapper scheduleMapper;
-	@Autowired
-	private SchedulerManager scheduleManager;
-	@Autowired
-	private DatasourceMapper datasourceMapper;
-	private List<DatasourceVo> datasourceList = new ArrayList<>();
-	@PostConstruct
-	public void init() {
-		TenantContext tenantContext = TenantContext.init();
-		datasourceList = datasourceMapper.getAllDatasource();
-		for(DatasourceVo datasourceVo : datasourceList) {
-			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
-			tenantContext.setUseDefaultDatasource(false);
-			List<JobVo> jobList = schedulerMapper.getJobByClasspath(this.getClass().getName());
-			for (JobVo job : jobList) {				
-				JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
-				scheduleManager.loadJob(jobObject);
-			}
-		}
-		
-		
-	}
-	
 	
 	@Input({@Param(name="p_1", dataType="int", controlType="t1", controlValue="v1", description="p1", required=true),
 		@Param(name="p_2", dataType="Integer", controlType="t2", controlValue="v2", description="p2", required=true),
@@ -65,8 +39,9 @@ public class TestJob extends JobBase {
 		JobKey jobKey = jobDetail.getKey();
 		System.out.println(jobKey.getGroup());
 		System.out.println(TenantContext.get().getTenantUuid());
+		
 		String jobUuid = jobKey.getName();
-		System.out.println("TestJob一分钟执行一次:" + jobUuid);
+		System.out.println("TestPublicJob一分钟执行一次:" + jobUuid);
 		JobVo jobVo = scheduleMapper.getJobByUuid(jobUuid);
 		
 		List<JobPropVo> propList = jobVo.getPropList();
@@ -75,7 +50,7 @@ public class TestJob extends JobBase {
 				System.out.println(prop.getName() + ":" + prop.getValue());
 			}
 		}
-//		logger.info("TestJob一分钟执行一次:" + jobUuid);
+//		logger.info("TestPublicJob一分钟执行一次:" + jobUuid);
 		
 //		OutputStreamWriter logOut = (OutputStreamWriter) context.get("logOutput");
 //		try {
@@ -84,6 +59,16 @@ public class TestJob extends JobBase {
 //			e.printStackTrace();
 //		}
 
+	}
+
+	@Override
+	public String getJobClassName() {
+		return "测试TestPublicJob";
+	}
+
+	@Override
+	public String getType() {
+		return JobClassVo.FLOW_TYPE;
 	}
 
 }

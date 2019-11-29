@@ -52,6 +52,5 @@ public class SerializerUtil {
 		jobObject.setNeedAudit("yes");
 		byte[] bytes = getByteArrayByObject(jobObject);
 		JobObject jobObject2 = (JobObject) getObjectByByteArray(bytes);
-		System.out.println("-----------------------");
 	}
 }

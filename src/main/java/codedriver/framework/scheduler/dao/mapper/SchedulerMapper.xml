@@ -28,6 +28,7 @@
 		<result column="last_fire_time" property="lastFireTime" />
 		<result column="last_finish_time" property="lastFinishTime" />
 		<result column="exec_count" property="execCount" />
+		<result column="need_audit" property="needAudit" />
 	</resultMap>
 
 	<sql id="jobDetailSql">
@@ -47,7 +48,8 @@
 		sjs.last_fire_time,
 		sjs.last_finish_time,
 		sjs.next_fire_time,
-		sjs.exec_count
+		sjs.exec_count,
+		sjs.need_audit
 	</sql>
 	
 	<sql id="searchScheduleJobSql">
@@ -94,6 +96,7 @@
 		<include refid="jobStatusSql"/>
 		FROM schedule_job_status sjs
 		WHERE sjs.job_uuid = #{jobUuid}
+		FOR UPDATE
 	</select>
 	<select id="getJobByClasspath" resultMap="scheduleMap">
 		SELECT
@@ -142,7 +145,7 @@
 		FROM schedule_job a
 		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-		WHERE a.name = #{name}
+		WHERE a.name = #{name} and a.uuid != #{uuid}
 	</select>
 	
 	<select id="getJobClassByClasspath" resultType="codedriver.framework.scheduler.dto.JobClassVo">
@@ -276,6 +279,9 @@
 		<if test="execCount != null">
 		exec_count = #{execCount},
 		</if>
+		<if test="needAudit != null">
+		need_audit = #{needAudit},
+		</if>
 		job_uuid = #{jobUuid}
 		WHERE
 		job_uuid = #{jobUuid}
@@ -342,7 +348,7 @@
 	</insert>
 	
 	<insert id="insertJobStatus">
-		REPLACE INTO schedule_job_status
+		INSERT INTO schedule_job_status
 		(
 		`job_uuid`,
 		`job_group`,
@@ -379,11 +385,9 @@
     </insert>
     
     <delete id="deleteJobByUuid">
-    DELETE a, b, sjs, sjl 
+    DELETE a, b
     FROM schedule_job a 
     LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid
-    LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_uuid 
-    LEFT JOIN schedule_job_lock sjl ON a.uuid = sjl.job_uuid 
     WHERE a.uuid = #{uuid}
     </delete>
 
@@ -397,5 +401,16 @@
 	
 	<delete id="deleteServerNewJobById">
 	DELETE FROM server_new_job WHERE id=#{id}
+	</delete>
+	
+	<delete id="deleteServerNewJobByServerId">
+	DELETE FROM server_new_job WHERE server_id=#{serverId}
+	</delete>
+	
+	<delete id="deleteJobStatusAndLockByJobUuid">
+	DELETE sjs, sjl 
+	FROM schedule_job_status sjs 
+    JOIN schedule_job_lock sjl ON sjs.job_uuid = sjl.job_uuid 
+    WHERE sjs.job_uuid = #{jobUuid}
 	</delete>
 </mapper>

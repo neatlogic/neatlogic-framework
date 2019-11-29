@@ -81,7 +81,7 @@ public abstract class JobBase implements IJob {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
 			logger.error(message.toString());
         	System.out.println(message.toString());
-        	schedulerManager.deleteJob(jobUuid);
+        	schedulerManager.pauseJob(jobUuid);
             return;
         }
         //抢锁前 获取定时作业状态信息
@@ -89,12 +89,12 @@ public abstract class JobBase implements IJob {
         if(lockBeforeJobStatus == null) {
         	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
 			logger.error(message.toString());
-        	schedulerManager.deleteJob(jobUuid);
+        	schedulerManager.pauseJob(jobUuid);
             return;
         }
         // 如果定时作业状态不是运行中，就停止定时调度
         if (!JobStatusVo.RUNNING.equals(lockBeforeJobStatus.getStatus())) {
-        	schedulerManager.deleteJob(jobUuid);
+        	schedulerManager.pauseJob(jobUuid);
             return;
         }
 		
@@ -169,7 +169,7 @@ public abstract class JobBase implements IJob {
 				jobStatus.setNextFireTime(context.getNextFireTime());
 			}else {				
 				jobStatus.setStatus(JobStatusVo.STOP);
-				schedulerManager.deleteJob(jobUuid);
+				schedulerManager.pauseJob(jobUuid);
 			} 			   		
 			jobStatus.setJobUuid(jobUuid);
 			jobStatus.setExecCount(lockBeforeJobStatus.getExecCount()+1);

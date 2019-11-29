@@ -42,6 +42,14 @@ public class TestPublicJob extends JobBase implements IPublicJob {
 		
 		String jobUuid = jobKey.getName();
 		System.out.println("TestPublicJob一分钟执行一次:" + jobUuid);
+		System.out.println("睡眠中");
+		try {
+			Thread.sleep(60000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("醒了");
 		JobVo jobVo = scheduleMapper.getJobByUuid(jobUuid);
 		
 		List<JobPropVo> propList = jobVo.getPropList();

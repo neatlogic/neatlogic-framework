@@ -26,7 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -65,6 +69,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	private DatasourceMapper datasourceMapper;
 	@Autowired 
 	private ServerMapper serverMapper;
+	@Autowired
+	private DataSourceTransactionManager dataSourceTransactionManager;
 	
 	private List<DatasourceVo> datasourceList = new ArrayList<>();
 	
@@ -74,7 +80,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		datasourceList = datasourceMapper.getAllDatasource();
 		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
 		CodeDriverThread newJobRunnable = new CodeDriverThread() {
-
 			@Override
 			protected void execute() {
 				String oldThreadName = Thread.currentThread().getName();
@@ -82,8 +87,13 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					Thread.currentThread().setName("NEW_JOB_CHECK");
 					System.out.println("一次检查newJob开始");
 					System.out.println(TenantContext.get());
+					if(tenantContext == null) {
+						tenantContext = TenantContext.init();
+					}						
+					tenantContext.setUseDefaultDatasource(true);
 					List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
 					for(ServerNewJobVo newJob : newJobList) {
+						tenantContext.setUseDefaultDatasource(true);
 						schedulerMapper.deleteServerNewJobById(newJob.getId());
 						JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
 						if(jobObject != null) {
@@ -117,22 +127,50 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 //					return;
 //				}
 //			}
-			JobKey jobKey = new JobKey(jobObject.getJobId(), jobObject.getJobGroup());
+			String jobId = jobObject.getJobId();
+			String groupName = jobObject.getJobGroup();
+			int index = groupName.indexOf(JobObject.DELIMITER);
+	        String tenantUuid = groupName.substring(0,index);
+			JobKey jobKey = new JobKey(jobId, groupName);
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);
 			}
 			
-			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobObject.getJobId(), jobObject.getJobGroup());
+			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobId, groupName);
 			
 			if(CronExpression.isValidExpression(jobObject.getCron())) {
 				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
 			}else {
 				return;
 			}
-			JobStatusVo jobStatus = new JobStatusVo(jobObject.getJobId(), jobObject.getJobGroup(), JobStatusVo.RUNNING, jobObject.getNeedAudit());
+			TenantContext.get().setTenantUuid(tenantUuid);
 			TenantContext.get().setUseDefaultDatasource(false);
-			schedulerMapper.insertJobStatus(jobStatus);
+			//TODO 开始事务
+			DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+			def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+			TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(def);
+			try {
+				JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobId);
+				if(jobStatus != null ) {
+					jobStatus.setJobGroup(groupName);
+					jobStatus.setStatus(JobStatusVo.RUNNING);
+					jobStatus.setNeedAudit(jobObject.getNeedAudit());
+					schedulerMapper.updateJobStatusByJobUuid(jobStatus);
+				}else {
+					jobStatus = new JobStatusVo(jobId, groupName, JobStatusVo.RUNNING, jobObject.getNeedAudit());
+					schedulerMapper.insertJobStatus(jobStatus);
+				}
+				JobLockVo jobLock = schedulerMapper.getJobLockByUuid(jobId);
+				if(jobLock == null) {
+					schedulerMapper.insertJobLock(new JobLockVo(jobId, JobLockVo.WAIT, Config.SCHEDULE_SERVER_ID));
+				}
+				dataSourceTransactionManager.commit(transactionStatus);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				dataSourceTransactionManager.rollback(transactionStatus);
+			}
+			//TODO 结束事务
 			Date startTime = jobObject.getStartTime();
 			if(startTime != null && startTime.after(new Date())) {
 				triggerBuilder.startAt(startTime);
@@ -143,25 +181,27 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			Trigger trigger = triggerBuilder.build();
 			Class clazz = Class.forName(jobObject.getJobClassName());
 			JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
-		    scheduler.scheduleJob(jobDetail, trigger);
-		    
-		    byte[] jobObjectByteArray = SerializerUtil.getByteArrayByObject(jobObject);
-			TenantContext.get().setUseDefaultDatasource(true);
-			List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
-			for(ServerClusterVo server : serverList) {
-				int serverId = server.getServerId();
-				if(Config.SCHEDULE_SERVER_ID == serverId) {
-					continue;
-				}
-				schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObjectByteArray));
-			}
-			TenantContext.get().setUseDefaultDatasource(false);
+		    scheduler.scheduleJob(jobDetail, trigger);		    
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 	
-	public void deleteJob(String jobUuid) {
+	public void broadcastNewJob(JobObject jobObject) {
+		byte[] jobObjectByteArray = SerializerUtil.getByteArrayByObject(jobObject);
+		TenantContext.get().setUseDefaultDatasource(true);
+		List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
+		for(ServerClusterVo server : serverList) {
+			int serverId = server.getServerId();
+			if(Config.SCHEDULE_SERVER_ID == serverId) {
+				continue;
+			}
+			schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObjectByteArray));
+		}
+		TenantContext.get().setUseDefaultDatasource(false);
+	}
+	
+	public void pauseJob(String jobUuid) {
 		try {
 //			TenantContext.get().setUseDefaultDatasource(false);
 			JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
@@ -179,8 +219,25 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 	}
 	
+	public void deleteJob(String jobUuid) {
+		try {
+//			TenantContext.get().setUseDefaultDatasource(false);
+			JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
+			if(jobStatus == null) {
+				return;
+			}
+			schedulerMapper.deleteJobStatusAndLockByJobUuid(jobUuid);
+			Scheduler scheduler = schedulerFactoryBean.getScheduler();
+			JobKey jobKey = new JobKey(jobStatus.getJobUuid(), jobStatus.getJobGroup());
+			if (scheduler.getJobDetail(jobKey) != null) {
+				scheduler.deleteJob(jobKey);
+			}			
+		} catch (SchedulerException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	
 	private void loadJob(String classpath) {
-		TenantContext.get().setUseDefaultDatasource(false);
 		List<JobVo> jobList = schedulerMapper.getJobByClasspath(classpath);
 		for (JobVo job : jobList) {
 			JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);
@@ -190,7 +247,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	
 	public void releaseLock(Integer serverId) {
 		JobLockVo jobLock = new JobLockVo(JobLockVo.WAIT, serverId);
-		TenantContext tenantContext = TenantContext.init();
+		TenantContext tenantContext = TenantContext.get();
 		for(DatasourceVo datasourceVo : datasourceList) {
 			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
 			tenantContext.setUseDefaultDatasource(false);
@@ -253,8 +310,13 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			String oldThreadName = Thread.currentThread().getName();
 			try {
 				Thread.currentThread().setName("SCHEDULER_LOAD_JOB");
-				System.out.println(tenantContext);
-				tenantContext = TenantContext.init(tenantUuid);				
+				System.out.println("SCHEDULER_LOAD_JOB:"+tenantContext);
+				if(tenantContext == null) {
+					tenantContext = TenantContext.init(tenantUuid);
+				}else {
+					tenantContext.setTenantUuid(tenantUuid);
+				}
+				tenantContext.setUseDefaultDatasource(false);				
 				loadJob(classpath);
 			}catch(Exception e) {
 				logger.error(e.getMessage(), e);

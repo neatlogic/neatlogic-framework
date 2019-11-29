@@ -49,5 +49,7 @@ public interface SchedulerMapper {
 //	public int deleteJobPropByJobUuid(String jobUuid);
 //	public int deleteJobLock(String jobUuid);
 	public int deleteServerNewJobById(Long id);
+	public int deleteServerNewJobByServerId(Integer serverId);
+	public int deleteJobStatusAndLockByJobUuid(String jobUuid);
 	
 }

@@ -1,6 +1,7 @@
 package codedriver.framework.server.core;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class ServerObserverThread extends CodeDriverThread {
 
@@ -14,6 +15,9 @@ public class ServerObserverThread extends CodeDriverThread {
 
 	@Override
 	protected void execute() {
+		if(tenantContext == null) {
+			tenantContext = TenantContext.init();
+		}
 		observer.whenServerInactivated(serverId);		
 	}
 

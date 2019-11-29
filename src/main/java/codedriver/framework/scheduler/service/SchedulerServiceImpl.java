@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.exception.ApiRuntimeException;
 
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
@@ -59,35 +58,37 @@ public class SchedulerServiceImpl implements SchedulerService{
 	}
 
 	@Override
-	public int saveJob(JobVo job) {
+	public void saveJob(JobVo job) {
 		String uuid = job.getUuid();
 		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
 			SchedulerExceptionMessage message = new SchedulerExceptionMessage("名称："+ job.getName() + " 已存在");
 			logger.error(message.toString());
-			throw new ApiRuntimeException(message);
+//			throw new ApiRuntimeException(message);
+			throw new RuntimeException(message.toString());
 		}
-		job.setUuid(null);						
-		int count = schedulerMapper.insertJob(job);
-		schedulerMapper.insertJobLock(new JobLockVo(uuid, JobLockVo.WAIT, Config.SCHEDULE_SERVER_ID));
+		job.setUuid(null);
+		uuid = job.getUuid();
+		schedulerMapper.insertJob(job);
+		
 		for(JobPropVo jobProp : job.getPropList()) {
 			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
-		}		
-		return count;
+		}
 	}
 
 	@Override
-	public int saveJobClass(JobClassVo jobClassVo) {
+	public void saveJobClass(JobClassVo jobClassVo) {
 		JobClassVo jobClass = schedulerMapper.getJobClassByClasspath(jobClassVo);
 		if(jobClass == null) {
 			SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在");
 			logger.error(message.toString());
-			throw new ApiRuntimeException(message);
+//			throw new ApiRuntimeException(message);
+			throw new RuntimeException(message.toString());
 		}
 		jobClass.setType(jobClassVo.getType());
-		return schedulerMapper.updateJobClass(jobClassVo);
+		schedulerMapper.updateJobClass(jobClassVo);
 	}
 
 	@Override

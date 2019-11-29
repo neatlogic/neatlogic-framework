@@ -19,7 +19,7 @@ public class JobObject implements Serializable {
 	private Date endTime;
 	private String jobClassName;
 	private String needAudit;
-
+//	private String TenantUuid;
 	public JobObject(String _jobId, String _jobGroup) {
 		this.jobId = _jobId;
 		this.jobGroup = _jobGroup;
@@ -85,10 +85,21 @@ public class JobObject implements Serializable {
 		this.needAudit = needAudit;
 	}
 
+//	public String getTenantUuid() {
+//		return TenantUuid;
+//	}
+//
+//	public void setTenantUuid(String tenantUuid) {
+//		TenantUuid = tenantUuid;
+//	}
+
 	public static JobObject buildJobObject(JobBaseVo jobBaseVo, String groupName) {
+		TenantContext tenant = TenantContext.get();
+		tenant.setUseDefaultDatasource(false);
 		JobObject jobObject = new JobObject();
 		jobObject.setJobId(jobBaseVo.getUuid());
-		jobObject.setJobGroup(TenantContext.get().getTenantUuid() + DELIMITER + groupName);
+//		jobObject.setTenantUuid(tenant.getTenantUuid());
+		jobObject.setJobGroup(tenant.getTenantUuid() + DELIMITER + groupName);
 		jobObject.setCron(jobBaseVo.getCron());
 		jobObject.setEndTime(jobBaseVo.getEndTime());
 		jobObject.setStartTime(jobBaseVo.getBeginTime());

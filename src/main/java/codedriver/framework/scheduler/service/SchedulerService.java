@@ -14,9 +14,9 @@ public interface SchedulerService {
 
 	List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
 
-	int saveJob(JobVo job);
+	void saveJob(JobVo job);
 
-	int saveJobClass(JobClassVo jobClassVo);
+	void saveJobClass(JobClassVo jobClassVo);
 
 	boolean getJobLock(String uuid);
 	

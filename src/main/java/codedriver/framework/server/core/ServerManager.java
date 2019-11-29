@@ -26,6 +26,7 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.server.dao.mapper.ServerMapper;
 import codedriver.framework.server.dto.ServerClusterVo;
 import codedriver.framework.server.dto.ServerCounterVo;
@@ -35,6 +36,8 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
+	@Autowired
+	private SchedulerMapper schedulerMapper;
 	@Autowired
 	private DataSourceTransactionManager dataSourceTransactionManager;
 
@@ -100,6 +103,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 				serverVo.setStatus(ServerClusterVo.STOP);
 				serverMapper.updateServerByServerId(serverVo);
 				serverMapper.deleteCounterByServerId(serverVo.getServerId());
+				schedulerMapper.deleteServerNewJobByServerId(serverId);
 				returnVal = true;
 			}
 			dataSourceTransactionManager.commit(transactionStatus);

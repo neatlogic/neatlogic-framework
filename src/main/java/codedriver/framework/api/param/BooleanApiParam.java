@@ -8,7 +8,7 @@ public class BooleanApiParam extends ApiParamBase {
 	@Override
 	public String getAuthName() {
 
-		return "整形参数认证";
+		return "布尔参数认证";
 	}
 
 	@Override

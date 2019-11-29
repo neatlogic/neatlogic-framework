@@ -1,6 +1,8 @@
 package codedriver.framework.api.core;
 
 public enum ApiParamType {
+	INTEGER("int","整形"),
+	BOOLEAN("boolean","布尔值"),
 	STRING("string", "字符串"), 
 	LONG("long", "长整形"), 
 	JSONOBJECT("JSONObject", "json"),

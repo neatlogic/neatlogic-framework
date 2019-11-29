@@ -15,7 +15,7 @@ public class ApiParamFactory {
 		for (Class<? extends ApiParamBase> c: authClass) {
 			try {
 				ApiParamBase authIns = c.newInstance();
-				authParamMap.put(authIns.getAuthType(), authIns);
+				authParamMap.put(authIns.getType(), authIns);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

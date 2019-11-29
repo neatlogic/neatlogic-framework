@@ -1,26 +1,28 @@
 package codedriver.framework.api.param;
 
-import java.util.regex.Pattern;
-
 import codedriver.framework.api.core.ApiParamBase;
 import codedriver.framework.api.core.ApiParamType;
 
-public class TelephoneApiParam extends ApiParamBase {
+public class BooleanApiParam extends ApiParamBase {
 
 	@Override
 	public String getName() {
-		return "手机号码";
+		return "布尔型";
 	}
 
 	@Override
 	public boolean validate(Object param) {
-		Pattern pattern = Pattern.compile("^1(3|4|5|7|8)\\d{9}$");
-		return pattern.matcher(param.toString()).matches();
+		try {
+			Boolean.valueOf(param.toString());
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
 	}
 
 	@Override
 	public ApiParamType getType() {
-		return ApiParamType.TELEPHONE;
+		return ApiParamType.LONG;
 	}
 
 }

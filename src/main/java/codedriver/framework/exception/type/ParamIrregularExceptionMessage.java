@@ -3,15 +3,15 @@ package codedriver.framework.exception.type;
 import codedriver.framework.api.core.ApiParamType;
 import codedriver.framework.exception.core.IApiExceptionMessage;
 
-public class AuthParamsExceptionMessage implements IApiExceptionMessage {
+public class ParamIrregularExceptionMessage implements IApiExceptionMessage {
 	private String paramName ="";
 	private ApiParamType paramType = null;
 	
-	public AuthParamsExceptionMessage(String _paramName) {
+	public ParamIrregularExceptionMessage(String _paramName) {
 		this.paramName = _paramName;
 	}
 	
-	public AuthParamsExceptionMessage(String _paramName,ApiParamType _paramType) {
+	public ParamIrregularExceptionMessage(String _paramName,ApiParamType _paramType) {
 		this.paramName = _paramName;
 		this.paramType = _paramType;
 	}

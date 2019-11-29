@@ -1,8 +1,9 @@
 package codedriver.framework.api.core;
 
-
 public abstract class ApiParamBase {
-	public abstract String getAuthName();
-	public abstract boolean doAuth(String param);
-	public abstract ApiParamType getAuthType();
+	public abstract String getName();
+
+	public abstract boolean validate(Object param);
+
+	public abstract ApiParamType getType();
 }

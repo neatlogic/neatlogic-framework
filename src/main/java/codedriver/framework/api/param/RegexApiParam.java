@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import codedriver.framework.api.core.ApiParamBase;
 import codedriver.framework.api.core.ApiParamType;
 
-public class TelephoneApiParam extends ApiParamBase {
+public class RegexApiParam extends ApiParamBase {
 
 	@Override
 	public String getName() {

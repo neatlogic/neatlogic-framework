@@ -8,15 +8,15 @@ import codedriver.framework.api.core.ApiParamType;
 public class JSONArrayApiParam extends ApiParamBase {
 
 	@Override
-	public String getAuthName() {
+	public String getName() {
 
-		return "json数组参数认证";
+		return "json数组";
 	}
 
 	@Override
-	public boolean doAuth(String param) {
+	public boolean validate(Object param) {
 		try {
-			JSONArray.parseArray(param);
+			JSONArray.parseArray(param.toString());
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -24,7 +24,7 @@ public class JSONArrayApiParam extends ApiParamBase {
 	}
 
 	@Override
-	public ApiParamType getAuthType() {
+	public ApiParamType getType() {
 		return ApiParamType.JSONARRAY;
 	}
 

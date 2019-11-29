@@ -16,7 +16,7 @@ public class CustomExceptionMessage implements IApiExceptionMessage {
 
 	@Override
 	public String getErrorCode() {
-		return "06";
+		return "99";
 	}
 
 }

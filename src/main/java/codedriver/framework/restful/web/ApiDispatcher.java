@@ -27,8 +27,8 @@ import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundExceptionMessage;
-import codedriver.framework.exception.type.ApiRuntimeException;
 import codedriver.framework.exception.type.ComponentNotFoundExceptionMessage;
 import codedriver.framework.restful.core.ApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
@@ -59,10 +59,13 @@ public class ApiDispatcher {
 	private void doIt(HttpServletRequest request, String token, String json, JSONObject jsonObj, String action) throws Exception {
 		TenantContext c = TenantContext.get();
 		System.out.print(c.getTenantUuid());
+		TenantContext tenantContext = TenantContext.get();
+		tenantContext.setUseDefaultDatasource(true);
 		ApiVo interfaceVo = apiService.getApiByToken(token);
 		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
 			throw new ApiRuntimeException(new ApiNotFoundExceptionMessage(token));
 		}
+		tenantContext.setUseDefaultDatasource(false);
 		ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
 		if (restComponent != null) {
 			if (action.equals("doservice")) {

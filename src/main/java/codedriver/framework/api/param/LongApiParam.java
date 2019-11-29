@@ -6,15 +6,15 @@ import codedriver.framework.api.core.ApiParamType;
 public class LongApiParam extends ApiParamBase {
 
 	@Override
-	public String getAuthName() {
+	public String getName() {
 
-		return "整形参数认证";
+		return "整数";
 	}
 
 	@Override
-	public boolean doAuth(String param) {
+	public boolean validate(Object param) {
 		try {
-			Long.valueOf(param);
+			Long.valueOf(param.toString());
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -22,7 +22,7 @@ public class LongApiParam extends ApiParamBase {
 	}
 
 	@Override
-	public ApiParamType getAuthType() {
+	public ApiParamType getType() {
 		return ApiParamType.LONG;
 	}
 

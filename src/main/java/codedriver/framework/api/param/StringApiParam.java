@@ -6,23 +6,18 @@ import codedriver.framework.api.core.ApiParamType;
 public class StringApiParam extends ApiParamBase {
 
 	@Override
-	public String getAuthName() {
-		
-		return "字符串参数认证";
+	public String getName() {
+
+		return "字符串";
 	}
 
-
-
 	@Override
-	public ApiParamType getAuthType() {
+	public ApiParamType getType() {
 		return ApiParamType.STRING;
 	}
 
-
-
 	@Override
-	public boolean doAuth(String param) {
-		// TODO Auto-generated method stub
+	public boolean validate(Object param) {
 		return true;
 	}
 

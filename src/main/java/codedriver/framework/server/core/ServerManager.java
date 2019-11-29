@@ -96,11 +96,13 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 		boolean returnVal = false;
 		try {
 			ServerClusterVo serverVo = serverMapper.getServerByServerId(serverId);
-			if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
-				serverVo.setStatus(ServerClusterVo.STOP);
-				serverMapper.updateServerByServerId(serverVo);
-				serverMapper.deleteCounterByServerId(serverVo.getServerId());
-				returnVal = true;
+			if (serverVo != null) {
+				if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
+					serverVo.setStatus(ServerClusterVo.STOP);
+					serverMapper.updateServerByServerId(serverVo);
+					serverMapper.deleteCounterByServerId(serverVo.getServerId());
+					returnVal = true;
+				}
 			}
 			dataSourceTransactionManager.commit(transactionStatus);
 		} catch (Exception e) {

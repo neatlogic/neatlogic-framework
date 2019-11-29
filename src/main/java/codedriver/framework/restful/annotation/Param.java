@@ -6,8 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.auth.param.AuthParamBase;
-import codedriver.framework.auth.param.AuthParamType;
+import codedriver.framework.auth.param.ApiParamBase;
+import codedriver.framework.auth.param.ApiParamType;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,7 +16,7 @@ public @interface Param {
 
 	String name() default "";
 
-	AuthParamType type() default AuthParamType.STRING;
+	ApiParamType type() default ApiParamType.STRING;
 
 	boolean isRequired() default false;
 

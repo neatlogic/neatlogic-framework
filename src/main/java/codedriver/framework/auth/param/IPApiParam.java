@@ -2,7 +2,7 @@ package codedriver.framework.auth.param;
 
 import java.util.regex.Pattern;
 
-public class IPAuthParam extends AuthParamBase {
+public class IPApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
@@ -17,8 +17,8 @@ public class IPAuthParam extends AuthParamBase {
 	}
 
 	@Override
-	public AuthParamType getAuthType() {
-		return AuthParamType.IP;
+	public ApiParamType getAuthType() {
+		return ApiParamType.IP;
 	}
 
 }

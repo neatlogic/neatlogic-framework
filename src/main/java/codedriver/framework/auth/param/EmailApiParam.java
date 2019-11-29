@@ -2,7 +2,7 @@ package codedriver.framework.auth.param;
 
 import java.util.regex.Pattern;
 
-public class EmailAuthParam extends AuthParamBase {
+public class EmailApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
@@ -17,8 +17,8 @@ public class EmailAuthParam extends AuthParamBase {
 	}
 
 	@Override
-	public AuthParamType getAuthType() {
-		return AuthParamType.EMAIL;
+	public ApiParamType getAuthType() {
+		return ApiParamType.EMAIL;
 	}
 
 }

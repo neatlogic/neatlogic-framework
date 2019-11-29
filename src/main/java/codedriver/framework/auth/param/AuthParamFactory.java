@@ -7,14 +7,14 @@ import java.util.Set;
 import org.reflections.Reflections;
 
 public class AuthParamFactory {
-	private static Map<AuthParamType, AuthParamBase> authParamMap = new HashMap<AuthParamType, AuthParamBase>();
+	private static Map<ApiParamType, ApiParamBase> authParamMap = new HashMap<ApiParamType, ApiParamBase>();
 	
 	static {
 		Reflections reflections = new Reflections("codedriver");
-		Set<Class<? extends AuthParamBase>> authClass = reflections.getSubTypesOf(AuthParamBase.class);
-		for (Class<? extends AuthParamBase> c: authClass) {
+		Set<Class<? extends ApiParamBase>> authClass = reflections.getSubTypesOf(ApiParamBase.class);
+		for (Class<? extends ApiParamBase> c: authClass) {
 			try {
-				AuthParamBase authIns = c.newInstance();
+				ApiParamBase authIns = c.newInstance();
 				authParamMap.put(authIns.getAuthType(), authIns);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -22,7 +22,7 @@ public class AuthParamFactory {
 		}
 	}
 	
-	public static AuthParamBase getAuthInstance(AuthParamType authParamType) {
+	public static ApiParamBase getAuthInstance(ApiParamType authParamType) {
 		return authParamMap.get(authParamType);
 	}
 }

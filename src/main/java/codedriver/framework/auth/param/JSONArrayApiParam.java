@@ -1,19 +1,19 @@
 package codedriver.framework.auth.param;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONArray;
 
-public class JSONObjectAuthParam extends AuthParamBase {
+public class JSONArrayApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
 
-		return "json参数认证";
+		return "json数组参数认证";
 	}
 
 	@Override
 	public boolean doAuth(String param) {
 		try {
-			JSONObject.parseObject(param);
+			JSONArray.parseArray(param);
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -21,8 +21,8 @@ public class JSONObjectAuthParam extends AuthParamBase {
 	}
 
 	@Override
-	public AuthParamType getAuthType() {
-		return AuthParamType.JSONOBJECT;
+	public ApiParamType getAuthType() {
+		return ApiParamType.JSONARRAY;
 	}
 
 }

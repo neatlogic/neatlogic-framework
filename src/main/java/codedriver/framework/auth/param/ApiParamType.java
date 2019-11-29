@@ -1,6 +1,6 @@
 package codedriver.framework.auth.param;
 
-public enum AuthParamType {
+public enum ApiParamType {
 	STRING("string", "字符串"), 
 	LONG("long", "长整形"), 
 	JSONOBJECT("JSONObject", "json"),
@@ -13,7 +13,7 @@ public enum AuthParamType {
 	private String name;
 	private String text;
 
-	private AuthParamType(String _name, String _text) {
+	private ApiParamType(String _name, String _text) {
 		this.name = _name;
 		this.text = _text;
 	}
@@ -27,7 +27,7 @@ public enum AuthParamType {
 	}
 
 	public static String getText(String name) {
-		for (AuthParamType s : AuthParamType.values()) {
+		for (ApiParamType s : ApiParamType.values()) {
 			if (s.getValue().equals(name)) {
 				return s.getText();
 			}
@@ -35,8 +35,8 @@ public enum AuthParamType {
 		return "";
 	}
 	
-	public static AuthParamType getAuthParamType(String name) {
-		for (AuthParamType s : AuthParamType.values()) {
+	public static ApiParamType getApiParamType(String name) {
+		for (ApiParamType s : ApiParamType.values()) {
 			if (s.getValue().equals(name)) {
 				return s;
 			}

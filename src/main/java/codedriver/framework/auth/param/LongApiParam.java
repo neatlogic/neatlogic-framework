@@ -1,6 +1,6 @@
 package codedriver.framework.auth.param;
 
-public class LongAuthParam extends AuthParamBase {
+public class LongApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
@@ -19,8 +19,8 @@ public class LongAuthParam extends AuthParamBase {
 	}
 
 	@Override
-	public AuthParamType getAuthType() {
-		return AuthParamType.LONG;
+	public ApiParamType getAuthType() {
+		return ApiParamType.LONG;
 	}
 
 }

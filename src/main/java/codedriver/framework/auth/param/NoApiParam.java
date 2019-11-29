@@ -1,6 +1,6 @@
 package codedriver.framework.auth.param;
 
-public class NoAuthParam extends AuthParamBase {
+public class NoApiParam extends ApiParamBase {
 
 	@Override
 	public String getAuthName() {
@@ -14,8 +14,8 @@ public class NoAuthParam extends AuthParamBase {
 	}
 
 	@Override
-	public AuthParamType getAuthType() {
-		return AuthParamType.NOAUTH;
+	public ApiParamType getAuthType() {
+		return ApiParamType.NOAUTH;
 	}
 
 }

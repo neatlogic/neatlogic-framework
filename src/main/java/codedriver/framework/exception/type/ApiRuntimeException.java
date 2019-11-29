@@ -1,4 +1,6 @@
-package codedriver.framework.exception;
+package codedriver.framework.exception.type;
+
+import codedriver.framework.exception.core.IApiExceptionMessage;
 
 public class ApiRuntimeException extends RuntimeException {
 	private static final long serialVersionUID = 9206337410118158624L;

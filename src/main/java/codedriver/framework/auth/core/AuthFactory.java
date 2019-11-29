@@ -1,12 +1,10 @@
-package codedriver.framework.auth;
+package codedriver.framework.auth.core;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
-
-import codedriver.framework.common.auth.AuthBase;
 
 public class AuthFactory {
 	private static Map<String, AuthBase> authMap = new HashMap<String, AuthBase>();

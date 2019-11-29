@@ -1,4 +1,4 @@
-package codedriver.framework.common.auth;
+package codedriver.framework.auth.core;
 
 public abstract class AuthBase {
 	public abstract String getAuthName();

@@ -1,6 +1,6 @@
-package codedriver.framework.auth;
+package codedriver.framework.auth.label;
 
-import codedriver.framework.common.auth.AuthBase;
+import codedriver.framework.auth.core.AuthBase;
 
 public class SYSTEM_USER_EDIT extends AuthBase{
 

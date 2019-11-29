@@ -1,6 +1,8 @@
-package codedriver.framework.exception;
+package codedriver.framework.exception.type;
 
-public class ApiNotFoundExceptionMessage extends FrameworkExceptionMessageBase {
+import codedriver.framework.exception.core.IApiExceptionMessage;
+
+public class ApiNotFoundExceptionMessage implements IApiExceptionMessage {
 	private String token;
 
 	public ApiNotFoundExceptionMessage(String _token) {
@@ -13,7 +15,7 @@ public class ApiNotFoundExceptionMessage extends FrameworkExceptionMessageBase {
 	}
 
 	@Override
-	protected String myGetErrorCode() {
+	public String getErrorCode() {
 		return "03";
 	}
 

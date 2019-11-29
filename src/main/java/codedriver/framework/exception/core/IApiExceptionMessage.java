@@ -1,4 +1,4 @@
-package codedriver.framework.exception;
+package codedriver.framework.exception.core;
 
 public interface IApiExceptionMessage {
 	public String getErrorCode();

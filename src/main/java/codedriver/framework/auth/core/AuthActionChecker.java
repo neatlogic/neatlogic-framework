@@ -1,4 +1,4 @@
-package codedriver.framework.auth;
+package codedriver.framework.auth.core;
 
 import java.util.List;
 

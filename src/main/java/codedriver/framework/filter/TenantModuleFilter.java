@@ -13,13 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadlocal.TenantModuleContext;
-import codedriver.framework.dao.mapper.TenantModuleMapper;
+import codedriver.framework.dao.mapper.ModuleMapper;
 
 public class TenantModuleFilter extends OncePerRequestFilter {
 
 	@Autowired
-	TenantModuleMapper tmMapper;
+	ModuleMapper moduleMapper;
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -28,7 +27,7 @@ public class TenantModuleFilter extends OncePerRequestFilter {
 		if (StringUtils.isNotBlank(tenant)) {
 			// 使用master库
 			tenantContext.setUseDefaultDatasource(true);
-			TenantModuleContext.init(tmMapper.getAllTenantModule());
+			TenantContext.get().setActiveModuleList(moduleMapper.getActiveModuleListByTenantUuid(tenant));
 			tenantContext.setTenantUuid(tenant);
 			// 还原回租户库
 			tenantContext.setUseDefaultDatasource(false);
@@ -41,6 +40,6 @@ public class TenantModuleFilter extends OncePerRequestFilter {
 	 */
 	@Override
 	public void destroy() {
-		TenantModuleContext.get().release();// 清除线程变量值
+		TenantContext.get().release();// 清除线程变量值
 	}
 }

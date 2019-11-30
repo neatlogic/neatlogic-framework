@@ -9,17 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Config {
-	private static Logger logger = LoggerFactory.getLogger(Config.class);	
+	private static Logger logger = LoggerFactory.getLogger(Config.class);
 	public static String JWT_SECRET = "techsure#codedriver$secret";
 	public static String REST_AUDIT_PATH;
 	public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 	public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
 	public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
 	public static final int SCHEDULE_SERVER_ID;
-	public static final int SERVER_HEARTBEAT_RATE;//默认3分钟
-	public static final int SERVER_HEARTBEAT_THRESHOLD;//默认5
 	public static String CODEDRIVER_HOME;
-	
+	public static final int SERVER_HEARTBEAT_RATE;// 默认3分钟
+	public static final int SERVER_HEARTBEAT_THRESHOLD;// 默认5
+
 	private static final String CONFIG_FILE = "config.properties";
 	static {
 		REST_AUDIT_PATH = "/app/codedriver/";
@@ -46,7 +46,7 @@ public class Config {
 			throw ex;
 		}
 	}
-	
+
 	private static String getProperty(String configFile, String keyName, String defaultValue) {
 		Properties pro = new Properties();
 		InputStreamReader is = null;
@@ -71,7 +71,7 @@ public class Config {
 
 		return value;
 	}
-	
+
 	public static String getProperty(String configFile, String keyName) {
 		Properties pro = new Properties();
 		InputStream is = Config.class.getClassLoader().getResourceAsStream(configFile);

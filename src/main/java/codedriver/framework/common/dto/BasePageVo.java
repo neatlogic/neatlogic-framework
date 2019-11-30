@@ -3,26 +3,15 @@ package codedriver.framework.common.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 public class BasePageVo {
-	@JSONField(serialize = false)
 	private Boolean needPage = true;
-	@JSONField(serialize = false)
 	private Boolean needPageCount = true;
-	@JSONField(serialize = false)
 	private Integer pageSize = 10;
-	@JSONField(serialize = false)
 	private Integer currentPage = 1;
-	@JSONField(serialize = false)
 	private Integer startNum;
-	@JSONField(serialize = false)
 	private Integer pageSizePlus;
-	@JSONField(serialize = false)
 	private Integer pageCount = 0;
-	@JSONField(serialize = false)
 	private Integer limit = 20;
-	@JSONField(serialize = false)
 	private Integer rowNum = 0;
 
 	public BasePageVo() {
@@ -54,11 +43,9 @@ public class BasePageVo {
 	}
 
 	// easyui插件新增属性
-	@JSONField(serialize = false)
 	private Integer rows = 10;
-	@JSONField(serialize = false)
 	private Integer page;
-	
+
 	private List<Long> taskIdListFromIndex; // 全文检索id集合
 
 	public Boolean getNeedPage() {

@@ -1,11 +1,15 @@
 package codedriver.framework.asynchronization.threadlocal;
 
 import java.io.Serializable;
+import java.util.List;
+
+import codedriver.framework.dto.ModuleVo;
 
 public class TenantContext implements Serializable {
 	private static ThreadLocal<TenantContext> instance = new ThreadLocal<TenantContext>();
 	private String tenantUuid;
 	private Boolean useDefaultDatasource = false;
+	private List<ModuleVo> activeModuleList;
 
 	public static TenantContext init() {
 		TenantContext context = new TenantContext();
@@ -54,4 +58,14 @@ public class TenantContext implements Serializable {
 	public void setUseDefaultDatasource(Boolean useDefaultDatasource) {
 		this.useDefaultDatasource = useDefaultDatasource;
 	}
+
+	public List<ModuleVo> getActiveModuleList() {
+		return activeModuleList;
+	}
+
+	public void setActiveModuleList(List<ModuleVo> activeModuleList) {
+		this.activeModuleList = activeModuleList;
+	}
+	
+	
 }

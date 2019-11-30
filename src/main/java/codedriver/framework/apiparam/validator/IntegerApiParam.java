@@ -1,7 +1,7 @@
-package codedriver.framework.api.param;
+package codedriver.framework.apiparam.validator;
 
-import codedriver.framework.api.core.ApiParamBase;
-import codedriver.framework.api.core.ApiParamType;
+import codedriver.framework.apiparam.core.ApiParamBase;
+import codedriver.framework.apiparam.core.ApiParamType;
 
 public class IntegerApiParam extends ApiParamBase {
 
@@ -11,7 +11,7 @@ public class IntegerApiParam extends ApiParamBase {
 	}
 
 	@Override
-	public boolean validate(Object param) {
+	public boolean validate(Object param, String rule) {
 		try {
 			Integer.valueOf(param.toString());
 			return true;

@@ -15,7 +15,7 @@ import org.springframework.util.ClassUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.api.core.ApiParamFactory;
+import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.AuthAction;
@@ -103,7 +103,7 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 							}
 							// 参数类型校验
 							Object paramValue = paramObj.get(p.name());
-							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue)) {
+							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
 								throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ParamIrregularExceptionMessage(p.name(), p.type())));
 							}
 						}

@@ -1,21 +1,21 @@
 package codedriver.framework.exception.type;
 
-import codedriver.framework.api.core.ApiParamType;
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.exception.core.IApiExceptionMessage;
 
 public class ParamIrregularExceptionMessage implements IApiExceptionMessage {
-	private String paramName ="";
+	private String paramName = "";
 	private ApiParamType paramType = null;
-	
+
 	public ParamIrregularExceptionMessage(String _paramName) {
 		this.paramName = _paramName;
 	}
-	
-	public ParamIrregularExceptionMessage(String _paramName,ApiParamType _paramType) {
+
+	public ParamIrregularExceptionMessage(String _paramName, ApiParamType _paramType) {
 		this.paramName = _paramName;
 		this.paramType = _paramType;
 	}
-	
+
 	@Override
 	public String getErrorCode() {
 		return "05";
@@ -23,11 +23,7 @@ public class ParamIrregularExceptionMessage implements IApiExceptionMessage {
 
 	@Override
 	public String getError() {
-		if(null != this.paramType) {
-			return "参数 '"+paramName+"' 类型异常,要求类型: "+paramType.getText();
-		}else {
-			return "参数 '"+paramName+"' 必填";
-		}
+		return "参数“" + paramName + "”不符合格式要求";
 	}
 
 }

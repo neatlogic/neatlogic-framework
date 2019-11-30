@@ -1,6 +1,6 @@
 package codedriver.framework.exception.type;
 
-import codedriver.framework.api.core.ApiParamType;
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.exception.core.IApiExceptionMessage;
 
 public class ParamNotExistsExceptionMessage implements IApiExceptionMessage {

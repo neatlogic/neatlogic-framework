@@ -1,4 +1,4 @@
-package codedriver.framework.api.core;
+package codedriver.framework.apiparam.core;
 
 import java.util.HashMap;
 import java.util.Map;

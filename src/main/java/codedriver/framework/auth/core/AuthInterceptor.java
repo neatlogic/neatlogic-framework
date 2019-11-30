@@ -7,7 +7,7 @@ import org.springframework.aop.support.AopUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.api.core.ApiParamFactory;
+import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.common.AuthAction;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.core.FrameworkExceptionMessageBase;

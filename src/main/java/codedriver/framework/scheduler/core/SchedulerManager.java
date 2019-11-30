@@ -42,7 +42,6 @@ import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
-import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
@@ -76,8 +75,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	
 	@PostConstruct
 	public final void init() {
-		System.out.println("定时检查newJob启动");
 		datasourceList = datasourceMapper.getAllDatasource();
+		//定时检查有没有新的定时作业要加载
 		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
 		CodeDriverThread newJobRunnable = new CodeDriverThread() {
 			@Override
@@ -85,7 +84,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				String oldThreadName = Thread.currentThread().getName();
 				try {
 					Thread.currentThread().setName("NEW_JOB_CHECK");
-					System.out.println("一次检查newJob开始");
 					System.out.println(TenantContext.get());
 					if(tenantContext == null) {
 						tenantContext = TenantContext.init();
@@ -100,7 +98,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 							loadJob(jobObject);
 						}					
 					}
-					System.out.println("一次检查newJob结束");
 				}catch(Exception e) {
 					logger.error(e.getMessage(), e);
 				}finally {
@@ -115,20 +112,21 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	public static IJob getInstance(String className){
 		return iJobMap.get(className);
 	}
-
+	/**
+	 * 
+	* @Description: 加载定时作业，同时设置定时作业状态和锁 
+	* @param jobObject 
+	* @return void
+	 */
 	public void loadJob(JobObject jobObject) {
+		//如果结束时间比当前时间早，就不加载了
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
 			return;
 		}
-//		IJob job = SchedulerManager.getInstance(jobObject.getJobClassName());
 		try {
-//			if (jobVo != null && job != null){
-//				if (!job.valid(jobVo.getPropList())){
-//					return;
-//				}
-//			}
 			String jobId = jobObject.getJobId();
 			String groupName = jobObject.getJobGroup();
+			//获取租户uuid，用于切换数据源
 			int index = groupName.indexOf(JobObject.DELIMITER);
 	        String tenantUuid = groupName.substring(0,index);
 			JobKey jobKey = new JobKey(jobId, groupName);
@@ -146,23 +144,25 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			}
 			TenantContext.get().setTenantUuid(tenantUuid);
 			TenantContext.get().setUseDefaultDatasource(false);
-			//TODO 开始事务
+			// 开始事务
 			DefaultTransactionDefinition def = new DefaultTransactionDefinition();
 			def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 			TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(def);
 			try {
 				JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobId);
-				if(jobStatus != null ) {
+				if(jobStatus != null ) {//将设置为运行中
 					jobStatus.setJobGroup(groupName);
 					jobStatus.setStatus(JobStatusVo.RUNNING);
 					jobStatus.setNeedAudit(jobObject.getNeedAudit());
 					schedulerMapper.updateJobStatusByJobUuid(jobStatus);
 				}else {
+					//首次加载该定时作业时，添加执行状态
 					jobStatus = new JobStatusVo(jobId, groupName, JobStatusVo.RUNNING, jobObject.getNeedAudit());
 					schedulerMapper.insertJobStatus(jobStatus);
 				}
 				JobLockVo jobLock = schedulerMapper.getJobLockByUuid(jobId);
 				if(jobLock == null) {
+					//首次加载该定时作业时，添加锁
 					schedulerMapper.insertJobLock(new JobLockVo(jobId, JobLockVo.WAIT, Config.SCHEDULE_SERVER_ID));
 				}
 				dataSourceTransactionManager.commit(transactionStatus);
@@ -170,7 +170,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				logger.error(e.getMessage(), e);
 				dataSourceTransactionManager.rollback(transactionStatus);
 			}
-			//TODO 结束事务
+			// 结束事务
 			Date startTime = jobObject.getStartTime();
 			if(startTime != null && startTime.after(new Date())) {
 				triggerBuilder.startAt(startTime);
@@ -186,10 +186,16 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			logger.error(ex.getMessage(), ex);
 		}
 	}
-	
+	/**
+	 * 
+	* @Description: 新添加job时调用该方法通知其他服务器加载该job
+	* @param jobObject 
+	* @return void
+	 */
 	public void broadcastNewJob(JobObject jobObject) {
 		byte[] jobObjectByteArray = SerializerUtil.getByteArrayByObject(jobObject);
 		TenantContext.get().setUseDefaultDatasource(true);
+		//获取在线服务器信息
 		List<ServerClusterVo> serverList = serverMapper.getServerByStatus(ServerClusterVo.STARTUP);
 		for(ServerClusterVo server : serverList) {
 			int serverId = server.getServerId();
@@ -200,14 +206,19 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		}
 		TenantContext.get().setUseDefaultDatasource(false);
 	}
-	
+	/**
+	 * 
+	* @Description: 暂停定时作业，将定时作业从调度器中删除，同时将定时作业状态设置为停止
+	* @param jobUuid 定时作业uuid
+	* @return void
+	 */
 	public void pauseJob(String jobUuid) {
 		try {
-//			TenantContext.get().setUseDefaultDatasource(false);
 			JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
 			if(jobStatus == null) {
 				return;
 			}
+			//将定时作业状态设置为停止
 			schedulerMapper.updateJobStatusByJobUuid(new JobStatusVo(jobUuid, JobStatusVo.STOP));
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			JobKey jobKey = new JobKey(jobStatus.getJobUuid(), jobStatus.getJobGroup());
@@ -218,14 +229,19 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			logger.error(e.getMessage(), e);
 		}
 	}
-	
+	/**
+	 * 
+	* @Description: 删除定时作业，将定时作业从调度器中删除，同时删除该定时作业的执行状态和锁数据
+	* @param jobUuid 定时作业uuid
+	* @return void
+	 */
 	public void deleteJob(String jobUuid) {
 		try {
-//			TenantContext.get().setUseDefaultDatasource(false);
 			JobStatusVo jobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
 			if(jobStatus == null) {
 				return;
 			}
+			//删除该定时作业的执行状态和锁数据
 			schedulerMapper.deleteJobStatusAndLockByJobUuid(jobUuid);
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			JobKey jobKey = new JobKey(jobStatus.getJobUuid(), jobStatus.getJobGroup());
@@ -236,7 +252,12 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			logger.error(e.getMessage(), e);
 		}
 	}
-	
+	/**
+	 * 
+	* @Description: 根据定时作业组件类的全限定名，批量加载定时作业
+	* @param classpath 
+	* @return void
+	 */
 	private void loadJob(String classpath) {
 		List<JobVo> jobList = schedulerMapper.getJobByClasspath(classpath);
 		for (JobVo job : jobList) {
@@ -244,7 +265,12 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			loadJob(jobObject);
 		}
 	}
-	
+	/**
+	 * 
+	* @Description: 某台服务器故障时，其他服务器调用该方法释放故障服务器占用的锁
+	* @param serverId 故障服务器id
+	* @return void
+	 */
 	public void releaseLock(Integer serverId) {
 		JobLockVo jobLock = new JobLockVo(JobLockVo.WAIT, serverId);
 		TenantContext tenantContext = TenantContext.get();
@@ -275,6 +301,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		TenantContext tenant = TenantContext.get();
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
 			IJob jobClass = entry.getValue();
+			//如果定时作业组件没有实现IPublicJob接口，不会插入schedule_job_class表
 			if(!(jobClass instanceof IPublicJob)) {
 				continue;
 			}
@@ -310,7 +337,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			String oldThreadName = Thread.currentThread().getName();
 			try {
 				Thread.currentThread().setName("SCHEDULER_LOAD_JOB");
-				System.out.println("SCHEDULER_LOAD_JOB:"+tenantContext);
 				if(tenantContext == null) {
 					tenantContext = TenantContext.init(tenantUuid);
 				}else {

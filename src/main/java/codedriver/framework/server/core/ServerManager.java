@@ -99,7 +99,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 		boolean returnVal = false;
 		try {
 			ServerClusterVo serverVo = serverMapper.getServerByServerId(serverId);
-			if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
+			if (serverVo != null && ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
 				serverVo.setStatus(ServerClusterVo.STOP);
 				serverMapper.updateServerByServerId(serverVo);
 				serverMapper.deleteCounterByServerId(serverVo.getServerId());

@@ -112,7 +112,7 @@ public abstract class JobBase implements IJob {
 			//抢到锁后，再次获取定时作业状态信息
 			JobStatusVo lockAfterJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
 			//如果抢锁前后获取到的执行次数不相等，则放弃执行业务逻辑
-			if(!lockAfterJobStatus.getExecCount().equals(lockAfterJobStatus.getExecCount())) {
+			if(!lockBeforeJobStatus.getExecCount().equals(lockAfterJobStatus.getExecCount())) {
 				return;
 			}
 			if (JobVo.YES.equals(lockBeforeJobStatus.getNeedAudit())) {

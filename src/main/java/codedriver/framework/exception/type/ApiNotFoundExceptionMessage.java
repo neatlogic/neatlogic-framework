@@ -11,7 +11,7 @@ public class ApiNotFoundExceptionMessage implements IApiExceptionMessage {
 
 	@Override
 	public String getError() {
-		return "token为：" + token + "的接口不存在或已被禁用";
+		return "token为“" + token + "”的接口不存在或已被禁用";
 	}
 
 	@Override

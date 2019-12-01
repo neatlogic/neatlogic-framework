@@ -27,6 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
+import codedriver.framework.exception.core.IApiExceptionMessage;
+import codedriver.framework.exception.type.CustomExceptionMessage;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
@@ -76,18 +80,11 @@ public abstract class JobBase implements IJob {
         String tenantUuid = groupName.substring(0,index);
 		TenantContext.init(tenantUuid).setUseDefaultDatasource(false);	
         String jobUuid = jobKey.getName();        
-        IJob job = SchedulerManager.getInstance(this.getClassName());
-        if (job == null) {
-        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ this.getClassName() + " 不存在");
-			logger.error(message.toString());
-        	System.out.println(message.toString());
-        	schedulerManager.pauseJob(jobUuid);
-            return;
-        }
+        
         //抢锁前 获取定时作业状态信息
         JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
         if(lockBeforeJobStatus == null) {
-        	SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业："+ jobUuid + " 不存在");
+        	IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业："+ jobUuid + " 不存在")));
 			logger.error(message.toString());
         	schedulerManager.pauseJob(jobUuid);
             return;
@@ -115,6 +112,10 @@ public abstract class JobBase implements IJob {
 			if(!lockBeforeJobStatus.getExecCount().equals(lockAfterJobStatus.getExecCount())) {
 				return;
 			}
+			IJob job = SchedulerManager.getInstance(this.getClassName());
+	        if (job == null) {
+	        	return;
+	        }
 			if (JobVo.YES.equals(lockBeforeJobStatus.getNeedAudit())) {
 
 	            JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);

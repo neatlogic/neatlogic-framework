@@ -10,7 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-
+import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
+import codedriver.framework.exception.core.IApiExceptionMessage;
+import codedriver.framework.exception.type.CustomExceptionMessage;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
@@ -63,10 +66,9 @@ public class SchedulerServiceImpl implements SchedulerService{
 		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
-			SchedulerExceptionMessage message = new SchedulerExceptionMessage("名称："+ job.getName() + " 已存在");
+			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("名称："+ job.getName() + " 已存在")));
 			logger.error(message.toString());
-//			throw new ApiRuntimeException(message);
-			throw new RuntimeException(message.toString());
+			throw new ApiRuntimeException(message);
 		}
 		job.setUuid(null);
 		uuid = job.getUuid();
@@ -82,10 +84,9 @@ public class SchedulerServiceImpl implements SchedulerService{
 	public void saveJobClass(JobClassVo jobClassVo) {
 		JobClassVo jobClass = schedulerMapper.getJobClassByClasspath(jobClassVo);
 		if(jobClass == null) {
-			SchedulerExceptionMessage message = new SchedulerExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在");
+			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在")));
 			logger.error(message.toString());
-//			throw new ApiRuntimeException(message);
-			throw new RuntimeException(message.toString());
+			throw new ApiRuntimeException(message);
 		}
 		jobClass.setType(jobClassVo.getType());
 		schedulerMapper.updateJobClass(jobClassVo);

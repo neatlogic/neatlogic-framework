@@ -2,6 +2,8 @@ package codedriver.framework.scheduler.dto;
 
 import java.util.Date;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class JobStatusVo {
 
 	public final static String RUNNING = "running";
@@ -15,6 +17,7 @@ public class JobStatusVo {
 	private Date lastFireTime;
 	private Date lastFinishTime;
 	private Integer execCount;
+	@JSONField(serialize = false)
 	private String needAudit;
 	public JobStatusVo() {
 	}

@@ -1,24 +1,23 @@
 package codedriver.framework.scheduler.exception;
 
-public class SchedulerExceptionMessage {
+import codedriver.framework.exception.core.IApiExceptionMessage;
 
-	private String message;
+public class SchedulerExceptionMessage implements IApiExceptionMessage {
 	
-	public SchedulerExceptionMessage(String message) {
-		this.message = message;
+	private String errorCode = "08";
+	private String error = "定时作业功能-";
+	
+	public SchedulerExceptionMessage(IApiExceptionMessage message) {
+		this.errorCode += message.getErrorCode();
+		this.error += message.getError();
 	}
-//	@Override
-//	public String getError() {
-//		return message;
-//	}
-//
-//	@Override
-//	protected String myGetErrorCode() {
-//		return "08";
-//	}
-//	
-//	@Override
-//	public String toString() {
-//		return "Error:" + getErrorCode() + ", Message:" + message;
-//	}
+	@Override
+	public String getErrorCode() {
+		return errorCode;
+	}
+
+	@Override
+	public String getError() {
+		return error;
+	}
 }

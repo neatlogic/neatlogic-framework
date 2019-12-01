@@ -84,7 +84,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				String oldThreadName = Thread.currentThread().getName();
 				try {
 					Thread.currentThread().setName("NEW_JOB_CHECK");
-					System.out.println(TenantContext.get());
 					if(tenantContext == null) {
 						tenantContext = TenantContext.init();
 					}						

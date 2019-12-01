@@ -1,5 +1,7 @@
 package codedriver.framework.scheduler.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.dto.BasePageVo;
 
 public class JobClassVo extends BasePageVo {
@@ -13,7 +15,8 @@ public class JobClassVo extends BasePageVo {
 	private String classpath;	
 	private String moduleName;
 	private String moduleDesc;
-
+	@JSONField(serialize = false)
+	private String tenantUuid;
 	public JobClassVo() {
 		this.setPageSize(20);
 	}
@@ -56,6 +59,14 @@ public class JobClassVo extends BasePageVo {
 
 	public void setModuleName(String moduleName) {
 		this.moduleName = moduleName;
+	}
+
+	public String getTenantUuid() {
+		return tenantUuid;
+	}
+
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
 	}
 
 	@Override

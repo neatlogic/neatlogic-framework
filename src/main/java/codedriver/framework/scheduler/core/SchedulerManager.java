@@ -284,6 +284,11 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
+		TenantContext tenant = TenantContext.get();
+		if(tenant == null) {
+			tenant = TenantContext.init();
+		}
+		tenant.setUseDefaultDatasource(true);
 		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
 		String moduleName = null;
 		for (ModuleVo vo : moduleList) {
@@ -298,7 +303,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		JobClassVo jobClassVo = null;
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
 		iJobMap.putAll(myMap);
-		TenantContext tenant = TenantContext.get();
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
 			IJob jobClass = entry.getValue();
 			//如果定时作业组件没有实现IPublicJob接口，不会插入schedule_job_class表

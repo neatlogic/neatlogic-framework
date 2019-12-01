@@ -92,7 +92,7 @@
 		</property>
 	</bean>
 
-
+ 	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
 
 
 </beans>

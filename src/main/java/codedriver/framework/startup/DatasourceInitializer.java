@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -58,4 +57,5 @@ public class DatasourceInitializer {
 			datasouce.afterPropertiesSet();
 		}
 	}
+
 }

@@ -26,8 +26,8 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class MyJsonStreamApiComponentBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
-	private static Logger logger = LoggerFactory.getLogger(MyJsonStreamApiComponentBase.class);
+public abstract class JsonStreamApiComponentBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
+	private static Logger logger = LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
 
 	@Autowired
 	private ApiMapper restMapper;

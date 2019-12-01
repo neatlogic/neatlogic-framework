@@ -6,8 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.api.core.ApiParamBase;
-import codedriver.framework.api.core.ApiParamType;
+import codedriver.framework.apiparam.core.ApiParamBase;
+import codedriver.framework.apiparam.core.ApiParamType;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,6 +19,8 @@ public @interface Param {
 	ApiParamType type() default ApiParamType.STRING;
 
 	boolean isRequired() default false;
+
+	String rule() default "";
 
 	String desc() default "";
 

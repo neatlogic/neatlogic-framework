@@ -1,17 +1,8 @@
-package codedriver.framework.api.core;
+package codedriver.framework.apiparam.core;
 
 public enum ApiParamType {
-	INTEGER("int","整形"),
-	BOOLEAN("boolean","布尔值"),
-	STRING("string", "字符串"), 
-	LONG("long", "长整形"), 
-	JSONOBJECT("JSONObject", "json"),
-	JSONARRAY("JSONArray", "json数组"),
-	IP("ip","ip"),
-	EMAIL("email","邮箱"),
-	TELEPHONE("telephone","手机号码"),
-	NOAUTH("noAuth","无需校验")
-	;
+	INTEGER("int", "整形"), BOOLEAN("boolean", "布尔值"), STRING("string", "字符串"), LONG("long", "长整形"), JSONOBJECT("JSONObject", "json"), JSONARRAY("JSONArray", "json数组"), IP("ip", "ip"), EMAIL("email", "邮箱"), REGEX("regex", "正则表达式"), NOAUTH("noAuth", "无需校验");
+
 	private String name;
 	private String text;
 
@@ -36,7 +27,7 @@ public enum ApiParamType {
 		}
 		return "";
 	}
-	
+
 	public static ApiParamType getApiParamType(String name) {
 		for (ApiParamType s : ApiParamType.values()) {
 			if (s.getValue().equals(name)) {

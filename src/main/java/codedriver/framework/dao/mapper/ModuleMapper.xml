@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.ModuleMapper">
-	<cache eviction="LRU" flushInterval="60000" size="1024" readOnly="true" />
+	<cache eviction="LRU" flushInterval="300000" size="1024" readOnly="true" />
 
 	<select id="getAllModuleList" resultType="codedriver.framework.dto.ModuleVo">
 		SELECT
@@ -15,6 +15,21 @@
 		`error`
 		FROM
 		`module`
+	</select>
+	
+	<select id="getActiveModuleListByTenantUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.ModuleVo" useCache="true">
+		SELECT 
+		   m.`name` ,
+		   m.`description`,
+		   m.`url_mapping` as urlMapper,
+		   m.`is_active` as isActive,
+		   m.`status`,
+		   m.`version`,
+		   m.`config_path` as configPath,
+		   m.`error`
+		FROM
+		  `tenant_module` tm LEFT JOIN module m ON tm.`module_name` = m.`name`
+		WHERE tm.`tenant_uuid` = #{value} and m.`is_active` = 1 and m.`status` = 'success'
 	</select>
 </mapper>
 

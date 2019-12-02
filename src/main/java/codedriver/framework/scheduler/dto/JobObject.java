@@ -6,9 +6,7 @@ import java.util.Date;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class JobObject implements Serializable {	
-	/** 
-	* @Fields serialVersionUID : TODO 
-	*/
+	
 	private static final long serialVersionUID = -8409651508383155447L;
 	public final static String FRAMEWORK = "FRAMEWORK";
 	public final static String DELIMITER = "(_)";
@@ -19,7 +17,6 @@ public class JobObject implements Serializable {
 	private Date endTime;
 	private String jobClassName;
 	private String needAudit;
-//	private String TenantUuid;
 	public JobObject(String _jobId, String _jobGroup) {
 		this.jobId = _jobId;
 		this.jobGroup = _jobGroup;
@@ -85,20 +82,11 @@ public class JobObject implements Serializable {
 		this.needAudit = needAudit;
 	}
 
-//	public String getTenantUuid() {
-//		return TenantUuid;
-//	}
-//
-//	public void setTenantUuid(String tenantUuid) {
-//		TenantUuid = tenantUuid;
-//	}
-
 	public static JobObject buildJobObject(JobBaseVo jobBaseVo, String groupName) {
 		TenantContext tenant = TenantContext.get();
 		tenant.setUseDefaultDatasource(false);
 		JobObject jobObject = new JobObject();
 		jobObject.setJobId(jobBaseVo.getUuid());
-//		jobObject.setTenantUuid(tenant.getTenantUuid());
 		jobObject.setJobGroup(tenant.getTenantUuid() + DELIMITER + groupName);
 		jobObject.setCron(jobBaseVo.getCron());
 		jobObject.setEndTime(jobBaseVo.getEndTime());

@@ -18,8 +18,8 @@ public interface ServerMapper {
 	int resetCounterByToServerId(int toServerId);
 	
 	//INSERT
-	int insertServer(ServerClusterVo server);
-	int insertServerCounter(ServerCounterVo serverCounter);
+	int replaceServer(ServerClusterVo server);
+	int replaceServerCounter(ServerCounterVo serverCounter);
 	
 	//DELETE
 	int deleteCounterByServerId(int serverId);		

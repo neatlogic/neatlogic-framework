@@ -49,7 +49,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		// 重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
-		serverMapper.insertServer(server);
+		serverMapper.replaceServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
 		CodeDriverThread runnable = new CodeDriverThread() {
 			@Override
@@ -73,7 +73,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
 					for (ServerCounterVo serverCounter : serverCounterList) {
 						// 重新插入数据
-						serverMapper.insertServerCounter(serverCounter);
+						serverMapper.replaceServerCounter(serverCounter);
 					}
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
@@ -104,6 +104,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					serverVo.setStatus(ServerClusterVo.STOP);
 					serverMapper.updateServerByServerId(serverVo);
 					serverMapper.deleteCounterByServerId(serverVo.getServerId());
+					schedulerMapper.deleteServerNewJobByServerId(serverVo.getServerId());
 					returnVal = true;
 				}
 			}

@@ -37,25 +37,25 @@ public class TestPublicJob extends JobBase implements IPublicJob {
 		
 		JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();
-		System.out.println(jobKey.getGroup());
-		System.out.println(TenantContext.get().getTenantUuid());
+		logger.info(jobKey.getGroup());
+		logger.info(TenantContext.get().getTenantUuid());
 		
 		String jobUuid = jobKey.getName();
-		System.out.println("TestPublicJob一分钟执行一次:" + jobUuid);
-		System.out.println("睡眠中");
+		logger.info("TestPublicJob一分钟执行一次:" + jobUuid);
+		logger.info("睡眠中");
 		try {
 			Thread.sleep(60000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("醒了");
+		logger.info("醒了");
 		JobVo jobVo = scheduleMapper.getJobByUuid(jobUuid);
 		
 		List<JobPropVo> propList = jobVo.getPropList();
 		if(propList != null && !propList.isEmpty()) {
 			for(JobPropVo prop : propList) {
-				System.out.println(prop.getName() + ":" + prop.getValue());
+				logger.info(prop.getName() + ":" + prop.getValue());
 			}
 		}
 //		logger.info("TestPublicJob一分钟执行一次:" + jobUuid);

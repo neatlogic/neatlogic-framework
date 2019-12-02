@@ -63,16 +63,16 @@ public class TestJob extends JobBase {
 		
 		JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();
-		System.out.println(jobKey.getGroup());
-		System.out.println(TenantContext.get().getTenantUuid());
+		logger.info(jobKey.getGroup());
+		logger.info(TenantContext.get().getTenantUuid());
 		String jobUuid = jobKey.getName();
-		System.out.println("TestJob一分钟执行一次:" + jobUuid);
+		logger.info("TestJob一分钟执行一次:" + jobUuid);
 		JobVo jobVo = scheduleMapper.getJobByUuid(jobUuid);
 		
 		List<JobPropVo> propList = jobVo.getPropList();
 		if(propList != null && !propList.isEmpty()) {
 			for(JobPropVo prop : propList) {
-				System.out.println(prop.getName() + ":" + prop.getValue());
+				logger.info(prop.getName() + ":" + prop.getValue());
 			}
 		}
 //		logger.info("TestJob一分钟执行一次:" + jobUuid);

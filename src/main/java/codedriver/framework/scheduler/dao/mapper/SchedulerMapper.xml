@@ -391,19 +391,12 @@
     </insert>
     
     <delete id="deleteJobByUuid">
-    DELETE a, b
+    DELETE a, b, sja
     FROM schedule_job a 
     LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid
+    LEFT JOIN schedule_job_audit sja ON sja.job_uuid = a.uuid
     WHERE a.uuid = #{uuid}
     </delete>
-
-	<!-- <delete id="deleteJobPropByJobUuid">
-		DELETE FROM schedule_job_prop WHERE job_uuid = #{jobUuid}
-	</delete>
-	
-	<delete id="deleteJobLock">
-		DELETE FROM schedule_job_lock WHERE job_uuid=#{jobUuid}
-	</delete> -->
 	
 	<delete id="deleteServerNewJobById">
 	DELETE FROM server_new_job WHERE id=#{id}

@@ -25,11 +25,7 @@ import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
 @Service
 @Transactional
 public class SchedulerServiceImpl implements SchedulerService{
-
-	private Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
-	
-
-	
+		
 	@Autowired 
 	private SchedulerMapper schedulerMapper;
 	
@@ -67,7 +63,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
 			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("名称："+ job.getName() + " 已存在")));
-			logger.error(message.toString());
 			throw new ApiRuntimeException(message);
 		}
 		job.setUuid(null);
@@ -85,7 +80,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 		JobClassVo jobClass = schedulerMapper.getJobClassByClasspath(jobClassVo);
 		if(jobClass == null) {
 			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在")));
-			logger.error(message.toString());
 			throw new ApiRuntimeException(message);
 		}
 		jobClass.setType(jobClassVo.getType());

@@ -85,7 +85,7 @@ public abstract class JobBase implements IJob {
         JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
         if(lockBeforeJobStatus == null) {
         	IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业："+ jobUuid + " 不存在")));
-			logger.error(message.toString());
+			logger.error(message.getErrorCode() + "-" + message.getError());
         	schedulerManager.pauseJob(jobUuid);
             return;
         }

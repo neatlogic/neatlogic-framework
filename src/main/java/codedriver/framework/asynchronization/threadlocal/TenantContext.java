@@ -6,6 +6,7 @@ import java.util.List;
 import codedriver.framework.dto.ModuleVo;
 
 public class TenantContext implements Serializable {
+	private static final long serialVersionUID = -5977938340288247600L;
 	private static ThreadLocal<TenantContext> instance = new ThreadLocal<TenantContext>();
 	private String tenantUuid;
 	private Boolean useDefaultDatasource = false;

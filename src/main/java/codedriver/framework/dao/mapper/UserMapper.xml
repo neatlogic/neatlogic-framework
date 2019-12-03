@@ -25,20 +25,24 @@
 		WHERE a.user_id = #{userId} AND a.password = #{password}
 	</select>
 	
-	<select id="getUserExpirationByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserExpirationVo">
-		SELECT `user_id` as userId,`expired_time` as expiredTime FROM `user_expiration` 
-		WHERE `user_id` = #{value} and expired_time > now()
+	<select id="getUserVisitByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVisitVo">
+		SELECT `user_id` as userId,`visit_time` as visitTime FROM `user_visit` 
+		WHERE `user_id` = #{value}
 	</select>
 	
 	
-	<insert id="replaceUserExpiration" parameterType="codedriver.framework.dto.UserExpirationVo">
-		REPLACE INTO `user_expiration` (`user_id`, `expired_time`) 
+	<insert id="insertUserVisit" parameterType="java.lang.String">
+		INSERT INTO `user_visit` (`user_id`, `visit_time`) 
 		VALUES
-		  (#{userId}, #{expiredTime}) ;
+		  (#{userId}, now()) ;
 	</insert>
 	
-	<delete id="deleteUserExpirationByUserId" parameterType="java.lang.String">
-		DELETE FROM `user_expiration`where `user_id` = #{value}
+	<update id="updateUserVisit" parameterType="java.lang.String">
+		UPDATE `user_visit` set `visit_time` =  now()  WHERE `user_id` = #{userId} 
+	</update>
+	
+	<delete id="deleteUserVisitByUserId" parameterType="java.lang.String">
+		DELETE FROM `user_visit`where `user_id` = #{value}
 	</delete>
 
 </mapper>

@@ -40,9 +40,7 @@ public class LogoutApi extends ApiComponentBase {
 	public Object myDoService(JSONObject jsonObj) throws Exception {
 		JSONObject json = new JSONObject();
 		UserContext userContext = UserContext.get();
-		userService.deleteUserExpirationByUserId(userContext.getUserId());
-		userContext.release();
-		TenantContext.get().release();
+		userService.deleteUserVisitByUserId(userContext.getUserId());
 		return json;
 	}
 }

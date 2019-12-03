@@ -70,7 +70,8 @@ public class LoginController {
 			UserVo checkUserVo = userService.getUserByUserIdAndPassword(userVo);
 			if (checkUserVo != null) {
 				//保存 user 登录有效时间
-				userService.saveUserExpiration(checkUserVo.getUserId());
+				userService.saveUserVisit(checkUserVo.getUserId());
+				
 				JSONObject jwtHeadObj = new JSONObject();
 				jwtHeadObj.put("alg", "HS256");
 				jwtHeadObj.put("typ", "JWT");

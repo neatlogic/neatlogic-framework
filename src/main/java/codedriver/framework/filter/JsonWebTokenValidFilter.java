@@ -3,9 +3,10 @@ package codedriver.framework.filter;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.Date;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,7 +27,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.UserMapper;
-import codedriver.framework.dto.UserExpirationVo;
+import codedriver.framework.dto.UserVisitVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	// private ServletContext context;
@@ -120,12 +121,19 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	
 	private boolean userExpirationValid() {
 		String userId = UserContext.get().getUserId();
-		UserExpirationVo userExpirationVo = userMapper.getUserExpirationByUserId(userId);
-		if(null != userExpirationVo) {
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			Date expireDate = new Date(System.currentTimeMillis() + Config.USER_EXPIRETIME * 60 * 1000);
-			userMapper.replaceUserExpiration(new UserExpirationVo(userId,formatter.format(expireDate)));
-			return true;
+		UserVisitVo userVisitVo = userMapper.getUserVisitByUserId(userId);
+		if(null != userVisitVo) {
+			 //北京时区
+			 ZoneId bjZone = ZoneId.of("GMT+08:00");
+		     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			 LocalDateTime nowDate = LocalDateTime.now();
+			 Long nowTime = nowDate.atZone(bjZone).toInstant().toEpochMilli();
+			 LocalDateTime visitDate = LocalDateTime.parse(userVisitVo.getVisitTime(),df);
+			 Long expireTime = visitDate.atZone(bjZone).toInstant().toEpochMilli()+Config.USER_EXPIRETIME;
+			 if(nowTime < expireTime){
+				userMapper.updateUserVisit(userId);
+				return true;
+			 }
 		}
 		return false;
 	}

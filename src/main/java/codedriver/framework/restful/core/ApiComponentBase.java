@@ -88,7 +88,7 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 //					String authType = authorization.substring(0, index);
 //					audit.setAuthType(authType);
 //				}
-				audit.setAuthType(interfaceVo.getAuthtype());
+				audit.setAuthType(interfaceVo.getAuthtype()); 
 				TenantContext.get().setUseDefaultDatasource(false);
 				apiMapper.insertApiAudit(audit);
 			}

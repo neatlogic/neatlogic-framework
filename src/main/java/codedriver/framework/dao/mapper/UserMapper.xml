@@ -24,6 +24,22 @@
 		`user` a LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
 		WHERE a.user_id = #{userId} AND a.password = #{password}
 	</select>
+	
+	<select id="getUserExpirationByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserExpirationVo">
+		SELECT `user_id` as userId,`expired_time` as expiredTime FROM `user_expiration` 
+		WHERE `user_id` = #{value} and expired_time > now()
+	</select>
+	
+	
+	<insert id="replaceUserExpiration" parameterType="codedriver.framework.dto.UserExpirationVo">
+		REPLACE INTO `user_expiration` (`user_id`, `expired_time`) 
+		VALUES
+		  (#{userId}, #{expiredTime}) ;
+	</insert>
+	
+	<delete id="deleteUserExpirationByUserId" parameterType="java.lang.String">
+		DELETE FROM `user_expiration`where `user_id` = #{value}
+	</delete>
 
 </mapper>
 

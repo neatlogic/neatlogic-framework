@@ -20,6 +20,7 @@ public class ServerObserverRegister implements BeanDefinitionRegistryPostProcess
 		
 	}
 
+	@SuppressWarnings({"rawtypes","unchecked"})
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {

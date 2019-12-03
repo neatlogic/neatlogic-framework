@@ -20,7 +20,7 @@ public class SchedulerComponentRegister implements BeanDefinitionRegistryPostPro
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		
 	}
-
+	@SuppressWarnings({"rawtypes","unchecked"})
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {

@@ -117,6 +117,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	* @param jobObject 
 	* @return void
 	 */
+	@SuppressWarnings({"rawtypes","unchecked"})
 	public void loadJob(JobObject jobObject) {
 		//如果结束时间比当前时间早，就不加载了
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {

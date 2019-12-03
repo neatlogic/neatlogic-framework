@@ -5,12 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import codedriver.framework.scheduler.dto.JobObject;
 
 public class SerializerUtil {
 
@@ -41,16 +38,16 @@ public class SerializerUtil {
 		return null;
 	}
 	
-	public static void main(String[] args) {
-		JobObject jobObject = new JobObject();
-		jobObject.setJobId("1");
-		jobObject.setJobGroup("abc");
-		jobObject.setCron("* * * * * *");
-		jobObject.setStartTime(new Date());
-		jobObject.setEndTime(new Date());
-		jobObject.setJobClassName("qwertyuiop");
-		jobObject.setNeedAudit("yes");
-		byte[] bytes = getByteArrayByObject(jobObject);
-		JobObject jobObject2 = (JobObject) getObjectByByteArray(bytes);
-	}
+//	public static void main(String[] args) {
+//		JobObject jobObject = new JobObject();
+//		jobObject.setJobId("1");
+//		jobObject.setJobGroup("abc");
+//		jobObject.setCron("* * * * * *");
+//		jobObject.setStartTime(new Date());
+//		jobObject.setEndTime(new Date());
+//		jobObject.setJobClassName("qwertyuiop");
+//		jobObject.setNeedAudit("yes");
+//		byte[] bytes = getByteArrayByObject(jobObject);
+//		JobObject jobObject2 = (JobObject) getObjectByByteArray(bytes);
+//	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiComponentVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -16,7 +17,10 @@ public interface ApiMapper {
 
 	public int insertApi(ApiVo apiVo);
 
+	public int insertApiAudit(ApiAuditVo apiAudit);
+	
 	public int updateApiComponentIdById(ApiVo apiVo);
 
 	public int deleteAllApiComponent();
+	
 }

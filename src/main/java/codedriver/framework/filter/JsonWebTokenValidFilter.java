@@ -3,7 +3,9 @@ package codedriver.framework.filter;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Date;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,9 +25,15 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.UserExpirationVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	// private ServletContext context;
+	
+	@Autowired 
+	UserMapper userMapper;
+
 
 	/**
 	 * Default constructor.
@@ -41,7 +50,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		TenantContext.get().release();// 清除线程变量值
 		UserContext.get().release();
 	}
-
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -97,7 +106,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-		if (isAuth) {
+		
+		if (isAuth&&userExpirationValid()) {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
@@ -106,5 +116,17 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
 			response.getWriter().print(redirectObj.toJSONString());
 		}
+	}
+	
+	private boolean userExpirationValid() {
+		String userId = UserContext.get().getUserId();
+		UserExpirationVo userExpirationVo = userMapper.getUserExpirationByUserId(userId);
+		if(null != userExpirationVo) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date expireDate = new Date(System.currentTimeMillis() + Config.USER_EXPIRETIME * 60 * 1000);
+			userMapper.replaceUserExpiration(new UserExpirationVo(userId,formatter.format(expireDate)));
+			return true;
+		}
+		return false;
 	}
 }

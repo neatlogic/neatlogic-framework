@@ -1,26 +1,33 @@
 package codedriver.framework.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class TeamVo {
+import codedriver.framework.common.dto.BasePageVo;
+
+public class TeamVo extends BasePageVo{
 	
 	private String uuid;
 	private Integer lft;
 	private Integer rht;
 	private Integer isShow;
 	private Long timeId;
-	private Long parentId;	
+	private String parentId;	
 	private String importId;
 	private String name;
 	private String description;
 	private String roleName;
+	private String module;
+	private String parentName;
 	private int isHandleChildtask;
 	private int isDelete ;
 	private int workTimeId;
 	private int sort;
 	private int childCount;
+	private Integer componentId;
+	private List<String> moduleList;
 
 	public synchronized String getUuid() {
 		  if (StringUtils.isBlank(uuid)) {
@@ -82,11 +89,11 @@ public class TeamVo {
 		this.timeId = timeId;
 	}
 
-	public Long getParentId() {
+	public String getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(Long parentId) {
+	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
 
@@ -112,6 +119,22 @@ public class TeamVo {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public String getModule() {
+		return module;
+	}
+
+	public void setModule(String module) {
+		this.module = module;
+	}
+
+	public String getParentName() {
+		return parentName;
+	}
+
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
 	}
 
 	public int getIsHandleChildtask() {
@@ -152,6 +175,22 @@ public class TeamVo {
 
 	public void setChildCount(int childCount) {
 		this.childCount = childCount;
+	}
+
+	public Integer getComponentId() {
+		return componentId;
+	}
+
+	public void setComponentId(Integer componentId) {
+		this.componentId = componentId;
+	}
+
+	public List<String> getModuleList() {
+		return moduleList;
+	}
+
+	public void setModuleList(List<String> moduleList) {
+		this.moduleList = moduleList;
 	}
 	
 }

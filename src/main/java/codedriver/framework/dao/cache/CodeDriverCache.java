@@ -21,10 +21,6 @@ public class CodeDriverCache implements Cache {
 	 */
 	protected final String id;
 
-	/**
-	 * The cache instance
-	 */
-	protected Ehcache cache;
 
 	/**
 	 * @param id
@@ -34,6 +30,9 @@ public class CodeDriverCache implements Cache {
 			throw new IllegalArgumentException("Cache instances require an ID");
 		}
 		this.id = id;
+	}
+	
+	private synchronized Ehcache getCache() {
 		TenantContext tenantContext = TenantContext.get();
 		String tenant = null;
 		if (tenantContext != null) {
@@ -43,12 +42,12 @@ public class CodeDriverCache implements Cache {
 			if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
 				CACHE_MANAGER.addCache(tenant + ":" + id);
 			}
-			this.cache = CACHE_MANAGER.getEhcache(tenant + ":" + id);
+			return CACHE_MANAGER.getEhcache(tenant + ":" + id);
 		} else {
 			if (!CACHE_MANAGER.cacheExists(id)) {
 				CACHE_MANAGER.addCache(id);
 			}
-			this.cache = CACHE_MANAGER.getEhcache(id);
+			return CACHE_MANAGER.getEhcache(id);
 		}
 	}
 
@@ -57,7 +56,7 @@ public class CodeDriverCache implements Cache {
 	 */
 	@Override
 	public void clear() {
-		cache.removeAll();
+		getCache().removeAll();
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class CodeDriverCache implements Cache {
 	 */
 	@Override
 	public Object getObject(Object key) {
-		Element cachedElement = cache.get(key);
+		Element cachedElement = getCache().get(key);
 		if (cachedElement == null) {
 			return null;
 		}
@@ -85,7 +84,7 @@ public class CodeDriverCache implements Cache {
 	 */
 	@Override
 	public int getSize() {
-		return cache.getSize();
+		return getCache().getSize();
 	}
 
 	/**
@@ -93,7 +92,8 @@ public class CodeDriverCache implements Cache {
 	 */
 	@Override
 	public void putObject(Object key, Object value) {
-		cache.put(new Element(key, value));
+		
+		getCache().put(new Element(key, value));
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class CodeDriverCache implements Cache {
 	@Override
 	public Object removeObject(Object key) {
 		Object obj = getObject(key);
-		cache.remove(key);
+		getCache().remove(key);
 		return obj;
 	}
 
@@ -163,7 +163,7 @@ public class CodeDriverCache implements Cache {
 	 *            last accessed or modified date
 	 */
 	public void setTimeToIdleSeconds(long timeToIdleSeconds) {
-		cache.getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
+		getCache().getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class CodeDriverCache implements Cache {
 	 *            creation date
 	 */
 	public void setTimeToLiveSeconds(long timeToLiveSeconds) {
-		cache.getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
+		getCache().getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class CodeDriverCache implements Cache {
 	 *            evicted (0 == no limit)
 	 */
 	public void setMaxEntriesLocalHeap(long maxEntriesLocalHeap) {
-		cache.getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
+		getCache().getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class CodeDriverCache implements Cache {
 	 *            unlimited.
 	 */
 	public void setMaxEntriesLocalDisk(long maxEntriesLocalDisk) {
-		cache.getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
+		getCache().getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class CodeDriverCache implements Cache {
 	 *            "FIFO".
 	 */
 	public void setMemoryStoreEvictionPolicy(String memoryStoreEvictionPolicy) {
-		cache.getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
+		getCache().getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
 	}
 
 }

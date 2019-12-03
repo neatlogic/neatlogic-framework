@@ -4,15 +4,11 @@ public class UserExpirationVo {
 	private String userId;
 	private String expiredTime;
 	
-	
 	public UserExpirationVo(String userId, String expiredTime) {
 		this.userId = userId;
 		this.expiredTime = expiredTime;
 	}
 	
-	
-
-
 	public UserExpirationVo() {
 		super();
 	}

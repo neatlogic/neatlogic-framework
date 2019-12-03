@@ -3,10 +3,13 @@ package codedriver.framework.filter;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Date;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -123,17 +126,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		String userId = UserContext.get().getUserId();
 		UserVisitVo userVisitVo = userMapper.getUserVisitByUserId(userId);
 		if(null != userVisitVo) {
-			 //北京时区
-			 ZoneId bjZone = ZoneId.of("GMT+08:00");
-		     DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			 LocalDateTime nowDate = LocalDateTime.now();
-			 Long nowTime = nowDate.atZone(bjZone).toInstant().toEpochMilli();
-			 LocalDateTime visitDate = LocalDateTime.parse(userVisitVo.getVisitTime(),df);
-			 Long expireTime = visitDate.atZone(bjZone).toInstant().toEpochMilli()+Config.USER_EXPIRETIME;
-			 if(nowTime < expireTime){
-				userMapper.updateUserVisit(userId);
-				return true;
-			 }
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				Date visitTime = formatter.parse(userVisitVo.getVisitTime());
+				Date now  = new Date();
+				if(now.getTime() < (visitTime.getTime()+Config.USER_EXPIRETIME*60*1000)) {
+					userMapper.updateUserVisit(userId);
+					return true;
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}

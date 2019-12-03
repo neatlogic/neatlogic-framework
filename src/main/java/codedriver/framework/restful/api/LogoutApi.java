@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
@@ -41,6 +40,6 @@ public class LogoutApi extends ApiComponentBase {
 		JSONObject json = new JSONObject();
 		UserContext userContext = UserContext.get();
 		userService.deleteUserVisitByUserId(userContext.getUserId());
-		return json;
+		return json; 
 	}
 }

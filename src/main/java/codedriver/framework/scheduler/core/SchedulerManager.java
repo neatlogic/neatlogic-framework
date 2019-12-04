@@ -37,9 +37,9 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.common.util.SerializerUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
-import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
@@ -62,8 +62,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	private SchedulerFactoryBean schedulerFactoryBean;
 	@Autowired
 	private SchedulerMapper schedulerMapper;
-	@Autowired
-	private ModuleMapper moduleMapper;
 	@Autowired
 	private DatasourceMapper datasourceMapper;
 	@Autowired 
@@ -289,7 +287,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			tenant = TenantContext.init();
 		}
 		tenant.setUseDefaultDatasource(true);
-		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
+		List<ModuleVo> moduleList = ModuleUtil.getAllModuleList();
 		String moduleName = null;
 		for (ModuleVo vo : moduleList) {
 			if (context.getDisplayName().indexOf(vo.getName()) > -1) {

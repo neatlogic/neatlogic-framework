@@ -20,21 +20,18 @@ public class ServerObserverRegister implements BeanDefinitionRegistryPostProcess
 		
 	}
 
-	@SuppressWarnings({"rawtypes","unchecked"})
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {
-			Class pluginBaseClass = Class.forName("codedriver.framework.server.core.ServerObserver");
 			Reflections reflections = new Reflections("codedriver");
-			Set<Class> modules = reflections.getSubTypesOf(pluginBaseClass);
-			for(Class clazz : modules) {
+			Set<Class<? extends ServerObserver>> modules = reflections.getSubTypesOf(ServerObserver.class);
+			for(Class<? extends ServerObserver> clazz : modules) {
 				RootBeanDefinition bean = new RootBeanDefinition(clazz);
 				registry.registerBeanDefinition(clazz.getName(), bean);
 			}
-		}catch(ClassNotFoundException e) {
+		}catch(Exception e) {
 			logger.error(e.getMessage(), e);
-		}
-		
+		}	
 	}
 
 }

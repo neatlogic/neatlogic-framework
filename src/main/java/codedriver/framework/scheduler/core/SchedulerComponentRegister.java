@@ -20,21 +20,19 @@ public class SchedulerComponentRegister implements BeanDefinitionRegistryPostPro
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		
 	}
-	@SuppressWarnings({"rawtypes","unchecked"})
+
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {
-			Class pluginBaseClass = Class.forName("codedriver.framework.scheduler.core.IJob");
 			Reflections reflections = new Reflections("codedriver");
-			Set<Class> modules = reflections.getSubTypesOf(pluginBaseClass);
-			for(Class clazz : modules) {
+			Set<Class<? extends JobBase>> modules = reflections.getSubTypesOf(JobBase.class);
+			for(Class<? extends JobBase> clazz : modules) {
 				RootBeanDefinition bean = new RootBeanDefinition(clazz);
 				registry.registerBeanDefinition(clazz.getName(),bean);
-			}
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage(),e);
+			}	
+		}catch(Exception e) {
+			logger.error(e.getMessage(), e);
 		}
-		
 	}
 
 }

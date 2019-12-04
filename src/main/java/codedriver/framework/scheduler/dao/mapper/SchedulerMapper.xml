@@ -156,8 +156,7 @@
 		a.`module_name` AS `moduleName`
 		FROM schedule_job_class a
 		<if test="tenantUuid != null">
-		JOIN module b ON a.module_name = b.name AND b.is_active = 1 AND b.status = 'success'
-		JOIN tenant_module tm ON tm.module_name=b.name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
 		</if>
 		WHERE a.classpath=#{classpath}
 	</select>
@@ -167,8 +166,7 @@
 		count(1)
 		FROM
 		schedule_job_class a 
-		JOIN module b ON a.module_name = b.name AND b.is_active = 1 AND b.status = 'success'
-		JOIN tenant_module tm ON tm.module_name=b.name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
 		<include refid="searchScheduleJobClassSql" />
 	</select>
 	
@@ -181,8 +179,7 @@
 		b.description AS moduleDesc
 		FROM
 		schedule_job_class a 
-		JOIN module b ON a.module_name = b.name AND b.is_active = 1 AND b.status = 'success'
-		JOIN tenant_module tm ON tm.module_name=b.name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
 		<include refid="searchScheduleJobClassSql" />
 		ORDER by a.name
 		limit #{startNum}, #{pageSize}

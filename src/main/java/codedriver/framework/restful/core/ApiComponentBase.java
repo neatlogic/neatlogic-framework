@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.AuthAction;
 import codedriver.framework.common.config.Config;
@@ -91,6 +92,7 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 				audit.setAuthType(interfaceVo.getAuthtype()); 
 				TenantContext.get().setUseDefaultDatasource(false);
 				apiMapper.insertApiAudit(audit);
+				CommonThreadPool.execute(new ApiAuditLog(audit.getUuid(),jsonObj.toString(), error, result.toString(), TenantContext.get().getTenantUuid()));
 			}
 		}
 		return result;

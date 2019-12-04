@@ -17,4 +17,18 @@ public class UserServiceImpl implements UserService {
 		return userMapper.getUserByUserIdAndPassword(userVo);
 	}
 
+	@Override
+	public int saveUserSession(String userId) {
+		if(null != userMapper.getUserSessionByUserId(userId)) {
+			return userMapper.updateUserSession(userId);
+		}else {
+			return userMapper.insertUserSession(userId);
+		}
+	}
+
+	@Override
+	public int deleteUserSessionByUserId(String userId) {
+		return userMapper.deleteUserSessionByUserId(userId);
+	}
+
 }

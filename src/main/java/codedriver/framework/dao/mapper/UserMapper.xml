@@ -24,6 +24,26 @@
 		`user` a LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
 		WHERE a.user_id = #{userId} AND a.password = #{password}
 	</select>
+	
+	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">
+		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session` 
+		WHERE `user_id` = #{value}
+	</select>
+	
+	
+	<insert id="insertUserSession" parameterType="java.lang.String">
+		INSERT INTO `user_session` (`user_id`, `visit_time`) 
+		VALUES
+		  (#{userId}, now()) ;
+	</insert>
+	
+	<update id="updateUserSession" parameterType="java.lang.String">
+		UPDATE `user_session` set `visit_time` =  now()  WHERE `user_id` = #{userId} 
+	</update>
+	
+	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">
+		DELETE FROM `user_session`where `user_id` = #{value}
+	</delete>
 
 </mapper>
 

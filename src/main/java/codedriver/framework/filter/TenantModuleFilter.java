@@ -1,6 +1,7 @@
 package codedriver.framework.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,13 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
 
 public class TenantModuleFilter extends OncePerRequestFilter {
 
 	@Autowired
 	ModuleMapper moduleMapper;
-	
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		TenantContext tenantContext = TenantContext.get();
@@ -27,10 +29,12 @@ public class TenantModuleFilter extends OncePerRequestFilter {
 		if (StringUtils.isNotBlank(tenant)) {
 			// 使用master库
 			tenantContext.setUseDefaultDatasource(true);
-			TenantContext.get().setActiveModuleList(moduleMapper.getActiveModuleListByTenantUuid(tenant));
-			tenantContext.setTenantUuid(tenant);
+			List<String> tenentModuleList = moduleMapper.getModuleListByTenantUuid(tenant);
 			// 还原回租户库
 			tenantContext.setUseDefaultDatasource(false);
+			// 设置当前租户激活模块信息
+			tenantContext.setActiveModuleList(ModuleUtil.getTenantActionModuleList(tenentModuleList));
+
 		}
 		filterChain.doFilter(request, response);
 	}
@@ -40,6 +44,5 @@ public class TenantModuleFilter extends OncePerRequestFilter {
 	 */
 	@Override
 	public void destroy() {
-		TenantContext.get().release();// 清除线程变量值
 	}
 }

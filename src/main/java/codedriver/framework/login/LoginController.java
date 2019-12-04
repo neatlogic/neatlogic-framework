@@ -70,7 +70,7 @@ public class LoginController {
 			UserVo checkUserVo = userService.getUserByUserIdAndPassword(userVo);
 			if (checkUserVo != null) {
 				//保存 user 登录访问时间
-				userService.saveUserVisit(checkUserVo.getUserId());
+				userService.saveUserSession(checkUserVo.getUserId());
 				
 				JSONObject jwtHeadObj = new JSONObject();
 				jwtHeadObj.put("alg", "HS256");

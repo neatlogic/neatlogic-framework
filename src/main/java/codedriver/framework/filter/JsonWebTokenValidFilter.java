@@ -29,7 +29,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.ConfigVo;
-import codedriver.framework.dto.UserVisitVo;
+import codedriver.framework.dto.UserSessionVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	// private ServletContext context;
@@ -126,18 +126,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	
 	private boolean userExpirationValid() {
 		String userId = UserContext.get().getUserId();
-		UserVisitVo userVisitVo = userMapper.getUserVisitByUserId(userId);
-		if(null != userVisitVo) {
+		UserSessionVo userSessionVo = userMapper.getUserSessionByUserId(userId);
+		if(null != userSessionVo) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
-				Date visitTime = formatter.parse(userVisitVo.getVisitTime());
+				Date visitTime = formatter.parse(userSessionVo.getSessionTime());
 				Date now  = new Date();
 				TenantContext.get().setUseDefaultDatasource(true);
-				ConfigVo configVo = configMapper.getConfigByKey(UserVisitVo.USER_EXPIRETIME); 
+				ConfigVo configVo = configMapper.getConfigByKey(UserSessionVo.USER_EXPIRETIME); 
 				TenantContext.get().setUseDefaultDatasource(false);
 				Long expireTime = Long.parseLong( configVo != null?configVo.getValue():"30")*60*1000+visitTime.getTime();
 				if(now.getTime() < expireTime) {
-					userMapper.updateUserVisit(userId);
+					userMapper.updateUserSession(userId);
 					return true;
 				}
 			} catch (ParseException e) {

@@ -132,7 +132,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			try {
 				Date visitTime = formatter.parse(userVisitVo.getVisitTime());
 				Date now  = new Date();
+				TenantContext.get().setUseDefaultDatasource(true);
 				ConfigVo configVo = configMapper.getConfigByKey(UserVisitVo.USER_EXPIRETIME); 
+				TenantContext.get().setUseDefaultDatasource(false);
 				Long expireTime = Long.parseLong( configVo != null?configVo.getValue():"30")*60*1000+visitTime.getTime();
 				if(now.getTime() < expireTime) {
 					userMapper.updateUserVisit(userId);

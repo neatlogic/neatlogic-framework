@@ -25,7 +25,7 @@ public class ServerObserverRegister implements BeanDefinitionRegistryPostProcess
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {
 			Class pluginBaseClass = Class.forName("codedriver.framework.server.core.ServerObserver");
-			Reflections reflections = new Reflections("codedriver.framework");
+			Reflections reflections = new Reflections("codedriver");
 			Set<Class> modules = reflections.getSubTypesOf(pluginBaseClass);
 			for(Class clazz : modules) {
 				RootBeanDefinition bean = new RootBeanDefinition(clazz);

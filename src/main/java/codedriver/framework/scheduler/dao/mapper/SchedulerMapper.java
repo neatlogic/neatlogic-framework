@@ -18,7 +18,7 @@ public interface SchedulerMapper {
 	public int searchJobCount(JobVo jobVo);
 	public List<JobVo> searchJobList(JobVo jobVo);	
 	public JobVo getJobByName(JobVo job);
-	public List<ServerNewJobVo> getNewJobByServerId(int serverId);
+	public List<ServerNewJobVo> getServerJobByServerId(int serverId);
 	
 	public JobClassVo getJobClassByClasspath(JobClassVo jobClassVo);
 	public int searchJobClassCount(JobClassVo jobClassVo);
@@ -43,11 +43,11 @@ public interface SchedulerMapper {
 	public int insertJobClass(JobClassVo jobClass);	
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
 	public int insertJobLock(JobLockVo jobLock);
-	public int insertServerNewJob(ServerNewJobVo serverNewJobVo);
+	public int insertServerJob(ServerNewJobVo serverNewJobVo);
 	//DELETE
 	public int deleteJobByUuid(String uuid);
-	public int deleteServerNewJobById(Long id);
-	public int deleteServerNewJobByServerId(Integer serverId);
+	public int deleteServerJobById(Long id);
+	public int deleteServerJobByServerId(Integer serverId);
 	public int deleteJobStatusAndLockByJobUuid(String jobUuid);
 	
 }

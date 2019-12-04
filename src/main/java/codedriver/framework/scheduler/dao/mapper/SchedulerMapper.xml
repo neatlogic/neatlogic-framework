@@ -218,10 +218,10 @@
         WHERE sja.id = #{id}
 	</select>
 	
-	<select id="getNewJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
+	<select id="getServerJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
 		SELECT 
 		id, server_id AS serverId, job_object AS jobObject
-		FROM server_new_job 
+		FROM schedule_server_job 
 		WHERE server_id=#{serverId}
 	</select>
 	
@@ -386,8 +386,8 @@
     	INSERT INTO `schedule_job_lock`(`job_uuid`, `lock`, `server_id`) VALUES(#{jobUuid}, #{lock}, #{serverId})
     </insert>
     
-    <insert id="insertServerNewJob">
-    INSERT INTO server_new_job(server_id, job_object) VALUES(#{serverId}, #{jobObject, jdbcType=BLOB})
+    <insert id="insertServerJob">
+    INSERT INTO schedule_server_job(server_id, job_object) VALUES(#{serverId}, #{jobObject, jdbcType=BLOB})
     </insert>
     
     <delete id="deleteJobByUuid">
@@ -398,12 +398,12 @@
     WHERE a.uuid = #{uuid}
     </delete>
 	
-	<delete id="deleteServerNewJobById">
-	DELETE FROM server_new_job WHERE id=#{id}
+	<delete id="deleteServerJobById">
+	DELETE FROM schedule_server_job WHERE id=#{id}
 	</delete>
 	
-	<delete id="deleteServerNewJobByServerId">
-	DELETE FROM server_new_job WHERE server_id=#{serverId}
+	<delete id="deleteServerJobByServerId">
+	DELETE FROM schedule_server_job WHERE server_id=#{serverId}
 	</delete>
 	
 	<delete id="deleteJobStatusAndLockByJobUuid">

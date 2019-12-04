@@ -24,8 +24,8 @@ public class SchedulerComponentRegister implements BeanDefinitionRegistryPostPro
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {
-			Class pluginBaseClass = Class.forName("codedriver.framework.scheduler.core.JobBase");
-			Reflections reflections = new Reflections("codedriver.framework");
+			Class pluginBaseClass = Class.forName("codedriver.framework.scheduler.core.IJob");
+			Reflections reflections = new Reflections("codedriver");
 			Set<Class> modules = reflections.getSubTypesOf(pluginBaseClass);
 			for(Class clazz : modules) {
 				RootBeanDefinition bean = new RootBeanDefinition(clazz);

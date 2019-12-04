@@ -88,10 +88,10 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 						tenantContext = TenantContext.init();
 					}						
 					tenantContext.setUseDefaultDatasource(true);
-					List<ServerNewJobVo> newJobList = schedulerMapper.getNewJobByServerId(Config.SCHEDULE_SERVER_ID);
+					List<ServerNewJobVo> newJobList = schedulerMapper.getServerJobByServerId(Config.SCHEDULE_SERVER_ID);
 					for(ServerNewJobVo newJob : newJobList) {
 						tenantContext.setUseDefaultDatasource(true);
-						schedulerMapper.deleteServerNewJobById(newJob.getId());
+						schedulerMapper.deleteServerJobById(newJob.getId());
 						JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
 						if(jobObject != null) {
 							loadJob(jobObject);
@@ -202,7 +202,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			if(Config.SCHEDULE_SERVER_ID == serverId) {
 				continue;
 			}
-			schedulerMapper.insertServerNewJob(new ServerNewJobVo(serverId, jobObjectByteArray));
+			schedulerMapper.insertServerJob(new ServerNewJobVo(serverId, jobObjectByteArray));
 		}
 		TenantContext.get().setUseDefaultDatasource(false);
 	}

@@ -104,7 +104,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					serverVo.setStatus(ServerClusterVo.STOP);
 					serverMapper.updateServerByServerId(serverVo);
 					serverMapper.deleteCounterByServerId(serverVo.getServerId());
-					schedulerMapper.deleteServerNewJobByServerId(serverVo.getServerId());
+					schedulerMapper.deleteServerJobByServerId(serverVo.getServerId());
 					returnVal = true;
 				}
 			}

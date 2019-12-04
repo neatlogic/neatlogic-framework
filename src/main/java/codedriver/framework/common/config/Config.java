@@ -19,7 +19,6 @@ public class Config {
 	public static String CODEDRIVER_HOME;
 	public static final int SERVER_HEARTBEAT_RATE;// 默认3分钟
 	public static final int SERVER_HEARTBEAT_THRESHOLD;// 默认5
-	public static final int USER_EXPIRETIME;//登录有效时间段
 
 	private static final String CONFIG_FILE = "config.properties";
 	static {
@@ -46,7 +45,6 @@ public class Config {
 			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.heart.threshold变量");
 			throw ex;
 		}
-		USER_EXPIRETIME = Integer.parseInt(getProperty(CONFIG_FILE, "user.expireTime", "30"));
 	}
 
 	private static String getProperty(String configFile, String keyName, String defaultValue) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.ConfigMapper">
+	
+	<select id="getConfigByKey" parameterType="java.lang.String" resultType="codedriver.framework.dto.ConfigVo">
+		SELECT `key`,`value`,`description` FROM `config` WHERE `key` = #{value} ;
+	</select>
+	
+	<replace id="relaceConfig" parameterType="codedriver.framework.dto.ConfigVo">
+		INSERT INTO `config` (`key`, `value`, `description`) 
+		VALUES
+		  (#{key}, #{value}, #{description}) ;
+	</replace>
+	
+	<delete id="deleteConfig" parameterType="java.lang.String">
+		DELETE FROM `config` WHERE `key` = #{value} ;
+	</delete>
+
+</mapper>
+

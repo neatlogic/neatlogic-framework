@@ -26,7 +26,9 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.dto.UserVisitVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
@@ -34,6 +36,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	
 	@Autowired 
 	UserMapper userMapper;
+	
+	@Autowired
+	ConfigMapper configMapper;
 
 
 	/**
@@ -127,7 +132,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			try {
 				Date visitTime = formatter.parse(userVisitVo.getVisitTime());
 				Date now  = new Date();
-				if(now.getTime() < (visitTime.getTime()+Config.USER_EXPIRETIME*60*1000)) {
+				ConfigVo configVo = configMapper.getConfigByKey(UserVisitVo.USER_EXPIRETIME); 
+				Long expireTime = Long.parseLong( configVo != null?configVo.getValue():"30")*60*1000+visitTime.getTime();
+				if(now.getTime() < expireTime) {
 					userMapper.updateUserVisit(userId);
 					return true;
 				}

@@ -93,6 +93,8 @@
 	</bean>
 
  	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
+ 	
+ 	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
 
 </beans>

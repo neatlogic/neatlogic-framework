@@ -119,10 +119,21 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			JSONObject redirectObj = new JSONObject();
 			redirectObj.put("Status", "failed");
 			redirectObj.put("Message", "认证失败");
+			//清除cookies
+			Cookie authCookie = new Cookie("codedriver_authorization",null);
+			authCookie.setMaxAge(0);
+			authCookie.setPath("/");
+			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
+			tenantCookie.setMaxAge(0);
+			tenantCookie.setPath("/");
+			response.addCookie(authCookie);
+			response.addCookie(tenantCookie);
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
 			response.getWriter().print(redirectObj.toJSONString());
 		}
 	}
+	
+	
 	
 	private boolean userExpirationValid() {
 		String userId = UserContext.get().getUserId();

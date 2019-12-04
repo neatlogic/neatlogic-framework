@@ -1,14 +1,10 @@
 package codedriver.framework.dto;
 
 public class ModuleVo {
+	private String id;
 	private String name;
 	private String description;
-	private String urlMapping;
-	private String isActive;
-	private String status;
 	private String version;
-	private String configPath;
-	private String error;
 
 	public String getName() {
 		return name;
@@ -26,28 +22,12 @@ public class ModuleVo {
 		this.description = description;
 	}
 
-	public String getUrlMapping() {
-		return urlMapping;
+	public String getId() {
+		return id;
 	}
 
-	public void setUrlMapping(String urlMapping) {
-		this.urlMapping = urlMapping;
-	}
-
-	public String getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(String isActive) {
-		this.isActive = isActive;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getVersion() {
@@ -56,22 +36,6 @@ public class ModuleVo {
 
 	public void setVersion(String version) {
 		this.version = version;
-	}
-
-	public String getConfigPath() {
-		return configPath;
-	}
-
-	public void setConfigPath(String configPath) {
-		this.configPath = configPath;
-	}
-
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
 	}
 
 }

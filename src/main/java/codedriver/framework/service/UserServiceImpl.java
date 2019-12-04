@@ -17,4 +17,18 @@ public class UserServiceImpl implements UserService {
 		return userMapper.getUserByUserIdAndPassword(userVo);
 	}
 
+	@Override
+	public int saveUserVisit(String userId) {
+		if(null != userMapper.getUserVisitByUserId(userId)) {
+			return userMapper.updateUserVisit(userId);
+		}else {
+			return userMapper.insertUserVisit(userId);
+		}
+	}
+
+	@Override
+	public int deleteUserVisitByUserId(String userId) {
+		return userMapper.deleteUserVisitByUserId(userId);
+	}
+
 }

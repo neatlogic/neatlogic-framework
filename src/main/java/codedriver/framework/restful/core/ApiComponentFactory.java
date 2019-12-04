@@ -16,6 +16,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.google.common.util.concurrent.RateLimiter;
 
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
@@ -54,11 +55,11 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 		ApplicationContext context = event.getApplicationContext();
 		Map<String, ApiComponent> myMap = context.getBeansOfType(ApiComponent.class);
 		Map<String, JsonStreamApiComponent> myStreamMap = context.getBeansOfType(JsonStreamApiComponent.class);
-		List<ModuleVo> moduleList = moduleMapper.getAllModuleList();
+		List<ModuleVo> moduleList = ModuleUtil.getAllModuleList();
 		String module = "";
 		for (ModuleVo vo : moduleList) {
-			if (context.getId().equals(vo.getName())) {
-				module = vo.getName();
+			if (context.getId().equals(vo.getId())) {
+				module = vo.getId();
 			}
 		}
 		for (Map.Entry<String, ApiComponent> entry : myMap.entrySet()) {

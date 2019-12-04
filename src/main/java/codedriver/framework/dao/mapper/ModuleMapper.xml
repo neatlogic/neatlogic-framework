@@ -3,33 +3,13 @@
 <mapper namespace="codedriver.framework.dao.mapper.ModuleMapper">
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
 
-	<select id="getAllModuleList" resultType="codedriver.framework.dto.ModuleVo" useCache="false">
+	<select id="getModuleListByTenantUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="true">
 		SELECT
-		`name`,
-		`description`,
-		`url_mapping` as urlMapping,
-		`is_active` as isActive,
-		`status`,
-		`version`,
-		`config_path` as configPath,
-		`error`
+		module_name
 		FROM
-		`module`
+		`tenant_module` tm
+		WHERE tm.`tenant_uuid` = #{value}
 	</select>
 
-	<select id="getActiveModuleListByTenantUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.ModuleVo" useCache="true">
-		SELECT
-		m.`name` ,
-		m.`description`,
-		m.`url_mapping` as urlMapper,
-		m.`is_active` as isActive,
-		m.`status`,
-		m.`version`,
-		m.`config_path` as configPath,
-		m.`error`
-		FROM
-		`tenant_module` tm LEFT JOIN module m ON tm.`module_name` = m.`name`
-		WHERE tm.`tenant_uuid` = #{value} and m.`is_active` = 1 and m.`status` = 'success'
-	</select>
 </mapper>
 

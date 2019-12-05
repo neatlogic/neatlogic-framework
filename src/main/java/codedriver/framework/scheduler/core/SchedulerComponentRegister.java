@@ -1,4 +1,4 @@
-package codedriver.framework.server.core;
+package codedriver.framework.scheduler.core;
 
 import java.util.Set;
 
@@ -11,10 +11,11 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.stereotype.Component;
-
 @Component
-public class ServerObserverRegister implements BeanDefinitionRegistryPostProcessor{
-	private Logger logger = LoggerFactory.getLogger(ServerObserverRegister.class);
+public class SchedulerComponentRegister implements BeanDefinitionRegistryPostProcessor{
+
+	Logger logger = LoggerFactory.getLogger(SchedulerComponentRegister.class);
+	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		
@@ -24,14 +25,14 @@ public class ServerObserverRegister implements BeanDefinitionRegistryPostProcess
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		try {
 			Reflections reflections = new Reflections("codedriver");
-			Set<Class<? extends ServerObserver>> modules = reflections.getSubTypesOf(ServerObserver.class);
-			for(Class<? extends ServerObserver> clazz : modules) {
+			Set<Class<? extends JobBase>> modules = reflections.getSubTypesOf(JobBase.class);
+			for(Class<? extends JobBase> clazz : modules) {
 				RootBeanDefinition bean = new RootBeanDefinition(clazz);
-				registry.registerBeanDefinition(clazz.getName(), bean);
-			}
+				registry.registerBeanDefinition(clazz.getName(),bean);
+			}	
 		}catch(Exception e) {
 			logger.error(e.getMessage(), e);
-		}	
+		}
 	}
 
 }

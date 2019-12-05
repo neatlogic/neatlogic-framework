@@ -52,11 +52,11 @@
 		WHERE to_server_id=#{toServerId}
 	</update>
 
-	<insert id="insertServer">
+	<insert id="replaceServer">
 		REPLACE INTO server_cluster(ip, server_id, status) VALUES(#{ip}, #{serverId}, #{status})
 	</insert>
 
-	<insert id="insertServerCounter">
+	<insert id="replaceServerCounter">
 		REPLACE INTO server_counter(from_server_id, to_server_id, counter) VALUES(#{fromServerId}, #{toServerId}, #{counter})
 	</insert>
 

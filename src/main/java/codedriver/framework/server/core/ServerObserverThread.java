@@ -1,7 +1,6 @@
 package codedriver.framework.server.core;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class ServerObserverThread extends CodeDriverThread {
 

@@ -272,6 +272,9 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	public void releaseLock(Integer serverId) {
 		JobLockVo jobLock = new JobLockVo(JobLockVo.WAIT, serverId);
 		TenantContext tenantContext = TenantContext.get();
+		if(tenantContext == null) {
+			tenantContext = TenantContext.init();
+		}
 		for(DatasourceVo datasourceVo : datasourceList) {
 			tenantContext.setTenantUuid(datasourceVo.getTenantUuid());
 			tenantContext.setUseDefaultDatasource(false);

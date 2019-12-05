@@ -15,9 +15,6 @@ public class ServerObserverThread extends CodeDriverThread {
 
 	@Override
 	protected void execute() {
-		if(tenantContext == null) {
-			tenantContext = TenantContext.init();
-		}
 		observer.whenServerInactivated(serverId);		
 	}
 

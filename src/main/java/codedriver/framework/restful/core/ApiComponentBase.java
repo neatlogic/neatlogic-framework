@@ -92,7 +92,7 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 				audit.setAuthType(interfaceVo.getAuthtype()); 
 				TenantContext.get().setUseDefaultDatasource(false);
 				apiMapper.insertApiAudit(audit);
-				CommonThreadPool.execute(new ApiAuditLog(audit.getUuid(),jsonObj.toString(), error, result.toString(), TenantContext.get().getTenantUuid()));
+//				ApiAuditLogger.log(audit.getUuid(),jsonObj, error, result);
 			}
 		}
 		return result;

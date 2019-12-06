@@ -21,7 +21,6 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.AuthAction;
 import codedriver.framework.common.config.Config;
@@ -46,6 +45,9 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 	@Autowired
 	private ApiMapper apiMapper;
 
+	@Autowired
+	private ApiAuditLogger apiAuditLogger;
+	
 	public final Object doService(ApiVo interfaceVo, JSONObject jsonObj) throws Exception {
 		String error = "";
 		Object result = null;
@@ -83,16 +85,10 @@ public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
 				HttpServletRequest request = UserContext.get().getRequest();
 				String requestIp = IpUtil.getIpAddr(request);				
 				audit.setIp(requestIp);
-//				String authorization = request.getHeader("Authorization");
-//				if(StringUtils.isNotBlank(authorization)) {
-//					int index = authorization.indexOf(" ");
-//					String authType = authorization.substring(0, index);
-//					audit.setAuthType(authType);
-//				}
 				audit.setAuthType(interfaceVo.getAuthtype()); 
 				TenantContext.get().setUseDefaultDatasource(false);
 				apiMapper.insertApiAudit(audit);
-//				ApiAuditLogger.log(audit.getUuid(),jsonObj, error, result);
+				apiAuditLogger.log(audit.getUuid(),jsonObj, error, result);
 			}
 		}
 		return result;

@@ -34,7 +34,7 @@ public class Config {
 			throw ex;
 		}
 		try {
-			SERVER_HEARTBEAT_RATE = Integer.parseInt(getProperty(CONFIG_FILE, "server.heartbeat.rate", "3"));
+			SERVER_HEARTBEAT_RATE = Integer.parseInt(getProperty(CONFIG_FILE, "server.heartbeat.rate", "5"));
 		} catch (Exception ex) {
 			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.heart.rate变量");
 			throw ex;

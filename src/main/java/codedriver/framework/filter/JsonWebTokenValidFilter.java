@@ -33,13 +33,12 @@ import codedriver.framework.dto.UserSessionVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	// private ServletContext context;
-	
-	@Autowired 
+
+	@Autowired
 	UserMapper userMapper;
-	
+
 	@Autowired
 	ConfigMapper configMapper;
-
 
 	/**
 	 * Default constructor.
@@ -56,7 +55,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		TenantContext.get().release();// 清除线程变量值
 		UserContext.get().release();
 	}
-	
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -80,7 +79,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				response.addCookie(tenantCookie);
 			}
 		}
-		
+
 		if (StringUtils.isBlank(authorization)) {
 			authorization = request.getHeader("Authorization");
 		}
@@ -112,15 +111,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-		
-		if (isAuth&&userExpirationValid()) {
+
+		if (isAuth && userExpirationValid()) {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
 			redirectObj.put("Status", "failed");
 			redirectObj.put("Message", "认证失败");
-			//清除cookies
-			Cookie authCookie = new Cookie("codedriver_authorization",null);
+			// 清除cookies
+			Cookie authCookie = new Cookie("codedriver_authorization", null);
 			authCookie.setMaxAge(0);
 			authCookie.setPath("/");
 			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
@@ -132,22 +131,20 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			response.getWriter().print(redirectObj.toJSONString());
 		}
 	}
-	
-	
-	
+
 	private boolean userExpirationValid() {
 		String userId = UserContext.get().getUserId();
 		UserSessionVo userSessionVo = userMapper.getUserSessionByUserId(userId);
-		if(null != userSessionVo) {
+		if (null != userSessionVo) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				Date visitTime = formatter.parse(userSessionVo.getSessionTime());
-				Date now  = new Date();
+				Date now = new Date();
 				TenantContext.get().setUseDefaultDatasource(true);
-				ConfigVo configVo = configMapper.getConfigByKey(UserSessionVo.USER_EXPIRETIME); 
+				ConfigVo configVo = configMapper.getConfigByKey(UserSessionVo.USER_EXPIRETIME);
 				TenantContext.get().setUseDefaultDatasource(false);
-				Long expireTime = Long.parseLong( configVo != null?configVo.getValue():"30")*60*1000+visitTime.getTime();
-				if(now.getTime() < expireTime) {
+				Long expireTime = Long.parseLong(configVo != null ? configVo.getValue() : "60") * 60 * 1000 + visitTime.getTime();
+				if (now.getTime() < expireTime) {
 					userMapper.updateUserSession(userId);
 					return true;
 				}
@@ -158,5 +155,5 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		}
 		return false;
 	}
-	
+
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.TeamMapper">
+
+	<select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid`
+		FROM
+		`team`
+		WHERE
+		1=1
+		<if test="uuid != null AND uuid != ''">
+			AND uuid = #{uuid}
+		</if>
+		<if test="keyword != null AND keyword != ''">
+			AND name LIKE CONCAT(#{keyword}, '%')
+		</if>
+		<if test="parentUuid != null AND parentUuid != ''">
+			AND parent_uuid = #{parentUuid}
+		</if>
+		ORDER BY `sort`
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`team`
+		WHERE
+		1=1
+		<if test="uuid != null AND uuid != ''">
+			AND uuid = #{uuid}
+		</if>
+		<if test="keyword != null AND keyword != ''">
+			AND name LIKE CONCAT(#{keyword}, '%')
+		</if>
+		<if test="parentUuid != null AND parentUuid != ''">
+			AND parent_uuid = #{parentUuid}
+		</if>
+	</select>
+
+	<select id="getTeamByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid`
+		FROM
+		`team`
+		WHERE
+		uuid = #{value}
+	</select>
+
+	<delete id="deleteTeamByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`team`
+		WHERE `uuid` = #{value}
+	</delete>
+
+	<delete id="deleteUserTeamRoleByTeamUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user_team_role`
+		WHERE
+		`team_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteUserTeamByTeamUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user_team`
+		WHERE `team_uuid` = #{value}
+	</delete>
+</mapper>

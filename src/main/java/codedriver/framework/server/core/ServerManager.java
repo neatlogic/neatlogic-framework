@@ -82,7 +82,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 				}
 			}
 		};
-		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
+		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
 	}
 
 	/**

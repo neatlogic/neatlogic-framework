@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class ApiDispatcher {
 		if (restComponent != null) {
 			if (action.equals("doservice")) {
 				JSONObject paramJson = null;
-				if (json != null && !"".equals(json.trim())) {
+				if (StringUtils.isNotBlank(json)) {
 					try {
 						paramJson = JSONObject.parseObject(json);
 					} catch (Exception e) {
@@ -117,7 +118,6 @@ public class ApiDispatcher {
 			jsonObj.put("ErrorCode", ex.getErrorCode());
 			jsonObj.put("Status", "ERROR");
 			jsonObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(500);
@@ -126,14 +126,6 @@ public class ApiDispatcher {
 			jsonObj.put("Message", ExceptionUtils.getStackFrames(ex));
 
 		}
-		// zouye: 如果在接口实现中已经处理了输出流，则此处不再处理
-		/**
-		 * response.isCommitted() == true 的几种情况 1、Response buffer has reached
-		 * the max buffer size。 2、Some part of the code has called flushed on
-		 * the response 3、Some part of the code has flushed the OutputStream or
-		 * Writer 4、If you have forwarded to another page, where the response is
-		 * both committed and closed.
-		 */
 		if (!response.isCommitted()) {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
 			response.getWriter().print(jsonObj);
@@ -245,18 +237,7 @@ public class ApiDispatcher {
 
 		JSONObject jsonObj = new JSONObject();
 		try {
-			ApiVo interfaceVo = apiService.getApiByToken(token);
-			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
-			if (restComponent != null) {
-				jsonObj.putAll(restComponent.help());
-			} else {
-				JsonStreamApiComponent restStreamComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
-				if (restStreamComponent != null) {
-					jsonObj.putAll(restStreamComponent.help());
-				} else {
-					throw new ApiRuntimeException(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId()));
-				}
-			}
+			doIt(request, token, null, jsonObj, "help");
 		} catch (Exception ex) {
 			jsonObj.put("Error", 300);
 			jsonObj.put("Status", "ERROR");
@@ -265,7 +246,7 @@ public class ApiDispatcher {
 		}
 
 		response.setContentType(Config.RESPONSE_TYPE_JSON);
-		response.getWriter().print(jsonObj.toJSONString(4));
+		response.getWriter().print(jsonObj.toJSONString());
 	}
 
 }

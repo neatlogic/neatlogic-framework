@@ -17,8 +17,6 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
-@RootComponent
-@Order(1)
 public class DatasourceInitializer {
 	@Autowired
 	private DatasourceMapper datasourceMapper;

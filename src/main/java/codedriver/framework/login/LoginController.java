@@ -80,9 +80,9 @@ public class LoginController {
 				jwtBodyObj.put("userid", checkUserVo.getUserId());
 				jwtBodyObj.put("username", checkUserVo.getUserName());
 				jwtBodyObj.put("tenant", tenant);
-				if (checkUserVo.getRoleList() != null && checkUserVo.getRoleList().size() > 0) {
+				if (checkUserVo.getRoleNameList() != null && checkUserVo.getRoleNameList().size() > 0) {
 					JSONArray roleList = new JSONArray();
-					for (String role : checkUserVo.getRoleList()) {
+					for (String role : checkUserVo.getRoleNameList()) {
 						roleList.add(role);
 					}
 					jwtBodyObj.put("rolelist", roleList);

@@ -36,10 +36,10 @@ public class ApiHelpBase {
 						if (params != null && params.length > 0) {
 							for (Param p : params) {
 								JSONObject paramObj = new JSONObject();
-								paramObj.put("参数", p.name());
-								paramObj.put("类型", p.type().getValue() + "(" + p.type().getText() + ")");
-								paramObj.put("是否必填", p.isRequired());
-								paramObj.put("说明", p.desc());
+								paramObj.put("name", p.name());
+								paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+								paramObj.put("isRequired", p.isRequired());
+								paramObj.put("description", p.desc());
 								inputList.add(paramObj);
 							}
 						}
@@ -57,9 +57,9 @@ public class ApiHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject paramObj = new JSONObject();
-														paramObj.put("参数", entityField.name());
-														paramObj.put("类型", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
-														paramObj.put("说明", entityField.desc());
+														paramObj.put("name", field.getName());
+														paramObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
+														paramObj.put("description", entityField.name());
 														outputList.add(paramObj);
 														break;
 													}
@@ -68,8 +68,8 @@ public class ApiHelpBase {
 										}
 									} else {
 										JSONObject paramObj = new JSONObject();
-										paramObj.put("参数", p.name());
-										paramObj.put("类型", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
+										paramObj.put("name", p.name());
+										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
 										JSONArray elementObjList = new JSONArray();
 										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
 											Annotation[] annotations = field.getDeclaredAnnotations();
@@ -78,31 +78,31 @@ public class ApiHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject elementObj = new JSONObject();
-														elementObj.put("参数", entityField.name());
-														elementObj.put("类型", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
-														elementObj.put("说明", entityField.desc());
+														elementObj.put("name", field.getName());
+														elementObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
+														elementObj.put("description", entityField.name());
 														elementObjList.add(elementObj);
 														break;
 													}
 												}
 											}
 										}
-										paramObj.put("成员", elementObjList);
-										paramObj.put("说明", p.desc());
+										paramObj.put("member", elementObjList);
+										paramObj.put("description", p.desc());
 										outputList.add(paramObj);
 									}
 								} else {
 									JSONObject paramObj = new JSONObject();
-									paramObj.put("参数", p.name());
-									paramObj.put("类型", p.type().getValue() + "(" + p.type().getText() + ")");
-									paramObj.put("说明", p.desc());
+									paramObj.put("name", p.name());
+									paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+									paramObj.put("description", p.desc());
 									outputList.add(paramObj);
 								}
 							}
 						}
 					} else if (anno.annotationType().equals(Description.class)) {
 						Description description = (Description) anno;
-						jsonObj.put("接口说明", description.desc());
+						jsonObj.put("description", description.desc());
 					} else if (anno.annotationType().equals(Example.class)) {
 						Example example = (Example) anno;
 						String content = example.example();
@@ -116,7 +116,7 @@ public class ApiHelpBase {
 
 								}
 							}
-							jsonObj.put("范例", content);
+							jsonObj.put("example", content);
 						}
 					}
 				}
@@ -125,10 +125,10 @@ public class ApiHelpBase {
 			logger.error(e.getMessage());
 		}
 		if (!outputList.isEmpty()) {
-			jsonObj.put("输出参数", outputList);
+			jsonObj.put("output", outputList);
 		}
 		if (!inputList.isEmpty()) {
-			jsonObj.put("输入参数", inputList);
+			jsonObj.put("input", inputList);
 		}
 		return jsonObj;
 	}

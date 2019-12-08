@@ -17,6 +17,4 @@ public @interface EntityField {
 
 	ApiParamType type() default ApiParamType.STRING;
 
-	String desc() default "";
-
 }

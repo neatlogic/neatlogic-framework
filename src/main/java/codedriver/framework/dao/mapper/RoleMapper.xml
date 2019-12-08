@@ -1,79 +1,86 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.RoleMapper">
-
-	<select id="selectAllRole" resultType="codedriver.framework.dto.RoleVo">
-		select
-		a.`name` as name,
-		a.description as description,
-		(SELECT COUNT(1) FROM user_role b JOIN user c ON b.user_id = c.user_id WHERE b.role_name = a.name) AS userCount
-		from role a
-		order by a.`name`
-	</select>
-	
-	<select id="getRoleByName" resultType="codedriver.framework.dto.RoleVo" parameterType="codedriver.framework.dto.RoleVo">
-		select
-		a.`name` as name,
-		a.description as description,
-		(SELECT COUNT(1) FROM user_role b JOIN user c ON b.user_id = c.user_id WHERE b.role_name = a.name) AS userCount
-		from role a
-		where a.name like concat("%",#{name},"%") or a.description like concat("%",#{name},"%")
-		order by a.`name`
-	</select>
-		
-	<select id="getRoleInfoByName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	<select id="searchRole" parameterType="codedriver.framework.dto.RoleVo" resultType="codedriver.framework.dto.RoleVo">
 		SELECT
-		`name` AS name,
-		`description` AS description
+		`name`,
+		`description`
 		FROM
 		`role`
-		WHERE name = #{name}
-	</select>	
-	
-	<select id="checkRoleNameExist" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
-		select count(1) from role where `name` = #{name}
-	</select>	
-	
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`role`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getRoleByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+		SELECT
+		`name`,
+		`description`
+		FROM
+		`role`
+		WHERE
+		`name` = #{value}
+	</select>
+
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
-		insert into role (name , description)
-		values (#{name}, #{description})
+		INSERT INTO `role` (`name`, `description`)
+		VALUES
+		(#{name}, #{description})
 	</insert>
-	
-<!-- 	<insert id="insertTeamRole" parameterType="java.util.List">
-		insert into team_role (team_uuid , role_name)
-		values
-		<foreach collection="list" item="item" index="index" separator=",">
-			(#{item.teamUuId},#{item.roleName})
-		</foreach>
-	</insert> -->
-	
-	<insert id="insertTeamChildrenRole">
-		REPLACE INTO team_role
-		SELECT distinct
-		ct.id,
-		r.role_name
-		FROM flow_team ct
-		JOIN flow_team pt ON pt.uuid = #{parentId}
-		JOIN flow_role r ON
-		r.id = #{roleId}
-		WHERE ct.lft > pt.lft
-		AND ct.rht &lt; pt.rht
-	</insert>
-	
+
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
-		UPDATE role
-		SET description = #{description}
+		UPDATE
+		`role`
+		SET
+		`description` = #{description}
 		WHERE `name` = #{name}
 	</update>
-	
-	<delete id="deleteRole" parameterType="java.lang.String">
-		DELETE a,b,c,d FROM role a LEFT JOIN url_role b ON a.name = b.role_name
-    	LEFT JOIN user_role c ON a.name = c.role_name
-    	LEFT JOIN team_role d ON a.name = d.role_name
-    	WHERE a.name = #{name}
+
+	<delete id="deleteRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`role`
+		WHERE `name` = #{value}
 	</delete>
-	
+
+	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`menu_role`
+		WHERE `role_name` = #{value}
+	</delete>
+
+	<delete id="deleteUserRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user_role`
+		WHERE `role_name` = #{value}
+	</delete>
+
 	<delete id="deleteTeamRoleByRoleName" parameterType="java.lang.String">
-		delete from team_role where role_name = #{name}
+		DELETE
+		FROM
+		`team_role`
+		WHERE `role_name` = #{value}
 	</delete>
 </mapper>

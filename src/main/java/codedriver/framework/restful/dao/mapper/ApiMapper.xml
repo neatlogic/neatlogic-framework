@@ -24,7 +24,6 @@
 
 	<select id="getApiByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="true">
 		SELECT
-		`id`,
 		`name`,
 		`component_id` AS componentId,
 		`username`,
@@ -58,9 +57,6 @@
 	</insert>
 
 	<insert id="insertApi" parameterType="codedriver.framework.restful.dto.ApiVo">
-		<selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER">
-			select LAST_INSERT_ID() as id
-		</selectKey>
 		INSERT INTO `api`
 		(
 		name,

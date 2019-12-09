@@ -40,8 +40,9 @@ public class TenantContext implements Serializable {
 		}
 	}
 
-	public void setTenantUuid(String tenantUuid) {
+	public TenantContext setTenantUuid(String tenantUuid) {
 		this.tenantUuid = tenantUuid;
+		return this;
 	}
 
 	public static TenantContext get() {

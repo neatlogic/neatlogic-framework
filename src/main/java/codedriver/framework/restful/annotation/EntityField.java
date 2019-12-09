@@ -8,21 +8,13 @@ import java.lang.annotation.Target;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Param {
+public @interface EntityField {
 
 	String name() default "";
 
 	ApiParamType type() default ApiParamType.STRING;
-
-	boolean isRequired() default false;
-
-	String rule() default "";
-
-	String desc() default "";
-
-	Class explode() default NotDefined.class;
 
 }

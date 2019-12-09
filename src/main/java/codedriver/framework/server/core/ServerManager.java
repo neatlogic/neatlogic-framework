@@ -26,6 +26,7 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.server.dao.mapper.ServerMapper;
 import codedriver.framework.server.dto.ServerClusterVo;
 import codedriver.framework.server.dto.ServerCounterVo;
@@ -35,6 +36,8 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
+	@Autowired
+	private SchedulerMapper schedulerMapper;
 	@Autowired
 	private DataSourceTransactionManager dataSourceTransactionManager;
 
@@ -46,7 +49,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		// 重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
-		serverMapper.insertServer(server);
+		serverMapper.replaceServer(server);
 		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
 		CodeDriverThread runnable = new CodeDriverThread() {
 			@Override
@@ -70,7 +73,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
 					for (ServerCounterVo serverCounter : serverCounterList) {
 						// 重新插入数据
-						serverMapper.insertServerCounter(serverCounter);
+						serverMapper.replaceServerCounter(serverCounter);
 					}
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
@@ -79,7 +82,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 				}
 			}
 		};
-		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.SECONDS);
+		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
 	}
 
 	/**
@@ -101,6 +104,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					serverVo.setStatus(ServerClusterVo.STOP);
 					serverMapper.updateServerByServerId(serverVo);
 					serverMapper.deleteCounterByServerId(serverVo.getServerId());
+					schedulerMapper.deleteServerJobByServerId(serverVo.getServerId());
 					returnVal = true;
 				}
 			}

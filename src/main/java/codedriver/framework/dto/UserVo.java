@@ -5,10 +5,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
+import com.alibaba.fastjson.JSONObject;
+
 import codedriver.framework.common.dto.BasePageVo;
 
-public class UserVo extends BasePageVo{
-	
+public class UserVo extends BasePageVo {
+	private transient String keyword;
 	private String userId;
 	private String userName;
 	private String tenant;
@@ -20,8 +22,10 @@ public class UserVo extends BasePageVo{
 	private String dept;
 	private String company;
 	private String position;
-	private List<String> roleList;
-	private List<RoleVo> roleVoList;
+	private String userInfo;
+	private JSONObject userInfoObj;
+	private List<String> roleNameList;
+	private List<RoleVo> roleList;
 	private List<String> teamUuidList;
 	private List<TeamVo> teamList;
 
@@ -70,14 +74,14 @@ public class UserVo extends BasePageVo{
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public String getRoleName() {
 		return roleName;
 	}
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
-	}	
+	}
 
 	public String getPhone() {
 		return phone;
@@ -119,13 +123,6 @@ public class UserVo extends BasePageVo{
 		this.isActive = isActive;
 	}
 
-	public List<String> getRoleList() {
-		return roleList;
-	}
-
-	public void setRoleList(List<String> roleList) {
-		this.roleList = roleList;
-	}
 
 	public List<String> getTeamUuidList() {
 		return teamUuidList;
@@ -135,13 +132,6 @@ public class UserVo extends BasePageVo{
 		this.teamUuidList = teamUuidList;
 	}
 
-	public List<RoleVo> getRoleVoList() {
-		return roleVoList;
-	}
-
-	public void setRoleVoList(List<RoleVo> roleVoList) {
-		this.roleVoList = roleVoList;
-	}
 
 	public List<TeamVo> getTeamList() {
 		return teamList;
@@ -151,5 +141,47 @@ public class UserVo extends BasePageVo{
 		this.teamList = teamList;
 	}
 
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public String getUserInfo() {
+		return userInfo;
+	}
+
+	public void setUserInfo(String userInfo) {
+		this.userInfo = userInfo;
+	}
+
+	public JSONObject getUserInfoObj() {
+		if (userInfoObj == null && StringUtils.isNotBlank(userInfo)) {
+			userInfoObj = JSONObject.parseObject(userInfo);
+		}
+		return userInfoObj;
+	}
+
+	public void setUserInfoObj(JSONObject userInfoObj) {
+		this.userInfoObj = userInfoObj;
+	}
+
+	public List<String> getRoleNameList() {
+		return roleNameList;
+	}
+
+	public void setRoleNameList(List<String> roleNameList) {
+		this.roleNameList = roleNameList;
+	}
+
+	public List<RoleVo> getRoleList() {
+		return roleList;
+	}
+
+	public void setRoleList(List<RoleVo> roleList) {
+		this.roleList = roleList;
+	}
 
 }

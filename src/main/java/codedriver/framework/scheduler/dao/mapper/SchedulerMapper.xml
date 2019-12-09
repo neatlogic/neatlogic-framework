@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.scheduler.dao.mapper.SchedulerMapper">
+	
+	<resultMap id="scheduleMap" type="codedriver.framework.scheduler.dto.JobVo">
+		<id column="uuid" property="uuid" />
+		<result column="name" property="name" />
+		<result column="classpath" property="classpath" />
+		<result column="cron" property="cron" />
+		
+		<result column="is_active" property="isActive" />
+        <result column="need_audit" property="needAudit"/>
+		
+		<result column="begin_time" property="beginTime" />
+		<result column="end_time" property="endTime" />
+		<association property="jobStatus" resultMap="jobStatusMap"/>
+		<collection property="propList" ofType="codedriver.framework.scheduler.dto.JobPropVo">
+			<id column="prop_id" property="id" />
+			<result column="prop_name" property="name" />
+			<result column="prop_value" property="value" />
+		</collection>
+	</resultMap>
+	
+	<resultMap id="jobStatusMap" type="codedriver.framework.scheduler.dto.JobStatusVo">
+		<id column="job_uuid" property="jobUuid" />
+		<result column="status" property="status" />
+		<result column="next_fire_time" property="nextFireTime" />
+		<result column="last_fire_time" property="lastFireTime" />
+		<result column="last_finish_time" property="lastFinishTime" />
+		<result column="exec_count" property="execCount" />
+		<result column="need_audit" property="needAudit" />
+	</resultMap>
+
+	<sql id="jobDetailSql">
+		a.uuid,
+		a.name,
+		a.classpath,
+		a.begin_time,
+		a.end_time,
+		a.cron,
+		a.is_active,
+		a.need_audit		
+	</sql>
+	
+	<sql id="jobStatusSql">
+		sjs.job_uuid,
+		sjs.status,
+		sjs.last_fire_time,
+		sjs.last_finish_time,
+		sjs.next_fire_time,
+		sjs.exec_count,
+		sjs.need_audit
+	</sql>
+	
+	<sql id="searchScheduleJobSql">
+		WHERE
+		1=1
+		<if test="name != null and name != ''">
+			AND a.name like CONCAT('%',#{name}, '%')
+		</if>
+		<if test="classpath != null">
+			AND a.classpath = #{classpath}
+		</if>
+	</sql>
+		
+	<sql id="searchScheduleJobClassSql">
+		WHERE
+		1=1
+		<if test="name != null and name != ''">
+			AND a.name like CONCAT('%', #{name}, '%')
+		</if>
+		<if test="moduleName != null">
+			AND a.module_name=#{moduleName}
+		</if>
+		<if test="type != null">
+			AND a.type=#{type}
+		</if>
+	</sql>
+	<select id="getJobByUuid" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		,
+		<include refid="jobStatusSql" />
+		,
+		d.prop_name,
+		d.prop_value,
+		d.id as prop_id
+		FROM schedule_job a
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+		WHERE a.uuid = #{uuid}
+	</select>
+	
+	<select id="getJobStatusByJobUuid" resultMap="jobStatusMap">
+		SELECT
+		<include refid="jobStatusSql"/>
+		FROM schedule_job_status sjs
+		WHERE sjs.job_uuid = #{jobUuid}
+		FOR UPDATE
+	</select>
+	<select id="getJobByClasspath" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		FROM schedule_job a		
+		JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		AND sjs.status = 'running'		
+		UNION
+		SELECT
+		<include refid="jobDetailSql" />
+		FROM schedule_job a		
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		AND sjs.job_uuid IS NULL		
+	</select>
+	
+	<select id="searchJobCount" resultType="int">
+		SELECT
+		count(1)
+		FROM schedule_job a
+		<include refid="searchScheduleJobSql" />
+	</select>
+	
+	<select id="searchJobList" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		,
+		<include refid="jobStatusSql" />
+		FROM schedule_job a		
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		<include refid="searchScheduleJobSql" />
+		ORDER by a.name
+		limit #{startNum}, #{pageSize}
+	</select>
+	
+	<select id="getJobByName" resultMap="scheduleMap">
+		SELECT
+		<include refid="jobDetailSql" />
+		,
+		<include refid="jobStatusSql" />
+		,
+		d.prop_name,
+		d.prop_value,
+		d.id AS prop_id
+		FROM schedule_job a
+		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+		WHERE a.name = #{name} and a.uuid != #{uuid}
+	</select>
+	
+	<select id="getJobClassByClasspath" resultType="codedriver.framework.scheduler.dto.JobClassVo">
+		SELECT 
+		a.`name` AS `name`,
+		a.`classpath` AS `classpath`,
+		a.`type` AS `type`,
+		a.`module_name` AS `moduleName`
+		FROM schedule_job_class a
+		<if test="tenantUuid != null">
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		</if>
+		WHERE a.classpath=#{classpath}
+	</select>
+	
+	<select id="searchJobClassCount" resultType="int">
+		SELECT 
+		count(1)
+		FROM
+		schedule_job_class a 
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		<include refid="searchScheduleJobClassSql" />
+	</select>
+	
+	<select id="searchJobClassList" resultType="codedriver.framework.scheduler.dto.JobClassVo">
+		SELECT 
+		a.`name` AS name,
+		a.classpath AS classPath,
+		a.module_name AS moduleName,
+		a.`type` AS type,
+		b.description AS moduleDesc
+		FROM
+		schedule_job_class a 
+		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		<include refid="searchScheduleJobClassSql" />
+		ORDER by a.name
+		limit #{startNum}, #{pageSize}
+	</select>
+	
+	<select id="searchJobAuditCount" resultType="int">
+		SELECT count(1) FROM schedule_job_audit WHERE job_uuid = #{jobUuid}
+	</select>
+	
+	<select id="searchJobAuditList" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
+		SELECT
+        sja.id AS id,
+        sja.job_uuid AS jobUuid,
+        sja.start_time AS startTime,
+        sja.end_time AS endTime,
+        sja.log_path AS logPath,
+        sja.state AS state
+        FROM schedule_job_audit sja
+        WHERE sja.job_uuid = #{jobUuid}
+        ORDER BY sja.id DESC
+        LIMIT #{startNum},#{pageSize}
+	</select>
+	
+	<select id="getJobAuditLogById" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
+		SELECT
+        sja.id AS id,
+        sja.job_uuid AS jobUuid,
+        sja.start_time AS startTime,
+        sja.end_time AS endTime,
+        sja.log_path AS logPath,
+        sja.state AS state
+        FROM schedule_job_audit sja
+        WHERE sja.id = #{id}
+	</select>
+	
+	<select id="getServerJobByServerId" resultType="codedriver.framework.scheduler.dto.ServerNewJobVo">
+		SELECT 
+		id, server_id AS serverId, job_object AS jobObject
+		FROM schedule_server_job 
+		WHERE server_id=#{serverId}
+	</select>
+	
+	<select id="getJobLockByUuid" resultType="codedriver.framework.scheduler.dto.JobLockVo">
+		SELECT 
+		`job_uuid` AS jobUuid, 
+		`lock`, 
+		`server_id` AS serverId
+		FROM schedule_job_lock 
+		WHERE job_uuid=#{jobUuid}
+		FOR UPDATE
+	</select>
+	
+	<update id="updateJobById">
+		UPDATE schedule_job
+		SET
+		<if test="name != null">
+		name = #{name},
+		</if>
+		<if test="classpath != null">
+		classpath = #{classpath},
+		</if>
+		<if test="beginTime != null">
+		begin_time = #{beginTime},
+		</if>
+		<if test="endTime != null">
+		end_time = #{endTime},
+		</if>
+		<if test="cron != null">
+		cron = #{cron},
+		</if>
+		<if test="status != null">
+		status = #{status},
+		</if>
+		<if test="isActive != null">
+		is_active = #{isActive},
+		</if>
+		<if test="needAudit != null">
+		need_audit = #{needAudit},
+		</if>
+		uuid = #{uuid}
+		WHERE
+		uuid = #{uuid}
+	</update>
+	
+	<update id="updateJobStatusByJobUuid">
+		UPDATE schedule_job_status
+		SET
+		<if test="status != null">
+		status = #{status},
+		</if>		
+		<if test="nextFireTime != null">
+		next_fire_time = #{nextFireTime},
+		</if>
+		<if test="lastFinishTime != null">
+		last_finish_time = #{lastFinishTime},
+		</if>
+		<if test="lastFireTime != null">
+		last_fire_time = #{lastFireTime},
+		</if>
+		<if test="execCount != null">
+		exec_count = #{execCount},
+		</if>
+		<if test="needAudit != null">
+		need_audit = #{needAudit},
+		</if>
+		job_uuid = #{jobUuid}
+		WHERE
+		job_uuid = #{jobUuid}
+	</update>
+	
+	<update id="updateJobClass">
+		UPDATE schedule_job_class 
+		SET
+		name = #{name},
+		classpath = #{classpath},
+		module_name = #{moduleName}
+		<if test="type != null and type != ''">
+			,type = #{type}
+		</if>
+		WHERE classpath = #{classpath}
+	</update>
+	
+	<update id="updateJobAudit">
+        UPDATE schedule_job_audit 
+        SET
+        end_time = now(),
+        state = #{state}
+        <if test="logPath != null">
+            , log_path = #{logPath}
+        </if>
+        WHERE id = #{id}
+    </update>
+    
+	<update id="updateJobLockByJobId">
+		UPDATE `schedule_job_lock` 
+		SET 
+		<if test="serverId != null">
+		`server_id`=#{serverId},
+		</if>
+		`lock`=#{lock}
+		WHERE `job_uuid`=#{jobUuid}
+	</update>
+	
+	<update id="updateJobLockByServerId">
+		UPDATE `schedule_job_lock` SET `lock`=#{lock}  WHERE `server_id`=#{serverId}
+	</update>
+		
+	<insert id="insertJob">
+		INSERT INTO schedule_job
+		(
+		`uuid`,
+		`name`,
+		classpath,
+		begin_time,
+		end_time,
+		cron,
+		is_active,
+		need_audit
+		) VALUES (
+		#{uuid},
+		#{name},
+		#{classpath},
+		#{beginTime},
+		#{endTime},
+		#{cron},
+		#{isActive},
+		#{needAudit}
+		)
+	</insert>
+	
+	<insert id="insertJobStatus">
+		INSERT INTO schedule_job_status
+		(
+		`job_uuid`,
+		`job_group`,
+		`status`,
+		`need_audit`
+		) VALUES (
+		#{jobUuid},
+		#{jobGroup},
+		#{status},
+		#{needAudit}
+		)
+	</insert>
+	
+	<insert id="insertJobProp">
+		INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
+		VALUES (#{jobUuid}, #{name}, #{value})
+	</insert>
+	
+	<insert id="insertJobClass">
+		INSERT INTO schedule_job_class (name, classpath, module_name, type) VALUES (#{name}, #{classpath}, #{moduleName}, #{type})
+	</insert>
+
+	<insert id="insertJobAudit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO schedule_job_audit (job_uuid,start_time,state,server_id)
+        VALUES (#{jobUuid},now(),#{state},#{serverId})
+    </insert>
+    
+    <insert id="insertJobLock">
+    	INSERT INTO `schedule_job_lock`(`job_uuid`, `lock`, `server_id`) VALUES(#{jobUuid}, #{lock}, #{serverId})
+    </insert>
+    
+    <insert id="insertServerJob">
+    INSERT INTO schedule_server_job(server_id, job_object) VALUES(#{serverId}, #{jobObject, jdbcType=BLOB})
+    </insert>
+    
+    <delete id="deleteJobByUuid">
+    DELETE a, b, sja
+    FROM schedule_job a 
+    LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid
+    LEFT JOIN schedule_job_audit sja ON sja.job_uuid = a.uuid
+    WHERE a.uuid = #{uuid}
+    </delete>
+	
+	<delete id="deleteServerJobById">
+	DELETE FROM schedule_server_job WHERE id=#{id}
+	</delete>
+	
+	<delete id="deleteServerJobByServerId">
+	DELETE FROM schedule_server_job WHERE server_id=#{serverId}
+	</delete>
+	
+	<delete id="deleteJobStatusAndLockByJobUuid">
+	DELETE sjs, sjl 
+	FROM schedule_job_status sjs 
+    JOIN schedule_job_lock sjl ON sjs.job_uuid = sjl.job_uuid 
+    WHERE sjs.job_uuid = #{jobUuid}
+	</delete>
+</mapper>

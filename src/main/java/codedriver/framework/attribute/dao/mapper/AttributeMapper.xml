@@ -8,7 +8,7 @@
 		<result column="value" property="value" />
 		<result column="sql" property="sql" />
 		<result column="url" property="url" />
-		<collection property="fieldList" ofType="codedriver.framework.attribute.dto.DataCubeFieldVoo">
+		<collection property="fieldList" ofType="codedriver.framework.attribute.dto.DataCubeFieldVo">
 			<result column="fieldName" property="name" />
 		</collection>
 	</resultMap>
@@ -103,10 +103,6 @@
 		WHERE
 		`uuid` = #{value}
 	</select>
-
-	<update id="resetAttributeActive">
-		UPDATE `attribute` SET is_active = 0 WHERE `type` = 'system'
-	</update>
 
 	<insert id="replaceAttribute" parameterType="codedriver.framework.attribute.dto.AttributeVo">
 		REPLACE INTO `attribute` (

@@ -24,7 +24,34 @@
 		`user` a LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
 		WHERE a.user_id = #{userId} AND a.password = #{password}
 	</select>
-	
+
+	<select id="getActiveUserByTeamId" resultType="codedriver.framework.dto.UserVo" parameterType="java.lang.String">
+		SELECT
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`is_active` as `isActive`,
+		a.`email`,
+		a.`password`,
+		a.`phone`
+		FROM `user` a
+		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
+		WHERE c.`uuid` = #{teamId}
+		AND a.`is_active` = 1
+	</select>
+
+	<select id="getActiveUserVoByUserId" resultType="codedriver.framework.dto.UserVo" parameterType="java.lang.String">
+		SELECT
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`is_active` as `isActive`,
+		a.`email`,
+		a.`password`,
+		a.`phone`
+		FROM `user` a
+		WHERE a.`user_id` = #{userId} AND a.`is_active` = 1
+	</select>
+
 	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">
 		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session` 
 		WHERE `user_id` = #{value}

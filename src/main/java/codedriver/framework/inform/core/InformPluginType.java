@@ -1,7 +1,7 @@
 package codedriver.framework.inform.core;
 
 public enum InformPluginType {
-    ITSM("itsm", "itsm");
+    EMAIL("emailPlugin", "emailPlugin");
 
     private String name;
     private String text;

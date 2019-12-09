@@ -46,7 +46,7 @@ public class EmailInformPlugin implements InformComponentBase {
 
     @Override
     public String getId() {
-        return "emailInformPlugin";
+        return "emailPlugin";
     }
 
     @Override

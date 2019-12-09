@@ -1,5 +1,6 @@
 package codedriver.framework.inform.core;
 
+import codedriver.framework.common.RootComponent;
 import org.reflections.Reflections;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -16,7 +17,7 @@ import java.util.Set;
  * @description:
  * @create: 2019-12-09 10:04
  **/
-@Component
+@RootComponent
 public class InformComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
     private static Map<String, InformComponentBase> informPluginMap = new HashMap<>();
 
@@ -24,7 +25,7 @@ public class InformComponentFactory implements ApplicationListener<ContextRefres
         if (informPluginType.contains(informPluginType)){
             return informPluginMap.get(informPluginType);
         }
-        throw new RuntimeException("插件不存在");
+        throw new RuntimeException("找不到类型为：" + informPluginType + "的流程组件");
     }
 
     @Override

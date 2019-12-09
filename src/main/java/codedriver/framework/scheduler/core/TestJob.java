@@ -1,9 +1,6 @@
 package codedriver.framework.scheduler.core;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
@@ -15,12 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.dao.mapper.DatasourceMapper;
-import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
@@ -30,11 +24,6 @@ public class TestJob extends JobBase {
 	private Logger logger = LoggerFactory.getLogger(TestJob.class);
 	@Autowired
 	private SchedulerMapper scheduleMapper;
-	@Autowired
-	private SchedulerManager scheduleManager;
-	@Autowired
-	private DatasourceMapper datasourceMapper;
-	private List<DatasourceVo> datasourceList = new ArrayList<>();
 
 	@Input({
 			@Param(name = "p_1",

@@ -5,7 +5,7 @@
 
 	<select id="getModuleListByTenantUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="true">
 		SELECT
-		module_name
+		module_id
 		FROM
 		`tenant_module` tm
 		WHERE tm.`tenant_uuid` = #{value}

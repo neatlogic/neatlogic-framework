@@ -111,13 +111,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				}
 			}
 		}
-
-		if (isAuth && userExpirationValid()) {
+		boolean isValid = userExpirationValid();
+		if (isAuth && isValid) {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
-			redirectObj.put("Status", "failed");
-			redirectObj.put("Message", "认证失败");
+			if (!isAuth) {
+				redirectObj.put("Status", "FAILED");
+				redirectObj.put("Message", "没有找到登录信息，请登录");
+			} else if (!isValid) {
+				redirectObj.put("Status", "FAILED");
+				redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
+			}
 			// 清除cookies
 			Cookie authCookie = new Cookie("codedriver_authorization", null);
 			authCookie.setMaxAge(0);

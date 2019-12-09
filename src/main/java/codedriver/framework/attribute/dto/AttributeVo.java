@@ -7,21 +7,37 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.attribute.constvalue.AttributeHandler;
 import codedriver.framework.attribute.constvalue.AttributeType;
 import codedriver.framework.attribute.core.AttributeHandlerFactory;
 import codedriver.framework.attribute.core.IAttributeHandler;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 
 public class AttributeVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 7749177698131954822L;
+	@EntityField(name = "属性uuid",
+			type = ApiParamType.STRING)
 	private String uuid;
-	private String keyword;
+	private transient String keyword;
+	@EntityField(name = "属性英文名称",
+			type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "属性中文名称",
+			type = ApiParamType.STRING)
 	private String label;
+	@EntityField(name = "属性处理器英文名称",
+			type = ApiParamType.STRING)
 	private String handler;
+	@EntityField(name = "属性处理器中文名称",
+			type = ApiParamType.STRING)
 	private String handlerName;
+	@EntityField(name = "属性类型英文名称",
+			type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "属性类型中文名称",
+			type = ApiParamType.STRING)
 	private String typeName;
 	private String unit;
 	private String config;

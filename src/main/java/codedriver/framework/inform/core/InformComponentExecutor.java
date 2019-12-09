@@ -65,7 +65,7 @@ public class InformComponentExecutor {
     private void handler(InformVo informVo){
         InformComponentBase informPlugin = InformComponentFactory.getInformPlugin(informVo.getPluginId());
         String templateContent = informPlugin.getTemplateContent();
-        String templateTitle = informPlugin.getTempateTitle();
+        String templateTitle = informPlugin.getTemplateTitle();
         if (StringUtils.isNotBlank(informVo.getTemplateContent())){
             templateContent = informVo.getTemplateContent();
         }
@@ -73,33 +73,35 @@ public class InformComponentExecutor {
             templateTitle = informVo.getTemplateTitle();
         }
         List<String> userIdList = informVo.getToUserIdList();
-        List<UserVo> toUserList = new ArrayList<>();
+        List<UserVo> userList = new ArrayList<>();
         if (userIdList != null && userIdList.size() > 0){
             for (String userId : userIdList){
-                UserVo userVo = userMapper.getActiveUserVoByUserId(userId);
-                toUserList.add(userVo);
+                UserVo userVo = userMapper.getUserByUserId(userId);
+                userList.add(userVo);
             }
         }
         List<String> teamIdList = informVo.getToTeamIdList();
         if (teamIdList != null && teamIdList.size() > 0){
             for (String teamId : teamIdList){
                List<UserVo> userVoList = userMapper.getActiveUserByTeamId(teamId);
-               toUserList.addAll(userVoList);
+                userList.addAll(userVoList);
             }
         }
         Set<String> checkSet = new HashSet<>();
-        for (UserVo userVo : toUserList){
+        List<UserVo> toUserList = new ArrayList<>();
+        for (UserVo userVo : userList){
             if (!checkSet.contains(userVo.getUserId())){
-                MessageVo message = new MessageVo();
-                message.setParamObj(informVo.getParamObj());
-                message.setFromUser(informVo.getFromUser());
-                message.setToUser(userVo);
-                message.setTitle(getFreemarkerContent(message, templateTitle));
-                message.setContent(getFreemarkerContent(message, templateContent));
-                informPlugin.execute(message);
+                toUserList.add(userVo);
                 checkSet.add(userVo.getUserId());
             }
         }
+        MessageVo message = new MessageVo();
+        message.setParamObj(informVo.getParamObj());
+        message.setFromUser(informVo.getFromUser());
+        message.setToUserList(toUserList);
+        message.setTitle(getFreemarkerContent(message, templateTitle));
+        message.setContent(getFreemarkerContent(message, templateContent));
+        informPlugin.execute(message);
     }
 
     public  String getFreemarkerContent(MessageVo messageVo, String content) {

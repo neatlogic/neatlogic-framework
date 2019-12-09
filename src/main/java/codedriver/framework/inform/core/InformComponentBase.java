@@ -18,9 +18,17 @@ public interface InformComponentBase {
     */ 
     String getId();
 
-    String getMduleId();
-
+    /** 
+    * @Description: 内容默认模板 
+    * @Param: [] 
+    * @return: java.lang.String  
+    */ 
     String getTemplateContent();
 
-    String getTempateTitle();
+    /** 
+    * @Description: 标题默认模板 
+    * @Param: [] 
+    * @return: java.lang.String  
+    */ 
+    String getTemplateTitle();
 }

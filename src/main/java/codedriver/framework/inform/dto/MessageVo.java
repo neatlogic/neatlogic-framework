@@ -3,6 +3,8 @@ package codedriver.framework.inform.dto;
 import codedriver.framework.dto.UserVo;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 /**
  * @program: codedriver
  * @description:
@@ -12,7 +14,7 @@ public class MessageVo {
     private String title;
     private String content;
     private String fromUser;
-    private UserVo toUser;
+    private List<UserVo> toUserList;
     private JSONObject paramObj;
 
     public String getTitle() {
@@ -39,12 +41,12 @@ public class MessageVo {
         this.fromUser = fromUser;
     }
 
-    public UserVo getToUser() {
-        return toUser;
+    public List<UserVo> getToUserList() {
+        return toUserList;
     }
 
-    public void setToUser(UserVo toUser) {
-        this.toUser = toUser;
+    public void setToUserList(List<UserVo> toUserList) {
+        this.toUserList = toUserList;
     }
 
     public JSONObject getParamObj() {

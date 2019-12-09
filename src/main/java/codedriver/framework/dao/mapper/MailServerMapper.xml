@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.MailServerMapper">
+	<select id="getActiveMailServer" resultType="codedriver.framework.dto.MailServerVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`host`,
+		`port`,
+		`username` as `userName`,
+		`password`,
+		`domain`,
+		`is_active` as `isActive`,
+		`from_address` AS `fromAddress`
+		FROM
+		mail_server
+		WHERE is_active
+		= 1 limit 1
+	</select>
+</mapper>
+

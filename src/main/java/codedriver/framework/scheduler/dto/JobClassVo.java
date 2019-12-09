@@ -13,8 +13,8 @@ public class JobClassVo extends BasePageVo {
 	private String type;	
 	private String name;
 	private String classpath;	
+	private String moduleId;
 	private String moduleName;
-	private String moduleDesc;
 	@JSONField(serialize = false)
 	private String tenantUuid;
 	public JobClassVo() {
@@ -29,12 +29,12 @@ public class JobClassVo extends BasePageVo {
 		this.type = type;
 	}
 
-	public String getModuleDesc() {
-		return moduleDesc;
+	public String getModuleId() {
+		return moduleId;
 	}
 
-	public void setModuleDesc(String moduleDesc) {
-		this.moduleDesc = moduleDesc;
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
 	}
 
 	public String getName() {
@@ -67,11 +67,6 @@ public class JobClassVo extends BasePageVo {
 
 	public void setTenantUuid(String tenantUuid) {
 		this.tenantUuid = tenantUuid;
-	}
-
-	@Override
-	public String toString() {
-		return "JobClassVo [type=" + type + ", name=" + name + ", classpath=" + classpath + ", moduleName=" + moduleName + ", moduleDesc=" + moduleDesc + "]";
 	}
 
 }

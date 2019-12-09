@@ -153,10 +153,10 @@
 		a.`name` AS `name`,
 		a.`classpath` AS `classpath`,
 		a.`type` AS `type`,
-		a.`module_name` AS `moduleName`
+		a.`module_id` AS `modulId`
 		FROM schedule_job_class a
 		<if test="tenantUuid != null">
-		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
 		</if>
 		WHERE a.classpath=#{classpath}
 	</select>
@@ -166,7 +166,7 @@
 		count(1)
 		FROM
 		schedule_job_class a 
-		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
 		<include refid="searchScheduleJobClassSql" />
 	</select>
 	
@@ -174,12 +174,11 @@
 		SELECT 
 		a.`name` AS name,
 		a.classpath AS classPath,
-		a.module_name AS moduleName,
-		a.`type` AS type,
-		b.description AS moduleDesc
+		a.module_id AS moduleId,
+		a.`type` AS type
 		FROM
 		schedule_job_class a 
-		JOIN tenant_module tm ON tm.module_name=a.module_name AND tm.tenant_uuid=#{tenantUuid}
+		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
 		<include refid="searchScheduleJobClassSql" />
 		ORDER by a.name
 		limit #{startNum}, #{pageSize}
@@ -295,7 +294,7 @@
 		SET
 		name = #{name},
 		classpath = #{classpath},
-		module_name = #{moduleName}
+		module_id = #{moduleId}
 		<if test="type != null and type != ''">
 			,type = #{type}
 		</if>
@@ -371,7 +370,7 @@
 	</insert>
 	
 	<insert id="insertJobClass">
-		INSERT INTO schedule_job_class (name, classpath, module_name, type) VALUES (#{name}, #{classpath}, #{moduleName}, #{type})
+		INSERT INTO schedule_job_class (name, classpath, module_id, type) VALUES (#{name}, #{classpath}, #{moduleId}, #{type})
 	</insert>
 
 	<insert id="insertJobAudit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

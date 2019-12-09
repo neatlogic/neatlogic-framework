@@ -7,8 +7,8 @@ public class ApiComponentVo {
 	private String name;
 	private String config;
 	private Integer isActive;
-	private String module;
-	
+	private String moduleId;
+
 	private List<ApiVo> interfaceList;
 
 	public String getConfig() {
@@ -25,14 +25,6 @@ public class ApiComponentVo {
 
 	public void setInterfaceList(List<ApiVo> interfaceList) {
 		this.interfaceList = interfaceList;
-	}
-
-	public String getModule() {
-		return module;
-	}
-
-	public void setModule(String module) {
-		this.module = module;
 	}
 
 	public String getId() {
@@ -57,5 +49,13 @@ public class ApiComponentVo {
 
 	public void setIsActive(Integer isActive) {
 		this.isActive = isActive;
+	}
+
+	public String getModuleId() {
+		return moduleId;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
 	}
 }

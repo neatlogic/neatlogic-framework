@@ -13,7 +13,9 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 3689437871016436622L;
 
 	public enum Type {
-		OBJECT("object", "对象模式"), STREAM("stream", "流模式");
+		OBJECT("object", "对象模式"),
+		STREAM("stream", "流模式");
+
 		private String name;
 		private String text;
 
@@ -54,8 +56,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String authtype = "";
 	private Integer timeout;
 	private boolean isExpire;
-	private String module;
-	private Integer moduleId;
+	private String moduleId;
 	private Integer visitTimes = 0;
 	private Long totalDataSize = 0l;
 	private String totalDataSizeText;
@@ -81,22 +82,6 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public Integer getModuleId() {
-		return moduleId;
-	}
-
-	public void setModuleId(Integer moduleId) {
-		this.moduleId = moduleId;
-	}
-
-	public String getModule() {
-		return module;
-	}
-
-	public void setModule(String module) {
-		this.module = module;
 	}
 
 	private List<Integer> idList;
@@ -280,5 +265,39 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public void setQps(Double qps) {
 		this.qps = qps;
+	}
+
+	public String getModuleId() {
+		return moduleId;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (!(other instanceof ApiVo))
+			return false;
+
+		final ApiVo api = (ApiVo) other;
+		try {
+			if (getToken().equals(api.getToken())) {
+				return true;
+			}
+		} catch (Exception ex) {
+			return false;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getToken().hashCode() * 117;
+		return result;
 	}
 }

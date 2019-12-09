@@ -10,5 +10,8 @@
 		WHERE `uuid` = #{value}
 	</select>
 
+	<select id="getAllTenant" resultType="codedriver.framework.dto.TenantVo">
+		SELECT `uuid`, `name` FROM `tenant`
+	</select>
 </mapper>
 

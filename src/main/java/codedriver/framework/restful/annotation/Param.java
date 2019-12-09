@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.apiparam.core.ApiParamBase;
 import codedriver.framework.apiparam.core.ApiParamType;
 
 @Target(ElementType.METHOD)
@@ -23,5 +22,7 @@ public @interface Param {
 	String rule() default "";
 
 	String desc() default "";
+
+	Class explode() default NotDefined.class;
 
 }

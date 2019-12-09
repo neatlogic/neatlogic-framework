@@ -82,6 +82,7 @@ public class ApiAuditLogger {
 		log.append("\n");
 		log.append("uuid: ");
 		log.append(uuid);
+		log.append(" start");
 		log.append("\n");
 		log.append("param: ");
 		log.append(param);
@@ -89,12 +90,15 @@ public class ApiAuditLogger {
 		if(StringUtils.isNotBlank(error)) {
 			log.append("error: ");
 			log.append(error);
-			log.append("\n");
 		}else {
 			log.append("result: ");
-			log.append(result);
-			log.append("\n");
-		}		
+			log.append(result);			
+		}
+		log.append("\n");
+		log.append("uuid: ");
+		log.append(uuid);
+		log.append(" end");
+		log.append("\n");
 		return log.toString();
 	}
 	/**

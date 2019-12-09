@@ -66,23 +66,30 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
 			throw e;
 		} finally {
-			if (interfaceVo.getNeedAudit() != null && interfaceVo.getNeedAudit().equals(1)) {
-				long endTime = System.currentTimeMillis();
-				ApiAuditVo audit = new ApiAuditVo();				
-				audit.setToken(interfaceVo.getToken());
-				audit.setStatus(status ? ApiAuditVo.SUCCEED : ApiAuditVo.FAILED);
-				audit.setTimeCost(endTime - startTime);			
-				audit.setServerId(Config.SCHEDULE_SERVER_ID);
-				audit.setStartTime(new Date(startTime));
-				audit.setEndTime(new Date(endTime));
-				UserContext userContext = UserContext.get();
-				audit.setUserId(userContext.getUserId());
-				HttpServletRequest request = UserContext.get().getRequest();
-				String requestIp = IpUtil.getIpAddr(request);				
-				audit.setIp(requestIp);
-				audit.setAuthType(interfaceVo.getAuthtype()); 
-				TenantContext.get().setUseDefaultDatasource(false);
-				apiMapper.insertApiAudit(audit);
+			long endTime = System.currentTimeMillis();
+			ApiAuditVo audit = new ApiAuditVo();				
+			audit.setToken(interfaceVo.getToken());
+			audit.setStatus(status ? ApiAuditVo.SUCCEED : ApiAuditVo.FAILED);
+			audit.setTimeCost(endTime - startTime);			
+			audit.setServerId(Config.SCHEDULE_SERVER_ID);
+			audit.setStartTime(new Date(startTime));
+			audit.setEndTime(new Date(endTime));
+			UserContext userContext = UserContext.get();
+			audit.setUserId(userContext.getUserId());
+			HttpServletRequest request = UserContext.get().getRequest();
+			String requestIp = IpUtil.getIpAddr(request);				
+			audit.setIp(requestIp);
+			audit.setAuthType(interfaceVo.getAuthtype()); 
+			TenantContext.get().setUseDefaultDatasource(false);
+			apiMapper.insertApiAudit(audit);
+			Integer needAudit = interfaceVo.getNeedAudit();
+			if ( needAudit == null) {
+				ApiVo apiVo = apiMapper.getApiByToken(interfaceVo.getToken());
+				if(apiVo != null) {
+					needAudit = apiVo.getNeedAudit();
+				}				
+			}
+			if(needAudit != null && needAudit.intValue() == 1) {
 				apiAuditLogger.log(audit.getUuid(),jsonObj, error, result);
 			}
 		}

@@ -27,6 +27,7 @@ import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dto.ConfigVo;
 @RootComponent
 public class ApiAuditLogger {
+	private org.slf4j.Logger logger = LoggerFactory.getLogger(ApiAuditLogger.class);
 	
 	private final static String API_LOG_CONFIG = "api_log_config";//接口访问日志配置在config表的key值
 	private final static String PATTERN = "[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line]- %msg%n";//日志格式
@@ -131,17 +132,29 @@ public class ApiAuditLogger {
 						}
 					}		
 					if(json.containsKey("maxFileSize")) {
-						maxFileSize = json.getIntValue("maxFileSize") + FILE_SIZE_UNIT;
+						try {
+							maxFileSize = json.getIntValue("maxFileSize") + FILE_SIZE_UNIT;
+						}catch(NumberFormatException e) {
+							logger.error(e.getMessage(), e);
+						}						
 					}		
 					if(json.containsKey("maxHistory")) {
-						maxHistory = json.getIntValue("maxHistory");
+						try {
+							maxHistory = json.getIntValue("maxHistory");
+						}catch(NumberFormatException e) {
+							logger.error(e.getMessage(), e);
+						}
 					}		
 					if(json.containsKey("queueSize")) {
-						queueSize = json.getIntValue("queueSize");
+						try {
+							queueSize = json.getIntValue("queueSize");
+						}catch(NumberFormatException e) {
+							logger.error(e.getMessage(), e);
+						}
 					}
 				}			
 			}catch(Exception e) {
-				
+				logger.error(e.getMessage(), e);
 			}			
 		}
 		Logger logger = LoggerBuilder(file, rollingPolicy, maxFileSize, maxHistory, queueSize);

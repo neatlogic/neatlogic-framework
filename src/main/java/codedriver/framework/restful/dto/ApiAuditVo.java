@@ -22,9 +22,6 @@ public class ApiAuditVo extends BasePageVo {
 	private Date endTime;
 	private Long timeCost;
 	private String status;
-//	private String param;
-//	private String error;
-//	private String result;
 
 	public ApiAuditVo() {
 		this.setPageSize(20);

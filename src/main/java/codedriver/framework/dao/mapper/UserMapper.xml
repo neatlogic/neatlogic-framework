@@ -1,13 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
+
+	<select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		`user_id` as userId,
+		`user_name` as userName,
+		`email`,
+		`phone`,
+		`password`,
+		`pinyin`,
+		`is_active` as isActive
+		FROM
+		`user`
+		WHERE
+		user_id = #{value}
+	</select>
+
+	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String">
+		SELECT
+		`user_id` AS userId
+		FROM
+		`user_team_role`
+		WHERE
+		role = 'leader'
+		AND
+		team_uuid IN
+		<foreach collection="teamUuidIdList" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		`user_id` AS userId,
+		`user_name` AS userName,
+		`email`,
+		`phone`,
+		`password`,
+		`is_active` AS isActive
+		FROM
+		`user`
+		WHERE
+		1=1
+		<if test="keyword !=null and keyword != ''">
+			AND
+			(user_id LIKE CONCAT(#{keyword}, '%')
+			OR user_name LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		ORDER BY user_id
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
 		<id property="userId" column="userId" />
 		<result property="userName" column="userName" />
 		<result property="email" column="email" />
 		<result property="password" column="password" />
 		<result property="isActive" column="isActive" />
-		<collection property="roleList" ofType="java.lang.String">
+		<collection property="roleNameList" ofType="java.lang.String">
 			<result column="roleName" />
 		</collection>
 	</resultMap>
@@ -25,51 +78,91 @@
 		WHERE a.user_id = #{userId} AND a.password = #{password}
 	</select>
 
-	<select id="getActiveUserByTeamId" resultType="codedriver.framework.dto.UserVo" parameterType="java.lang.String">
-		SELECT
-		a.`user_id` as `userId`,
-		a.`user_name` as `userName`,
-		a.`is_active` as `isActive`,
-		a.`email`,
-		a.`password`,
-		a.`phone`
-		FROM `user` a
-		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
-		WHERE c.`uuid` = #{teamId}
-		AND a.`is_active` = 1
-	</select>
-
-	<select id="getActiveUserVoByUserId" resultType="codedriver.framework.dto.UserVo" parameterType="java.lang.String">
-		SELECT
-		a.`user_id` as `userId`,
-		a.`user_name` as `userName`,
-		a.`is_active` as `isActive`,
-		a.`email`,
-		a.`password`,
-		a.`phone`
-		FROM `user` a
-		WHERE a.`user_id` = #{userId} AND a.`is_active` = 1
-	</select>
-
 	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">
-		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session` 
+		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session`
 		WHERE `user_id` = #{value}
 	</select>
-	
-	
-	<insert id="insertUserSession" parameterType="java.lang.String">
-		INSERT INTO `user_session` (`user_id`, `visit_time`) 
+
+	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
+		INSERT INTO `user` (
+		`user_id`,
+		`user_name`,
+		`email`,
+		`phone`,
+		`password`,
+		`pinyin`,
+		`is_active`,
+		`user_info`
+		)
 		VALUES
-		  (#{userId}, now()) ;
+		(
+		#{userId},
+		#{userName},
+		#{email},
+		#{phone},
+		#{password},
+		#{pinyin},
+		#{isActive},
+		#{userInfo}
+		)
 	</insert>
-	
-	<update id="updateUserSession" parameterType="java.lang.String">
-		UPDATE `user_session` set `visit_time` =  now()  WHERE `user_id` = #{userId} 
+
+	<insert id="insertUserTeam">
+		INSERT INTO `user_team` (`team_uuid`, `user_id`)
+		VALUES
+		(#{teamUuid}, #{userId})
+	</insert>
+
+	<insert id="insertUserRole">
+		INSERT INTO `user_role` (`user_id`, `role_name`)
+		VALUES
+		(#{userId}, #{roleName})
+	</insert>
+
+	<insert id="insertUserSession" parameterType="java.lang.String">
+		INSERT INTO `user_session` (`user_id`, `visit_time`)
+		VALUES
+		(#{userId}, now()) ;
+	</insert>
+
+	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE
+		`user`
+		SET
+		`user_name` = {userName},
+		`email` = #{email},
+		`phone` = #{phone},
+		`password` = #{password},
+		`pinyin` = #{pinyin},
+		`is_active` = #{isActive},
+		`user_info` = #{userInfo}
+		WHERE `user_id` = #{userId}
 	</update>
-	
+
+	<update id="updateUserSession" parameterType="java.lang.String">
+		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
+	</update>
+
+	<delete id="deleteUserByUserId" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user`
+		WHERE `user_id` = #{value}
+	</delete>
+
 	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">
-		DELETE FROM `user_session`where `user_id` = #{value}
+		DELETE FROM `user_session` where `user_id` = #{value}
+	</delete>
+
+	<delete id="deleteUserRoleByUserId" parameterType="java.lang.String">
+		DELETE FROM `user_role` where `user_id` = #{value}
+	</delete>
+
+	<delete id="deleteUserTeamByUserId" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user_team`
+		WHERE `user_id` = #{value}
 	</delete>
 
 </mapper>

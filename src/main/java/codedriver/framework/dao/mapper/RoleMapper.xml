@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.RoleMapper">
+	<select id="searchRole" parameterType="codedriver.framework.dto.RoleVo" resultType="codedriver.framework.dto.RoleVo">
+		SELECT
+		`name`,
+		`description`
+		FROM
+		`role`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`role`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getRoleByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+		SELECT
+		`name`,
+		`description`
+		FROM
+		`role`
+		WHERE
+		`name` = #{value}
+	</select>
+
+	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
+		INSERT INTO `role` (`name`, `description`)
+		VALUES
+		(#{name}, #{description})
+	</insert>
+
+	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
+		UPDATE
+		`role`
+		SET
+		`description` = #{description}
+		WHERE `name` = #{name}
+	</update>
+
+	<delete id="deleteRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`role`
+		WHERE `name` = #{value}
+	</delete>
+
+	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`menu_role`
+		WHERE `role_name` = #{value}
+	</delete>
+
+	<delete id="deleteUserRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`user_role`
+		WHERE `role_name` = #{value}
+	</delete>
+
+	<delete id="deleteTeamRoleByRoleName" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`team_role`
+		WHERE `role_name` = #{value}
+	</delete>
+</mapper>

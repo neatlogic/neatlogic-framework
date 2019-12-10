@@ -1,18 +1,14 @@
 package codedriver.framework.scheduler.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
@@ -20,7 +16,7 @@ import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
-import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
+import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 
 @Service
 @Transactional
@@ -40,11 +36,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	@Override
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo) {
-		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
-		Set<String> moduleIdSet = new HashSet<>();
-		for(ModuleVo module : activeModuleList) {
-			moduleIdSet.add(module.getId());
-		}
 		List<JobClassVo> jobClassList = SchedulerManager.getAllJobClassList();
 		int rowNum = jobClassList.size();
 		int pageCount = PageUtil.getPageCount(rowNum,jobClassVo.getPageSize());
@@ -52,9 +43,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 		jobClassVo.setRowNum(rowNum);
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
 		for(JobClassVo jobClass : jobClassList) {
-			if(!moduleIdSet.contains(jobClass.getModuleId())) {
-				continue;
-			}
 			if(jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
 				continue;
 			}
@@ -91,7 +79,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
-			throw new ScheduleJobNotFoundException("定时作业："+ job.getName() + "不存在");
+			throw new ScheduleJobNameRepeatException("定时作业名称："+ job.getName() + "已存在");
 		}
 		job.setUuid(null);
 		uuid = job.getUuid();

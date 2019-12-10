@@ -3,8 +3,10 @@ package codedriver.framework.scheduler.core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -115,15 +117,35 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	}
 	
 	public static List<JobClassVo> getAllJobClassList(){
-		List<JobClassVo> jobClassList = new ArrayList<>();
+		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
+		Set<String> moduleIdSet = new HashSet<>();
+		for(ModuleVo module : activeModuleList) {
+			moduleIdSet.add(module.getId());
+		}
+		List<JobClassVo> jobClassList = new ArrayList<>();		
 		for(Entry<String, JobClassVo> entry : publicJobClassMap.entrySet()) {
-			jobClassList.add(entry.getValue());
+			JobClassVo jobClass = entry.getValue();
+			if(moduleIdSet.contains(jobClass.getModuleId())) {
+				jobClassList.add(jobClass);
+			}		
 		}
 		return jobClassList;
 	}
 
 	public static JobClassVo getJobClassByClasspath(String classpath) {
-		return publicJobClassMap.get(classpath);
+		JobClassVo jobClass = publicJobClassMap.get(classpath);
+		if(jobClass == null) {
+			return null;
+		}
+		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
+		Set<String> moduleIdSet = new HashSet<>();
+		for(ModuleVo module : activeModuleList) {
+			moduleIdSet.add(module.getId());
+		}
+		if(moduleIdSet.contains(jobClass.getModuleId())) {
+			return jobClass;
+		}
+		return null;
 	}
 	
 	/**
@@ -303,16 +325,16 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			moduleName = module.getName();
 		}
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
-			IJob jobClass = entry.getValue();
+			IJob job = entry.getValue();
 			// 如果定时作业组件没有实现IPublicJob接口，不会插入schedule_job_class表
-			if (!(jobClass instanceof IPublicJob)) {
+			if (!(job instanceof IPublicJob)) {
 				continue;
 			}
-			IPublicJob publicJobClass = (IPublicJob) jobClass;
-			jobClassVo = new JobClassVo(publicJobClass.getType(), publicJobClass.getJobClassName(), publicJobClass.getClassName(), context.getId(), moduleName);
-			publicJobClassMap.put(publicJobClass.getClassName(), jobClassVo);
+			IPublicJob publicJob = (IPublicJob) job;
+			jobClassVo = new JobClassVo(publicJob.getType(), publicJob.getJobClassName(), publicJob.getClassName(), context.getId(), moduleName);
+			publicJobClassMap.put(publicJob.getClassName(), jobClassVo);
 			for (TenantVo tenantVo : tenantList) {
-				CommonThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), publicJobClass.getClassName()));
+				CommonThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), publicJob.getClassName()));
 			}
 		}
 	}

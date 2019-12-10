@@ -30,12 +30,12 @@ public class ApiAuditLogger {
 	private org.slf4j.Logger logger = LoggerFactory.getLogger(ApiAuditLogger.class);
 	
 	private final static String API_LOG_CONFIG = "api_log_config";//接口访问日志配置在config表的key值
-	private final static String PATTERN = "[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line]- %msg%n";//日志格式
+	private final static String PATTERN = "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n";//日志格式
 	private final static String FILE_SIZE_UNIT = "MB"; //日志文件大小单位
 	private final static String DEFAULT_ROLLING_POLICY = "fixedSize";//默认轮转策略
 	private final static String DEFAULT_FILE = "/logs/api.log";//默认文件路径
 	private final static String DEFAULT_MAX_FILE_SIZE = "10MB";//默认单个文件大小
-	private final static int DEFAULT_MAX_HISTORY = 10;//默认保留10个文件
+	private final static int DEFAULT_MAX_HISTORY = 20;//固定大小轮转策略默认保留20个历史文件，时间及大小的轮转策略默认保留全部历史文件
 	private final static int DEFAULT_QUEUE_SIZE = 256;//默认异步输出日志的阻塞队列大小256个
 	
 	private static Map<String, Logger> loggerMap = new HashMap<>();
@@ -63,9 +63,9 @@ public class ApiAuditLogger {
 	 */
 	public void log(String uuid, JSONObject param, String error, Object result) {		
 		Logger logger = getLogger();
-		if(logger.isErrorEnabled()) {
+		if(logger.isTraceEnabled()) {
 			String log = logFormat(uuid, param, error, result);
-			logger.error(log);
+			logger.trace(log);
 		}		
 	}
 	/**
@@ -146,9 +146,16 @@ public class ApiAuditLogger {
 						try {
 							maxHistory = json.getIntValue("maxHistory");
 						}catch(NumberFormatException e) {
+							if(!rollingPolicy.equals(DEFAULT_ROLLING_POLICY)) {
+								maxHistory = 0;
+							}
 							logger.error(e.getMessage(), e);
 						}
-					}		
+					}else {
+						if(!rollingPolicy.equals(DEFAULT_ROLLING_POLICY)) {
+							maxHistory = 0;
+						}
+					}
 					if(json.containsKey("queueSize")) {
 						try {
 							queueSize = json.getIntValue("queueSize");
@@ -234,26 +241,36 @@ public class ApiAuditLogger {
         asyncAppender.addAppender(appender);
         asyncAppender.start();
         logger.setAdditive(false);
-        logger.setLevel(Level.ERROR);
+        logger.setLevel(Level.TRACE);
         logger.addAppender(asyncAppender);
         
         return logger; 
 	}
 	
 //	public static void main(String[] args) {
+//		TenantContext.init("test_1210").setUseDefaultDatasource(false);		
 //		ApiAuditLogger apiAuditLogger = new ApiAuditLogger();
-//		
+//		Logger logger = apiAuditLogger.LoggerBuilder(DEFAULT_FILE, DEFAULT_ROLLING_POLICY, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_HISTORY, DEFAULT_QUEUE_SIZE);
+//		loggerMap.put("test_1210",logger);
 //		String uuid = null;
 //		JSONObject json = new JSONObject();
-//		StringBuilder error = new StringBuilder();
-//		int count = 10000;
-//		for(int i = 0; i < count; i++) {
-//			error.append("error-");
+////		StringBuilder error = new StringBuilder();
+////		int count = 10000;
+////		for(int i = 0; i < count; i++) {
+////			error.append("error-");
+////		}
+////		StringBuilder result = new StringBuilder();
+////		for(int i = 0; i < count; i++) {
+////			result.append("result-");
+////		}
+//		String error = "";
+//		Object result = null;
+//		try {
+//			result = 1/0;
+//		}catch(Exception e) {
+//			error = ExceptionUtils.getStackTrace(e);
 //		}
-//		StringBuilder result = new StringBuilder();
-//		for(int i = 0; i < count; i++) {
-//			result.append("result-");
-//		}
+//		
 //		uuid = UUID.randomUUID().toString().replace("-", "");
 //		json.put("uuid", uuid);
 //		apiAuditLogger.log(uuid, json, error.toString(), result);

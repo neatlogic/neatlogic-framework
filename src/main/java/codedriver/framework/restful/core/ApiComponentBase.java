@@ -15,8 +15,8 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
-import codedriver.framework.common.AuthAction;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.core.FrameworkExceptionMessageBase;

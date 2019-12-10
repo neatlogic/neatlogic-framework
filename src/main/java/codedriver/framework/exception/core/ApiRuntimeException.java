@@ -20,11 +20,6 @@ public class ApiRuntimeException extends RuntimeException {
 		super(message);
 	}
 
-	public ApiRuntimeException(IApiExceptionMessage exception) {
-		super(exception.getError());
-		this.errorCode = exception.getErrorCode();
-	}
-
 	public String getErrorCode() {
 		return errorCode;
 	}

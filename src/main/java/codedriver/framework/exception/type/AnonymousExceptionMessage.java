@@ -1,17 +1,11 @@
 package codedriver.framework.exception.type;
 
-import codedriver.framework.exception.core.IApiExceptionMessage;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class AnonymousExceptionMessage implements IApiExceptionMessage {
+public class AnonymousExceptionMessage extends ApiRuntimeException {
 
-	@Override
-	public String getErrorCode() {
-		return "01";
-	}
-
-	@Override
-	public String getError() {
-		return "不允许匿名访问";
+	public AnonymousExceptionMessage() {
+		super("不允许匿名访问");
 	}
 
 }

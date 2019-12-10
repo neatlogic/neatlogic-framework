@@ -8,17 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
-import codedriver.framework.exception.core.IApiExceptionMessage;
-import codedriver.framework.exception.type.CustomExceptionMessage;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
-import codedriver.framework.scheduler.exception.SchedulerExceptionMessage;
+import codedriver.framework.scheduler.exception.ScheduleJobClassNotFoundException;
+import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
 
 @Service
 @Transactional
@@ -60,8 +57,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
-			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("名称："+ job.getName() + " 已存在")));
-			throw new ApiRuntimeException(message);
+			throw new ScheduleJobNotFoundException("定时作业："+ job.getName() + "不存在");
 		}
 		job.setUuid(null);
 		uuid = job.getUuid();
@@ -77,8 +73,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 	public void saveJobClass(JobClassVo jobClassVo) {
 		JobClassVo jobClass = schedulerMapper.getJobClassByClasspath(jobClassVo);
 		if(jobClass == null) {
-			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在")));
-			throw new ApiRuntimeException(message);
+			throw new ScheduleJobClassNotFoundException("定时作业组件："+ jobClassVo.getClasspath() + " 不存在");
 		}
 		jobClass.setType(jobClassVo.getType());
 		schedulerMapper.updateJobClass(jobClassVo);

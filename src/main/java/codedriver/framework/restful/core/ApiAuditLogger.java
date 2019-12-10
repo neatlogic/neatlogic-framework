@@ -8,7 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Level;
@@ -92,7 +94,8 @@ public class ApiAuditLogger {
 			log.append(error);
 		}else {
 			log.append("result: ");
-			log.append(result);			
+			String pretty = JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+			log.append(pretty);			
 		}
 		log.append("\n");
 		log.append("uuid: ");

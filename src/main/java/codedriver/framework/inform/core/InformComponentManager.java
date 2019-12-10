@@ -27,25 +27,23 @@ import java.util.Set;
  * @description:
  * @create: 2019-12-09 10:45
  **/
-public class InformComponentExecutor {
-    Logger logger = LoggerFactory.getLogger(InformComponentExecutor.class);
+public class InformComponentManager {
+    Logger logger = LoggerFactory.getLogger(InformComponentManager.class);
 
-    private InformVo informVo;
+    private static InformComponentManager manager;
 
     @Autowired
     private UserMapper userMapper;
 
-    public InformComponentExecutor(InformVo informVo){
-        this.informVo = informVo;
-    }
-
     public static void inform(InformVo informVo){
-        InformComponentExecutor executor = new InformComponentExecutor(informVo);
-        executor.executor();
+        if (manager == null){
+            manager = new InformComponentManager();
+        }
+        manager.executor(informVo);
     }
 
-    public void executor(){
-        CommonThreadPool.getThreadPool().execute(new InformRunner(informVo));
+    public void executor(InformVo informVo){
+        CommonThreadPool.execute(new InformRunner(informVo));
     }
 
     class InformRunner implements Runnable{

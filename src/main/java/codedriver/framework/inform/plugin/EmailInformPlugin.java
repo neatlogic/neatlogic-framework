@@ -137,6 +137,4 @@ public class EmailInformPlugin implements InformComponentBase {
         }
         return content;
     }
-
-
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,8 +38,10 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.common.util.SerializerUtil;
 import codedriver.framework.dao.mapper.TenantMapper;
+import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
@@ -56,6 +59,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 	private static Map<String, IJob> iJobMap = new HashMap<>();
 
+	private static Map<String, JobClassVo> publicJobClassMap = new HashMap<>();
+	
 	@Autowired
 	private SchedulerFactoryBean schedulerFactoryBean;
 	@Autowired
@@ -108,7 +113,19 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	public static IJob getInstance(String className) {
 		return iJobMap.get(className);
 	}
+	
+	public static List<JobClassVo> getAllJobClassList(){
+		List<JobClassVo> jobClassList = new ArrayList<>();
+		for(Entry<String, JobClassVo> entry : publicJobClassMap.entrySet()) {
+			jobClassList.add(entry.getValue());
+		}
+		return jobClassList;
+	}
 
+	public static JobClassVo getJobClassByClasspath(String classpath) {
+		return publicJobClassMap.get(classpath);
+	}
+	
 	/**
 	 * 
 	 * @Description: 加载定时作业，同时设置定时作业状态和锁
@@ -277,13 +294,14 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
-		TenantContext tenant = TenantContext.get();
-		if (tenant == null) {
-			tenant = TenantContext.init();
-		}
 		JobClassVo jobClassVo = null;
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
 		iJobMap.putAll(myMap);
+		String moduleName = "";
+		ModuleVo module = ModuleUtil.getModuleById(context.getId());	
+		if(module != null) {
+			moduleName = module.getName();
+		}
 		for (Map.Entry<String, IJob> entry : myMap.entrySet()) {
 			IJob jobClass = entry.getValue();
 			// 如果定时作业组件没有实现IPublicJob接口，不会插入schedule_job_class表
@@ -291,18 +309,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				continue;
 			}
 			IPublicJob publicJobClass = (IPublicJob) jobClass;
-			jobClassVo = new JobClassVo();
-			jobClassVo.setName(publicJobClass.getJobClassName());
-			jobClassVo.setClasspath(publicJobClass.getClassName());
-			jobClassVo.setModuleId(context.getId());
-			tenant.setUseDefaultDatasource(true);
-			if (schedulerMapper.getJobClassByClasspath(jobClassVo) != null) {
-				schedulerMapper.updateJobClass(jobClassVo);
-			} else {
-				jobClassVo.setType(publicJobClass.getType());
-				schedulerMapper.insertJobClass(jobClassVo);
-			}
-			tenant.setUseDefaultDatasource(false);
+			jobClassVo = new JobClassVo(publicJobClass.getType(), publicJobClass.getJobClassName(), publicJobClass.getClassName(), context.getId(), moduleName);
+			publicJobClassMap.put(publicJobClass.getClassName(), jobClassVo);
 			for (TenantVo tenantVo : tenantList) {
 				CommonThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), publicJobClass.getClassName()));
 			}
@@ -342,4 +350,5 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			}
 		}
 	}
+
 }

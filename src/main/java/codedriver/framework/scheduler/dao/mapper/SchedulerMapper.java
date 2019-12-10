@@ -3,7 +3,6 @@ package codedriver.framework.scheduler.dao.mapper;
 import java.util.List;
 
 import codedriver.framework.scheduler.dto.JobAuditVo;
-import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobStatusVo;
@@ -20,10 +19,6 @@ public interface SchedulerMapper {
 	public JobVo getJobByName(JobVo job);
 	public List<ServerNewJobVo> getServerJobByServerId(int serverId);
 	
-	public JobClassVo getJobClassByClasspath(JobClassVo jobClassVo);
-	public int searchJobClassCount(JobClassVo jobClassVo);
-	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo);
-	
 	public int searchJobAuditCount(JobAuditVo jobAuditVo);
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
 	public JobAuditVo getJobAuditLogById(Long auditId);
@@ -32,15 +27,13 @@ public interface SchedulerMapper {
 	//UPDATE
 	public int updateJobById(JobVo job);
 	public int updateJobStatusByJobUuid(JobStatusVo jobStatus);
-	public int updateJobClass(JobClassVo jobClass);
 	public int updateJobAudit(JobAuditVo scheduleJobAudit);
 	public int updateJobLockByJobId(JobLockVo jobLock);
 	public int updateJobLockByServerId(JobLockVo jobLock);
 	//INSERT	
 	public int insertJob(JobVo job);
 	public int insertJobStatus(JobStatusVo jobStatus);
-	public int insertJobProp(JobPropVo jobProp);
-	public int insertJobClass(JobClassVo jobClass);	
+	public int insertJobProp(JobPropVo jobProp);	
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
 	public int insertJobLock(JobLockVo jobLock);
 	public int insertServerJob(ServerNewJobVo serverNewJobVo);

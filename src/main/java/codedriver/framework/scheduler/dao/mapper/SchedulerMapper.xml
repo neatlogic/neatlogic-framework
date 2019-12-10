@@ -148,42 +148,6 @@
 		WHERE a.name = #{name} and a.uuid != #{uuid}
 	</select>
 	
-	<select id="getJobClassByClasspath" resultType="codedriver.framework.scheduler.dto.JobClassVo">
-		SELECT 
-		a.`name` AS `name`,
-		a.`classpath` AS `classpath`,
-		a.`type` AS `type`,
-		a.`module_id` AS `modulId`
-		FROM schedule_job_class a
-		<if test="tenantUuid != null">
-		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
-		</if>
-		WHERE a.classpath=#{classpath}
-	</select>
-	
-	<select id="searchJobClassCount" resultType="int">
-		SELECT 
-		count(1)
-		FROM
-		schedule_job_class a 
-		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
-		<include refid="searchScheduleJobClassSql" />
-	</select>
-	
-	<select id="searchJobClassList" resultType="codedriver.framework.scheduler.dto.JobClassVo">
-		SELECT 
-		a.`name` AS name,
-		a.classpath AS classPath,
-		a.module_id AS moduleId,
-		a.`type` AS type
-		FROM
-		schedule_job_class a 
-		JOIN tenant_module tm ON tm.module_id=a.module_id AND tm.tenant_uuid=#{tenantUuid}
-		<include refid="searchScheduleJobClassSql" />
-		ORDER by a.name
-		limit #{startNum}, #{pageSize}
-	</select>
-	
 	<select id="searchJobAuditCount" resultType="int">
 		SELECT count(1) FROM schedule_job_audit WHERE job_uuid = #{jobUuid}
 	</select>
@@ -289,18 +253,6 @@
 		job_uuid = #{jobUuid}
 	</update>
 	
-	<update id="updateJobClass">
-		UPDATE schedule_job_class 
-		SET
-		name = #{name},
-		classpath = #{classpath},
-		module_id = #{moduleId}
-		<if test="type != null and type != ''">
-			,type = #{type}
-		</if>
-		WHERE classpath = #{classpath}
-	</update>
-	
 	<update id="updateJobAudit">
         UPDATE schedule_job_audit 
         SET
@@ -367,10 +319,6 @@
 	<insert id="insertJobProp">
 		INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
 		VALUES (#{jobUuid}, #{name}, #{value})
-	</insert>
-	
-	<insert id="insertJobClass">
-		INSERT INTO schedule_job_class (name, classpath, module_id, type) VALUES (#{name}, #{classpath}, #{moduleId}, #{type})
 	</insert>
 
 	<insert id="insertJobAudit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

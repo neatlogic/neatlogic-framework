@@ -1,17 +1,23 @@
 package codedriver.framework.scheduler.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
+import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
 import codedriver.framework.exception.core.IApiExceptionMessage;
 import codedriver.framework.exception.type.CustomExceptionMessage;
+import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
@@ -38,11 +44,40 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	@Override
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo) {
-		int rowNum = schedulerMapper.searchJobClassCount(jobClassVo);
+		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
+		Set<String> moduleIdSet = new HashSet<>();
+		for(ModuleVo module : activeModuleList) {
+			moduleIdSet.add(module.getId());
+		}
+		List<JobClassVo> jobClassList = SchedulerManager.getAllJobClassList();
+		int rowNum = jobClassList.size();
 		int pageCount = PageUtil.getPageCount(rowNum,jobClassVo.getPageSize());
 		jobClassVo.setPageCount(pageCount);
 		jobClassVo.setRowNum(rowNum);
-		return schedulerMapper.searchJobClassList(jobClassVo);
+		List<JobClassVo> jobClassFilterList = new ArrayList<>();
+		for(JobClassVo jobClass : jobClassList) {
+			if(!moduleIdSet.contains(jobClass.getModuleId())) {
+				continue;
+			}
+			if(jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
+				continue;
+			}
+			if(jobClassVo.getModuleName() != null && !jobClass.getModuleName().contains(jobClassVo.getModuleName())) {
+				continue;
+			}
+			if(jobClassVo.getName() != null && !jobClass.getName().contains(jobClassVo.getName())) {
+				continue;
+			}
+			jobClassFilterList.add(jobClass);
+		}
+		
+		int startNum = jobClassVo.getStartNum();
+		int pageSize = jobClassVo.getPageSize();
+		int endNum = startNum + pageSize - 1;
+		int MaxNum = jobClassFilterList.size() - 1;
+		endNum = endNum >  MaxNum ? MaxNum : endNum;
+		List<JobClassVo> returnJobClassList = jobClassFilterList.subList(startNum, endNum + 1);
+		return returnJobClassList;
 	}
 
 	@Override
@@ -71,17 +106,6 @@ public class SchedulerServiceImpl implements SchedulerService{
 			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
 		}
-	}
-
-	@Override
-	public void saveJobClass(JobClassVo jobClassVo) {
-		JobClassVo jobClass = schedulerMapper.getJobClassByClasspath(jobClassVo);
-		if(jobClass == null) {
-			IApiExceptionMessage message = new FrameworkExceptionMessageBase(new SchedulerExceptionMessage(new CustomExceptionMessage("定时作业组件："+ jobClassVo.getClasspath() + " 不存在")));
-			throw new ApiRuntimeException(message);
-		}
-		jobClass.setType(jobClassVo.getType());
-		schedulerMapper.updateJobClass(jobClassVo);
 	}
 
 	@Override

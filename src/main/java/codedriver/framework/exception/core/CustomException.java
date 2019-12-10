@@ -1,26 +1,26 @@
 package codedriver.framework.exception.core;
 
-public class ApiRuntimeException extends RuntimeException {
+public class CustomException extends RuntimeException {
 	private static final long serialVersionUID = 9206337410118158624L;
 	private String errorCode;
 
-	public ApiRuntimeException() {
+	public CustomException() {
 		super();
 	}
 
-	public ApiRuntimeException(Throwable ex) {
+	public CustomException(Throwable ex) {
 		super(ex);
 	}
 
-	public ApiRuntimeException(String message, Throwable ex) {
+	public CustomException(String message, Throwable ex) {
 		super(message, ex);
 	}
 
-	public ApiRuntimeException(String message) {
+	public CustomException(String message) {
 		super(message);
 	}
 
-	public ApiRuntimeException(IApiExceptionMessage exception) {
+	public CustomException(IApiExceptionMessage exception) {
 		super(exception.getError());
 		this.errorCode = exception.getErrorCode();
 	}

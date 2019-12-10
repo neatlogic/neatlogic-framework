@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.CustomException;
 import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
 import codedriver.framework.exception.type.ApiNotFoundExceptionMessage;
 import codedriver.framework.exception.type.ComponentNotFoundExceptionMessage;
@@ -168,7 +169,6 @@ public class ApiDispatcher {
 			returnObj.put("Error", ex.getErrorCode());
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
 			response.setStatus(500);
 			returnObj.put("Error", 500);
@@ -268,6 +268,18 @@ public class ApiDispatcher {
 		}
 		response.setContentType(Config.RESPONSE_TYPE_JSON);
 		response.getWriter().print(returnObj.toJSONString());
+	}
+
+	public static void main(String[] arg) {
+		try {
+			try {
+				Integer.parseInt("abc");
+			} catch (Exception ex) {
+				throw new ApiRuntimeException("转换失败", ex);
+			}
+		} catch (ApiRuntimeException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

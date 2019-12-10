@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,6 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
@@ -55,11 +55,8 @@ public class ApiDispatcher {
 		errorMap.put(470, "访问频率过高，请稍后访问");
 	}
 
-	private void doIt(HttpServletRequest request, String token, String json, JSONObject jsonObj, String action) throws Exception {
-		TenantContext tenantContext = TenantContext.get();
-		tenantContext.setUseDefaultDatasource(true);
-		ApiVo interfaceVo = apiService.getApiByToken(token);
-		tenantContext.setUseDefaultDatasource(false);
+	private void doIt(HttpServletRequest request, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+		ApiVo interfaceVo = ApiComponentFactory.getApiByToken(token);
 
 		if (interfaceVo == null) {
 			interfaceVo = apiService.getApiByToken(token);
@@ -68,84 +65,41 @@ public class ApiDispatcher {
 			}
 		}
 
-		ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
-		if (restComponent != null) {
-			if (action.equals("doservice")) {
-				JSONObject paramJson = null;
-				if (json != null && !"".equals(json.trim())) {
-					try {
-						paramJson = JSONObject.parseObject(json);
-					} catch (Exception e) {
-						throw new Exception("参数不是json格式,错误信息为：" + e.getMessage());
-					}
+		if (apiType.equals(ApiVo.Type.OBJECT)) {
+			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
+			if (restComponent != null) {
+				if (action.equals("doservice")) {
+					Object returnV = restComponent.doService(interfaceVo, paramObj);
+					returnObj.put("Return", returnV);
+					returnObj.put("Status", "OK");
 				} else {
-					paramJson = new JSONObject();
+					returnObj.putAll(restComponent.help());
 				}
-
-				Object returnObj = restComponent.doService(interfaceVo, paramJson);
-				jsonObj.put("Return", returnObj);
-				jsonObj.put("Status", "OK");
 			} else {
-				jsonObj.putAll(restComponent.help());
+				throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId())));
 			}
-		} else {
-			throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId())));
+		} else if (apiType.equals(ApiVo.Type.STREAM)) {
+			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
+			if (restComponent != null) {
+				if (action.equals("doservice")) {
+					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
+					returnObj.put("Return", returnV);
+					returnObj.put("Status", "OK");
+				} else {
+					returnObj.putAll(restComponent.help());
+				}
+			} else {
+				throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId())));
+			}
 		}
 	}
 
-	@RequestMapping(value = "/rest/**", method = RequestMethod.GET)
+	@RequestMapping(value = "/rest/**",
+			method = RequestMethod.GET)
 	public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
-		JSONObject json = new JSONObject();
-		Enumeration<String> paraNames = request.getParameterNames();
-		while (paraNames.hasMoreElements()) {
-			String p = paraNames.nextElement();
-			String[] vs = request.getParameterValues(p);
-			if (vs.length > 1) {
-				json.put(p, vs);
-			} else {
-				json.put(p, request.getParameter(p));
-			}
-		}
-		JSONObject jsonObj = new JSONObject();
-		try {
-			doIt(request, token, json.toString(), jsonObj, "doservice");
-		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			jsonObj.put("ErrorCode", ex.getErrorCode());
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			jsonObj.put("ErrorCode", 500);
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ExceptionUtils.getStackFrames(ex));
-
-		}
-		// zouye: 如果在接口实现中已经处理了输出流，则此处不再处理
-		/**
-		 * response.isCommitted() == true 的几种情况 1、Response buffer has reached
-		 * the max buffer size。 2、Some part of the code has called flushed on
-		 * the response 3、Some part of the code has flushed the OutputStream or
-		 * Writer 4、If you have forwarded to another page, where the response is
-		 * both committed and closed.
-		 */
-		if (!response.isCommitted()) {
-			response.setContentType(Config.RESPONSE_TYPE_JSON);
-			response.getWriter().print(jsonObj);
-		}
-	}
-
-	@RequestMapping(value = "/stream/**", method = RequestMethod.POST)
-	public void displatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
-		JSONObject jsonObj = new JSONObject();
 		JSONObject paramObj = new JSONObject();
 		Enumeration<String> paraNames = request.getParameterNames();
 		while (paraNames.hasMoreElements()) {
@@ -157,53 +111,43 @@ public class ApiDispatcher {
 				paramObj.put(p, request.getParameter(p));
 			}
 		}
-		ApiVo interfaceVo = apiService.getApiByToken(token);
-		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
-			throw new ApiRuntimeException(new ApiNotFoundExceptionMessage(token));
-		}
+		JSONObject returnObj = new JSONObject();
 		try {
-			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
-			if (restComponent != null) {
-				Object returnObj = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
-				jsonObj.put("Return", returnObj);
-				jsonObj.put("Status", "OK");
-			} else {
-				// throw new Exception410("插件：" + interfaceVo.getComponentId() +
-				// "不存在");
-			}
+			doIt(request, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
-			jsonObj.put("Error", ex.getErrorCode());
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
-			response.setStatus(500);
-			jsonObj.put("Error", 500);
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ExceptionUtils.getStackTrace(ex));
 			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
 		if (!response.isCommitted()) {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
-			response.getWriter().print(jsonObj);
+			response.getWriter().print(returnObj);
 		}
 	}
 
-	@RequestMapping(value = "/rest/**", method = RequestMethod.POST)
-	public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/rest/**",
+			method = RequestMethod.POST)
+	public void dispatcherForPost(@RequestBody
+	String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
-		JSONObject json = null;
-		if (jsonStr != null && !"".equals(jsonStr.trim())) {
+		JSONObject paramObj = null;
+		if (StringUtils.isNotBlank(jsonStr)) {
 			try {
-				json = JSONObject.parseObject(jsonStr);
+				paramObj = JSONObject.parseObject(jsonStr);
 			} catch (Exception e) {
 				throw new Exception("参数不是json格式,错误信息为：" + e.getMessage());
 			}
 		} else {
-			json = new JSONObject();
+			paramObj = new JSONObject();
 		}
 
 		Enumeration<String> paraNames = request.getParameterNames();
@@ -211,61 +155,119 @@ public class ApiDispatcher {
 			String p = paraNames.nextElement();
 			String[] vs = request.getParameterValues(p);
 			if (vs.length > 1) {
-				json.put(p, vs);
+				paramObj.put(p, vs);
 			} else {
-				json.put(p, request.getParameter(p));
+				paramObj.put(p, request.getParameter(p));
 			}
 		}
-		JSONObject jsonObj = new JSONObject();
+		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, json.toString(), jsonObj, "doservice");
+			doIt(request, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
-			jsonObj.put("Error", ex.getErrorCode());
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ex.getMessage());
+			returnObj.put("Error", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
 			response.setStatus(500);
-			jsonObj.put("Error", 500);
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ExceptionUtils.getStackTrace(ex));
+			returnObj.put("Error", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
 			logger.error(ex.getCause().getMessage(), ex.getCause());
 		}
 		if (!response.isCommitted()) {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
-			response.getWriter().print(jsonObj);
+			response.getWriter().print(returnObj);
 		}
 	}
 
-	@RequestMapping(value = "/help/**", method = RequestMethod.GET)
-	public void help(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	@RequestMapping(value = "/stream/**",
+			method = RequestMethod.POST)
+	public void displatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
-		JSONObject jsonObj = new JSONObject();
-		try {
-			ApiVo interfaceVo = apiService.getApiByToken(token);
-			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
-			if (restComponent != null) {
-				jsonObj.putAll(restComponent.help());
+		JSONObject paramObj = new JSONObject();
+		Enumeration<String> paraNames = request.getParameterNames();
+		while (paraNames.hasMoreElements()) {
+			String p = paraNames.nextElement();
+			String[] vs = request.getParameterValues(p);
+			if (vs.length > 1) {
+				paramObj.put(p, vs);
 			} else {
-				JsonStreamApiComponent restStreamComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
-				if (restStreamComponent != null) {
-					jsonObj.putAll(restStreamComponent.help());
-				} else {
-					throw new ApiRuntimeException(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId()));
-				}
+				paramObj.put(p, request.getParameter(p));
 			}
-		} catch (Exception ex) {
-			jsonObj.put("Error", 300);
-			jsonObj.put("Status", "ERROR");
-			jsonObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
 		}
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
+		if (!response.isCommitted()) {
+			response.setContentType(Config.RESPONSE_TYPE_JSON);
+			response.getWriter().print(returnObj.toJSONString());
+		}
+	}
 
+	@RequestMapping(value = "/help/rest/**",
+			method = RequestMethod.GET)
+	public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, token, ApiVo.Type.OBJECT, null, returnObj, "help");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
 		response.setContentType(Config.RESPONSE_TYPE_JSON);
-		response.getWriter().print(jsonObj.toJSONString(4));
+		response.getWriter().print(returnObj.toJSONString());
+	}
+
+	@RequestMapping(value = "/help/stream/**",
+			method = RequestMethod.GET)
+	public void steamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, token, ApiVo.Type.STREAM, null, returnObj, "help");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
+		response.setContentType(Config.RESPONSE_TYPE_JSON);
+		response.getWriter().print(returnObj.toJSONString());
 	}
 
 }

@@ -56,8 +56,11 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
 					if (moduleId.equalsIgnoreCase("framework")) {
 						sr.addMapping("/");
+						sr.setLoadOnStartup(1);
+					}else {
+						sr.setLoadOnStartup(2);
 					}
-					sr.setLoadOnStartup(1);
+					
 
 					ModuleVo moduleVo = new ModuleVo();
 					moduleVo.setId(moduleId);

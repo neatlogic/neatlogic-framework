@@ -8,6 +8,10 @@ public class ApiRuntimeException extends RuntimeException {
 		super();
 	}
 
+	public ApiRuntimeException(String message) {
+		super(message);
+	}
+
 	public ApiRuntimeException(IApiExceptionMessage exception) {
 		super(exception.getError());
 		this.errorCode = exception.getErrorCode();

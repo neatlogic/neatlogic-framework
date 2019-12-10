@@ -79,7 +79,7 @@
 
 	<!-- scan for mappers and let them be autowired -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="codedriver.framework.**.dao.mapper" />
+		<property name="basePackage" value="codedriver.framework.**.mapper" />
 	</bean>
 	<!-- 创建SqlSessionFactory，同时指定数据源 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -87,14 +87,16 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapperLocations">
 			<list>
-				<value>classpath*:codedriver/framework/**/dao/mapper/*.xml</value>
+				<value>classpath*:codedriver/framework/**/mapper/*.xml</value>
 			</list>
 		</property>
 	</bean>
 
- 	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
- 	
- 	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
+	<bean id="DatasourceInitializer" class="codedriver.framework.startup.DatasourceInitializer"></bean>
+
+	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
+
+	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
 
 </beans>

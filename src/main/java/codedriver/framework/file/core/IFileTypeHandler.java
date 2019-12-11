@@ -12,8 +12,6 @@ public interface IFileTypeHandler {
 
 	public String getName();
 
-	public String getBelong();
-
 	public String getDisplayName();
 
 	public void afterUpload(FileVo fileVo, JSONObject jsonObj);

@@ -16,9 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.alibaba.fastjson.JSONObject;
@@ -30,6 +32,7 @@ import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.restful.core.ApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
+import codedriver.framework.restful.core.BinaryStreamApiComponent;
 import codedriver.framework.restful.core.JsonStreamApiComponent;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.service.ApiService;
@@ -85,6 +88,19 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
+					returnObj.put("Return", returnV);
+					returnObj.put("Status", "OK");
+				} else {
+					returnObj.putAll(restComponent.help());
+				}
+			} else {
+				throw new ComponentNotFoundException("接口组件:" + restComponent.getId() + "不存在");
+			}
+		} else if (apiType.equals(ApiVo.Type.BINARY)) {
+			BinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getComponentId());
+			if (restComponent != null) {
+				if (action.equals("doservice")) {
+					Object returnV = restComponent.doService(interfaceVo, paramObj, (MultipartHttpServletRequest) request);
 					returnObj.put("Return", returnV);
 					returnObj.put("Status", "OK");
 				} else {
@@ -221,6 +237,44 @@ public class ApiDispatcher {
 		}
 	}
 
+	@RequestMapping(value = "/binary/**",
+			method = RequestMethod.POST)
+	public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+
+		JSONObject paramObj = new JSONObject();
+		Enumeration<String> paraNames = request.getParameterNames();
+		while (paraNames.hasMoreElements()) {
+			String p = paraNames.nextElement();
+			String[] vs = request.getParameterValues(p);
+			if (vs.length > 1) {
+				paramObj.put(p, vs);
+			} else {
+				paramObj.put(p, request.getParameter(p));
+			}
+		}
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
+		if (!response.isCommitted()) {
+			response.setContentType(Config.RESPONSE_TYPE_JSON);
+			response.getWriter().print(returnObj.toJSONString());
+		}
+	}
+
 	@RequestMapping(value = "/help/rest/**",
 			method = RequestMethod.GET)
 	public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -271,16 +325,29 @@ public class ApiDispatcher {
 		response.getWriter().print(returnObj.toJSONString());
 	}
 
-	public static void main(String[] arg) {
+	@RequestMapping(value = "/help/binary/**",
+			method = RequestMethod.GET)
+	public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+
+		JSONObject returnObj = new JSONObject();
 		try {
-			try {
-				Integer.parseInt("abc");
-			} catch (Exception ex) {
-				throw new ApiRuntimeException("转换失败", ex);
-			}
-		} catch (ApiRuntimeException e) {
-			e.printStackTrace();
+			doIt(request, token, ApiVo.Type.BINARY, null, returnObj, "help");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(500);
+			returnObj.put("ErrorCode", 500);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
+		response.setContentType(Config.RESPONSE_TYPE_JSON);
+		response.getWriter().print(returnObj.toJSONString());
 	}
 
 }

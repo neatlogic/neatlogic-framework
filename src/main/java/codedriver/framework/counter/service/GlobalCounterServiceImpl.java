@@ -1,6 +1,8 @@
 package codedriver.framework.counter.service;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.counter.dto.GlobalCounterSubscribeVo;
@@ -39,7 +41,12 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
 
     @Override
     public List<ModuleVo> getActiveCounterModuleList() {
+
+        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
         Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
+        for (ModuleVo moduleVo : tenantModuleList){
+            tenantModuleMap.put(moduleVo.getId(), moduleVo);
+        }
         List<ModuleVo> moduleList = new ArrayList<>();
         List<ModuleVo> activeModuleList = counterMapper.getActiveCounterModuleList();
         for (ModuleVo module : activeModuleList){
@@ -52,9 +59,12 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
     @Override
     public List<GlobalCounterVo> getSubscribeCounterListByUserId(String userId) {
         List<GlobalCounterVo> counterVoList = counterMapper.getSubscribeCounterListByUserId(userId);
-        String tenant = UserContext.get().getTenant();
-       /* List<ModuleVo> tenantModuleList = ModuleUtil.getTenantActionModuleList(moduleMapper.getModuleListByTenantUuid(tenant));*/
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        List<ModuleVo> tenantModuleList = ModuleUtil.getTenantActionModuleList(moduleMapper.getModuleListByTenantUuid(tenantUuid));
         Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
+        for (ModuleVo moduleVo : tenantModuleList){
+            tenantModuleMap.put(moduleVo.getId(), moduleVo);
+        }
         if (counterVoList != null && counterVoList.size() > 0){
             for (GlobalCounterVo counterVo : counterVoList){
                 ModuleVo moduleVo = tenantModuleMap.get(counterVo.getModuleId());

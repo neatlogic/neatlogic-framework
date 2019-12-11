@@ -42,13 +42,13 @@ public class ReminderSearchApi extends ApiComponentBase {
         return null;
     }
 
-    @Input({ @Param(name = "moduleId", type = ApiParamType.LONG, desc = "模块ID")})
+    @Input({ @Param(name = "moduleId", type = ApiParamType.STRING, desc = "模块ID")})
     @Output({ @Param(name = "reminderList", type = ApiParamType.JSONARRAY, desc = "实时动态插件集合")})
     @Description(desc = "实时动态插件检索接口")
     @Override
     public Object myDoService(JSONObject jsonObj) throws Exception {
         GlobalReminderVo reminderVo = new GlobalReminderVo();
-        reminderVo.setModuleId(jsonObj.getLong("moduleId"));
+        reminderVo.setModuleId(jsonObj.getString("moduleId"));
         JSONObject returnJson = new JSONObject();
         reminderVo.setUserId(UserContext.get().getUserId());
         List<GlobalReminderVo> reminderVoList = reminderService.searchReminder(reminderVo);

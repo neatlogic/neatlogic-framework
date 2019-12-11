@@ -4,7 +4,7 @@
     <resultMap id="reminderMap"  type="codedriver.framework.reminder.dto.GlobalReminderVo">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
-        <result column="pluginId" property=""
+        <result column="pluginId" property="pluginId"/>
         <result column="description" property="description"/>
         <result column="isActive" property="isActive"/>
         <result column="config" property="config"/>
@@ -21,6 +21,7 @@
         SELECT
         a.`id`,
         a.`name`,
+        a.`plugin_id` as `pluginId`,
         a.`description`,
         a.`module_id` as `moduleId`,
         a.`config`,
@@ -43,7 +44,7 @@
         </if>
     </select>
 
-    <select id="getActiveReminderModuleList" resultType="com.techsure.balantflow.dto.ModuleVo">
+    <select id="getActiveReminderModuleList" resultType="codedriver.framework.dto.ModuleVo">
         SELECT
         rem.`module_id` as `id`
         FROM (

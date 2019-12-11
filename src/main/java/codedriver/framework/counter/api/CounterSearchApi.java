@@ -52,7 +52,7 @@ public class CounterSearchApi extends ApiComponentBase {
         GlobalCounterVo counter = new GlobalCounterVo();
         JSONObject returnJson = new JSONObject();
         String userId = UserContext.get().getUserId();
-        Long moduleId = jsonObj.getLong("moduleId");
+        String moduleId = jsonObj.getString("moduleId");
         counter.setModuleId(moduleId);
         counter.setUserId(userId);
         List<GlobalCounterVo> counterList = counterService.searchCounterVo(counter);

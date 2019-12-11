@@ -62,7 +62,7 @@
         </if>
     </select>
 
-    <select id="getActiveCounterModuleList" resultType="com.techsure.balantflow.dto.ModuleVo">
+    <select id="getActiveCounterModuleList" resultType="codedriver.framework.dto.ModuleVo">
         SELECT
         rem.`module_id` AS `id`
         FROM (
@@ -79,10 +79,6 @@
 
     <update id="resetIsActiveOfAllCounter" >
        UPDATE `counter` SET `is_active` = 0
-    </update>
-
-    <update id="updateCounterSubscribe" parameterType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
-        UPDATE `counter_subscribe` SET
     </update>
 
     <update id="updateCounterByPluginId" parameterType="codedriver.framework.counter.dto.GlobalCounterVo">

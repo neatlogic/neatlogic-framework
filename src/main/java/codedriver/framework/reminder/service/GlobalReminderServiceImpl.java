@@ -1,5 +1,7 @@
 package codedriver.framework.reminder.service;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.GlobalReminderSubscribeVo;
@@ -91,7 +93,11 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
 
     @Override
     public List<GlobalReminderMessageVo> getScheduleMessageList(String userId) {
+        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
         Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
+        for (ModuleVo moduleVo : tenantModuleList){
+            tenantModuleMap.put(moduleVo.getId(), moduleVo);
+        }
         List<GlobalReminderMessageVo> messageVoList = reminderMessageMapper.getScheduleMessageList(userId);
         for (GlobalReminderMessageVo messageVo : messageVoList){
             GlobalReminderVo reminderVo = messageVo.getReminderVo();

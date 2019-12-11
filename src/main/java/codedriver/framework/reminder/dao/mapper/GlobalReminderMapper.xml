@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.reminder.dao.mapper.GlobalReminderMapper">
+    <resultMap id="reminderMap"  type="codedriver.framework.reminder.dto.GlobalReminderVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pluginId" property=""
+        <result column="description" property="description"/>
+        <result column="isActive" property="isActive"/>
+        <result column="config" property="config"/>
+        <result column="moduleId" property="moduleId"/>
+        <association property="reminderSubscribeVo" javaType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+            <id column="subId" property="id"/>
+            <result column="id" property="reminderId"/>
+            <result column="userId" property="userId"/>
+            <result column="param" property="param"/>
+        </association>
+    </resultMap>
+
+    <select id="getReminderList" parameterType="codedriver.framework.reminder.dto.GlobalReminderVo" resultMap="reminderMap">
+        SELECT
+        a.`id`,
+        a.`name`,
+        a.`description`,
+        a.`module_id` as `moduleId`,
+        a.`config`,
+        a.`is_active` as `isActive`,
+        b.`id` as `subId`,
+        b.`user_id` as `userId`,
+        b.`param` as `param`
+        FROM `reminder` a
+        LEFT JOIN (
+        SELECT `id`,
+        `reminder_id`,
+        `user_id`,
+        `param`
+        FROM `reminder_subscribe`
+        WHERE `user_id` = #{userId}
+        ) b ON a.`id` = b.`reminder_id`
+        WHERE a.`is_active` = 1
+        <if test="moduleId != null and moduleId != 0">
+            AND a.`module_id` = #{moduleId}
+        </if>
+    </select>
+
+    <select id="getActiveReminderModuleList" resultType="com.techsure.balantflow.dto.ModuleVo">
+        SELECT
+        rem.`module_id` as `id`
+        FROM (
+        SELECT
+        DISTINCT(`module_id`)
+        FROM `reminder`
+        WHERE `is_active` = 1
+        ) rem
+    </select>
+
+    <select id="getReminderCountByPluginId" parameterType="java.lang.String" resultType="java.lang.Integer">
+      SELECT COUNT(`id`) FROM `reminder` WHERE `plugin_id` = #{value}
+  </select>
+
+    <select id="getReminderIdByName" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT `id` FROM `reminder` WHERE `name` = #{name}
+    </select>
+
+    <select id="getUserIdListByTeamIdList" resultType="java.lang.String">
+        SELECT DISTINCT (`user_id`) FROM `flow_user_team` WHERE `team_id` IN
+        <foreach collection="teamIdList" open="(" separator="," close=")" item="teamId">
+            #{teamId}
+        </foreach>
+    </select>
+
+    <select id="getSubscribeUserIdListByReminderId" resultType="java.lang.String" parameterType="java.lang.Long">
+        SELECT DISTINCT (`user_id`) FROM `reminder_subscribe` WHERE `reminder_id` = #{reminderId}
+    </select>
+
+    <update id="updateReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+        UPDATE `reminder_subscribe` SET `param` = #{param}
+        WHERE
+        `user_id` = #{userId}
+        AND `reminder_id` = #{reminderId}
+    </update>
+
+    <update id="resetIsActiveOfAllReminder" >
+       UPDATE `reminder` SET `is_active` = 0
+   </update>
+
+    <update id="updateReminderByPluginId" parameterType="codedriver.framework.reminder.dto.GlobalReminderVo">
+        UPDATE `reminder`
+        SET `description` = #{description},
+            `name` = #{name},
+            `config` = #{config},
+            `module_id` = #{moduleId},
+            `is_active` = #{isActive}
+        WHERE `plugin_id` = #{pluginId}
+    </update>
+
+    <insert id="insertReminder" parameterType="codedriver.framework.reminder.dto.GlobalReminderVo">
+        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO `reminder` (
+          `name`,
+          `plugin_id`,
+          `description`,
+          `config`,
+          `module_id`,
+          `is_active`
+        ) VALUES(
+        #{name},
+        #{pluginId},
+        #{description},
+        #{config},
+        #{moduleId},
+        #{isActive}
+        )
+    </insert>
+
+    <insert id="insertReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        INSERT INTO `reminder_subscribe`(
+        `reminder_id`,
+        `user_id`,
+        `param`
+        ) VALUES(
+        #{reminderId},
+        #{userId},
+        #{param}
+        )
+    </insert>
+
+    <delete id="deleteReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+        DELETE FROM `reminder_subscribe`
+        WHERE `user_id` = #{userId}
+        AND `reminder_id` = #{reminderId}
+    </delete>
+</mapper>

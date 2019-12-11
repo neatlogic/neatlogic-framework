@@ -85,7 +85,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 				String oldThreadName = Thread.currentThread().getName();
 				try {
 					Thread.currentThread().setName("NEW_JOB_CHECK");
-					if (tenantContext == null) {
+					TenantContext tenantContext = TenantContext.get();
+					if(tenantContext == null) {
 						tenantContext = TenantContext.init();
 					}
 					tenantContext.setUseDefaultDatasource(true);
@@ -93,7 +94,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 					for (ServerNewJobVo newJob : newJobList) {
 						tenantContext.setUseDefaultDatasource(true);
 						schedulerMapper.deleteServerJobById(newJob.getId());
-						tenantContext.setUseDefaultDatasource(false);
 						JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
 						if (jobObject != null) {
 							loadJob(jobObject);
@@ -342,11 +342,12 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			String oldThreadName = Thread.currentThread().getName();
 			try {
 				Thread.currentThread().setName("SCHEDULER_LOAD_JOB");
-				if (tenantContext == null) {
+				TenantContext tenantContext = TenantContext.get();
+				if(tenantContext == null) {
 					tenantContext = TenantContext.init(tenantUuid);
-				} else {
+				}else {
 					tenantContext.setTenantUuid(tenantUuid);
-				}
+				}					
 				tenantContext.setUseDefaultDatasource(false);
 				List<JobVo> jobList = schedulerMapper.getJobByClasspath(classpath);
 				for (JobVo job : jobList) {

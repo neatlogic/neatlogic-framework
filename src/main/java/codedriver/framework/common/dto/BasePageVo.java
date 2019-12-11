@@ -1,11 +1,19 @@
 package codedriver.framework.common.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class BasePageVo {
+	@JSONField(serialize = false)
 	private transient Boolean needPage = true;
+	@JSONField(serialize = false)
 	private transient Integer pageSize = 10;
+	@JSONField(serialize = false)
 	private transient Integer currentPage = 1;
+	@JSONField(serialize = false)
 	private transient Integer pageCount = 0;
+	@JSONField(serialize = false)
 	private transient Integer startNum;
+	@JSONField(serialize = false)
 	private transient Integer rowNum = 0;
 
 	public BasePageVo() {

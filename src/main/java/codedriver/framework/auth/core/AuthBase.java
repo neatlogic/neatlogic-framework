@@ -1,9 +1,11 @@
 package codedriver.framework.auth.core;
 
 public abstract class AuthBase {
-	public abstract String getAuthName();
-	
+	public final String getAuthName() {
+		return this.getClass().getSimpleName();
+	}
+
 	public abstract String getAuthDisplayName();
-	
+
 	public abstract String getAuthIntroduction();
 }

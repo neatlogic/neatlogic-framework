@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
@@ -83,7 +84,7 @@ public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements 
 	}
 
 	public final String getId() {
-		return this.getClass().getName();
+		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
 
 	@Override

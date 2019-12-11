@@ -117,15 +117,10 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	}
 	
 	public static List<JobClassVo> getAllJobClassList(){
-		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
-		Set<String> moduleIdSet = new HashSet<>();
-		for(ModuleVo module : activeModuleList) {
-			moduleIdSet.add(module.getId());
-		}
 		List<JobClassVo> jobClassList = new ArrayList<>();		
 		for(Entry<String, JobClassVo> entry : publicJobClassMap.entrySet()) {
 			JobClassVo jobClass = entry.getValue();
-			if(moduleIdSet.contains(jobClass.getModuleId())) {
+			if(TenantContext.get().containsModule(jobClass.getModuleId())) {
 				jobClassList.add(jobClass);
 			}		
 		}
@@ -137,12 +132,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		if(jobClass == null) {
 			return null;
 		}
-		List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
-		Set<String> moduleIdSet = new HashSet<>();
-		for(ModuleVo module : activeModuleList) {
-			moduleIdSet.add(module.getId());
-		}
-		if(moduleIdSet.contains(jobClass.getModuleId())) {
+		if(TenantContext.get().containsModule(jobClass.getModuleId())) {
 			return jobClass;
 		}
 		return null;

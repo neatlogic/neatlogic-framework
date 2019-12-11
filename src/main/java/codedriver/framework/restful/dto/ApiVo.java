@@ -14,7 +14,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public enum Type {
 		OBJECT("object", "对象模式"),
-		STREAM("stream", "流模式");
+		STREAM("stream", "json流模式"),
+		BINARY("binary", "字节流模式");
 
 		private String name;
 		private String text;

@@ -11,7 +11,13 @@
 	</select>
 
 	<select id="getAllTenant" resultType="codedriver.framework.dto.TenantVo">
-		SELECT `uuid`, `name` FROM `tenant`
+		SELECT 
+		t.`uuid`, 
+		t.`name` 
+		FROM 
+		`tenant` t
+		JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
+		WHERE t.`is_active` = 1
 	</select>
 </mapper>
 

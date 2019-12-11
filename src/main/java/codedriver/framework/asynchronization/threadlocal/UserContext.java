@@ -19,6 +19,20 @@ public class UserContext implements Serializable {
 	private String userName;
 	private String userId;
 	private List<String> roleNameList;
+	
+	public static UserContext init(UserContext _userContext) {
+		UserContext context = new UserContext();
+		if(null != context) {
+			context.setUserId(_userContext.getUserId());
+			context.setUserName(_userContext.getUserName());
+			context.setTenant(_userContext.getTenant());
+			context.setRequest(_userContext.getRequest());
+			context.setResponse(_userContext.getResponse());
+			context.setRoleNameList(_userContext.getRoleNameList());
+			instance.set(context);
+		}
+		return context;
+	}
 
 	public static UserContext init(JSONObject jsonObj, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();

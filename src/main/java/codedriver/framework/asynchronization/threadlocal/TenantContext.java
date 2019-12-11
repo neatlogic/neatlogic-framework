@@ -17,6 +17,15 @@ public class TenantContext implements Serializable {
 		instance.set(context);
 		return context;
 	}
+	
+	public static TenantContext init(TenantContext tenantContext) {
+		TenantContext context = new TenantContext();
+		if(tenantContext != null) {
+			context.setTenantUuid(tenantContext.getTenantUuid());
+			instance.set(context);
+		}
+		return context;
+	}
 
 	public static TenantContext init(String _tenantUuid) {
 		TenantContext context = new TenantContext(_tenantUuid);

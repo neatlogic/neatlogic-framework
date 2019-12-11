@@ -15,11 +15,11 @@ public abstract class CodeDriverThread implements Runnable {
 
 	@Override
 	public final void run() {
-		userContext = UserContext.get();
-		tenantContext = TenantContext.get();
+		TenantContext.init(tenantContext);
+		UserContext.init(userContext);
 		execute();
 	}
 
 	protected abstract void execute();
-
+	
 }

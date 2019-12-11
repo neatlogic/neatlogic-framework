@@ -22,7 +22,7 @@ public class UserContext implements Serializable {
 	
 	public static UserContext init(UserContext _userContext) {
 		UserContext context = new UserContext();
-		if(null != context) {
+		if(_userContext != null) {
 			context.setUserId(_userContext.getUserId());
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());

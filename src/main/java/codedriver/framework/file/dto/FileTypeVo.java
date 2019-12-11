@@ -14,9 +14,6 @@ public class FileTypeVo {
 	@EntityField(name = "中文名称",
 			type = ApiParamType.STRING)
 	private String displayName;
-	@EntityField(name = "附件归属",
-			type = ApiParamType.STRING)
-	private String belong;
 	private String moduleId;
 	private String config;
 	private JSONObject configObj;
@@ -64,11 +61,4 @@ public class FileTypeVo {
 		this.configObj = configObj;
 	}
 
-	public String getBelong() {
-		return belong;
-	}
-
-	public void setBelong(String belong) {
-		this.belong = belong;
-	}
 }

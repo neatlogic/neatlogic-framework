@@ -1,7 +1,9 @@
 package codedriver.framework.asynchronization.threadlocal;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import codedriver.framework.dto.ModuleVo;
 
@@ -11,17 +13,18 @@ public class TenantContext implements Serializable {
 	private String tenantUuid;
 	private Boolean useDefaultDatasource = false;
 	private List<ModuleVo> activeModuleList;
-
+	private Map<String, ModuleVo>  activeModuleMap;
 	public static TenantContext init() {
 		TenantContext context = new TenantContext();
 		instance.set(context);
 		return context;
 	}
 	
-	public static TenantContext init(TenantContext tenantContext) {
+	public static TenantContext init(TenantContext _tenantContext) {
 		TenantContext context = new TenantContext();
-		if(tenantContext != null) {
-			context.setTenantUuid(tenantContext.getTenantUuid());
+		if(_tenantContext != null) {
+			context.setTenantUuid(_tenantContext.getTenantUuid());
+			context.setActiveModuleList(_tenantContext.getActiveModuleList());
 			instance.set(context);
 		}
 		return context;
@@ -76,7 +79,17 @@ public class TenantContext implements Serializable {
 
 	public void setActiveModuleList(List<ModuleVo> activeModuleList) {
 		this.activeModuleList = activeModuleList;
+		activeModuleMap = new HashMap<>();
+		for(ModuleVo module : activeModuleList) {
+			activeModuleMap.put(module.getId(), module);
+		}
+	}
+
+	public Map<String, ModuleVo> getActiveModuleMap() {
+		return activeModuleMap;
 	}
 	
-	
+	public boolean containsModule(String moduleId) {
+		return activeModuleMap.containsKey(moduleId);
+	}
 }

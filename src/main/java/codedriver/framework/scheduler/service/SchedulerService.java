@@ -16,8 +16,6 @@ public interface SchedulerService {
 
 	void saveJob(JobVo job);
 
-	void saveJobClass(JobClassVo jobClassVo);
-
 	boolean getJobLock(String uuid);
 	
 }

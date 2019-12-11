@@ -1,7 +1,6 @@
 package codedriver.framework.inform.core;
 
-import codedriver.framework.inform.dto.InformVo;
-import codedriver.framework.inform.dto.MessageVo;
+import codedriver.framework.inform.dto.MessageBaseVo;
 
 public interface InformComponentBase {
     /** 
@@ -9,7 +8,7 @@ public interface InformComponentBase {
     * @Param: [informVo] 
     * @return: void  
     */ 
-    void execute(MessageVo messageVo);
+    void execute(MessageBaseVo messageVo);
     
     /** 
     * @Description: 插件ID 

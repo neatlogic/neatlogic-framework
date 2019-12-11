@@ -9,7 +9,7 @@ import java.util.List;
  * @description: 通知类
  * @create: 2019-12-09 09:54
  **/
-public class InformVo {
+public class InformBaseVo {
     private String title;
     private String content;
     private String pluginId;

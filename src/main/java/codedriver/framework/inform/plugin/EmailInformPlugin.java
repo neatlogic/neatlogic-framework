@@ -5,15 +5,14 @@ import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.MailServerVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.inform.core.InformComponentBase;
-import codedriver.framework.inform.dto.MessageVo;
-import com.alibaba.fastjson.JSONArray;
+import codedriver.framework.inform.dto.EmailMessageVo;
+import codedriver.framework.inform.dto.MessageBaseVo;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +38,7 @@ public class EmailInformPlugin implements InformComponentBase {
     private UserMapper userMapper;
 
     @Override
-    public void execute(MessageVo messageVo) {
+    public void execute(MessageBaseVo messageVo) {
         this.loadSmtpInfo();
         this.sendEmail(messageVo);
     }
@@ -59,19 +58,11 @@ public class EmailInformPlugin implements InformComponentBase {
         return null;
     }
 
-    private void sendEmail(MessageVo message){
+    private void sendEmail(MessageBaseVo message){
+        EmailMessageVo emailMessage = (EmailMessageVo) message;
         if (SMTP_SERVER_HOST != null && USER_MAIL_USERNAME != null && USER_MAIL_PASSWORD != null) {
-            List<UserVo> toUserList = message.getToUserList();
-            List<UserVo> ccUserList = new ArrayList<>();
-            JSONArray ccUsers = message.getParamObj().getJSONArray("ccUserIdList");
-            if (ccUsers != null && ccUsers.size() > 0){
-                for (int i = 0; i < ccUsers.size(); i++){
-                    UserVo ccUser =  userMapper.getUserByUserId(ccUsers.getString(i));
-                    if (ccUser != null){
-                        ccUserList.add(ccUser);
-                    }
-                }
-            }
+            List<UserVo> toUserList = emailMessage.getToUserList();
+            List<UserVo> ccUserList = emailMessage.getCcUserList();
             HtmlEmail se = null;
             try {
                 if (toUserList.size() > 0) {
@@ -82,8 +73,8 @@ public class EmailInformPlugin implements InformComponentBase {
                         se.setAuthentication(USER_MAIL_USERNAME, USER_MAIL_PASSWORD);
                     }
                     se.setSmtpPort(SMTP_PORT);
-                    se.setFrom((FROM_ADDRESS == null || FROM_ADDRESS.equals("")? USER_MAIL_USERNAME : FROM_ADDRESS), (message.getFromUser() != null && !"".equals(message.getFromUser())) ? message.getFromUser() : SMTP_SERVER_USERNAME);
-                    se.setSubject(clearStringHTML(message.getTitle()));
+                    se.setFrom((FROM_ADDRESS == null || FROM_ADDRESS.equals("")? USER_MAIL_USERNAME : FROM_ADDRESS), (emailMessage.getFromUser() != null && !"".equals(emailMessage.getFromUser())) ? emailMessage.getFromUser() : SMTP_SERVER_USERNAME);
+                    se.setSubject(clearStringHTML(emailMessage.getTitle()));
                     StringBuilder sb = new StringBuilder();
                     sb.append("<html>");
                     sb.append("<head>");
@@ -91,14 +82,16 @@ public class EmailInformPlugin implements InformComponentBase {
                     sb.append("<style type=\"text/css\">");
                     sb.append("</style>");
                     sb.append("</head><body>");
-                    sb.append(message.getContent());
+                    sb.append(emailMessage.getContent());
                     sb.append("</body></html>");
                     se.addPart(sb.toString(), "text/html;charset=utf-8");
                     for (UserVo user : toUserList) {
                         se.addTo(user.getEmail());
                     }
-                    for (UserVo ccUser : ccUserList) {
-                        se.addCc(ccUser.getEmail());
+                    if (ccUserList != null && ccUserList.size() > 0){
+                        for (UserVo ccUser : ccUserList) {
+                            se.addCc(ccUser.getEmail());
+                        }
                     }
                     se.send();
                 }

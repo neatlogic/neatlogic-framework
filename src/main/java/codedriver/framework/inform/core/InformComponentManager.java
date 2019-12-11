@@ -1,10 +1,13 @@
 package codedriver.framework.inform.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
-import codedriver.framework.inform.dto.InformVo;
-import codedriver.framework.inform.dto.MessageVo;
+import codedriver.framework.inform.dto.EmailInformVo;
+import codedriver.framework.inform.dto.EmailMessageVo;
+import codedriver.framework.inform.dto.InformBaseVo;
+import codedriver.framework.inform.dto.MessageBaseVo;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -13,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -27,40 +31,51 @@ import java.util.Set;
  * @description:
  * @create: 2019-12-09 10:45
  **/
+@Service
 public class InformComponentManager {
     Logger logger = LoggerFactory.getLogger(InformComponentManager.class);
 
     private static InformComponentManager manager;
 
-    @Autowired
-    private UserMapper userMapper;
+    protected static UserMapper userMapper;
 
-    public static void inform(InformVo informVo){
+    @Autowired
+    public  void setUserMapper(UserMapper _userMapper) {
+        userMapper = _userMapper;
+    }
+
+    public static void inform(InformBaseVo informVo){
         if (manager == null){
             manager = new InformComponentManager();
         }
         manager.executor(informVo);
     }
 
-    public void executor(InformVo informVo){
-        CommonThreadPool.execute(new InformRunner(informVo));
+    public void executor(InformBaseVo informVo){
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        CommonThreadPool.execute(new InformRunner(informVo, tenantUuid));
     }
 
     class InformRunner implements Runnable{
-        private InformVo informVo;
+        private InformBaseVo informVo;
+        private String tenantUuid;
 
-        public InformRunner(InformVo _informVo){
+        public InformRunner(InformBaseVo _informVo, String _tenantUuid){
             this.informVo = _informVo;
+            this.tenantUuid = _tenantUuid;
         }
 
         @Override
         public void run() {
+            if (TenantContext.get() == null){
+                TenantContext.init(tenantUuid);
+            }
             Thread.currentThread().setName(new StringBuilder("INFORM-").append(informVo.getPluginId()).toString());
             handler(informVo);
         }
     }
 
-    private void handler(InformVo informVo){
+    private void handler(InformBaseVo informVo){
         InformComponentBase informPlugin = InformComponentFactory.getInformPlugin(informVo.getPluginId());
         String templateContent = informPlugin.getTemplateContent();
         String templateTitle = informPlugin.getTemplateTitle();
@@ -93,16 +108,38 @@ public class InformComponentManager {
                 checkSet.add(userVo.getUserId());
             }
         }
-        MessageVo message = new MessageVo();
+        MessageBaseVo message = new MessageBaseVo();
+
+        //针对邮件提取抄送人
+        if (informVo instanceof EmailInformVo){
+            message = new EmailMessageVo();
+            EmailInformVo emailInfo = (EmailInformVo) informVo;
+            List<String> ccUserIdList =  emailInfo.getCcUserIdList();
+            List<UserVo> ccUserList = new ArrayList<>();
+            for (String ccUserId : ccUserIdList){
+                UserVo userVo = userMapper.getUserByUserId(ccUserId);
+                ccUserList.add(userVo);
+            }
+            ((EmailMessageVo) message).setCcUserList(ccUserList);
+        }
+
         message.setParamObj(informVo.getParamObj());
         message.setFromUser(informVo.getFromUser());
         message.setToUserList(toUserList);
-        message.setTitle(getFreemarkerContent(message, templateTitle));
-        message.setContent(getFreemarkerContent(message, templateContent));
+        message.setTitle(informVo.getTitle());
+        message.setContent(informVo.getContent());
+        if (StringUtils.isNotBlank(templateTitle)){
+            message.setTitle(getFreemarkerContent(message, templateTitle));
+        }
+        if (StringUtils.isNotBlank(templateContent)){
+            message.setContent(getFreemarkerContent(message, templateContent));
+        }
+
+
         informPlugin.execute(message);
     }
 
-    public  String getFreemarkerContent(MessageVo messageVo, String content) {
+    public  String getFreemarkerContent(MessageBaseVo messageVo, String content) {
         String resultStr = "";
         if (content != null) {
             Configuration cfg = new Configuration();

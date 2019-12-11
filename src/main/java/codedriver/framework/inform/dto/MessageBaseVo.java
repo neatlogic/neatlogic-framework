@@ -10,7 +10,7 @@ import java.util.List;
  * @description:
  * @create: 2019-12-09 11:38
  **/
-public class MessageVo {
+public class MessageBaseVo {
     private String title;
     private String content;
     private String fromUser;

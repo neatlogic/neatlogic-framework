@@ -1,4 +1,4 @@
-package codedriver.framework.common;
+package codedriver.framework.auth.core;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

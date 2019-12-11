@@ -26,9 +26,8 @@ import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.core.FrameworkExceptionMessageBase;
-import codedriver.framework.exception.type.ApiNotFoundExceptionMessage;
-import codedriver.framework.exception.type.ComponentNotFoundExceptionMessage;
+import codedriver.framework.exception.type.ApiNotFoundException;
+import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.restful.core.ApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.JsonStreamApiComponent;
@@ -61,7 +60,7 @@ public class ApiDispatcher {
 		if (interfaceVo == null) {
 			interfaceVo = apiService.getApiByToken(token);
 			if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
-				throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ApiNotFoundExceptionMessage(token)));
+				throw new ApiNotFoundException("token为“" + token + "”的接口不存在或已被禁用");
 			}
 		}
 
@@ -69,14 +68,17 @@ public class ApiDispatcher {
 			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
+					Long endtime = System.currentTimeMillis();
+					returnObj.put("TimeCost", endtime - starttime);
 					returnObj.put("Return", returnV);
 					returnObj.put("Status", "OK");
 				} else {
 					returnObj.putAll(restComponent.help());
 				}
 			} else {
-				throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId())));
+				throw new ComponentNotFoundException("接口组件:" + restComponent.getId() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.STREAM)) {
 			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
@@ -89,7 +91,7 @@ public class ApiDispatcher {
 					returnObj.putAll(restComponent.help());
 				}
 			} else {
-				throw new ApiRuntimeException(new FrameworkExceptionMessageBase(new ComponentNotFoundExceptionMessage(interfaceVo.getComponentId())));
+				throw new ComponentNotFoundException("接口组件:" + restComponent.getId() + "不存在");
 			}
 		}
 	}
@@ -168,7 +170,6 @@ public class ApiDispatcher {
 			returnObj.put("Error", ex.getErrorCode());
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-			logger.error(ex.getMessage(), ex);
 		} catch (Exception ex) {
 			response.setStatus(500);
 			returnObj.put("Error", 500);
@@ -268,6 +269,18 @@ public class ApiDispatcher {
 		}
 		response.setContentType(Config.RESPONSE_TYPE_JSON);
 		response.getWriter().print(returnObj.toJSONString());
+	}
+
+	public static void main(String[] arg) {
+		try {
+			try {
+				Integer.parseInt("abc");
+			} catch (Exception ex) {
+				throw new ApiRuntimeException("转换失败", ex);
+			}
+		} catch (ApiRuntimeException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -2,7 +2,7 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
-public class SYSTEM_ROLE_EDIT extends AuthBase{
+public class ROLE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
@@ -11,12 +11,7 @@ public class SYSTEM_ROLE_EDIT extends AuthBase{
 
 	@Override
 	public String getAuthIntroduction() {
-		return "拥有此权限才能查看，添加，修改和删除角色管理的内容。";
-	}
-
-	@Override
-	public String getAuthName() {
-		return "SYSTEM_ROLE_EDIT";
+		return "对角色进行添加、修改和删除";
 	}
 
 }

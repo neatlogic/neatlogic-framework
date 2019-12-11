@@ -1,4 +1,4 @@
-package codedriver.framework.dto.auth;
+package codedriver.framework.dto;
 
 import java.util.List;
 

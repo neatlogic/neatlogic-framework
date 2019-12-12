@@ -30,6 +30,7 @@ import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiAuditContentVo;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -89,7 +90,7 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 				}				
 			}
 			if(needAudit != null && needAudit.intValue() == 1) {
-				apiAuditLogger.log(audit.getUuid(),jsonObj, error, result);
+				apiAuditLogger.getQueue().offer(new ApiAuditContentVo(TenantContext.get().getTenantUuid(), audit.getUuid(), jsonObj, error, result));
 			}
 		}
 		return result;

@@ -20,6 +20,7 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiAuditContentVo;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -77,7 +78,7 @@ public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements 
 				}				
 			}
 			if(needAudit != null && needAudit.intValue() == 1) {
-				apiAuditLogger.log(audit.getUuid(),paramObj, error, result);
+				apiAuditLogger.getQueue().offer(new ApiAuditContentVo(TenantContext.get().getTenantUuid(), audit.getUuid(), paramObj, error, result));
 			}
 		}
 		return result;

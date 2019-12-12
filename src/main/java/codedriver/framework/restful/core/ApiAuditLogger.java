@@ -1,18 +1,21 @@
 package codedriver.framework.restful.core;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
-import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -22,26 +25,34 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.RollingPolicy;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.RootComponent;
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dto.ConfigVo;
-@RootComponent
-public class ApiAuditLogger {
+import codedriver.framework.restful.dto.ApiAuditContentVo;
+@Component
+public class ApiAuditLogger extends Thread {
 	private org.slf4j.Logger logger = LoggerFactory.getLogger(ApiAuditLogger.class);
 	
 	private final static String API_LOG_CONFIG = "api_log_config";//接口访问日志配置在config表的key值
-	private final static String PATTERN = "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n";//日志格式
+	private final static String PATTERN = "[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] - %msg%n";//日志格式
 	private final static String FILE_SIZE_UNIT = "MB"; //日志文件大小单位
 	private final static String DEFAULT_ROLLING_POLICY = "fixedSize";//默认轮转策略
 	private final static String DEFAULT_FILE = "/logs/api.log";//默认文件路径
 	private final static String DEFAULT_MAX_FILE_SIZE = "10MB";//默认单个文件大小
 	private final static int DEFAULT_MAX_HISTORY = 20;//固定大小轮转策略默认保留20个历史文件，时间及大小的轮转策略默认保留全部历史文件
-	private final static int DEFAULT_QUEUE_SIZE = 256;//默认异步输出日志的阻塞队列大小256个
 	
+	private final static int THREAD_COUNT = 5;
+	private final static int QUEUE_SIZE = 256;
 	private static Map<String, Logger> loggerMap = new HashMap<>();
-	private static Map<String, String> fileNamePatternMap = new HashMap<>();
+	private static Map<String, String> fileNamePatternMap = new HashMap<>(); 
+	private static ArrayBlockingQueue<ApiAuditContentVo> mainQueue = new ArrayBlockingQueue<ApiAuditContentVo>(QUEUE_SIZE * THREAD_COUNT, false);
+	
+	private static List<ArrayBlockingQueue<ApiAuditContentVo>> queueList = new ArrayList<>();
+	
+	public synchronized static ArrayBlockingQueue<ApiAuditContentVo> getQueue(){
+		return mainQueue;
+	}
 	
 	static {
 		fileNamePatternMap.put("minute",".%d{yyyy-MM-dd HH-mm}.%i");
@@ -50,67 +61,48 @@ public class ApiAuditLogger {
 		fileNamePatternMap.put("week",".%d{yyyy-WW}.%i");
 		fileNamePatternMap.put("month",".%d{yyyy-MM}.%i");
 		fileNamePatternMap.put("fixedSize",".%i");
+		for(int i = 0; i < THREAD_COUNT; i++) {
+			queueList.add(new ArrayBlockingQueue<ApiAuditContentVo>(QUEUE_SIZE, false));
+		}
 	}
 
 	@Autowired
 	private ConfigMapper configMapper;
-	/**
-	 * 
-	* @Description: 异步打印日志 
-	* @param uuid 对应api_audit表的uuid
-	* @param param 请求参数
-	* @param error 处理异常信息
-	* @param result 请求返回结果 
-	* @return void
-	 */
-	public void log(String uuid, JSONObject param, String error, Object result) {		
-		Logger logger = getLogger();
-		if(logger.isTraceEnabled()) {
-			String log = logFormat(uuid, param, error, result);
-			logger.trace(log);
-		}		
-	}
-	/**
-	 * 
-	* @Description: 接口日志格式化
-	* @param uuid 对应api_audit表的uuid
-	* @param param 请求参数
-	* @param error 处理异常信息
-	* @param result 请求返回结果
-	* @return String
-	 */
-	private String logFormat(String uuid, JSONObject param, String error, Object result) {
-		StringBuilder log = new StringBuilder();
-		log.append("\n");
-		log.append("uuid: ");
-		log.append(uuid);
-		log.append(" start");
-		log.append("\n");
-		log.append("param: ");
-		log.append(param);
-		log.append("\n");
-		if(StringUtils.isNotBlank(error)) {
-			log.append("error: ");
-			log.append(error);
-		}else {
-			log.append("result: ");
-			String pretty = JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
-			log.append(pretty);			
+	
+	@PostConstruct
+	public void init() {
+		super.setName("API-AUDIT-LOGGER-THREAD");
+		this.setDaemon(true);
+		this.start();
+		
+		for(int i = 0; i < THREAD_COUNT; i++) {
+			Thread thread = new Thread(new ApiAuditTask(), "API-AUDIT-LOGGER-THREAD-" + i);
+			thread.setDaemon(true);
+			thread.start();
 		}
-		log.append("\n");
-		log.append("uuid: ");
-		log.append(uuid);
-		log.append(" end");
-		log.append("\n");
-		return log.toString();
 	}
+	
+	@Override
+	public void run() {
+		try {
+			ApiAuditContentVo apiAuditContent = null;
+			String tenentUuid = null;
+			while((apiAuditContent = mainQueue.take()) != null) {
+				tenentUuid = apiAuditContent.getTenantUuid();
+				int index = Math.abs(tenentUuid.hashCode()) % THREAD_COUNT;
+				queueList.get(index).offer(apiAuditContent);
+			}		
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(),e);
+		}
+	}
+
 	/**
 	 * 
 	* @Description: 获取当前租户的接口日志logger 
 	* @return Logger
 	 */
-	private Logger getLogger(){
-		String tenantUuid = TenantContext.get().getTenantUuid();
+	private Logger getLogger(String tenantUuid){
 		if(loggerMap.containsKey(tenantUuid)) {
 			return loggerMap.get(tenantUuid);
 		}
@@ -118,7 +110,6 @@ public class ApiAuditLogger {
 		String file = DEFAULT_FILE;
 		String maxFileSize = DEFAULT_MAX_FILE_SIZE;
 		int maxHistory = DEFAULT_MAX_HISTORY;
-		int queueSize = DEFAULT_QUEUE_SIZE;
 		ConfigVo config = configMapper.getConfigByKey(API_LOG_CONFIG);
 		JSONObject json = new JSONObject();
 		if(config != null) {
@@ -159,19 +150,12 @@ public class ApiAuditLogger {
 							maxHistory = 0;
 						}
 					}
-					if(json.containsKey("queueSize")) {
-						try {
-							queueSize = json.getIntValue("queueSize");
-						}catch(NumberFormatException e) {
-							logger.error(e.getMessage(), e);
-						}
-					}
 				}			
 			}catch(Exception e) {
 				logger.error(e.getMessage(), e);
 			}			
 		}
-		Logger logger = LoggerBuilder(file, rollingPolicy, maxFileSize, maxHistory, queueSize);
+		Logger logger = LoggerBuilder(tenantUuid, file, rollingPolicy, maxFileSize, maxHistory);
 		loggerMap.put(tenantUuid, logger);
 		return logger;
          
@@ -187,13 +171,12 @@ public class ApiAuditLogger {
 	* @return Logger
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Logger LoggerBuilder(String file, String rollingPolicy, String maxFileSize, int maxHistory, int queueSize) {
-		String tenantUuid = TenantContext.get().getTenantUuid();
+	private Logger LoggerBuilder(String tenantUuid, String file, String rollingPolicy, String maxFileSize, int maxHistory) {
 		file = Config.REST_AUDIT_PATH + tenantUuid + file;
 		Logger logger = (Logger) LoggerFactory.getLogger(ApiAuditLogger.class.getName() + "-" + tenantUuid);  		  
-        LoggerContext loggerContext = logger.getLoggerContext();  
+        LoggerContext loggerContext = logger.getLoggerContext();
         //日志格式设置
-        PatternLayoutEncoder encoder = new PatternLayoutEncoder();  
+        PatternLayoutEncoder encoder = new PatternLayoutEncoder();
         encoder.setContext(loggerContext);
         encoder.setPattern(PATTERN);  
         encoder.start();    
@@ -208,7 +191,7 @@ public class ApiAuditLogger {
         String fileNamePattern = file + fileNamePatternMap.get(rollingPolicy);
         if(rollingPolicy.equals(DEFAULT_ROLLING_POLICY)) {
         	//单个文件大小
-        	SizeBasedTriggeringPolicy sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy();       	
+        	SizeBasedTriggeringPolicy sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy();
         	sizeBasedTriggeringPolicy.setMaxFileSize(maxFileSize);
             sizeBasedTriggeringPolicy.start();
             appender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
@@ -235,69 +218,35 @@ public class ApiAuditLogger {
              
         appender.setRollingPolicy(rollingPolicyBase);      
         appender.start();  
-
-        //异步
-        AsyncAppender asyncAppender = new AsyncAppender();
-        asyncAppender.setContext(loggerContext);
-        asyncAppender.setDiscardingThreshold(0);
-        asyncAppender.setQueueSize(queueSize);
-        asyncAppender.addAppender(appender);
-        asyncAppender.start();
+       
         logger.setAdditive(false);
         logger.setLevel(Level.TRACE);
-        logger.addAppender(asyncAppender);
-        
+        logger.addAppender(appender);
         return logger; 
 	}
 	
-//	public static void main(String[] args) {
-//		TenantContext.init("test_1210").setUseDefaultDatasource(false);		
-//		ApiAuditLogger apiAuditLogger = new ApiAuditLogger();
-//		Logger logger = apiAuditLogger.LoggerBuilder(DEFAULT_FILE, DEFAULT_ROLLING_POLICY, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_HISTORY, DEFAULT_QUEUE_SIZE);
-//		loggerMap.put("test_1210",logger);
-//		String uuid = null;
-//		JSONObject json = new JSONObject();
-////		StringBuilder error = new StringBuilder();
-////		int count = 10000;
-////		for(int i = 0; i < count; i++) {
-////			error.append("error-");
-////		}
-////		StringBuilder result = new StringBuilder();
-////		for(int i = 0; i < count; i++) {
-////			result.append("result-");
-////		}
-//		String error = "";
-//		Object result = null;
-//		try {
-//			result = 1/0;
-//		}catch(Exception e) {
-//			error = ExceptionUtils.getStackTrace(e);
-//		}
-//		
-//		uuid = UUID.randomUUID().toString().replace("-", "");
-//		json.put("uuid", uuid);
-//		apiAuditLogger.log(uuid, json, error.toString(), result);
-//		
-//		for(int j = 0; j < 130; j++) {
-//			long startTime = System.currentTimeMillis();
-//			for(int i = 0; i < DEFAULT_QUEUE_SIZE; i++) {
-//				uuid = UUID.randomUUID().toString().replace("-", "");
-//				json.put("uuid", uuid);
-//				apiAuditLogger.log(uuid, json, error.toString(), result);
-//				try {
-//					Thread.sleep(50);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//			long cost = System.currentTimeMillis() - startTime;
-//			System.out.println(cost);
-//			try {
-//				Thread.sleep(61000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}		
-//	}
+	public class ApiAuditTask extends CodeDriverThread {
+		
+		@Override
+		public void execute() {			
+			try {				
+				ApiAuditContentVo apiAuditContent = null;
+				String tenentUuid = null;
+				String oldName = Thread.currentThread().getName();
+				int index = Integer.parseInt(oldName.substring(oldName.length()-1));
+				ArrayBlockingQueue<ApiAuditContentVo> queue = queueList.get(index);
+				while((apiAuditContent = queue.take()) != null) {
+					tenentUuid = apiAuditContent.getTenantUuid();
+					Logger logger = getLogger(tenentUuid);
+					if(logger.isTraceEnabled()) {
+						String log = apiAuditContent.logFormat();
+						logger.trace(log);
+					}
+				}		
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage(),e);
+			}
+		}		
+	}
 
 }

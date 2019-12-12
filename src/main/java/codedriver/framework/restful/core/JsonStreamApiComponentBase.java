@@ -29,8 +29,6 @@ public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements 
 
 	@Autowired
 	private ApiMapper apiMapper;
-	@Autowired
-	private ApiAuditLogger apiAuditLogger;
 	
 	@Override
 	public final Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception {
@@ -78,7 +76,9 @@ public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements 
 				}				
 			}
 			if(needAudit != null && needAudit.intValue() == 1) {
-				apiAuditLogger.getQueue().offer(new ApiAuditContentVo(TenantContext.get().getTenantUuid(), audit.getUuid(), paramObj, error, result));
+				String tenentUuid = TenantContext.get().getTenantUuid();
+				int index = Math.abs(tenentUuid.hashCode()) % ApiAuditLogger.THREAD_COUNT;
+				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(TenantContext.get().getTenantUuid(), audit.getUuid(), paramObj, error, result));
 			}
 		}
 		return result;

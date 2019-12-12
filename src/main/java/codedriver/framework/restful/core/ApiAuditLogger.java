@@ -31,29 +31,24 @@ import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.restful.dto.ApiAuditContentVo;
 @Component
-public class ApiAuditLogger extends Thread {
+public class ApiAuditLogger {
 	private org.slf4j.Logger logger = LoggerFactory.getLogger(ApiAuditLogger.class);
 	
 	private final static String API_LOG_CONFIG = "api_log_config";//接口访问日志配置在config表的key值
-	private final static String PATTERN = "[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] - %msg%n";//日志格式
+	private final static String PATTERN = "%msg%n";//日志格式
 	private final static String FILE_SIZE_UNIT = "MB"; //日志文件大小单位
 	private final static String DEFAULT_ROLLING_POLICY = "fixedSize";//默认轮转策略
 	private final static String DEFAULT_FILE = "/logs/api.log";//默认文件路径
 	private final static String DEFAULT_MAX_FILE_SIZE = "10MB";//默认单个文件大小
 	private final static int DEFAULT_MAX_HISTORY = 20;//固定大小轮转策略默认保留20个历史文件，时间及大小的轮转策略默认保留全部历史文件
 	
-	private final static int THREAD_COUNT = 5;
+	public final static int THREAD_COUNT = 5;
 	private final static int QUEUE_SIZE = 256;
 	private static Map<String, Logger> loggerMap = new HashMap<>();
-	private static Map<String, String> fileNamePatternMap = new HashMap<>(); 
-	private static ArrayBlockingQueue<ApiAuditContentVo> mainQueue = new ArrayBlockingQueue<ApiAuditContentVo>(QUEUE_SIZE * THREAD_COUNT, false);
+	private static Map<String, String> fileNamePatternMap = new HashMap<>();
 	
 	private static List<ArrayBlockingQueue<ApiAuditContentVo>> queueList = new ArrayList<>();
-	
-	public synchronized static ArrayBlockingQueue<ApiAuditContentVo> getQueue(){
-		return mainQueue;
-	}
-	
+		
 	static {
 		fileNamePatternMap.put("minute",".%d{yyyy-MM-dd HH-mm}.%i");
 		fileNamePatternMap.put("hour",".%d{yyyy-MM-dd HH}.%i");
@@ -65,35 +60,19 @@ public class ApiAuditLogger extends Thread {
 			queueList.add(new ArrayBlockingQueue<ApiAuditContentVo>(QUEUE_SIZE, false));
 		}
 	}
-
+	public synchronized static ArrayBlockingQueue<ApiAuditContentVo> getQueue(int index){	
+		return queueList.get(index);
+	}
+	
 	@Autowired
 	private ConfigMapper configMapper;
 	
 	@PostConstruct
-	public void init() {
-		super.setName("API-AUDIT-LOGGER-THREAD");
-		this.setDaemon(true);
-		this.start();
-		
+	public void init() {		
 		for(int i = 0; i < THREAD_COUNT; i++) {
 			Thread thread = new Thread(new ApiAuditTask(), "API-AUDIT-LOGGER-THREAD-" + i);
 			thread.setDaemon(true);
 			thread.start();
-		}
-	}
-	
-	@Override
-	public void run() {
-		try {
-			ApiAuditContentVo apiAuditContent = null;
-			String tenentUuid = null;
-			while((apiAuditContent = mainQueue.take()) != null) {
-				tenentUuid = apiAuditContent.getTenantUuid();
-				int index = Math.abs(tenentUuid.hashCode()) % THREAD_COUNT;
-				queueList.get(index).offer(apiAuditContent);
-			}		
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(),e);
 		}
 	}
 

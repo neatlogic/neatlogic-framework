@@ -39,9 +39,6 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 
 	@Autowired
 	private ApiMapper apiMapper;
-
-	@Autowired
-	private ApiAuditLogger apiAuditLogger;
 	
 	public final Object doService(ApiVo interfaceVo, JSONObject jsonObj) throws Exception {
 		String error = "";
@@ -90,7 +87,9 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 				}				
 			}
 			if(needAudit != null && needAudit.intValue() == 1) {
-				apiAuditLogger.getQueue().offer(new ApiAuditContentVo(TenantContext.get().getTenantUuid(), audit.getUuid(), jsonObj, error, result));
+				String tenentUuid = TenantContext.get().getTenantUuid();
+				int index = Math.abs(tenentUuid.hashCode()) % ApiAuditLogger.THREAD_COUNT;
+				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(tenentUuid, audit.getUuid(), jsonObj, error, result));
 			}
 		}
 		return result;

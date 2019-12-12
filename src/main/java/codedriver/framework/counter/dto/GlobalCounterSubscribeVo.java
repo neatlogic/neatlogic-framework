@@ -2,7 +2,7 @@ package codedriver.framework.counter.dto;
 
 public class GlobalCounterSubscribeVo {
     private Long id;
-    private Long counterId;
+    private String pluginId;
     private String userId;
 
     public Long getId() {
@@ -13,12 +13,12 @@ public class GlobalCounterSubscribeVo {
         this.id = id;
     }
 
-    public Long getCounterId() {
-        return counterId;
+    public String getPluginId() {
+        return pluginId;
     }
 
-    public void setCounterId(Long counterId) {
-        this.counterId = counterId;
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
     }
 
     public String getUserId() {

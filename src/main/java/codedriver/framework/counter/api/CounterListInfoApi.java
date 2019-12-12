@@ -43,11 +43,11 @@ public class CounterListInfoApi extends ApiComponentBase {
         return null;
     }
 
-    @Output({ @Param(name = "counterList", type = ApiParamType.JSONARRAY, desc = "数据集合"),
-            @Param(name = "id", type = ApiParamType.LONG, desc="主键ID"),
-            @Param(name = "name", type = ApiParamType.STRING, desc = "模块名称"),
-            @Param(name = "moduleIcon", type = ApiParamType.STRING, desc = "图标"),
-            @Param(name = "data", type = ApiParamType.JSONOBJECT, desc = "插件配置信息"),
+    @Output({@Param(name = "pluginId", type = ApiParamType.LONG, desc="插件ID"),
+            @Param(name = "name", type = ApiParamType.STRING, desc = "插件名称"),
+            @Param(name = "moduleName", type = ApiParamType.STRING, desc = "模块名称"),
+            @Param(name = "moduleIcon", type = ApiParamType.STRING, desc = "模块图标"),
+            @Param(name = "data", type = ApiParamType.JSONOBJECT, desc = "插件自定义配置数据"),
             @Param(name = "showTemplate", type = ApiParamType.STRING, desc = "模板路径")})
     @Description(desc = "查询消息统计信息集合接口")
     @Override
@@ -59,10 +59,11 @@ public class CounterListInfoApi extends ApiComponentBase {
         if (counterVoList != null && counterVoList.size() > 0){
             for (GlobalCounterVo counter : counterVoList){
                 JSONObject remindObj = new JSONObject();
-                IGlobalCounter counterPlugin = GlobalCounterFactory.getCounter(counter.getName());
+                IGlobalCounter counterPlugin = GlobalCounterFactory.getCounter(counter.getPluginId());
                 Object data = counterPlugin.getShowData();
-                remindObj.put("id", counter.getId());
-                remindObj.put("name", counter.getModuleName());
+                remindObj.put("pluginId", counter.getPluginId());
+                remindObj.put("name", counterPlugin.getName());
+                remindObj.put("moduleNme", counter.getModuleName());
                 remindObj.put("moduleIcon", counter.getModuleIcon());
                 remindObj.put("data", data);
                 remindObj.put("showTemplate", counterPlugin.getShowTemplate());

@@ -38,22 +38,13 @@ public class CounterResortApi extends ApiComponentBase {
         return null;
     }
 
-    @Input({ @Param(name = "sortIdStr", type = ApiParamType.STRING, desc = "排序后的ID拼接字符串")})
-    @Output({ @Param(name = "Status", type = ApiParamType.STRING, desc = "接口执行状态"),
-            @Param(name = "Message", type = ApiParamType.STRING, desc = "错误信息")})
+    @Input({ @Param(name = "sortPluginIdStr", type = ApiParamType.STRING, desc = "排序后的ID拼接字符串")})
     @Description(desc = "统计消息重排序接口")
     @Override
     public Object myDoService(JSONObject jsonObj) throws Exception {
-        String sortIdStr = jsonObj.getString("sortIdStr");
+        String sortIdStr = jsonObj.getString("sortPluginIdStr");
         String userId = UserContext.get().getUserId();
-        JSONObject returnJson = new JSONObject();
-        try {
-            counterService.updateCounterUserSort(userId, sortIdStr);
-            returnJson.put("Status", "OK");
-        } catch (Exception e) {
-            returnJson.put("Status", "ERROR");
-            returnJson.put("Message", e.getMessage());
-        }
-        return returnJson;
+        counterService.updateCounterUserSort(userId, sortIdStr);
+        return null;
     }
 }

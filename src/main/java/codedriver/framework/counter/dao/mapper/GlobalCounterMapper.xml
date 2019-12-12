@@ -11,124 +11,60 @@
         <result column="sort" property="sort"/>
         <association property="counterSubscribeVo" javaType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
             <id column="subId" property="id"/>
-            <result column="id" property="counterId"/>
+            <result column="id" property="pluginId"/>
             <result column="userId" property="userId"/>
         </association>
     </resultMap>
     
     <select id="getSubscribeCounterListByUserId" resultMap="counterMap" parameterType="java.lang.String">
         SELECT
-        a.`counter_id` as `id`,
+        a.`plugin_id` as `pluginId`,
         a.`id` as `subId`,
         a.`user_id` as `userId`,
-        b.`name` as `name`,
-        b.`plugin_id` as `pluginId`,
-        b.`description` as `description`,
-        b.`module_id` as `moduleId`,
-        b.`is_active` as `isActive`,
         d.`sort` as `userSort`
         FROM `counter_subscribe` a
-        LEFT JOIN `counter` b ON a.`counter_id` = b.`id`
-        LEFT JOIN `counter_user_sort` d ON a.`counter_id` = d.`counter_id`
-        WHERE a.`user_id` = #{value} AND b.`is_active` = 1
+        LEFT JOIN `counter_user_sort` d ON a.`plugin_id` = d.`plugin_id`
+        WHERE a.`user_id` = #{value}
     </select>
 
-    <select id="getCounterList" parameterType="codedriver.framework.counter.dto.GlobalCounterVo" resultMap="counterMap">
+    <select id="getCounterSubscribeByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
         SELECT
-        a.`id`,
-        a.`name`,
-        a.`plugin_id` as `pluginId`,
-        a.`description`,
-        a.`module_id` as `moduleId`,
-        a.`is_active` as `isActive`,
-        b.`id` as `subId`,
-        b.`user_id` as `userId`,
-        d.`sort`
-        FROM `counter` a
-         LEFT JOIN (
-        SELECT `id`,
-        `counter_id`,
-        `user_id`
+        `id`,
+        `plugin_id` as `pluginId`,
+        `user_id` as `userId`
         FROM `counter_subscribe`
         WHERE `user_id` = #{userId}
-        ) b ON a.`id` = b.`counter_id`
-        LEFT JOIN (
-          SELECT `counter_id`, `sort`
-          FROM counter_user_sort
-          WHERE user_id = #{userId}) d ON a.`id` = d.`counter_id`
-        WHERE a.`is_active` = 1
-        <if test="moduleId != null and moduleId != 0">
-            AND a.`module_id` = #{moduleId}
-        </if>
     </select>
 
-    <select id="getActiveCounterModuleList" resultType="codedriver.framework.dto.ModuleVo">
+    <select id="getCounterSortListByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
         SELECT
-        rem.`module_id` AS `id`
-        FROM (
-        SELECT
-        DISTINCT(`module_id`)
-        FROM `global_counter`
-        WHERE `is_active` = 1
-        ) rem
+        `plugin_id` as `pluginId`,
+        `user_id` as `userId`,
+        `sort`
+        FROM `counter_user_sort`
+        WHERE `user_id` = #{userId}
     </select>
-
-    <select id="getCounterCountByPluginId" parameterType="java.lang.String" resultType="java.lang.Integer">
-      SELECT COUNT(`id`) FROM `counter` WHERE `plugin_id` = #{value}
-  </select>
-
-    <update id="resetIsActiveOfAllCounter" >
-       UPDATE `counter` SET `is_active` = 0
-    </update>
-
-    <update id="updateCounterByPluginId" parameterType="codedriver.framework.counter.dto.GlobalCounterVo">
-        UPDATE `counter`
-        SET `description` = #{description},
-            `module_id` = #{moduleId},
-            `is_active` = #{isActive},
-            `name` = #{name}
-        WHERE `plugin_id` = #{pluginId}
-    </update>
-
-    <insert id="insertCounter" parameterType="codedriver.framework.counter.dto.GlobalCounterVo">
-        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-            select LAST_INSERT_ID()
-        </selectKey>
-        INSERT INTO `counter` (
-          `name`,
-          `plugin_id`,
-          `description`,
-          `module_id`,
-          `is_active`
-        ) VALUES(
-        #{name},
-        #{pluginId},
-        #{description},
-        #{moduleId},
-        #{isActive}
-        )
-    </insert>
     
     <insert id="insertCounterSubscribe" parameterType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
         <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
             SELECT LAST_INSERT_ID() as id
         </selectKey>
         INSERT INTO `counter_subscribe`(
-        `counter_id`,
+        `plugin_id`,
         `user_id`
         ) VALUES(
-        #{counterId},
+        #{pluginId},
         #{userId}
         )
     </insert>
     
     <insert id="insertCounterUserSort" parameterType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
         INSERT INTO `counter_user_sort`(
-          `counter_id`,
+          `plugin_id`,
           `user_id`,
           `sort`
         )VALUES(
-        #{counterId},
+        #{pluginId},
         #{userId},
         #{sort}
         )

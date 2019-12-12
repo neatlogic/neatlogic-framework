@@ -44,7 +44,7 @@ public class CounterSearchApi extends ApiComponentBase {
         return null;
     }
 
-    @Input({ @Param(name = "moduleId", type = ApiParamType.LONG, desc = "模块ID")})
+    @Input({ @Param(name = "moduleId", type = ApiParamType.STRING, desc = "模块ID")})
     @Output({ @Param(name = "counterList", type = ApiParamType.JSONARRAY, desc = "消息统计插件列表")})
     @Description(desc = "消息统计插件检索接口")
     @Override
@@ -52,14 +52,16 @@ public class CounterSearchApi extends ApiComponentBase {
         GlobalCounterVo counter = new GlobalCounterVo();
         JSONObject returnJson = new JSONObject();
         String userId = UserContext.get().getUserId();
-        String moduleId = jsonObj.getString("moduleId");
-        counter.setModuleId(moduleId);
+        if(jsonObj.containsKey("moduleId")){
+            String moduleId = jsonObj.getString("moduleId");
+            counter.setModuleId(moduleId);
+        }
         counter.setUserId(userId);
         List<GlobalCounterVo> counterList = counterService.searchCounterVo(counter);
         if (counterList != null && counterList.size() > 0){
             for (int i = 0; i < counterList.size(); i++){
                 GlobalCounterVo counterVo = counterList.get(i);
-                IGlobalCounter globalCounter = GlobalCounterFactory.getCounter(counterVo.getName());
+                IGlobalCounter globalCounter = GlobalCounterFactory.getCounter(counterVo.getPluginId());
                 counterVo.setPreviewPath(globalCounter.getPreviewPath());
                 counterVo.setShowTemplate(globalCounter.getShowTemplate());
             }

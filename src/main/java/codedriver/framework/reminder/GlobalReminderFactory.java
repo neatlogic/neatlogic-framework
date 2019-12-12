@@ -42,23 +42,19 @@ public class GlobalReminderFactory implements ApplicationListener<ContextRefresh
 		Map<String, IGlobalReminder> map = context.getBeansOfType(IGlobalReminder.class);
 		for (Map.Entry<String, IGlobalReminder> entry : map.entrySet()) {
 			IGlobalReminder reminder = entry.getValue();
-			try {
-				GlobalReminderVo reminderVo = new GlobalReminderVo();
-				reminderVo.setName(reminder.getName());
-				reminderVo.setReminderParamList(reminder.getConfig());
-				reminderVo.setModuleId(context.getId());
-				reminderVo.setDescription(reminder.getDescription());
-				reminderVo.setPluginId(reminder.getPluginId());
-				reminderVo.setIsActive(1);
-				if (reminderMapper.getReminderCountByPluginId(reminder.getPluginId()) < 1) {
-					reminderMapper.insertReminder(reminderVo);
-				} else {
-					reminderMapper.updateReminderByPluginId(reminderVo);
-				}
-				reminderMap.put(reminder.getPluginId(), reminder);
-			} catch (Exception e) {
-				logger.error("消息统计插件：" + reminder.getName() + "加载失败," + e.getMessage());
+			GlobalReminderVo reminderVo = new GlobalReminderVo();
+			reminderVo.setName(reminder.getName());
+			reminderVo.setReminderParamList(reminder.getConfig());
+			reminderVo.setModuleId(context.getId());
+			reminderVo.setDescription(reminder.getDescription());
+			reminderVo.setPluginId(reminder.getPluginId());
+			reminderVo.setIsActive(1);
+			if (reminderMapper.getReminderCountByPluginId(reminder.getPluginId()) < 1) {
+				reminderMapper.insertReminder(reminderVo);
+			} else {
+				reminderMapper.updateReminderByPluginId(reminderVo);
 			}
+			reminderMap.put(reminder.getPluginId(), reminder);
 		}
 	}
 }

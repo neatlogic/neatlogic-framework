@@ -40,7 +40,7 @@ public class CounterSubscribeApi extends ApiComponentBase {
     }
 
     @Input({ @Param(name = "id", type = ApiParamType.LONG, desc = "主键ID"),
-             @Param(name = "counterId", type = ApiParamType.LONG, desc = "消息统计插件ID")})
+             @Param(name = "pluginId", type = ApiParamType.STRING, desc = "消息统计插件ID", isRequired = true)})
     @Output({ @Param(name = "id", type = ApiParamType.LONG, desc = "主键ID"),
               @Param(name = "Status", type = ApiParamType.STRING, desc = "执行状态"),
               @Param(name = "Message", type = ApiParamType.STRING, desc = "错误信息")})
@@ -49,10 +49,10 @@ public class CounterSubscribeApi extends ApiComponentBase {
     public Object myDoService(JSONObject jsonObj) throws Exception {
         String userId = UserContext.get().getUserId();
         Long id = jsonObj.getLong("id");
-        Long counterId = jsonObj.getLong("counterId");
+        String counterId = jsonObj.getString("pluginId");
         GlobalCounterSubscribeVo counterSubscribeVo = new GlobalCounterSubscribeVo();
         counterSubscribeVo.setId(id);
-        counterSubscribeVo.setCounterId(counterId);
+        counterSubscribeVo.setPluginId(counterId);
         counterSubscribeVo.setUserId(userId);
         JSONObject returnJson = new JSONObject();
         try {

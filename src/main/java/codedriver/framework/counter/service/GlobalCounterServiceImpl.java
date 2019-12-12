@@ -3,6 +3,7 @@ package codedriver.framework.counter.service;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.counter.GlobalCounterFactory;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.counter.dto.GlobalCounterSubscribeVo;
@@ -36,48 +37,83 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
 
     @Override
     public List<GlobalCounterVo> searchCounterVo(GlobalCounterVo counterVo) {
-        return counterMapper.getCounterList(counterVo);
+        boolean moduleId = StringUtils.isNotBlank(counterVo.getModuleId());
+        List<GlobalCounterVo> activeCounterList = new ArrayList<>();
+        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterList();
+        Map<String, ModuleVo> moduleVoMap = TenantContext.get().getActiveModuleMap();
+        for (GlobalCounterVo c : counterVoList){
+            if (moduleVoMap.containsKey(c.getModuleId())){
+                if (!moduleId || (moduleId && c.getModuleId().equals(counterVo.getModuleId()))){
+                    activeCounterList.add(c);
+                }
+            }
+        }
+        List<GlobalCounterUserSortVo> userCountSortList = counterMapper.getCounterSortListByUserId(UserContext.get().getUserId());
+        Map<String, GlobalCounterUserSortVo> counterSortMap = new HashMap<>();
+        for (GlobalCounterUserSortVo gus : userCountSortList){
+            counterSortMap.put(gus.getPluginId(), gus);
+        }
+
+        List<GlobalCounterSubscribeVo> countSubList = counterMapper.getCounterSubscribeByUserId(UserContext.get().getUserId());
+        Map<String, GlobalCounterSubscribeVo> subscribeMap = new HashMap<>();
+        for (GlobalCounterSubscribeVo subscribeVo : countSubList){
+            subscribeMap.put(subscribeVo.getPluginId(), subscribeVo);
+        }
+
+
+        for (GlobalCounterVo counter : activeCounterList){
+            if (counterSortMap.containsKey(counter.getPluginId())){
+                counter.setSort(counterSortMap.get(counter.getPluginId()).getSort());
+            }
+            if (subscribeMap.containsKey(counter.getPluginId())){
+                counter.setCounterSubscribeVo(subscribeMap.get(counter.getPluginId()));
+            }
+        }
+        return activeCounterList;
     }
 
     @Override
     public List<ModuleVo> getActiveCounterModuleList() {
-
-        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
-        Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
-        for (ModuleVo moduleVo : tenantModuleList){
-            tenantModuleMap.put(moduleVo.getId(), moduleVo);
-        }
         List<ModuleVo> moduleList = new ArrayList<>();
-        List<ModuleVo> activeModuleList = counterMapper.getActiveCounterModuleList();
-        for (ModuleVo module : activeModuleList){
-            moduleList.add(tenantModuleMap.get(module.getId()));
-
+        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
+        List<GlobalCounterVo> counterList = GlobalCounterFactory.getCounterList();
+        for (ModuleVo moduleVo : tenantModuleList){
+            for (GlobalCounterVo counterVo : counterList){
+                if (moduleVo.getId().equals(counterVo.getModuleId())){
+                    moduleList.add(moduleVo);
+                    break;
+                }
+            }
         }
         return moduleList;
     }
 
     @Override
     public List<GlobalCounterVo> getSubscribeCounterListByUserId(String userId) {
-        List<GlobalCounterVo> counterVoList = counterMapper.getSubscribeCounterListByUserId(userId);
-        String tenantUuid = TenantContext.get().getTenantUuid();
-        List<ModuleVo> tenantModuleList = ModuleUtil.getTenantActionModuleList(moduleMapper.getModuleListByTenantUuid(tenantUuid));
-        Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
-        for (ModuleVo moduleVo : tenantModuleList){
-            tenantModuleMap.put(moduleVo.getId(), moduleVo);
-        }
-        if (counterVoList != null && counterVoList.size() > 0){
+        List<GlobalCounterVo> subCounterVoList = counterMapper.getSubscribeCounterListByUserId(userId);
+        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterList();
+        for (GlobalCounterVo subCounterVo : subCounterVoList){
             for (GlobalCounterVo counterVo : counterVoList){
-                ModuleVo moduleVo = tenantModuleMap.get(counterVo.getModuleId());
-                counterVo.setModuleName(moduleVo.getName());
-                counterVo.setDescription(moduleVo.getDescription());
+                if (subCounterVo.getPluginId().equals(counterVo.getPluginId())){
+                    subCounterVo.setModuleId(counterVo.getModuleId());
+                }
             }
         }
-        return counterVoList;
+
+        Map<String, ModuleVo> tenantModuleMap = TenantContext.get().getActiveModuleMap();
+        if (subCounterVoList != null && subCounterVoList.size() > 0){
+            for (GlobalCounterVo counterVo : subCounterVoList){
+                ModuleVo moduleVo = tenantModuleMap.get(counterVo.getModuleId());
+                counterVo.setModuleName(moduleVo.getName());
+                counterVo.setModuleDesc(moduleVo.getDescription());
+            }
+        }
+        return subCounterVoList;
     }
 
     @Override
     public void updateCounterSubscribe(GlobalCounterSubscribeVo counterSubscribeVo) {
-        if (counterSubscribeVo.getId() != null){
+        if (counterSubscribeVo.getId() != null && counterSubscribeVo.getId() != 0L){
             counterMapper.deleteCounterSubscribe(counterSubscribeVo.getId());
         }else {
             counterMapper.insertCounterSubscribe(counterSubscribeVo);
@@ -85,13 +121,13 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
     }
 
     @Override
-    public void updateCounterUserSort(String userId, String sortIdStr) {
-        if (!StringUtils.isBlank(sortIdStr)){
+    public void updateCounterUserSort(String userId, String sortPluginIdStr) {
+        if (!StringUtils.isBlank(sortPluginIdStr)){
             counterMapper.deleteCounterUserSortByUserId(userId);
-            String[] counterIdArray = sortIdStr.split(",");
-            for (int i = 0; i < counterIdArray.length; i++){
+            String[] pluginIdArray = sortPluginIdStr.split(",");
+            for (int i = 0; i < pluginIdArray.length; i++){
                 GlobalCounterUserSortVo userSortVo = new GlobalCounterUserSortVo();
-                userSortVo.setCounterId(Long.parseLong(counterIdArray[i]));
+                userSortVo.setPluginId(pluginIdArray[i]);
                 userSortVo.setSort(i);
                 userSortVo.setUserId(userId);
                 counterMapper.insertCounterUserSort(userSortVo);

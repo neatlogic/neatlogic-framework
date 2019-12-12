@@ -12,7 +12,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +29,7 @@ public class GlobalCounterFactory implements ApplicationListener<ContextRefreshe
     private GlobalCounterMapper counterMapper;
 
     private static Map<String, IGlobalCounter> counterMap = new HashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(GlobalCounterFactory.class);
+    private static List<GlobalCounterVo> counterVoList = new ArrayList<>();
 
     public static IGlobalCounter getCounter(String name){
         if (!counterMap.containsKey(name)){
@@ -36,9 +38,8 @@ public class GlobalCounterFactory implements ApplicationListener<ContextRefreshe
         return counterMap.get(name);
     }
 
-    @PostConstruct
-    private void resetIsActiveOfAllCounterPlugin(){
-        counterMapper.resetIsActiveOfAllCounter();
+    public static List<GlobalCounterVo> getCounterList(){
+        return counterVoList;
     }
 
     @Override
@@ -47,24 +48,21 @@ public class GlobalCounterFactory implements ApplicationListener<ContextRefreshe
         Map<String, IGlobalCounter> map = context.getBeansOfType(IGlobalCounter.class);
         for (Map.Entry<String, IGlobalCounter> entry : map.entrySet()){
         	IGlobalCounter counter = entry.getValue();
-            try {
-                GlobalCounterVo counterVo = new GlobalCounterVo();
-                counterVo.setName(counter.getName());
-                counterVo.setModuleId(context.getId());
-                counterVo.setDescription(counter.getDescription());
-                counterVo.setPluginId(counter.getPluginId());
-                counterVo.setIsActive(1);
+            GlobalCounterVo counterVo = new GlobalCounterVo();
+            counterVo.setName(counter.getName());
+            counterVo.setModuleId(context.getId());
+            counterVo.setDescription(counter.getDescription());
+            counterVo.setPluginId(counter.getPluginId());
+           /* counterVo.setIsActive(1);*/
 
-                if (counterMapper.getCounterCountByPluginId(counter.getPluginId()) < 1){
-                    counterMapper.insertCounter(counterVo);
-                }else {
-                    counterMapper.updateCounterByPluginId(counterVo);
-                }
+            /*if (counterMapper.getCounterCountByPluginId(counter.getPluginId()) < 1){
+                counterMapper.insertCounter(counterVo);
+            }else {
+                counterMapper.updateCounterByPluginId(counterVo);
+            }*/
+            counterVoList.add(counterVo);
+            counterMap.put(counter.getPluginId(), counter);
 
-                counterMap.put(counter.getPluginId(), counter);
-            } catch (Exception e) {
-                logger.error("消息统计插件：" + counter.getName() + "加载失败," + e.getMessage());
-            }
         }
     }
 }

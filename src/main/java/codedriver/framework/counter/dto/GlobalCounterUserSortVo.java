@@ -6,16 +6,17 @@ package codedriver.framework.counter.dto;
  * @create: 2019-08-16 10:22
  **/
 public class GlobalCounterUserSortVo {
-    private Long counterId;
+
+    private String pluginId;
     private String userId;
     private Integer sort;
 
-    public Long getCounterId() {
-        return counterId;
+    public String getPluginId() {
+        return pluginId;
     }
 
-    public void setCounterId(Long counterId) {
-        this.counterId = counterId;
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
     }
 
     public String getUserId() {

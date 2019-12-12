@@ -9,12 +9,10 @@ import java.util.Objects;
  **/
 public class GlobalCounterVo implements Comparable<GlobalCounterVo> {
     //数据库对应
-    private Long id;
     private String name;
     private String pluginId;
     private String description;
     private String moduleId;
-    private int isActive;
     //扩充字段
     private String userId;
     private String previewPath;
@@ -25,13 +23,6 @@ public class GlobalCounterVo implements Comparable<GlobalCounterVo> {
     private String moduleName;
 
     private GlobalCounterSubscribeVo counterSubscribeVo;
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getPluginId() {
         return pluginId;
@@ -95,14 +86,6 @@ public class GlobalCounterVo implements Comparable<GlobalCounterVo> {
 
     public void setCounterSubscribeVo(GlobalCounterSubscribeVo counterSubscribeVo) {
         this.counterSubscribeVo = counterSubscribeVo;
-    }
-
-    public int getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(int isActive) {
-        this.isActive = isActive;
     }
 
     public String getUserId() {

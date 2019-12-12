@@ -40,5 +40,5 @@ public interface GlobalCounterService {
     * @Param: [userId, afterSort] 
     * @return: void  
     */ 
-    void updateCounterUserSort(String userId, String sortIdStr);
+    void updateCounterUserSort(String userId, String sortPluginIdStr);
 }

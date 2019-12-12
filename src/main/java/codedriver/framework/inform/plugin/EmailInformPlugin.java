@@ -34,9 +34,6 @@ public class EmailInformPlugin implements InformComponentBase {
     @Autowired
     private MailServerMapper mailServerMapper;
 
-    @Autowired
-    private UserMapper userMapper;
-
     @Override
     public void execute(MessageBaseVo messageVo) {
         this.loadSmtpInfo();
@@ -50,7 +47,7 @@ public class EmailInformPlugin implements InformComponentBase {
 
     @Override
     public String getTemplateContent() {
-        return null;
+        return "你好，下面是内容哦${content}";
     }
 
     @Override

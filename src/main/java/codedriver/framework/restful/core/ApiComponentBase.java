@@ -25,6 +25,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
+import codedriver.framework.exception.type.ParamValueTooLongException;
 import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.Param;
@@ -122,10 +123,16 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 						for (Param p : params) {
 							// 判断是否必填
 							if (p.isRequired() && !paramObj.containsKey(p.name())) {
-								throw new ParamNotExistsException("参数：\"" + p.name() + "\"不存在");
+								throw new ParamNotExistsException("参数：\"" + p.name() + "\"不能为空");
 							}
 							// 参数类型校验
 							Object paramValue = paramObj.get(p.name());
+							// 判断长度
+							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
+								if (paramValue.toString().length() > p.length()) {
+									throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.length());
+								}
+							}
 							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
 								throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
 							}

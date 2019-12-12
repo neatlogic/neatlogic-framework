@@ -25,4 +25,5 @@ public @interface Param {
 
 	Class explode() default NotDefined.class;
 
+	int length() default -1;
 }

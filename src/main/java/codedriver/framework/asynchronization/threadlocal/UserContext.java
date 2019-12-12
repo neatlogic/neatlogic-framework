@@ -26,8 +26,8 @@ public class UserContext implements Serializable {
 			context.setUserId(_userContext.getUserId());
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());
-			context.setRequest(_userContext.getRequest());
-			context.setResponse(_userContext.getResponse());
+			//context.setRequest(_userContext.getRequest());
+			//context.setResponse(_userContext.getResponse());
 			context.setRoleNameList(_userContext.getRoleNameList());
 			instance.set(context);
 		}

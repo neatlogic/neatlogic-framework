@@ -20,11 +20,9 @@ public class FileTypeHandlerFactory implements ApplicationListener<ContextRefres
 	private static final Map<String, IFileTypeHandler> componentMap = new HashMap<>();
 	private static final List<FileTypeVo> fileTypeList = new ArrayList<>();
 
-	public static IFileTypeHandler getComponent(String belong) {
-		if (belong == null || "".equals(belong)) {
-			return null;
-		}
-		return componentMap.get(belong);
+	public static IFileTypeHandler getHandler(String type) {
+		type = type.toUpperCase();
+		return componentMap.get(type);
 	}
 
 	public static List<FileTypeVo> getActiveFileTypeHandler() {
@@ -48,12 +46,11 @@ public class FileTypeHandlerFactory implements ApplicationListener<ContextRefres
 		Map<String, IFileTypeHandler> myMap = context.getBeansOfType(IFileTypeHandler.class);
 		for (Map.Entry<String, IFileTypeHandler> entry : myMap.entrySet()) {
 			IFileTypeHandler typeHandler = entry.getValue();
-			componentMap.put(typeHandler.getName(), typeHandler);
+			componentMap.put(typeHandler.getName().toUpperCase(), typeHandler);
 			FileTypeVo fileTypeVo = new FileTypeVo();
 			fileTypeVo.setName(typeHandler.getName());
 			fileTypeVo.setDisplayName(typeHandler.getDisplayName());
 			fileTypeVo.setModuleId(context.getId());
-			fileTypeVo.setBelong(typeHandler.getBelong());
 			fileTypeList.add(fileTypeVo);
 		}
 	}

@@ -242,7 +242,7 @@ public abstract class JobBase implements IJob {
 		for (Entry<String, Param> entry : paramMap.entrySet()) {
 			Param param = entry.getValue();
 			if (param.required() == true) {
-				throw new RuntimeException("jobClass为" + this.getClassName() + "," + param.name() + "是必填参数");
+				throw new RuntimeException("定时作业组件：" + this.getClassName() + "的" + param.name() + "是必填参数");
 			}
 		}
 		return true;

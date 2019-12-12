@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +20,18 @@ public class Config {
 	public static String CODEDRIVER_HOME;
 	public static final int SERVER_HEARTBEAT_RATE;// 默认3分钟
 	public static final int SERVER_HEARTBEAT_THRESHOLD;// 默认5
+	public static String DATA_HOME;// 数据文件根路径
 
 	private static final String CONFIG_FILE = "config.properties";
 	static {
 		REST_AUDIT_PATH = "/app/codedriver/";
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
-		if (CODEDRIVER_HOME == null || "".equals(CODEDRIVER_HOME)) {
+		if (StringUtils.isBlank(CODEDRIVER_HOME)) {
 			CODEDRIVER_HOME = "/app";
+		}
+		DATA_HOME = getProperty(CONFIG_FILE, "data.home");
+		if (StringUtils.isBlank(DATA_HOME)) {
+			DATA_HOME = "/app/data";
 		}
 		try {
 			SCHEDULE_SERVER_ID = Integer.parseInt(getProperty(CONFIG_FILE, "schedule.server.id", "1"));

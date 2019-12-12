@@ -110,7 +110,7 @@ public class InformComponentManager {
         }
         MessageBaseVo message = new MessageBaseVo();
 
-        //针对邮件提取抄送人
+        //针对邮件提取抄送人,以此可扩展其他自定义属性
         if (informVo instanceof EmailInformVo){
             message = new EmailMessageVo();
             EmailInformVo emailInfo = (EmailInformVo) informVo;

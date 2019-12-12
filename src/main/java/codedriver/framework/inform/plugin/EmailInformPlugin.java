@@ -1,12 +1,12 @@
 package codedriver.framework.inform.plugin;
 
 import codedriver.framework.dao.mapper.MailServerMapper;
-import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.MailServerVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.inform.core.InformComponentBase;
 import codedriver.framework.inform.dto.EmailMessageVo;
 import codedriver.framework.inform.dto.MessageBaseVo;
+import codedriver.framework.inform.exception.EmailNoServerException;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class EmailInformPlugin implements InformComponentBase {
 
     @Override
     public String getTemplateContent() {
-        return "你好，下面是内容哦${content}";
+        return null;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class EmailInformPlugin implements InformComponentBase {
                 logger.error(ex.getMessage(), ex);
             }
         } else {
-            logger.error("MAIL SMTP CONFIGURATION INIT FAILURED! ::  Current System has not been configured mail server!");
+            throw new EmailNoServerException("MAIL SMTP CONFIGURATION INIT FAILURED! ::  Current System has not been configured mail server!");
         }
     }
 

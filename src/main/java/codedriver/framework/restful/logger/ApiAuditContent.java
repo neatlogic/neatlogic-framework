@@ -1,4 +1,4 @@
-package codedriver.framework.restful.dto;
+package codedriver.framework.restful.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
-public class ApiAuditContentVo {
+public class ApiAuditContent implements Content{
 
 	private String tenantUuid;
 	private String uuid;
@@ -17,9 +17,9 @@ public class ApiAuditContentVo {
 	private String error;
 	private Object result;
 	
-	public ApiAuditContentVo() {
+	public ApiAuditContent() {
 	}
-	public ApiAuditContentVo(String tenantUuid, String uuid, JSONObject param, String error, Object result) {
+	public ApiAuditContent(String tenantUuid, String uuid, JSONObject param, String error, Object result) {
 		this.tenantUuid = tenantUuid;
 		this.uuid = uuid;
 		this.param = param;
@@ -59,17 +59,13 @@ public class ApiAuditContentVo {
 	
 	/**
 	 * 
-	* @Description: 接口日志格式化
-	* @param uuid 对应api_audit表的uuid
-	* @param param 请求参数
-	* @param error 处理异常信息
-	* @param result 请求返回结果
+	* @Description: 内容格式化
 	* @return String
 	 */
-	public String logFormat() {
+	@Override
+	public String format() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		StringBuilder log = new StringBuilder();
-		log.append("\n");
 		log.append(">>>\tuuid: ");
 		log.append(uuid);
 		log.append("\n");
@@ -88,7 +84,7 @@ public class ApiAuditContentVo {
 			log.append(pretty);			
 		}
 		log.append("\n");
-		log.append("<<<");
+		log.append("<<<\n");
 		return log.toString();
 	}
 }

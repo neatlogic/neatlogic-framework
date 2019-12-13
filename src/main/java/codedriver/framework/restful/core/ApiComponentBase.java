@@ -20,9 +20,10 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
-import codedriver.framework.restful.dto.ApiAuditContentVo;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.logger.ApiAuditContent;
+import codedriver.framework.restful.logger.ApiAuditLogger;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements ApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
@@ -83,7 +84,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 			if (needAudit != null && needAudit.intValue() == 1) {
 				String tenentUuid = TenantContext.get().getTenantUuid();
 				int index = Math.abs(tenentUuid.hashCode()) % ApiAuditLogger.THREAD_COUNT;
-				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(tenentUuid, audit.getUuid(), paramObj, error, result));
+				ApiAuditLogger.getQueue(index).offer(new ApiAuditContent(tenentUuid, audit.getUuid(), paramObj, error, result));
 			}
 		}
 		return result;

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codedriver.framework.restful.logger.ApiAuditAppender;
-import codedriver.framework.restful.logger.ApiAuditContent;
 import codedriver.framework.restful.logger.Content;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
@@ -245,9 +243,8 @@ public class FileUtil {
 				InputStreamReader fir = new InputStreamReader(fis, "UTF-8");
 				OutputStream fos = new FileOutputStream(newFile, true);
 				OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8");){
-			int n = -1;
 			char[] cbuf = new char[1024];
-			while((n = fir.read(cbuf)) != -1) {
+			while(fir.read(cbuf) != -1) {
 				fow.write(cbuf);
 				fow.flush();
 			}		

@@ -63,7 +63,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String totalDataSizeText;
 	private String type;
 	private String typeText;
-	private Integer needAudit = 0;
+	private Integer needAudit;
 	private Double qps;
 
 	public String getTypeText() {

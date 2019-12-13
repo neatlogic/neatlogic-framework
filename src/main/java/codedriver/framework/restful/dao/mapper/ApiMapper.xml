@@ -34,7 +34,8 @@
 		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
 		`description`,
 		`authtype`,
-		`type`
+		`type`,
+		`need_audit` AS needAudit
 		FROM `api`
 		WHERE
 		token = #{value}
@@ -88,6 +89,11 @@
 		)
 	</insert>
 
+	<insert id="insertApiAudit">
+		INSERT INTO `api_audit`(`uuid`, `token`, `user_id`, `auth_type`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
+		VALUES(#{uuid}, #{token}, #{userId}, #{authType}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
+	</insert>
+	
 	<delete id="deleteAllApiComponent">
 		DELETE FROM `api_component`
 	</delete>

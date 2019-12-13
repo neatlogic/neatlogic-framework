@@ -1,4 +1,4 @@
-package codedriver.framework.reminder;
+package codedriver.framework.reminder.core;
 
 public enum ControlEnum {
     RADIO("radio", "单选"), SELECT("select", "下拉单选框"), MSELECT("mselect", "多选下拉框");

@@ -1,4 +1,4 @@
-package codedriver.framework.reminder;
+package codedriver.framework.reminder.core;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;
@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
     @Override
     public Object packData(GlobalReminderMessageVo messageVo) {
         JSONObject returnObj = new JSONObject();
-        IGlobalReminder reminder = GlobalReminderFactory.getReminder(messageVo.getReminderVo().getName());
+        IGlobalReminder reminder = GlobalReminderFactory.getReminder(messageVo.getReminderVo().getPluginId());
         returnObj.put("id", messageVo.getId());
         returnObj.put("title", messageVo.getTitle());
         returnObj.put("content", messageVo.getContent());
@@ -93,8 +94,8 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         returnObj.put("remindName", messageVo.getReminderVo().getName());
         returnObj.put("moduleName", messageVo.getReminderVo().getModuleName());
         returnObj.put("moduleIcon", messageVo.getReminderVo().getModuleIcon());
-        returnObj.put("receiver", messageVo.getReminderVo().getUserId());
-        returnObj.put("receiverName", messageVo.getReminderVo().getUserName());
+        returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserId());
+        returnObj.put("receiverName", messageVo.getReminderSubscribeVo().getUserName());
         returnObj.put("isKeep", messageVo.getIsKeep());
         returnObj.put("showTemplate", reminder.getShowTemplate());
         returnObj.put("popUpTemplate", reminder.getPopUpTemplate());
@@ -106,7 +107,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         //是否为新消息（新消息会触发一系列动作）
         returnObj.put("isNew", messageVo.getIsNew());
         if (messageVo.getIsNew() == 1){
-            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderVo().getUserId());
+            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderSubscribeVo().getUserId());
         }
         //自定义信息参数，例：告警的级别
         String messageParam = messageVo.getParam();
@@ -128,7 +129,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
     @Override
     public void send(ReminderMessageVo message) {
         try{
-            GlobalReminderMessageHandler.sendMessage(message, this.getName());
+            GlobalReminderMessageHandler.sendMessage(message,  ClassUtils.getUserClass(this.getClass()).getName());
         }catch (Exception e){
             logger.error(e.getMessage(), e);
         }

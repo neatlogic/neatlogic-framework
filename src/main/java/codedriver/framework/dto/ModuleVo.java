@@ -1,9 +1,17 @@
 package codedriver.framework.dto;
 
-public class ModuleVo {
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
+
+public class ModuleVo extends BasePageVo {
+	@EntityField( name = "模块ID", type = ApiParamType.STRING)
 	private String id;
+	@EntityField( name = "模块ID", type = ApiParamType.STRING)
 	private String name;
+	@EntityField( name = "模块描述", type = ApiParamType.STRING)
 	private String description;
+	@EntityField( name = "模块版本", type = ApiParamType.STRING)
 	private String version;
 
 	public String getName() {

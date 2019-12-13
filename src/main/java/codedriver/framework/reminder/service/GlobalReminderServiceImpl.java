@@ -1,14 +1,16 @@
 package codedriver.framework.reminder.service;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.reminder.core.GlobalReminderFactory;
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.GlobalReminderSubscribeVo;
 import codedriver.framework.reminder.dto.GlobalReminderVo;
 import codedriver.framework.reminder.dto.ReminderMessageSearchVo;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +38,12 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
     public void updateReminderSubscribe(GlobalReminderSubscribeVo reminderSubscribeVo) {
         int isActive = reminderSubscribeVo.getIsActive();
         if (reminderSubscribeVo.getId() != null){
-            if (isActive == 1){
+                if (isActive == 1){
                 reminderMapper.updateReminderSubscribe(reminderSubscribeVo);
             }else {
                 reminderMapper.deleteReminderSubscribe(reminderSubscribeVo);
                 //取消订阅，移除该控件所有消息的有效性
-                reminderMessageMapper.updateMessageActiveByReminderId(reminderSubscribeVo.getUserId(), reminderSubscribeVo.getReminderId());
+                reminderMessageMapper.updateMessageActiveByReminderId(reminderSubscribeVo.getUserId(), reminderSubscribeVo.getPluginId());
             }
         }else {
             reminderMapper.insertReminderSubscribe(reminderSubscribeVo);
@@ -50,12 +52,48 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
 
     @Override
     public List<GlobalReminderVo> searchReminder(GlobalReminderVo reminderVo) {
-        return reminderMapper.getReminderList(reminderVo);
+        boolean moduleId = StringUtils.isNotBlank(reminderVo.getModuleId());
+        List<GlobalReminderVo> activeReminderList = new ArrayList<>();
+        List<GlobalReminderVo> reminderVoList = GlobalReminderFactory.getReminderVoList();
+        Map<String, ModuleVo> moduleVoMap = TenantContext.get().getActiveModuleMap();
+        for (GlobalReminderVo c : reminderVoList) {
+            if (moduleVoMap.containsKey(c.getModuleId())) {
+                c.setModuleName(moduleVoMap.get(c.getModuleId()).getName());
+                c.setModuleName(moduleVoMap.get(c.getModuleId()).getDescription());
+                if (!moduleId || (moduleId && c.getModuleId().equals(reminderVo.getModuleId()))) {
+                    activeReminderList.add(c);
+                }
+            }
+        }
+            List<GlobalReminderSubscribeVo> reminderSubList = reminderMapper.getReminderSubscribeListByUserId(UserContext.get().getUserId());
+            Map<String, GlobalReminderSubscribeVo> subscribeMap = new HashMap<>();
+            for (GlobalReminderSubscribeVo subscribeVo : reminderSubList) {
+                subscribeMap.put(subscribeVo.getPluginId(), subscribeVo);
+            }
+
+
+            for (GlobalReminderVo reminder : activeReminderList) {
+                if (subscribeMap.containsKey(reminder.getPluginId())) {
+                    reminder.setReminderSubscribeVo(subscribeMap.get(reminder.getPluginId()));
+                }
+            }
+        return activeReminderList;
     }
 
     @Override
-    public List<ModuleVo> getActiveReminderModuleList() {
-        return reminderMapper.getActiveReminderModuleList();
+    public List<ModuleVo> getActiveReminderModuleList () {
+        List<ModuleVo> moduleList = new ArrayList<>();
+        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
+        List<GlobalReminderVo> reminderList = GlobalReminderFactory.getReminderVoList();
+        for (ModuleVo moduleVo : tenantModuleList) {
+            for (GlobalReminderVo reminderVo : reminderList) {
+                if (moduleVo.getId().equals(reminderVo.getModuleId())) {
+                    moduleList.add(moduleVo);
+                    break;
+                }
+            }
+        }
+        return moduleList;
     }
 
     @Override
@@ -71,12 +109,9 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
         searchVo.setStartTime(timeMap.get("startTime"));
         searchVo.setEndTime(timeMap.get("endTime"));
         searchVo.setUserId(userId);
-        Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
         List<GlobalReminderMessageVo> messageVoList = reminderMessageMapper.getShowReminderMessageListByIdListAndUserId(searchVo);
         for (GlobalReminderMessageVo messageVo : messageVoList){
-            GlobalReminderVo reminderVo = messageVo.getReminderVo();
-            reminderVo.setModuleName(tenantModuleMap.get(reminderVo.getModuleId()).getName());
-            reminderVo.setDescription(tenantModuleMap.get(reminderVo.getModuleId()).getDescription());
+            packageData(messageVo);
         }
         return messageVoList;
     }
@@ -93,16 +128,9 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
 
     @Override
     public List<GlobalReminderMessageVo> getScheduleMessageList(String userId) {
-        List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
-        Map<String, ModuleVo> tenantModuleMap = new HashMap<>();
-        for (ModuleVo moduleVo : tenantModuleList){
-            tenantModuleMap.put(moduleVo.getId(), moduleVo);
-        }
         List<GlobalReminderMessageVo> messageVoList = reminderMessageMapper.getScheduleMessageList(userId);
         for (GlobalReminderMessageVo messageVo : messageVoList){
-            GlobalReminderVo reminderVo = messageVo.getReminderVo();
-            reminderVo.setModuleName(tenantModuleMap.get(reminderVo.getModuleId()).getName());
-            reminderVo.setDescription(tenantModuleMap.get(reminderVo.getModuleId()).getDescription());
+            packageData(messageVo);
         }
         return messageVoList;
     }
@@ -153,5 +181,13 @@ public class GlobalReminderServiceImpl implements GlobalReminderService {
         timeMap.put("startTime", startTime);
         timeMap.put("endTime", endTime);
         return timeMap;
+    }
+
+    public void packageData(GlobalReminderMessageVo messageVo){
+        GlobalReminderVo reminderVo = GlobalReminderFactory.getReminderVoMap().get(messageVo.getPluginId());
+        ModuleVo moduleVo = TenantContext.get().getActiveModuleMap().get(reminderVo.getModuleId());
+        reminderVo.setModuleDesc(moduleVo.getDescription());
+        reminderVo.setModuleName(moduleVo.getName());
+        messageVo.setReminderVo(reminderVo);
     }
 }

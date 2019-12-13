@@ -3,6 +3,7 @@
 <mapper namespace="codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper">
     <resultMap id="messageMap" type="codedriver.framework.reminder.dto.GlobalReminderMessageVo">
         <id column="id" property="id"/>
+        <result column="pluginId" property="pluginId"/>
         <result column="title" property="title"/>
         <result column="content" property="content"/>
         <result column="createTime" property="createTime"/>
@@ -11,16 +12,10 @@
         <result column="isNew" property="isNew"/>
         <result column="isKeep" property="isKeep"/>
         <result column="messageParam" property="param"/>
-        <result column="template" property="template"/>
-        <association property="reminderVo" javaType="codedriver.framework.reminder.dto.GlobalReminderVo">
-            <id column="reminderId" property="id"/>
-            <result column="name" property="name"/>
-            <result column="userId" property="userId"/>
-            <result column="userName" property="userName"/>
-            <result column="moduleId" property="moduleId"/>
-        </association>
         <association property="reminderSubscribeVo" javaType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
             <id column="subscribeId" property="id"/>
+            <result column="userId" property="userId"/>
+            <result column="userName" property="userName"/>
             <result  column="param" property="param"/>
         </association>
     </resultMap>
@@ -30,32 +25,28 @@
         b.`id` as `id`,
         a.`is_new` as `isNew`,
         a.`is_keep` as `isKeep`,
+        a.`user_id` as `userId`,
+        c.`user_name` as `userName`,
         b.`title`,
         g.`content`,
         b.`param` as `messageParam`,
-        b.`template`,
+        b.`plugin_id` as `pluginId`,
         DATE_FORMAT(b.`create_time`, '%Y-%m-%d %H:%i:%s') AS createTime,
-        b.`from_user` as `fromUser`,
-        f.`user_name` as `fromUserName`,
-        c.`id` as `reminderId`,
-        c.`name`,
-        c.`module_id` as `moduleId`,
+        b.`from_user` as `fromUserName`,
         e.`id` as `subscribeId`,
         e.`param` as `param`,
-        (SELECT `user_name` FROM `flow_user` WHERE `user_id` = #{userId}) as `userName`,
+        (SELECT `user_name` FROM `user` WHERE `user_id` = #{userId}) as `userName`,
         (#{userId}) as `userId`
         FROM `reminder_message_user` a
         LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
+        LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
         LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
-        LEFT JOIN `reminder` c ON b.`reminder_id` = c.`id`
-        LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`reminder_id` = e.`reminder_id`
-        LEFT JOIN `flow_user` f ON b.`from_user` = f.`user_id`
+        LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
         WHERE a.`is_active` = 1
         AND e.`id` IS NOT null
         AND a.`user_id` = #{userId}
-        AND c.`is_active` = 1
-        AND b.`reminder_id` IN (
-        SELECT `reminder_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
+        AND b.`plugin_id` IN (
+        SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
         )
         AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
         AND UNIX_TIMESTAMP(b.`create_time`) &gt;= UNIX_TIMESTAMP(#{startTime})
@@ -71,10 +62,8 @@
         SELECT COUNT(a.reminder_message_id)
         FROM `reminder_message_user` a
         LEFT JOIN `reminder_message` b ON a.reminder_message_id = b.id
-        LEFT JOIN `reminder` c ON b.`reminder_id` = c.`id`
-        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) d ON b.`reminder_id` = d.`reminder_id`
+        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) d ON b.`plugin_id` = d.`plugin_id`
         WHERE a.`user_id` = #{userId}
-        AND c.`is_active` = 1
         AND d.`id` IS NOT null
         AND a.`is_active` = 1
         AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
@@ -84,34 +73,30 @@
     <select id="getScheduleMessageList" parameterType="java.lang.String" resultMap="messageMap">
           SELECT
         b.`id` as `id`,
+        b.`plugin_id` as `pluginId`,
         a.`is_new` as `isNew`,
         a.`is_keep` as `isKeep`,
+        a.`user_id` as `userId`,
+        c.`user_name` as `userName`,
         b.`title`,
         g.`content`,
         b.`param` as `messageParam`,
-        b.`template`,
         DATE_FORMAT(b.`create_time`, '%Y-%m-%d %H:%i:%s') AS createTime,
-        b.`from_user` as `fromUser`,
-        f.`user_name` as `fromUserName`,
-        c.`id` as `reminderId`,
-        c.`name`,
-        c.`module_id` as `moduleId`,
+        b.`from_user` as `fromUserName`,
         e.`id` as `subscribeId`,
         e.`param` as `param`,
-        (SELECT `user_name` FROM `flow_user` WHERE `user_id` = #{userId}) as `userName`,
+        (SELECT `user_name` FROM `user` WHERE `user_id` = #{userId}) as `userName`,
         (#{userId}) as `userId`
         FROM `reminder_message_user` a
         LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
+        LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
         LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
-        LEFT JOIN `reminder` c ON b.`reminder_id` = c.`id`
-        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`reminder_id` = e.`reminder_id`
-        LEFT JOIN `flow_user` f ON b.`from_user` = f.`user_id`
+        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
         WHERE a.`is_active` = 1
         AND e.`id` IS NOT null
-        AND c.`is_active` = 1
         AND a.`user_id` = #{userId}
-        AND b.`reminder_id` IN (
-          SELECT `reminder_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
+        AND b.`plugin_id` IN (
+          SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
         )
         AND a.`is_new` = 1
     </select>
@@ -120,11 +105,9 @@
         SELECT COUNT(a.`reminder_message_id`)
         FROM `reminder_message_user` a
         LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
-        LEFT JOIN `reminder` c ON b.`reminder_id` = c.`id`
-        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) d ON b.`reminder_id` = d.`reminder_id`
+        LEFT JOIN (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) d ON b.`plugin_id` = d.`plugin_id`
         WHERE a.`user_id`= #{userId}
          AND a.`is_active` = 1
-         AND c.`is_active` = 1
          AND d.`id` IS NOT null
          AND DATE_SUB(CURDATE(), INTERVAL 6 DAY) &lt;= b.`create_time`
     </select>
@@ -168,7 +151,7 @@
                   LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
                   WHERE a.`is_active` = 1
                   AND a.`user_id` = #{userId}
-                  AND b.`reminder_id` = #{reminderId}
+                  AND b.`plugin_id` = #{pluginId}
             ) c
         )
     </update>
@@ -197,14 +180,14 @@
         `title`,
         `create_time`,
         `from_user`,
-        `reminder_id`,
+        `plugin_id`,
         `param`,
         `template`
         ) VALUES (
         #{title},
         NOW(),
         #{fromUser},
-        #{reminderId},
+        #{pluginId},
         #{param},
         #{template}
         )

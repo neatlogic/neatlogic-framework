@@ -1,4 +1,4 @@
-package codedriver.framework.reminder;
+package codedriver.framework.reminder.core;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;

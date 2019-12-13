@@ -1,4 +1,4 @@
-package codedriver.framework.counter;
+package codedriver.framework.counter.core;
 
 public abstract class GlobalCounterBase implements IGlobalCounter {
 	@Override

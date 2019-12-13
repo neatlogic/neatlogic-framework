@@ -102,5 +102,5 @@ public interface GlobalReminderMessageMapper {
     * @Param: [userId, reminderId] 
     * @return: int  
     */
-    int updateMessageActiveByReminderId(@Param("userId") String userId, @Param("reminderId") Long reminderId);
+    int updateMessageActiveByReminderId(@Param("userId") String userId, @Param("pluginId") String pluginId);
 }

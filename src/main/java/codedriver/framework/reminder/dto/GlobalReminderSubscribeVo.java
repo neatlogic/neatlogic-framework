@@ -7,8 +7,9 @@ package codedriver.framework.reminder.dto;
  **/
 public class GlobalReminderSubscribeVo {
     private Long id;
-    private Long reminderId;
+    private String pluginId;
     private String userId;
+    private String userName;
     private String param;
     private int isActive;
 
@@ -20,12 +21,12 @@ public class GlobalReminderSubscribeVo {
         this.id = id;
     }
 
-    public Long getReminderId() {
-        return reminderId;
+    public String getPluginId() {
+        return pluginId;
     }
 
-    public void setReminderId(Long reminderId) {
-        this.reminderId = reminderId;
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
     }
 
     public String getUserId() {
@@ -34,6 +35,14 @@ public class GlobalReminderSubscribeVo {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getParam() {

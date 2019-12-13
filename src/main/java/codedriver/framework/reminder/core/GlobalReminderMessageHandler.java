@@ -1,4 +1,4 @@
-package codedriver.framework.reminder;
+package codedriver.framework.reminder.core;
 
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
@@ -41,8 +41,8 @@ public class GlobalReminderMessageHandler {
         GlobalReminderMessageHandler.reminderMessageMapper = reminderMessageMapper;
     }
 
-    public synchronized static void sendMessage(ReminderMessageVo messageVo, String className){
-        GlobalReminderMessageHandler.MessageRunner runner = new GlobalReminderMessageHandler.MessageRunner(messageVo, className);
+    public synchronized static void sendMessage(ReminderMessageVo messageVo, String pluginId){
+        GlobalReminderMessageHandler.MessageRunner runner = new GlobalReminderMessageHandler.MessageRunner(messageVo, pluginId);
         if (!TransactionSynchronizationManager.isSynchronizationActive()){
             CommonThreadPool.execute(runner);
             return;
@@ -74,11 +74,11 @@ public class GlobalReminderMessageHandler {
 
         private ReminderMessageVo mess;
 
-        private String name;
+        private String pluginId;
 
-        public MessageRunner(ReminderMessageVo _mess, String _name){
+        public MessageRunner(ReminderMessageVo _mess, String _pluginId){
             mess = _mess;
-            name = _name;
+            pluginId = _pluginId;
         }
 
         @Override
@@ -86,13 +86,11 @@ public class GlobalReminderMessageHandler {
             String oldName = Thread.currentThread().getName();
             Thread.currentThread().setName("SYSTEMREMIND-MESSAGEHANDLER-" + mess.getTitle());
             try{
-                Long reminderId = reminderMapper.getReminderIdByName(name);
-                if (reminderId != null && reminderId !=0L){
                     GlobalReminderMessageVo message = new GlobalReminderMessageVo();
                     message.setTitle(mess.getTitle());
                     message.setContent(mess.getContent());
                     message.setFromUser(mess.getFromUser());
-                    message.setReminderId(reminderId);
+                    message.setPluginId(pluginId);
                     message.setParam(mess.getParamObj() == null ? "" : mess.getParamObj().toString());
                     reminderMessageMapper.insertReminderMessage(message);
                     reminderMessageMapper.insertReminderMessageContent(message);
@@ -108,14 +106,11 @@ public class GlobalReminderMessageHandler {
                         }
                     }
                     //获取订阅者名单
-                    List<String> subUserIdList = reminderMapper.getSubscribeUserIdListByReminderId(message.getReminderId());
+                    List<String> subUserIdList = reminderMapper.getSubscribeUserIdListByPluginId(message.getPluginId());
                     subUserIdList.retainAll(userIdList);
                     for (String userId : subUserIdList){
                         reminderMessageMapper.insertReminderMessageUser(message.getId(), userId);
                     }
-                }else {
-                    throw new RuntimeException("找不到动态消息组件：" + name);
-                }
 
             }catch (Exception ex){
                 logger.error(ex.getMessage(), ex);

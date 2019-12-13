@@ -1,27 +1,25 @@
-package codedriver.framework.reminder;
+package codedriver.framework.reminder.core;
 
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.reminder.dto.GlobalReminderVo;
-import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RootComponent
 public class GlobalReminderFactory implements ApplicationListener<ContextRefreshedEvent> {
 
-	@Autowired
-	private GlobalReminderMapper reminderMapper;
-
+	private static List<GlobalReminderVo> reminderVoList = new ArrayList<>();
 	private static Map<String, IGlobalReminder> reminderMap = new HashMap<>();
+	private static Map<String, GlobalReminderVo> reminderVoMap = new HashMap<>();
 	private static final Logger logger = LoggerFactory.getLogger(GlobalReminderFactory.class);
 
 	public static IGlobalReminder getReminder(String name) {
@@ -31,9 +29,12 @@ public class GlobalReminderFactory implements ApplicationListener<ContextRefresh
 		return reminderMap.get(name);
 	}
 
-	@PostConstruct
-	private void resetIsLoadOfAllSystemRemindPlugin() {
-		reminderMapper.resetIsActiveOfAllReminder();
+	public static List<GlobalReminderVo> getReminderVoList(){
+		return reminderVoList;
+	}
+
+	public static Map<String, GlobalReminderVo> getReminderVoMap(){
+		return reminderVoMap;
 	}
 
 	@Override
@@ -48,13 +49,9 @@ public class GlobalReminderFactory implements ApplicationListener<ContextRefresh
 			reminderVo.setModuleId(context.getId());
 			reminderVo.setDescription(reminder.getDescription());
 			reminderVo.setPluginId(reminder.getPluginId());
-			reminderVo.setIsActive(1);
-			if (reminderMapper.getReminderCountByPluginId(reminder.getPluginId()) < 1) {
-				reminderMapper.insertReminder(reminderVo);
-			} else {
-				reminderMapper.updateReminderByPluginId(reminderVo);
-			}
+			reminderVoList.add(reminderVo);
 			reminderMap.put(reminder.getPluginId(), reminder);
+			reminderVoMap.put(reminder.getPluginId(), reminderVo);
 		}
 	}
 }

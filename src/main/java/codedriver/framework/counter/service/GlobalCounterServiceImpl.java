@@ -2,8 +2,7 @@ package codedriver.framework.counter.service;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.counter.GlobalCounterFactory;
+import codedriver.framework.counter.core.GlobalCounterFactory;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.counter.dto.GlobalCounterSubscribeVo;
@@ -39,7 +38,7 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
     public List<GlobalCounterVo> searchCounterVo(GlobalCounterVo counterVo) {
         boolean moduleId = StringUtils.isNotBlank(counterVo.getModuleId());
         List<GlobalCounterVo> activeCounterList = new ArrayList<>();
-        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterList();
+        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterVoList();
         Map<String, ModuleVo> moduleVoMap = TenantContext.get().getActiveModuleMap();
         for (GlobalCounterVo c : counterVoList){
             if (moduleVoMap.containsKey(c.getModuleId())){
@@ -76,7 +75,7 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
     public List<ModuleVo> getActiveCounterModuleList() {
         List<ModuleVo> moduleList = new ArrayList<>();
         List<ModuleVo> tenantModuleList = TenantContext.get().getActiveModuleList();
-        List<GlobalCounterVo> counterList = GlobalCounterFactory.getCounterList();
+        List<GlobalCounterVo> counterList = GlobalCounterFactory.getCounterVoList();
         for (ModuleVo moduleVo : tenantModuleList){
             for (GlobalCounterVo counterVo : counterList){
                 if (moduleVo.getId().equals(counterVo.getModuleId())){
@@ -91,7 +90,7 @@ public class GlobalCounterServiceImpl implements GlobalCounterService {
     @Override
     public List<GlobalCounterVo> getSubscribeCounterListByUserId(String userId) {
         List<GlobalCounterVo> subCounterVoList = counterMapper.getSubscribeCounterListByUserId(userId);
-        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterList();
+        List<GlobalCounterVo> counterVoList = GlobalCounterFactory.getCounterVoList();
         for (GlobalCounterVo subCounterVo : subCounterVoList){
             for (GlobalCounterVo counterVo : counterVoList){
                 if (subCounterVo.getPluginId().equals(counterVo.getPluginId())){

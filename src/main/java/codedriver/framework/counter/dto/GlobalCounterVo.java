@@ -1,5 +1,9 @@
 package codedriver.framework.counter.dto;
 
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
+
 import java.util.Objects;
 
 /**
@@ -7,21 +11,29 @@ import java.util.Objects;
  * @description: 消息统计插件实体类
  * @create: 2019-09-10 15:13
  **/
-public class GlobalCounterVo implements Comparable<GlobalCounterVo> {
+public class GlobalCounterVo extends BasePageVo implements Comparable<GlobalCounterVo> {
     //数据库对应
+
+    @EntityField( name = "插件名称", type = ApiParamType.STRING)
     private String name;
+    @EntityField( name = "插件ID", type = ApiParamType.STRING)
     private String pluginId;
+    @EntityField( name = "模块描述", type = ApiParamType.STRING)
     private String description;
+    @EntityField( name = "模块ID", type = ApiParamType.STRING)
     private String moduleId;
     //扩充字段
     private String userId;
+    @EntityField( name = "预览图路径", type = ApiParamType.STRING)
     private String previewPath;
+    @EntityField( name = "展示模板路径", type = ApiParamType.STRING)
     private String showTemplate;
+    @EntityField( name = "排序编码", type = ApiParamType.INTEGER)
     private Integer sort = Integer.MAX_VALUE;
     private String moduleDesc;
     private String moduleIcon;
     private String moduleName;
-
+    @EntityField( name = "模块订阅者信息", type = ApiParamType.JSONOBJECT)
     private GlobalCounterSubscribeVo counterSubscribeVo;
 
     public String getPluginId() {

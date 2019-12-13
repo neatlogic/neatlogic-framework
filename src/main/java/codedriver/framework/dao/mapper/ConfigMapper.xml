@@ -4,17 +4,17 @@
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
 	
 	<select id="getConfigByKey" parameterType="java.lang.String" resultType="codedriver.framework.dto.ConfigVo" useCache="true">
-		SELECT `key`,`value`,`description` FROM `config` WHERE `key` = #{value} ;
+		SELECT `key`,`value`,`description` FROM `config` WHERE `key` = #{value}
 	</select>
 	
 	<insert id="relaceConfig" parameterType="codedriver.framework.dto.ConfigVo">
 		REPLACE INTO `config` (`key`, `value`, `description`) 
 		VALUES
-		  (#{key}, #{value}, #{description}) ;
+		  (#{key}, #{value}, #{description})
 	</insert>
 	
 	<delete id="deleteConfig" parameterType="java.lang.String">
-		DELETE FROM `config` WHERE `key` = #{value} ;
+		DELETE FROM `config` WHERE `key` = #{value}
 	</delete>
 
 </mapper>

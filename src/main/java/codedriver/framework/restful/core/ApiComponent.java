@@ -12,7 +12,8 @@ public interface ApiComponent {
 	public String getName();
 
 	public String getConfig();
-	
+
+	public boolean isPrivate();
 
 	public Object doService(ApiVo apiVo, JSONObject jsonObj) throws Exception;
 

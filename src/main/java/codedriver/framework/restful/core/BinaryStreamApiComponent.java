@@ -1,6 +1,7 @@
 package codedriver.framework.restful.core;
 
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -15,7 +16,9 @@ public interface BinaryStreamApiComponent {
 
 	public String getConfig();
 
-	public Object doService(ApiVo interfaceVo, JSONObject paramObj, MultipartHttpServletRequest multipartRequest) throws Exception;
+	public boolean isPrivate();
+
+	public Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	public JSONObject help();
 }

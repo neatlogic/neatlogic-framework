@@ -1,48 +1,73 @@
 package codedriver.framework.restful.dto;
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.apache.commons.lang3.StringUtils;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.common.util.FileUtil;
 
 public class ApiAuditVo extends BasePageVo {
-	private Long id;
-	private Integer interfaceId;
+	
+	public final static String SUCCEED = "succeed";
+	public final static String FAILED = "failed";
+	
+	private String uuid;
+	private String token;
+	private String userId;
+	private String authType;
+	private Integer serverId;
 	private String ip;
-	private String param;
-	private String startTime;
-	private String endTime;
+	private Date startTime;
+	private Date endTime;
 	private Long timeCost;
 	private String status;
-	private String statusText;
-	private String error;
-	private String timeCostText;
-	private String result;
-	private String paramPath;
-	private String errorPath;
-	private String resultPath;
 
 	public ApiAuditVo() {
 		this.setPageSize(20);
 	}
 
-	public Long getId() {
-		return id;
+	public synchronized String getUuid() {
+		if(StringUtils.isBlank(uuid)) {
+			uuid = UUID.randomUUID().toString().replace("-", "");
+		}			
+		return uuid;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
-	public Integer getInterfaceId() {
-		return interfaceId;
+	public String getToken() {
+		return token;
 	}
 
-	public void setInterfaceId(Integer interfaceId) {
-		this.interfaceId = interfaceId;
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getAuthType() {
+		return authType;
+	}
+
+	public void setAuthType(String authType) {
+		this.authType = authType;
+	}
+
+	public Integer getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(Integer serverId) {
+		this.serverId = serverId;
 	}
 
 	public String getIp() {
@@ -53,104 +78,20 @@ public class ApiAuditVo extends BasePageVo {
 		this.ip = ip;
 	}
 
-	public String getParam() {
-		if (param == null) {
-			if (StringUtils.isNotBlank(this.paramPath)) {
-				if (this.paramPath.contains("||")) {
-					String[] pathArray = this.paramPath.split("\\|\\|");
-					if (pathArray.length == 2) {
-						param = FileUtil.readZipContent(pathArray[0], pathArray[1]);
-					} else {
-						param = "压缩文件路径不完整";
-					}
-				} else {
-					param = FileUtil.readContent(this.paramPath);
-					;
-				}
-
-				if (StringUtils.isNotBlank(param)) {
-					param = param.trim();
-					if (param.startsWith("{")) {
-						try {
-							JSONObject jsonObj = JSONObject.parseObject(param);
-							param = jsonObj.toJSONString();
-						} catch (Exception ex) {
-						}
-					} else if (param.startsWith("[")) {
-						try {
-							JSONArray jsonList = JSONArray.parseArray(param);
-							param = jsonList.toJSONString();
-						} catch (Exception ex) {
-						}
-					}
-				}
-			}
-		}
-		return param;
-	}
-
-	public void setParam(String param) {
-		this.param = param;
-	}
-
-	public String getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(String startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
-	public String getEndTime() {
+	public Date getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(String endTime) {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public String getError() {
-		if (error == null) {
-			if (StringUtils.isNotBlank(this.errorPath)) {
-				if (this.errorPath.contains("||")) {
-					String[] pathArray = this.errorPath.split("\\|\\|");
-					if (pathArray.length == 2) {
-						error = FileUtil.readZipContent(pathArray[0], pathArray[1]);
-					} else {
-						error = "压缩文件路径不完整";
-					}
-				} else {
-					error = FileUtil.readContent(this.errorPath);
-					;
-				}
-			}
-		}
-		return error;
-	}
-
-	public void setError(String error) {
-		this.error = error;
-	}
-
-	public String getStatusText() {
-		if (this.status.equals("succeed")) {
-			statusText = "成功";
-		} else if (this.status.equals("failed")) {
-			statusText = "失败";
-		}
-		return statusText;
-	}
-
-	public void setStatusText(String statusText) {
-		this.statusText = statusText;
 	}
 
 	public Long getTimeCost() {
@@ -161,84 +102,12 @@ public class ApiAuditVo extends BasePageVo {
 		this.timeCost = timeCost;
 	}
 
-	public String getTimeCostText() {
-		if (timeCost != null) {
-			if (timeCost / 1000 > 0) {
-				timeCostText = timeCost / 1000 + "秒";
-			} else {
-				timeCostText = timeCost + "毫秒";
-			}
-		}
-		return timeCostText;
+	public String getStatus() {
+		return status;
 	}
 
-	public void setTimeCostText(String timeCostText) {
-		this.timeCostText = timeCostText;
-	}
-
-	public String getResultPath() {
-		return resultPath;
-	}
-
-	public void setResultPath(String resultPath) {
-		this.resultPath = resultPath;
-	}
-
-	public String getParamPath() {
-		return paramPath;
-	}
-
-	public void setParamPath(String paramPath) {
-		this.paramPath = paramPath;
-	}
-
-	public String getErrorPath() {
-		return errorPath;
-	}
-
-	public void setErrorPath(String errorPath) {
-		this.errorPath = errorPath;
-	}
-
-	public String getResult() {
-		if (result == null) {
-			if (StringUtils.isNotBlank(this.resultPath)) {
-				if (this.resultPath.contains("||")) {
-					String[] pathArray = this.resultPath.split("\\|\\|");
-					if (pathArray.length == 2) {
-						result = FileUtil.readZipContent(pathArray[0], pathArray[1]);
-					} else {
-						result = "压缩文件路径不完整";
-					}
-				} else {
-					result = FileUtil.readContent(this.resultPath);
-					;
-				}
-
-				if (StringUtils.isNotBlank(result)) {
-					result = result.trim();
-					if (result.startsWith("{")) {
-						try {
-							JSONObject jsonObj = JSONObject.parseObject(result);
-							result = jsonObj.toJSONString(4);
-						} catch (Exception ex) {
-						}
-					} else if (result.startsWith("[")) {
-						try {
-							JSONArray jsonList = JSONArray.parseArray(result);
-							result = jsonList.toJSONString(4);
-						} catch (Exception ex) {
-						}
-					}
-				}
-			}
-		}
-
-		return result;
-	}
-
-	public void setResult(String result) {
-		this.result = result;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

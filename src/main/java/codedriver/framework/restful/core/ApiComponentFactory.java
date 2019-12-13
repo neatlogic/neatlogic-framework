@@ -57,6 +57,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 				restComponentVo.setId(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
+				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
 				componentList.add(restComponentVo);
 				String token = component.getToken();
@@ -94,6 +95,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 				restComponentVo.setId(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
+				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
 				componentList.add(restComponentVo);
 				String token = component.getToken();
@@ -131,6 +133,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 				restComponentVo.setId(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
+				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
 				componentList.add(restComponentVo);
 				String token = component.getToken();

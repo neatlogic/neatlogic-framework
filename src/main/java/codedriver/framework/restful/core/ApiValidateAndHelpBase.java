@@ -11,7 +11,14 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.auth.core.AuthAction;
+import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.exception.type.ParamIrregularException;
+import codedriver.framework.exception.type.ParamNotExistsException;
+import codedriver.framework.exception.type.ParamValueTooLongException;
+import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.annotation.Example;
@@ -20,9 +27,58 @@ import codedriver.framework.restful.annotation.NotDefined;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
 
-public class ApiHelpBase {
-	private static Logger logger = LoggerFactory.getLogger(ApiHelpBase.class);
-	public final JSONObject getApiComponentHelp(Class<?>... arg) {
+public class ApiValidateAndHelpBase {
+	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
+
+	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {
+		// 获取目标类
+		Boolean isAuth = false;
+		if (apiClass != null) {
+			AuthAction action = apiClass.getAnnotation(AuthAction.class);
+			if (null != action && StringUtils.isNotBlank(action.name())) {
+				String actionName = action.name();
+				// 判断用户角色是否拥有接口权限
+				if (AuthActionChecker.check(actionName)) {
+					isAuth = true;
+				}
+			} else {
+				isAuth = true;
+			}
+
+			if (!isAuth) {
+				throw new PermissionDeniedException();
+			}
+			// 判断参数是否合法
+			Method method = apiClass.getMethod("myDoService", classes);
+			if (method != null) {
+				Input input = method.getAnnotation(Input.class);
+				if (input != null) {
+					Param[] params = input.value();
+					if (params != null && params.length > 0) {
+						for (Param p : params) {
+							// 判断是否必填
+							if (p.isRequired() && !paramObj.containsKey(p.name())) {
+								throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
+							}
+							// 参数类型校验
+							Object paramValue = paramObj.get(p.name());
+							// 判断长度
+							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
+								if (paramValue.toString().length() > p.length()) {
+									throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.length());
+								}
+							}
+							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
+								throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	protected final JSONObject getApiComponentHelp(Class<?>... arg) {
 		JSONObject jsonObj = new JSONObject();
 		JSONArray inputList = new JSONArray();
 		JSONArray outputList = new JSONArray();

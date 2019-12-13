@@ -14,6 +14,8 @@ public interface JsonStreamApiComponent {
 
 	public String getConfig();
 
+	public boolean isPrivate();
+
 	public Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception;
 
 	public JSONObject help();

@@ -4,13 +4,30 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
+
 public class FileVo {
+	@EntityField(name = "文件uuid",
+			type = ApiParamType.STRING)
 	private String uuid;
+	@EntityField(name = "文件保存路径",
+			type = ApiParamType.STRING)
 	private String path;
+	@EntityField(name = "文件名称",
+			type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "文件大小（字节）",
+			type = ApiParamType.INTEGER)
 	private Long size;
+	@EntityField(name = "上传用户",
+			type = ApiParamType.STRING)
 	private String userId;
+	@EntityField(name = "上传时间",
+			type = ApiParamType.STRING)
 	private String uploadTime;
+	@EntityField(name = "文件归属",
+			type = ApiParamType.STRING)
 	private String type;
 
 	public String getUuid() {

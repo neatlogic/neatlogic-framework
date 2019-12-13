@@ -84,7 +84,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 			protected void execute() {
 				String oldThreadName = Thread.currentThread().getName();
 				try {
-					Thread.currentThread().setName("NEW_JOB_CHECK");
+					Thread.currentThread().setName("SCHEDULE-JOB-CHECKER");
 					TenantContext tenantContext = TenantContext.get();
 					if(tenantContext == null) {
 						tenantContext = TenantContext.init();
@@ -341,7 +341,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		protected void execute() {
 			String oldThreadName = Thread.currentThread().getName();
 			try {
-				Thread.currentThread().setName("SCHEDULER_LOAD_JOB");
+				Thread.currentThread().setName("SCHEDULE-JOB-LOADER");
 				TenantContext tenantContext = TenantContext.get();
 				if(tenantContext == null) {
 					tenantContext = TenantContext.init(tenantUuid);

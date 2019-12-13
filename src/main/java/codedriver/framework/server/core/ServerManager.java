@@ -56,7 +56,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 			protected void execute() {
 				String oldThreadName = Thread.currentThread().getName();
 				try {
-					Thread.currentThread().setName("HEALTHYCHECK");
+					Thread.currentThread().setName("HEARBEAT");
 					// 查找故障服务器
 					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
 					for (ServerClusterVo server : list) {

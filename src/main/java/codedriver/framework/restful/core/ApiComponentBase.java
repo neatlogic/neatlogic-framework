@@ -1,8 +1,10 @@
 package codedriver.framework.restful.core;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,32 +15,27 @@ import org.springframework.util.ClassUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.apiparam.core.ApiParamFactory;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.auth.core.AuthAction;
-import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.IpUtil;
-import codedriver.framework.exception.type.ParamIrregularException;
-import codedriver.framework.exception.type.ParamNotExistsException;
-import codedriver.framework.exception.type.ParamValueTooLongException;
-import codedriver.framework.exception.type.PermissionDeniedException;
-import codedriver.framework.restful.annotation.Input;
-import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiAuditContentVo;
+import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements ApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
 
+	
 	@Autowired
-	private ApiMapper restMapper;
+	private ApiMapper apiMapper;
 
 	public final Object doService(ApiVo interfaceVo, JSONObject paramObj) throws Exception {
 		String error = "";
 		Object result = null;
 		boolean status = false;
 		long startTime = System.currentTimeMillis();
-		String requestIp = IpUtil.getIpAddr(UserContext.get().getRequest());
 		try {
 			try {
 				Object proxy = AopContext.currentProxy();
@@ -83,7 +80,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 			if(needAudit != null && needAudit.intValue() == 1) {
 				String tenentUuid = TenantContext.get().getTenantUuid();
 				int index = Math.abs(tenentUuid.hashCode()) % ApiAuditLogger.THREAD_COUNT;
-				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(tenentUuid, audit.getUuid(), jsonObj, error, result));
+				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(tenentUuid, audit.getUuid(), paramObj, error, result));
 			}
 		}
 		return result;

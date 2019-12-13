@@ -34,7 +34,7 @@
         </foreach>
     </select>
 
-    <select id="getSubscribeUserIdListByPluginId" resultType="java.lang.String" parameterType="java.lang.Long">
+    <select id="getSubscribeUserIdListByPluginId" resultType="java.lang.String" parameterType="java.lang.String">
         SELECT DISTINCT (`user_id`) FROM `reminder_subscribe` WHERE `plugin_id` = #{pluginId}
     </select>
 

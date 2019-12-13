@@ -1,5 +1,6 @@
 package codedriver.framework.reminder.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;
@@ -42,7 +43,8 @@ public class GlobalReminderMessageHandler {
     }
 
     public synchronized static void sendMessage(ReminderMessageVo messageVo, String pluginId){
-        GlobalReminderMessageHandler.MessageRunner runner = new GlobalReminderMessageHandler.MessageRunner(messageVo, pluginId);
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        GlobalReminderMessageHandler.MessageRunner runner = new GlobalReminderMessageHandler.MessageRunner(messageVo, pluginId, tenantUuid);
         if (!TransactionSynchronizationManager.isSynchronizationActive()){
             CommonThreadPool.execute(runner);
             return;
@@ -76,9 +78,13 @@ public class GlobalReminderMessageHandler {
 
         private String pluginId;
 
-        public MessageRunner(ReminderMessageVo _mess, String _pluginId){
+        private String tenantUuid;
+
+        public MessageRunner(ReminderMessageVo _mess, String _pluginId, String _tenantUuid){
+
             mess = _mess;
             pluginId = _pluginId;
+            tenantUuid = _tenantUuid;
         }
 
         @Override
@@ -86,31 +92,34 @@ public class GlobalReminderMessageHandler {
             String oldName = Thread.currentThread().getName();
             Thread.currentThread().setName("SYSTEMREMIND-MESSAGEHANDLER-" + mess.getTitle());
             try{
-                    GlobalReminderMessageVo message = new GlobalReminderMessageVo();
-                    message.setTitle(mess.getTitle());
-                    message.setContent(mess.getContent());
-                    message.setFromUser(mess.getFromUser());
-                    message.setPluginId(pluginId);
-                    message.setParam(mess.getParamObj() == null ? "" : mess.getParamObj().toString());
-                    reminderMessageMapper.insertReminderMessage(message);
-                    reminderMessageMapper.insertReminderMessageContent(message);
-                    List<String> userIdList = new ArrayList<>();
-                    if (mess.getReceiveTeamList() != null && mess.getReceiveTeamList().size() > 0){
-                        userIdList = reminderMapper.getUserIdListByTeamIdList(mess.getReceiveTeamList());
-                    }
-                    if (mess.getReceiverList() != null && mess.getReceiverList().size() > 0){
-                        for (String userId : mess.getReceiverList()){
-                            if (!userIdList.contains(userId)){
-                                userIdList.add(userId);
-                            }
+                if (tenantUuid != null){
+                    TenantContext.init(tenantUuid);
+                }
+                GlobalReminderMessageVo message = new GlobalReminderMessageVo();
+                message.setTitle(mess.getTitle());
+                message.setContent(mess.getContent());
+                message.setFromUser(mess.getFromUser());
+                message.setPluginId(pluginId);
+                message.setParam(mess.getParamObj() == null ? "" : mess.getParamObj().toString());
+                reminderMessageMapper.insertReminderMessage(message);
+                reminderMessageMapper.insertReminderMessageContent(message);
+                List<String> userIdList = new ArrayList<>();
+                if (mess.getReceiveTeamList() != null && mess.getReceiveTeamList().size() > 0){
+                    userIdList = reminderMapper.getUserIdListByTeamIdList(mess.getReceiveTeamList());
+                }
+                if (mess.getReceiverList() != null && mess.getReceiverList().size() > 0){
+                    for (String userId : mess.getReceiverList()){
+                        if (!userIdList.contains(userId)){
+                            userIdList.add(userId);
                         }
                     }
-                    //获取订阅者名单
-                    List<String> subUserIdList = reminderMapper.getSubscribeUserIdListByPluginId(message.getPluginId());
-                    subUserIdList.retainAll(userIdList);
-                    for (String userId : subUserIdList){
-                        reminderMessageMapper.insertReminderMessageUser(message.getId(), userId);
-                    }
+                }
+                //获取订阅者名单
+                List<String> subUserIdList = reminderMapper.getSubscribeUserIdListByPluginId(message.getPluginId());
+                subUserIdList.retainAll(userIdList);
+                for (String userId : subUserIdList){
+                    reminderMessageMapper.insertReminderMessageUser(message.getId(), userId);
+                }
 
             }catch (Exception ex){
                 logger.error(ex.getMessage(), ex);

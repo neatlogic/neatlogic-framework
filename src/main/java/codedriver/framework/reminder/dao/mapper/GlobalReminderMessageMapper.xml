@@ -181,15 +181,13 @@
         `create_time`,
         `from_user`,
         `plugin_id`,
-        `param`,
-        `template`
+        `param`
         ) VALUES (
         #{title},
         NOW(),
         #{fromUser},
         #{pluginId},
-        #{param},
-        #{template}
+        #{param}
         )
     </insert>
     

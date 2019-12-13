@@ -27,13 +27,13 @@ import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class ApiComponentBase extends ApiHelpBase implements ApiComponent, MyApiComponent {
+public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements ApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
 
 	@Autowired
 	private ApiMapper restMapper;
 
-	public final Object doService(ApiVo interfaceVo, JSONObject jsonObj) throws Exception {
+	public final Object doService(ApiVo interfaceVo, JSONObject paramObj) throws Exception {
 		String error = "";
 		Object result = null;
 		boolean status = false;
@@ -43,12 +43,12 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 			try {
 				Object proxy = AopContext.currentProxy();
 				Class<?> targetClass = AopUtils.getTargetClass(proxy);
-				validApi(targetClass, jsonObj);
+				validApi(targetClass, paramObj, JSONObject.class);
 				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
-				result = method.invoke(proxy, jsonObj);
+				result = method.invoke(proxy, paramObj);
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
-				validApi(this.getClass(), jsonObj);
-				result = myDoService(jsonObj);
+				validApi(this.getClass(), paramObj, JSONObject.class);
+				result = myDoService(paramObj);
 			} catch (Exception ex) {
 				throw ex;
 			}
@@ -62,54 +62,6 @@ public abstract class ApiComponentBase extends ApiHelpBase implements ApiCompone
 			}
 		}
 		return result;
-	}
-
-	private void validApi(Class<?> apiClass, JSONObject paramObj) throws NoSuchMethodException, SecurityException {
-		// 获取目标类
-		Boolean isAuth = false;
-		if (apiClass != null) {
-			AuthAction action = apiClass.getAnnotation(AuthAction.class);
-			if (null != action && StringUtils.isNotBlank(action.name())) {
-				String actionName = action.name();
-				// 判断用户角色是否拥有接口权限
-				if (AuthActionChecker.check(actionName)) {
-					isAuth = true;
-				}
-			} else {
-				isAuth = true;
-			}
-
-			if (!isAuth) {
-				throw new PermissionDeniedException();
-			}
-			// 判断参数是否合法
-			Method method = apiClass.getMethod("myDoService", JSONObject.class);
-			if (method != null) {
-				Input input = method.getAnnotation(Input.class);
-				if (input != null) {
-					Param[] params = input.value();
-					if (params != null && params.length > 0) {
-						for (Param p : params) {
-							// 判断是否必填
-							if (p.isRequired() && !paramObj.containsKey(p.name())) {
-								throw new ParamNotExistsException("参数：\"" + p.name() + "\"不能为空");
-							}
-							// 参数类型校验
-							Object paramValue = paramObj.get(p.name());
-							// 判断长度
-							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
-								if (paramValue.toString().length() > p.length()) {
-									throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.length());
-								}
-							}
-							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
-								throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	@Override

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,7 +56,7 @@ public class ApiDispatcher {
 		errorMap.put(470, "访问频率过高，请稍后访问");
 	}
 
-	private void doIt(HttpServletRequest request, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+	private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
 		ApiVo interfaceVo = ApiComponentFactory.getApiByToken(token);
 
 		if (interfaceVo == null) {
@@ -100,7 +99,7 @@ public class ApiDispatcher {
 			BinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getComponentId());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
-					Object returnV = restComponent.doService(interfaceVo, paramObj, (MultipartHttpServletRequest) request);
+					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
 					returnObj.put("Return", returnV);
 					returnObj.put("Status", "OK");
 				} else {
@@ -131,7 +130,7 @@ public class ApiDispatcher {
 		}
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
@@ -180,7 +179,7 @@ public class ApiDispatcher {
 		}
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("Error", ex.getErrorCode());
@@ -218,7 +217,7 @@ public class ApiDispatcher {
 		}
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
+			doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
@@ -237,8 +236,7 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/binary/**",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/binary/**")
 	public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -256,7 +254,7 @@ public class ApiDispatcher {
 		}
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
@@ -283,7 +281,7 @@ public class ApiDispatcher {
 
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.OBJECT, null, returnObj, "help");
+			doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
@@ -308,7 +306,7 @@ public class ApiDispatcher {
 
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.STREAM, null, returnObj, "help");
+			doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
@@ -333,7 +331,7 @@ public class ApiDispatcher {
 
 		JSONObject returnObj = new JSONObject();
 		try {
-			doIt(request, token, ApiVo.Type.BINARY, null, returnObj, "help");
+			doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());

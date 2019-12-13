@@ -6,6 +6,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
@@ -17,7 +18,7 @@ import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
+public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
 	private static Logger logger = LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
 
 	@Autowired
@@ -34,9 +35,12 @@ public abstract class JsonStreamApiComponentBase extends ApiHelpBase implements 
 		try {
 			try {
 				Object proxy = AopContext.currentProxy();
+				Class<?> targetClass = AopUtils.getTargetClass(proxy);
+				validApi(targetClass, paramObj, JSONObject.class, JSONReader.class);
 				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class, JSONReader.class);
 				result = method.invoke(proxy, paramObj, jsonReader);
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
+				validApi(this.getClass(), paramObj, JSONObject.class, JSONReader.class);
 				result = myDoService(paramObj, jsonReader);
 			} catch (Exception ex) {
 				throw ex;

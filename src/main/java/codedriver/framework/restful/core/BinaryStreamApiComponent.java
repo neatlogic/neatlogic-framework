@@ -16,7 +16,9 @@ public interface BinaryStreamApiComponent {
 
 	public String getConfig();
 
-	public Object doService(ApiVo interfaceVo, JSONObject paramObj,HttpServletRequest request, HttpServletResponse response) throws Exception;
+	public boolean isPrivate();
+
+	public Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	public JSONObject help();
 }

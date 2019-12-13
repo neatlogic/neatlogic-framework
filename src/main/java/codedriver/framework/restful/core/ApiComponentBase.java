@@ -27,9 +27,12 @@ import codedriver.framework.restful.dto.ApiVo;
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements ApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
 
-	
 	@Autowired
 	private ApiMapper apiMapper;
+
+	public boolean isPrivate() {
+		return true;
+	}
 
 	public final Object doService(ApiVo interfaceVo, JSONObject paramObj) throws Exception {
 		String error = "";
@@ -55,29 +58,29 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 			throw e;
 		} finally {
 			long endTime = System.currentTimeMillis();
-			ApiAuditVo audit = new ApiAuditVo();				
+			ApiAuditVo audit = new ApiAuditVo();
 			audit.setToken(interfaceVo.getToken());
 			audit.setStatus(status ? ApiAuditVo.SUCCEED : ApiAuditVo.FAILED);
-			audit.setTimeCost(endTime - startTime);			
+			audit.setTimeCost(endTime - startTime);
 			audit.setServerId(Config.SCHEDULE_SERVER_ID);
 			audit.setStartTime(new Date(startTime));
 			audit.setEndTime(new Date(endTime));
 			UserContext userContext = UserContext.get();
 			audit.setUserId(userContext.getUserId());
 			HttpServletRequest request = UserContext.get().getRequest();
-			String requestIp = IpUtil.getIpAddr(request);				
+			String requestIp = IpUtil.getIpAddr(request);
 			audit.setIp(requestIp);
-			audit.setAuthType(interfaceVo.getAuthtype()); 
+			audit.setAuthType(interfaceVo.getAuthtype());
 			TenantContext.get().setUseDefaultDatasource(false);
 			apiMapper.insertApiAudit(audit);
 			Integer needAudit = interfaceVo.getNeedAudit();
-			if ( needAudit == null) {
+			if (needAudit == null) {
 				ApiVo apiVo = apiMapper.getApiByToken(interfaceVo.getToken());
-				if(apiVo != null) {
+				if (apiVo != null) {
 					needAudit = apiVo.getNeedAudit();
-				}				
+				}
 			}
-			if(needAudit != null && needAudit.intValue() == 1) {
+			if (needAudit != null && needAudit.intValue() == 1) {
 				String tenentUuid = TenantContext.get().getTenantUuid();
 				int index = Math.abs(tenentUuid.hashCode()) % ApiAuditLogger.THREAD_COUNT;
 				ApiAuditLogger.getQueue(index).offer(new ApiAuditContentVo(tenentUuid, audit.getUuid(), paramObj, error, result));

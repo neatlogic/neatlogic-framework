@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 public class Config {
 	private static Logger logger = LoggerFactory.getLogger(Config.class);
 	public static String JWT_SECRET = "techsure#codedriver$secret";
-	public static String REST_AUDIT_PATH;
 	public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 	public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
 	public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
@@ -24,7 +23,6 @@ public class Config {
 
 	private static final String CONFIG_FILE = "config.properties";
 	static {
-		REST_AUDIT_PATH = "/app/codedriver/";
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
 		if (StringUtils.isBlank(CODEDRIVER_HOME)) {
 			CODEDRIVER_HOME = "/app";

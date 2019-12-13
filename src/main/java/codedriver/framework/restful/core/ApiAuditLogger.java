@@ -168,7 +168,14 @@ public class ApiAuditLogger {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Logger LoggerBuilder(String tenantUuid, String file, String rollingPolicy, String maxFileSize, int maxHistory) {
-		file = Config.REST_AUDIT_PATH + tenantUuid + file;
+		if (!file.startsWith(File.separator)) {
+			if (Config.CODEDRIVER_HOME.endsWith(File.separator)) {
+				file = Config.CODEDRIVER_HOME + tenantUuid + File.separator + file;
+			} else {
+				file = Config.CODEDRIVER_HOME + File.separator + tenantUuid + File.separator + file;
+			}
+		}
+
 		Logger logger = (Logger) LoggerFactory.getLogger(ApiAuditLogger.class.getName() + "-" + tenantUuid);
 		LoggerContext loggerContext = logger.getLoggerContext();
 		// 日志格式设置

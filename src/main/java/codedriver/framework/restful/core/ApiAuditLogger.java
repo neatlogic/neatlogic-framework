@@ -26,6 +26,7 @@ import ch.qos.logback.core.rolling.RollingPolicy;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dto.ConfigVo;
@@ -42,8 +43,8 @@ public class ApiAuditLogger {
 	private final static String DEFAULT_MAX_FILE_SIZE = "10MB";//默认单个文件大小
 	private final static int DEFAULT_MAX_HISTORY = 20;//固定大小轮转策略默认保留20个历史文件，时间及大小的轮转策略默认保留全部历史文件
 	
-	public final static int THREAD_COUNT = 5;
-	private final static int QUEUE_SIZE = 256;
+	public final static int THREAD_COUNT = 3;
+	private final static int QUEUE_SIZE = 512;
 	private static Map<String, Logger> loggerMap = new HashMap<>();
 	private static Map<String, String> fileNamePatternMap = new HashMap<>();
 	
@@ -89,6 +90,7 @@ public class ApiAuditLogger {
 		String file = DEFAULT_FILE;
 		String maxFileSize = DEFAULT_MAX_FILE_SIZE;
 		int maxHistory = DEFAULT_MAX_HISTORY;
+		
 		ConfigVo config = configMapper.getConfigByKey(API_LOG_CONFIG);
 		JSONObject json = new JSONObject();
 		if(config != null) {

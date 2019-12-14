@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -77,37 +74,6 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	@PostConstruct
 	public final void init() {
 		tenantList = tenantMapper.getAllTenant();
-		// 定时检查有没有新的定时作业要加载
-		ScheduledExecutorService newJobService = Executors.newScheduledThreadPool(1);
-		CodeDriverThread newJobRunnable = new CodeDriverThread() {
-			@Override
-			protected void execute() {
-				String oldThreadName = Thread.currentThread().getName();
-				try {
-					Thread.currentThread().setName("SCHEDULE-JOB-CHECKER");
-					TenantContext tenantContext = TenantContext.get();
-					if(tenantContext == null) {
-						tenantContext = TenantContext.init();
-					}
-					tenantContext.setUseDefaultDatasource(true);
-					List<ServerNewJobVo> newJobList = schedulerMapper.getServerJobByServerId(Config.SCHEDULE_SERVER_ID);
-					for (ServerNewJobVo newJob : newJobList) {
-						tenantContext.setUseDefaultDatasource(true);
-						schedulerMapper.deleteServerJobById(newJob.getId());
-						JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
-						if (jobObject != null) {
-							loadJob(jobObject);
-						}
-					}
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				} finally {
-					Thread.currentThread().setName(oldThreadName);
-				}
-			}
-
-		};
-		newJobService.scheduleWithFixedDelay(newJobRunnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
 	}
 
 	public static IJob getInstance(String className) {
@@ -291,13 +257,23 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 	 */
 	public void releaseLock(Integer serverId) {
 		JobLockVo jobLock = new JobLockVo(JobLockVo.WAIT, serverId);
-		TenantContext tenantContext = TenantContext.get();
-		if (tenantContext == null) {
-			tenantContext = TenantContext.init();
-		}
 		for (TenantVo tenantVo : tenantList) {
-			tenantContext.setTenantUuid(tenantVo.getUuid()).setUseDefaultDatasource(false);
+			TenantContext.get().setTenantUuid(tenantVo.getUuid()).setUseDefaultDatasource(false);
 			schedulerMapper.updateJobLockByServerId(jobLock);
+		}
+	}
+	
+	public void loadNewJob() {
+		TenantContext.get().setUseDefaultDatasource(true);
+		List<ServerNewJobVo> newJobList = schedulerMapper.getServerJobByServerId(Config.SCHEDULE_SERVER_ID);
+		for (ServerNewJobVo newJob : newJobList) {
+			TenantContext.get().setUseDefaultDatasource(true);
+			schedulerMapper.deleteServerJobById(newJob.getId());
+			TenantContext.get().setUseDefaultDatasource(false);
+			JobObject jobObject = (JobObject) SerializerUtil.getObjectByByteArray(newJob.getJobObject());
+			if (jobObject != null) {
+				loadJob(jobObject);
+			}
 		}
 	}
 
@@ -341,14 +317,8 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 		protected void execute() {
 			String oldThreadName = Thread.currentThread().getName();
 			try {
-				Thread.currentThread().setName("SCHEDULE-JOB-LOADER");
-				TenantContext tenantContext = TenantContext.get();
-				if(tenantContext == null) {
-					tenantContext = TenantContext.init(tenantUuid);
-				}else {
-					tenantContext.setTenantUuid(tenantUuid);
-				}					
-				tenantContext.setUseDefaultDatasource(false);
+				Thread.currentThread().setName("SCHEDULE-JOB-LOADER");					
+				TenantContext.get().setTenantUuid(tenantUuid).setUseDefaultDatasource(false);
 				List<JobVo> jobList = schedulerMapper.getJobByClasspath(classpath);
 				for (JobVo job : jobList) {
 					JobObject jobObject = JobObject.buildJobObject(job, JobObject.FRAMEWORK);

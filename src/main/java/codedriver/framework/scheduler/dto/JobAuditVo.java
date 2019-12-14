@@ -40,7 +40,7 @@ public class JobAuditVo extends BasePageVo {
     private int isLogEmpty = 0;
     @EntityField(name = "执行状态(success:成功；error异常；processing:进行中)", type = ApiParamType.STRING)
     private String state = PROCESSING;
-    @EntityField(name = "定时作业名称", type = ApiParamType.INTEGER)
+    @EntityField(name = "服务器id", type = ApiParamType.INTEGER)
     private Integer serverId;
 
     public JobAuditVo() {

@@ -30,7 +30,7 @@ public class ApiAuditLogger {
 	private final static String API_LOG_CONFIG = "api_log_config";// 接口访问日志配置在config表的key值
 	private final static long FILE_SIZE_UNIT = 1024 * 1024; // 日志文件大小单位MB
 	private final static String DEFAULT_FILE = "logs/api.log";// 默认文件路径
-	private final static long DEFAULT_MAX_FILE_SIZE = 10 * FILE_SIZE_UNIT;// 默认单个文件大小
+	private final static long DEFAULT_MAX_FILE_SIZE = 10;// 默认单个文件大小
 	private final static int DEFAULT_MAX_HISTORY = -1;//默认保留全部历史文件
 
 	public final static int THREAD_COUNT = 3;
@@ -67,7 +67,7 @@ public class ApiAuditLogger {
 			return appender;
 		}
 		String file = DEFAULT_FILE;
-		long maxFileSize = DEFAULT_MAX_FILE_SIZE;
+		long maxFileSize = DEFAULT_MAX_FILE_SIZE * FILE_SIZE_UNIT;
 		int maxHistory = DEFAULT_MAX_HISTORY;
 		// 切换租户库
 		TenantContext tenantContext = TenantContext.get();
@@ -91,7 +91,9 @@ public class ApiAuditLogger {
 					}
 					if (json.containsKey("maxFileSize")) {
 						try {
-							maxFileSize = json.getIntValue("maxFileSize") * FILE_SIZE_UNIT;
+							maxFileSize = json.getIntValue("maxFileSize");
+							maxFileSize = maxFileSize < 1 ? DEFAULT_MAX_FILE_SIZE : maxFileSize;
+							maxFileSize = maxFileSize * FILE_SIZE_UNIT;
 						} catch (NumberFormatException e) {
 							logger.error(e.getMessage(), e);
 						}

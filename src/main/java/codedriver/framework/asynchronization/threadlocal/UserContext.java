@@ -29,8 +29,8 @@ public class UserContext implements Serializable {
 			//context.setRequest(_userContext.getRequest());
 			//context.setResponse(_userContext.getResponse());
 			context.setRoleNameList(_userContext.getRoleNameList());
-			instance.set(context);
 		}
+		instance.set(context);
 		return context;
 	}
 

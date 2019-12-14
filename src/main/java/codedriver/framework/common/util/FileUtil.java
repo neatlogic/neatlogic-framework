@@ -17,14 +17,21 @@ import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codedriver.framework.restful.logger.ApiAuditAppender;
+import codedriver.framework.restful.logger.Content;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
@@ -156,6 +163,115 @@ public class FileUtil {
 		return desFile.getAbsolutePath();
 	}
 
+	public static String writeContent(Content apiAuditContent, Boolean isAppend, ApiAuditAppender appender) {		
+		String filePath = appender.getFilePath();
+		filePath = createNewFile(filePath);
+		if (filePath == null) {
+			return null;		
+		}
+		try {
+			File desFile = new File(filePath);
+			String content = apiAuditContent.format();
+			content = content == null ? "" : content;
+			writeContent(content, desFile, isAppend);
+			long length = desFile.length();
+			if(length < appender.getMaxFileSize()) {
+				return filePath;				
+			}
+			SimpleDateFormat sdf = new SimpleDateFormat(appender.getFileNamepattern());
+			String newFilePath = filePath + sdf.format(new Date());
+			newFilePath = createNewFile(newFilePath);
+			if(newFilePath == null) {
+				return filePath;
+			}
+			File newFile = new File(newFilePath);
+			boolean flag = copy(desFile, newFile);
+			if(!flag) {
+				newFile.delete();
+			}
+			writeContent("", desFile, false);
+			int maxHistory = appender.getMaxHistory();
+			if(maxHistory < 0) {
+				return filePath;
+			}
+			int index = filePath.lastIndexOf(File.separator);
+			String dirPath = filePath.substring(0, index);		
+			File[] fileList = new File(dirPath).listFiles();
+			int deleteCount = fileList.length - (maxHistory + 1);
+			if(deleteCount < 1) {
+				return filePath;
+			}
+			Map<Long, File> fileMap = new HashMap<>();
+			List<Long> lastModifiedList = new ArrayList<>();
+			for(File file : fileList) {
+				fileMap.put(file.lastModified(), file);
+				lastModifiedList.add(file.lastModified());
+			}
+			lastModifiedList.sort(new Comparator<Long>() {
+				@Override
+				public int compare(Long o1, Long o2) {
+					return o1.compareTo(o2);
+				}});
+			for(int i = 0; i < deleteCount; i++) {
+				fileMap.get(lastModifiedList.get(i)).delete();
+			}
+		}catch(Exception e) {
+			logger.error(e.getMessage(), e);
+		}	
+		return filePath;
+	}
+	
+	private static String createNewFile(String filePath) {
+		File file = new File(filePath);
+		if ((!file.isFile()) || (!file.exists())) {
+			try {
+				File dirFile = file.getParentFile();
+				if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
+					dirFile.mkdirs();
+				}
+
+				boolean fileIsExists = file.createNewFile();
+				if(fileIsExists) {
+					return file.getAbsolutePath();
+				}
+				return null;
+			} catch (IOException e) {
+				logger.error("create task file error : " + e.getMessage() + filePath, e);
+			}
+		}
+		return file.getAbsolutePath();
+	}
+	
+	private static boolean copy(File oldFile, File newFile) {
+		try(	FileInputStream fis = new FileInputStream(oldFile);
+				InputStreamReader fir = new InputStreamReader(fis, "UTF-8");
+				OutputStream fos = new FileOutputStream(newFile, true);
+				OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8");){
+			char[] cbuf = new char[1024];
+			while(fir.read(cbuf) != -1) {
+				fow.write(cbuf);
+				fow.flush();
+			}		
+		} catch (FileNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
+		return true;
+	}
+	
+	private static void writeContent(String content, File file, boolean isAppend) {
+		try (	OutputStream fos = new FileOutputStream(file, isAppend);
+				OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8");
+				) {
+			fow.write(content);
+			fow.flush();
+		} catch (IOException e) {
+			logger.error("write task file error : " + e.getMessage(), e);
+		}
+	}
 	public static List<String> readContentToList(String filePath, String fileName) {
 		FileReader fr = null;
 		BufferedReader filebr = null;

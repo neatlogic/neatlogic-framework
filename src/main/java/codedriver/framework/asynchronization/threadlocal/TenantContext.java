@@ -25,8 +25,8 @@ public class TenantContext implements Serializable {
 		if(_tenantContext != null) {
 			context.setTenantUuid(_tenantContext.getTenantUuid());
 			context.setActiveModuleList(_tenantContext.getActiveModuleList());
-			instance.set(context);
 		}
+		instance.set(context);
 		return context;
 	}
 

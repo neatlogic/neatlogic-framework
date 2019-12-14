@@ -80,8 +80,10 @@ public class TenantContext implements Serializable {
 	public void setActiveModuleList(List<ModuleVo> activeModuleList) {
 		this.activeModuleList = activeModuleList;
 		activeModuleMap = new HashMap<>();
-		for(ModuleVo module : activeModuleList) {
-			activeModuleMap.put(module.getId(), module);
+		if(activeModuleList != null && activeModuleList.size() > 0) {
+			for(ModuleVo module : activeModuleList) {
+				activeModuleMap.put(module.getId(), module);
+			}
 		}
 	}
 

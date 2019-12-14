@@ -1,7 +1,6 @@
 package codedriver.framework.scheduler.core;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.server.core.ServerObserver;
 
 public class SchedulerServerObserver implements ServerObserver{
@@ -11,7 +10,8 @@ public class SchedulerServerObserver implements ServerObserver{
 	
 	@Override
 	public void whenServerInactivated(Integer serverId) {
-		schedulerManager.releaseLock(serverId);		
+		schedulerManager.releaseLock(serverId);
+		schedulerManager.loadNewJob();
 	}
 
 }

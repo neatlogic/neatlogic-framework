@@ -10,7 +10,7 @@
 		WHERE `uuid` = #{value}
 	</select>
 
-	<select id="getAllTenant" resultType="codedriver.framework.dto.TenantVo">
+	<select id="getAllActiveTenant" resultType="codedriver.framework.dto.TenantVo">
 		SELECT 
 		t.`uuid`, 
 		t.`name` 

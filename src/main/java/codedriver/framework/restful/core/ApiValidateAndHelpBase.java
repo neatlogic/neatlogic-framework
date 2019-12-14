@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -26,9 +27,20 @@ import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.NotDefined;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
+import codedriver.framework.restful.audit.ApiAuditManager;
+import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiAuditVo;
 
 public class ApiValidateAndHelpBase {
 	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
+
+	@Autowired
+	private ApiMapper apiMapper;
+
+	protected void saveAudit(ApiAuditVo auditVo) {
+		apiMapper.insertApiAudit(auditVo);
+		ApiAuditManager.saveAudit(auditVo);
+	}
 
 	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {
 		// 获取目标类

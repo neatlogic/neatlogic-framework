@@ -18,6 +18,8 @@ public interface BinaryStreamApiComponent {
 
 	public boolean isPrivate();
 
+	public int needAudit();
+
 	public Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	public JSONObject help();

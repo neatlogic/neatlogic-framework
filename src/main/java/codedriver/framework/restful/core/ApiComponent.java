@@ -15,6 +15,8 @@ public interface ApiComponent {
 
 	public boolean isPrivate();
 
+	public int needAudit();
+
 	public Object doService(ApiVo apiVo, JSONObject jsonObj) throws Exception;
 
 	public JSONObject help();

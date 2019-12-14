@@ -190,7 +190,7 @@ public class ApiDispatcher {
 			returnObj.put("Error", 500);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
-			logger.error(ex.getCause().getMessage(), ex.getCause());
+			logger.error(ex.getMessage(), ex);
 		}
 		if (!response.isCommitted()) {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);

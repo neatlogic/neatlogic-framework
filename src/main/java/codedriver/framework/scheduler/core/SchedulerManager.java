@@ -73,7 +73,7 @@ public class SchedulerManager implements ApplicationListener<ContextRefreshedEve
 
 	@PostConstruct
 	public final void init() {
-		tenantList = tenantMapper.getAllTenant();
+		tenantList = tenantMapper.getAllActiveTenant();
 	}
 
 	public static IJob getInstance(String className) {

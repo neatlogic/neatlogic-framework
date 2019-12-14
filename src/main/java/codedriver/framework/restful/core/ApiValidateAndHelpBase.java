@@ -3,6 +3,9 @@ package codedriver.framework.restful.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,8 +17,14 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.IpUtil;
+import codedriver.framework.dao.mapper.ConfigMapper;
+import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
@@ -30,16 +39,53 @@ import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.audit.ApiAuditManager;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
+import codedriver.framework.restful.dto.ApiVo;
 
 public class ApiValidateAndHelpBase {
 	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
-
+	private static final String API_AUDIT_CONFIG_KEY = "api_audit_config";
 	@Autowired
 	private ApiMapper apiMapper;
 
-	protected void saveAudit(ApiAuditVo auditVo) {
-		apiMapper.insertApiAudit(auditVo);
-		ApiAuditManager.saveAudit(auditVo);
+	@Autowired
+	private ConfigMapper configMapper;
+
+	protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
+		ConfigVo configVo = configMapper.getConfigByKey(API_AUDIT_CONFIG_KEY);
+		ApiAuditVo audit = new ApiAuditVo();
+		audit.setToken(apiVo.getToken());
+		audit.setTenant(TenantContext.get().getTenantUuid());
+		audit.setStatus(StringUtils.isNotBlank(error) ? ApiAuditVo.FAILED : ApiAuditVo.SUCCEED);
+		audit.setServerId(Config.SCHEDULE_SERVER_ID);
+		audit.setStartTime(new Date(startTime));
+		audit.setEndTime(new Date(endTime));
+		if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
+			try {
+				JSONObject auditConfig = JSONObject.parseObject(configVo.getValue());
+				if (auditConfig.containsKey("savepath")) {
+					audit.setLogPath(auditConfig.getString("savepath"));
+				}
+			} catch (Exception ex) {
+
+			}
+		}
+		UserContext userContext = UserContext.get();
+		audit.setUserId(userContext.getUserId());
+		HttpServletRequest request = userContext.getRequest();
+		String requestIp = IpUtil.getIpAddr(request);
+		audit.setIp(requestIp);
+		audit.setAuthType(apiVo.getAuthtype());
+		if (paramObj != null) {
+			audit.setParam(paramObj.toJSONString());
+		}
+		if (error != null) {
+			audit.setError(error);
+		}
+		if (result != null) {
+			audit.setResult(result);
+		}
+		apiMapper.insertApiAudit(audit);
+		ApiAuditManager.saveAudit(audit);
 	}
 
 	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {

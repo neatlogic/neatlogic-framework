@@ -15,7 +15,8 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
 public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements JsonStreamApiComponent, MyJsonStreamApiComponent {
-	//private static Logger logger = LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
+	// private static Logger logger =
+	// LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
 
 	@Autowired
 	private ApiMapper apiMapper;
@@ -29,11 +30,10 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 	}
 
 	@Override
-	public final Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception {
+	public final Object doService(ApiVo apiVo, JSONObject paramObj, JSONReader jsonReader) throws Exception {
 		String error = "";
 		Object result = null;
 		long startTime = System.currentTimeMillis();
-		Boolean status = false;
 		// audit.setParam(jsonObj.toString(4));
 		try {
 			try {
@@ -48,13 +48,19 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 			} catch (Exception ex) {
 				throw ex;
 			}
-			status = true;
 		} catch (Exception e) {
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
 			throw e;
 		} finally {
 			long endTime = System.currentTimeMillis();
-			
+			ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
+			// 如果没有配置，则使用默认配置
+			if (apiConfigVo == null) {
+				apiConfigVo = apiVo;
+			}
+			if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+				saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+			}
 		}
 		return result;
 	}

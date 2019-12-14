@@ -21,7 +21,7 @@ public class ApiAuditManager {
 	@PostConstruct
 	public void init() {
 		for (int i = 0; i < THREAD_COUNT; i++) {
-			BlockingQueue queue = new ArrayBlockingQueue<ApiAuditVo>(QUEUE_SIZE, true);
+			BlockingQueue<ApiAuditVo> queue = new ArrayBlockingQueue<>(QUEUE_SIZE, true);
 			queueList.add(queue);
 			Thread thread = new Thread(new ApiAuditThread(queue), "API-AUDIT-" + i);
 			thread.setDaemon(true);

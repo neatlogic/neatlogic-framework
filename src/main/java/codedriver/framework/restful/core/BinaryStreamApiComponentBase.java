@@ -17,7 +17,8 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
 public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBase implements BinaryStreamApiComponent, MyBinaryStreamApiComponent {
-	//private static Logger logger = LoggerFactory.getLogger(BinaryStreamApiComponentBase.class);
+	// private static Logger logger =
+	// LoggerFactory.getLogger(BinaryStreamApiComponentBase.class);
 
 	@Autowired
 	private ApiMapper apiMapper;
@@ -31,11 +32,10 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
 	}
 
 	@Override
-	public final Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public final Object doService(ApiVo apiVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String error = "";
 		Object result = null;
 		long startTime = System.currentTimeMillis();
-		Boolean status = false;
 		try {
 			try {
 				Object proxy = AopContext.currentProxy();
@@ -49,12 +49,19 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
 			} catch (Exception ex) {
 				throw ex;
 			}
-			status = true;
 		} catch (Exception e) {
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
 			throw e;
 		} finally {
 			long endTime = System.currentTimeMillis();
+			ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
+			// 如果没有配置，则使用默认配置
+			if (apiConfigVo == null) {
+				apiConfigVo = apiVo;
+			}
+			if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+				saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+			}
 		}
 		return result;
 	}

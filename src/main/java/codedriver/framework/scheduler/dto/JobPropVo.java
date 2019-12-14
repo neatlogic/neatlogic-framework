@@ -1,10 +1,19 @@
 package codedriver.framework.scheduler.dto;
 
-public class JobPropVo {
+import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
+
+public class JobPropVo {
+	
+	@EntityField(name = "属性id", type = ApiParamType.STRING)
 	private Long id;
-	private String jobUuid;
+	@JSONField(serialize = false)
+	private transient String jobUuid;
+	@EntityField(name = "属性名", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "属性值", type = ApiParamType.STRING)
 	private String value;
 	
 	public JobPropVo() {

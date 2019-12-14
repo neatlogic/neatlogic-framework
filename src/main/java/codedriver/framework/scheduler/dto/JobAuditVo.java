@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,22 +24,23 @@ public class JobAuditVo extends BasePageVo {
     public final static String SUCCESS = "success";
     
     public final static String ERROR = "error";
+    @EntityField(name = "记录id", type = ApiParamType.LONG)
     private Long id;
-
+    @EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
     private String jobUuid;
-
+    @EntityField(name = "开始时间", type = ApiParamType.LONG)
     private Date startTime;
-
+    @EntityField(name = "结束时间", type = ApiParamType.LONG)
     private Date endTime;
     @JSONField(serialize = false)
     private String logPath;
     @JSONField(serialize = false)
     private String logContent;
-
+    @EntityField(name = "日志是否为空", type = ApiParamType.INTEGER)
     private int isLogEmpty = 0;
-
+    @EntityField(name = "执行状态(success:成功；error异常；processing:进行中)", type = ApiParamType.STRING)
     private String state = PROCESSING;
-    
+    @EntityField(name = "定时作业名称", type = ApiParamType.INTEGER)
     private Integer serverId;
 
     public JobAuditVo() {

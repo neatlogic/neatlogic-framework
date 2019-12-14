@@ -169,51 +169,55 @@ public class FileUtil {
 		if (filePath == null) {
 			return null;		
 		}
-		File desFile = new File(filePath);
-		String content = apiAuditContent.format();
-		content = content == null ? "" : content;
-		writeContent(content, desFile, isAppend);
-		long length = desFile.length();
-		if(length < appender.getMaxFileSize()) {
-			return filePath;				
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat(appender.getFileNamepattern());
-		String newFilePath = filePath + sdf.format(new Date());
-		newFilePath = createNewFile(newFilePath);
-		if(newFilePath == null) {
-			return filePath;
-		}
-		File newFile = new File(newFilePath);
-		boolean flag = copy(desFile, newFile);
-		if(!flag) {
-			newFile.delete();
-		}
-		writeContent("", desFile, false);
-		int maxHistory = appender.getMaxHistory();
-		if(maxHistory == -1) {
-			return filePath;
-		}
-		int index = filePath.lastIndexOf(File.separator);
-		String dirPath = filePath.substring(0, index);		
-		File[] fileList = new File(dirPath).listFiles();
-		int deleteCount = fileList.length - (maxHistory + 1);
-		if(deleteCount < 1) {
-			return filePath;
-		}
-		Map<Long, File> fileMap = new HashMap<>();
-		List<Long> lastModifiedList = new ArrayList<>();
-		for(File file : fileList) {
-			fileMap.put(file.lastModified(), file);
-			lastModifiedList.add(file.lastModified());
-		}
-		lastModifiedList.sort(new Comparator<Long>() {
-			@Override
-			public int compare(Long o1, Long o2) {
-				return o1.compareTo(o2);
-			}});
-		for(int i = 0; i < deleteCount; i++) {
-			fileMap.get(lastModifiedList.get(i)).delete();
-		}
+		try {
+			File desFile = new File(filePath);
+			String content = apiAuditContent.format();
+			content = content == null ? "" : content;
+			writeContent(content, desFile, isAppend);
+			long length = desFile.length();
+			if(length < appender.getMaxFileSize()) {
+				return filePath;				
+			}
+			SimpleDateFormat sdf = new SimpleDateFormat(appender.getFileNamepattern());
+			String newFilePath = filePath + sdf.format(new Date());
+			newFilePath = createNewFile(newFilePath);
+			if(newFilePath == null) {
+				return filePath;
+			}
+			File newFile = new File(newFilePath);
+			boolean flag = copy(desFile, newFile);
+			if(!flag) {
+				newFile.delete();
+			}
+			writeContent("", desFile, false);
+			int maxHistory = appender.getMaxHistory();
+			if(maxHistory < 0) {
+				return filePath;
+			}
+			int index = filePath.lastIndexOf(File.separator);
+			String dirPath = filePath.substring(0, index);		
+			File[] fileList = new File(dirPath).listFiles();
+			int deleteCount = fileList.length - (maxHistory + 1);
+			if(deleteCount < 1) {
+				return filePath;
+			}
+			Map<Long, File> fileMap = new HashMap<>();
+			List<Long> lastModifiedList = new ArrayList<>();
+			for(File file : fileList) {
+				fileMap.put(file.lastModified(), file);
+				lastModifiedList.add(file.lastModified());
+			}
+			lastModifiedList.sort(new Comparator<Long>() {
+				@Override
+				public int compare(Long o1, Long o2) {
+					return o1.compareTo(o2);
+				}});
+			for(int i = 0; i < deleteCount; i++) {
+				fileMap.get(lastModifiedList.get(i)).delete();
+			}
+		}catch(Exception e) {
+			logger.error(e.getMessage(), e);
+		}	
 		return filePath;
 	}
 	

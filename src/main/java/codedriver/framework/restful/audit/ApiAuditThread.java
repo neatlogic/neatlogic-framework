@@ -79,7 +79,9 @@ public class ApiAuditThread extends CodeDriverThread {
 		String lastTenantUuid = "";
 		try {
 			while ((apiAuditVo = queue.take()) != null) {
+				String oldThreadName = Thread.currentThread().getName();
 				try {
+					Thread.currentThread().setName("API-AUDIT-" + apiAuditVo.getTenant() + "-" + apiAuditVo.getToken());
 					if (StringUtils.isNotBlank(lastTenantUuid) && !lastTenantUuid.equals(apiAuditVo.getTenant())) {
 						OutputStreamWriter writer = apiAuditWriterMap.get(lastTenantUuid);
 						if (writer != null) {
@@ -117,6 +119,8 @@ public class ApiAuditThread extends CodeDriverThread {
 					lastTenantUuid = apiAuditVo.getTenant();
 				} catch (Exception ex) {
 					logger.error(ex.getMessage(), ex);
+				} finally {
+					Thread.currentThread().setName(oldThreadName);
 				}
 			}
 		} catch (InterruptedException e) {

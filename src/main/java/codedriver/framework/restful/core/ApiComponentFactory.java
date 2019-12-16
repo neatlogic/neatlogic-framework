@@ -155,7 +155,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setIsActive(1);
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
-					apiVo.setType(ApiVo.Type.STREAM.getValue());
+					apiVo.setType(ApiVo.Type.BINARY.getValue());
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);

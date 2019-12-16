@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -88,6 +90,76 @@ public class ApiValidateAndHelpBase {
 		ApiAuditManager.saveAudit(audit);
 	}
 
+	private static void encodeHtml(JSONObject paramObj, String key) {
+		Object value = paramObj.get(key);
+		if (value instanceof String) {
+			try {
+				JSONObject valObj = JSONObject.parseObject(value.toString());
+				encodeHtml(valObj);
+				paramObj.replace(key, valObj.toJSONString());
+			} catch (Exception ex) {
+				try {
+					JSONArray valList = JSONArray.parseArray(value.toString());
+					encodeHtml(valList);
+					paramObj.replace(key, valList.toJSONString());
+				} catch (Exception e) {
+					paramObj.replace(key, encodeHtml(value.toString()));
+				}
+			}
+		} else if (value instanceof JSONObject) {
+			encodeHtml((JSONObject) value);
+			paramObj.replace(key, value);
+		} else if (value instanceof JSONArray) {
+			encodeHtml((JSONArray) value);
+			paramObj.replace(key, value);
+		}
+	}
+
+	private static String encodeHtml(String str) {
+		if (StringUtils.isNotBlank(str)) {
+			// str = str.replace("&", "&amp;");
+			str = str.replace("<", "&lt;");
+			str = str.replace(">", "&gt;");
+			str = str.replace("'", "&#39;");
+			str = str.replace("\"", "&quot;");
+			return str;
+		}
+		return "";
+	}
+
+	private static void encodeHtml(JSONObject j) {
+		Set<String> set = j.keySet();
+		Iterator<String> it = set.iterator();
+		while (it.hasNext()) {
+			String key = it.next().toString();
+			String newKey = encodeHtml(key);
+			if (!newKey.equals(key)) {
+				Object value = j.get(key);
+				j.remove(key);
+				j.replace(newKey, value);
+			}
+			if (j.get(newKey) instanceof JSONObject) {
+				encodeHtml(j.getJSONObject(newKey));
+			} else if (j.get(newKey) instanceof JSONArray) {
+				encodeHtml(j.getJSONArray(newKey));
+			} else if (j.get(newKey) instanceof String) {
+				j.replace(newKey, encodeHtml(j.getString(newKey)));
+			}
+		}
+	}
+
+	private static void encodeHtml(JSONArray j) {
+		for (int i = 0; i < j.size(); i++) {
+			if (j.get(i) instanceof JSONObject) {
+				encodeHtml(j.getJSONObject(i));
+			} else if (j.get(i) instanceof JSONArray) {
+				encodeHtml(j.getJSONArray(i));
+			} else if (j.get(i) instanceof String) {
+				j.set(i, encodeHtml(j.getString(i)));
+			}
+		}
+	}
+
 	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {
 		// 获取目标类
 		Boolean isAuth = false;
@@ -120,6 +192,11 @@ public class ApiValidateAndHelpBase {
 							}
 							// 参数类型校验
 							Object paramValue = paramObj.get(p.name());
+							// xss过滤
+							if (p.xss() && paramObj.containsKey(p.name())) {
+								encodeHtml(paramObj, p.name());
+							}
+
 							// 判断长度
 							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
 								if (paramValue.toString().length() > p.length()) {

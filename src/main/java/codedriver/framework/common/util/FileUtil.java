@@ -156,6 +156,58 @@ public class FileUtil {
 		return desFile.getAbsolutePath();
 	}
 
+	
+	private static String createNewFile(String filePath) {
+		File file = new File(filePath);
+		if ((!file.isFile()) || (!file.exists())) {
+			try {
+				File dirFile = file.getParentFile();
+				if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
+					dirFile.mkdirs();
+				}
+
+				boolean fileIsExists = file.createNewFile();
+				if(fileIsExists) {
+					return file.getAbsolutePath();
+				}
+				return null;
+			} catch (IOException e) {
+				logger.error("create task file error : " + e.getMessage() + filePath, e);
+			}
+		}
+		return file.getAbsolutePath();
+	}
+	
+	private static boolean copy(File oldFile, File newFile) {
+		try(	FileInputStream fis = new FileInputStream(oldFile);
+				InputStreamReader fir = new InputStreamReader(fis, "UTF-8");
+				OutputStream fos = new FileOutputStream(newFile, true);
+				OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8");){
+			char[] cbuf = new char[1024];
+			while(fir.read(cbuf) != -1) {
+				fow.write(cbuf);
+				fow.flush();
+			}		
+		} catch (FileNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
+		return true;
+	}
+	
+	private static void writeContent(String content, File file, boolean isAppend) {
+		try (	OutputStream fos = new FileOutputStream(file, isAppend);
+				OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8");
+				) {
+			fow.write(content);
+			fow.flush();
+		} catch (IOException e) {
+			logger.error("write task file error : " + e.getMessage(), e);
+		}
+	}
 	public static List<String> readContentToList(String filePath, String fileName) {
 		FileReader fr = null;
 		BufferedReader filebr = null;

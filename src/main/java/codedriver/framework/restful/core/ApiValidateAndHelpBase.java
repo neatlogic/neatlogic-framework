@@ -3,18 +3,30 @@ package codedriver.framework.restful.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.apiparam.core.ApiParamFactory;
 import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.IpUtil;
+import codedriver.framework.dao.mapper.ConfigMapper;
+import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
@@ -26,9 +38,127 @@ import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.NotDefined;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
+import codedriver.framework.restful.audit.ApiAuditManager;
+import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiAuditVo;
+import codedriver.framework.restful.dto.ApiVo;
 
 public class ApiValidateAndHelpBase {
 	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
+	private static final String API_AUDIT_CONFIG_KEY = "api_audit_config";
+	@Autowired
+	private ApiMapper apiMapper;
+
+	@Autowired
+	private ConfigMapper configMapper;
+
+	protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
+		ConfigVo configVo = configMapper.getConfigByKey(API_AUDIT_CONFIG_KEY);
+		ApiAuditVo audit = new ApiAuditVo();
+		audit.setToken(apiVo.getToken());
+		audit.setTenant(TenantContext.get().getTenantUuid());
+		audit.setStatus(StringUtils.isNotBlank(error) ? ApiAuditVo.FAILED : ApiAuditVo.SUCCEED);
+		audit.setServerId(Config.SCHEDULE_SERVER_ID);
+		audit.setStartTime(new Date(startTime));
+		audit.setEndTime(new Date(endTime));
+		if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
+			try {
+				JSONObject auditConfig = JSONObject.parseObject(configVo.getValue());
+				if (auditConfig.containsKey("savepath")) {
+					audit.setLogPath(auditConfig.getString("savepath"));
+				}
+			} catch (Exception ex) {
+
+			}
+		}
+		UserContext userContext = UserContext.get();
+		audit.setUserId(userContext.getUserId());
+		HttpServletRequest request = userContext.getRequest();
+		String requestIp = IpUtil.getIpAddr(request);
+		audit.setIp(requestIp);
+		audit.setAuthType(apiVo.getAuthtype());
+		if (paramObj != null) {
+			audit.setParam(paramObj.toJSONString());
+		}
+		if (error != null) {
+			audit.setError(error);
+		}
+		if (result != null) {
+			audit.setResult(result);
+		}
+		apiMapper.insertApiAudit(audit);
+		ApiAuditManager.saveAudit(audit);
+	}
+
+	private static void encodeHtml(JSONObject paramObj, String key) {
+		Object value = paramObj.get(key);
+		if (value instanceof String) {
+			try {
+				JSONObject valObj = JSONObject.parseObject(value.toString());
+				encodeHtml(valObj);
+				paramObj.replace(key, valObj.toJSONString());
+			} catch (Exception ex) {
+				try {
+					JSONArray valList = JSONArray.parseArray(value.toString());
+					encodeHtml(valList);
+					paramObj.replace(key, valList.toJSONString());
+				} catch (Exception e) {
+					paramObj.replace(key, encodeHtml(value.toString()));
+				}
+			}
+		} else if (value instanceof JSONObject) {
+			encodeHtml((JSONObject) value);
+			paramObj.replace(key, value);
+		} else if (value instanceof JSONArray) {
+			encodeHtml((JSONArray) value);
+			paramObj.replace(key, value);
+		}
+	}
+
+	private static String encodeHtml(String str) {
+		if (StringUtils.isNotBlank(str)) {
+			// str = str.replace("&", "&amp;");
+			str = str.replace("<", "&lt;");
+			str = str.replace(">", "&gt;");
+			str = str.replace("'", "&#39;");
+			str = str.replace("\"", "&quot;");
+			return str;
+		}
+		return "";
+	}
+
+	private static void encodeHtml(JSONObject j) {
+		Set<String> set = j.keySet();
+		Iterator<String> it = set.iterator();
+		while (it.hasNext()) {
+			String key = it.next().toString();
+			String newKey = encodeHtml(key);
+			if (!newKey.equals(key)) {
+				Object value = j.get(key);
+				j.remove(key);
+				j.replace(newKey, value);
+			}
+			if (j.get(newKey) instanceof JSONObject) {
+				encodeHtml(j.getJSONObject(newKey));
+			} else if (j.get(newKey) instanceof JSONArray) {
+				encodeHtml(j.getJSONArray(newKey));
+			} else if (j.get(newKey) instanceof String) {
+				j.replace(newKey, encodeHtml(j.getString(newKey)));
+			}
+		}
+	}
+
+	private static void encodeHtml(JSONArray j) {
+		for (int i = 0; i < j.size(); i++) {
+			if (j.get(i) instanceof JSONObject) {
+				encodeHtml(j.getJSONObject(i));
+			} else if (j.get(i) instanceof JSONArray) {
+				encodeHtml(j.getJSONArray(i));
+			} else if (j.get(i) instanceof String) {
+				j.set(i, encodeHtml(j.getString(i)));
+			}
+		}
+	}
 
 	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {
 		// 获取目标类
@@ -62,6 +192,11 @@ public class ApiValidateAndHelpBase {
 							}
 							// 参数类型校验
 							Object paramValue = paramObj.get(p.name());
+							// xss过滤
+							if (p.xss() && paramObj.containsKey(p.name())) {
+								encodeHtml(paramObj, p.name());
+							}
+
 							// 判断长度
 							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
 								if (paramValue.toString().length() > p.length()) {

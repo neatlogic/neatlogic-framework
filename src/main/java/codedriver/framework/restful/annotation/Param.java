@@ -23,7 +23,9 @@ public @interface Param {
 
 	String desc() default "";
 
-	Class explode() default NotDefined.class;
+	Class<?> explode() default NotDefined.class;
+
+	boolean xss() default false;
 
 	int length() default -1;
 }

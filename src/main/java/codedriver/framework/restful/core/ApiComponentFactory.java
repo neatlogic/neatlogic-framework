@@ -68,18 +68,19 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					if (token.endsWith("/")) {
 						token = token.substring(0, token.length() - 1);
 					}
-					ApiVo restInterfaceVo = new ApiVo();
-					restInterfaceVo.setAuthtype("token");
-					restInterfaceVo.setToken(token);
-					restInterfaceVo.setComponentId(component.getId());
-					restInterfaceVo.setName(component.getName());
-					restInterfaceVo.setIsActive(1);
-					restInterfaceVo.setTimeout(0);// 0是default
-					restInterfaceVo.setType(ApiVo.Type.OBJECT.getValue());
-					restInterfaceVo.setModuleId(context.getId());
+					ApiVo apiVo = new ApiVo();
+					apiVo.setAuthtype("token");
+					apiVo.setToken(token);
+					apiVo.setComponentId(component.getId());
+					apiVo.setName(component.getName());
+					apiVo.setIsActive(1);
+					apiVo.setNeedAudit(component.needAudit());
+					apiVo.setTimeout(0);// 0是default
+					apiVo.setType(ApiVo.Type.OBJECT.getValue());
+					apiVo.setModuleId(context.getId());
 					if (!apiMap.containsKey(token)) {
-						apiList.add(restInterfaceVo);
-						apiMap.put(token, restInterfaceVo);
+						apiList.add(apiVo);
+						apiMap.put(token, apiVo);
 					} else {
 						throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
 					}
@@ -106,18 +107,19 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					if (token.endsWith("/")) {
 						token = token.substring(0, token.length() - 1);
 					}
-					ApiVo restInterfaceVo = new ApiVo();
-					restInterfaceVo.setAuthtype("");
-					restInterfaceVo.setToken(token);
-					restInterfaceVo.setComponentId(component.getId());
-					restInterfaceVo.setExpire("");
-					restInterfaceVo.setName(component.getName());
-					restInterfaceVo.setIsActive(1);
-					restInterfaceVo.setTimeout(0);// 0是default
-					restInterfaceVo.setType(ApiVo.Type.STREAM.getValue());
+					ApiVo apiVo = new ApiVo();
+					apiVo.setAuthtype("");
+					apiVo.setToken(token);
+					apiVo.setComponentId(component.getId());
+					apiVo.setExpire("");
+					apiVo.setName(component.getName());
+					apiVo.setIsActive(1);
+					apiVo.setNeedAudit(component.needAudit());
+					apiVo.setTimeout(0);// 0是default
+					apiVo.setType(ApiVo.Type.STREAM.getValue());
 					if (!apiMap.containsKey(token)) {
-						apiList.add(restInterfaceVo);
-						apiMap.put(token, restInterfaceVo);
+						apiList.add(apiVo);
+						apiMap.put(token, apiVo);
 					} else {
 						throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
 					}
@@ -144,18 +146,19 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					if (token.endsWith("/")) {
 						token = token.substring(0, token.length() - 1);
 					}
-					ApiVo restInterfaceVo = new ApiVo();
-					restInterfaceVo.setAuthtype("");
-					restInterfaceVo.setToken(token);
-					restInterfaceVo.setComponentId(component.getId());
-					restInterfaceVo.setExpire("");
-					restInterfaceVo.setName(component.getName());
-					restInterfaceVo.setIsActive(1);
-					restInterfaceVo.setTimeout(0);// 0是default
-					restInterfaceVo.setType(ApiVo.Type.STREAM.getValue());
+					ApiVo apiVo = new ApiVo();
+					apiVo.setAuthtype("");
+					apiVo.setToken(token);
+					apiVo.setComponentId(component.getId());
+					apiVo.setExpire("");
+					apiVo.setName(component.getName());
+					apiVo.setIsActive(1);
+					apiVo.setNeedAudit(component.needAudit());
+					apiVo.setTimeout(0);// 0是default
+					apiVo.setType(ApiVo.Type.BINARY.getValue());
 					if (!apiMap.containsKey(token)) {
-						apiList.add(restInterfaceVo);
-						apiMap.put(token, restInterfaceVo);
+						apiList.add(apiVo);
+						apiMap.put(token, apiVo);
 					} else {
 						throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
 					}

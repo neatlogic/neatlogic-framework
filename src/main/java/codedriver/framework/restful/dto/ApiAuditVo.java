@@ -8,10 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import codedriver.framework.common.dto.BasePageVo;
 
 public class ApiAuditVo extends BasePageVo {
-	
+
 	public final static String SUCCEED = "succeed";
 	public final static String FAILED = "failed";
-	
+
 	private String uuid;
 	private String token;
 	private String userId;
@@ -22,15 +22,20 @@ public class ApiAuditVo extends BasePageVo {
 	private Date endTime;
 	private Long timeCost;
 	private String status;
+	private String param;
+	private String error;
+	private Object result;
+	private String logPath;
+	private transient String tenant;
 
 	public ApiAuditVo() {
 		this.setPageSize(20);
 	}
 
 	public synchronized String getUuid() {
-		if(StringUtils.isBlank(uuid)) {
+		if (StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
-		}			
+		}
 		return uuid;
 	}
 
@@ -108,6 +113,46 @@ public class ApiAuditVo extends BasePageVo {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getParam() {
+		return param;
+	}
+
+	public void setParam(String param) {
+		this.param = param;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
+	public String getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(String tenant) {
+		this.tenant = tenant;
+	}
+
+	public String getLogPath() {
+		return logPath;
+	}
+
+	public void setLogPath(String logPath) {
+		this.logPath = logPath;
+	}
+
+	public Object getResult() {
+		return result;
+	}
+
+	public void setResult(Object result) {
+		this.result = result;
 	}
 
 }

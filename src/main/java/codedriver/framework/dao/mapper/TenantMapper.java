@@ -8,5 +8,5 @@ public interface TenantMapper {
 
 	public TenantVo getTenantByUuid(String tenantUuid);
 
-	public List<TenantVo> getAllTenant();
+	public List<TenantVo> getAllActiveTenant();
 }

@@ -1,10 +1,17 @@
 package codedriver.framework.scheduler.dto;
 
-public class JobPropVo {
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
 
+public class JobPropVo {
+	
+	@EntityField(name = "属性id", type = ApiParamType.STRING)
 	private Long id;
+	@EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
 	private String jobUuid;
+	@EntityField(name = "属性名", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "属性值", type = ApiParamType.STRING)
 	private String value;
 	
 	public JobPropVo() {

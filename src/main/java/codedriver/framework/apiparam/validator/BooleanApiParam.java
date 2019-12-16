@@ -22,7 +22,7 @@ public class BooleanApiParam extends ApiParamBase {
 
 	@Override
 	public ApiParamType getType() {
-		return ApiParamType.LONG;
+		return ApiParamType.BOOLEAN;
 	}
 
 }

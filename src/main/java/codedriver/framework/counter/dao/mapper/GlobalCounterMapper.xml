@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.counter.dao.mapper.GlobalCounterMapper">
+    <resultMap id="counterMap" type="codedriver.framework.counter.dto.GlobalCounterVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pluginId" property="pluginId"/>
+        <result column="description" property="description"/>
+        <result column="isActive" property="isActive"/>
+        <result column="moduleId" property="moduleId"/>
+        <result column="sort" property="sort"/>
+        <association property="counterSubscribeVo" javaType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
+            <id column="subId" property="id"/>
+            <result column="id" property="pluginId"/>
+            <result column="userId" property="userId"/>
+        </association>
+    </resultMap>
+    
+    <select id="getSubscribeCounterListByUserId" resultMap="counterMap" parameterType="java.lang.String">
+        SELECT
+        a.`plugin_id` as `pluginId`,
+        a.`id` as `subId`,
+        a.`user_id` as `userId`,
+        d.`sort` as `userSort`
+        FROM `counter_subscribe` a
+        LEFT JOIN `counter_user_sort` d ON a.`plugin_id` = d.`plugin_id`
+        WHERE a.`user_id` = #{value}
+    </select>
+
+    <select id="getCounterSubscribeByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
+        SELECT
+        `id`,
+        `plugin_id` as `pluginId`,
+        `user_id` as `userId`
+        FROM `counter_subscribe`
+        WHERE `user_id` = #{userId}
+    </select>
+
+    <select id="getCounterSortListByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
+        SELECT
+        `plugin_id` as `pluginId`,
+        `user_id` as `userId`,
+        `sort`
+        FROM `counter_user_sort`
+        WHERE `user_id` = #{userId}
+    </select>
+    
+    <insert id="insertCounterSubscribe" parameterType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
+        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        INSERT INTO `counter_subscribe`(
+        `plugin_id`,
+        `user_id`
+        ) VALUES(
+        #{pluginId},
+        #{userId}
+        )
+    </insert>
+    
+    <insert id="insertCounterUserSort" parameterType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
+        INSERT INTO `counter_user_sort`(
+          `plugin_id`,
+          `user_id`,
+          `sort`
+        )VALUES(
+        #{pluginId},
+        #{userId},
+        #{sort}
+        )
+    </insert>
+    
+    <delete id="deleteCounterSubscribe" parameterType="java.lang.Long">
+        DELETE FROM `counter_subscribe` WHERE id = #{value}
+    </delete>
+
+    <delete id="deleteCounterUserSortByUserId" parameterType="java.lang.String">
+        DELETE FROM `counter_user_sort` WHERE `user_id` = #{value}
+    </delete>
+</mapper>

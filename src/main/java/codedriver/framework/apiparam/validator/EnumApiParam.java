@@ -32,7 +32,7 @@ public class EnumApiParam extends ApiParamBase {
 
 	@Override
 	public ApiParamType getType() {
-		return ApiParamType.REGEX;
+		return ApiParamType.ENUM;
 	}
 
 }

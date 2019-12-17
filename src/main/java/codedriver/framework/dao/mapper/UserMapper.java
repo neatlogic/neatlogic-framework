@@ -14,6 +14,8 @@ public interface UserMapper {
 
 	public List<UserVo> searchUser(UserVo userVo);
 
+	public List<UserVo> getActiveUserByTeamId(String teamId);
+
 	public UserVo getUserByUserIdAndPassword(UserVo userVo);
 
 	public UserSessionVo getUserSessionByUserId(String userId);

@@ -54,6 +54,20 @@
 		</if>
 	</select>
 
+	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`email`,
+		a.`phone`,
+		a.`password`,
+		a.`is_active` as `isActive`
+		FROM `user` a
+		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
+		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1
+	</select>
+
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
 		<id property="userId" column="userId" />
 		<result property="userName" column="userName" />

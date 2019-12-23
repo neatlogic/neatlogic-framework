@@ -24,7 +24,7 @@
 				<configuration>
 					<skip>true</skip>
 				</configuration>
-			</plugin>
+			</plugin> 
 		</plugins>
 	</build>
 </project>

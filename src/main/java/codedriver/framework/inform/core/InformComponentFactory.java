@@ -1,16 +1,13 @@
 package codedriver.framework.inform.core;
 
-import codedriver.framework.common.RootComponent;
-import org.reflections.Reflections;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+
+import codedriver.framework.common.RootComponent;
 
 /**
  * @program: codedriver

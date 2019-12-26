@@ -206,6 +206,11 @@ public class ApiValidateAndHelpBase {
 							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
 								throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
 							}
+							if (p.type().equals(ApiParamType.STRING)) {
+								if (paramValue != null) {
+									paramObj.put(p.name(), paramValue.toString().trim());
+								}
+							}
 						}
 					}
 				}

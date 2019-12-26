@@ -36,11 +36,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	@Override
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo) {
-		List<JobClassVo> jobClassList = SchedulerManager.getAllJobClassList();
-		int rowNum = jobClassList.size();
-		int pageCount = PageUtil.getPageCount(rowNum,jobClassVo.getPageSize());
-		jobClassVo.setPageCount(pageCount);
-		jobClassVo.setRowNum(rowNum);
+		List<JobClassVo> jobClassList = SchedulerManager.getAllJobClassList();		
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
 		for(JobClassVo jobClass : jobClassList) {
 			if(jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
@@ -57,10 +53,13 @@ public class SchedulerServiceImpl implements SchedulerService{
 		
 		int startNum = jobClassVo.getStartNum();
 		int pageSize = jobClassVo.getPageSize();
-		int endNum = startNum + pageSize - 1;
-		int MaxNum = jobClassFilterList.size() - 1;
-		endNum = endNum >  MaxNum ? MaxNum : endNum;
-		List<JobClassVo> returnJobClassList = jobClassFilterList.subList(startNum, endNum + 1);
+		int rowNum = jobClassFilterList.size();
+		int pageCount = PageUtil.getPageCount(rowNum, pageSize);
+		jobClassVo.setPageCount(pageCount);
+		jobClassVo.setRowNum(rowNum);
+		int endNum = startNum + pageSize;
+		endNum = endNum >  rowNum ? rowNum : endNum;
+		List<JobClassVo> returnJobClassList = jobClassFilterList.subList(startNum, endNum);
 		return returnJobClassList;
 	}
 

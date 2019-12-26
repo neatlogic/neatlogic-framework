@@ -11,6 +11,7 @@ import org.springframework.util.ClassUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -46,7 +47,11 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 				validApi(this.getClass(), paramObj, JSONObject.class, JSONReader.class);
 				result = myDoService(paramObj, jsonReader);
 			} catch (Exception ex) {
-				throw ex;
+				if(ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException ){
+					throw new ApiRuntimeException(ex.getCause().getMessage());
+				}else {
+					throw ex;
+				}
 			}
 		} catch (Exception e) {
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();

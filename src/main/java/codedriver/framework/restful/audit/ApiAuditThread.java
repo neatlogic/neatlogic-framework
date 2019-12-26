@@ -22,9 +22,10 @@ import codedriver.framework.restful.dto.ApiAuditVo;
 
 public class ApiAuditThread extends CodeDriverThread {
 	Logger logger = LoggerFactory.getLogger(ApiAuditThread.class);
-
+	private static long maxFileSize = 1024 * 1024 * 10;
 	private BlockingQueue<ApiAuditVo> queue;
 	private Map<String, OutputStreamWriter> apiAuditWriterMap = new HashMap<>();
+	private Map<String, String> fileNameMap = new HashMap<>();
 
 	public ApiAuditThread(BlockingQueue<ApiAuditVo> _queue) {
 		queue = _queue;
@@ -33,15 +34,32 @@ public class ApiAuditThread extends CodeDriverThread {
 	private String getLogPath(String tenant, String logPath) {
 		String logFilePath = "";
 		if (StringUtils.isBlank(logPath)) {
-			logFilePath = Config.CODEDRIVER_HOME + File.separator + "apiaudit" + File.separator + tenant + File.separator + "audit.log";
+			logFilePath = Config.CODEDRIVER_HOME + File.separator + "apiaudit" + File.separator + tenant + File.separator;
 		} else {
 			if (logPath.startsWith(File.separator)) {
-				logFilePath = logPath + File.separator + tenant + File.separator + "audit.log";
+				logFilePath = logPath + File.separator + tenant + File.separator;
 			} else {
-				logFilePath = Config.CODEDRIVER_HOME + File.separator + logPath + File.separator + tenant + File.separator + "audit.log";
+				logFilePath = Config.CODEDRIVER_HOME + File.separator + logPath + File.separator + tenant + File.separator;
 			}
 		}
 		return logFilePath;
+	}
+
+	private String getFileName(String tenant) {
+		if (!fileNameMap.containsKey(tenant)) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+			String filename = "audit.log." + sdf.format(new Date());
+			fileNameMap.put(tenant, filename);
+		}
+		return fileNameMap.get(tenant);
+	}
+
+	private String getRotateFileName(String tenant) {
+		String filename = getFileName(tenant);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+		filename = filename + "-" + sdf.format(new Date());
+		fileNameMap.remove(tenant);
+		return filename;
 	}
 
 	public static String formatContent(ApiAuditVo apiAuditVo) {
@@ -95,11 +113,17 @@ public class ApiAuditThread extends CodeDriverThread {
 					OutputStreamWriter writer = apiAuditWriterMap.get(apiAuditVo.getTenant());
 					if (writer == null) {
 						String logFilePath = getLogPath(apiAuditVo.getTenant(), apiAuditVo.getLogPath());
-						File file = new File(logFilePath);
-						if (!file.getParentFile().exists()) {
-							file.getParentFile().mkdirs();
-						}
-						if (!file.exists()) {
+						File file = new File(logFilePath + getFileName(apiAuditVo.getTenant()));
+						if (file.exists()) {
+							if (file.length() > maxFileSize) {
+								file.renameTo(new File(logFilePath + getRotateFileName(apiAuditVo.getTenant())));
+								file = new File(logFilePath + getFileName(apiAuditVo.getTenant()));
+								file.createNewFile();
+							}
+						} else {
+							if (!file.getParentFile().exists()) {
+								file.getParentFile().mkdirs();
+							}
 							file.createNewFile();
 						}
 						writer = new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8");

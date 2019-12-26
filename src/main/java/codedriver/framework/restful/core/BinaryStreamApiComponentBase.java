@@ -13,6 +13,7 @@ import org.springframework.util.ClassUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -47,7 +48,11 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
 				validApi(this.getClass(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
 				result = myDoService(paramObj, request, response);
 			} catch (Exception ex) {
-				throw ex;
+				if(ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException ){
+					throw new ApiRuntimeException(ex.getCause().getMessage());
+				}else {
+					throw ex;
+				}
 			}
 		} catch (Exception e) {
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();

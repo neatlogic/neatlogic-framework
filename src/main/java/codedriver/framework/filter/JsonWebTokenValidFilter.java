@@ -84,7 +84,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			authorization = request.getHeader("Authorization");
 		}
 		if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
-			if (authorization.startsWith("Bearer")) {
+			if (authorization.startsWith("Bearer") && authorization.length() > 7) {
 				String jwt = authorization.substring(7);
 				String[] jwtParts = jwt.split("\\.");
 				if (jwtParts.length == 3) {

@@ -148,7 +148,8 @@
 		`phone` = #{phone},
 		`password` = #{password},
 		`pinyin` = #{pinyin},
-		`is_active` = #{isActive}
+		`is_active` = #{isActive},
+		`user_info` = #{userInfo}
 		WHERE `user_id` = #{userId}
 	</update>
 

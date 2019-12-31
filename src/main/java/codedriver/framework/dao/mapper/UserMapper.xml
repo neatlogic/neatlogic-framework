@@ -157,7 +157,7 @@
 		UPDATE
 		`user`
 		SET
-		`user_name` = {userName},
+		`user_name` = #{userName},
 		`email` = #{email},
 		`phone` = #{phone},
 		`password` = #{password},

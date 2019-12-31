@@ -13,6 +13,7 @@ public class UserVo extends BasePageVo {
 	private transient String keyword;
 	private String userId;
 	private String userName;
+	private String pinyin;
 	private String tenant;
 	private String email;
 	private String password;
@@ -43,6 +44,14 @@ public class UserVo extends BasePageVo {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getPinyin() {
+		return pinyin;
+	}
+
+	public void setPinyin(String pinyin) {
+		this.pinyin = pinyin;
 	}
 
 	public String getTenant() {

@@ -13,14 +13,14 @@
 		`team`
 		WHERE
 		1=1
-		<if test="uuid != null AND uuid != ''">
-			AND uuid = #{uuid}
+		<if test="uuid != null and uuid != ''">
+			and uuid = #{uuid}
 		</if>
-		<if test="keyword != null AND keyword != ''">
-			AND name LIKE CONCAT(#{keyword}, '%')
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT(#{keyword}, '%')
 		</if>
-		<if test="parentUuid != null AND parentUuid != ''">
-			AND parent_uuid = #{parentUuid}
+		<if test="parentUuid != null and parentUuid != ''">
+			and parent_uuid = #{parentUuid}
 		</if>
 		ORDER BY `sort`
 		<if test="needPage == true">
@@ -35,14 +35,14 @@
 		`team`
 		WHERE
 		1=1
-		<if test="uuid != null AND uuid != ''">
-			AND uuid = #{uuid}
+		<if test="uuid != null and uuid != ''">
+			and uuid = #{uuid}
 		</if>
-		<if test="keyword != null AND keyword != ''">
-			AND name LIKE CONCAT(#{keyword}, '%')
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT(#{keyword}, '%')
 		</if>
-		<if test="parentUuid != null AND parentUuid != ''">
-			AND parent_uuid = #{parentUuid}
+		<if test="parentUuid != null and parentUuid != ''">
+			and parent_uuid = #{parentUuid}
 		</if>
 	</select>
 

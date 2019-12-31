@@ -17,6 +17,7 @@ import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
+import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
 
 @Service
 @Transactional
@@ -65,6 +66,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 
 	@Override
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo) {
+		JobVo job = schedulerMapper.getJobByUuid(jobAuditVo.getJobUuid());
+		if(job == null) {
+			throw new ScheduleJobNotFoundException(jobAuditVo.getJobUuid());
+		}
 		int rowNum = schedulerMapper.searchJobAuditCount(jobAuditVo);
 		int pageCount = PageUtil.getPageCount(rowNum,jobAuditVo.getPageSize());
 		jobAuditVo.setPageCount(pageCount);
@@ -78,7 +83,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		schedulerMapper.deleteJobByUuid(uuid);
 		JobVo jobVo = schedulerMapper.getJobByName(job);
 		if(jobVo != null) {
-			throw new ScheduleJobNameRepeatException("定时作业名称："+ job.getName() + "已存在");
+			throw new ScheduleJobNameRepeatException(jobVo.getName());
 		}
 		job.setUuid(null);
 		uuid = job.getUuid();

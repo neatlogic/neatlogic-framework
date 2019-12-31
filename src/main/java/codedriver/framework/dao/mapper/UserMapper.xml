@@ -61,6 +61,20 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 	</select>
+	
+	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		`user`
+		WHERE
+		1=1
+		<if test="keyword !=null and keyword != ''">
+			AND
+			(user_id LIKE CONCAT(#{keyword}, '%')
+			OR user_name LIKE CONCAT(#{keyword}, '%'))
+		</if>
+	</select>
 
 	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
 		SELECT
@@ -151,7 +165,7 @@
 		UPDATE
 		`user`
 		SET
-		`user_name` = {userName},
+		`user_name` = #{userName},
 		`email` = #{email},
 		`phone` = #{phone},
 		`password` = #{password},
@@ -163,6 +177,10 @@
 
 	<update id="updateUserSession" parameterType="java.lang.String">
 		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
+	</update>
+	
+	<update id="updateUserPassword" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE user SET password = #{password} WHERE user_id = #{userId}
 	</update>
 
 	<delete id="deleteUserByUserId" parameterType="java.lang.String">

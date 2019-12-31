@@ -54,6 +54,14 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
+					//*******************************************
+					//TODO 临时后端测试页面试用  start
+					if (moduleId.equalsIgnoreCase("process")) {
+						sr.addMapping("/module/process/*");
+					}
+					//TODO 临时后端测试页面试用  end
+					//********************************************
+				
 					if (moduleId.equalsIgnoreCase("framework")) {
 						sr.addMapping("/");
 						sr.setLoadOnStartup(1);

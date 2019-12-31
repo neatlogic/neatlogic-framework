@@ -13,6 +13,8 @@ public interface UserMapper {
 	public List<String> getLeaderUserIdByTeamIds(@Param("teamUuidIdList") List<String> teamUuidIdList);
 
 	public List<UserVo> searchUser(UserVo userVo);
+	
+	public int searchUserCount(UserVo userVo);
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
 

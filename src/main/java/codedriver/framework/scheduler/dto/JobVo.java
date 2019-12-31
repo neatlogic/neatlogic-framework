@@ -59,7 +59,7 @@ public class JobVo extends JobBaseVo {
 	}
 
 	public String getJobClassName() {
-		if(jobClassName == null) {
+		if(jobClassName == null && super.getClasspath() != null) {
 			jobClassName = SchedulerManager.getJobClassByClasspath(super.getClasspath()).getName();
 		}
 		return jobClassName;

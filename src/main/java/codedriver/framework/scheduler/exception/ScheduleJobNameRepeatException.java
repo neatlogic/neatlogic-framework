@@ -6,7 +6,7 @@ public class ScheduleJobNameRepeatException extends ApiRuntimeException {
 
 	private static final long serialVersionUID = 1986043935715158952L;
 
-	public ScheduleJobNameRepeatException(String msg){
-		super(msg);
+	public ScheduleJobNameRepeatException(String name){
+		super("定时作业名称：'"+ name + "'已存在");
 	}
 }

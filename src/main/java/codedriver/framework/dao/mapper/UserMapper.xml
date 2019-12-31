@@ -53,6 +53,20 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 	</select>
+	
+	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		`user`
+		WHERE
+		1=1
+		<if test="keyword !=null and keyword != ''">
+			AND
+			(user_id LIKE CONCAT(#{keyword}, '%')
+			OR user_name LIKE CONCAT(#{keyword}, '%'))
+		</if>
+	</select>
 
 	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
 		SELECT

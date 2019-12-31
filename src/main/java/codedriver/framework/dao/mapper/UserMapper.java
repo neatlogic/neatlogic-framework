@@ -33,6 +33,8 @@ public interface UserMapper {
 	public int updateUser(UserVo userVo);
 
 	public int updateUserSession(String userId);
+	
+	public int updateUserPassword(UserVo userVo);
 
 	public int deleteUserByUserId(String userId);
 

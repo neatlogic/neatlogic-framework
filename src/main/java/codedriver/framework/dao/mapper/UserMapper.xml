@@ -170,6 +170,10 @@
 	<update id="updateUserSession" parameterType="java.lang.String">
 		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
 	</update>
+	
+	<update id="updateUserPassword" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE user SET password = #{password} WHERE user_id = #{userId}
+	</update>
 
 	<delete id="deleteUserByUserId" parameterType="java.lang.String">
 		DELETE

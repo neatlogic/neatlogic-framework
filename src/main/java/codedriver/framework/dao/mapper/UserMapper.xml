@@ -10,19 +10,42 @@
 		AND team_uuid = #{teamUuid}
 	</select>
 
-	<select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
+		<id property="userId" column="userId" />
+		<result property="userName" column="userName" />
+		<result property="email" column="email" />
+		<result property="phone" column="phone" />
+		<result property="password" column="password" />
+		<result property="pinyin" column="pinyin" />
+		<result property="isActive" column="isActive" />
+		<collection property="roleNameList" ofType="java.lang.String">
+			<result property="roleName" column="roleName" />
+		</collection>
+		<collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
+			<result property="uuid" column="teamUuid" />
+			<result property="name" column="teamName" />
+		</collection>
+	</resultMap>
+
+	<select id="getUserByUserId" parameterType="java.lang.String" resultMap="userInfoMap">
 		SELECT
-		`user_id` as userId,
-		`user_name` as userName,
-		`email`,
-		`phone`,
-		`password`,
-		`pinyin`,
-		`is_active` as isActive
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		a.`password`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		b.role_name as roleName,
+		c.team_uuid as teamUuid,
+		d.name as teamName
 		FROM
-		`user`
+		`user` a
+		LEFT JOIN user_role b ON a.user_id = b.user_id
+		LEFT JOIN user_team c ON a.user_id = c.user_id
+		LEFT JOIN team d ON c.team_uuid = d.uuid
 		WHERE
-		user_id = #{value}
+		a.user_id = #{value}
 	</select>
 
 	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String">

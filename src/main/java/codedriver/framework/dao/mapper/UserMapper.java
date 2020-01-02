@@ -8,9 +8,14 @@ import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 
 public interface UserMapper {
+	public int checkUserIsInTeam(@Param("userId")
+	String userId, @Param("teamUuid")
+	String teamUuid);
+
 	public UserVo getUserByUserId(String userId);
 
-	public List<String> getLeaderUserIdByTeamIds(@Param("teamUuidIdList") List<String> teamUuidIdList);
+	public List<String> getLeaderUserIdByTeamIds(@Param("teamUuidIdList")
+	List<String> teamUuidIdList);
 
 	public List<UserVo> searchUser(UserVo userVo);
 	
@@ -24,9 +29,13 @@ public interface UserMapper {
 
 	public int insertUser(UserVo userVo);
 
-	public int insertUserRole(@Param("userId") String userId, @Param("roleName") String roleName);
+	public int insertUserRole(@Param("userId")
+	String userId, @Param("roleName")
+	String roleName);
 
-	public int insertUserTeam(@Param("userId") String userId, @Param("teamUuid") String teamUuid);
+	public int insertUserTeam(@Param("userId")
+	String userId, @Param("teamUuid")
+	String teamUuid);
 
 	public int insertUserSession(String userId);
 

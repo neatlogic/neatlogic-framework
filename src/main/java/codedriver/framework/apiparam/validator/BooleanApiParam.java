@@ -12,7 +12,7 @@ public class BooleanApiParam extends ApiParamBase {
 
 	@Override
 	public boolean validate(Object param, String rule) {
-		if("true".equalsIgnoreCase(param.toString()) || "false".equalsIgnoreCase(param.toString())){
+		if(Boolean.TRUE.toString().equalsIgnoreCase(param.toString()) || Boolean.FALSE.toString().equalsIgnoreCase(param.toString())){
 			return true;
 		}else {
 			return false;

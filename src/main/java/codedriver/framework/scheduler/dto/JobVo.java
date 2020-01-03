@@ -10,8 +10,8 @@ public class JobVo extends JobBaseVo {
 			
 	@EntityField(name = "定时作业名称", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "是否激活(no:禁用，yes：激活)", type = ApiParamType.STRING)
-	private String isActive;
+	@EntityField(name = "是否激活(0:禁用，1：激活)", type = ApiParamType.INTEGER)
+	private Integer isActive;
 	@EntityField(name = "定时作业组件名称", type = ApiParamType.STRING)
 	private String jobClassName;
 	@EntityField(name = "定时作业状态", type = ApiParamType.JSONOBJECT)
@@ -42,11 +42,11 @@ public class JobVo extends JobBaseVo {
 		this.name = name;
 	}
 
-	public String getIsActive() {
+	public Integer getIsActive() {
 		return isActive;
 	}
 
-	public void setIsActive(String isActive) {
+	public void setIsActive(Integer isActive) {
 		this.isActive = isActive;
 	}
 

@@ -12,10 +12,9 @@ public class BooleanApiParam extends ApiParamBase {
 
 	@Override
 	public boolean validate(Object param, String rule) {
-		try {
-			Boolean.valueOf(param.toString());
+		if(Boolean.TRUE.toString().equalsIgnoreCase(param.toString()) || Boolean.FALSE.toString().equalsIgnoreCase(param.toString())){
 			return true;
-		} catch (Exception ex) {
+		}else {
 			return false;
 		}
 	}

@@ -10,14 +10,13 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class JobBaseVo extends BasePageVo  {
-	public final static String YES = "yes";
-	public final static String NO = "no";
+
 	@EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "定时作业组件类路径", type = ApiParamType.STRING)
 	private String classpath;
-	@EntityField(name = "是否保存执行记录(no:不保存，yes:保存)", type = ApiParamType.STRING)
-	private String needAudit;
+	@EntityField(name = "是否保存执行记录(0:不保存，1:保存)", type = ApiParamType.INTEGER)
+	private Integer needAudit;
 	@EntityField(name = "cron表达式", type = ApiParamType.STRING)
 	private String cron;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
@@ -40,10 +39,10 @@ public class JobBaseVo extends BasePageVo  {
 	public void setClasspath(String classpath) {
 		this.classpath = classpath;
 	}
-	public String getNeedAudit() {
+	public Integer getNeedAudit() {
 		return needAudit;
 	}
-	public void setNeedAudit(String needAudit) {
+	public void setNeedAudit(Integer needAudit) {
 		this.needAudit = needAudit;
 	}
 	public String getCron() {

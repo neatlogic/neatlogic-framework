@@ -16,7 +16,7 @@ public class JobObject implements Serializable {
 	private Date startTime;
 	private Date endTime;
 	private String jobClassName;
-	private String needAudit;
+	private Integer needAudit;
 	public JobObject(String _jobId, String _jobGroup) {
 		this.jobId = _jobId;
 		this.jobGroup = _jobGroup;
@@ -74,11 +74,11 @@ public class JobObject implements Serializable {
 		this.jobClassName = jobClassName;
 	}
 
-	public String getNeedAudit() {
+	public Integer getNeedAudit() {
 		return needAudit;
 	}
 
-	public void setNeedAudit(String needAudit) {
+	public void setNeedAudit(Integer needAudit) {
 		this.needAudit = needAudit;
 	}
 

@@ -29,7 +29,7 @@ public class JobStatusVo {
 	private Integer execCount;
 	
 	@JSONField(serialize = false)
-	private transient String needAudit;
+	private transient Integer needAudit;
 	
 	public JobStatusVo() {
 	}
@@ -37,7 +37,7 @@ public class JobStatusVo {
 		this.jobUuid = jobUuid;
 		this.status = status;
 	}
-	public JobStatusVo(String jobUuid, String jobGroup, String status, String needAudit) {
+	public JobStatusVo(String jobUuid, String jobGroup, String status, Integer needAudit) {
 		this.jobUuid = jobUuid;		
 		this.jobGroup = jobGroup;
 		this.status = status;
@@ -85,10 +85,10 @@ public class JobStatusVo {
 	public void setExecCount(Integer execCount) {
 		this.execCount = execCount;
 	}
-	public String getNeedAudit() {
+	public Integer getNeedAudit() {
 		return needAudit;
 	}
-	public void setNeedAudit(String needAudit) {
+	public void setNeedAudit(Integer needAudit) {
 		this.needAudit = needAudit;
 	}
 }

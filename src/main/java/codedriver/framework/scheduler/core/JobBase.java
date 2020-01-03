@@ -106,7 +106,7 @@ public abstract class JobBase implements IJob {
 			if (job == null) {
 				return;
 			}
-			if (JobVo.YES.equals(lockBeforeJobStatus.getNeedAudit())) {
+			if (lockBeforeJobStatus.getNeedAudit().intValue() == 1) {
 
 				JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);
 				schedulerMapper.insertJobAudit(auditVo);

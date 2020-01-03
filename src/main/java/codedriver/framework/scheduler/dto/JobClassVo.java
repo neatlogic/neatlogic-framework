@@ -54,4 +54,24 @@ public class JobClassVo extends BasePageVo {
 		return moduleName;
 	}
 
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
+	}
+
 }

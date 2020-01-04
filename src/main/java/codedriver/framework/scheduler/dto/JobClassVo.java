@@ -19,6 +19,8 @@ public class JobClassVo extends BasePageVo {
 	private String moduleId;
 	@EntityField(name = "定时作业组件所属模块名", type = ApiParamType.STRING)
 	private String moduleName;
+
+	private transient String keyword;
 	
 	public JobClassVo() {
 		this.setPageSize(20);
@@ -72,6 +74,14 @@ public class JobClassVo extends BasePageVo {
 
 	public void setModuleName(String moduleName) {
 		this.moduleName = moduleName;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
 	}
 
 }

@@ -19,6 +19,8 @@ public class JobVo extends JobBaseVo {
 	@EntityField(name = "定时作业属性列表", type = ApiParamType.JSONARRAY)
 	private List<JobPropVo> propList;
 
+	private transient String keyword;
+	
 	public JobVo() {
 		this.setPageSize(20);
 	}
@@ -67,6 +69,14 @@ public class JobVo extends JobBaseVo {
 
 	public void setJobClassName(String jobClassName) {
 		this.jobClassName = jobClassName;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
 	}
 
 }

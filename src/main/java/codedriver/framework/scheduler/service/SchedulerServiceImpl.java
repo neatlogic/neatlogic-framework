@@ -43,10 +43,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 			if(jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
 				continue;
 			}
-			if(jobClassVo.getModuleName() != null && !jobClass.getModuleName().contains(jobClassVo.getModuleName())) {
+			if(jobClassVo.getModuleId() != null && !jobClass.getModuleId().equals(jobClassVo.getModuleId())) {
 				continue;
 			}
-			if(jobClassVo.getName() != null && !jobClass.getName().contains(jobClassVo.getName())) {
+			if(jobClassVo.getKeyword() != null && !jobClass.getName().contains(jobClassVo.getKeyword())) {
 				continue;
 			}
 			jobClassFilterList.add(jobClass);

@@ -17,7 +17,7 @@ public class EnumApiParam extends ApiParamBase {
 		if (StringUtils.isNotBlank(rule)) {
 			if (rule.contains(",")) {
 				for (String r : rule.split(",")) {
-					if (param.equals(r)) {
+					if (param.toString().equals(r)) {
 						return true;
 					}
 				}

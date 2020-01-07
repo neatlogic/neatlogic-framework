@@ -26,7 +26,8 @@ import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobStatusVo;
-import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.exception.ScheduleIllegalParameterException;
+import codedriver.framework.scheduler.exception.ScheduleParamNotExistsException;
 import codedriver.framework.scheduler.service.SchedulerService;
 
 /**
@@ -218,21 +219,21 @@ public abstract class JobBase implements IJob {
 						Integer.parseInt(jobProp.getValue());
 					} catch (NumberFormatException e) {
 						logger.error(e.getMessage(), e);
-						throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+						throw new ScheduleIllegalParameterException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
 					}
 				} else if ("long".equals(dataType) || "Long".equals(dataType)) {
 					try {
 						Long.parseLong(jobProp.getValue());
 					} catch (NumberFormatException e) {
 						logger.error(e.getMessage(), e);
-						throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+						throw new ScheduleIllegalParameterException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
 					}
 				} else if ("double".equals(dataType) || "Double".equals(dataType)) {
 					try {
 						Double.parseDouble(dataType);
 					} catch (NumberFormatException e) {
 						logger.error(e.getMessage(), e);
-						throw new NumberFormatException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
+						throw new ScheduleIllegalParameterException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);
 					}
 				}
 				paramMap.remove(jobProp.getName(), param);
@@ -242,7 +243,7 @@ public abstract class JobBase implements IJob {
 		for (Entry<String, Param> entry : paramMap.entrySet()) {
 			Param param = entry.getValue();
 			if (param.required() == true) {
-				throw new RuntimeException("定时作业组件：" + this.getClassName() + "的" + param.name() + "是必填参数");
+				throw new ScheduleParamNotExistsException(this.getClassName(), param.name());
 			}
 		}
 		return true;

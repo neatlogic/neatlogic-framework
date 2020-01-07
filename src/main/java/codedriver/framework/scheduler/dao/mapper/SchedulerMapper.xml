@@ -55,7 +55,7 @@
 	<sql id="searchScheduleJobSql">
 		WHERE
 		1=1
-		<if test="name != null and name != ''">
+		<if test="keyword != null and keyword != ''">
 			AND a.name like CONCAT('%',#{keyword}, '%')
 		</if>
 		<if test="classpath != null">

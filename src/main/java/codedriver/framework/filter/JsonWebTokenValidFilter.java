@@ -61,6 +61,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
 		Cookie[] cookies = request.getCookies();
 		boolean isAuth = false;
+		boolean isValid = false;
 		String tenant = null, authorization = null;
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
@@ -106,12 +107,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
 						TenantContext.init(tenant);
 						UserContext.init(jwtBodyObj, request, response);
+						isValid = userExpirationValid();
 					}
 
 				}
 			}
 		}
-		boolean isValid = userExpirationValid();
+		
 		if (isAuth && isValid) {
 			filterChain.doFilter(request, response);
 		} else {

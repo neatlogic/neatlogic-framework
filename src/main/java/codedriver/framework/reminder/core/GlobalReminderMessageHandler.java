@@ -1,11 +1,8 @@
 package codedriver.framework.reminder.core;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
-import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
-import codedriver.framework.reminder.dto.ReminderMessageVo;
-import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
-import codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
+import codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper;
+import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
+import codedriver.framework.reminder.dto.ReminderMessageVo;
 
 /**
  * @program: balantflow
@@ -26,7 +28,7 @@ public class GlobalReminderMessageHandler {
 
     static Logger logger = LoggerFactory.getLogger(GlobalReminderMessageHandler.class);
 
-    private static final ThreadLocal<List<Runnable>> RUNNABLES = new ThreadLocal<>();
+    private static final ThreadLocal<List<CodeDriverThread>> RUNNABLES = new ThreadLocal<>();
 
     private static GlobalReminderMapper reminderMapper;
 
@@ -49,16 +51,16 @@ public class GlobalReminderMessageHandler {
             CommonThreadPool.execute(runner);
             return;
         }
-        List<Runnable> runnables = RUNNABLES.get();
+        List<CodeDriverThread> runnables = RUNNABLES.get();
         if (runnables == null){
-            runnables = new ArrayList<Runnable>();
+            runnables = new ArrayList<>();
             RUNNABLES.set(runnables);
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    List<Runnable> runnables = RUNNABLES.get();
+                    List<CodeDriverThread> runnables = RUNNABLES.get();
                     for (int i = 0; i < runnables.size(); i++){
-                        Runnable runnable = runnables.get(i);
+                        CodeDriverThread runnable = runnables.get(i);
                         CommonThreadPool.execute(runnable);
                     }
                 }
@@ -72,7 +74,7 @@ public class GlobalReminderMessageHandler {
         runnables.add(runner);
     }
 
-    static class MessageRunner implements Runnable{
+    static class MessageRunner extends CodeDriverThread{
 
         private ReminderMessageVo mess;
 
@@ -88,7 +90,7 @@ public class GlobalReminderMessageHandler {
         }
 
         @Override
-        public void run() {
+        public void execute() {
             String oldName = Thread.currentThread().getName();
             Thread.currentThread().setName("SYSTEMREMIND-MESSAGEHANDLER-" + mess.getTitle());
             try{

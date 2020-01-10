@@ -7,13 +7,10 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
-
-import com.alibaba.druid.pool.DruidDataSource;
 
 import codedriver.framework.common.CodeDriverDataSource;
-import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
@@ -25,7 +22,7 @@ public class DatasourceInitializer {
 	private CodeDriverDataSource datasouce;
 
 	@Resource(name = "dataSourceMaster")
-	private DruidDataSource masterDatasource;
+	private BasicDataSource masterDatasource;
 
 	private static Map<Object, Object> datasourceMap = new HashMap<>();
 
@@ -39,7 +36,7 @@ public class DatasourceInitializer {
 
 		for (DatasourceVo datasourceVo : datasourceList) {
 			if (!datasourceMap.containsKey(datasourceVo.getTenantUuid())) {
-				DruidDataSource tenantDatasource = new DruidDataSource();
+				BasicDataSource tenantDatasource = new BasicDataSource();
 				tenantDatasource.setUrl(datasourceVo.getUrl());
 				tenantDatasource.setDriverClassName(datasourceVo.getDriver());
 				tenantDatasource.setUsername(datasourceVo.getUsername());

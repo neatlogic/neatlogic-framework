@@ -16,13 +16,13 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 
 public class CommonThreadPool {
 	private static final Log logger = LogFactory.getLog(CommonThreadPool.class);
-	private static BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+	private static BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(1000);
 	private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 30, TimeUnit.SECONDS, workQueue, new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
 			Thread t = new Thread(r);
-			//t.setDaemon(true);
-			t.setName("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" + t.getName());
+			t.setDaemon(true);
+			t.setName("COMMON-THREADPOOL-" + t.getName());
 			return t;
 		}
 	}, new ThreadPoolExecutor.AbortPolicy());
@@ -35,8 +35,6 @@ public class CommonThreadPool {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
-
-	
 
 	public static void invokeAll(List<Callable<Object>> commandList) {
 		try {

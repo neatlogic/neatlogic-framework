@@ -14,7 +14,8 @@
 		</property>
 	</bean>
 
-	<bean id="dataSourceMaster" class="com.alibaba.druid.pool.DruidDataSource">
+	<!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
+	<bean id="dataSourceMaster" class="org.apache.commons.dbcp2.BasicDataSource">
 		<property name="driverClassName">
 			<value>${db.driverClassName}</value>
 		</property>
@@ -97,9 +98,9 @@
 	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
 
 	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
-	
-	<!-- TODO 临时后端测试页面试用  start-->
+
+	<!-- TODO 临时后端测试页面试用 start -->
 	<bean id="TestProcessFilter" class="codedriver.module.process.controller.TestProcessFilter"></bean>
-	<!-- TODO 临时后端测试页面试用  end-->
+	<!-- TODO 临时后端测试页面试用 end -->
 
 </beans>

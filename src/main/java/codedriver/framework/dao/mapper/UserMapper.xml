@@ -68,7 +68,6 @@
 		`user_name` AS userName,
 		`email`,
 		`phone`,
-		`password`,
 		`is_active` AS isActive
 		FROM
 		`user`

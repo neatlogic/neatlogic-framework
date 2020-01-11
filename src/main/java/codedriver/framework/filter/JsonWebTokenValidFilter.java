@@ -109,12 +109,12 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
 						TenantContext.init(tenant);
 						UserContext.init(jwtBodyObj, timezone, request, response);
+						boolean isValid = userExpirationValid();
 					}
 
 				}
 			}
 		}
-		boolean isValid = userExpirationValid();
 		if (isAuth && isValid) {
 			filterChain.doFilter(request, response);
 		} else {

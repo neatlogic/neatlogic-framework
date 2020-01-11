@@ -186,12 +186,20 @@ public class ApiValidateAndHelpBase {
 					Param[] params = input.value();
 					if (params != null && params.length > 0) {
 						for (Param p : params) {
+							Object paramValue = null;
+							if(paramObj.containsKey(p.name())) {
+								// 参数类型校验
+								paramValue = paramObj.get(p.name());
+								//如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
+								if(paramValue == null) {
+									paramObj.remove(p.name());
+								}
+							}
 							// 判断是否必填
 							if (p.isRequired() && !paramObj.containsKey(p.name())) {
 								throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
 							}
-							// 参数类型校验
-							Object paramValue = paramObj.get(p.name());
+							
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
 								encodeHtml(paramObj, p.name());
@@ -211,6 +219,7 @@ public class ApiValidateAndHelpBase {
 									paramObj.put(p.name(), paramValue.toString().trim());
 								}
 							}
+							
 						}
 					}
 				}

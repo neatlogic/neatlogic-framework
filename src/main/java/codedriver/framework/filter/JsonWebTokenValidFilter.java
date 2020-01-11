@@ -62,6 +62,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
 		Cookie[] cookies = request.getCookies();
 		boolean isAuth = false;
+		boolean isUnExpired = false;
 		String tenant = null, authorization = null, timezone = "+8:00";
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
@@ -109,20 +110,20 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
 						TenantContext.init(tenant);
 						UserContext.init(jwtBodyObj, timezone, request, response);
-						boolean isValid = userExpirationValid();
+						isUnExpired = userExpirationValid();
 					}
 
 				}
 			}
 		}
-		if (isAuth && isValid) {
+		if (isAuth && isUnExpired) {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
 			if (!isAuth) {
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "没有找到登录信息，请登录");
-			} else if (!isValid) {
+			} else if (!isUnExpired) {
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
 			}

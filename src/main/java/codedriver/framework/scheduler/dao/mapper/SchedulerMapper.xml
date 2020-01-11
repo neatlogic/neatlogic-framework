@@ -120,19 +120,8 @@
 		limit #{startNum}, #{pageSize}
 	</select>
 	
-	<select id="getJobByName" resultMap="scheduleMap">
-		SELECT
-		<include refid="jobDetailSql" />
-		,
-		<include refid="jobStatusSql" />
-		,
-		d.prop_name,
-		d.prop_value,
-		d.id AS prop_id
-		FROM schedule_job a
-		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
-		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-		WHERE a.name = #{name} and a.uuid != #{uuid}
+	<select id="checkJobNameIsRepeat" resultType="int">
+		SELECT COUNT(1) FROM `schedule_job` WHERE `name` = #{name} AND `uuid` != #{uuid}
 	</select>
 	
 	<select id="searchJobAuditCount" resultType="int">

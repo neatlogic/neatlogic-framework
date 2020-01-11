@@ -12,7 +12,7 @@
 		FROM
 		`team`
 		WHERE
-		1=1
+		`uuid` != '0'
 		<if test="keyword != null and keyword != ''">
 			and name LIKE CONCAT(#{keyword}, '%')
 		</if>

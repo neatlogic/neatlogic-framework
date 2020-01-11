@@ -29,7 +29,6 @@ public class CommonThreadPool {
 
 	public static void execute(CodeDriverThread command) {
 		try {
-			System.out.println(threadPoolExecutor.getActiveCount());
 			threadPoolExecutor.execute(command);
 		} catch (RejectedExecutionException ex) {
 			logger.error(ex.getMessage(), ex);

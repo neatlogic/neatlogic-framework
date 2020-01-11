@@ -4,7 +4,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
-public class CodeDriverDataSource extends AbstractRoutingDataSource {
+public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
 	@Override
 	protected Object determineCurrentLookupKey() {
 		if (TenantContext.get() != null) {

@@ -1,6 +1,7 @@
 package codedriver.framework.filter;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -61,13 +62,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
 		Cookie[] cookies = request.getCookies();
 		boolean isAuth = false;
-		String tenant = null, authorization = null;
+		String tenant = null, authorization = null, timezone = "+8:00";
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("codedriver_tenant")) {
 					tenant = cookie.getValue();
 				} else if (cookie.getName().equals("codedriver_authorization")) {
 					authorization = cookie.getValue();
+				} else if (cookie.getName().equals("codedriver_timezone")) {
+					timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
 				}
 			}
 		}
@@ -105,7 +108,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
 						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
 						TenantContext.init(tenant);
-						UserContext.init(jwtBodyObj, request, response);
+						UserContext.init(jwtBodyObj, timezone, request, response);
 					}
 
 				}

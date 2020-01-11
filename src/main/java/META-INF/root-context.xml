@@ -15,7 +15,8 @@
 	</bean>
 
 	<!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
-	<bean id="dataSourceMaster" class="org.apache.commons.dbcp2.BasicDataSource">
+	<!-- org.apache.commons.dbcp2.BasicDataSource -->
+	<bean id="dataSourceMaster" class="codedriver.framework.common.CodeDriverBasicDataSource">
 		<property name="driverClassName">
 			<value>${db.driverClassName}</value>
 		</property>
@@ -46,7 +47,7 @@
 		<context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent" />
 	</context:component-scan>
 
-	<bean id="dataSource" class="codedriver.framework.common.CodeDriverDataSource">
+	<bean id="dataSource" class="codedriver.framework.common.CodeDriverRoutingDataSource">
 		<property name="targetDataSources">
 			<map key-type="java.lang.String">
 				<entry key="master" value-ref="dataSourceMaster" />

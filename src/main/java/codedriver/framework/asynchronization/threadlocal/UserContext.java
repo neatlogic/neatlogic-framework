@@ -18,29 +18,32 @@ public class UserContext implements Serializable {
 	private String tenant;
 	private String userName;
 	private String userId;
+	private String timezone = "+8:00";
 	private List<String> roleNameList;
-	
+
 	public static UserContext init(UserContext _userContext) {
 		UserContext context = new UserContext();
-		if(_userContext != null) {
+		if (_userContext != null) {
 			context.setUserId(_userContext.getUserId());
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());
-			//context.setRequest(_userContext.getRequest());
-			//context.setResponse(_userContext.getResponse());
+			context.setTimezone(_userContext.getTimezone());
+			// context.setRequest(_userContext.getRequest());
+			// context.setResponse(_userContext.getResponse());
 			context.setRoleNameList(_userContext.getRoleNameList());
 		}
 		instance.set(context);
 		return context;
 	}
 
-	public static UserContext init(JSONObject jsonObj, HttpServletRequest request, HttpServletResponse response) {
+	public static UserContext init(JSONObject jsonObj, String timezone, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();
 		context.setUserId(jsonObj.getString("userid"));
 		context.setUserName(jsonObj.getString("username"));
 		context.setTenant(jsonObj.getString("tenant"));
 		context.setRequest(request);
 		context.setResponse(response);
+		context.setTimezone(timezone);
 		JSONArray roleList = jsonObj.getJSONArray("rolelist");
 		if (roleList != null && roleList.size() > 0) {
 			for (int i = 0; i < roleList.size(); i++) {
@@ -58,6 +61,14 @@ public class UserContext implements Serializable {
 		if (!roleNameList.contains(role)) {
 			roleNameList.add(role);
 		}
+	}
+
+	public String getTimezone() {
+		return timezone;
+	}
+
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
 	}
 
 	private UserContext() {

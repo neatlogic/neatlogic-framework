@@ -7,10 +7,10 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import codedriver.framework.common.CodeDriverDataSource;
+import codedriver.framework.common.CodeDriverBasicDataSource;
+import codedriver.framework.common.CodeDriverRoutingDataSource;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
@@ -19,10 +19,10 @@ public class DatasourceInitializer {
 	private DatasourceMapper datasourceMapper;
 
 	@Autowired
-	private CodeDriverDataSource datasouce;
+	private CodeDriverRoutingDataSource datasouce;
 
 	@Resource(name = "dataSourceMaster")
-	private BasicDataSource masterDatasource;
+	private CodeDriverBasicDataSource masterDatasource;
 
 	private static Map<Object, Object> datasourceMap = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class DatasourceInitializer {
 
 		for (DatasourceVo datasourceVo : datasourceList) {
 			if (!datasourceMap.containsKey(datasourceVo.getTenantUuid())) {
-				BasicDataSource tenantDatasource = new BasicDataSource();
+				CodeDriverBasicDataSource tenantDatasource = new CodeDriverBasicDataSource();
 				tenantDatasource.setUrl(datasourceVo.getUrl());
 				tenantDatasource.setDriverClassName(datasourceVo.getDriver());
 				tenantDatasource.setUsername(datasourceVo.getUsername());

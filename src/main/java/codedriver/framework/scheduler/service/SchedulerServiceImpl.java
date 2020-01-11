@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
+import codedriver.framework.exception.type.CurrentPageNumberOutOfBoundsException;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
@@ -29,7 +30,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public List<JobVo> searchJobList(JobVo jobVo) {
 		int rowNum = schedulerMapper.searchJobCount(jobVo);
-		int pageCount = PageUtil.getPageCount(rowNum,jobVo.getPageSize());
+		int pageCount = PageUtil.getPageCount(rowNum, jobVo.getPageSize());
+		if(jobVo.getCurrentPage() > pageCount) {
+			throw new CurrentPageNumberOutOfBoundsException(jobVo.getCurrentPage(), pageCount);
+		}
 		jobVo.setPageCount(pageCount);
 		jobVo.setRowNum(rowNum);
 		return schedulerMapper.searchJobList(jobVo);
@@ -51,13 +55,16 @@ public class SchedulerServiceImpl implements SchedulerService{
 			}
 			jobClassFilterList.add(jobClass);
 		}
-		
-		int startNum = jobClassVo.getStartNum();
+				
 		int pageSize = jobClassVo.getPageSize();
 		int rowNum = jobClassFilterList.size();
 		int pageCount = PageUtil.getPageCount(rowNum, pageSize);
+		if(jobClassVo.getCurrentPage() > pageCount) {
+			throw new CurrentPageNumberOutOfBoundsException(jobClassVo.getCurrentPage(), pageCount);
+		}
 		jobClassVo.setPageCount(pageCount);
 		jobClassVo.setRowNum(rowNum);
+		int startNum = jobClassVo.getStartNum();
 		int endNum = startNum + pageSize;
 		endNum = endNum >  rowNum ? rowNum : endNum;
 		List<JobClassVo> returnJobClassList = jobClassFilterList.subList(startNum, endNum);
@@ -71,7 +78,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 			throw new ScheduleJobNotFoundException(jobAuditVo.getJobUuid());
 		}
 		int rowNum = schedulerMapper.searchJobAuditCount(jobAuditVo);
-		int pageCount = PageUtil.getPageCount(rowNum,jobAuditVo.getPageSize());
+		int pageCount = PageUtil.getPageCount(rowNum, jobAuditVo.getPageSize());
+		if(jobAuditVo.getCurrentPage() > pageCount) {
+			throw new CurrentPageNumberOutOfBoundsException(jobAuditVo.getCurrentPage(), pageCount);
+		}
 		jobAuditVo.setPageCount(pageCount);
 		jobAuditVo.setRowNum(rowNum);
 		return schedulerMapper.searchJobAuditList(jobAuditVo);
@@ -80,11 +90,10 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public void saveJob(JobVo job) {
 		String uuid = job.getUuid();
-		schedulerMapper.deleteJobByUuid(uuid);
-		JobVo jobVo = schedulerMapper.getJobByName(job);
-		if(jobVo != null) {
-			throw new ScheduleJobNameRepeatException(jobVo.getName());
+		if(schedulerMapper.checkJobNameIsRepeat(job) == 0) {
+			throw new ScheduleJobNameRepeatException(job.getName());
 		}
+		schedulerMapper.deleteJobByUuid(uuid);
 		job.setUuid(null);
 		uuid = job.getUuid();
 		schedulerMapper.insertJob(job);

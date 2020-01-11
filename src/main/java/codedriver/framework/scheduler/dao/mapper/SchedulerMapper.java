@@ -15,8 +15,7 @@ public interface SchedulerMapper {
 	public JobStatusVo getJobStatusByJobUuid(String jobUuid);
 	public List<JobVo> getJobByClasspath(String classpath);
 	public int searchJobCount(JobVo jobVo);
-	public List<JobVo> searchJobList(JobVo jobVo);	
-	public JobVo getJobByName(JobVo job);
+	public List<JobVo> searchJobList(JobVo jobVo);
 	public List<ServerNewJobVo> getServerJobByServerId(int serverId);
 	
 	public int searchJobAuditCount(JobAuditVo jobAuditVo);
@@ -24,6 +23,7 @@ public interface SchedulerMapper {
 	public JobAuditVo getJobAuditLogById(Long auditId);
 	
 	public JobLockVo getJobLockByUuid(String uuid);
+	public int checkJobNameIsRepeat(JobVo job);
 	//UPDATE
 	public int updateJobById(JobVo job);
 	public int updateJobStatusByJobUuid(JobStatusVo jobStatus);

@@ -27,6 +27,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.ConfigVo;
@@ -63,6 +64,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		Cookie[] cookies = request.getCookies();
 		boolean isAuth = false;
 		boolean isUnExpired = false;
+		boolean hasTenant = false;
 		String tenant = null, authorization = null, timezone = "+8:00";
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
@@ -88,39 +90,46 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			authorization = request.getHeader("Authorization");
 		}
 		if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
-			if (authorization.startsWith("Bearer") && authorization.length() > 7) {
-				String jwt = authorization.substring(7);
-				String[] jwtParts = jwt.split("\\.");
-				if (jwtParts.length == 3) {
-					SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET.getBytes(), "HmacSHA1");
-					Mac mac;
-					try {
-						mac = Mac.getInstance("HmacSHA1");
-						mac.init(signingKey);
-						byte[] rawHmac = mac.doFinal((jwtParts[0] + "." + jwtParts[1]).getBytes());
-						String result = Base64.getUrlEncoder().encodeToString(rawHmac);
-						if (result.equals(jwtParts[2])) {
-							isAuth = true;
-						}
-					} catch (NoSuchAlgorithmException | InvalidKeyException e) {
-						e.printStackTrace();
-					}
-					if (isAuth) {
-						String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
-						JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-						TenantContext.init(tenant);
-						UserContext.init(jwtBodyObj, timezone, request, response);
-						isUnExpired = userExpirationValid();
-					}
+			if (TenantUtil.hasTenant(tenant)) {
+				hasTenant = true;
 
+				if (authorization.startsWith("Bearer") && authorization.length() > 7) {
+					String jwt = authorization.substring(7);
+					String[] jwtParts = jwt.split("\\.");
+					if (jwtParts.length == 3) {
+						SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET.getBytes(), "HmacSHA1");
+						Mac mac;
+						try {
+							mac = Mac.getInstance("HmacSHA1");
+							mac.init(signingKey);
+							byte[] rawHmac = mac.doFinal((jwtParts[0] + "." + jwtParts[1]).getBytes());
+							String result = Base64.getUrlEncoder().encodeToString(rawHmac);
+							if (result.equals(jwtParts[2])) {
+								isAuth = true;
+							}
+						} catch (NoSuchAlgorithmException | InvalidKeyException e) {
+							e.printStackTrace();
+						}
+						if (isAuth) {
+							String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
+							JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+							TenantContext.init(tenant);
+							UserContext.init(jwtBodyObj, timezone, request, response);
+							isUnExpired = userExpirationValid();
+						}
+
+					}
 				}
 			}
 		}
-		if (isAuth && isUnExpired) {
+		if (hasTenant && isAuth && isUnExpired) {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
-			if (!isAuth) {
+			if (!hasTenant) {
+				redirectObj.put("Status", "FAILED");
+				redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
+			} else if (!isAuth) {
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "没有找到登录信息，请登录");
 			} else if (!isUnExpired) {

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import codedriver.framework.common.CodeDriverBasicDataSource;
 import codedriver.framework.common.CodeDriverRoutingDataSource;
+import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
@@ -29,7 +30,7 @@ public class DatasourceInitializer {
 	@PostConstruct
 	public void init() {
 		// TenantContext context = TenantContext.init("master");
-		List<DatasourceVo> datasourceList = datasourceMapper.getAllDatasource();
+		List<DatasourceVo> datasourceList = datasourceMapper.getAllActiveTenantDatasource();
 		if (!datasourceMap.containsKey("master")) {
 			datasourceMap.put("master", masterDatasource);
 		}
@@ -42,6 +43,7 @@ public class DatasourceInitializer {
 				tenantDatasource.setUsername(datasourceVo.getUsername());
 				tenantDatasource.setPassword(datasourceVo.getPassword());
 				datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
+				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}
 		}
 		if (!datasourceMap.isEmpty()) {

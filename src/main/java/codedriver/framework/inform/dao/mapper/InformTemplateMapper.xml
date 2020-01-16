@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.inform.dao.mapper.InformTemplateMapper">
+
+	<select id="searchInformTemplateCount" parameterType="codedriver.framework.inform.dto.InformTemplateVo" resultType="int">
+	SELECT 
+	COUNT(`uuid`) 
+	FROM `inform_template` 
+	WHERE 1=1
+	<if test="type != null and type != ''">
+	AND `type` = #{type}
+	</if>
+	<if test="keyword != null and keyword != ''">
+	AND `name` LIKE CONCAT('%', #{keyword}, '%')
+	</if>
+	</select>
+	
+	<select id="searchInformTemplateList" parameterType="codedriver.framework.inform.dto.InformTemplateVo" resultType="codedriver.framework.inform.dto.InformTemplateVo">
+	SELECT 
+	`uuid`,
+	`name`,
+	`title`,
+	`content`,
+	`type` 
+	FROM `inform_template` 
+	WHERE 1=1
+	<if test="type != null and type != ''">
+	AND `type` = #{type}
+	</if>
+	<if test="keyword != null and keyword != ''">
+	AND `name` LIKE CONCAT('%', #{keyword}, '%')
+	</if>
+	<if test="needPage">
+	limit #{startNum}, #{pageSize}
+	</if>
+	</select>
+</mapper>

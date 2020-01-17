@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.inform.dto.InformPluginTypeVo;
 
 /**
@@ -21,9 +22,9 @@ import codedriver.framework.inform.dto.InformPluginTypeVo;
 public class InformComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
     private static Map<String, InformComponentBase> informPluginMap = new HashMap<>();
 
-    private static List<InformPluginTypeVo> informPluginTypeList = new ArrayList<>();
+    private static List<ValueTextVo> informPluginTypeList = new ArrayList<>();
     
-    public static List<InformPluginTypeVo> getInformPluginTypeList(){
+    public static List<ValueTextVo> getInformPluginTypeList(){
     	return informPluginTypeList;
     }
     public static InformComponentBase getInformPlugin(String informPluginType){
@@ -43,7 +44,7 @@ public class InformComponentFactory implements ApplicationListener<ContextRefres
                 informPluginMap.put(plugin.getId(), plugin);
                 InformPluginType informPluginType = InformPluginType.getInformParamType(plugin.getId());
                 if(informPluginType != null) {
-                	informPluginTypeList.add(new InformPluginTypeVo(informPluginType.getValue(), informPluginType.getText()));
+                	informPluginTypeList.add(new ValueTextVo(informPluginType.getValue(), informPluginType.getText()));
                 }
             }
         }

@@ -11,6 +11,8 @@ public interface RoleMapper {
 
 	public RoleVo getRoleByRoleName(String name);
 
+	public List<RoleVo> getRoleByRoleNameList(List<String> roleNameList);
+
 	public int insertRole(RoleVo roleVo);
 
 	public int updateRole(RoleVo roleVo);

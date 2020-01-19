@@ -52,6 +52,21 @@
 		WHERE
 		uuid = #{value}
 	</select>
+	
+	<select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid`
+		FROM
+		`team`
+		WHERE `uuid` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+		#{item}
+		</foreach>
+	</select>
 
 	<delete id="deleteTeamByUuid" parameterType="java.lang.String">
 		DELETE

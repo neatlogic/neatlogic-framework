@@ -27,6 +27,8 @@ public interface UserMapper {
 
 	public UserSessionVo getUserSessionByUserId(String userId);
 
+	public List<UserVo> getUserByUserIdList(List<String> userIdList);
+
 	public int insertUser(UserVo userVo);
 
 	public int insertUserRole(@Param("userId")

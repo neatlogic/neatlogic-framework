@@ -41,6 +41,18 @@
 		WHERE
 		`name` = #{value}
 	</select>
+	
+	<select id="getRoleByRoleNameList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	SELECT
+		`name`,
+		`description`
+		FROM
+		`role`
+	WHERE `name` in 
+	<foreach collection="list" item="item" separator="," open="(" close=")">
+	#{item}
+	</foreach>
+	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`name`, `description`)

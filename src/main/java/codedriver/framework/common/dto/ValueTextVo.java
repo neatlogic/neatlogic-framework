@@ -1,8 +1,13 @@
 package codedriver.framework.common.dto;
 
-public class ValueTextVo {
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
 
+public class ValueTextVo {
+	
+	@EntityField(name = "value", type = ApiParamType.STRING)
 	private String value;
+	@EntityField(name = "text", type = ApiParamType.STRING)
 	private String text;
 
 	public ValueTextVo() {

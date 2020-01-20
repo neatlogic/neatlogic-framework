@@ -43,7 +43,7 @@
 		</property>
 	</bean>
 
-	<context:component-scan base-package="codedriver.framework" use-default-filters="false">
+	<context:component-scan base-package="codedriver" use-default-filters="false">
 		<context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent" />
 	</context:component-scan>
 

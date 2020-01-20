@@ -11,6 +11,8 @@ public interface TeamMapper {
 
 	public int searchTeamCount(TeamVo teamVo);
 
+	public List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
+
 	public int deleteTeamByUuid(String uuid);
 
 	public int deleteUserTeamByTeamUuid(String uuid);

@@ -140,6 +140,21 @@
 		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session`
 		WHERE `user_id` = #{value}
 	</select>
+	
+	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" >
+	SELECT
+		`user_id` AS userId,
+		`user_name` AS userName,
+		`email`,
+		`phone`,
+		`is_active` AS isActive
+		FROM
+		`user`
+	Where `user_id` in 
+	<foreach collection="list" item="item" separator="," open="(" close=")">
+	#{item}
+	</foreach>
+	</select>
 
 	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user` (

@@ -18,10 +18,7 @@
 	<select id="searchInformTemplateList" parameterType="codedriver.framework.inform.dto.InformTemplateVo" resultType="codedriver.framework.inform.dto.InformTemplateVo">
 	SELECT 
 	`uuid`,
-	`name`,
-	`title`,
-	`content`,
-	`type` 
+	`name`
 	FROM `inform_template` 
 	WHERE 1=1
 	<if test="type != null and type != ''">

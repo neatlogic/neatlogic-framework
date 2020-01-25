@@ -41,9 +41,10 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				Element rootE = document.getRootElement();
 				Element codedriverE = rootE.element("module");
 				// Element nameE = rootE.element("name");
-				String moduleId = null, moduleName = null, moduleDescription = null, version = null;
+				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null;
 				moduleId = codedriverE.attributeValue("id");
 				moduleName = codedriverE.attributeValue("name");
+				urlMapping = codedriverE.attributeValue("urlMapping");
 				moduleDescription = codedriverE.attributeValue("description");
 
 				if (StringUtils.isNotBlank(moduleId)) {
@@ -54,21 +55,16 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
-					//*******************************************
-					//TODO 临时后端测试页面试用  start
-					if (moduleId.equalsIgnoreCase("process")) {
-						sr.addMapping("/module/process/*");
+					if(StringUtils.isNotBlank(urlMapping)) {
+						sr.addMapping(urlMapping);
 					}
-					//TODO 临时后端测试页面试用  end
-					//********************************************
-				
+
 					if (moduleId.equalsIgnoreCase("framework")) {
 						sr.addMapping("/");
 						sr.setLoadOnStartup(1);
-					}else {
+					} else {
 						sr.setLoadOnStartup(2);
 					}
-					
 
 					ModuleVo moduleVo = new ModuleVo();
 					moduleVo.setId(moduleId);

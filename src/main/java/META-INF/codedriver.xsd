@@ -9,6 +9,7 @@
 				<xsd:extension base="beans:identifiedType">
 					<xsd:attribute name="name" type="xsd:string" use="required" />
 					<xsd:attribute name="description" type="xsd:string" />
+					<xsd:attribute name="urlMapping" type="xsd:string" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

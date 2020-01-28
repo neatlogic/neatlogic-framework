@@ -8,6 +8,8 @@ import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 
 public interface UserMapper {
+	public UserVo getUserBaseInfoByUserId(String userId);
+
 	public int checkUserIsInTeam(@Param("userId")
 	String userId, @Param("teamUuid")
 	String teamUuid);
@@ -18,7 +20,7 @@ public interface UserMapper {
 	List<String> teamUuidIdList);
 
 	public List<UserVo> searchUser(UserVo userVo);
-	
+
 	public int searchUserCount(UserVo userVo);
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
@@ -44,7 +46,7 @@ public interface UserMapper {
 	public int updateUser(UserVo userVo);
 
 	public int updateUserSession(String userId);
-	
+
 	public int updateUserPassword(UserVo userVo);
 
 	public int deleteUserByUserId(String userId);

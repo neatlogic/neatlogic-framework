@@ -10,6 +10,21 @@
 		AND team_uuid = #{teamUuid}
 	</select>
 
+	<select id="getUserBaseInfoByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		`user_id` as userId,
+		`user_name` as userName,
+		`email`,
+		`phone`,
+		`password`,
+		`pinyin`,
+		`is_active` as isActive,
+		`user_info` as userInfo
+		FROM
+		`user`
+		WHERE user_id = #{value}
+	</select>
+
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
 		<id property="userId" column="userId" />
 		<result property="userName" column="userName" />
@@ -83,7 +98,7 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 	</select>
-	
+
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
 		SELECT
 		count(1)
@@ -140,9 +155,9 @@
 		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session`
 		WHERE `user_id` = #{value}
 	</select>
-	
-	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" >
-	SELECT
+
+	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+		SELECT
 		`user_id` AS userId,
 		`user_name` AS userName,
 		`email`,
@@ -150,10 +165,10 @@
 		`is_active` AS isActive
 		FROM
 		`user`
-	Where `user_id` in 
-	<foreach collection="list" item="item" separator="," open="(" close=")">
-	#{item}
-	</foreach>
+		Where `user_id` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
 	</select>
 
 	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
@@ -215,7 +230,7 @@
 	<update id="updateUserSession" parameterType="java.lang.String">
 		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
 	</update>
-	
+
 	<update id="updateUserPassword" parameterType="codedriver.framework.dto.UserVo">
 		UPDATE user SET password = #{password} WHERE user_id = #{userId}
 	</update>

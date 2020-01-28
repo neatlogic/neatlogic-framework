@@ -132,7 +132,6 @@ public class UserVo extends BasePageVo {
 		this.isActive = isActive;
 	}
 
-
 	public List<String> getTeamUuidList() {
 		return teamUuidList;
 	}
@@ -140,7 +139,6 @@ public class UserVo extends BasePageVo {
 	public void setTeamUuidList(List<String> teamUuidList) {
 		this.teamUuidList = teamUuidList;
 	}
-
 
 	public List<TeamVo> getTeamList() {
 		return teamList;
@@ -193,4 +191,28 @@ public class UserVo extends BasePageVo {
 		this.roleList = roleList;
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (!(other instanceof UserVo))
+			return false;
+
+		final UserVo user = (UserVo) other;
+		try {
+			if (getUserId().equals(user.getUserId()))
+				return true;
+		} catch (Exception ex) {
+			return false;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getUserId().hashCode() * 7;
+		return result;
+	}
 }

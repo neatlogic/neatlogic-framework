@@ -6,7 +6,7 @@ package codedriver.framework.dto;
  * @create: 2019-12-09 16:47
  **/
 public class MailServerVo {
-    private Long uuid;
+    private String uuid;
     private String name;
     private Integer port;
     private String host;
@@ -16,11 +16,11 @@ public class MailServerVo {
     private int isActive;
     private String fromAddress;
 
-    public Long getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(Long uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 

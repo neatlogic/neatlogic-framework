@@ -1,7 +1,5 @@
 package codedriver.framework.scheduler.core;
 
-import java.util.List;
-
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -10,16 +8,16 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobPropVo;
-import codedriver.framework.scheduler.dto.JobVo;
 
+@Service
 @DisallowConcurrentExecution
-public class TestJob extends JobBase {
+public class TestJob extends JobBase implements IPublicJob {
 
 	private Logger logger = LoggerFactory.getLogger(TestJob.class);
 	@Autowired
@@ -60,28 +58,19 @@ public class TestJob extends JobBase {
 
 		JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();
-		logger.info(jobKey.getGroup());
-		logger.info(TenantContext.get().getTenantUuid());
-		String jobUuid = jobKey.getName();
-		logger.info("TestJob一分钟执行一次:" + jobUuid);
-		JobVo jobVo = scheduleMapper.getJobByUuid(jobUuid);
+		System.out.println("##############" + jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "############");
 
-		List<JobPropVo> propList = jobVo.getPropList();
-		if (propList != null && !propList.isEmpty()) {
-			for (JobPropVo prop : propList) {
-				logger.info(prop.getName() + ":" + prop.getValue());
-			}
-		}
-		// logger.info("TestJob一分钟执行一次:" + jobUuid);
+	}
 
-		// OutputStreamWriter logOut = (OutputStreamWriter)
-		// context.get("logOutput");
-		// try {
-		// logOut.write("success");
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	@Override
+	public String getName() {
+		return "测试作业";
 	}
 
 }

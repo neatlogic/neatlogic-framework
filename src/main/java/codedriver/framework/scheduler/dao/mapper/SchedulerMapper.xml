@@ -90,14 +90,14 @@
 		<include refid="jobDetailSql" />
 		FROM schedule_job a		
 		JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
-		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		WHERE a.is_active = 1 AND a.classpath = #{classpath}
 		AND sjs.status = 'running'		
 		UNION
 		SELECT
 		<include refid="jobDetailSql" />
 		FROM schedule_job a		
 		LEFT JOIN schedule_job_status sjs ON sjs.job_uuid=a.uuid
-		WHERE a.is_active = 'yes' AND a.classpath = #{classpath}
+		WHERE a.is_active = 1 AND a.classpath = #{classpath}
 		AND sjs.job_uuid IS NULL		
 	</select>
 	

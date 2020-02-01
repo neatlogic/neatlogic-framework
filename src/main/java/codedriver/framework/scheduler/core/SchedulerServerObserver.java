@@ -1,9 +1,12 @@
 package codedriver.framework.scheduler.core;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import codedriver.framework.server.core.ServerObserver;
+import org.springframework.stereotype.Component;
 
-public class SchedulerServerObserver implements ServerObserver{
+import codedriver.framework.heartbeat.core.HeartbeatObserver;
+
+@Component
+public class SchedulerServerObserver implements HeartbeatObserver{
 
 	@Autowired
 	private SchedulerManager schedulerManager;

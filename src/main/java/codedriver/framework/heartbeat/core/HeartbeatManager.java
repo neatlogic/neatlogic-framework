@@ -1,4 +1,4 @@
-package codedriver.framework.server.core;
+package codedriver.framework.heartbeat.core;
 
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -23,17 +24,17 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
+import codedriver.framework.heartbeat.dto.ServerClusterVo;
+import codedriver.framework.heartbeat.dto.ServerCounterVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.server.dao.mapper.ServerMapper;
-import codedriver.framework.server.dto.ServerClusterVo;
-import codedriver.framework.server.dto.ServerCounterVo;
 
 @RootComponent
-public class ServerManager implements ApplicationListener<ContextRefreshedEvent> {
-	private Logger logger = LoggerFactory.getLogger(ServerManager.class);
+public class HeartbeatManager implements ApplicationListener<ContextRefreshedEvent> {
+	private Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
 	@Autowired
@@ -41,7 +42,7 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	@Autowired
 	private DataSourceTransactionManager dataSourceTransactionManager;
 
-	private static Set<ServerObserver> set = new HashSet<>();
+	private static Set<HeartbeatObserver> set = new HashSet<>();
 
 	@PostConstruct
 	public final void init() {
@@ -50,20 +51,26 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 		// 重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
 		serverMapper.replaceServer(server);
-		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1);
+		ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setDaemon(true);
+				t.setName("HEARBEAT");
+				return t;
+			}
+		});
 		CodeDriverThread runnable = new CodeDriverThread() {
 			@Override
 			protected void execute() {
-				String oldThreadName = Thread.currentThread().getName();
 				try {
-					Thread.currentThread().setName("HEARBEAT");
 					// 查找故障服务器
 					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
 					for (ServerClusterVo server : list) {
 						if (getServerLock(server.getServerId())) {
 							// 如果抢到锁，开始处理
-							for (ServerObserver observer : set) {
-								CommonThreadPool.execute(new ServerObserverThread(observer, server.getServerId()));
+							for (HeartbeatObserver observer : set) {
+								CachedThreadPool.execute(new HeartbeatObserverThread(observer, server.getServerId()));
 							}
 						}
 					}
@@ -77,8 +84,6 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 					}
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
-				} finally {
-					Thread.currentThread().setName(oldThreadName);
 				}
 			}
 		};
@@ -120,8 +125,8 @@ public class ServerManager implements ApplicationListener<ContextRefreshedEvent>
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
 		// 找出所有实现ServerObserver接口的类
-		Map<String, ServerObserver> serverObserverMap = context.getBeansOfType(ServerObserver.class);
-		for (Entry<String, ServerObserver> entry : serverObserverMap.entrySet()) {
+		Map<String, HeartbeatObserver> serverObserverMap = context.getBeansOfType(HeartbeatObserver.class);
+		for (Entry<String, HeartbeatObserver> entry : serverObserverMap.entrySet()) {
 			set.add(entry.getValue());
 		}
 	}

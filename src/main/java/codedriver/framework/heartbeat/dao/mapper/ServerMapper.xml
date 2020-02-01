@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="codedriver.framework.server.dao.mapper.ServerMapper">
+<mapper namespace="codedriver.framework.heartbeat.dao.mapper.ServerMapper">
 
-	<select id="getInactivatedServer" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	<select id="getInactivatedServer" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
 		scl.`ip`, scl.`server_id` AS serverId, scl.`status`
 		FROM server_cluster scl
@@ -10,14 +10,14 @@
 		WHERE scl.`status`='startup'
 	</select>
 
-	<select id="getServerByStatus" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	<select id="getServerByStatus" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
 		scl.`ip`, scl.`server_id` AS serverId,scl.`status`
 		FROM server_cluster scl
 		WHERE scl.`status`=#{status}
 	</select>
 
-	<select id="getServerByServerId" resultType="codedriver.framework.server.dto.ServerClusterVo">
+	<select id="getServerByServerId" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
 		scl.`ip`, scl.`server_id` AS serverId,scl.`status`
 		FROM server_cluster scl
@@ -25,13 +25,14 @@
 		FOR UPDATE
 	</select>
 
-	<select id="getServerCounterIncreaseByFromServerId" resultType="codedriver.framework.server.dto.ServerCounterVo">
+	<select id="getServerCounterIncreaseByFromServerId" resultType="codedriver.framework.heartbeat.dto.ServerCounterVo">
 		SELECT
 		${fromServerId} AS fromServerId, scl.`server_id` AS toServerId, IFNULL(sco.`counter` + 1, 1) AS counter
 		FROM `server_cluster` scl
 		LEFT JOIN `server_counter` sco ON sco.`to_server_id`=scl.`server_id` AND sco.`from_server_id`=#{fromServerId}
 		WHERE scl.`status`='startup' AND scl.`server_id` != #{fromServerId}
 	</select>
+
 	<update id="updateServerByServerId">
 		UPDATE server_cluster
 		SET

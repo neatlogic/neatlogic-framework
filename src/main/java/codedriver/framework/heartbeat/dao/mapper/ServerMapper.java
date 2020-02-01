@@ -1,11 +1,11 @@
-package codedriver.framework.server.dao.mapper;
+package codedriver.framework.heartbeat.dao.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import codedriver.framework.server.dto.ServerClusterVo;
-import codedriver.framework.server.dto.ServerCounterVo;
+import codedriver.framework.heartbeat.dto.ServerClusterVo;
+import codedriver.framework.heartbeat.dto.ServerCounterVo;
 
 public interface ServerMapper {
 	//SELECT

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.util.ClassUtils;
 
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dto.JobPropVo;
@@ -22,7 +23,9 @@ public interface IJob extends Job{
 	* @param @return 
 	* @return Integer
 	 */
-	public abstract String getClassName();
+	public default String getClassName() {
+		return ClassUtils.getUserClass(this.getClass()).getName();
+	}
 	
 	/**
 	* @Description: 解析注解参数

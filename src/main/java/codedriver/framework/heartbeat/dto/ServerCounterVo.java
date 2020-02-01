@@ -1,4 +1,4 @@
-package codedriver.framework.server.dto;
+package codedriver.framework.heartbeat.dto;
 
 public class ServerCounterVo {
 

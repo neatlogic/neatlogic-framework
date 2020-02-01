@@ -15,6 +15,7 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
@@ -179,13 +180,6 @@ public abstract class JobBase implements IJob {
 	@Override
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
 
-	/**
-	 * 获取类名
-	 */
-	@Override
-	public String getClassName() {
-		return this.getClass().getName();
-	}
 
 	// private String getFilePath() {
 	// Calendar calendar = Calendar.getInstance();

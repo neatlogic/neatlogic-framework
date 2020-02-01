@@ -1,16 +1,16 @@
-package codedriver.framework.server.core;
+package codedriver.framework.heartbeat.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 
-public class ServerObserverThread extends CodeDriverThread {
-	private Logger logger = LoggerFactory.getLogger(ServerObserverThread.class);
-	private ServerObserver observer;
+public class HeartbeatObserverThread extends CodeDriverThread {
+	private Logger logger = LoggerFactory.getLogger(HeartbeatObserverThread.class);
+	private HeartbeatObserver observer;
 	private Integer serverId;
 	
-	public ServerObserverThread(ServerObserver observer, Integer serverId) {
+	public HeartbeatObserverThread(HeartbeatObserver observer, Integer serverId) {
 		this.observer = observer;
 		this.serverId = serverId;
 	}

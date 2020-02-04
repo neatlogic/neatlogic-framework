@@ -113,7 +113,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						if (isAuth) {
 							String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
 							JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-							TenantContext.init(tenant);
+							TenantContext.init();
+							TenantContext.get().switchTenant(tenant);
 							UserContext.init(jwtBodyObj, timezone, request, response);
 							isUnExpired = userExpirationValid();
 						}

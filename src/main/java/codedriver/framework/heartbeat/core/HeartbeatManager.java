@@ -110,7 +110,6 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 					serverVo.setStatus(ServerClusterVo.STOP);
 					serverMapper.updateServerByServerId(serverVo);
 					serverMapper.deleteCounterByServerId(serverVo.getServerId());
-					schedulerMapper.deleteServerJobByServerId(serverVo.getServerId());
 					returnVal = true;
 				}
 			}

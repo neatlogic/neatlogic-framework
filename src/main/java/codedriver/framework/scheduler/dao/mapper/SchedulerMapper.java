@@ -38,7 +38,7 @@ public interface SchedulerMapper {
 
 	public List<JobLockVo> getJobLockByServerId(Integer serverId);
 
-	public int checkJobNameIsRepeat(JobVo job);
+	public int checkJobNameIsExists(JobVo job);
 
 	// UPDATE
 	public int updateJob(JobVo jobVo);
@@ -67,9 +67,9 @@ public interface SchedulerMapper {
 	// DELETE
 	public int deleteJobByUuid(String uuid);
 
-	public int deleteServerJobById(Long id);
+	public int deleteJobPropByJobUuid(String jobUuid);
 
-	public int deleteServerJobByServerId(Integer serverId);
+	public int deleteJobAuditByJobUuid(String jobUuid);
 
 	public int deleteJobStatus(@Param("jobName")
 	String jobName, @Param("jobGroup")

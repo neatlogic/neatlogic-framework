@@ -12,7 +12,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 	public Boolean checkCronIsExpired(JobObject jobObject) {
 		JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
 		if (jobVo != null) {
-			if (jobVo.getCron().equals(jobObject.getCron())) {
+			if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {
 				return true;
 			}
 		}
@@ -25,7 +25,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 		// 切换租户库
 		TenantContext.get().switchTenant(tenantUuid);
 		JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
-		if (jobVo != null) {
+		if (jobVo != null && jobVo.getIsActive().equals(1)) {
 			JobClassVo jobClassVo = SchedulerManager.getJobClassByClasspath(jobObject.getJobClassName());
 			JobObject newJobObject = new JobObject.Builder(jobVo.getUuid(), tenantUuid + JobObject.DELIMITER + jobClassVo.getModuleId(), jobClassVo.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
 			schedulerManager.loadJob(newJobObject);
@@ -33,7 +33,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 			schedulerManager.unloadJob(jobObject);
 		}
 	}
-	
+
 	@Override
 	public void initJob(String tenantUuid) {
 		List<JobVo> jobVoList = schedulerMapper.getJobByClassName(this.getClassName());

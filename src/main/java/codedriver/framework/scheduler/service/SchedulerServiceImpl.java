@@ -5,18 +5,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.common.util.TransactionDebugUtils;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
-import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
@@ -84,20 +81,25 @@ public class SchedulerServiceImpl implements SchedulerService {
 	}
 
 	@Override
-	public void saveJob(JobVo job) {
+	public int saveJob(JobVo job) {
 		String uuid = job.getUuid();
-		if (schedulerMapper.checkJobNameIsRepeat(job) == 0) {
+		if (schedulerMapper.checkJobNameIsExists(job) > 0) {
 			throw new ScheduleJobNameRepeatException(job.getName());
 		}
-		schedulerMapper.deleteJobByUuid(uuid);
-		job.setUuid(null);
-		uuid = job.getUuid();
-		schedulerMapper.insertJob(job);
-
-		for (JobPropVo jobProp : job.getPropList()) {
-			jobProp.setJobUuid(uuid);
-			schedulerMapper.insertJobProp(jobProp);
+		JobVo oldJobVo = schedulerMapper.getJobBaseInfoByUuid(uuid);
+		if (oldJobVo == null) {
+			schedulerMapper.insertJob(job);
+		} else {
+			schedulerMapper.deleteJobPropByJobUuid(uuid);
+			schedulerMapper.updateJob(job);
 		}
+		if (job.getPropList() != null && job.getPropList().size() > 0) {
+			for (JobPropVo jobProp : job.getPropList()) {
+				jobProp.setJobUuid(uuid);
+				schedulerMapper.insertJobProp(jobProp);
+			}
+		}
+		return 1;
 	}
 
 	@Override
@@ -129,6 +131,19 @@ public class SchedulerServiceImpl implements SchedulerService {
 	@Override
 	public List<JobLockVo> getJobLockByServerId(Integer serverId) {
 		return schedulerMapper.getJobLockByServerId(serverId);
+	}
+
+	@Override
+	public int deleteJob(String jobUuid) {
+		schedulerMapper.deleteJobAuditByJobUuid(jobUuid);
+		schedulerMapper.deleteJobPropByJobUuid(jobUuid);
+		schedulerMapper.deleteJobByUuid(jobUuid);
+		return 1;
+	}
+
+	@Override
+	public JobVo getJobBaseInfoByUuid(String uuid) {
+		return schedulerMapper.getJobBaseInfoByUuid(uuid);
 	}
 
 }

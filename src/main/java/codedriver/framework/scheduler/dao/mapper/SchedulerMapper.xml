@@ -129,7 +129,7 @@
 		limit #{startNum}, #{pageSize}
 	</select>
 
-	<select id="checkJobNameIsRepeat" resultType="int">
+	<select id="checkJobNameIsExists" parameterType="codedriver.framework.scheduler.dto.JobVo" resultType="int">
 		SELECT COUNT(1) FROM `schedule_job` WHERE `name` = #{name} AND `uuid` != #{uuid}
 	</select>
 
@@ -181,7 +181,7 @@
 		job_group = #{jobGroup}
 		FOR UPDATE
 	</select>
-	
+
 	<select id="getJobLockByServerId" parameterType="java.lang.Integer" resultType="codedriver.framework.scheduler.dto.JobLockVo">
 		SELECT
 		`job_name` as jobName,
@@ -210,11 +210,9 @@
 		UPDATE schedule_job
 		SET
 		name = #{name},
-		classname = #{className},
 		begin_time = #{beginTime},
 		end_time = #{endTime},
 		cron = #{cron},
-		status = #{status},
 		is_active = #{isActive},
 		need_audit = #{needAudit}
 		WHERE
@@ -322,22 +320,25 @@
 		)
 	</insert>
 
-
-
-	<delete id="deleteJobByUuid">
-		DELETE a, b, sja
-		FROM schedule_job a
-		LEFT JOIN schedule_job_prop b ON a.uuid = b.job_uuid
-		LEFT JOIN schedule_job_audit sja ON sja.job_uuid = a.uuid
-		WHERE a.uuid = #{uuid}
+	<delete id="deleteJobAuditByJobUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`schedule_job_audit`
+		WHERE `job_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteServerJobById">
-		DELETE FROM schedule_server_job WHERE id=#{id}
+	<delete id="deleteJobPropByJobUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`schedule_job_prop`
+		WHERE `job_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteServerJobByServerId">
-		DELETE FROM schedule_server_job WHERE server_id=#{serverId}
+	<delete id="deleteJobByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`schedule_job`
+		WHERE `uuid` = #{value}
 	</delete>
 
 	<delete id="deleteJobStatus">

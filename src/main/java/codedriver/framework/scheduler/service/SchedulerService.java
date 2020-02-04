@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
-import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
 public interface SchedulerService {
@@ -20,9 +19,13 @@ public interface SchedulerService {
 
 	public List<JobLockVo> getJobLockByServerId(Integer serverId);
 
+	public JobVo getJobBaseInfoByUuid(String uuid);
 
 	@Transactional
-	public void saveJob(JobVo job);
+	public int saveJob(JobVo job);
+
+	@Transactional
+	public int deleteJob(String jobUuid);
 
 	@Transactional
 	public int updateJobLock(JobLockVo jobLockVo);

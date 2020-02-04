@@ -97,7 +97,7 @@ public abstract class JobBase implements IJob {
 		}
 		JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
 		// 前后执行次数不一致，证明已经执行过，直接退出
-		if (beforeJobStatusVo.getExecCount() != oldJobStatusVo.getExecCount()) {
+		if (beforeJobStatusVo.getExecCount().intValue() != oldJobStatusVo.getExecCount().intValue()) {
 			return;
 		}
 		try {

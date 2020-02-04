@@ -16,13 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
@@ -30,22 +30,18 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
 import codedriver.framework.heartbeat.dto.ServerClusterVo;
 import codedriver.framework.heartbeat.dto.ServerCounterVo;
-import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 
 @RootComponent
-public class HeartbeatManager implements ApplicationListener<ContextRefreshedEvent> {
+public class HeartbeatManager extends ApplicationListenerBase  {
 	private Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
-	@Autowired
-	private SchedulerMapper schedulerMapper;
 	@Autowired
 	private DataSourceTransactionManager dataSourceTransactionManager;
 
 	private static Set<IHeartbreakHandler> set = new HashSet<>();
 
-	@PostConstruct
-	public final void init() {
+	public final void myInit() {
 		// 服务器重启时，先重置与自己相关的数据
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		// 重新插入一条服务器信息

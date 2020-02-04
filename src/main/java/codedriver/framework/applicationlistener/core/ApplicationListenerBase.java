@@ -17,23 +17,13 @@ import codedriver.framework.dao.mapper.TenantMapper;
 public abstract class ApplicationListenerBase implements ApplicationListener<ContextRefreshedEvent> {
 	@Autowired
 	protected TenantMapper tenantMapper;
-	@Autowired
-	protected ModuleMapper moduleMapper;
 
 	@PostConstruct
 	public final void init() {
 		TenantContext.init();
 		TenantContext tenantContext = TenantContext.get();
 		String tenant = tenantContext.getTenantUuid();
-		if (StringUtils.isNotBlank(tenant)) {
-			// 使用master库
-			tenantContext.setUseDefaultDatasource(true);
-			List<String> tenentModuleList = moduleMapper.getModuleListByTenantUuid(tenant);
-			// 还原回租户库
-			tenantContext.setUseDefaultDatasource(false);
-			// 设置当前租户激活模块信息
-			tenantContext.setActiveModuleList(ModuleUtil.getTenantActionModuleList(tenentModuleList));
-		}
+		tenantContext.switchTenant(tenant);
 		myInit();
 	}
 

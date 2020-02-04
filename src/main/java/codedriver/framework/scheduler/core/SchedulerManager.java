@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
@@ -29,7 +28,6 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dto.TenantVo;
-import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
@@ -48,11 +46,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 	private SchedulerFactoryBean schedulerFactoryBean;
 	@Autowired
 	private SchedulerMapper schedulerMapper;
-
-	@Autowired
-	private ServerMapper serverMapper;
-	@Autowired
-	private DataSourceTransactionManager dataSourceTransactionManager;
 
 	private List<TenantVo> tenantList = new ArrayList<>();
 
@@ -105,7 +98,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 			String jobName = jobObject.getJobName();
 			String jobGroup = jobObject.getJobGroup();
 			String className = jobObject.getJobClassName();
-			String tenantUuid = jobObject.getTenantUuid();
 
 			JobKey jobKey = new JobKey(jobName, jobGroup);
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -183,16 +175,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
-	}
-
-	/**
-	 * 
-	 * @Description: 某台服务器故障时，其他服务器调用该方法释放故障服务器占用的锁
-	 * @param serverId
-	 *            故障服务器id
-	 * @return void
-	 */
-	public void releaseLock(Integer serverId) {
 	}
 
 	@Override

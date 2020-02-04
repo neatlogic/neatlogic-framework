@@ -5,24 +5,16 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import codedriver.framework.common.config.Config;
-import codedriver.framework.scheduler.annotation.Input;
-import codedriver.framework.scheduler.annotation.Param;
-import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobObject;
 
 @Service
 @DisallowConcurrentExecution
 public class TestJob extends JobBase {
 
-	private Logger logger = LoggerFactory.getLogger(TestJob.class);
-	@Autowired
-	private SchedulerMapper scheduleMapper;
 
 	@Autowired
 	private SchedulerManager schedulerManager;

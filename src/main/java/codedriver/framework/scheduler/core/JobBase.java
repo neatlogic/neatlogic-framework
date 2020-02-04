@@ -16,7 +16,6 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
@@ -46,12 +45,6 @@ public abstract class JobBase implements IJob {
 
 	protected static SchedulerService schedulerService;
 
-	private static DataSourceTransactionManager dataSourceTransactionManager;
-
-	@Autowired
-	public void setDataSourceTransactionManager(DataSourceTransactionManager _dataSourceTransactionManager) {
-		dataSourceTransactionManager = _dataSourceTransactionManager;
-	}
 
 	@Autowired
 	public void setSchedulerMapper(SchedulerMapper schMapper) {

@@ -2,45 +2,81 @@ package codedriver.framework.scheduler.dao.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
-import codedriver.framework.scheduler.dto.ServerNewJobVo;
 
 public interface SchedulerMapper {
-	//SELECT
+	// SELECT
 	public JobVo getJobByUuid(String uuid);
-	public JobStatusVo getJobStatusByJobUuid(String jobUuid);
-	public List<JobVo> getJobByClasspath(String classpath);
+
+	public JobVo getJobBaseInfoByUuid(String uuid);
+
+	public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName")
+	String jobName, @Param("jobGroup")
+	String jobGroup);
+
+	public List<JobVo> getJobByClassName(String className);
+
 	public int searchJobCount(JobVo jobVo);
-	public List<JobVo> searchJobList(JobVo jobVo);
-	public List<ServerNewJobVo> getServerJobByServerId(int serverId);
-	
+
+	public List<JobVo> searchJob(JobVo jobVo);
+
 	public int searchJobAuditCount(JobAuditVo jobAuditVo);
+
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
-	public JobAuditVo getJobAuditLogById(Long auditId);
-	
-	public JobLockVo getJobLockByUuid(String uuid);
+
+	public JobAuditVo getJobAuditById(Long auditId);
+
+	public JobLockVo getJobLockByJobNameGroup(@Param("jobName")
+	String jobName, @Param("jobGroup")
+	String jobGroup);
+
+	public List<JobLockVo> getJobLockByServerId(Integer serverId);
+
 	public int checkJobNameIsRepeat(JobVo job);
-	//UPDATE
-	public int updateJobById(JobVo job);
-	public int updateJobStatusByJobUuid(JobStatusVo jobStatus);
+
+	// UPDATE
+	public int updateJob(JobVo jobVo);
+
+	public int resetJobLockByServerId(Integer serverId);
+
+	public int updateJobStatus(JobStatusVo jobStatus);
+
 	public int updateJobAudit(JobAuditVo scheduleJobAudit);
-	public int updateJobLockByJobId(JobLockVo jobLock);
+
+	public int updateJobLock(JobLockVo jobLock);
+
 	public int updateJobLockByServerId(JobLockVo jobLock);
-	//INSERT	
+
+	// INSERT
 	public int insertJob(JobVo job);
+
 	public int insertJobStatus(JobStatusVo jobStatus);
-	public int insertJobProp(JobPropVo jobProp);	
+
+	public int insertJobProp(JobPropVo jobProp);
+
 	public int insertJobAudit(JobAuditVo scheduleJobAudit);
+
 	public int insertJobLock(JobLockVo jobLock);
-	public int insertServerJob(ServerNewJobVo serverNewJobVo);
-	//DELETE
+
+	// DELETE
 	public int deleteJobByUuid(String uuid);
+
 	public int deleteServerJobById(Long id);
+
 	public int deleteServerJobByServerId(Integer serverId);
-	public int deleteJobStatusAndLockByJobUuid(String jobUuid);
-	
+
+	public int deleteJobStatus(@Param("jobName")
+	String jobName, @Param("jobGroup")
+	String jobGroup);
+
+	public int deleteJobLock(@Param("jobName")
+	String jobName, @Param("jobGroup")
+	String jobGroup);
+
 }

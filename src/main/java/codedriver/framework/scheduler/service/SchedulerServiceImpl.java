@@ -9,49 +9,50 @@ import org.springframework.transaction.annotation.Transactional;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
+import codedriver.framework.common.util.TransactionDebugUtils;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
 
 @Service
-@Transactional
-public class SchedulerServiceImpl implements SchedulerService{
-		
-	@Autowired 
+public class SchedulerServiceImpl implements SchedulerService {
+
+	@Autowired
 	private SchedulerMapper schedulerMapper;
-	
+
 	@Override
 	public List<JobVo> searchJobList(JobVo jobVo) {
 		int rowNum = schedulerMapper.searchJobCount(jobVo);
 		int pageCount = PageUtil.getPageCount(rowNum, jobVo.getPageSize());
 		jobVo.setPageCount(pageCount);
 		jobVo.setRowNum(rowNum);
-		return schedulerMapper.searchJobList(jobVo);
+		return schedulerMapper.searchJob(jobVo);
 	}
 
 	@Override
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo) {
-		List<JobClassVo> jobClassList = SchedulerManager.getAllJobClassList();		
+		List<JobClassVo> jobClassList = SchedulerManager.getAllPublicJobClassList();
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
-		for(JobClassVo jobClass : jobClassList) {
-			if(jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
+		for (JobClassVo jobClass : jobClassList) {
+			if (jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
 				continue;
 			}
-			if(jobClassVo.getModuleId() != null && !jobClass.getModuleId().equals(jobClassVo.getModuleId())) {
+			if (jobClassVo.getModuleId() != null && !jobClass.getModuleId().equals(jobClassVo.getModuleId())) {
 				continue;
 			}
-			if(jobClassVo.getKeyword() != null && !jobClass.getName().contains(jobClassVo.getKeyword())) {
+			if (jobClassVo.getKeyword() != null && !jobClass.getName().contains(jobClassVo.getKeyword())) {
 				continue;
 			}
 			jobClassFilterList.add(jobClass);
 		}
-				
+
 		int pageSize = jobClassVo.getPageSize();
 		int rowNum = jobClassFilterList.size();
 		int pageCount = PageUtil.getPageCount(rowNum, pageSize);
@@ -59,7 +60,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 		jobClassVo.setRowNum(rowNum);
 		int startNum = jobClassVo.getStartNum();
 		int endNum = startNum + pageSize;
-		endNum = endNum >  rowNum ? rowNum : endNum;
+		endNum = endNum > rowNum ? rowNum : endNum;
 		List<JobClassVo> returnJobClassList = jobClassFilterList.subList(startNum, endNum);
 		return returnJobClassList;
 	}
@@ -67,7 +68,7 @@ public class SchedulerServiceImpl implements SchedulerService{
 	@Override
 	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo) {
 		JobVo job = schedulerMapper.getJobByUuid(jobAuditVo.getJobUuid());
-		if(job == null) {
+		if (job == null) {
 			throw new ScheduleJobNotFoundException(jobAuditVo.getJobUuid());
 		}
 		int rowNum = schedulerMapper.searchJobAuditCount(jobAuditVo);
@@ -78,33 +79,56 @@ public class SchedulerServiceImpl implements SchedulerService{
 	}
 
 	@Override
+	public int updateJobLock(JobLockVo jobLockVo) {
+		return schedulerMapper.updateJobLock(jobLockVo);
+	}
+
+	@Override
 	public void saveJob(JobVo job) {
 		String uuid = job.getUuid();
-		if(schedulerMapper.checkJobNameIsRepeat(job) == 0) {
+		if (schedulerMapper.checkJobNameIsRepeat(job) == 0) {
 			throw new ScheduleJobNameRepeatException(job.getName());
 		}
 		schedulerMapper.deleteJobByUuid(uuid);
 		job.setUuid(null);
 		uuid = job.getUuid();
 		schedulerMapper.insertJob(job);
-		
-		for(JobPropVo jobProp : job.getPropList()) {
+
+		for (JobPropVo jobProp : job.getPropList()) {
 			jobProp.setJobUuid(uuid);
 			schedulerMapper.insertJobProp(jobProp);
 		}
 	}
 
 	@Override
-	public boolean getJobLock(String uuid) {
-		JobLockVo jobLock = schedulerMapper.getJobLockByUuid(uuid);
-		if(jobLock == null) {
-			return false;
+	public JobLockVo getJobLock(String jobName, String jobGroup) {
+		JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
+		if (jobLockVo == null) {
+			// 没有锁的情况证明作业已经被删除
+			return null;
+		} else {
+			// 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
+			if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+				return null;
+			}
 		}
-		if(JobLockVo.WAIT.equals(jobLock.getLock()) || jobLock.getServerId().intValue() == Config.SCHEDULE_SERVER_ID) {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(uuid, JobLockVo.RUN, Config.SCHEDULE_SERVER_ID));
-			return true;
-		}		
-		return false;
+		// 修改锁状态
+		jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+		jobLockVo.setLock(JobLockVo.RUNNING);
+		schedulerMapper.updateJobLock(jobLockVo);
+		return jobLockVo;
+	}
+
+	@Override
+	public int resetRunningJobLockByServerId(Integer serverId) {
+		// 重置该serverid的作业锁状态为waiting
+		schedulerMapper.resetJobLockByServerId(serverId);
+		return 1;
+	}
+
+	@Override
+	public List<JobLockVo> getJobLockByServerId(Integer serverId) {
+		return schedulerMapper.getJobLockByServerId(serverId);
 	}
 
 }

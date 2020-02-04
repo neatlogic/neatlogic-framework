@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -15,7 +16,7 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ClassUtils;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
@@ -27,6 +28,8 @@ import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import codedriver.framework.scheduler.dto.JobStatusVo;
+import codedriver.framework.scheduler.dto.JobVo;
+import codedriver.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import codedriver.framework.scheduler.exception.ScheduleIllegalParameterException;
 import codedriver.framework.scheduler.exception.ScheduleParamNotExistsException;
 import codedriver.framework.scheduler.service.SchedulerService;
@@ -42,6 +45,13 @@ public abstract class JobBase implements IJob {
 	protected static SchedulerManager schedulerManager;
 
 	protected static SchedulerService schedulerService;
+
+	private static DataSourceTransactionManager dataSourceTransactionManager;
+
+	@Autowired
+	public void setDataSourceTransactionManager(DataSourceTransactionManager _dataSourceTransactionManager) {
+		dataSourceTransactionManager = _dataSourceTransactionManager;
+	}
 
 	@Autowired
 	public void setSchedulerMapper(SchedulerMapper schMapper) {
@@ -60,99 +70,56 @@ public abstract class JobBase implements IJob {
 
 	@Override
 	public final void execute(JobExecutionContext context) throws JobExecutionException {
-
+		Date fireTime = new Date();
 		JobDetail jobDetail = context.getJobDetail();
+		JobObject jobObject = (JobObject) jobDetail.getJobDataMap().get("jobObject");
 		JobKey jobKey = jobDetail.getKey();
+		String jobName = jobKey.getName();
+		String jobGroup = jobKey.getGroup();
+		String tenantUuid = jobObject.getTenantUuid();
 		// 从job组名中获取租户uuid,切换到租户的数据源
-		String groupName = jobKey.getGroup();
-		int index = groupName.indexOf(JobObject.DELIMITER);
-		String tenantUuid = groupName.substring(0, index);
 		TenantContext.init(tenantUuid).setUseDefaultDatasource(false);
-		String jobUuid = jobKey.getName();
-
-		// 抢锁前 获取定时作业状态信息
-		JobStatusVo lockBeforeJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
-		if (lockBeforeJobStatus == null) {
-			// IApiExceptionMessage message = new
-			// FrameworkExceptionMessageBase(new
-			// ScheduleJobNotFoundException(new CustomExceptionMessage("定时作业："+
-			// jobUuid + " 不存在")));
-			logger.error("定时作业：" + jobUuid + " 不存在");
-			schedulerManager.pauseJob(jobUuid);
+		// 检查作业是否需要重新加载
+		IJob jobHandler = SchedulerManager.getHandler(this.getClassName());
+		if (jobHandler == null) {
+			schedulerManager.unloadJob(jobObject);
+			throw new ScheduleHandlerNotFoundException(jobObject.getJobClassName());
+		}
+		if (!jobHandler.checkCronIsExpired(jobObject)) {
+			jobHandler.reloadJob(jobObject);
 			return;
 		}
-		// 如果定时作业状态不是运行中，就停止定时调度
-		if (!JobStatusVo.RUNNING.equals(lockBeforeJobStatus.getStatus())) {
-			schedulerManager.pauseJob(jobUuid);
+		JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+		JobLockVo jobLockVo = schedulerService.getJobLock(jobName, jobGroup);
+		// 取不到锁，不允许执行
+		if (jobLockVo == null) {
 			return;
 		}
-
-		Date fireTime = context.getFireTime();// 本次执行激活时间
-		Date nextFireTime = lockBeforeJobStatus.getNextFireTime();// 数据库中记录的下次激活时间
-		// 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
-		if (nextFireTime != null && nextFireTime.after(fireTime)) {
-			return;
-		}
-		// 抢不到锁，则放弃执行业务逻辑
-		if (!schedulerService.getJobLock(jobUuid)) {
+		JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+		// 前后执行次数不一致，证明已经执行过，直接退出
+		if (beforeJobStatusVo.getExecCount() != oldJobStatusVo.getExecCount()) {
 			return;
 		}
 		try {
-			// 抢到锁后，再次获取定时作业状态信息
-			JobStatusVo lockAfterJobStatus = schedulerMapper.getJobStatusByJobUuid(jobUuid);
-			// 如果抢锁前后获取到的执行次数不相等，则放弃执行业务逻辑
-			if (!lockBeforeJobStatus.getExecCount().equals(lockAfterJobStatus.getExecCount())) {
-				return;
-			}
-			IJob job = SchedulerManager.getInstance(this.getClassName());
-			if (job == null) {
-				return;
-			}
-			if (lockBeforeJobStatus.getNeedAudit().intValue() == 1) {
 
-				JobAuditVo auditVo = new JobAuditVo(jobUuid, Config.SCHEDULE_SERVER_ID);
+			JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobName);
+			// 如果作业存在并且设置为需要审计
+			if (jobVo != null && jobVo.getNeedAudit().equals(1)) {
+				JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
 				schedulerMapper.insertJobAudit(auditVo);
-				// String path = getFilePath();
-				// File logFile = new File(path + auditVo.getId() + ".log");
-				// auditVo.setLogPath(logFile.getPath());
-				// OutputStreamWriter logOut = null;
-
+				jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
 				try {
-					// if (!logFile.getParentFile().exists()) {
-					// logFile.getParentFile().mkdirs();
-					// }
-					// if (!logFile.exists()) {
-					// logFile.createNewFile();
-					// }
-					// logOut = new OutputStreamWriter(new
-					// FileOutputStream(logFile, true), "UTF-8");
-					// if (logOut != null) {
-					// context.put("logOutput", logOut);
-					// }
-
-					job.executeInternal(context);
-					auditVo.setState(JobAuditVo.SUCCESS);
+					jobHandler.executeInternal(context);
+					auditVo.setStatus(JobAuditVo.SUCCEED);
 				} catch (Exception ex) {
-					// try {
-					auditVo.setState(JobAuditVo.ERROR);
+					auditVo.setStatus(JobAuditVo.FAILED);
+					auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
 					logger.error(ex.getMessage(), ex);
-					// logOut.write(ExceptionUtils.getStackTrace(ex));
-					// } catch (IOException e) {
-					// logger.error(e.getMessage(), e);
-					// }
 				} finally {
 					schedulerMapper.updateJobAudit(auditVo);
-					// if (logOut != null) {
-					// try {
-					// logOut.flush();
-					// logOut.close();
-					// } catch (IOException e) {
-					// e.printStackTrace();
-					// }
-					// }
 				}
 			} else {
-				job.executeInternal(context);
+				jobHandler.executeInternal(context);
 			}
 			// 执行完业务逻辑后，更新定时作业状态信息
 			JobStatusVo jobStatus = new JobStatusVo();
@@ -162,15 +129,23 @@ public abstract class JobBase implements IJob {
 			if (context.getNextFireTime() != null) {
 				jobStatus.setNextFireTime(context.getNextFireTime());
 			} else {
-				jobStatus.setStatus(JobStatusVo.STOP);
-				schedulerManager.pauseJob(jobUuid);
+				// 没有下次执行时间，则unload作业，清除作业相关信息。
+				schedulerManager.unloadJob(jobObject);
+				schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
+				schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
 			}
-			jobStatus.setJobUuid(jobUuid);
-			jobStatus.setExecCount(lockBeforeJobStatus.getExecCount() + 1);
-
-			schedulerMapper.updateJobStatusByJobUuid(jobStatus);
+			jobStatus.setJobName(jobName);
+			jobStatus.setJobGroup(jobGroup);
+			jobStatus.setExecCount(oldJobStatusVo.getExecCount() + 1);
+			schedulerMapper.updateJobStatus(jobStatus);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 		} finally {
-			schedulerMapper.updateJobLockByJobId(new JobLockVo(jobUuid, JobLockVo.WAIT));
+			// 恢复作业锁状态为等待中
+
+			jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+			jobLockVo.setLock(JobLockVo.WAITING);
+			schedulerService.updateJobLock(jobLockVo);
 		}
 	}
 
@@ -179,7 +154,6 @@ public abstract class JobBase implements IJob {
 	 */
 	@Override
 	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
-
 
 	// private String getFilePath() {
 	// Calendar calendar = Calendar.getInstance();

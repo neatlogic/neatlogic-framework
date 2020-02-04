@@ -3,96 +3,120 @@ package codedriver.framework.scheduler.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
+public class JobObject implements Serializable {
 
-public class JobObject implements Serializable {	
-	
 	private static final long serialVersionUID = -8409651508383155447L;
-	public final static String FRAMEWORK = "FRAMEWORK";
-	public final static String DELIMITER = "(_)";
-	private String jobId;
+	public final static String DELIMITER = "#";
+	private String jobName;
 	private String jobGroup;
 	private String cron;
-	private Date startTime;
+	private Date beginTime;
 	private Date endTime;
+	private String type;
 	private String jobClassName;
 	private Integer needAudit;
-	public JobObject(String _jobId, String _jobGroup) {
-		this.jobId = _jobId;
-		this.jobGroup = _jobGroup;
+	private String tenantUuid;
+
+	private JobObject(Builder builder) {
+		this.jobName = builder.jobId;
+		this.jobGroup = builder.jobGroup;
+		this.jobClassName = builder.jobClassName;
+		this.cron = builder.cron;
+		this.beginTime = builder.beginTime;
+		this.endTime = builder.endTime;
+		this.needAudit = builder.needAudit;
+		this.tenantUuid = builder.tenantUuid;
+		this.type = builder.type;
 	}
 
 	public JobObject() {
 
 	}
 
-	public String getJobId() {
-		return jobId;
-	}
-
-	public void setJobId(String jobId) {
-		this.jobId = jobId;
+	public String getJobName() {
+		return jobName;
 	}
 
 	public String getJobGroup() {
 		return jobGroup;
 	}
 
-	public void setJobGroup(String jobGroup) {
-		this.jobGroup = jobGroup;
-	}
-
 	public String getCron() {
 		return cron;
 	}
 
-	public void setCron(String cron) {
-		this.cron = cron;
-	}
-
-	public Date getStartTime() {
-		return startTime;	
-	}
-
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
-
 	public Date getEndTime() {
-		return endTime;		
-	}
-
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
+		return endTime;
 	}
 
 	public String getJobClassName() {
 		return jobClassName;
 	}
 
-	public void setJobClassName(String jobClassName) {
-		this.jobClassName = jobClassName;
-	}
-
 	public Integer getNeedAudit() {
 		return needAudit;
 	}
 
-	public void setNeedAudit(Integer needAudit) {
-		this.needAudit = needAudit;
+	public Date getBeginTime() {
+		return beginTime;
 	}
 
-	public static JobObject buildJobObject(JobBaseVo jobBaseVo, String groupName) {
-		TenantContext tenant = TenantContext.get();
-		tenant.setUseDefaultDatasource(false);
-		JobObject jobObject = new JobObject();
-		jobObject.setJobId(jobBaseVo.getUuid());
-		jobObject.setJobGroup(tenant.getTenantUuid() + DELIMITER + groupName);
-		jobObject.setCron(jobBaseVo.getCron());
-		jobObject.setEndTime(jobBaseVo.getEndTime());
-		jobObject.setStartTime(jobBaseVo.getBeginTime());
-		jobObject.setJobClassName(jobBaseVo.getClasspath());
-		jobObject.setNeedAudit(jobBaseVo.getNeedAudit());
-		return jobObject;
+	public String getTenantUuid() {
+		return tenantUuid;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public static class Builder {
+		// 必要参数
+		private final String jobId;
+		private final String jobGroup;
+		private final String jobClassName;
+		private final String tenantUuid;
+
+		// 可选参数
+		private String cron;
+		private Date beginTime;
+		private Date endTime;
+		private Integer needAudit = 0;
+		private String type = "private";
+
+		public Builder(String jobId, String jobGroup, String jobClassName, String tenantUuid) {
+			this.jobId = jobId;
+			this.jobGroup = jobGroup;
+			this.jobClassName = jobClassName;
+			this.tenantUuid = tenantUuid;
+		}
+
+		public Builder withCron(String _cron) {
+			cron = _cron;
+			return this;
+		}
+
+		public Builder withBeginTime(Date _beginTime) {
+			beginTime = _beginTime;
+			return this;
+		}
+
+		public Builder withEndTime(Date _endTime) {
+			endTime = _endTime;
+			return this;
+		}
+
+		public Builder setType(String _type) {
+			type = _type;
+			return this;
+		}
+
+		public Builder needAudit(Integer _needAudit) {
+			needAudit = _needAudit;
+			return this;
+		}
+
+		public JobObject build() {
+			return new JobObject(this);
+		}
 	}
 }

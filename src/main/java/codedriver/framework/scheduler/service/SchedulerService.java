@@ -2,20 +2,35 @@ package codedriver.framework.scheduler.service;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
+import codedriver.framework.scheduler.dto.JobLockVo;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 
 public interface SchedulerService {
 
-	List<JobVo> searchJobList(JobVo jobVo);
+	public List<JobVo> searchJobList(JobVo jobVo);
 
-	List<JobClassVo> searchJobClassList(JobClassVo jobClassVo);
+	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo);
 
-	List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
+	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
 
-	void saveJob(JobVo job);
+	public List<JobLockVo> getJobLockByServerId(Integer serverId);
 
-	boolean getJobLock(String uuid);
-	
+
+	@Transactional
+	public void saveJob(JobVo job);
+
+	@Transactional
+	public int updateJobLock(JobLockVo jobLockVo);
+
+	@Transactional
+	public JobLockVo getJobLock(String jobName, String jobGroup);
+
+	@Transactional
+	public int resetRunningJobLockByServerId(Integer serverId);
+
 }

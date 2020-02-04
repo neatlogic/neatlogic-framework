@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 
-public class HeartbeatObserverThread extends CodeDriverThread {
-	private Logger logger = LoggerFactory.getLogger(HeartbeatObserverThread.class);
-	private HeartbeatObserver observer;
+public class HeartbreakHandlerThread extends CodeDriverThread {
+	private Logger logger = LoggerFactory.getLogger(HeartbreakHandlerThread.class);
+	private IHeartbreakHandler observer;
 	private Integer serverId;
-	
-	public HeartbeatObserverThread(HeartbeatObserver observer, Integer serverId) {
+
+	public HeartbreakHandlerThread(IHeartbreakHandler observer, Integer serverId) {
 		this.observer = observer;
 		this.serverId = serverId;
 	}
@@ -19,7 +19,7 @@ public class HeartbeatObserverThread extends CodeDriverThread {
 	protected void execute() {
 		String oldThreadName = Thread.currentThread().getName();
 		try {
-			Thread.currentThread().setName("SERVER_OBSERVER_THREAD");
+			Thread.currentThread().setName("HEARTBREAK-HANDLER");
 			observer.whenServerInactivated(serverId);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

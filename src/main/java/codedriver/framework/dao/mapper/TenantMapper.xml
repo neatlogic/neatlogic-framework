@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
+	<!--  <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>-->
+
 	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
 		`uuid`,
@@ -11,10 +13,10 @@
 	</select>
 
 	<select id="getAllActiveTenant" resultType="codedriver.framework.dto.TenantVo">
-		SELECT 
-		t.`uuid`, 
-		t.`name` 
-		FROM 
+		SELECT
+		t.`uuid`,
+		t.`name`
+		FROM
 		`tenant` t
 		JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
 		WHERE t.`is_active` = 1

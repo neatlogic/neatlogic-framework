@@ -57,7 +57,7 @@ public class LoginController {
 				if (tenantVo == null) {
 					throw new RuntimeException("找不到租户：" + tenant);
 				}
-				tenantContext.setTenantUuid(tenant);
+				tenantContext.switchTenant(tenant);
 				// 还原回租户库
 				tenantContext.setUseDefaultDatasource(false);
 			}

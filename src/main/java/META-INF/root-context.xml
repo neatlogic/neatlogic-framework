@@ -96,12 +96,6 @@
 
 	<bean id="DatasourceInitializer" class="codedriver.framework.startup.DatasourceInitializer"></bean>
 
-	<bean id="TenantModuleFilter" class="codedriver.framework.filter.TenantModuleFilter"></bean>
-
 	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
-
-	<!-- TODO 临时后端测试页面试用 start -->
-	<!--  <bean id="TestProcessFilter" class="codedriver.module.test.controller.TestProcessFilter"></bean>-->
-	<!-- TODO 临时后端测试页面试用 end -->
 
 </beans>

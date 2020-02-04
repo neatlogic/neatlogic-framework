@@ -14,45 +14,17 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
+import codedriver.framework.scheduler.dto.JobObject;
 
 @Service
 @DisallowConcurrentExecution
-public class TestJob extends JobBase implements IPublicJob {
+public class TestJob extends JobBase {
 
 	private Logger logger = LoggerFactory.getLogger(TestJob.class);
 	@Autowired
 	private SchedulerMapper scheduleMapper;
 
-	@Input({
-			@Param(name = "p_1",
-					dataType = "int",
-					controlType = "t1",
-					controlValue = "v1",
-					description = "p1",
-					required = true),
-			@Param(name = "p_2",
-					dataType = "Integer",
-					controlType = "t2",
-					controlValue = "v2",
-					description = "p2",
-					required = true),
-			@Param(name = "p_3",
-					dataType = "long",
-					controlType = "t3",
-					controlValue = "v3",
-					description = "p3",
-					required = true),
-			@Param(name = "p_4",
-					dataType = "Long",
-					controlType = "t4",
-					controlValue = "v4",
-					description = "p4",
-					required = true),
-			@Param(name = "p_5",
-					dataType = "String",
-					controlValue = "v5",
-					description = "p5",
-					required = true) })
+	@Input({ @Param(name = "p_1", dataType = "int", controlType = "t1", controlValue = "v1", description = "p1", required = true), @Param(name = "p_2", dataType = "Integer", controlType = "t2", controlValue = "v2", description = "p2", required = true), @Param(name = "p_3", dataType = "long", controlType = "t3", controlValue = "v3", description = "p3", required = true), @Param(name = "p_4", dataType = "Long", controlType = "t4", controlValue = "v4", description = "p4", required = true), @Param(name = "p_5", dataType = "String", controlValue = "v5", description = "p5", required = true) })
 	@Override
 	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
@@ -63,14 +35,19 @@ public class TestJob extends JobBase implements IPublicJob {
 	}
 
 	@Override
-	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean checkCronIsExpired(JobObject jobObject) {
+		return true;
 	}
 
 	@Override
-	public String getName() {
-		return "测试作业";
+	public void reloadJob(JobObject jobObject) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void initJob(String tenantUuid) {
+		System.out.println("init private jobs");
 	}
 
 }

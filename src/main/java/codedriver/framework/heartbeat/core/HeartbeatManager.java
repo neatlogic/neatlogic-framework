@@ -42,7 +42,7 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 	@Autowired
 	private DataSourceTransactionManager dataSourceTransactionManager;
 
-	private static Set<HeartbeatObserver> set = new HashSet<>();
+	private static Set<IHeartbreakHandler> set = new HashSet<>();
 
 	@PostConstruct
 	public final void init() {
@@ -56,7 +56,7 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 			public Thread newThread(Runnable r) {
 				Thread t = new Thread(r);
 				t.setDaemon(true);
-				t.setName("HEARBEAT");
+				t.setName("HEARTBEAT");
 				return t;
 			}
 		});
@@ -69,8 +69,8 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 					for (ServerClusterVo server : list) {
 						if (getServerLock(server.getServerId())) {
 							// 如果抢到锁，开始处理
-							for (HeartbeatObserver observer : set) {
-								CachedThreadPool.execute(new HeartbeatObserverThread(observer, server.getServerId()));
+							for (IHeartbreakHandler observer : set) {
+								CachedThreadPool.execute(new HeartbreakHandlerThread(observer, server.getServerId()));
 							}
 						}
 					}
@@ -99,7 +99,8 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 	 */
 	public boolean getServerLock(Integer serverId) {
 		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 		TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(def);
 		boolean returnVal = false;
 		try {
@@ -125,8 +126,8 @@ public class HeartbeatManager implements ApplicationListener<ContextRefreshedEve
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
 		// 找出所有实现ServerObserver接口的类
-		Map<String, HeartbeatObserver> serverObserverMap = context.getBeansOfType(HeartbeatObserver.class);
-		for (Entry<String, HeartbeatObserver> entry : serverObserverMap.entrySet()) {
+		Map<String, IHeartbreakHandler> serverObserverMap = context.getBeansOfType(IHeartbreakHandler.class);
+		for (Entry<String, IHeartbreakHandler> entry : serverObserverMap.entrySet()) {
 			set.add(entry.getValue());
 		}
 	}

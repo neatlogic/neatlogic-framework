@@ -27,6 +27,7 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobClassVo;
@@ -42,6 +43,8 @@ public class SchedulerManager extends ApplicationListenerBase {
 	private static Map<String, JobClassVo> jobClassMap = new HashMap<>();
 	private static List<JobClassVo> publicJobClassList = new ArrayList<>();
 
+	@Autowired
+	private TenantMapper tenantMapper;
 	@Autowired
 	private SchedulerFactoryBean schedulerFactoryBean;
 	@Autowired

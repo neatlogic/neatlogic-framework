@@ -14,6 +14,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.google.common.util.concurrent.RateLimiter;
 
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.restful.annotation.IsActive;
 import codedriver.framework.restful.dto.ApiComponentVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -41,6 +42,10 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 
 	public static ApiVo getApiByToken(String token) {
 		return apiMap.get(token);
+	}
+
+	public static List<ApiVo> getApiList() {
+		return apiList;
 	}
 
 	@Override
@@ -73,7 +78,11 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setToken(token);
 					apiVo.setComponentId(component.getId());
 					apiVo.setName(component.getName());
-					apiVo.setIsActive(1);
+					if (component.getClass().getAnnotation(IsActive.class) != null) {
+						apiVo.setIsActive(1);
+					} else {
+						apiVo.setIsActive(0);
+					}
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
@@ -113,7 +122,11 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setComponentId(component.getId());
 					apiVo.setExpire("");
 					apiVo.setName(component.getName());
-					apiVo.setIsActive(1);
+					if (component.getClass().getAnnotation(IsActive.class) != null) {
+						apiVo.setIsActive(1);
+					} else {
+						apiVo.setIsActive(0);
+					}
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
@@ -152,7 +165,11 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setComponentId(component.getId());
 					apiVo.setExpire("");
 					apiVo.setName(component.getName());
-					apiVo.setIsActive(1);
+					if (component.getClass().getAnnotation(IsActive.class) != null) {
+						apiVo.setIsActive(1);
+					} else {
+						apiVo.setIsActive(0);
+					}
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());

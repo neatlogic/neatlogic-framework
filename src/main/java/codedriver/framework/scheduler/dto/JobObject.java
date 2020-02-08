@@ -2,11 +2,11 @@ package codedriver.framework.scheduler.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public class JobObject implements Serializable {
 
 	private static final long serialVersionUID = -8409651508383155447L;
-	public final static String DELIMITER = "#";
 	private String jobName;
 	private String jobGroup;
 	private String cron;
@@ -16,6 +16,8 @@ public class JobObject implements Serializable {
 	private String jobClassName;
 	private Integer needAudit;
 	private String tenantUuid;
+	private Date triggerTime;
+	private Map<String, Object> dataMap;
 
 	private JobObject(Builder builder) {
 		this.jobName = builder.jobId;
@@ -27,6 +29,7 @@ public class JobObject implements Serializable {
 		this.needAudit = builder.needAudit;
 		this.tenantUuid = builder.tenantUuid;
 		this.type = builder.type;
+		this.triggerTime = builder.triggerTime;
 	}
 
 	public JobObject() {
@@ -69,6 +72,10 @@ public class JobObject implements Serializable {
 		return type;
 	}
 
+	public Date getTriggerTime() {
+		return triggerTime;
+	}
+
 	public static class Builder {
 		// 必要参数
 		private final String jobId;
@@ -82,6 +89,7 @@ public class JobObject implements Serializable {
 		private Date endTime;
 		private Integer needAudit = 0;
 		private String type = "private";
+		private Date triggerTime;
 
 		public Builder(String jobId, String jobGroup, String jobClassName, String tenantUuid) {
 			this.jobId = jobId;
@@ -92,6 +100,11 @@ public class JobObject implements Serializable {
 
 		public Builder withCron(String _cron) {
 			cron = _cron;
+			return this;
+		}
+
+		public Builder withTriggerTime(Date _triggerTime) {
+			triggerTime = _triggerTime;
 			return this;
 		}
 
@@ -119,4 +132,13 @@ public class JobObject implements Serializable {
 			return new JobObject(this);
 		}
 	}
+
+	public Map<String, Object> getDataMap() {
+		return dataMap;
+	}
+
+	public void setDataMap(Map<String, Object> dataMap) {
+		this.dataMap = dataMap;
+	}
+
 }

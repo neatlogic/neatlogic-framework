@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -44,8 +46,7 @@ public abstract class JobBase implements IJob {
 	protected static SchedulerManager schedulerManager;
 
 	protected static SchedulerService schedulerService;
-
-
+	
 	@Autowired
 	public void setSchedulerMapper(SchedulerMapper schMapper) {
 		schedulerMapper = schMapper;

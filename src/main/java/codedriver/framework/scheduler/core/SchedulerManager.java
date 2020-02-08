@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -109,8 +110,9 @@ public class SchedulerManager extends ApplicationListenerBase {
 			}
 
 			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup);
-
-			if (CronExpression.isValidExpression(jobObject.getCron())) {
+			if (jobObject.getTriggerTime() != null && jobObject.getTriggerTime().after(new Date())) {
+				triggerBuilder.startAt(jobObject.getTriggerTime());
+			} else if (StringUtils.isNotBlank(jobObject.getCron()) && CronExpression.isValidExpression(jobObject.getCron())) {
 				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
 			} else {
 				return;

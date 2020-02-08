@@ -26,6 +26,25 @@ public interface IJob extends Job {
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
+	
+	/**
+	* @Author: chenqiwei
+	* @Time:Feb 8, 2020
+	* @Description: TODO 
+	* @param @return 
+	* @return IJob
+	 */
+	public default IJob getThis() {
+		return SchedulerManager.getHandler(this.getClassName());
+	}
+	/**
+	* @Author: chenqiwei
+	* @Time:Feb 8, 2020
+	* @Description: 获取分组名称 
+	* @param @return 
+	* @return String
+	 */
+	public abstract String getGroupName();
 
 	/**
 	 * @Description: 解析注解参数

@@ -27,7 +27,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 		JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
 		if (jobVo != null && jobVo.getIsActive().equals(1)) {
 			JobClassVo jobClassVo = SchedulerManager.getJobClassByClasspath(jobObject.getJobClassName());
-			JobObject newJobObject = new JobObject.Builder(jobVo.getUuid(), tenantUuid + JobObject.DELIMITER + jobClassVo.getModuleId(), jobClassVo.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
+			JobObject newJobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), jobClassVo.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
 			schedulerManager.loadJob(newJobObject);
 		} else {
 			schedulerManager.unloadJob(jobObject);
@@ -40,9 +40,14 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 		JobClassVo jobClassVo = SchedulerManager.getJobClassByClasspath(this.getClassName());
 		for (JobVo jobVo : jobVoList) {
 			if (jobVo.getIsActive().equals(1)) {
-				JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), tenantUuid + JobObject.DELIMITER + jobClassVo.getModuleId(), this.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
+				JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), this.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
 				schedulerManager.loadJob(jobObject);
 			}
 		}
+	}
+
+	@Override
+	public String getGroupName() {
+		return TenantContext.get().getTenantUuid() + "-PUBLICJOB";
 	}
 }

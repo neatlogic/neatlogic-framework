@@ -45,4 +45,9 @@ public class TestJob extends JobBase {
 		schedulerManager.loadJob(jobOject);
 	}
 
+	@Override
+	public String getGroupName() {
+		return "TESTGROUP";
+	}
+
 }

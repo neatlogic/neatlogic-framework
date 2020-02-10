@@ -41,8 +41,8 @@ public class TestJob extends JobBase {
 
 	@Override
 	public void initJob(String tenantUuid) {
-		JobObject jobOject = new JobObject.Builder("aaa", "bbbb", this.getClassName(), tenantUuid).withCron("1,11,21,31,41,51 * * * * ?").build();
-		schedulerManager.loadJob(jobOject);
+		/*JobObject jobOject = new JobObject.Builder("aaa", "bbbb", this.getClassName(), tenantUuid).withCron("1,11,21,31,41,51 * * * * ?").build();
+		schedulerManager.loadJob(jobOject);*/
 	}
 
 	@Override

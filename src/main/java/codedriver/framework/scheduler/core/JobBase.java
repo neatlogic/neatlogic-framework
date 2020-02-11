@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -46,7 +44,7 @@ public abstract class JobBase implements IJob {
 	protected static SchedulerManager schedulerManager;
 
 	protected static SchedulerService schedulerService;
-	
+
 	@Autowired
 	public void setSchedulerMapper(SchedulerMapper schMapper) {
 		schedulerMapper = schMapper;
@@ -103,7 +101,7 @@ public abstract class JobBase implements IJob {
 				schedulerMapper.insertJobAudit(auditVo);
 				jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
 				try {
-					jobHandler.executeInternal(context);
+					jobHandler.executeInternal(context, jobObject);
 					auditVo.setStatus(JobAuditVo.SUCCEED);
 				} catch (Exception ex) {
 					auditVo.setStatus(JobAuditVo.FAILED);
@@ -113,7 +111,7 @@ public abstract class JobBase implements IJob {
 					schedulerMapper.updateJobAudit(auditVo);
 				}
 			} else {
-				jobHandler.executeInternal(context);
+				jobHandler.executeInternal(context, jobObject);
 			}
 			// 执行完业务逻辑后，更新定时作业状态信息
 			JobStatusVo jobStatus = new JobStatusVo();
@@ -147,7 +145,7 @@ public abstract class JobBase implements IJob {
 	 * 主要定时方法实现区
 	 */
 	@Override
-	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
+	public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
 
 	// private String getFilePath() {
 	// Calendar calendar = Calendar.getInstance();

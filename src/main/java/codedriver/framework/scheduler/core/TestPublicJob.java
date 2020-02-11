@@ -11,15 +11,14 @@ import org.quartz.JobKey;
 import org.springframework.stereotype.Service;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.scheduler.dto.JobObject;
 
 @Service
 @DisallowConcurrentExecution
 public class TestPublicJob extends PublicJobBase {
 
-
-
 	@Override
-	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
 		JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");

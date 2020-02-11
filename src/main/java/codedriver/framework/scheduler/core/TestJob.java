@@ -15,12 +15,11 @@ import codedriver.framework.scheduler.dto.JobObject;
 @DisallowConcurrentExecution
 public class TestJob extends JobBase {
 
-
 	@Autowired
 	private SchedulerManager schedulerManager;
 
 	@Override
-	public void executeInternal(JobExecutionContext context) throws JobExecutionException {
+	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
 
 		JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();

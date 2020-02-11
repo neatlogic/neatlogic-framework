@@ -2,6 +2,7 @@ package codedriver.framework.scheduler.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JobObject implements Serializable {
@@ -16,7 +17,7 @@ public class JobObject implements Serializable {
 	private String jobClassName;
 	private Integer needAudit;
 	private String tenantUuid;
-	private Date triggerTime;
+	private Integer intervalInSeconds;
 	private Map<String, Object> dataMap;
 
 	private JobObject(Builder builder) {
@@ -29,7 +30,7 @@ public class JobObject implements Serializable {
 		this.needAudit = builder.needAudit;
 		this.tenantUuid = builder.tenantUuid;
 		this.type = builder.type;
-		this.triggerTime = builder.triggerTime;
+		this.intervalInSeconds = builder.intervalInSeconds;
 	}
 
 	public JobObject() {
@@ -72,10 +73,6 @@ public class JobObject implements Serializable {
 		return type;
 	}
 
-	public Date getTriggerTime() {
-		return triggerTime;
-	}
-
 	public static class Builder {
 		// 必要参数
 		private final String jobId;
@@ -89,7 +86,7 @@ public class JobObject implements Serializable {
 		private Date endTime;
 		private Integer needAudit = 0;
 		private String type = "private";
-		private Date triggerTime;
+		private Integer intervalInSeconds;
 
 		public Builder(String jobId, String jobGroup, String jobClassName, String tenantUuid) {
 			this.jobId = jobId;
@@ -100,11 +97,6 @@ public class JobObject implements Serializable {
 
 		public Builder withCron(String _cron) {
 			cron = _cron;
-			return this;
-		}
-
-		public Builder withTriggerTime(Date _triggerTime) {
-			triggerTime = _triggerTime;
 			return this;
 		}
 
@@ -128,17 +120,32 @@ public class JobObject implements Serializable {
 			return this;
 		}
 
+		public Builder withIntervalInSeconds(Integer _intervalInSeconds) {
+			intervalInSeconds = _intervalInSeconds;
+			return this;
+		}
+
 		public JobObject build() {
 			return new JobObject(this);
 		}
 	}
 
-	public Map<String, Object> getDataMap() {
-		return dataMap;
+	public Object getData(String key) {
+		if (dataMap != null) {
+			return dataMap.get(key);
+		}
+		return null;
 	}
 
-	public void setDataMap(Map<String, Object> dataMap) {
-		this.dataMap = dataMap;
+	public void addData(String key, Object data) {
+		if (dataMap == null) {
+			dataMap = new HashMap<>();
+		}
+		dataMap.put(key, data);
+	}
+
+	public Integer getIntervalInSeconds() {
+		return intervalInSeconds;
 	}
 
 }

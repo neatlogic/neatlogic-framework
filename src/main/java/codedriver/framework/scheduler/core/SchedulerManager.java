@@ -14,6 +14,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
@@ -93,10 +94,10 @@ public class SchedulerManager extends ApplicationListenerBase {
 	 * @return void
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void loadJob(JobObject jobObject) {
+	public Date loadJob(JobObject jobObject) {
 		// 如果结束时间比当前时间早，就不加载了
 		if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
-			return;
+			return null;
 		}
 		try {
 			String jobName = jobObject.getJobName();
@@ -109,19 +110,22 @@ public class SchedulerManager extends ApplicationListenerBase {
 				scheduler.deleteJob(jobKey);
 			}
 
-			TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup);
-			if (jobObject.getTriggerTime() != null && jobObject.getTriggerTime().after(new Date())) {
-				triggerBuilder.startAt(jobObject.getTriggerTime());
-			} else if (StringUtils.isNotBlank(jobObject.getCron()) && CronExpression.isValidExpression(jobObject.getCron())) {
-				triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
-			} else {
-				return;
-			}
 			try {
 				JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
 				if (jobLockVo == null) {
 					jobLockVo = new JobLockVo(jobName, jobGroup, className);
 					schedulerMapper.insertJobLock(jobLockVo);
+				}
+
+				TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup);
+				if (StringUtils.isNotBlank(jobObject.getCron()) && CronExpression.isValidExpression(jobObject.getCron())) {
+					triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
+				} else if (jobObject.getIntervalInSeconds() != null && jobObject.getIntervalInSeconds() > 0) {
+					SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
+					ssb = ssb.withIntervalInSeconds(jobObject.getIntervalInSeconds());
+					triggerBuilder.withSchedule(ssb);
+				} else {
+					return null;
 				}
 
 				Date startTime = jobObject.getBeginTime();
@@ -149,20 +153,20 @@ public class SchedulerManager extends ApplicationListenerBase {
 					jobStatusVo.setNextFireTime(nextFireDate);
 					schedulerMapper.updateJobStatus(jobStatusVo);
 				}
+				return nextFireDate;
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
 			}
-
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
+		return null;
 	}
 
 	/**
 	 * 
 	 * @Description: 将定时作业从调度器中删除
-	 * @param jobObject
-	 *            作业信息
+	 * @param jobObject 作业信息
 	 * @return void
 	 */
 	public boolean unloadJob(JobObject jobObject) {

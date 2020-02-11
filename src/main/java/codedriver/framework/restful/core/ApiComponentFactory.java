@@ -15,13 +15,15 @@ import com.google.common.util.concurrent.RateLimiter;
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.restful.annotation.IsActive;
-import codedriver.framework.restful.dto.ApiComponentVo;
+import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 @RootComponent
 public class ApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
+	
 	private static Map<String, ApiComponent> componentMap = new HashMap<>();
-	private static List<ApiComponentVo> componentList = new ArrayList<>();
+	private static List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
+	private static Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
 	private static List<ApiVo> apiList = new ArrayList<>();
 	private static Map<String, ApiVo> apiMap = new HashMap<>();
 	public static Map<String, RateLimiter> interfaceRateMap = new ConcurrentHashMap<>();
@@ -47,7 +49,14 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	public static List<ApiVo> getApiList() {
 		return apiList;
 	}
-
+	
+	public static ApiHandlerVo getApiHandlerByHandler(String handler) {
+		return apiHandlerMap.get(handler);
+	}
+	public static List<ApiHandlerVo> getApiHandlerList(){
+		return apiHandlerList;
+	}
+	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
@@ -58,13 +67,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 			ApiComponent component = entry.getValue();
 			if (component.getId() != null) {
 				componentMap.put(component.getId(), component);
-				ApiComponentVo restComponentVo = new ApiComponentVo();
-				restComponentVo.setId(component.getId());
+				ApiHandlerVo restComponentVo = new ApiHandlerVo();
+				restComponentVo.setHandler(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
 				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
-				componentList.add(restComponentVo);
+				restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
+				apiHandlerList.add(restComponentVo);
+				apiHandlerMap.put(component.getId(), restComponentVo);
 				String token = component.getToken();
 				if (StringUtils.isNotBlank(token)) {
 					if (token.startsWith("/")) {
@@ -76,7 +87,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					ApiVo apiVo = new ApiVo();
 					apiVo.setAuthtype("token");
 					apiVo.setToken(token);
-					apiVo.setComponentId(component.getId());
+					apiVo.setHandler(component.getId());
+					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					if (component.getClass().getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
@@ -87,6 +99,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
 					apiVo.setModuleId(context.getId());
+					apiVo.setIsDeletable(0);//不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -101,13 +114,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 			JsonStreamApiComponent component = entry.getValue();
 			if (component.getId() != null) {
 				streamComponentMap.put(component.getId(), component);
-				ApiComponentVo restComponentVo = new ApiComponentVo();
-				restComponentVo.setId(component.getId());
+				ApiHandlerVo restComponentVo = new ApiHandlerVo();
+				restComponentVo.setHandler(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
 				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
-				componentList.add(restComponentVo);
+				restComponentVo.setType(ApiVo.Type.STREAM.getValue());
+				apiHandlerList.add(restComponentVo);
+				apiHandlerMap.put(component.getId(), restComponentVo);
 				String token = component.getToken();
 				if (StringUtils.isNotBlank(token)) {
 					if (token.startsWith("/")) {
@@ -119,8 +134,9 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					ApiVo apiVo = new ApiVo();
 					apiVo.setAuthtype("");
 					apiVo.setToken(token);
-					apiVo.setComponentId(component.getId());
+					apiVo.setHandler(component.getId());
 					apiVo.setExpire("");
+					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					if (component.getClass().getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
@@ -130,6 +146,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
+					apiVo.setIsDeletable(0);//不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -144,13 +161,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 			BinaryStreamApiComponent component = entry.getValue();
 			if (component.getId() != null) {
 				binaryComponentMap.put(component.getId(), component);
-				ApiComponentVo restComponentVo = new ApiComponentVo();
-				restComponentVo.setId(component.getId());
+				ApiHandlerVo restComponentVo = new ApiHandlerVo();
+				restComponentVo.setHandler(component.getId());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
 				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
-				componentList.add(restComponentVo);
+				restComponentVo.setType(ApiVo.Type.BINARY.getValue());
+				apiHandlerList.add(restComponentVo);
+				apiHandlerMap.put(component.getId(), restComponentVo);
 				String token = component.getToken();
 				if (StringUtils.isNotBlank(token)) {
 					if (token.startsWith("/")) {
@@ -162,8 +181,9 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					ApiVo apiVo = new ApiVo();
 					apiVo.setAuthtype("");
 					apiVo.setToken(token);
-					apiVo.setComponentId(component.getId());
+					apiVo.setHandler(component.getId());
 					apiVo.setExpire("");
+					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					if (component.getClass().getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
@@ -173,6 +193,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());
+					apiVo.setIsDeletable(0);//不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);

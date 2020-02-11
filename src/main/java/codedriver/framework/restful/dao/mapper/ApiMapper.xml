@@ -3,11 +3,10 @@
 <mapper namespace="codedriver.framework.restful.dao.mapper.ApiMapper">
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" readOnly="true"></cache>
 	
-	<select id="getApiByComponentId" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
+	<select id="getApiByhandler" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
 		SELECT
-		`id`,
 		`name`,
-		`component_id` AS componentId,
+		`handler`,
 		`username`,
 		`password`,
 		`config`,
@@ -19,13 +18,13 @@
 		`type`
 		FROM `api`
 		WHERE
-		component_id = #{value}
+		handler = #{value}
 	</select>
 
 	<select id="getApiByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="true">
 		SELECT
 		`name`,
-		`component_id` AS componentId,
+		`handler`,
 		`username`,
 		`password`,
 		`config`,
@@ -35,33 +34,100 @@
 		`description`,
 		`authtype`,
 		`type`,
+		`timeout`,
 		`need_audit` AS needAudit
 		FROM `api`
 		WHERE
 		token = #{value}
 	</select>
+	
+	<select id="getApiTokenList" parameterType="codedriver.framework.restful.dto.ApiVo" resultType="java.lang.String">
+		SELECT
+		`token`
+		FROM `api`
+		WHERE 1=1
+		<if test="handler != null">
+		AND `handler` = #{handler}
+		</if>
+		<if test="keyword != null and keyword != ''">
+		AND `name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
+	
+	<select id="getApiListByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
+		SELECT
+		`name`,
+		`handler`,
+		`username`,
+		`password`,
+		`config`,
+		`is_active` AS isActive,
+		`token`,
+		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`description`,
+		`authtype`,
+		`type`,
+		`timeout`,
+		`need_audit` AS needAudit
+		FROM `api`
+		WHERE `token` IN 
+		<foreach collection="list" item="token" separator="," open="(" close=")">
+		#{token}
+		</foreach>
+	</select>
 
-	<update id="updateApiComponentIdById" parameterType="codedriver.framework.restful.dto.ApiVo">
+	<select id="getApiAuditCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int">
+	SELECT 
+	  count(`token`) 
+	FROM
+	  `api_audit` 
+	WHERE `token` = #{token}
+	</select>
+
+	<select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo">
+	SELECT 
+	  `uuid`,
+	  `token`,
+	  `user_id` AS userId,
+	  `authtype`,
+	  `server_id` AS serverId,
+	  `ip`,
+	  `start_time` AS startTime,
+	  `end_time` AS endTime,
+	  `time_cost` AS timeCost,
+	  `status` 
+	FROM
+	  `api_audit` 
+	WHERE `token` = #{token}
+	LIMIT #{startNum}, #{pageSize}
+	</select>
+	
+	<select id="getApiVisitTimesListByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
+		SELECT	
+		`token`,
+		COUNT(`token`) AS visitTimes
+		FROM `api_audit`
+		WHERE `token` IN 
+		<foreach collection="list" item="token" separator="," open="(" close=")">
+		#{token}
+		</foreach>
+		GROUP BY `token`
+	</select>
+	
+	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
 		UPDATE `api`
 		SET
-		component_id = #{componentId}
+		handler = #{handler}
 		WHERE
 		id = #{id}
 	</update>
 
-	<insert id="replaceApiComponent" parameterType="codedriver.framework.restful.dto.ApiComponentVo">
-		REPLACE INTO `api_component`
-		(id, name, config, module)
-		VALUES
-		(#{id}, #{name}, #{config}, #{module})
-	</insert>
-
-	<insert id="insertApi" parameterType="codedriver.framework.restful.dto.ApiVo">
-		INSERT INTO `api`
+	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
+		REPLACE INTO `api`
 		(
 		name,
 		`is_active`,
-		`component_id`,
+		`handler`,
 		`config`,
 		`token`,
 		`description`,
@@ -71,11 +137,13 @@
 		`authtype`,
 		`type`,
 		`qps`,
-		`need_audit`
+		`timeout`,
+		`need_audit`,
+		`create_time`
 		) VALUES (
 		#{name},
 		#{isActive},
-		#{componentId},
+		#{handler},
 		#{config},
 		#{token},
 		#{description},
@@ -85,17 +153,18 @@
 		#{authtype},
 		#{type},
 		#{qps},
-		#{needAudit}
+		#{timeout},
+		#{needAudit},
+		now()
 		)
 	</insert>
 
 	<insert id="insertApiAudit">
-		INSERT INTO `api_audit`(`uuid`, `token`, `user_id`, `auth_type`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
-		VALUES(#{uuid}, #{token}, #{userId}, #{authType}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
+		INSERT INTO `api_audit`(`uuid`, `token`, `user_id`, `authtype`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
+		VALUES(#{uuid}, #{token}, #{userId}, #{authtype}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
 	</insert>
-	
-	<delete id="deleteAllApiComponent">
-		DELETE FROM `api_component`
-	</delete>
 
+	<delete id="deleteApiByToken" parameterType="java.lang.String">
+	DELETE FROM `api` WHERE `token` = #{token}
+	</delete>
 </mapper>

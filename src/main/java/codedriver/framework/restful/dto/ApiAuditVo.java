@@ -15,7 +15,7 @@ public class ApiAuditVo extends BasePageVo {
 	private String uuid;
 	private String token;
 	private String userId;
-	private String authType;
+	private String authtype;
 	private Integer serverId;
 	private String ip;
 	private Date startTime;
@@ -59,12 +59,12 @@ public class ApiAuditVo extends BasePageVo {
 		this.userId = userId;
 	}
 
-	public String getAuthType() {
-		return authType;
+	public String getAuthtype() {
+		return authtype;
 	}
 
-	public void setAuthType(String authType) {
-		this.authType = authType;
+	public void setAuthtype(String authtype) {
+		this.authtype = authtype;
 	}
 
 	public Integer getServerId() {

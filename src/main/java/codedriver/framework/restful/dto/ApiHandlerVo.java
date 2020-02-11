@@ -2,14 +2,14 @@ package codedriver.framework.restful.dto;
 
 import java.util.List;
 
-public class ApiComponentVo {
-	private String id;
+public class ApiHandlerVo {
+	private String handler;
 	private String name;
 	private String config;
 	private Integer isActive;
 	private String moduleId;
 	private boolean isPrivate;
-
+	private String type;
 	private List<ApiVo> interfaceList;
 
 	public String getConfig() {
@@ -28,12 +28,12 @@ public class ApiComponentVo {
 		this.interfaceList = interfaceList;
 	}
 
-	public String getId() {
-		return id;
+	public String getHandler() {
+		return handler;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 
 	public String getName() {
@@ -66,5 +66,13 @@ public class ApiComponentVo {
 
 	public void setPrivate(boolean isPrivate) {
 		this.isPrivate = isPrivate;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

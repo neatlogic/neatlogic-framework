@@ -68,6 +68,32 @@
 		</foreach>
 	</select>
 
+	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
+		INSERT INTO `team` (
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid`
+		) VALUES (
+		#{uuid},
+		#{name, typeHandler=XssHandler},
+		#{sort},
+		#{description, typeHandler=XssHandler},
+		#{parentUuid}
+		)
+	</insert>
+
+	<update id="updateTeamByUuid" parameterType="codedriver.framework.dto.TeamVo">
+		UPDATE `team`
+		SET
+		`name` = #{name, typeHandler=XssHandler},
+		`sort` = #{sort},
+		`description` = #{description, typeHandler=XssHandler},
+		`parent_uuid` = #{parentUuid}
+		WHERE `uuid` = #{uuid}
+	</update>
+
 	<delete id="deleteTeamByUuid" parameterType="java.lang.String">
 		DELETE
 		FROM

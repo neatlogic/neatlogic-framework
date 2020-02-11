@@ -217,13 +217,13 @@
 		UPDATE
 		`user`
 		SET
-		`user_name` = #{userName},
+		`user_name` = #{userName, typeHandler=XssHandler},
 		`email` = #{email},
 		`phone` = #{phone},
 		`password` = #{password},
 		`pinyin` = #{pinyin},
 		`is_active` = #{isActive},
-		`user_info` = #{userInfo}
+		`user_info` = #{userInfo, typeHandler=XssHandler}
 		WHERE `user_id` = #{userId}
 	</update>
 

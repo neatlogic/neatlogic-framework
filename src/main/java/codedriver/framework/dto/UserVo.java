@@ -9,6 +9,13 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.dto.BasePageVo;
 
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 public class UserVo extends BasePageVo {
 	private transient String keyword;
 	private String userId;
@@ -47,7 +54,34 @@ public class UserVo extends BasePageVo {
 	}
 
 	public String getPinyin() {
-		return pinyin;
+		if (StringUtils.isBlank(this.pinyin)) {
+			// 新增或者编辑的情况，this.pinYin是为null的，需要对其进行处理，通过userName拿到拼音；不为空时直接返回this.pinYin
+			if (StringUtils.isNotBlank(this.userName)) {
+				HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+				format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+				format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);// 不带声调
+				format.setVCharType(HanyuPinyinVCharType.WITH_V);
+				char[] ch = this.userName.trim().toCharArray();
+				StringBuffer buffer = new StringBuffer("");
+				for (int i = 0; i < ch.length; i++) {
+					if (Character.toString(ch[i]).matches("[\u4e00-\u9fa5]")) {
+						String[] temp;
+						try {
+							temp = PinyinHelper.toHanyuPinyinStringArray(ch[i], format);
+							buffer.append(temp[0]);
+						} catch (BadHanyuPinyinOutputFormatCombination | NullPointerException e) {
+							// 无法翻译的生僻字，不必处理
+						}
+					} else {
+						buffer.append(Character.toString(ch[i]));
+					}
+				}
+				this.pinyin = buffer.toString();
+			} else {
+				this.pinyin = "";
+			}
+		}
+		return this.pinyin;
 	}
 
 	public void setPinyin(String pinyin) {

@@ -57,14 +57,14 @@
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`name`, `description`)
 		VALUES
-		(#{name}, #{description})
+		(#{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
 	</insert>
 
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
 		UPDATE
 		`role`
 		SET
-		`description` = #{description}
+		`description` = #{description, typeHandler=XssHandler}
 		WHERE `name` = #{name}
 	</update>
 

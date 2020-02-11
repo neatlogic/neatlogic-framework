@@ -18,4 +18,8 @@ public interface TeamMapper {
 	public int deleteUserTeamByTeamUuid(String uuid);
 
 	public int deleteUserTeamRoleByTeamUuid(String uuid);
+
+	public  int insertTeam(TeamVo teamVo);
+
+	public void updateTeamByUuid(TeamVo teamVo);
 }

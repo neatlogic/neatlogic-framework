@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.core.ApiComponentFactory;
 
-public class ApiVo extends BasePageVo implements Serializable {
+public class ApiVo extends BasePageVo implements Serializable{
 
 	private static final long serialVersionUID = 3689437871016436622L;
 
@@ -43,10 +43,9 @@ public class ApiVo extends BasePageVo implements Serializable {
 		}
 	}
 
-	private Integer id;
 	private String name;
-	private String componentId;
-	private String componentName;
+	private String handler;
+	private String handlerName;
 	private String config;
 	private Integer isActive;
 	private String token;
@@ -65,9 +64,20 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String typeText;
 	private Integer needAudit;
 	private Double qps;
+	private Integer isDeletable = 1;
+	
+	private transient String keyword;
+	
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
 
 	public String getTypeText() {
-		if (type != null) {
+		if (getType() != null) {
 			typeText = Type.getText(type);
 		}
 		return typeText;
@@ -78,21 +88,22 @@ public class ApiVo extends BasePageVo implements Serializable {
 	}
 
 	public String getType() {
+		if(type != null) {
+			return type;
+		}
+		if(handler == null) {
+			return null;
+		}
+		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		if(apiHandlerVo == null) {
+			return null;
+		}
+		type = apiHandlerVo.getType();
 		return type;
 	}
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	private List<Integer> idList;
-
-	public List<Integer> getIdList() {
-		return idList;
-	}
-
-	public void setIdList(List<Integer> idList) {
-		this.idList = idList;
 	}
 
 	public Integer getTimeout() {
@@ -127,12 +138,23 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.password = password;
 	}
 
-	public String getComponentName() {
-		return componentName;
+	public String getHandlerName() {
+		if(handlerName != null) {
+			return handlerName;
+		}
+		if(handler == null) {
+			return null;
+		}
+		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		if(apiHandlerVo == null) {
+			return null;
+		}
+		handlerName = apiHandlerVo.getName();
+		return handlerName;
 	}
 
-	public void setComponentName(String componentName) {
-		this.componentName = componentName;
+	public void setHandlerName(String handlerName) {
+		this.handlerName = handlerName;
 	}
 
 	public String getDescription() {
@@ -169,14 +191,6 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.expire = expire;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -185,12 +199,12 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.name = name;
 	}
 
-	public String getComponentId() {
-		return componentId;
+	public String getHandler() {
+		return handler;
 	}
 
-	public void setComponentId(String componentId) {
-		this.componentId = componentId;
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 
 	public String getConfig() {
@@ -276,29 +290,140 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.moduleId = moduleId;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (this == other)
-			return true;
-		if (other == null)
-			return false;
-		if (!(other instanceof ApiVo))
-			return false;
+	public Integer getIsDeletable() {
+		return isDeletable;
+	}
 
-		final ApiVo api = (ApiVo) other;
-		try {
-			if (getToken().equals(api.getToken())) {
-				return true;
-			}
-		} catch (Exception ex) {
-			return false;
-		}
-		return false;
+	public void setIsDeletable(Integer isDeletable) {
+		this.isDeletable = isDeletable;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = getToken().hashCode() * 117;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((authtype == null) ? 0 : authtype.hashCode());
+		result = prime * result + ((config == null) ? 0 : config.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((expire == null) ? 0 : expire.hashCode());
+		result = prime * result + ((handler == null) ? 0 : handler.hashCode());
+		result = prime * result + ((isActive == null) ? 0 : isActive.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((needAudit == null) ? 0 : needAudit.hashCode());
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((qps == null) ? 0 : qps.hashCode());
+		result = prime * result + ((timeout == null) ? 0 : timeout.hashCode());
+		result = prime * result + ((token == null) ? 0 : token.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ApiVo other = (ApiVo) obj;
+		if (authtype == null) {
+			if (other.authtype != null)
+				return false;
+		} else if (!authtype.equals(other.authtype))
+			return false;
+		if (config == null) {
+			if (other.config != null)
+				return false;
+		} else if (!config.equals(other.config))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (expire == null) {
+			if (other.expire != null)
+				return false;
+		} else if (!expire.equals(other.expire))
+			return false;
+		if (handler == null) {
+			if (other.handler != null)
+				return false;
+		} else if (!handler.equals(other.handler))
+			return false;
+		if (isActive == null) {
+			if (other.isActive != null)
+				return false;
+		} else if (!isActive.equals(other.isActive))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (needAudit == null) {
+			if (other.needAudit != null)
+				return false;
+		} else if (!needAudit.equals(other.needAudit))
+			return false;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (qps == null) {
+			if (other.qps != null)
+				return false;
+		} else if (!qps.equals(other.qps))
+			return false;
+		if (timeout == null) {
+			if (other.timeout != null)
+				return false;
+		} else if (!timeout.equals(other.timeout))
+			return false;
+		if (token == null) {
+			if (other.token != null)
+				return false;
+		} else if (!token.equals(other.token))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+//	@Override
+//	public boolean equals(Object other) {
+//		if (this == other)
+//			return true;
+//		if (other == null)
+//			return false;
+//		if (!(other instanceof ApiVo))
+//			return false;
+//
+//		final ApiVo api = (ApiVo) other;
+//		try {
+//			if (getToken().equals(api.getToken())) {
+//				return true;
+//			}
+//		} catch (Exception ex) {
+//			return false;
+//		}
+//		return false;
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		int result = getToken().hashCode() * 117;
+//		return result;
+//	}
 }

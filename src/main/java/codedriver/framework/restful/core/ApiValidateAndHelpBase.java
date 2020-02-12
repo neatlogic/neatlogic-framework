@@ -76,7 +76,7 @@ public class ApiValidateAndHelpBase {
 		HttpServletRequest request = userContext.getRequest();
 		String requestIp = IpUtil.getIpAddr(request);
 		audit.setIp(requestIp);
-		audit.setAuthType(apiVo.getAuthtype());
+		audit.setAuthtype(apiVo.getAuthtype());
 		if (paramObj != null) {
 			audit.setParam(paramObj.toJSONString());
 		}

@@ -67,7 +67,7 @@ public class ApiDispatcher {
 		}
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
-			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getComponentId());
+			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					Long starttime = System.currentTimeMillis();
@@ -83,7 +83,7 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + restComponent.getId() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.STREAM)) {
-			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getComponentId());
+			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
@@ -96,7 +96,7 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + restComponent.getId() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.BINARY)) {
-			BinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getComponentId());
+			BinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);

@@ -3,10 +3,12 @@
 <mapper namespace="codedriver.framework.dao.mapper.RoleMapper">
 	<select id="searchRole" parameterType="codedriver.framework.dto.RoleVo" resultType="codedriver.framework.dto.RoleVo">
 		SELECT
-		`name`,
-		`description`
+		a.`name`,
+		a.`description`,
+		COUNT(b.`user_id`) as userCount
 		FROM
-		`role`
+		`role` a
+		LEFT JOIN `user_role` b ON a.`name` = b.`role_name`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
@@ -30,6 +32,14 @@
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
+	</select>
+
+	<select id="searchRoleUserCountByRoleName" parameterType="java.lang.String" resultType = "int">
+		SELECT
+		COUNT(1)
+		FROM
+		`user_role`
+		WHERE `role_name` = #{value}
 	</select>
 
 	<select id="getRoleByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
@@ -57,14 +67,20 @@
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`name`, `description`)
 		VALUES
-		(#{name}, #{description})
+		(#{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
+	</insert>
+
+	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
+		INSERT INTO `user_role` (`user_id`, `role_name`)
+		VALUES
+		(#{userId}, #{roleName})
 	</insert>
 
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
 		UPDATE
 		`role`
 		SET
-		`description` = #{description}
+		`description` = #{description, typeHandler=XssHandler}
 		WHERE `name` = #{name}
 	</update>
 

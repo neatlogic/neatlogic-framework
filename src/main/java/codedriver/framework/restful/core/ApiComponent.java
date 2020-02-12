@@ -1,5 +1,7 @@
 package codedriver.framework.restful.core;
 
+import org.springframework.util.ClassUtils;
+
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.restful.dto.ApiVo;
@@ -7,7 +9,9 @@ import codedriver.framework.restful.dto.ApiVo;
 public interface ApiComponent {
 	public String getToken();
 
-	public String getId();
+	public default String getClassName() {
+		return ClassUtils.getUserClass(this.getClass()).getName();
+	}
 
 	public String getName();
 

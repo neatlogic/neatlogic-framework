@@ -65,17 +65,17 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 		Map<String, BinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(BinaryStreamApiComponent.class);
 		for (Map.Entry<String, ApiComponent> entry : myMap.entrySet()) {
 			ApiComponent component = entry.getValue();
-			if (component.getId() != null) {
-				componentMap.put(component.getId(), component);
+			if (component.getClassName() != null) {
+				componentMap.put(component.getClassName(), component);
 				ApiHandlerVo restComponentVo = new ApiHandlerVo();
-				restComponentVo.setHandler(component.getId());
+				restComponentVo.setHandler(component.getClassName());
 				restComponentVo.setName(component.getName());
 				restComponentVo.setConfig(component.getConfig());
 				restComponentVo.setPrivate(component.isPrivate());
 				restComponentVo.setModuleId(context.getId());
 				restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
 				apiHandlerList.add(restComponentVo);
-				apiHandlerMap.put(component.getId(), restComponentVo);
+				apiHandlerMap.put(component.getClassName(), restComponentVo);
 				String token = component.getToken();
 				if (StringUtils.isNotBlank(token)) {
 					if (token.startsWith("/")) {
@@ -87,7 +87,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					ApiVo apiVo = new ApiVo();
 					apiVo.setAuthtype("token");
 					apiVo.setToken(token);
-					apiVo.setHandler(component.getId());
+					apiVo.setHandler(component.getClassName());
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					if (component.getClass().getAnnotation(IsActive.class) != null) {

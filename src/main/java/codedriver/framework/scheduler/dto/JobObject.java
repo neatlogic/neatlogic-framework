@@ -33,7 +33,7 @@ public class JobObject implements Serializable {
 		this.intervalInSeconds = builder.intervalInSeconds;
 	}
 
-	public JobObject() {
+	private JobObject() {
 
 	}
 

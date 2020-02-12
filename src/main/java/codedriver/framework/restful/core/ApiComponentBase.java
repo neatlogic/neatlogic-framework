@@ -69,10 +69,6 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 		return result;
 	}
 
-	@Override
-	public final String getId() {
-		return ClassUtils.getUserClass(this.getClass()).getName();
-	}
 
 	@Override
 	public final JSONObject help() {

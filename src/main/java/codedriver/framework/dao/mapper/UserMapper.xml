@@ -12,17 +12,18 @@
 
 	<select id="getUserBaseInfoByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
 		SELECT
-		`user_id` as userId,
-		`user_name` as userName,
-		`email`,
-		`phone`,
-		`password`,
-		`pinyin`,
-		`is_active` as isActive,
-		`user_info` as userInfo
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		b.`password`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		a.`user_info` as userInfo
 		FROM
-		`user`
-		WHERE user_id = #{value}
+		`user` a
+		LEFT JOIN `user_password` b ON a.`user_id` = b.`user_id`
+		WHERE a.user_id = #{value} AND b.`is_active` = 1
 	</select>
 
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
@@ -48,7 +49,7 @@
 		a.`user_name` as userName,
 		a.`email`,
 		a.`phone`,
-		a.`password`,
+		e.`password`,
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		b.role_name as roleName,
@@ -59,8 +60,9 @@
 		LEFT JOIN user_role b ON a.user_id = b.user_id
 		LEFT JOIN user_team c ON a.user_id = c.user_id
 		LEFT JOIN team d ON c.team_uuid = d.uuid
+		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
 		WHERE
-		a.user_id = #{value}
+		a.user_id = #{value} AND e.`is_active` = 1
 	</select>
 
 	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String">
@@ -113,18 +115,23 @@
 		</if>
 	</select>
 
+	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string">
+		SELECT id FROM `user_password` WHERE user_id = #{userId} ORDER BY id DESC LIMIT 2
+	</select>
+
 	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
 		SELECT
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
 		a.`email`,
 		a.`phone`,
-		a.`password`,
+		d.`password`,
 		a.`is_active` as `isActive`
 		FROM `user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
 		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
-		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1
+		LEFT JOIN `user_password` d ON a.`user_id` = d.`user_id`
+		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1 AND d.`is_active` = 1
 	</select>
 
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
@@ -143,12 +150,14 @@
 		a.`user_id` AS userId,
 		a.`user_name` AS userName,
 		a.`email`,
-		a.`password`,
+		c.`password`,
 		a.`is_active` AS isActive,
 		b.`role_name` AS roleName
 		FROM
-		`user` a LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
-		WHERE a.user_id = #{userId} AND a.password = #{password}
+		`user` a
+		LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `user_password` c ON a.`user_id` = c.`user_id`
+		WHERE a.user_id = #{userId} AND c.password = #{password} AND c.`is_active` = 1
 	</select>
 
 	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">
@@ -177,7 +186,6 @@
 		`user_name`,
 		`email`,
 		`phone`,
-		`password`,
 		`pinyin`,
 		`is_active`,
 		`user_info`
@@ -188,10 +196,24 @@
 		#{userName},
 		#{email},
 		#{phone},
-		#{password},
 		#{pinyin},
 		#{isActive},
 		#{userInfo}
+		)
+	</insert>
+
+	<insert id="insertUserPassword" parameterType="codedriver.framework.dto.UserVo">
+		INSERT INTO `user_password` (
+			`user_id`,
+			`password`,
+			`create_time`,
+			`is_active`
+		) VALUES
+		(
+		#{userId},
+		#{password},
+		NOW(),
+		1
 		)
 	</insert>
 
@@ -220,10 +242,25 @@
 		`user_name` = #{userName, typeHandler=XssHandler},
 		`email` = #{email},
 		`phone` = #{phone},
-		`password` = #{password},
 		`pinyin` = #{pinyin},
 		`is_active` = #{isActive},
 		`user_info` = #{userInfo, typeHandler=XssHandler}
+		WHERE `user_id` = #{userId}
+	</update>
+
+	<update id="updateUserPasswordActive" parameterType="java.lang.String">
+		UPDATE
+		`user_password`
+		SET
+		`is_active` = 0
+		WHERE `user_id` = #{userId}
+	</update>
+
+	<update id="updateUserActive" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE
+		`user`
+		SET
+		`is_active` = #{isActive}
 		WHERE `user_id` = #{userId}
 	</update>
 
@@ -231,9 +268,14 @@
 		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
 	</update>
 
-	<update id="updateUserPassword" parameterType="codedriver.framework.dto.UserVo">
-		UPDATE user SET password = #{password} WHERE user_id = #{userId}
-	</update>
+	<delete id="deleteUserPasswordByLimit">
+		DELETE FROM `user_password`
+		WHERE `user_id` = #{userId}
+		AND `id` NOT IN
+		<foreach collection="idList" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
 
 	<delete id="deleteUserByUserId" parameterType="java.lang.String">
 		DELETE

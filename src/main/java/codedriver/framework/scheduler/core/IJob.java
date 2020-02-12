@@ -14,7 +14,7 @@ import codedriver.framework.scheduler.dto.JobPropVo;
 
 public interface IJob extends Job {
 
-	public abstract void executeInternal(JobExecutionContext context) throws JobExecutionException;
+	public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
 
 	/**
 	 * @Author: chenqiwei
@@ -26,23 +26,24 @@ public interface IJob extends Job {
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
-	
+
 	/**
-	* @Author: chenqiwei
-	* @Time:Feb 8, 2020
-	* @Description: TODO 
-	* @param @return 
-	* @return IJob
+	 * @Author: chenqiwei
+	 * @Time:Feb 8, 2020
+	 * @Description: TODO
+	 * @param @return
+	 * @return IJob
 	 */
 	public default IJob getThis() {
 		return SchedulerManager.getHandler(this.getClassName());
 	}
+
 	/**
-	* @Author: chenqiwei
-	* @Time:Feb 8, 2020
-	* @Description: 获取分组名称 
-	* @param @return 
-	* @return String
+	 * @Author: chenqiwei
+	 * @Time:Feb 8, 2020
+	 * @Description: 获取分组名称
+	 * @param @return
+	 * @return String
 	 */
 	public abstract String getGroupName();
 
@@ -70,8 +71,7 @@ public interface IJob extends Job {
 	 * 
 	 * @Time:Feb 4, 2020
 	 * @Description: 重新加载单个作业
-	 * @param @param
-	 *            jobObject
+	 * @param @param jobObject
 	 * @return void
 	 */
 	public void reloadJob(JobObject jobObject);
@@ -79,8 +79,7 @@ public interface IJob extends Job {
 	/**
 	 * @Time:Feb 4, 2020
 	 * @Description: 加载当前类的租户作业
-	 * @param @param
-	 *            tenantUuid
+	 * @param @param tenantUuid
 	 * @return void
 	 */
 	public void initJob(String tenantUuid);

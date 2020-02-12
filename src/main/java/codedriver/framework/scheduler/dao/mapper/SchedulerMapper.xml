@@ -11,48 +11,7 @@
 		<result column="needAudit" property="needAudit" />
 		<result column="beginTime" property="beginTime" />
 		<result column="endTime" property="endTime" />
-		<association property="jobStatus" resultMap="jobStatusMap" />
 	</resultMap>
-
-	<resultMap id="jobStatusMap" type="codedriver.framework.scheduler.dto.JobStatusVo">
-		<id column="jobName" property="jobName" />
-		<result column="nextFireTime" property="nextFireTime" />
-		<result column="lastFireTime" property="lastFireTime" />
-		<result column="lastFinishTime" property="lastFinishTime" />
-		<result column="execCount" property="execCount" />
-	</resultMap>
-
-	<sql id="jobDetailSql">
-		a.uuid,
-		a.name,
-		a.classname,
-		a.begin_time,
-		a.end_time,
-		a.cron,
-		a.is_active,
-		a.need_audit
-	</sql>
-
-	<sql id="jobStatusSql">
-		sjs.job_uuid,
-		sjs.status,
-		sjs.last_fire_time,
-		sjs.last_finish_time,
-		sjs.next_fire_time,
-		sjs.exec_count,
-		sjs.need_audit
-	</sql>
-
-	<sql id="searchScheduleJobSql">
-		WHERE
-		1=1
-		<if test="keyword != null and keyword != ''">
-			AND a.name like CONCAT('%',#{keyword}, '%')
-		</if>
-		<if test="className != null and className != ''">
-			AND a.className = #{className}
-		</if>
-	</sql>
 
 
 	<select id="getJobBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobVo">
@@ -105,7 +64,14 @@
 		SELECT
 		count(1)
 		FROM schedule_job a
-		<include refid="searchScheduleJobSql" />
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND a.name like CONCAT('%',#{keyword}, '%')
+		</if>
+		<if test="className != null and className != ''">
+			AND a.className = #{className}
+		</if>
 	</select>
 
 	<select id="searchJob" resultMap="jobDetailMap">
@@ -125,7 +91,14 @@
 		DATE_FORMAT(sjs.next_fire_time, '%Y-%m-%d %H:%i:%s') as nextFireTime,
 		sjs.exec_count as execCount
 		FROM schedule_job a LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_name
-		<include refid="searchScheduleJobSql" />
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			AND a.name like CONCAT('%',#{keyword}, '%')
+		</if>
+		<if test="className != null and className != ''">
+			AND a.className = #{className}
+		</if>
 		limit #{startNum}, #{pageSize}
 	</select>
 

@@ -30,6 +30,8 @@ public class TeamVo extends BasePageVo {
 			type = ApiParamType.INTEGER)
 	private int sort;
 
+	private int userCount;
+
 	public synchronized String getUuid() {
 		if (StringUtils.isBlank(uuid) && isAutoGenerateUuid) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -105,4 +107,11 @@ public class TeamVo extends BasePageVo {
 		this.isAutoGenerateUuid = isAutoGenerateUuid;
 	}
 
+	public int getUserCount() {
+		return userCount;
+	}
+
+	public void setUserCount(int userCount) {
+		this.userCount = userCount;
+	}
 }

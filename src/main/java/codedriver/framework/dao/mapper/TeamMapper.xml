@@ -4,13 +4,15 @@
 
 	<select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`description`,
-		`parent_uuid`
+		a.`uuid`,
+		a.`name`,
+		a.`sort`,
+		a.`description`,
+		a.`parent_uuid`,
+		COUNT(b.`user_id`) as `userCount`
 		FROM
-		`team`
+		`team` a
+		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		WHERE
 		`uuid` != '0'
 		<if test="keyword != null and keyword != ''">
@@ -51,6 +53,14 @@
 		`team`
 		WHERE
 		uuid = #{value}
+	</select>
+
+	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM `user_team`
+		WHERE
+		`team_uuid` = #{value}
 	</select>
 	
 	<select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">

@@ -21,6 +21,8 @@ public interface UserMapper {
 
 	public List<UserVo> searchUser(UserVo userVo);
 
+	public List<Long> getLimitUserPasswordIdList(String userId);
+
 	public int searchUserCount(UserVo userVo);
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
@@ -32,6 +34,10 @@ public interface UserMapper {
 	public List<UserVo> getUserByUserIdList(List<String> userIdList);
 
 	public int insertUser(UserVo userVo);
+
+	public int insertUserPassword(UserVo userVo);
+
+	public int updateUserPasswordActive(String userId);
 
 	public int insertUserRole(@Param("userId")
 	String userId, @Param("roleName")
@@ -45,9 +51,11 @@ public interface UserMapper {
 
 	public int updateUser(UserVo userVo);
 
+	public int updateUserActive(UserVo userVo);
+
 	public int updateUserSession(String userId);
 
-	public int updateUserPassword(UserVo userVo);
+	public int deleteUserPasswordByLimit(@Param("userId") String userId,@Param("idList") List<Long> idList);
 
 	public int deleteUserByUserId(String userId);
 

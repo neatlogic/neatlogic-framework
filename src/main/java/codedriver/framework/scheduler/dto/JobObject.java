@@ -31,6 +31,7 @@ public class JobObject implements Serializable {
 		this.tenantUuid = builder.tenantUuid;
 		this.type = builder.type;
 		this.intervalInSeconds = builder.intervalInSeconds;
+		this.dataMap = builder.dataMap;
 	}
 
 	private JobObject() {
@@ -87,6 +88,7 @@ public class JobObject implements Serializable {
 		private Integer needAudit = 0;
 		private String type = "private";
 		private Integer intervalInSeconds;
+		private Map<String, Object> dataMap;
 
 		public Builder(String jobId, String jobGroup, String jobClassName, String tenantUuid) {
 			this.jobId = jobId;
@@ -125,6 +127,14 @@ public class JobObject implements Serializable {
 			return this;
 		}
 
+		public Builder addData(String key, Object data) {
+			if (dataMap == null) {
+				dataMap = new HashMap<>();
+			}
+			dataMap.put(key, data);
+			return this;
+		}
+
 		public JobObject build() {
 			return new JobObject(this);
 		}
@@ -135,13 +145,6 @@ public class JobObject implements Serializable {
 			return dataMap.get(key);
 		}
 		return null;
-	}
-
-	public void addData(String key, Object data) {
-		if (dataMap == null) {
-			dataMap = new HashMap<>();
-		}
-		dataMap.put(key, data);
 	}
 
 	public Integer getIntervalInSeconds() {

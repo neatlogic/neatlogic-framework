@@ -21,7 +21,7 @@ import codedriver.framework.restful.dto.ApiVo;
 @RootComponent
 public class ApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
 	
-	private static Map<String, ApiComponent> componentMap = new HashMap<>();
+	private static Map<String, IApiComponent> componentMap = new HashMap<>();
 	private static List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
 	private static Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
 	private static List<ApiVo> apiList = new ArrayList<>();
@@ -30,7 +30,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	private static Map<String, JsonStreamApiComponent> streamComponentMap = new HashMap<>();
 	private static Map<String, BinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
 
-	public static ApiComponent getInstance(String componentId) {
+	public static IApiComponent getInstance(String componentId) {
 		return componentMap.get(componentId);
 	}
 
@@ -60,11 +60,11 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
-		Map<String, ApiComponent> myMap = context.getBeansOfType(ApiComponent.class);
+		Map<String, IApiComponent> myMap = context.getBeansOfType(IApiComponent.class);
 		Map<String, JsonStreamApiComponent> myStreamMap = context.getBeansOfType(JsonStreamApiComponent.class);
 		Map<String, BinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(BinaryStreamApiComponent.class);
-		for (Map.Entry<String, ApiComponent> entry : myMap.entrySet()) {
-			ApiComponent component = entry.getValue();
+		for (Map.Entry<String, IApiComponent> entry : myMap.entrySet()) {
+			IApiComponent component = entry.getValue();
 			if (component.getClassName() != null) {
 				componentMap.put(component.getClassName(), component);
 				ApiHandlerVo restComponentVo = new ApiHandlerVo();

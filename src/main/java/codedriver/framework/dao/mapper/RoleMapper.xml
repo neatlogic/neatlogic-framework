@@ -14,6 +14,7 @@
 		<if test="keyword != null and keyword != ''">
 			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
 		</if>
+		group by a.`name`
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>

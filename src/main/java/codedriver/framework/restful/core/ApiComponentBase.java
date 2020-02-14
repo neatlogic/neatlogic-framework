@@ -16,7 +16,7 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements ApiComponent, MyApiComponent {
+public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements IApiComponent, MyApiComponent {
 	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
 
 	@Autowired

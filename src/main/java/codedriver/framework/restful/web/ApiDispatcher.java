@@ -29,7 +29,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
-import codedriver.framework.restful.core.ApiComponent;
+import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.BinaryStreamApiComponent;
 import codedriver.framework.restful.core.JsonStreamApiComponent;
@@ -67,7 +67,7 @@ public class ApiDispatcher {
 		}
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
-			ApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
+			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					Long starttime = System.currentTimeMillis();

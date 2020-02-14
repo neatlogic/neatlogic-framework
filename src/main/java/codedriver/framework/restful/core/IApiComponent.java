@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.restful.dto.ApiVo;
 
-public interface ApiComponent {
+public interface IApiComponent {
 	public String getToken();
 
 	public default String getClassName() {

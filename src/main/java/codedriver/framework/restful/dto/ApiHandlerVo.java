@@ -2,13 +2,23 @@ package codedriver.framework.restful.dto;
 
 import java.util.List;
 
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
+
 public class ApiHandlerVo {
+	@EntityField(name = "处理器", type = ApiParamType.STRING)
 	private String handler;
+	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "配置信息，json格式", type = ApiParamType.JSONOBJECT)
 	private String config;
+	@EntityField(name = "状态", type = ApiParamType.INTEGER)
 	private Integer isActive;
+	@EntityField(name = "模块ID", type = ApiParamType.STRING)
 	private String moduleId;
+	@EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
 	private boolean isPrivate;
+	@EntityField(name = "处理器类型", type = ApiParamType.STRING)
 	private String type;
 	private List<ApiVo> interfaceList;
 

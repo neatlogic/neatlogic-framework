@@ -1,11 +1,11 @@
 package codedriver.framework.restful.dto;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.ApiComponentFactory;
 
 public class ApiVo extends BasePageVo implements Serializable{
@@ -43,31 +43,53 @@ public class ApiVo extends BasePageVo implements Serializable{
 		}
 	}
 
+	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "处理器", type = ApiParamType.STRING)
 	private String handler;
+	@EntityField(name = "处理器名", type = ApiParamType.STRING)
 	private String handlerName;
+	@EntityField(name = "配置信息，json格式", type = ApiParamType.JSONOBJECT)
 	private String config;
+	@EntityField(name = "状态", type = ApiParamType.INTEGER)
 	private Integer isActive;
+	@EntityField(name = "地址", type = ApiParamType.STRING)
 	private String token;
+	@EntityField(name = "使用期限", type = ApiParamType.LONG)
 	private Date expire;
+	@EntityField(name = "描述", type = ApiParamType.STRING)
 	private String description;
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
 	private String username;
+	@EntityField(name = "密码", type = ApiParamType.STRING)
 	private String password;
+	@EntityField(name = "认证方式", type = ApiParamType.STRING)
 	private String authtype = "";
+	@EntityField(name = "请求时效", type = ApiParamType.INTEGER)
 	private Integer timeout;
+	@EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
 	private boolean isExpire;
+	@EntityField(name = "模块ID", type = ApiParamType.STRING)
 	private String moduleId;
-	private Integer visitTimes = 0;
-	private Long totalDataSize = 0l;
-	private String totalDataSizeText;
+	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
+	private Integer visitTimes = 0;	
+	@EntityField(name = "接口类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "接口类型名称", type = ApiParamType.STRING)
 	private String typeText;
+	@EntityField(name = "是否需要保存记录", type = ApiParamType.INTEGER)
 	private Integer needAudit;
+	@EntityField(name = "访问频率", type = ApiParamType.INTEGER)
 	private Integer qps = 0;
+	@EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
 	private Integer isDeletable = 1;
+	@EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
 	private Boolean isPrivate;
 	
 	private transient String keyword;
+	
+//	private Long totalDataSize = 0l;
+//	private String totalDataSizeText;
 	
 	public String getKeyword() {
 		return keyword;
@@ -229,32 +251,32 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.visitTimes = visitTimes;
 	}
 
-	public Long getTotalDataSize() {
-		return totalDataSize;
-	}
-
-	public void setTotalDataSize(Long totalDataSize) {
-		this.totalDataSize = totalDataSize;
-	}
-
-	public String getTotalDataSizeText() {
-		if (this.totalDataSize != null) {
-			if (this.totalDataSize / (1024 * 1024 * 1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024 * 1024)) + "GB";
-			} else if (this.totalDataSize / (1024 * 1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024)) + "MB";
-			} else if (this.totalDataSize / (1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024)) + "KB";
-			} else {
-				totalDataSizeText = this.totalDataSize + "B";
-			}
-		}
-		return totalDataSizeText;
-	}
-
-	public void setTotalDataSizeText(String totalDataSizeText) {
-		this.totalDataSizeText = totalDataSizeText;
-	}
+//	public Long getTotalDataSize() {
+//		return totalDataSize;
+//	}
+//
+//	public void setTotalDataSize(Long totalDataSize) {
+//		this.totalDataSize = totalDataSize;
+//	}
+//
+//	public String getTotalDataSizeText() {
+//		if (this.totalDataSize != null) {
+//			if (this.totalDataSize / (1024 * 1024 * 1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024 * 1024)) + "GB";
+//			} else if (this.totalDataSize / (1024 * 1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024)) + "MB";
+//			} else if (this.totalDataSize / (1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024)) + "KB";
+//			} else {
+//				totalDataSizeText = this.totalDataSize + "B";
+//			}
+//		}
+//		return totalDataSizeText;
+//	}
+//
+//	public void setTotalDataSizeText(String totalDataSizeText) {
+//		this.totalDataSizeText = totalDataSizeText;
+//	}
 
 	public Integer getNeedAudit() {
 		return needAudit;

@@ -104,6 +104,9 @@
 			(a.user_id LIKE CONCAT(#{keyword}, '%')
 			OR a.user_name LIKE CONCAT(#{keyword}, '%'))
 		</if>
+		<if test="teamUuid != null and teamUuid != ''">
+			AND c.`team_uuid` = #{teamUuid}
+		</if>
 		ORDER BY a.user_id
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
@@ -114,13 +117,18 @@
 		SELECT
 		count(1)
 		FROM
-		`user`
+		`user` a
+		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
 			(user_id LIKE CONCAT(#{keyword}, '%')
 			OR user_name LIKE CONCAT(#{keyword}, '%'))
+		</if>
+
+		<if test="teamUuid != null and teamUuid != ''">
+			AND b.`team_uuid` = #{teamUuid}
 		</if>
 	</select>
 

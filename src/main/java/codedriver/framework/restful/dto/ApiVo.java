@@ -49,7 +49,7 @@ public class ApiVo extends BasePageVo implements Serializable{
 	private String config;
 	private Integer isActive;
 	private String token;
-	private String expire;
+	private Date expire;
 	private String description;
 	private String username;
 	private String password;
@@ -63,8 +63,9 @@ public class ApiVo extends BasePageVo implements Serializable{
 	private String type;
 	private String typeText;
 	private Integer needAudit;
-	private Double qps;
+	private Integer qps = 0;
 	private Integer isDeletable = 1;
+	private Boolean isPrivate;
 	
 	private transient String keyword;
 	
@@ -165,29 +166,18 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.description = description;
 	}
 
-	public String getExpire() {
-		if (expire != null && this.expire.equals("")) {
-			return null;
-		}
+	public Date getExpire() {
 		return expire;
 	}
 
 	public boolean getIsExpire() {
-		isExpire = false;
-		if (this.expire != null && !this.expire.equals("")) {
-			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				Date ed = f.parse(this.expire);
-				Date now = new Date();
-				isExpire = ed.before(now);
-			} catch (ParseException e) {
-				isExpire = false;
-			}
+		if (this.expire != null) {
+			return this.expire.after(new Date());
 		}
 		return isExpire;
 	}
 
-	public void setExpire(String expire) {
+	public void setExpire(Date expire) {
 		this.expire = expire;
 	}
 
@@ -274,11 +264,11 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.needAudit = needAudit;
 	}
 
-	public Double getQps() {
+	public Integer getQps() {
 		return qps;
 	}
 
-	public void setQps(Double qps) {
+	public void setQps(Integer qps) {
 		this.qps = qps;
 	}
 
@@ -296,6 +286,25 @@ public class ApiVo extends BasePageVo implements Serializable{
 
 	public void setIsDeletable(Integer isDeletable) {
 		this.isDeletable = isDeletable;
+	}
+
+	public Boolean getIsPrivate() {
+		if(isPrivate != null) {
+			return isPrivate;
+		}
+		if(handler == null) {
+			return null;
+		}
+		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		if(apiHandlerVo == null) {
+			return null;
+		}
+		isPrivate = apiHandlerVo.isPrivate();
+		return isPrivate;
+	}
+
+	public void setIsPrivate(Boolean isPrivate) {
+		this.isPrivate = isPrivate;
 	}
 
 	@Override

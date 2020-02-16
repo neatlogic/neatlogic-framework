@@ -61,6 +61,7 @@ public class ApiValidateAndHelpBase {
 		audit.setServerId(Config.SCHEDULE_SERVER_ID);
 		audit.setStartTime(new Date(startTime));
 		audit.setEndTime(new Date(endTime));
+		audit.setTimeCost(endTime - startTime);
 		if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
 			try {
 				JSONObject auditConfig = JSONObject.parseObject(configVo.getValue());
@@ -254,7 +255,9 @@ public class ApiValidateAndHelpBase {
 						if (params != null && params.length > 0) {
 							for (Param p : params) {
 								if (!p.explode().getName().equals(NotDefined.class.getName())) {
+									String paramNamePrefix = p.name();
 									if (!p.explode().isArray()) {
+										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? "" : paramNamePrefix + ".";
 										for (Field field : p.explode().getDeclaredFields()) {
 											Annotation[] annotations = field.getDeclaredAnnotations();
 											if (annotations != null && annotations.length > 0) {
@@ -262,7 +265,7 @@ public class ApiValidateAndHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject paramObj = new JSONObject();
-														paramObj.put("name", field.getName());
+														paramObj.put("name", paramNamePrefix+ field.getName());
 														paramObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
 														paramObj.put("description", entityField.name());
 														outputList.add(paramObj);
@@ -275,6 +278,7 @@ public class ApiValidateAndHelpBase {
 										JSONObject paramObj = new JSONObject();
 										paramObj.put("name", p.name());
 										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
+										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) ? "" : paramNamePrefix + "[0].";
 										JSONArray elementObjList = new JSONArray();
 										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
 											Annotation[] annotations = field.getDeclaredAnnotations();
@@ -283,7 +287,7 @@ public class ApiValidateAndHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject elementObj = new JSONObject();
-														elementObj.put("name", field.getName());
+														elementObj.put("name", paramNamePrefix+ field.getName());
 														elementObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
 														elementObj.put("description", entityField.name());
 														elementObjList.add(elementObj);
@@ -292,9 +296,10 @@ public class ApiValidateAndHelpBase {
 												}
 											}
 										}
-										paramObj.put("member", elementObjList);
+										//paramObj.put("member", elementObjList);
 										paramObj.put("description", p.desc());
 										outputList.add(paramObj);
+										outputList.addAll(elementObjList);
 									}
 								} else {
 									JSONObject paramObj = new JSONObject();

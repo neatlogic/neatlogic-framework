@@ -108,6 +108,7 @@
 	FROM
 	  `api_audit` 
 	WHERE `token` = #{token}
+	ORDER BY `start_time` DESC
 	LIMIT #{startNum}, #{pageSize}
 	</select>
 	

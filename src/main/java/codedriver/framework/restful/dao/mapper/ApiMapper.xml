@@ -131,7 +131,27 @@
 		WHERE
 		id = #{id}
 	</update>
-
+	
+	<update id="batchUpdate" parameterType="codedriver.framework.restful.dto.ApiVo">
+		UPDATE `api` 
+		SET
+		<if test="isActive != null">
+		`is_active` = #{isActive},
+		</if>
+		<if test="expire != null">
+		`expire` = #{expire},
+		</if>
+		<if test="timeout != null">
+		`timeout` = #{timeout},
+		</if>
+		`token` = `token`
+		WHERE `token` IN 
+		<foreach collection="tokenList" item="token" separator="," open="(" close=")">
+		#{token}
+		</foreach>
+			
+	</update>
+	
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api`
 		(

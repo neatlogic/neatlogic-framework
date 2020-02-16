@@ -2,6 +2,7 @@ package codedriver.framework.restful.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
@@ -66,7 +67,7 @@ public class ApiVo extends BasePageVo implements Serializable{
 	@EntityField(name = "认证方式", type = ApiParamType.STRING)
 	private String authtype = "";
 	@EntityField(name = "请求时效", type = ApiParamType.INTEGER)
-	private Integer timeout;
+	private Integer timeout = 0;
 	@EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
 	private boolean isExpire;
 	@EntityField(name = "模块ID", type = ApiParamType.STRING)
@@ -78,7 +79,7 @@ public class ApiVo extends BasePageVo implements Serializable{
 	@EntityField(name = "接口类型名称", type = ApiParamType.STRING)
 	private String typeText;
 	@EntityField(name = "是否需要保存记录", type = ApiParamType.INTEGER)
-	private Integer needAudit;
+	private Integer needAudit = 0;
 	@EntityField(name = "访问频率", type = ApiParamType.INTEGER)
 	private Integer qps = 0;
 	@EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
@@ -87,7 +88,7 @@ public class ApiVo extends BasePageVo implements Serializable{
 	private Boolean isPrivate;
 	
 	private transient String keyword;
-	
+	private transient List<String> tokenList;
 //	private Long totalDataSize = 0l;
 //	private String totalDataSizeText;
 	
@@ -97,6 +98,14 @@ public class ApiVo extends BasePageVo implements Serializable{
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public List<String> getTokenList() {
+		return tokenList;
+	}
+
+	public void setTokenList(List<String> tokenList) {
+		this.tokenList = tokenList;
 	}
 
 	public String getTypeText() {
@@ -418,11 +427,6 @@ public class ApiVo extends BasePageVo implements Serializable{
 			if (other.token != null)
 				return false;
 		} else if (!token.equals(other.token))
-			return false;
-		if (type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!type.equals(other.type))
 			return false;
 		if (username == null) {
 			if (other.username != null)

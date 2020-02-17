@@ -31,6 +31,7 @@ public class UserVo extends BasePageVo {
 	private String company;
 	private String position;
 	private String userInfo;
+	private String teamUuid;
 	private JSONObject userInfoObj;
 	private List<String> roleNameList;
 	private List<RoleVo> roleList;
@@ -116,6 +117,14 @@ public class UserVo extends BasePageVo {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getTeamUuid() {
+		return teamUuid;
+	}
+
+	public void setTeamUuid(String teamUuid) {
+		this.teamUuid = teamUuid;
 	}
 
 	public String getRoleName() {

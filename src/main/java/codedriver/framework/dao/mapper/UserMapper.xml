@@ -79,23 +79,35 @@
 		</foreach>
 	</select>
 
-	<select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.dto.UserVo">
+	<select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap">
 		SELECT
-		`user_id` AS userId,
-		`user_name` AS userName,
-		`email`,
-		`phone`,
-		`is_active` AS isActive
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		e.`password`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		b.role_name as roleName,
+		c.team_uuid as teamUuid,
+		d.name as teamName
 		FROM
-		`user`
+		`user` a
+		LEFT JOIN user_role b ON a.user_id = b.user_id
+		LEFT JOIN user_team c ON a.user_id = c.user_id
+		LEFT JOIN team d ON c.team_uuid = d.uuid
+		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
-			(user_id LIKE CONCAT(#{keyword}, '%')
-			OR user_name LIKE CONCAT(#{keyword}, '%'))
+			(a.user_id LIKE CONCAT(#{keyword}, '%')
+			OR a.user_name LIKE CONCAT(#{keyword}, '%'))
 		</if>
-		ORDER BY user_id
+		<if test="teamUuid != null and teamUuid != ''">
+			AND c.`team_uuid` = #{teamUuid}
+		</if>
+		ORDER BY a.user_id
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
@@ -105,13 +117,18 @@
 		SELECT
 		count(1)
 		FROM
-		`user`
+		`user` a
+		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
-			(user_id LIKE CONCAT(#{keyword}, '%')
-			OR user_name LIKE CONCAT(#{keyword}, '%'))
+			(a.`user_id` LIKE CONCAT(#{keyword}, '%')
+			OR a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+		</if>
+
+		<if test="teamUuid != null and teamUuid != ''">
+			AND b.`team_uuid` = #{teamUuid}
 		</if>
 	</select>
 

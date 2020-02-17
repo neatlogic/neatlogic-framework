@@ -140,7 +140,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setExpire("");
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					if (component.getClass().getAnnotation(IsActive.class) != null) {
+					if (ClassUtils.getUserClass(component.getClass()).getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);
@@ -187,7 +187,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setExpire("");
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					if (component.getClass().getAnnotation(IsActive.class) != null) {
+					if (ClassUtils.getUserClass(component.getClass()).getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);

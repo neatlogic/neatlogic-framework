@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.util.ClassUtils;
 
 import com.google.common.util.concurrent.RateLimiter;
 
@@ -20,7 +21,7 @@ import codedriver.framework.restful.dto.ApiVo;
 
 @RootComponent
 public class ApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
-	
+
 	private static Map<String, IApiComponent> componentMap = new HashMap<>();
 	private static List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
 	private static Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
@@ -49,14 +50,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	public static List<ApiVo> getApiList() {
 		return apiList;
 	}
-	
+
 	public static ApiHandlerVo getApiHandlerByHandler(String handler) {
 		return apiHandlerMap.get(handler);
 	}
-	public static List<ApiHandlerVo> getApiHandlerList(){
+
+	public static List<ApiHandlerVo> getApiHandlerList() {
 		return apiHandlerList;
 	}
-	
+
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
@@ -90,7 +92,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandler(component.getClassName());
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					if (component.getClass().getAnnotation(IsActive.class) != null) {
+					if (ClassUtils.getUserClass(component.getClass()).getAnnotation(IsActive.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);
@@ -99,7 +101,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
 					apiVo.setModuleId(context.getId());
-					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsDeletable(0);// 不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -146,7 +148,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
-					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsDeletable(0);// 不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -193,7 +195,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());
-					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsDeletable(0);// 不能删除
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);

@@ -97,6 +97,7 @@
 		LEFT JOIN user_team c ON a.user_id = c.user_id
 		LEFT JOIN team d ON c.team_uuid = d.uuid
 		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
+		LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -106,6 +107,12 @@
 		</if>
 		<if test="teamUuid != null and teamUuid != ''">
 			AND c.`team_uuid` = #{teamUuid}
+		</if>
+		<if test="authModule != null and authModule != ''">
+			AND c.`module` = #{authModule}
+		</if>
+		<if test="auth != null and auth != ''">
+			AND c.`auth` = #{auth}
 		</if>
 		ORDER BY a.user_id
 		<if test="needPage == true">
@@ -119,6 +126,7 @@
 		FROM
 		`user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `user_authority` c ON a.`user_id` = c.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -129,6 +137,14 @@
 
 		<if test="teamUuid != null and teamUuid != ''">
 			AND b.`team_uuid` = #{teamUuid}
+		</if>
+
+		<if test="authModule != null and authModule != ''">
+			AND c.`module` = #{authModule}
+		</if>
+
+		<if test="auth != null and auth != ''">
+			AND c.`auth` = #{auth}
 		</if>
 	</select>
 

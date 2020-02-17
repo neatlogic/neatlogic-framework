@@ -26,6 +26,8 @@ public interface ApiMapper {
 	
 	public int updateApiComponentIdById(ApiVo apiVo);
 
+	public int batchUpdate(ApiVo apiVo);
+
 	public int deleteApiByToken(String token);
 	
 }

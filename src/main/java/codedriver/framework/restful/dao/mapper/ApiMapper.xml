@@ -13,7 +13,7 @@
 		`config`,
 		`is_active` AS isActive,
 		`token`,
-		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`expire`,
 		`description`,
 		`authtype`,
 		`type`
@@ -32,7 +32,7 @@
 		`config`,
 		`is_active` AS isActive,
 		`token`,
-		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`expire`,
 		`description`,
 		`authtype`,
 		`type`,
@@ -54,6 +54,9 @@
 		<if test="handler != null">
 		AND `handler` = #{handler}
 		</if>
+		<if test="isActive != null">
+		AND `is_active` = #{isActive}
+		</if>
 		<if test="keyword != null and keyword != ''">
 		AND `name` LIKE CONCAT('%', #{keyword}, '%')
 		</if>
@@ -69,7 +72,7 @@
 		`config`,
 		`is_active` AS isActive,
 		`token`,
-		DATE_FORMAT(expire, '%Y-%m-%d %H:%i:%s') AS expire,
+		`expire`,
 		`description`,
 		`authtype`,
 		`type`,
@@ -105,6 +108,7 @@
 	FROM
 	  `api_audit` 
 	WHERE `token` = #{token}
+	ORDER BY `start_time` DESC
 	LIMIT #{startNum}, #{pageSize}
 	</select>
 	
@@ -127,7 +131,27 @@
 		WHERE
 		id = #{id}
 	</update>
-
+	
+	<update id="batchUpdate" parameterType="codedriver.framework.restful.dto.ApiVo">
+		UPDATE `api` 
+		SET
+		<if test="isActive != null">
+		`is_active` = #{isActive},
+		</if>
+		<if test="expire != null">
+		`expire` = #{expire},
+		</if>
+		<if test="timeout != null">
+		`timeout` = #{timeout},
+		</if>
+		`token` = `token`
+		WHERE `token` IN 
+		<foreach collection="tokenList" item="token" separator="," open="(" close=")">
+		#{token}
+		</foreach>
+			
+	</update>
+	
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api`
 		(

@@ -132,7 +132,7 @@
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
 		SELECT
-		count(a.`user_id`)
+		count(DISTINCT (a.`user_id`))
 		FROM
 		`user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`

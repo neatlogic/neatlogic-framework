@@ -42,7 +42,7 @@
 
 	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
 		SELECT
-		COUNT(a.`name`)
+		COUNT(DISTINCT (a.`name`))
 		FROM
 		`role` a
 		LEFT JOIN `role_authority` b ON a.`name` = b.`role_name`

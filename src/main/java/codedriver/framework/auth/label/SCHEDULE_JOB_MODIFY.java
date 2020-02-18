@@ -1,6 +1,7 @@
 package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
+import codedriver.framework.auth.core.AuthGroupEnum;
 
 public class SCHEDULE_JOB_MODIFY extends AuthBase {
 
@@ -14,4 +15,8 @@ public class SCHEDULE_JOB_MODIFY extends AuthBase {
 		return "对定时作业进行添加、修改和删除";
 	}
 
+	@Override
+	public String getAuthGroup() {
+		return AuthGroupEnum.FRAMEWORK.getValue();
+	}
 }

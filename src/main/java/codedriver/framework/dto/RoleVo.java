@@ -1,6 +1,7 @@
 package codedriver.framework.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
@@ -19,6 +20,33 @@ public class RoleVo extends BasePageVo implements Serializable {
 			type = ApiParamType.STRING)
 	private String description;
 	private int userCount;
+	private String authGroup;
+	private String auth;
+	private List<RoleAuthVo> roleAuthList;
+
+	public List<RoleAuthVo> getRoleAuthList() {
+		return roleAuthList;
+	}
+
+	public void setRoleAuthList(List<RoleAuthVo> roleAuthList) {
+		this.roleAuthList = roleAuthList;
+	}
+
+	public String getAuthGroup() {
+		return authGroup;
+	}
+
+	public void setAuthGroup(String authGroup) {
+		this.authGroup = authGroup;
+	}
+
+	public String getAuth() {
+		return auth;
+	}
+
+	public void setAuth(String auth) {
+		this.auth = auth;
+	}
 
 	public String getName() {
 		return name;

@@ -9,10 +9,17 @@
 		FROM
 		`role` a
 		LEFT JOIN `user_role` b ON a.`name` = b.`role_name`
+		LEFT JOIN `role_authority` c ON a.`name` = c.`role_name`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
 			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="authGroup != null and authGroup != ''">
+			AND c.`auth_group` = #{authGroup}
+		</if>
+		<if test="auth != null and auth != ''">
+			AND c.`auth` = #{auth}
 		</if>
 		group by a.`name`
 		<if test="needPage == true">
@@ -20,15 +27,31 @@
 		</if>
 	</select>
 
+	<select id = "searchRoleAuthByRoleName" parameterType = "String" resultType = "codedriver.framework.dto.RoleAuthVo">
+		SELECT
+		`role_name` as `roleName`,
+		`auth_group` as `authGroup`,
+		`auth`
+		FROM `role_authority`
+		WHERE `role_name` = #{roleName}
+	</select>
+
 	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
 		SELECT
-		COUNT(1)
+		COUNT(a.`name`)
 		FROM
-		`role`
+		`role` a
+		LEFT JOIN `role_authority` b ON a.`name` = b.`role_name`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
 			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+		</if>
+		<if test="authGroup != null and authGroup != ''">
+			AND b.`auth_group` = #{authGroup}
+		</if>
+		<if test="auth != null and auth != ''">
+			AND b.`auth` = #{auth}
 		</if>
 	</select>
 
@@ -74,6 +97,18 @@
 		(#{userId}, #{roleName})
 	</insert>
 
+	<insert id="insertRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">
+		INSERT INTO `role_authority` (
+			`role_name`,
+			`auth_group`,
+			`auth`
+		) VALUES (
+			#{roleName},
+			#{authGroup},
+			#{auth}
+		)
+	</insert>
+
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
 		UPDATE
 		`role`
@@ -87,6 +122,13 @@
 		FROM
 		`role`
 		WHERE `name` = #{value}
+	</delete>
+
+	<delete id="deleteRoleAuthByRoleName" parameterType="string">
+		DELETE
+		FROM
+		`role_authority`
+		WHERE `role_name` = #{roleName}
 	</delete>
 
 	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">

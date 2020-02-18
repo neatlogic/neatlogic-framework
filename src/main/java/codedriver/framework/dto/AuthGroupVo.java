@@ -5,15 +5,17 @@ import java.util.List;
 import codedriver.framework.common.dto.BasePageVo;
 
 public class AuthGroupVo extends BasePageVo{
+	private String displayName;
 	private String name;
-	private String desc;
-	private String intro;
-	private Integer isActive = 1;
-	private String moduleName;
-	private String roleName;
-	private String apiComponentId;
-	
-	private List<String> roleList;
+	private List<AuthVo> authVoList;
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
 	public String getName() {
 		return name;
@@ -23,61 +25,11 @@ public class AuthGroupVo extends BasePageVo{
 		this.name = name;
 	}
 
-	public String getDesc() {
-		return desc;
+	public List<AuthVo> getAuthVoList() {
+		return authVoList;
 	}
 
-	public void setDesc(String desc) {
-		this.desc = desc;
+	public void setAuthVoList(List<AuthVo> authVoList) {
+		this.authVoList = authVoList;
 	}
-
-	public String getIntro() {
-		return intro;
-	}
-
-	public void setIntro(String intro) {
-		this.intro = intro;
-	}
-
-	public Integer getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Integer isActive) {
-		this.isActive = isActive;
-	}
-
-	public String getModuleName() {
-		return moduleName;
-	}
-
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
-	}
-
-	public String getRoleName() {
-		return roleName;
-	}
-
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
-
-	public String getApiComponentId() {
-		return apiComponentId;
-	}
-
-	public void setApiComponentId(String apiComponentId) {
-		this.apiComponentId = apiComponentId;
-	}
-
-	public List<String> getRoleList() {
-		return roleList;
-	}
-
-	public void setRoleList(List<String> roleList) {
-		this.roleList = roleList;
-	}
-
-	
 }

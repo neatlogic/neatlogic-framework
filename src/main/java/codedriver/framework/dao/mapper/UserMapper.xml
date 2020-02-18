@@ -108,8 +108,8 @@
 		<if test="teamUuid != null and teamUuid != ''">
 			AND c.`team_uuid` = #{teamUuid}
 		</if>
-		<if test="authModule != null and authModule != ''">
-			AND c.`module` = #{authModule}
+		<if test="authGroup != null and authGroup != ''">
+			AND c.`auth_group` = #{authGroup}
 		</if>
 		<if test="auth != null and auth != ''">
 			AND c.`auth` = #{auth}
@@ -120,9 +120,17 @@
 		</if>
 	</select>
 
+	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
+		SELECT `user_id` as `userId`,
+		`auth_group` as `authGroup`,
+		`auth`
+		FROM `user_authority`
+		WHERE `user_id` = #{userId}
+	</select>
+
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
 		SELECT
-		count(1)
+		count(a.`user_id`)
 		FROM
 		`user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
@@ -139,8 +147,8 @@
 			AND b.`team_uuid` = #{teamUuid}
 		</if>
 
-		<if test="authModule != null and authModule != ''">
-			AND c.`module` = #{authModule}
+		<if test="authGroup != null and authGroup != ''">
+			AND c.`group` = #{authGroup}
 		</if>
 
 		<if test="auth != null and auth != ''">
@@ -212,6 +220,19 @@
 			#{item}
 		</foreach>
 	</select>
+
+    <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
+        INSERT INTO `user_authority`(
+        `user_id`,
+        `auth_group`,
+        `auth`
+        ) VALUES
+        (
+         #{userId},
+         #{authGroup},
+         #{auth}
+        )
+    </insert>
 
 	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user` (
@@ -316,6 +337,12 @@
 		`user`
 		WHERE `user_id` = #{value}
 	</delete>
+
+    <delete id="deleteUserAuthByUserId" parameterType="java.lang.String">
+        DELETE
+        FROM
+        `user_authority` WHERE `user_id` = #{userId}
+    </delete>
 
 	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">
 		DELETE FROM `user_session` where `user_id` = #{value}

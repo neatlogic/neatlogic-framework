@@ -33,12 +33,21 @@ public class UserVo extends BasePageVo {
 	private String userInfo;
 	private String teamUuid;
 	private String auth;
-	private String authModule;
+	private String authGroup;
 	private JSONObject userInfoObj;
 	private List<String> roleNameList;
 	private List<RoleVo> roleList;
 	private List<String> teamUuidList;
 	private List<TeamVo> teamList;
+	private List<UserAuthVo> userAuthList;
+
+	public List<UserAuthVo> getUserAuthList() {
+		return userAuthList;
+	}
+
+	public void setUserAuthList(List<UserAuthVo> userAuthList) {
+		this.userAuthList = userAuthList;
+	}
 
 	public String getAuth() {
 		return auth;
@@ -48,12 +57,12 @@ public class UserVo extends BasePageVo {
 		this.auth = auth;
 	}
 
-	public String getAuthModule() {
-		return authModule;
+	public String getAuthGroup() {
+		return authGroup;
 	}
 
-	public void setAuthModule(String authModule) {
-		this.authModule = authModule;
+	public void setAuthGroup(String authGroup) {
+		this.authGroup = authGroup;
 	}
 
 	public String getUserId() {

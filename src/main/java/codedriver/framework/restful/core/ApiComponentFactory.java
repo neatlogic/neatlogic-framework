@@ -103,7 +103,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
 					apiVo.setModuleId(context.getId());
-					apiVo.setIsDeletable(0);// 不能删除
+					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsPrivate(component.isPrivate());
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -139,7 +140,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setAuthtype("");
 					apiVo.setToken(token);
 					apiVo.setHandler(component.getId());
-					apiVo.setExpire("");
+					//apiVo.setExpire("");
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					Class<?> targetClass = AopUtils.getTargetClass(component);
@@ -151,7 +152,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
-					apiVo.setIsDeletable(0);// 不能删除
+					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsPrivate(component.isPrivate());
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);
@@ -187,7 +189,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setAuthtype("");
 					apiVo.setToken(token);
 					apiVo.setHandler(component.getId());
-					apiVo.setExpire("");
+					//apiVo.setExpire("");
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					Class<?> targetClass = AopUtils.getTargetClass(component);
@@ -199,7 +201,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());
-					apiVo.setIsDeletable(0);// 不能删除
+					apiVo.setIsDeletable(0);//不能删除
+					apiVo.setIsPrivate(component.isPrivate());
 					if (!apiMap.containsKey(token)) {
 						apiList.add(apiVo);
 						apiMap.put(token, apiVo);

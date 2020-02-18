@@ -30,9 +30,6 @@
 		<if test="keyword != null and keyword != ''">
 			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
 		</if>
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
 	</select>
 
 	<select id="searchRoleUserCountByRoleName" parameterType="java.lang.String" resultType = "int">

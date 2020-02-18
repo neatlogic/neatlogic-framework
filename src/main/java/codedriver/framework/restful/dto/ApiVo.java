@@ -1,11 +1,12 @@
 package codedriver.framework.restful.dto;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.ApiComponentFactory;
 
 public class ApiVo extends BasePageVo implements Serializable{
@@ -43,30 +44,53 @@ public class ApiVo extends BasePageVo implements Serializable{
 		}
 	}
 
+	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "处理器", type = ApiParamType.STRING)
 	private String handler;
+	@EntityField(name = "处理器名", type = ApiParamType.STRING)
 	private String handlerName;
+	@EntityField(name = "配置信息，json格式", type = ApiParamType.JSONOBJECT)
 	private String config;
+	@EntityField(name = "状态", type = ApiParamType.INTEGER)
 	private Integer isActive;
+	@EntityField(name = "地址", type = ApiParamType.STRING)
 	private String token;
-	private String expire;
+	@EntityField(name = "使用期限", type = ApiParamType.LONG)
+	private Date expire;
+	@EntityField(name = "描述", type = ApiParamType.STRING)
 	private String description;
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
 	private String username;
+	@EntityField(name = "密码", type = ApiParamType.STRING)
 	private String password;
+	@EntityField(name = "认证方式", type = ApiParamType.STRING)
 	private String authtype = "";
-	private Integer timeout;
+	@EntityField(name = "请求时效", type = ApiParamType.INTEGER)
+	private Integer timeout = 0;
+	@EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
 	private boolean isExpire;
+	@EntityField(name = "模块ID", type = ApiParamType.STRING)
 	private String moduleId;
-	private Integer visitTimes = 0;
-	private Long totalDataSize = 0l;
-	private String totalDataSizeText;
+	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
+	private Integer visitTimes = 0;	
+	@EntityField(name = "接口类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "接口类型名称", type = ApiParamType.STRING)
 	private String typeText;
-	private Integer needAudit;
-	private Double qps;
+	@EntityField(name = "是否需要保存记录", type = ApiParamType.INTEGER)
+	private Integer needAudit = 0;
+	@EntityField(name = "访问频率", type = ApiParamType.INTEGER)
+	private Integer qps = 0;
+	@EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
 	private Integer isDeletable = 1;
+	@EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
+	private Boolean isPrivate;
 	
 	private transient String keyword;
+	private transient List<String> tokenList;
+//	private Long totalDataSize = 0l;
+//	private String totalDataSizeText;
 	
 	public String getKeyword() {
 		return keyword;
@@ -74,6 +98,14 @@ public class ApiVo extends BasePageVo implements Serializable{
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public List<String> getTokenList() {
+		return tokenList;
+	}
+
+	public void setTokenList(List<String> tokenList) {
+		this.tokenList = tokenList;
 	}
 
 	public String getTypeText() {
@@ -165,29 +197,18 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.description = description;
 	}
 
-	public String getExpire() {
-		if (expire != null && this.expire.equals("")) {
-			return null;
-		}
+	public Date getExpire() {
 		return expire;
 	}
 
 	public boolean getIsExpire() {
-		isExpire = false;
-		if (this.expire != null && !this.expire.equals("")) {
-			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				Date ed = f.parse(this.expire);
-				Date now = new Date();
-				isExpire = ed.before(now);
-			} catch (ParseException e) {
-				isExpire = false;
-			}
+		if (this.expire != null) {
+			return this.expire.after(new Date());
 		}
 		return isExpire;
 	}
 
-	public void setExpire(String expire) {
+	public void setExpire(Date expire) {
 		this.expire = expire;
 	}
 
@@ -239,32 +260,32 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.visitTimes = visitTimes;
 	}
 
-	public Long getTotalDataSize() {
-		return totalDataSize;
-	}
-
-	public void setTotalDataSize(Long totalDataSize) {
-		this.totalDataSize = totalDataSize;
-	}
-
-	public String getTotalDataSizeText() {
-		if (this.totalDataSize != null) {
-			if (this.totalDataSize / (1024 * 1024 * 1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024 * 1024)) + "GB";
-			} else if (this.totalDataSize / (1024 * 1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024)) + "MB";
-			} else if (this.totalDataSize / (1024) > 1) {
-				totalDataSizeText = ((float) this.totalDataSize / (1024)) + "KB";
-			} else {
-				totalDataSizeText = this.totalDataSize + "B";
-			}
-		}
-		return totalDataSizeText;
-	}
-
-	public void setTotalDataSizeText(String totalDataSizeText) {
-		this.totalDataSizeText = totalDataSizeText;
-	}
+//	public Long getTotalDataSize() {
+//		return totalDataSize;
+//	}
+//
+//	public void setTotalDataSize(Long totalDataSize) {
+//		this.totalDataSize = totalDataSize;
+//	}
+//
+//	public String getTotalDataSizeText() {
+//		if (this.totalDataSize != null) {
+//			if (this.totalDataSize / (1024 * 1024 * 1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024 * 1024)) + "GB";
+//			} else if (this.totalDataSize / (1024 * 1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024 * 1024)) + "MB";
+//			} else if (this.totalDataSize / (1024) > 1) {
+//				totalDataSizeText = ((float) this.totalDataSize / (1024)) + "KB";
+//			} else {
+//				totalDataSizeText = this.totalDataSize + "B";
+//			}
+//		}
+//		return totalDataSizeText;
+//	}
+//
+//	public void setTotalDataSizeText(String totalDataSizeText) {
+//		this.totalDataSizeText = totalDataSizeText;
+//	}
 
 	public Integer getNeedAudit() {
 		return needAudit;
@@ -274,11 +295,11 @@ public class ApiVo extends BasePageVo implements Serializable{
 		this.needAudit = needAudit;
 	}
 
-	public Double getQps() {
+	public Integer getQps() {
 		return qps;
 	}
 
-	public void setQps(Double qps) {
+	public void setQps(Integer qps) {
 		this.qps = qps;
 	}
 
@@ -296,6 +317,25 @@ public class ApiVo extends BasePageVo implements Serializable{
 
 	public void setIsDeletable(Integer isDeletable) {
 		this.isDeletable = isDeletable;
+	}
+
+	public Boolean getIsPrivate() {
+		if(isPrivate != null) {
+			return isPrivate;
+		}
+		if(handler == null) {
+			return null;
+		}
+		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		if(apiHandlerVo == null) {
+			return null;
+		}
+		isPrivate = apiHandlerVo.isPrivate();
+		return isPrivate;
+	}
+
+	public void setIsPrivate(Boolean isPrivate) {
+		this.isPrivate = isPrivate;
 	}
 
 	@Override
@@ -387,11 +427,6 @@ public class ApiVo extends BasePageVo implements Serializable{
 			if (other.token != null)
 				return false;
 		} else if (!token.equals(other.token))
-			return false;
-		if (type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!type.equals(other.type))
 			return false;
 		if (username == null) {
 			if (other.username != null)

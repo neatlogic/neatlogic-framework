@@ -14,7 +14,7 @@ public class JobObject implements Serializable {
 	private Date beginTime;
 	private Date endTime;
 	private String type;
-	private String jobClassName;
+	private String jobHandler;
 	private Integer needAudit;
 	private String tenantUuid;
 	private Integer intervalInSeconds;
@@ -23,7 +23,7 @@ public class JobObject implements Serializable {
 	private JobObject(Builder builder) {
 		this.jobName = builder.jobId;
 		this.jobGroup = builder.jobGroup;
-		this.jobClassName = builder.jobClassName;
+		this.jobHandler = builder.jobHandler;
 		this.cron = builder.cron;
 		this.beginTime = builder.beginTime;
 		this.endTime = builder.endTime;
@@ -54,8 +54,8 @@ public class JobObject implements Serializable {
 		return endTime;
 	}
 
-	public String getJobClassName() {
-		return jobClassName;
+	public String getJobHandler() {
+		return jobHandler;
 	}
 
 	public Integer getNeedAudit() {
@@ -78,7 +78,7 @@ public class JobObject implements Serializable {
 		// 必要参数
 		private final String jobId;
 		private final String jobGroup;
-		private final String jobClassName;
+		private final String jobHandler;
 		private final String tenantUuid;
 
 		// 可选参数
@@ -90,10 +90,10 @@ public class JobObject implements Serializable {
 		private Integer intervalInSeconds;
 		private Map<String, Object> dataMap;
 
-		public Builder(String jobId, String jobGroup, String jobClassName, String tenantUuid) {
+		public Builder(String jobId, String jobGroup, String jobHandler, String tenantUuid) {
 			this.jobId = jobId;
 			this.jobGroup = jobGroup;
-			this.jobClassName = jobClassName;
+			this.jobHandler = jobHandler;
 			this.tenantUuid = tenantUuid;
 		}
 

@@ -15,7 +15,7 @@ public interface SchedulerService {
 
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo);
 
-	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
+	public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
 
 	public List<JobLockVo> getJobLockByServerId(Integer serverId);
 

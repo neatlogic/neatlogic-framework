@@ -9,24 +9,26 @@ import org.apache.commons.lang3.StringUtils;
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.scheduler.core.SchedulerManager;
 
 public class JobVo extends BasePageVo {
 
 	@EntityField(name = "定时作业名称",
 			type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "是否激活(0:禁用，1：激活)",
+	@EntityField(name = "状态(0:禁用，1：启用)",
 			type = ApiParamType.INTEGER)
 	private Integer isActive;
-	@EntityField(name = "定时作业属性列表",
-			type = ApiParamType.JSONARRAY)
-	private List<JobPropVo> propList;
+	
 	@EntityField(name = "定时作业uuid",
 			type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "定时作业组件类路径",
 			type = ApiParamType.STRING)
-	private String className;
+	private String handler;
+	@EntityField(name = "定时作业组件名称",
+			type = ApiParamType.STRING)
+	private String handlerName;
 	@EntityField(name = "是否保存执行记录(0:不保存，1:保存)",
 			type = ApiParamType.INTEGER)
 	private Integer needAudit;
@@ -42,6 +44,12 @@ public class JobVo extends BasePageVo {
 
 	private transient String keyword;
 
+	private JobStatusVo jobStatus;
+	
+//	@EntityField(name = "定时作业属性列表",
+//			type = ApiParamType.JSONARRAY)
+	private List<JobPropVo> propList;
+	
 	public JobVo() {
 		this.setPageSize(20);
 	}
@@ -124,12 +132,36 @@ public class JobVo extends BasePageVo {
 		this.endTime = endTime;
 	}
 
-	public String getClassName() {
-		return className;
+	public String getHandler() {
+		return handler;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setHandler(String handler) {
+		this.handler = handler;
+	}
+
+	public String getHandlerName() {
+		if(handlerName != null) {
+			return handlerName;
+		}
+		JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(handler);
+		if(jobClassVo == null) {
+			return null;
+		}
+		handlerName = jobClassVo.getName();
+		return handlerName;
+	}
+
+	public void setHandlerName(String handlerName) {
+		this.handlerName = handlerName;
+	}
+
+	public JobStatusVo getJobStatus() {
+		return jobStatus;
+	}
+
+	public void setJobStatus(JobStatusVo jobStatus) {
+		this.jobStatus = jobStatus;
 	}
 
 }

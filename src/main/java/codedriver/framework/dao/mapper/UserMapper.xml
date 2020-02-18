@@ -92,7 +92,12 @@
 		c.team_uuid as teamUuid,
 		d.name as teamName
 		FROM
-		`user` a
+		(
+			SELECT * FROM `user`
+			<if test="needPage == true">
+				LIMIT #{startNum}, #{pageSize}
+			</if>
+		) a
 		LEFT JOIN user_role b ON a.user_id = b.user_id
 		LEFT JOIN user_team c ON a.user_id = c.user_id
 		LEFT JOIN team d ON c.team_uuid = d.uuid
@@ -115,9 +120,6 @@
 			AND c.`auth` = #{auth}
 		</if>
 		ORDER BY a.user_id
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
 	</select>
 
 	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">

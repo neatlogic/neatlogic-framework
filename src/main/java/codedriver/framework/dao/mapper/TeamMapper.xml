@@ -56,6 +56,10 @@
 		uuid = #{value}
 	</select>
 
+	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
+		SELECT MAX(`sort`) FROM `team` WHERE `parent_uuid` = #{parentUuid}
+	</select>
+
 	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int">
 		SELECT
 		COUNT(1)
@@ -102,6 +106,13 @@
 		`sort` = #{sort},
 		`description` = #{description, typeHandler=XssHandler},
 		`parent_uuid` = #{parentUuid}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
+		UPDATE 	`team`
+		SET
+		`name` = #{name, typeHandler=XssHandler}
 		WHERE `uuid` = #{uuid}
 	</update>
 

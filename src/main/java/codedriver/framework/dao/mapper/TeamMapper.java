@@ -7,6 +7,8 @@ import codedriver.framework.dto.TeamVo;
 public interface TeamMapper {
 	public TeamVo getTeamByUuid(String uuid);
 
+	public int getMaxTeamSortByParentUuid(String parentUuid);
+
 	public List<TeamVo> searchTeam(TeamVo teamVo);
 
 	public int searchTeamCount(TeamVo teamVo);
@@ -24,4 +26,6 @@ public interface TeamMapper {
 	public  int insertTeam(TeamVo teamVo);
 
 	public void updateTeamByUuid(TeamVo teamVo);
+
+	public void updateTeamNameByUuid(TeamVo teamVo);
 }

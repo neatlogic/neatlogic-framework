@@ -135,6 +135,19 @@
 		WHERE `role_name` = #{roleName}
 	</delete>
 
+	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleVo">
+		DELETE
+		FROM
+		`role_authority`
+		WHERE `role_name` = #{name}
+		<if test="roleAuthList != null and roleAuthList.size > 0">
+			AND `auth` IN
+			<foreach collection="roleAuthList" open="(" separator="," close=")" item="roleAuth">
+				#{roleAuth.auth}
+			</foreach>
+		</if>
+	</delete>
+
 	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">
 		DELETE
 		FROM

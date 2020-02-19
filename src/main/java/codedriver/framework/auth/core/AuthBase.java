@@ -10,4 +10,5 @@ public abstract class AuthBase {
 	public abstract String getAuthIntroduction();
 
 	public abstract String getAuthGroup();
+
 }

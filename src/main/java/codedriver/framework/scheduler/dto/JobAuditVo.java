@@ -3,15 +3,12 @@ package codedriver.framework.scheduler.dto;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class JobAuditVo extends BasePageVo {
-	private static final Logger logger = LoggerFactory.getLogger(JobAuditVo.class);
 
 	public final static String RUNNING = "running";
 
@@ -30,8 +27,8 @@ public class JobAuditVo extends BasePageVo {
 	@EntityField(name = "结束时间",
 			type = ApiParamType.LONG)
 	private Date endTime;
-	@EntityField(name = "日志内容",
-			type = ApiParamType.STRING)
+//	@EntityField(name = "日志内容",
+//			type = ApiParamType.STRING)
 	private String content;
 	@EntityField(name = "执行状态(succeed：成功；failed:失败；running：进行中)",
 			type = ApiParamType.STRING)
@@ -39,7 +36,10 @@ public class JobAuditVo extends BasePageVo {
 	@EntityField(name = "服务器id",
 			type = ApiParamType.INTEGER)
 	private Integer serverId;
-
+	@EntityField(name = "日志内容长度",
+			type = ApiParamType.INTEGER)
+	private int contentLength;
+	
 	public JobAuditVo() {
 		this.setPageSize(20);
 	}
@@ -112,5 +112,13 @@ public class JobAuditVo extends BasePageVo {
 			}
 			this.content += content;
 		}
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
 	}
 }

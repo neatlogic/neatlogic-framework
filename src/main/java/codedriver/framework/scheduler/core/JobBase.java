@@ -75,7 +75,7 @@ public abstract class JobBase implements IJob {
 		IJob jobHandler = SchedulerManager.getHandler(this.getClassName());
 		if (jobHandler == null) {
 			schedulerManager.unloadJob(jobObject);
-			throw new ScheduleHandlerNotFoundException(jobObject.getJobClassName());
+			throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
 		}
 		if (!jobHandler.checkCronIsExpired(jobObject)) {
 			jobHandler.reloadJob(jobObject);

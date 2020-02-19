@@ -8,7 +8,7 @@ public class JobLockVo {
 
 	private String jobName;
 	private String jobGroup;
-	private String jobClassName;
+	private String jobHandler;
 	private String lock = WAITING;
 	private Integer serverId;
 
@@ -16,10 +16,10 @@ public class JobLockVo {
 
 	}
 
-	public JobLockVo(String _jobName, String _jobGroup, String _jobClassName) {
+	public JobLockVo(String _jobName, String _jobGroup, String _jobHandler) {
 		jobName = _jobName;
 		jobGroup = _jobGroup;
-		jobClassName = _jobClassName;
+		jobHandler = _jobHandler;
 	}
 
 	public String getLock() {
@@ -57,11 +57,11 @@ public class JobLockVo {
 		this.jobGroup = jobGroup;
 	}
 
-	public String getJobClassName() {
-		return jobClassName;
+	public String getJobHandler() {
+		return jobHandler;
 	}
 
-	public void setJobClassName(String jobClassName) {
-		this.jobClassName = jobClassName;
+	public void setJobHandler(String jobHandler) {
+		this.jobHandler = jobHandler;
 	}
 }

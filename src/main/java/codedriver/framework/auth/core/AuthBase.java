@@ -8,4 +8,6 @@ public abstract class AuthBase {
 	public abstract String getAuthDisplayName();
 
 	public abstract String getAuthIntroduction();
+
+	public abstract String getAuthGroup();
 }

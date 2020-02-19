@@ -43,9 +43,9 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			// TODO 获取所有tenant
 			for (JobLockVo jobLockVo : jobLockList) {
 				if (!schedulerManager.checkJobIsExists(jobLockVo.getJobName(), jobLockVo.getJobGroup())) {
-					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobClassName());
+					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobHandler());
 					if (jobHandler != null) {
-						JobObject jobObject = new JobObject.Builder(jobLockVo.getJobName(), jobLockVo.getJobGroup(), jobLockVo.getJobClassName(), tenantVo.getUuid()).build();
+						JobObject jobObject = new JobObject.Builder(jobLockVo.getJobName(), jobLockVo.getJobGroup(), jobLockVo.getJobHandler(), tenantVo.getUuid()).build();
 						jobHandler.reloadJob(jobObject);
 					}
 				}

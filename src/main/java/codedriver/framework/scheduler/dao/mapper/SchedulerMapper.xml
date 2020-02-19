@@ -1,26 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.scheduler.dao.mapper.SchedulerMapper">
-
-	<resultMap id="jobDetailMap" type="codedriver.framework.scheduler.dto.JobVo">
+	
+	<resultMap id="jobMap" type="codedriver.framework.scheduler.dto.JobVo">
 		<id column="uuid" property="uuid" />
 		<result column="name" property="name" />
-		<result column="className" property="className" />
+		<result column="handler" property="handler" />
 		<result column="cron" property="cron" />
-		<result column="isActive" property="isActive" />
-		<result column="needAudit" property="needAudit" />
-		<result column="beginTime" property="beginTime" />
-		<result column="endTime" property="endTime" />
+		<result column="is_active" property="isActive" />
+		<result column="need_audit" property="needAudit" />
+		<result column="begin_time" property="beginTime" />
+		<result column="end_time" property="endTime" />
+		<collection property="propList" ofType="codedriver.framework.scheduler.dto.JobPropVo">
+			<id column="prop_id" property="id" />
+			<result column="prop_name" property="name" />
+			<result column="prop_value" property="value" />
+		</collection>
 	</resultMap>
-
-
+	
+	<select id="getJobByUuid" parameterType="java.lang.String" resultMap="jobMap">
+		SELECT
+		a.uuid,
+		a.name,
+		a.handler,
+		a.begin_time,
+		a.end_time,
+		a.cron,
+		a.is_active,
+		a.need_audit,
+		d.prop_name,
+		d.prop_value,
+		d.id as prop_id
+		FROM schedule_job a
+		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+		WHERE a.uuid = #{uuid}
+	</select>
+	
 	<select id="getJobBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobVo">
 		SELECT
 		`uuid`,
 		`name`,
-		`classname` AS className,
-		DATE_FORMAT(`begin_time`, '%Y-%m-%d %H:%i:%s') AS beginTime,
-		DATE_FORMAT(`end_time`, '%Y-%m-%d %H:%i:%s') AS endTime,
+		`handler`,
+		`begin_time` AS beginTime,
+		`end_time` AS endTime,
 		`cron`,
 		`is_active` AS isActive,
 		`need_audit` AS needAudit
@@ -34,30 +56,30 @@
 		SELECT
 		`job_name` as jobName,
 		`job_group` as jobGroup,
-		`classname` as className,
-		DATE_FORMAT(last_fire_time, '%Y-%m-%d %H:%i:%s') as lastFireTime,
-		DATE_FORMAT(last_finish_time, '%Y-%m-%d %H:%i:%s') as lastFinishTime,
-		DATE_FORMAT(next_fire_time, '%Y-%m-%d %H:%i:%s') as nextFireTime,
-		exec_count as execCount
-		FROM schedule_job_status
-		WHERE job_name = #{jobName}
-		AND job_group = #{jobGroup}
+		`handler`,
+		`last_fire_time` as lastFireTime,
+		`last_finish_time` as lastFinishTime,
+		`next_fire_time` as nextFireTime,
+		`exec_count` as execCount
+		FROM `schedule_job_status`
+		WHERE `job_name` = #{jobName}
+		AND `job_group` = #{jobGroup}
 	</select>
 
-	<select id="getJobByClassName" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobVo">
+	<select id="getJobByHandler" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobVo">
 		SELECT
 		`uuid`,
 		`name`,
-		`classname`,
-		DATE_FORMAT(`begin_time`, '%Y-%m-%d %H:%i:%s') AS beginTime,
-		DATE_FORMAT(`end_time`, '%Y-%m-%d %H:%i:%s') AS endTime,
+		`handler`,
+		`begin_time` AS beginTime,
+		`end_time` AS endTime,
 		`cron`,
 		`is_active` AS isActive,
 		`need_audit` AS needAudit
 		FROM
 		`schedule_job`
 		WHERE
-		`classname` = #{value}
+		`handler` = #{value}
 	</select>
 
 	<select id="searchJobCount" resultType="int">
@@ -69,35 +91,58 @@
 		<if test="keyword != null and keyword != ''">
 			AND a.name like CONCAT('%',#{keyword}, '%')
 		</if>
-		<if test="className != null and className != ''">
-			AND a.className = #{className}
+		<if test="handler != null and handler != ''">
+			AND a.handler = #{handler}
 		</if>
 	</select>
 
+	<resultMap id="jobDetailMap" type="codedriver.framework.scheduler.dto.JobVo">
+		<id column="uuid" property="uuid" />
+		<result column="name" property="name" />
+		<result column="handler" property="handler" />
+		<result column="cron" property="cron" />
+		<result column="is_active" property="isActive" />
+		<result column="need_audit" property="needAudit" />
+		<result column="begin_time" property="beginTime" />
+		<result column="end_time" property="endTime" />
+		<association property="jobStatus" resultMap="jobStatusMap"/>
+	</resultMap>
+
+	<resultMap id="jobStatusMap" type="codedriver.framework.scheduler.dto.JobStatusVo">
+		<result column="job_name" property="jobName"/>
+		<result column="job_group" property="jobGroup"/>
+		<result column="handler" property="handler"/>
+		<result column="next_fire_time" property="nextFireTime"/>
+		<result column="last_fire_time" property="lastFireTime"/>
+		<result column="last_finish_time" property="lastFinishTime"/>
+		<result column="exec_count" property="execCount"/>
+	</resultMap>
+	
 	<select id="searchJob" resultMap="jobDetailMap">
 		SELECT
-		a.uuid,
+		a.`uuid`,
 		a.name,
-		a.classname as className,
-		DATE_FORMAT(a.`begin_time`, '%Y-%m-%d %H:%i:%s') AS beginTime,
-		DATE_FORMAT(a.`end_time`, '%Y-%m-%d %H:%i:%s') AS endTime,
+		a.handler,
+		a.`begin_time`,
+		a.`end_time`,
 		a.cron,
-		a.is_active as isActive,
-		a.need_audit as needAudit,
-		sjs.job_name as jobName,
-		sjs.job_group as jobGroup,
-		DATE_FORMAT(sjs.last_fire_time, '%Y-%m-%d %H:%i:%s') as lastFireTime,
-		DATE_FORMAT(sjs.last_finish_time, '%Y-%m-%d %H:%i:%s') as lastFinishTime,
-		DATE_FORMAT(sjs.next_fire_time, '%Y-%m-%d %H:%i:%s') as nextFireTime,
-		sjs.exec_count as execCount
-		FROM schedule_job a LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_name
+		a.is_active,
+		a.need_audit,
+		sjs.job_name,
+		sjs.job_group,
+		sjs.last_fire_time,
+		sjs.last_finish_time,
+		sjs.next_fire_time,
+		sjs.exec_count
+		FROM schedule_job a 
+		LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_name
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
 			AND a.name like CONCAT('%',#{keyword}, '%')
 		</if>
-		<if test="className != null and className != ''">
-			AND a.className = #{className}
+		<if test="handler != null and handler != ''">
+			AND a.handler = #{handler}
 		</if>
 		limit #{startNum}, #{pageSize}
 	</select>
@@ -113,13 +158,15 @@
 	<select id="searchJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
 		SELECT
 		id,
-		job_uuid AS jobUuid,
-		DATE_FORMAT(`start_time`, '%Y-%m-%d %H:%i:%s') AS startTime,
-		DATE_FORMAT(`end_time`, '%Y-%m-%d %H:%i:%s') AS endTime,
-		status AS status
-		FROM schedule_job_audit
-		WHERE job_uuid = #{jobUuid}
-		ORDER BY id DESC
+		`job_uuid` AS jobUuid,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`status`,
+		server_id AS serverId,
+		IFNULL(LENGTH(content),0) AS contentLength
+		FROM `schedule_job_audit`
+		WHERE `job_uuid` = #{jobUuid}
+		ORDER BY `id` DESC
 		LIMIT #{startNum}, #{pageSize}
 	</select>
 
@@ -127,8 +174,8 @@
 		SELECT
 		`id`,
 		`job_uuid` AS jobUuid,
-		DATE_FORMAT(a.`start_time`, '%Y-%m-%d %H:%i:%s') AS startTime,
-		DATE_FORMAT(a.`end_time`, '%Y-%m-%d %H:%i:%s') AS endTime,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
 		`content`,
 		`status`,
 		`server_id` AS serverId
@@ -143,7 +190,7 @@
 		SELECT
 		`job_name` as jobName,
 		`job_group` as jobGroup,
-		`job_classname` as jobClassName,
+		`job_handler` as jobHandler,
 		`lock`,
 		`server_id` as serverId
 		FROM
@@ -159,7 +206,7 @@
 		SELECT
 		`job_name` as jobName,
 		`job_group` as jobGroup,
-		`job_classname` as jobClassName,
+		`job_handler` as jobHandler,
 		`lock`,
 		`server_id` as serverId
 		FROM
@@ -232,7 +279,7 @@
 		(
 		`uuid`,
 		`name`,
-		`classname`,
+		`handler`,
 		begin_time,
 		end_time,
 		cron,
@@ -241,7 +288,7 @@
 		) VALUES (
 		#{uuid},
 		#{name},
-		#{className},
+		#{handler},
 		#{beginTime},
 		#{endTime},
 		#{cron},
@@ -255,12 +302,12 @@
 		(
 		`job_name`,
 		`job_group`,
-		`classname`,
+		`handler`,
 		`next_fire_time`
 		) VALUES (
 		#{jobName},
 		#{jobGroup},
-		#{className},
+		#{handler},
 		#{nextFireTime}
 		)
 	</insert>
@@ -279,7 +326,7 @@
 		INSERT INTO `schedule_job_lock` (
 		`job_name`,
 		`job_group`,
-		`job_classname`,
+		`job_handler`,
 		`lock`,
 		`server_id`
 		)
@@ -287,7 +334,7 @@
 		(
 		#{jobName},
 		#{jobGroup},
-		#{jobClassName},
+		#{jobHandler},
 		#{lock},
 		#{serverId}
 		)

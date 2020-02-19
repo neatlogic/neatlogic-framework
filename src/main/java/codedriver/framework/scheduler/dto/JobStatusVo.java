@@ -17,7 +17,7 @@ public class JobStatusVo {
 	private String jobGroup;
 	@EntityField(name = "定时作业类名",
 			type = ApiParamType.STRING)
-	private String className;
+	private String handler;
 	@EntityField(name = "下一次被唤醒时间",
 			type = ApiParamType.LONG)
 	private Date nextFireTime;
@@ -29,7 +29,7 @@ public class JobStatusVo {
 	private Date lastFinishTime;
 	@EntityField(name = "执行次数",
 			type = ApiParamType.INTEGER)
-	private Integer execCount;
+	private Integer execCount = 0;
 
 	@JSONField(serialize = false)
 	private transient Integer needAudit;
@@ -93,11 +93,11 @@ public class JobStatusVo {
 		this.jobName = jobName;
 	}
 
-	public String getClassName() {
-		return className;
+	public String getHandler() {
+		return handler;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 }

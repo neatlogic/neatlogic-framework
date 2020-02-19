@@ -2,6 +2,8 @@ package codedriver.framework.scheduler.dto;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class JobClassVo extends BasePageVo {
@@ -16,10 +18,13 @@ public class JobClassVo extends BasePageVo {
 	@EntityField(name = "定时作业组件全类名",
 			type = ApiParamType.STRING)
 	private String className;
-	@EntityField(name = "时作业组件所属模块id",
+	@EntityField(name = "定时作业组件所属模块id",
 			type = ApiParamType.STRING)
 	private String moduleId;
-
+	@EntityField(name = "定时作业组件所属模块名称",
+			type = ApiParamType.STRING)
+	private String moduleName;
+	
 	private transient String keyword;
 
 	public JobClassVo() {
@@ -54,6 +59,25 @@ public class JobClassVo extends BasePageVo {
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	public String getModuleName() {
+		if(moduleName != null) {
+			return moduleName;
+		}
+		if(moduleId == null) {
+			return null;
+		}
+		ModuleVo module = ModuleUtil.getModuleById(moduleId);
+		if(module == null) {
+			return null;
+		}
+		moduleName = module.getName();
+		return moduleName;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
 	}
 
 	public String getKeyword() {

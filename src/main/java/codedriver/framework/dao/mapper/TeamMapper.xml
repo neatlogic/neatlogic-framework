@@ -8,7 +8,7 @@
 		a.`name`,
 		a.`sort`,
 		a.`description`,
-		a.`parent_uuid`,
+		a.`parent_uuid` as `parentUuid`,
 		COUNT(b.`user_id`) as `userCount`
 		FROM
 		`team` a
@@ -26,6 +26,17 @@
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
+	</select>
+
+	<select id = "getTeamTree" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid` as `parentUuid`
+		FROM `team`
+		ORDER BY `parentUuid`, `sort`
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">

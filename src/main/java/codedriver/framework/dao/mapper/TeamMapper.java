@@ -11,6 +11,8 @@ public interface TeamMapper {
 
 	public List<TeamVo> searchTeam(TeamVo teamVo);
 
+	public List<TeamVo> getTeamTree();
+
 	public int searchTeamCount(TeamVo teamVo);
 
 	public int searchUserCountByTeamUuid(String uuid);

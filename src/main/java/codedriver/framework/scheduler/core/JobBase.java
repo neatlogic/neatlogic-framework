@@ -232,7 +232,6 @@ public abstract class JobBase implements IJob {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println(paramMap);
 		return paramMap;
 	}
 }

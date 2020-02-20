@@ -149,11 +149,7 @@ public class SchedulerManager extends ApplicationListenerBase {
 					jobStatusVo.setHandler(className);
 					jobStatusVo.setNextFireTime(nextFireDate);
 					schedulerMapper.insertJobStatus(jobStatusVo);
-				} 
-//				else {
-//					jobStatusVo.setNextFireTime(nextFireDate);
-//					schedulerMapper.updateJobStatus(jobStatusVo);
-//				}
+				}
 				return nextFireDate;
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);

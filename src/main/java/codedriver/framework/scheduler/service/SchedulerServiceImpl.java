@@ -14,6 +14,7 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
@@ -38,9 +39,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 		List<JobClassVo> jobClassList = SchedulerManager.getAllPublicJobClassList();
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
 		for (JobClassVo jobClass : jobClassList) {
-			if (jobClassVo.getType() != null && !jobClass.getType().equals(jobClassVo.getType())) {
-				continue;
-			}
 			if (jobClassVo.getModuleId() != null && !jobClass.getModuleId().equals(jobClassVo.getModuleId())) {
 				continue;
 			}
@@ -63,7 +61,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 	}
 
 	@Override
-	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo) {
+	public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo) {
 		JobVo job = schedulerMapper.getJobByUuid(jobAuditVo.getJobUuid());
 		if (job == null) {
 			throw new ScheduleJobNotFoundException(jobAuditVo.getJobUuid());
@@ -72,11 +70,12 @@ public class SchedulerServiceImpl implements SchedulerService {
 		int pageCount = PageUtil.getPageCount(rowNum, jobAuditVo.getPageSize());
 		jobAuditVo.setPageCount(pageCount);
 		jobAuditVo.setRowNum(rowNum);
-		return schedulerMapper.searchJobAuditList(jobAuditVo);
+		return schedulerMapper.searchJobAudit(jobAuditVo);
 	}
 
 	@Override
-	public int updateJobLock(JobLockVo jobLockVo) {
+	public int updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {
+		schedulerMapper.updateJobStatus(jobStatusVo);
 		return schedulerMapper.updateJobLock(jobLockVo);
 	}
 

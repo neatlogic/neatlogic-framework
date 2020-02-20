@@ -66,8 +66,8 @@ public class SchedulerManager extends ApplicationListenerBase {
 		return publicJobClassList;
 	}
 
-	public static JobClassVo getJobClassByClasspath(String classpath) {
-		JobClassVo jobClassVo = jobClassMap.get(classpath);
+	public static JobClassVo getJobClassByClassName(String className) {
+		JobClassVo jobClassVo = jobClassMap.get(className);
 		if (jobClassVo != null && TenantContext.get().containsModule(jobClassVo.getModuleId())) {
 			return jobClassVo;
 		}
@@ -102,7 +102,7 @@ public class SchedulerManager extends ApplicationListenerBase {
 		try {
 			String jobName = jobObject.getJobName();
 			String jobGroup = jobObject.getJobGroup();
-			String className = jobObject.getJobClassName();
+			String className = jobObject.getJobHandler();
 
 			JobKey jobKey = new JobKey(jobName, jobGroup);
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -136,7 +136,7 @@ public class SchedulerManager extends ApplicationListenerBase {
 				}
 				triggerBuilder.endAt(jobObject.getEndTime());
 				Trigger trigger = triggerBuilder.build();
-				Class clazz = Class.forName(jobObject.getJobClassName());
+				Class clazz = Class.forName(jobObject.getJobHandler());
 				JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
 				jobDetail.getJobDataMap().put("jobObject", jobObject);
 				Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
@@ -146,12 +146,9 @@ public class SchedulerManager extends ApplicationListenerBase {
 					jobStatusVo = new JobStatusVo();
 					jobStatusVo.setJobName(jobName);
 					jobStatusVo.setJobGroup(jobGroup);
-					jobStatusVo.setClassName(className);
+					jobStatusVo.setHandler(className);
 					jobStatusVo.setNextFireTime(nextFireDate);
 					schedulerMapper.insertJobStatus(jobStatusVo);
-				} else {
-					jobStatusVo.setNextFireTime(nextFireDate);
-					schedulerMapper.updateJobStatus(jobStatusVo);
 				}
 				return nextFireDate;
 			} catch (Exception ex) {

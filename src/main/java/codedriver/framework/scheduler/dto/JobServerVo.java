@@ -6,7 +6,7 @@ public class JobServerVo {
 
 	private String jobName;
 	private String jobGroup;
-	private String className;
+	private String handler;
 	private Integer serverId;
 	private Integer needReload = 0;
 
@@ -14,10 +14,10 @@ public class JobServerVo {
 
 	}
 
-	public JobServerVo(String _jobName, String _jobGroup, String _className) {
+	public JobServerVo(String _jobName, String _jobGroup, String _handler) {
 		jobName = _jobName;
 		jobGroup = _jobGroup;
-		className = _className;
+		handler = _handler;
 	}
 
 	public String getJobName() {
@@ -36,12 +36,12 @@ public class JobServerVo {
 		this.jobGroup = jobGroup;
 	}
 
-	public String getClassName() {
-		return className;
+	public String getHandler() {
+		return handler;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 
 	public Integer getServerId() {

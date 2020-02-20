@@ -20,7 +20,7 @@ public interface SchedulerMapper {
 	String jobName, @Param("jobGroup")
 	String jobGroup);
 
-	public List<JobVo> getJobByClassName(String className);
+	public List<JobVo> getJobByHandler(String handler);
 
 	public int searchJobCount(JobVo jobVo);
 
@@ -28,7 +28,7 @@ public interface SchedulerMapper {
 
 	public int searchJobAuditCount(JobAuditVo jobAuditVo);
 
-	public List<JobAuditVo> searchJobAuditList(JobAuditVo jobAuditVo);
+	public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
 
 	public JobAuditVo getJobAuditById(Long auditId);
 

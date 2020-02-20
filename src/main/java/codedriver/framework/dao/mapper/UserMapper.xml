@@ -92,11 +92,17 @@
 		c.team_uuid as teamUuid,
 		d.name as teamName
 		FROM
-		`user` a
+		(
+			SELECT * FROM `user`
+			<if test="needPage == true">
+				LIMIT #{startNum}, #{pageSize}
+			</if>
+		) a
 		LEFT JOIN user_role b ON a.user_id = b.user_id
 		LEFT JOIN user_team c ON a.user_id = c.user_id
 		LEFT JOIN team d ON c.team_uuid = d.uuid
 		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
+		LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -107,18 +113,33 @@
 		<if test="teamUuid != null and teamUuid != ''">
 			AND c.`team_uuid` = #{teamUuid}
 		</if>
-		ORDER BY a.user_id
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
+		<if test="authGroup != null and authGroup != ''">
+			AND c.`auth_group` = #{authGroup}
 		</if>
+		<if test="auth != null and auth != ''">
+			AND c.`auth` = #{auth}
+		</if>
+		<if test="roleName != null and roleName = ''">
+			AND b.`role_name` = #{roleName}
+		</if>
+		ORDER BY a.user_id
+	</select>
+
+	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
+		SELECT `user_id` as `userId`,
+		`auth_group` as `authGroup`,
+		`auth`
+		FROM `user_authority`
+		WHERE `user_id` = #{userId}
 	</select>
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
 		SELECT
-		count(1)
+		count(DISTINCT (a.`user_id`))
 		FROM
 		`user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `user_authority` c ON a.`user_id` = c.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -129,6 +150,14 @@
 
 		<if test="teamUuid != null and teamUuid != ''">
 			AND b.`team_uuid` = #{teamUuid}
+		</if>
+
+		<if test="authGroup != null and authGroup != ''">
+			AND c.`auth_group` = #{authGroup}
+		</if>
+
+		<if test="auth != null and auth != ''">
+			AND c.`auth` = #{auth}
 		</if>
 	</select>
 
@@ -196,6 +225,19 @@
 			#{item}
 		</foreach>
 	</select>
+
+    <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
+        INSERT INTO `user_authority`(
+        `user_id`,
+        `auth_group`,
+        `auth`
+        ) VALUES
+        (
+         #{userId},
+         #{authGroup},
+         #{auth}
+        )
+    </insert>
 
 	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user` (
@@ -299,6 +341,25 @@
 		FROM
 		`user`
 		WHERE `user_id` = #{value}
+	</delete>
+
+    <delete id="deleteUserAuthByUserId" parameterType="java.lang.String">
+        DELETE
+        FROM
+        `user_authority` WHERE `user_id` = #{userId}
+    </delete>
+
+	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
+		DELETE
+		FROM
+		`user_authority`
+		WHERE `user_id` = #{userId}
+		<if test="userAuthList != null and userAuthList.size > 0">
+			AND `auth` IN
+			<foreach collection="userAuthList" open="(" separator="," close=")" item="userAuth">
+				#{userAuth.auth}
+			</foreach>
+		</if>
 	</delete>
 
 	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">

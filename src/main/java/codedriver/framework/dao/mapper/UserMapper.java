@@ -2,6 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.dto.UserAuthVo;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.dto.UserSessionVo;
@@ -21,6 +22,8 @@ public interface UserMapper {
 
 	public List<UserVo> searchUser(UserVo userVo);
 
+	public List<UserAuthVo> searchUserAuthByUserId(String userId);
+
 	public List<Long> getLimitUserPasswordIdList(String userId);
 
 	public int searchUserCount(UserVo userVo);
@@ -32,6 +35,8 @@ public interface UserMapper {
 	public UserSessionVo getUserSessionByUserId(String userId);
 
 	public List<UserVo> getUserByUserIdList(List<String> userIdList);
+
+	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
 
@@ -58,6 +63,10 @@ public interface UserMapper {
 	public int deleteUserPasswordByLimit(@Param("userId") String userId,@Param("idList") List<Long> idList);
 
 	public int deleteUserByUserId(String userId);
+
+	public int deleteUserAuthByUserId(String userId);
+
+	public int deleteUserAuth(UserVo userVo);
 
 	public int deleteUserRoleByUserId(String userId);
 

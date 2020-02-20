@@ -8,7 +8,7 @@
 		a.`name`,
 		a.`sort`,
 		a.`description`,
-		a.`parent_uuid`,
+		a.`parent_uuid` as `parentUuid`,
 		COUNT(b.`user_id`) as `userCount`
 		FROM
 		`team` a
@@ -26,6 +26,17 @@
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
+	</select>
+
+	<select id = "getTeamTree" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`description`,
+		`parent_uuid` as `parentUuid`
+		FROM `team`
+		ORDER BY `parentUuid`, `sort`
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
@@ -54,6 +65,10 @@
 		`team`
 		WHERE
 		uuid = #{value}
+	</select>
+
+	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
+		SELECT MAX(`sort`) FROM `team` WHERE `parent_uuid` = #{parentUuid}
 	</select>
 
 	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int">
@@ -102,6 +117,13 @@
 		`sort` = #{sort},
 		`description` = #{description, typeHandler=XssHandler},
 		`parent_uuid` = #{parentUuid}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
+		UPDATE 	`team`
+		SET
+		`name` = #{name, typeHandler=XssHandler}
 		WHERE `uuid` = #{uuid}
 	</update>
 

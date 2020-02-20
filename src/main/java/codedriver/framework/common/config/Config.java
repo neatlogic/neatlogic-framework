@@ -25,6 +25,7 @@ public class Config {
     public static final int SERVER_HEARTBEAT_THRESHOLD;// 默认3
     public static String DATA_HOME;// 数据文件根路径
     public static final Map<String, String> ES_CLUSTERS;
+    public static final boolean ES_ENABLE;
 
     private static final String CONFIG_FILE = "config.properties";
 
@@ -56,6 +57,7 @@ public class Config {
             throw ex;
         }
 
+        boolean esEnable = false;
         Map<String, String> map = null;
         try (InputStream in = Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (in == null) {
@@ -86,11 +88,14 @@ public class Config {
 					}
                     map.put(clusterName, value);
                 }
+
+                esEnable = Boolean.parseBoolean(props.getProperty("es.enable"));
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             ES_CLUSTERS = map == null || map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map);
+            ES_ENABLE = esEnable;
         }
     }
 

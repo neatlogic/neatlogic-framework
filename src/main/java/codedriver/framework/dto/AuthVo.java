@@ -1,6 +1,10 @@
 package codedriver.framework.dto;
 
 public class AuthVo {
+
+    public static final String AUTH_DELETE = "delete";
+    public static final String AUTH_ADD = "add";
+    public static final String AUTH_COVER = "cover";
     private String name;
     private String displayName;
 

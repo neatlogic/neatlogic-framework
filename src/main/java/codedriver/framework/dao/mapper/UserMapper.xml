@@ -119,7 +119,7 @@
 		<if test="auth != null and auth != ''">
 			AND c.`auth` = #{auth}
 		</if>
-		<if test="roleName != null and roleName = ''">
+		<if test="roleName != null and roleName != ''">
 			AND b.`role_name` = #{roleName}
 		</if>
 		ORDER BY a.user_id
@@ -140,6 +140,7 @@
 		`user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
 		LEFT JOIN `user_authority` c ON a.`user_id` = c.`user_id`
+		LEFT JOIN `user_role` d ON a.`user_id` = d.`user_id`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -158,6 +159,10 @@
 
 		<if test="auth != null and auth != ''">
 			AND c.`auth` = #{auth}
+		</if>
+
+		<if test="roleName != null and roleName != ''">
+			AND d.`role_name` = #{roleName}
 		</if>
 	</select>
 

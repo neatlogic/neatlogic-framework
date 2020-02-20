@@ -119,6 +119,9 @@
 		<if test="auth != null and auth != ''">
 			AND c.`auth` = #{auth}
 		</if>
+		<if test="roleName != null and roleName = ''">
+			AND b.`role_name` = #{roleName}
+		</if>
 		ORDER BY a.user_id
 	</select>
 
@@ -150,7 +153,7 @@
 		</if>
 
 		<if test="authGroup != null and authGroup != ''">
-			AND c.`group` = #{authGroup}
+			AND c.`auth_group` = #{authGroup}
 		</if>
 
 		<if test="auth != null and auth != ''">
@@ -345,6 +348,19 @@
         FROM
         `user_authority` WHERE `user_id` = #{userId}
     </delete>
+
+	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
+		DELETE
+		FROM
+		`user_authority`
+		WHERE `user_id` = #{userId}
+		<if test="userAuthList != null and userAuthList.size > 0">
+			AND `auth` IN
+			<foreach collection="userAuthList" open="(" separator="," close=")" item="userAuth">
+				#{userAuth.auth}
+			</foreach>
+		</if>
+	</delete>
 
 	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">
 		DELETE FROM `user_session` where `user_id` = #{value}

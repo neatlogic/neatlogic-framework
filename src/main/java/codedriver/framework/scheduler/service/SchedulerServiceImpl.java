@@ -14,6 +14,7 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
+import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
@@ -73,7 +74,8 @@ public class SchedulerServiceImpl implements SchedulerService {
 	}
 
 	@Override
-	public int updateJobLock(JobLockVo jobLockVo) {
+	public int updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {
+		schedulerMapper.updateJobStatus(jobStatusVo);
 		return schedulerMapper.updateJobLock(jobLockVo);
 	}
 

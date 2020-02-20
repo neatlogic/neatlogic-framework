@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
+import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobObject;
 @Service
 @DisallowConcurrentExecution
@@ -30,6 +31,11 @@ public class TestPublicJob extends PublicJobBase {
 		JobKey jobKey = jobDetail.getKey();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		System.out.println(jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "-" + sdf.format(new Date()));
+		Object obj = jobDetail.getJobDataMap().get("jobAuditVo");
+		if(obj instanceof JobAuditVo) {
+			JobAuditVo auditVo = (JobAuditVo) obj;
+			auditVo.appendContent(jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "-" + sdf.format(new Date()));
+		}
 	}
 
 	@Override

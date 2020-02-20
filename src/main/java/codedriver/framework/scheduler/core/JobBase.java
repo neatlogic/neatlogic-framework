@@ -81,7 +81,12 @@ public abstract class JobBase implements IJob {
 			jobHandler.reloadJob(jobObject);
 			return;
 		}
+		Date currentFireTime = context.getFireTime();//本次执行激活时间
 		JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+		//如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
+		if(beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
+			return;
+		}
 		JobLockVo jobLockVo = schedulerService.getJobLock(jobName, jobGroup);
 		// 取不到锁，不允许执行
 		if (jobLockVo == null) {
@@ -114,22 +119,20 @@ public abstract class JobBase implements IJob {
 				jobHandler.executeInternal(context, jobObject);
 			}
 			// 执行完业务逻辑后，更新定时作业状态信息
-			JobStatusVo jobStatus = new JobStatusVo();
-			jobStatus.setLastFinishTime(new Date());
-			jobStatus.setLastFireTime(fireTime);
+			
+			oldJobStatusVo.setLastFinishTime(new Date());
+			oldJobStatusVo.setLastFireTime(fireTime);
 
 			if (context.getNextFireTime() != null) {
-				jobStatus.setNextFireTime(context.getNextFireTime());
+				oldJobStatusVo.setNextFireTime(context.getNextFireTime());
 			} else {
 				// 没有下次执行时间，则unload作业，清除作业相关信息。
 				schedulerManager.unloadJob(jobObject);
 				schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
 				schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
 			}
-			jobStatus.setJobName(jobName);
-			jobStatus.setJobGroup(jobGroup);
-			jobStatus.setExecCount(oldJobStatusVo.getExecCount() + 1);
-			schedulerMapper.updateJobStatus(jobStatus);
+			
+			oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		} finally {
@@ -137,7 +140,7 @@ public abstract class JobBase implements IJob {
 
 			jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
 			jobLockVo.setLock(JobLockVo.WAITING);
-			schedulerService.updateJobLock(jobLockVo);
+			schedulerService.updateJobLockAndStatus(jobLockVo, oldJobStatusVo);
 		}
 	}
 
@@ -213,7 +216,7 @@ public abstract class JobBase implements IJob {
 	public Map<String, Param> initProp() {
 		Map<String, Param> paramMap = new HashMap<>();
 		try {
-			Method method = this.getClass().getDeclaredMethod("executeInternal", JobExecutionContext.class);
+			Method method = this.getClass().getDeclaredMethod("executeInternal", JobExecutionContext.class, JobObject.class);
 			if (method == null || !method.isAnnotationPresent(Input.class)) {
 				return paramMap;
 			}

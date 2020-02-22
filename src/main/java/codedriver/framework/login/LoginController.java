@@ -25,6 +25,8 @@ import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.exception.tenant.TenantNotFoundException;
+import codedriver.framework.exception.user.UserAuthFailedException;
 import codedriver.framework.service.TenantService;
 import codedriver.framework.service.UserService;
 
@@ -55,7 +57,7 @@ public class LoginController {
 				tenantContext.setUseDefaultDatasource(true);
 				TenantVo tenantVo = tenantService.getTenantByUuid(tenant);
 				if (tenantVo == null) {
-					throw new RuntimeException("找不到租户：" + tenant);
+					throw new TenantNotFoundException(tenant);
 				}
 				tenantContext.switchTenant(tenant);
 				// 还原回租户库
@@ -69,9 +71,9 @@ public class LoginController {
 
 			UserVo checkUserVo = userService.getUserByUserIdAndPassword(userVo);
 			if (checkUserVo != null) {
-				//保存 user 登录访问时间
+				// 保存 user 登录访问时间
 				userService.saveUserSession(checkUserVo.getUserId());
-				
+
 				JSONObject jwtHeadObj = new JSONObject();
 				jwtHeadObj.put("alg", "HS256");
 				jwtHeadObj.put("typ", "JWT");
@@ -110,8 +112,10 @@ public class LoginController {
 				returnObj.put("JwtToken", jwthead + "." + jwtbody + "." + jwtsign);
 				response.getWriter().print(returnObj);
 			} else {
-				throw new RuntimeException("用户验证失败");
+				throw new UserAuthFailedException();
 			}
+		} catch (UserAuthFailedException | TenantNotFoundException ex) {
+			ReturnJson.error(ex.getMessage(), response);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			ReturnJson.error(ex.getMessage(), response);

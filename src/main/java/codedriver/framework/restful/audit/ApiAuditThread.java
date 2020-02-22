@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.common.config.Config;
@@ -34,12 +33,12 @@ public class ApiAuditThread extends CodeDriverThread {
 	private String getLogPath(String tenant, String logPath) {
 		String logFilePath = "";
 		if (StringUtils.isBlank(logPath)) {
-			logFilePath = Config.CODEDRIVER_HOME + File.separator + "apiaudit" + File.separator + tenant + File.separator;
+			logFilePath = Config.DATA_HOME + File.separator + "apiaudit" + File.separator + tenant + File.separator;
 		} else {
 			if (logPath.startsWith(File.separator)) {
 				logFilePath = logPath + File.separator + tenant + File.separator;
 			} else {
-				logFilePath = Config.CODEDRIVER_HOME + File.separator + logPath + File.separator + tenant + File.separator;
+				logFilePath = Config.DATA_HOME + File.separator + logPath + File.separator + tenant + File.separator;
 			}
 		}
 		return logFilePath;
@@ -68,6 +67,9 @@ public class ApiAuditThread extends CodeDriverThread {
 		log.append(">>>>>>>>>>>>>\nuuid: ");
 		log.append(apiAuditVo.getUuid());
 		log.append("\n");
+		log.append("user: ");
+		log.append(apiAuditVo.getUserId());
+		log.append("\n");
 		log.append("time: ");
 		log.append(sdf.format(new Date()));
 		log.append("\n");
@@ -78,7 +80,7 @@ public class ApiAuditThread extends CodeDriverThread {
 		}
 		if (apiAuditVo.getResult() != null) {
 			log.append("result: ");
-			String pretty = JSON.toJSONString(apiAuditVo.getResult(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteDateUseDateFormat);
+			String pretty = JSON.toJSONString(apiAuditVo.getResult());
 			log.append(pretty);
 			log.append("\n");
 		}

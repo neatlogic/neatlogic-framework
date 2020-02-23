@@ -21,11 +21,15 @@ public interface TeamMapper {
 
 	public int deleteTeamByUuid(String uuid);
 
+	public int deleteTeamTagByUuid(String uuid);
+
 	public int deleteUserTeamByTeamUuid(String uuid);
 
 	public int deleteUserTeamRoleByTeamUuid(String uuid);
 
 	public  int insertTeam(TeamVo teamVo);
+
+	public int insertTeamTag(TeamVo teamVo);
 
 	public void updateTeamByUuid(TeamVo teamVo);
 

@@ -110,6 +110,16 @@
 		)
 	</insert>
 
+	<insert id="insertTeamTag" parameterType="codedriver.framework.dto.TeamVo">
+		INSERT INTO `team_tag`(
+		`team_uuid`,
+		`tag_id`
+		) VALUES (
+			#{uuid},
+			#{tagId}
+		)
+	</insert>
+
 	<update id="updateTeamByUuid" parameterType="codedriver.framework.dto.TeamVo">
 		UPDATE `team`
 		SET
@@ -132,6 +142,13 @@
 		FROM
 		`team`
 		WHERE `uuid` = #{value}
+	</delete>
+
+	<delete id="deleteTeamTagByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`team_tag`
+		WHERE `team_uuid` = #{uuid}
 	</delete>
 
 	<delete id="deleteUserTeamRoleByTeamUuid" parameterType="java.lang.String">

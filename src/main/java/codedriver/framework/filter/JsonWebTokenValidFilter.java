@@ -66,29 +66,29 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		boolean isUnExpired = false;
 		boolean hasTenant = false;
 		String tenant = null, authorization = null, timezone = "+8:00";
+		String authorizationFromCookie = null;
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("codedriver_tenant")) {
-					tenant = cookie.getValue();
-				} else if (cookie.getName().equals("codedriver_authorization")) {
-					authorization = cookie.getValue();
-				} else if (cookie.getName().equals("codedriver_timezone")) {
+				if (cookie.getName().equals("codedriver_timezone")) {
 					timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
+				} else if (cookie.getName().equals("codedriver_authorization")) {
+					authorizationFromCookie = cookie.getValue();
 				}
 			}
 		}
+
 		if (StringUtils.isBlank(tenant)) {
 			tenant = request.getHeader("Tenant");
-			if (StringUtils.isNotBlank(tenant)) {
-				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
-				tenantCookie.setPath("/");
-				response.addCookie(tenantCookie);
-			}
 		}
 
 		if (StringUtils.isBlank(authorization)) {
 			authorization = request.getHeader("Authorization");
 		}
+
+		if (StringUtils.isBlank(authorization)) {
+			authorization = authorizationFromCookie;
+		}
+
 		if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
 			if (TenantUtil.hasTenant(tenant)) {
 				hasTenant = true;

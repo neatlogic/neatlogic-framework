@@ -1,5 +1,6 @@
 package codedriver.framework.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,11 @@ public class TeamVo extends BasePageVo {
 	@EntityField(name = "排序",
 			type = ApiParamType.INTEGER)
 	private int sort;
+
+	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
+	private List<TagVo> tagList;
+
+	private Long tagId;
 
 	private int userCount;
 
@@ -113,5 +119,21 @@ public class TeamVo extends BasePageVo {
 
 	public void setUserCount(int userCount) {
 		this.userCount = userCount;
+	}
+
+	public List<TagVo> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<TagVo> tagList) {
+		this.tagList = tagList;
+	}
+
+	public Long getTagId() {
+		return tagId;
+	}
+
+	public void setTagId(Long tagId) {
+		this.tagId = tagId;
 	}
 }

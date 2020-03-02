@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ModuleEnum;
@@ -44,12 +45,14 @@ public class ModuleListApi extends ApiComponentBase {
 	@Description(desc = "获取租户激活模块接口")
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
-		JSONObject resultJson = new JSONObject();
+		JSONArray resultArray = new JSONArray();
 		Map<String,String> activeModuleMap = ModuleEnum.getActiveModule();
 		for(Entry<String, String> module: activeModuleMap.entrySet()) {
+			JSONObject resultJson = new JSONObject();
 			resultJson.put("text", module.getKey());
 			resultJson.put("value", module.getValue());
+			resultArray.add(resultJson);
 		}
-		return resultJson;
+		return resultArray;
 	}
 }

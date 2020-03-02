@@ -49,8 +49,8 @@ public class ModuleListApi extends ApiComponentBase {
 		Map<String,String> activeModuleMap = ModuleEnum.getActiveModule();
 		for(Entry<String, String> module: activeModuleMap.entrySet()) {
 			JSONObject resultJson = new JSONObject();
-			resultJson.put("text", module.getKey());
-			resultJson.put("value", module.getValue());
+			resultJson.put("value", module.getKey());
+			resultJson.put("text", module.getValue());
 			resultArray.add(resultJson);
 		}
 		return resultArray;

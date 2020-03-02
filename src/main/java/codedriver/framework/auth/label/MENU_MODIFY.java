@@ -1,7 +1,7 @@
 package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
-import codedriver.framework.auth.core.AuthGroupEnum;
+import codedriver.framework.common.constvalue.ModuleEnum;
 
 public class MENU_MODIFY extends AuthBase {
 
@@ -17,6 +17,6 @@ public class MENU_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthGroup() {
-		return AuthGroupEnum.FRAMEWORK.getValue();
+		return ModuleEnum.FRAMEWORK.getValue();
 	}
 }

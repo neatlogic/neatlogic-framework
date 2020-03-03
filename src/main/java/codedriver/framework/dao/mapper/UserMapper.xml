@@ -133,6 +133,16 @@
 		WHERE `user_id` = #{userId}
 	</select>
 
+	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo">
+		SELECT
+		a.`role_name` as `roleName`,
+		a.`auth_group` as `authGroup`,
+		a.`auth`
+		FROM `role_authority` a
+		LEFT JOIN `user_role` b ON a.`role_name` = b.`role_name`
+		WHERE b.`user_id` = #{userId}
+	</select>
+
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
 		SELECT
 		count(DISTINCT (a.`user_id`))

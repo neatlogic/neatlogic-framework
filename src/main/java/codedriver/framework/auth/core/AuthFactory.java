@@ -32,7 +32,7 @@ public class AuthFactory {
 		return authMap.get(authName);
 	}
 
-	public static Map getAuthGroupMap(){
+	public static Map<String, List<AuthBase>> getAuthGroupMap(){
 		return authGroupMap;
 	}
 }

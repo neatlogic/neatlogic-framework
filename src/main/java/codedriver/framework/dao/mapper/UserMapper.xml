@@ -31,7 +31,6 @@
 		<result property="userName" column="userName" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone" />
-		<result property="password" column="password" />
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
 		<collection property="roleNameList" ofType="java.lang.String">
@@ -85,7 +84,6 @@
 		a.`user_name` as userName,
 		a.`email`,
 		a.`phone`,
-		e.`password`,
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		b.role_name as roleName,

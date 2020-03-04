@@ -64,7 +64,7 @@ public class AuthSearchApi extends ApiComponentBase {
                 List<AuthVo> authArray = new ArrayList<>();
                 for (AuthBase authBase : authList){
                     AuthVo authVo = new AuthVo();
-                    authVo.setName(authBase.getAuthName());
+                    authVo.setName(authGroupName + "#" + authBase.getAuthName());
                     authVo.setDisplayName(authBase.getAuthDisplayName());
                     authArray.add(authVo);
                 }

@@ -31,7 +31,6 @@
 		<result property="userName" column="userName" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone" />
-		<result property="password" column="password" />
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
 		<collection property="roleNameList" ofType="java.lang.String">
@@ -85,7 +84,6 @@
 		a.`user_name` as userName,
 		a.`email`,
 		a.`phone`,
-		e.`password`,
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		b.role_name as roleName,
@@ -131,6 +129,16 @@
 		`auth`
 		FROM `user_authority`
 		WHERE `user_id` = #{userId}
+	</select>
+
+	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo">
+		SELECT
+		a.`role_name` as `roleName`,
+		a.`auth_group` as `authGroup`,
+		a.`auth`
+		FROM `role_authority` a
+		LEFT JOIN `user_role` b ON a.`role_name` = b.`role_name`
+		WHERE b.`user_id` = #{userId}
 	</select>
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">

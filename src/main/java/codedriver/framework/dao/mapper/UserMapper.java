@@ -2,6 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.UserAuthVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,6 +24,8 @@ public interface UserMapper {
 	public List<UserVo> searchUser(UserVo userVo);
 
 	public List<UserAuthVo> searchUserAuthByUserId(String userId);
+
+	public List<RoleAuthVo> searchUserRoleAuthByUserId(String userId);
 
 	public List<Long> getLimitUserPasswordIdList(String userId);
 

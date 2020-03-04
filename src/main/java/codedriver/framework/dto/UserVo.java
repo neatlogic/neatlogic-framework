@@ -2,14 +2,12 @@ package codedriver.framework.dto;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.dto.BasePageVo;
-
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -43,10 +41,6 @@ public class UserVo extends BasePageVo {
 	private List<UserAuthVo> userAuthList;
 
 	public List<UserAuthVo> getUserAuthList() {
-		//mybatis 有bug，union 如果为null 会返回[null]
-		if(!CollectionUtils.isEmpty(userAuthList) && userAuthList.size() == 1 && userAuthList.get(0) == null) {
-			userAuthList.remove(0);
-		}
 		return userAuthList;
 	}
 

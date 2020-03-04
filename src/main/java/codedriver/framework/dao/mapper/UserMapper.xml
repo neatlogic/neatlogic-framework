@@ -130,6 +130,13 @@
 		FROM `user_authority`
 		WHERE `user_id` = #{userId}
 	</select>
+	
+	<select id="searchUserAllAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
+		SELECT auth_group authGroup,CONCAT(auth_group,'#',auth) AS auth FROM `user_role` ur 
+		LEFT JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` WHERE ur.`user_id` = #{userId}
+		UNION
+		SELECT auth_group authGroup,CONCAT(auth_group,'#',auth) AS auth FROM `user_authority` WHERE user_id = #{userId}
+	</select>
 
 	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo">
 		SELECT

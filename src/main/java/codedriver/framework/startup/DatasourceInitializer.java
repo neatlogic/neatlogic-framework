@@ -20,7 +20,9 @@ public class DatasourceInitializer {
 	private DatasourceMapper datasourceMapper;
 
 	@Autowired
-	private CodeDriverRoutingDataSource datasouce;
+	private CodeDriverRoutingDataSource datasource;
+
+	private static CodeDriverRoutingDataSource instance;
 
 	@Resource(name = "dataSourceMaster")
 	private CodeDriverBasicDataSource masterDatasource;
@@ -46,13 +48,25 @@ public class DatasourceInitializer {
 				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}
 		}
+		if (instance == null && datasource != null){
+			instance = datasource;
+		}
 		if (!datasourceMap.isEmpty()) {
-			datasouce.setTargetDataSources(datasourceMap);
+			datasource.setTargetDataSources(datasourceMap);
 			if (datasourceMap.containsKey("master")) {
-				datasouce.setDefaultTargetDataSource(datasourceMap.get("master"));
+				datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
 			}
-			datasouce.afterPropertiesSet();
+			datasource.afterPropertiesSet();
 		}
 	}
+
+	public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource){
+	    datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
+        instance.setTargetDataSources(datasourceMap);
+        if (datasourceMap.containsKey("master")) {
+            instance.setDefaultTargetDataSource(datasourceMap.get("master"));
+        }
+        instance.afterPropertiesSet();
+    }
 
 }

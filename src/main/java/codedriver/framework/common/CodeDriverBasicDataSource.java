@@ -4,12 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.techsure.passwd.rsa.Secret;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 
@@ -46,7 +45,7 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
 		String prefix = "{ENCRYPTED}";
 		if (password.startsWith(prefix)) {
 			password = password.substring(prefix.length());
-			password = Secret.decodeBase64AndDecrypt(password);
+			password = RC4Util.decrypt(password);
 		}
 		super.setPassword(password);
 	}

@@ -12,7 +12,21 @@ public class UserAuthVo extends BasePageVo {
     @EntityField(name = "权限组", type = ApiParamType.STRING)
     private String authGroup;
 
-    public String getUserId() {
+    
+    public UserAuthVo() {
+		
+	}
+    
+    public UserAuthVo(String _userId) {
+		this.userId = _userId;
+   	}
+    
+    public UserAuthVo(String _userId,String _auth) {
+		this.userId = _userId;
+		this.auth = _auth;
+   	}
+
+	public String getUserId() {
         return userId;
     }
 

@@ -6,7 +6,6 @@
 		<id property="uuid" column="uuid"/>
 		<result property="name" column="name"/>
 		<result property="sort" column="sort"/>
-		<result property="description" column="description"/>
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="userCount" column="userCount"/>
 		<collection property="tagList" ofType="codedriver.framework.dto.TagVo">
@@ -20,7 +19,6 @@
 		a.`uuid`,
 		a.`name`,
 		a.`sort`,
-		a.`description`,
 		a.`parent_uuid` as `parentUuid`,
 		COUNT(b.`user_id`) as `userCount`,
 		d.`id` as `tagId`,
@@ -50,7 +48,6 @@
 		a.`uuid`,
 		a.`name`,
 		a.`sort`,
-		a.`description`,
 		a.`parent_uuid` as `parentUuid`,
 		c.`id` as `tagId`,
 		c.`name` as `tagName`
@@ -80,12 +77,23 @@
 		`uuid`,
 		`name`,
 		`sort`,
-		`description`,
 		`parent_uuid`
 		FROM
 		`team`
 		WHERE
 		uuid = #{value}
+	</select>
+
+	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`parent_uuid`
+		FROM
+		`team`
+		WHERE
+		parent_uuid = #{value}
 	</select>
 
 	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
@@ -105,7 +113,6 @@
 		`uuid`,
 		`name`,
 		`sort`,
-		`description`,
 		`parent_uuid`
 		FROM
 		`team`
@@ -120,13 +127,11 @@
 		`uuid`,
 		`name`,
 		`sort`,
-		`description`,
 		`parent_uuid`
 		) VALUES (
 		#{uuid},
-		#{name, typeHandler=XssHandler},
+		#{name},
 		#{sort},
-		#{description, typeHandler=XssHandler},
 		#{parentUuid}
 		)
 	</insert>
@@ -144,9 +149,8 @@
 	<update id="updateTeamByUuid" parameterType="codedriver.framework.dto.TeamVo">
 		UPDATE `team`
 		SET
-		`name` = #{name, typeHandler=XssHandler},
+		`name` = #{name},
 		`sort` = #{sort},
-		`description` = #{description, typeHandler=XssHandler},
 		`parent_uuid` = #{parentUuid}
 		WHERE `uuid` = #{uuid}
 	</update>
@@ -154,7 +158,7 @@
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
 		UPDATE 	`team`
 		SET
-		`name` = #{name, typeHandler=XssHandler}
+		`name` = #{name}
 		WHERE `uuid` = #{uuid}
 	</update>
 

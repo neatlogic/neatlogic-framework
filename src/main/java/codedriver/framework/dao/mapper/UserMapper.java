@@ -2,10 +2,10 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
-import codedriver.framework.dto.RoleAuthVo;
-import codedriver.framework.dto.UserAuthVo;
 import org.apache.ibatis.annotations.Param;
 
+import codedriver.framework.dto.RoleAuthVo;
+import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 
@@ -24,6 +24,8 @@ public interface UserMapper {
 	public List<UserVo> searchUser(UserVo userVo);
 
 	public List<UserAuthVo> searchUserAuthByUserId(String userId);
+	
+	public List<UserAuthVo> searchUserAllAuthByUserId(String userId);
 
 	public List<RoleAuthVo> searchUserRoleAuthByUserId(String userId);
 

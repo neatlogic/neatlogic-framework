@@ -18,9 +18,6 @@ public class TeamVo extends BasePageVo {
 	@EntityField(name = "分组名称",
 			type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "分组描述",
-			type = ApiParamType.STRING)
-	private String description;
 	@EntityField(name = "父分组uuid",
 			type = ApiParamType.STRING)
 	private String parentUuid;
@@ -63,14 +60,6 @@ public class TeamVo extends BasePageVo {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public int getSort() {

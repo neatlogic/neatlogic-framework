@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
+	<select id="getDashboardWidgetByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`refresh_interval` AS refreshInterval,
+		`description`,
+		`dashboard_uuid` AS dashboardUuid,
+		`handler`,
+		`chart_type` AS  chartType,
+		`condition_config` AS conditionConfig,
+		`chart_config` AS chartConfig,
+		`position`,
+		`fcd`,
+		`fcu`,
+		`lcd`,
+		`lcu`
+		FROM
+		`dashboard_widget`
+		WHERE
+		uuid = #{value}
+	</select>
+
+	<select id="getDashboardByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`description`,
+		`is_active` AS isActive,
+		`fcd`,
+		`fcu`,
+		`lcd`,
+		`lcu`
+		FROM
+		`dashboard`
+		WHERE
+		`uuid` = #{value}
+	</select>
+
+	<select id="getDashboardWidgetByDashboardUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`refresh_interval` AS refreshInterval,
+		`description`,
+		`dashboard_uuid` AS dashboardUuid,
+		`handler`,
+		`chart_type` AS chartType,
+		`position`,
+		`fcd`,
+		`fcu`,
+		`lcd`,
+		`lcu`
+		FROM
+		`dashboard_widget`
+		WHERE
+		dashboard_uuid = #{value}
+	</select>
+</mapper>

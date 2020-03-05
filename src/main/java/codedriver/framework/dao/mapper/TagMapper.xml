@@ -18,6 +18,9 @@
 	</select>
 
 	<insert id="insertTag" parameterType="codedriver.framework.dto.TagVo">
+		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+			select LAST_INSERT_ID() as id
+		</selectKey>
 		INSERT INTO `tag`(
 			`name`
 		) VALUES (

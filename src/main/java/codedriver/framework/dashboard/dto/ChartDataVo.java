@@ -12,10 +12,12 @@ import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ChartDataVo {
-	@EntityField(name = "值字段列表", type = ApiParamType.JSONARRAY)
-	private List<String> valueFieldList;
+	@EntityField(name = "值字段名称", type = ApiParamType.STRING)
+	private String valueField;
 	@EntityField(name = "图例字段名称", type = ApiParamType.STRING)
 	private String legendField;
+	@EntityField(name = "分组字段名称", type = ApiParamType.STRING)
+	private String groupField;
 	@EntityField(name = "数据集", type = ApiParamType.JSONARRAY)
 	private JSONArray dataList;
 	@EntityField(name = "图表配置", type = ApiParamType.JSONOBJECT)
@@ -36,15 +38,6 @@ public class ChartDataVo {
 		dataList.add(data);
 	}
 
-	public void addValueField(String valueField) {
-		if (StringUtils.isNotBlank(valueField)) {
-			if (valueFieldList == null) {
-				valueFieldList = new ArrayList<>();
-			}
-			valueFieldList.add(valueField);
-		}
-	}
-
 	public String getLegendField() {
 		return legendField;
 	}
@@ -61,11 +54,19 @@ public class ChartDataVo {
 		this.configObj = configObj;
 	}
 
-	public List<String> getValueFieldList() {
-		return valueFieldList;
+	public String getValueField() {
+		return valueField;
 	}
 
-	public void setValueFieldList(List<String> valueFieldList) {
-		this.valueFieldList = valueFieldList;
+	public void setValueField(String valueField) {
+		this.valueField = valueField;
+	}
+
+	public String getGroupField() {
+		return groupField;
+	}
+
+	public void setGroupField(String groupField) {
+		this.groupField = groupField;
 	}
 }

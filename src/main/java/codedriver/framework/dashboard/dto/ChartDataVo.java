@@ -1,5 +1,10 @@
 package codedriver.framework.dashboard.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -7,8 +12,8 @@ import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ChartDataVo {
-	@EntityField(name = "值字段名称", type = ApiParamType.STRING)
-	private String valueField;
+	@EntityField(name = "值字段列表", type = ApiParamType.JSONARRAY)
+	private List<String> valueFieldList;
 	@EntityField(name = "图例字段名称", type = ApiParamType.STRING)
 	private String legendField;
 	@EntityField(name = "数据集", type = ApiParamType.JSONARRAY)
@@ -31,12 +36,13 @@ public class ChartDataVo {
 		dataList.add(data);
 	}
 
-	public String getValueField() {
-		return valueField;
-	}
-
-	public void setValueField(String valueField) {
-		this.valueField = valueField;
+	public void addValueField(String valueField) {
+		if (StringUtils.isNotBlank(valueField)) {
+			if (valueFieldList == null) {
+				valueFieldList = new ArrayList<>();
+			}
+			valueFieldList.add(valueField);
+		}
 	}
 
 	public String getLegendField() {
@@ -53,5 +59,13 @@ public class ChartDataVo {
 
 	public void setConfigObj(JSONObject configObj) {
 		this.configObj = configObj;
+	}
+
+	public List<String> getValueFieldList() {
+		return valueFieldList;
+	}
+
+	public void setValueFieldList(List<String> valueFieldList) {
+		this.valueFieldList = valueFieldList;
 	}
 }

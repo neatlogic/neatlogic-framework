@@ -7,7 +7,6 @@
 		<result property="name" column="name"/>
 		<result property="sort" column="sort"/>
 		<result property="parentUuid" column="parentUuid"/>
-		<result property="userCount" column="userCount"/>
 		<collection property="tagList" ofType="codedriver.framework.dto.TagVo">
 			<id property="id" column="tagId"/>
 			<result property="name" column="tagName"/>
@@ -20,7 +19,6 @@
 		a.`name`,
 		a.`sort`,
 		a.`parent_uuid` as `parentUuid`,
-		COUNT(b.`user_id`) as `userCount`,
 		d.`id` as `tagId`,
 		d.`name` as `tagName`
 		FROM
@@ -36,7 +34,6 @@
 		<if test="parentUuid != null and parentUuid != ''">
 			and a.`parent_uuid` = #{parentUuid}
 		</if>
-		GROUP BY a.uuid
 		ORDER BY `sort`
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}

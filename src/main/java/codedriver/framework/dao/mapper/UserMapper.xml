@@ -131,11 +131,17 @@
 		WHERE `user_id` = #{userId}
 	</select>
 	
-	<select id="searchUserAllAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
-		SELECT auth_group authGroup,CONCAT(auth_group,'#',auth) AS auth FROM `user_role` ur 
-		JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` WHERE ur.`user_id` = #{userId}
+	<select id="searchUserAllAuthByUserAuth" parameterType="codedriver.framework.dto.UserAuthVo" resultType="codedriver.framework.dto.UserAuthVo">
+		SELECT auth_group authGroup,auth FROM `user_role` ur 
+		JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` WHERE ur.`user_id` = #{userId} 
+		<if test="auth != null and auth != ''">
+			AND `auth` = #{auth}
+		</if>
 		UNION
-		SELECT auth_group authGroup,CONCAT(auth_group,'#',auth) AS auth FROM `user_authority` WHERE user_id = #{userId}
+		SELECT auth_group authGroup,auth FROM `user_authority` WHERE user_id = #{userId}
+		<if test="auth != null and auth != ''">
+			AND `auth` = #{auth}
+		</if>
 	</select>
 
 	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo">

@@ -141,6 +141,16 @@
 		#{parentUuid}
 		)
 	</insert>
+	
+	<insert id="insertTeamUser">
+		INSERT INTO `user_team` (
+		`team_uuid`,
+		`user_id`
+		) VALUES (
+		#{teamUuid},
+		#{userId}
+		)
+	</insert>
 
 	<insert id="insertTeamTag" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team_tag`(

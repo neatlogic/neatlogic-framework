@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
@@ -122,5 +123,14 @@ public class LoginController {
 		} finally {
 			tenantContext.release();
 		}
+	}
+	
+	
+	@RequestMapping(value = "/init/check/{tenant}")
+	public void checkTenant(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(!TenantUtil.hasTenant(tenant)) {
+			ReturnJson.error("租户" + tenant + "不存在或已被禁用",response);
+		}
+		ReturnJson.success(response);
 	}
 }

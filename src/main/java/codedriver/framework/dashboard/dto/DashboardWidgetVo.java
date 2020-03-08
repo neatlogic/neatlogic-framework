@@ -27,6 +27,8 @@ public class DashboardWidgetVo {
 	private transient String chartConfig;
 	private transient JSONObject conditionConfigObj;
 	private transient JSONObject chartConfigObj;
+	@EntityField(name = "明细组件uuid", type = ApiParamType.STRING)
+	private String detailWidgetUuid;
 	@EntityField(name = "组件位置信息", type = ApiParamType.STRING)
 	private String position;
 	@EntityField(name = "组件创建时间", type = ApiParamType.LONG)
@@ -173,5 +175,13 @@ public class DashboardWidgetVo {
 
 	public void setChartConfigObj(JSONObject chartConfigObj) {
 		this.chartConfigObj = chartConfigObj;
+	}
+
+	public String getDetailWidgetUuid() {
+		return detailWidgetUuid;
+	}
+
+	public void setDetailWidgetUuid(String detailWidgetUuid) {
+		this.detailWidgetUuid = detailWidgetUuid;
 	}
 }

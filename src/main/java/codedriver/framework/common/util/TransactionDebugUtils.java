@@ -10,8 +10,6 @@ import java.lang.reflect.InvocationTargetException;
  * @Description: 用于检查事务是否启动
  */
 public class TransactionDebugUtils {
-	private static final boolean transactionDebugging = true;
-	private static final boolean verboseTransactionDebugging = true;
 
 	// Some guidance from:
 	// http://java.dzone.com/articles/monitoring-declarative-transac?page=0,1

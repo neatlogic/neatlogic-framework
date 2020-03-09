@@ -2,6 +2,7 @@ package codedriver.framework.reminder.dao.mapper;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageSearchVo;
+import codedriver.framework.reminder.dto.param.ReminderHistoryParamVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -19,6 +20,13 @@ public interface GlobalReminderMessageMapper {
     * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.GlobalReminderMessageVo>  
     */ 
     List<GlobalReminderMessageVo> getShowReminderMessageListByIdListAndUserId(ReminderMessageSearchVo searchVo);
+
+    /**
+    * @Description: 获取指定实时动态历史消息
+    * @Param: [paramVo]
+    * @return: java.util.List<codedriver.framework.reminder.dto.GlobalReminderMessageVo>
+    */
+    List<GlobalReminderMessageVo> getReminderHistoryMessageList(ReminderHistoryParamVo paramVo);
 
     /** 
     * @Description: 定时获取最新消息 

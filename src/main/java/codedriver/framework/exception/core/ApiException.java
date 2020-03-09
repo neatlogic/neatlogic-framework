@@ -1,6 +1,7 @@
 package codedriver.framework.exception.core;
 
 public class ApiException extends Exception {
+	private static final long serialVersionUID = 9163793348080280240L;
 	private String errorCode;
 
 	public ApiException() {

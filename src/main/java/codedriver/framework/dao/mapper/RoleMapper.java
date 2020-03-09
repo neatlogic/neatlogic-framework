@@ -5,7 +5,6 @@ import java.util.List;
 import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.dto.UserVo;
-import org.apache.ibatis.annotations.Param;
 
 
 public interface RoleMapper {

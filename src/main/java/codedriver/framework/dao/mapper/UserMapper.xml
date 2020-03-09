@@ -93,12 +93,7 @@
         SELECT
         DISTINCT (a.`user_id`)
         FROM
-        (
-        SELECT * FROM `user`
-        <if test="needPage == true">LIMIT #{startNum}, #{pageSize}
-        </if
-        >
-        ) a
+       `user` a
         LEFT JOIN user_role b ON a.user_id = b.user_id
         LEFT JOIN user_team c ON a.user_id = c.user_id
         LEFT JOIN team d ON c.team_uuid = d.uuid
@@ -122,6 +117,9 @@
         <if test="roleName != null and roleName != ''">
             AND b.`role_name` = #{roleName}
         </if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
         ) g
         LEFT JOIN `user` k ON g.`user_id` = k.`user_id`
         LEFT JOIN `user_role` h ON g.user_id = h.`user_id`

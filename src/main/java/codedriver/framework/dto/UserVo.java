@@ -3,6 +3,7 @@ package codedriver.framework.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
@@ -114,7 +115,7 @@ public class UserVo extends BasePageVo {
 	}
 
 	public List<String> getTeamNameList() {
-		if (teamList != null && teamList.size() > 0){
+		if (CollectionUtils.isNotEmpty(teamList)){
 			List<String> arrayList = new ArrayList<>();
 			for (TeamVo teamVo : teamList){
 				arrayList.add(teamVo.getName());

@@ -58,6 +58,72 @@
 
     </select>
 
+    <select id="getReminderHistoryMessageCount" parameterType="codedriver.framework.reminder.dto.param.ReminderHistoryParamVo" resultType="Integer">
+        SELECT
+        COUNT(DISTINCT (b.`id`))
+        FROM `reminder_message_user` a
+        LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
+        LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
+        LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
+        LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
+        WHERE
+        e.`id` IS NOT null
+        AND a.`user_id` = #{userId}
+        AND b.`plugin_id` IN (
+        SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
+        )
+        AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
+        AND UNIX_TIMESTAMP(b.`create_time`) &gt;= UNIX_TIMESTAMP(#{startTime})
+        <if test="pluginIdList != null and pluginIdList.size > 0">
+            AND b.`plugin_id` IN
+            <foreach collection="pluginIdList" open="(" separator="," close=")" item="pluginId">
+                #{pluginId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getReminderHistoryMessageList" parameterType="codedriver.framework.reminder.dto.param.ReminderHistoryParamVo" resultMap="messageMap">
+        SELECT
+        b.`id` as `id`,
+        a.`is_new` as `isNew`,
+        a.`is_keep` as `isKeep`,
+        a.`user_id` as `userId`,
+        c.`user_name` as `userName`,
+        b.`title`,
+        g.`content`,
+        b.`param` as `messageParam`,
+        b.`plugin_id` as `pluginId`,
+        DATE_FORMAT(b.`create_time`, '%Y-%m-%d %H:%i:%s') AS createTime,
+        b.`from_user` as `fromUserName`,
+        e.`id` as `subscribeId`,
+        e.`param` as `param`,
+        (SELECT `user_name` FROM `user` WHERE `user_id` = #{userId}) as `userName`,
+        (#{userId}) as `userId`
+        FROM `reminder_message_user` a
+        LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
+        LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
+        LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
+        LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
+        WHERE
+        e.`id` IS NOT null
+        AND a.`user_id` = #{userId}
+        AND b.`plugin_id` IN (
+        SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
+        )
+        AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
+        AND UNIX_TIMESTAMP(b.`create_time`) &gt;= UNIX_TIMESTAMP(#{startTime})
+        <if test="pluginIdList != null and pluginIdList.size > 0">
+            AND b.`plugin_id` IN
+            <foreach collection="pluginIdList" open="(" separator="," close=")" item="pluginId">
+                #{pluginId}
+            </foreach>
+        </if>
+        ORDER BY a.`reminder_message_id` desc
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
     <select id="getReminderMessageCountByDay" parameterType="codedriver.framework.reminder.dto.ReminderMessageSearchVo" resultType="java.lang.Integer">
         SELECT COUNT(a.reminder_message_id)
         FROM `reminder_message_user` a

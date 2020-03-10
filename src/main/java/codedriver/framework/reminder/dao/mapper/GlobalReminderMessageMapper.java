@@ -28,6 +28,13 @@ public interface GlobalReminderMessageMapper {
     */
     List<GlobalReminderMessageVo> getReminderHistoryMessageList(ReminderHistoryParamVo paramVo);
 
+    /**
+    * @Description:  获取指定实时动态历史消息数目
+    * @Param: [paramVo]
+    * @return: int
+    */
+    int getReminderHistoryMessageCount(ReminderHistoryParamVo paramVo);
+
     /** 
     * @Description: 定时获取最新消息 
     * @Param: [userId] 

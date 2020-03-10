@@ -34,10 +34,10 @@
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
 		<collection property="roleNameList" ofType="java.lang.String">
-			<result property="roleName" column="roleName" />
+			<id property="roleName" column="roleName" />
 		</collection>
 		<collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
-			<result property="uuid" column="teamUuid" />
+			<id property="uuid" column="teamUuid" />
 			<result property="name" column="teamName" />
 		</collection>
 	</resultMap>
@@ -78,50 +78,55 @@
 		</foreach>
 	</select>
 
-	<select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap">
-		SELECT
-		a.`user_id` as userId,
-		a.`user_name` as userName,
-		a.`email`,
-		a.`phone`,
-		a.`pinyin`,
-		a.`is_active` as isActive,
-		b.role_name as roleName,
-		c.team_uuid as teamUuid,
-		d.name as teamName
-		FROM
-		(
-			SELECT * FROM `user`
-			<if test="needPage == true">
-				LIMIT #{startNum}, #{pageSize}
-			</if>
-		) a
-		LEFT JOIN user_role b ON a.user_id = b.user_id
-		LEFT JOIN user_team c ON a.user_id = c.user_id
-		LEFT JOIN team d ON c.team_uuid = d.uuid
-		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
-		LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
-		WHERE
-		1=1
-		<if test="keyword !=null and keyword != ''">
-			AND
-			(a.user_id LIKE CONCAT(#{keyword}, '%')
-			OR a.user_name LIKE CONCAT(#{keyword}, '%'))
+    <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap">
+        SELECT
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        h.`role_name` as `roleName`,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
+        FROM (
+        SELECT
+        DISTINCT (a.`user_id`)
+        FROM
+       `user` a
+        LEFT JOIN user_role b ON a.user_id = b.user_id
+        LEFT JOIN user_team c ON a.user_id = c.user_id
+        LEFT JOIN team d ON c.team_uuid = d.uuid
+        LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
+        WHERE
+        1=1
+        <if test="keyword !=null and keyword != ''">
+            AND
+            (a.user_id LIKE CONCAT(#{keyword}, '%')
+            OR a.user_name LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        <if test="teamUuid != null and teamUuid != ''">
+            AND c.`team_uuid` = #{teamUuid}
+        </if>
+        <if test="authGroup != null and authGroup != ''">
+            AND f.`auth_group` = #{authGroup}
+        </if>
+        <if test="auth != null and auth != ''">
+            AND f.`auth` = #{auth}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            AND b.`role_name` = #{roleName}
+        </if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
 		</if>
-		<if test="teamUuid != null and teamUuid != ''">
-			AND c.`team_uuid` = #{teamUuid}
-		</if>
-		<if test="authGroup != null and authGroup != ''">
-			AND f.`auth_group` = #{authGroup}
-		</if>
-		<if test="auth != null and auth != ''">
-			AND f.`auth` = #{auth}
-		</if>
-		<if test="roleName != null and roleName != ''">
-			AND b.`role_name` = #{roleName}
-		</if>
-		ORDER BY a.user_id
-	</select>
+        ) g
+        LEFT JOIN `user` k ON g.`user_id` = k.`user_id`
+        LEFT JOIN `user_role` h ON g.user_id = h.`user_id`
+        LEFT JOIN `user_team` i ON g.`user_id` = i.`user_id`
+        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+        ORDER BY g.user_id
+    </select>
 
 	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
 		SELECT `user_id` as `userId`,

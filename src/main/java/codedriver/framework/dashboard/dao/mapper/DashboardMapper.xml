@@ -286,7 +286,7 @@
 	<insert id="insertDashboardDefault">
 		INSERT INTO `dashboard_userdefault` (`dashboard_uuid`, `user_id`)
 		VALUES
-		('dashboard_uuid', 'user_id')
+		(#{dashboardUuid}, #{userId})
 	</insert>
 
 	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">

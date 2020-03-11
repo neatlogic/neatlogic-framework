@@ -1,7 +1,9 @@
 package codedriver.framework.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
@@ -37,6 +39,7 @@ public class UserVo extends BasePageVo {
 	private List<String> roleNameList;
 	private List<RoleVo> roleList;
 	private List<String> teamUuidList;
+	private List<String> teamNameList;
 	private List<TeamVo> teamList;
 	private List<UserAuthVo> userAuthList;
 
@@ -109,6 +112,21 @@ public class UserVo extends BasePageVo {
 			}
 		}
 		return this.pinyin;
+	}
+
+	public List<String> getTeamNameList() {
+		if (CollectionUtils.isNotEmpty(teamList)){
+			List<String> arrayList = new ArrayList<>();
+			for (TeamVo teamVo : teamList){
+				arrayList.add(teamVo.getName());
+			}
+			return arrayList;
+		}
+		return teamNameList;
+	}
+
+	public void setTeamNameList(List<String> teamNameList) {
+		this.teamNameList = teamNameList;
 	}
 
 	public void setPinyin(String pinyin) {

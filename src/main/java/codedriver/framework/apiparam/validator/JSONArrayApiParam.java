@@ -1,7 +1,5 @@
 package codedriver.framework.apiparam.validator;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import com.alibaba.fastjson.JSONArray;
 
 import codedriver.framework.apiparam.core.ApiParamBase;
@@ -18,8 +16,8 @@ public class JSONArrayApiParam extends ApiParamBase {
 	@Override
 	public boolean validate(Object param, String rule) {
 		try {
-			JSONArray jsonArray= JSONArray.parseArray(param.toString());
-			return CollectionUtils.isNotEmpty(jsonArray);
+			JSONArray.parseArray(param.toString());
+			return true;
 		} catch (Exception ex) {
 			return false;
 		}

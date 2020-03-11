@@ -2,6 +2,8 @@ package codedriver.framework.reminder.dto.param;
 
 import codedriver.framework.common.dto.BasePageVo;
 
+import java.util.List;
+
 /**
  * @program: codedriver
  * @description: 实时动态历史查询Vo
@@ -12,6 +14,7 @@ public class ReminderHistoryParamVo extends BasePageVo {
     private String startTime;
     private String endTime;
     private String userId;
+    private List<String> pluginIdList;
 
     public String getModuleId() {
         return moduleId;
@@ -43,5 +46,13 @@ public class ReminderHistoryParamVo extends BasePageVo {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public List<String> getPluginIdList() {
+        return pluginIdList;
+    }
+
+    public void setPluginIdList(List<String> pluginIdList) {
+        this.pluginIdList = pluginIdList;
     }
 }

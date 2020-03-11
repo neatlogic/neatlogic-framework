@@ -98,6 +98,7 @@
         LEFT JOIN user_team c ON a.user_id = c.user_id
         LEFT JOIN team d ON c.team_uuid = d.uuid
         LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
+		LEFT JOIN `role_authority` l ON b.`role_name` = l.`role_name`
         WHERE
         1=1
         <if test="keyword !=null and keyword != ''">
@@ -112,7 +113,7 @@
             AND f.`auth_group` = #{authGroup}
         </if>
         <if test="auth != null and auth != ''">
-            AND f.`auth` = #{auth}
+            AND f.`auth` = #{auth} OR l.`auth` = #{auth}
         </if>
         <if test="roleName != null and roleName != ''">
             AND b.`role_name` = #{roleName}

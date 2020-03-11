@@ -58,7 +58,31 @@
 
     </select>
 
-    <select id="getReminderHistoryMessageList" parameterType="codedriver.framework.reminder.dto.param.ReminderHistoryParamVo">
+    <select id="getReminderHistoryMessageCount" parameterType="codedriver.framework.reminder.dto.param.ReminderHistoryParamVo" resultType="Integer">
+        SELECT
+        COUNT(DISTINCT (b.`id`))
+        FROM `reminder_message_user` a
+        LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
+        LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
+        LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
+        LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
+        WHERE
+        e.`id` IS NOT null
+        AND a.`user_id` = #{userId}
+        AND b.`plugin_id` IN (
+        SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
+        )
+        AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
+        AND UNIX_TIMESTAMP(b.`create_time`) &gt;= UNIX_TIMESTAMP(#{startTime})
+        <if test="pluginIdList != null and pluginIdList.size > 0">
+            AND b.`plugin_id` IN
+            <foreach collection="pluginIdList" open="(" separator="," close=")" item="pluginId">
+                #{pluginId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getReminderHistoryMessageList" parameterType="codedriver.framework.reminder.dto.param.ReminderHistoryParamVo" resultMap="messageMap">
         SELECT
         b.`id` as `id`,
         a.`is_new` as `isNew`,
@@ -80,17 +104,19 @@
         LEFT JOIN `user` c ON a.`user_id` = c.`user_id`
         LEFT JOIN `reminder_message_content` g ON b.`id` = g.`reminder_message_id`
         LEFT JOIN  (SELECT * FROM `reminder_subscribe` WHERE `user_id` = #{userId}) e ON b.`plugin_id` = e.`plugin_id`
-        LEFT JOIN `reminder` f ON b.`plugin_id` = f.`plugin_id`
         WHERE
-        AND e.`id` IS NOT null
+        e.`id` IS NOT null
         AND a.`user_id` = #{userId}
         AND b.`plugin_id` IN (
         SELECT `plugin_id` FROM `reminder_subscribe` WHERE `user_id` = #{userId}
         )
         AND UNIX_TIMESTAMP(b.`create_time`) &lt; UNIX_TIMESTAMP(#{endTime})
         AND UNIX_TIMESTAMP(b.`create_time`) &gt;= UNIX_TIMESTAMP(#{startTime})
-        <if test="moduleId != null and moduleId != ''">
-            AND f.`module_id` = #{moduleId}
+        <if test="pluginIdList != null and pluginIdList.size > 0">
+            AND b.`plugin_id` IN
+            <foreach collection="pluginIdList" open="(" separator="," close=")" item="pluginId">
+                #{pluginId}
+            </foreach>
         </if>
         ORDER BY a.`reminder_message_id` desc
         <if test="needPage == true">

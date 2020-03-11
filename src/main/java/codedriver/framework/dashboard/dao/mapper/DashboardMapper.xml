@@ -1,7 +1,134 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
-	
+	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
+		SELECT
+		`dashboard_uuid` AS dashboardUuid,
+		`user_id` AS userId,
+		`visit_count` AS visitCount
+		FROM
+		`dashboard_visitcounter`
+		WHERE
+		`dashboard_uuid` = #{dashboardUuid} AND
+		`user_id` = #{userId}
+	</select>
+
+	<select id="getDashboardRoleByDashboardUuid" resultType="java.lang.String">
+		SELECT
+		DISTINCT b.`action`
+		FROM
+		`dashboard_role` b
+		WHERE b.`dashboard_uuid` = #{dashboardUuid}
+		AND (
+		b.user_id = #{userId}
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		`user_team` ut
+		WHERE ut.user_id = #{userId}
+		AND ut.`team_uuid` = b.team_uuid)
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		user_role ur
+		WHERE ur.`user_id` = #{userId}
+		AND ur.`role_name` = b.role_name)
+		)
+	</select>
+
+	<sql id="searchDashboardCondition">
+		SELECT
+		a.*
+		FROM
+		`dashboard` a
+		WHERE a.fcu = #{fcu}
+		<if test="keyword!=null and keyword!=''">
+			AND a.name LIKE concat('%',#{keyword},'%')
+		</if>
+		<if test="type == 'all'">
+			UNION
+			SELECT
+			a.*
+			FROM
+			`dashboard` a
+			JOIN `dashboard_role` b
+			WHERE a.`uuid` = b.dashboard_uuid
+			AND (
+			b.user_id = #{fcu}
+			OR EXISTS
+			(SELECT
+			1
+			FROM
+			`user_team` ut
+			WHERE ut.user_id = #{fcu}
+			AND ut.`team_uuid` = b.team_uuid)
+			OR EXISTS
+			(SELECT
+			1
+			FROM
+			user_role ur
+			WHERE ur.`user_id` = #{fcu}
+			AND ur.`role_name` = b.role_name)
+			)
+			<if test="keyword!=null and keyword!=''">
+				WHERE a.name LIKE concat('%',#{keyword},'%')
+			</if>
+		</if>
+	</sql>
+
+	<select id="searchDashboardCount" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
+		SELECT
+		count(DISTINCT `uuid`)
+		FROM (
+		<include refid="searchDashboardCondition" />
+		) tmp
+	</select>
+
+	<select id="searchDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="codedriver.framework.dashboard.dto.DashboardVo">
+		SELECT
+		DISTINCT
+		`uuid`,
+		`name`,
+		description,
+		is_active AS isActive,
+		fcu,
+		fcd
+		FROM (
+		<include refid="searchDashboardCondition" />
+		) tmp
+		ORDER BY fcd DESC
+		LIMIT #{startNum}, #{pageSize}
+	</select>
+
+	<select id="searchTopVisitDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="codedriver.framework.dashboard.dto.DashboardVo">
+		SELECT
+		DISTINCT
+		`uuid`,
+		`name`,
+		description,
+		is_active AS isActive,
+		fcu,
+		fcd,
+		b.visit_count
+		FROM (
+		<include refid="searchDashboardCondition" />
+		) tmp LEFT JOIN dashboard_visitcounter b ON tmp.uuid = b.dashboard_uuid AND b.user_id = #{fcu}
+		ORDER BY b.visit_count DESC, fcd DESC
+		LIMIT #{pageSize}
+	</select>
+
+	<select id="checkDashboardNameIsExists" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		`dashboard`
+		WHERE uuid != #{uuid}
+		AND
+		name = #{name}
+	</select>
+
 	<select id="getDashboardWidgetByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
 		SELECT
 		`uuid`,
@@ -10,17 +137,17 @@
 		`description`,
 		`dashboard_uuid` AS dashboardUuid,
 		`handler`,
-		`chart_type` AS  chartType,
+		`chart_type` AS chartType,
 		`condition_config` AS conditionConfig,
 		`chart_config` AS chartConfig,
-		`position`,
-		`detail_widget_uuid` AS detailWidgetUuid,
-		`fcd`,
-		`fcu`,
-		`lcd`,
-		`lcu`
+		`x`,
+		`y`,
+		`i`,
+		`h`,
+		`w`,
+		`detail_widget_uuid` AS detailWidgetUuid
 		FROM
-		`dashboard_widget` 
+		`dashboard_widget`
 		WHERE
 		uuid = #{value}
 	</select>
@@ -50,15 +177,170 @@
 		`dashboard_uuid` AS dashboardUuid,
 		`handler`,
 		`chart_type` AS chartType,
-		`position`,
-		`detail_widget_uuid` AS detailWidgetUuid,
-		`fcd`,
-		`fcu`,
-		`lcd`,
-		`lcu`
+		`x`,
+		`y`,
+		`i`,
+		`h`,
+		`w`,
+		`detail_widget_uuid` AS detailWidgetUuid
 		FROM
 		`dashboard_widget`
 		WHERE
 		dashboard_uuid = #{value}
 	</select>
+
+	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
+		SELECT
+		`dashboard_uuid` AS dashboardUuid,
+		`user_id` AS userId,
+		`visit_count` AS visitCount
+		FROM
+		`dashboard_visitcounter`
+		WHERE
+		dashboard_uuid = #{dashboardUuid}
+		AND
+		user_id = #{userId}
+	</select>
+
+	<update id="updateDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
+		UPDATE
+		`dashboard`
+		SET
+		`name` = #{name},
+		`description` = #{description},
+		`is_active` = #{isActive},
+		`lcd` = NOW(),
+		`lcu` = #{lcu}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateDashboardVisitCounter" parameterType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
+		UPDATE
+		`dashboard_visitcounter`
+		SET
+		`visit_count` = `visit_count` + 1
+		WHERE `dashboard_uuid` = #{dashboardUuid}
+		AND `user_id` = #{userId}
+	</update>
+
+	<insert id="insertDashboardVisitCounter" parameterType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
+		INSERT INTO `dashboard_visitcounter` (
+		`dashboard_uuid`,
+		`user_id`,
+		`visit_count`
+		)
+		VALUES
+		(
+		#{dashboardUuid},
+		#{userId},
+		#{visitCount}
+		)
+	</insert>
+
+	<insert id="insertDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
+		INSERT INTO `dashboard` (
+		`uuid`,
+		`name`,
+		`description`,
+		`is_active`,
+		`fcd`,
+		`fcu`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{description},
+		#{isActive},
+		NOW(),
+		#{fcu}
+		)
+	</insert>
+
+	<insert id="insertDashboardWidget" parameterType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
+		INSERT INTO `dashboard_widget` (
+		`uuid`,
+		`name`,
+		`refresh_interval`,
+		`description`,
+		`dashboard_uuid`,
+		`handler`,
+		`chart_type`,
+		`condition_config`,
+		`chart_config`,
+		`detail_widget_uuid`,
+		`x`,
+		`y`,
+		`h`,
+		`w`,
+		`i`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{refreshInterval},
+		#{description},
+		#{dashboardUuid},
+		#{handler},
+		#{chartType},
+		#{conditionConfig},
+		#{chartConfig},
+		#{detailWidgetUuid},
+		#{x},
+		#{y},
+		#{h},
+		#{w},
+		#{i}
+		)
+	</insert>
+
+	<insert id="insertDashboardDefault">
+		INSERT INTO `dashboard_userdefault` (`dashboard_uuid`, `user_id`)
+		VALUES
+		('dashboard_uuid', 'user_id')
+	</insert>
+
+	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_widget`
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardDefaultUserByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_userdefault`
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardDefaultUser">
+		DELETE
+		FROM
+		`dashboard_userdefault`
+		WHERE `dashboard_uuid` = #{dashboardUuid}
+		AND `user_id` = #{userId}
+	</delete>
+
+	<delete id="deleteDashboardRoleByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_role`
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard`
+		WHERE `uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardVisitCounterByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_visitcounter`
+		WHERE `dashboard_uuid` = #{dashboardUuid}
+	</delete>
 </mapper>

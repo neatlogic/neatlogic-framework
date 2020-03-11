@@ -1,6 +1,5 @@
 package codedriver.framework.dashboard.dto;
 
-import java.util.Date;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,22 +22,24 @@ public class DashboardWidgetVo {
 	private String handler;
 	@EntityField(name = "组件图表类型", type = ApiParamType.STRING)
 	private String chartType;
+	@EntityField(name = "仪表板uuid", type = ApiParamType.STRING)
+	private String dashboardUuid;
 	private transient String conditionConfig;
 	private transient String chartConfig;
 	private transient JSONObject conditionConfigObj;
 	private transient JSONObject chartConfigObj;
 	@EntityField(name = "明细组件uuid", type = ApiParamType.STRING)
 	private String detailWidgetUuid;
-	@EntityField(name = "组件位置信息", type = ApiParamType.STRING)
-	private String position;
-	@EntityField(name = "组件创建时间", type = ApiParamType.LONG)
-	private Date fcd;
-	@EntityField(name = "组件创建人", type = ApiParamType.STRING)
-	private String fcu;
-	@EntityField(name = "组件修改时间", type = ApiParamType.LONG)
-	private Date lcd;
-	@EntityField(name = "组件修改人", type = ApiParamType.STRING)
-	private String lcu;
+	@EntityField(name = "x坐标", type = ApiParamType.INTEGER)
+	private int x;
+	@EntityField(name = "y坐标", type = ApiParamType.INTEGER)
+	private int y;
+	@EntityField(name = "索引", type = ApiParamType.INTEGER)
+	private int i;
+	@EntityField(name = "高度", type = ApiParamType.INTEGER)
+	private int h;
+	@EntityField(name = "宽度", type = ApiParamType.INTEGER)
+	private int w;
 
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
@@ -107,46 +108,6 @@ public class DashboardWidgetVo {
 		this.chartConfig = chartConfig;
 	}
 
-	public String getPosition() {
-		return position;
-	}
-
-	public void setPosition(String position) {
-		this.position = position;
-	}
-
-	public Date getFcd() {
-		return fcd;
-	}
-
-	public void setFcd(Date fcd) {
-		this.fcd = fcd;
-	}
-
-	public String getFcu() {
-		return fcu;
-	}
-
-	public void setFcu(String fcu) {
-		this.fcu = fcu;
-	}
-
-	public Date getLcd() {
-		return lcd;
-	}
-
-	public void setLcd(Date lcd) {
-		this.lcd = lcd;
-	}
-
-	public String getLcu() {
-		return lcu;
-	}
-
-	public void setLcu(String lcu) {
-		this.lcu = lcu;
-	}
-
 	public JSONObject getConditionConfigObj() {
 		if (conditionConfigObj == null && StringUtils.isNotBlank(conditionConfig)) {
 			try {
@@ -183,5 +144,53 @@ public class DashboardWidgetVo {
 
 	public void setDetailWidgetUuid(String detailWidgetUuid) {
 		this.detailWidgetUuid = detailWidgetUuid;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public int getI() {
+		return i;
+	}
+
+	public void setI(int i) {
+		this.i = i;
+	}
+
+	public int getH() {
+		return h;
+	}
+
+	public void setH(int h) {
+		this.h = h;
+	}
+
+	public int getW() {
+		return w;
+	}
+
+	public void setW(int w) {
+		this.w = w;
+	}
+
+	public String getDashboardUuid() {
+		return dashboardUuid;
+	}
+
+	public void setDashboardUuid(String dashboardUuid) {
+		this.dashboardUuid = dashboardUuid;
 	}
 }

@@ -7,15 +7,18 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class DashboardVo {
+public class DashboardVo extends BasePageVo {
 	@EntityField(name = "仪表板uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "仪表板名称", type = ApiParamType.STRING)
 	private String name;
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
 	private int isActive;
+	@EntityField(name = "描述", type = ApiParamType.STRING)
+	private String description;
 	@EntityField(name = "仪表板创建时间", type = ApiParamType.LONG)
 	private Date fcd;
 	@EntityField(name = "仪表板创建人", type = ApiParamType.STRING)
@@ -26,6 +29,8 @@ public class DashboardVo {
 	private String lcu;
 	@EntityField(name = "仪表板组件列表", type = ApiParamType.JSONOBJECT)
 	private List<DashboardWidgetVo> widgetList;
+	@EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
+	private List<String> roleList;
 
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
@@ -92,5 +97,21 @@ public class DashboardVo {
 
 	public void setWidgetList(List<DashboardWidgetVo> widgetList) {
 		this.widgetList = widgetList;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<String> getRoleList() {
+		return roleList;
+	}
+
+	public void setRoleList(List<String> roleList) {
+		this.roleList = roleList;
 	}
 }

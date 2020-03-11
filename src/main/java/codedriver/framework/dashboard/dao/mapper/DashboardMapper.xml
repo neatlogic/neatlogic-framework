@@ -1,7 +1,121 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
-	
+	<select id="getDashboardRoleByDashboardUuid" resultType="java.lang.String">
+		SELECT
+		DISTINCT b.`action`
+		FROM
+		`dashboard_role` b
+		WHERE b.`dashboard_uuid` = #{dashboardUuid}
+		AND (
+		b.user_id = #{userId}
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		`user_team` ut
+		WHERE ut.user_id = #{userId}
+		AND ut.`team_uuid` = b.team_uuid)
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		user_role ur
+		WHERE ur.`user_id` = #{userId}
+		AND ur.`role_name` = b.role_name)
+		)
+	</select>
+
+	<select id="searchDashboardCount" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
+		SELECT
+		count(DISTINCT `uuid`)
+		FROM (
+		SELECT
+		a.*
+		FROM
+		`dashboard` a
+		WHERE a.fcu = #{fcu}
+		UNION
+		SELECT
+		a.*
+		FROM
+		`dashboard` a
+		JOIN `dashboard_role` b
+		WHERE a.`uuid` = b.dashboard_uuid
+		AND (
+		b.user_id = #{fcu}
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		`user_team` ut
+		WHERE ut.user_id = #{fcu}
+		AND ut.`team_uuid` = b.team_uuid)
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		user_role ur
+		WHERE ur.`user_id` = #{fcu}
+		AND ur.`role_name` = b.role_name)
+		)
+		) tmp
+	</select>
+
+	<select id="searchDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="codedriver.framework.dashboard.dto.DashboardVo">
+		SELECT
+		DISTINCT
+		`uuid`,
+		`name`,
+		description,
+		is_active AS isActive,
+		fcu,
+		fcd
+		FROM (
+		SELECT
+		a.*
+		FROM
+		`dashboard` a
+		WHERE a.fcu = #{fcu}
+		UNION
+		SELECT
+		a.*
+		FROM
+		`dashboard` a
+		JOIN `dashboard_role` b
+		WHERE a.`uuid` = b.dashboard_uuid
+		AND (
+		b.user_id = #{fcu}
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		`user_team` ut
+		WHERE ut.user_id = #{fcu}
+		AND ut.`team_uuid` = b.team_uuid)
+		OR EXISTS
+		(SELECT
+		1
+		FROM
+		user_role ur
+		WHERE ur.`user_id` = #{fcu}
+		AND ur.`role_name` = b.role_name)
+		)
+		) tmp
+		ORDER BY fcd DESC
+		LIMIT #{startNum}, #{pageSize}
+	</select>
+
+	<select id="checkDashboardNameIsExists" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
+		SELECT
+		count(1)
+		FROM
+		`dashboard`
+		WHERE uuid != #{uuid}
+		AND
+		name = #{name}
+	</select>
+
 	<select id="getDashboardWidgetByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
 		SELECT
 		`uuid`,
@@ -10,17 +124,17 @@
 		`description`,
 		`dashboard_uuid` AS dashboardUuid,
 		`handler`,
-		`chart_type` AS  chartType,
+		`chart_type` AS chartType,
 		`condition_config` AS conditionConfig,
 		`chart_config` AS chartConfig,
-		`position`,
-		`detail_widget_uuid` AS detailWidgetUuid,
-		`fcd`,
-		`fcu`,
-		`lcd`,
-		`lcu`
+		`x`,
+		`y`,
+		`i`,
+		`h`,
+		`w`,
+		`detail_widget_uuid` AS detailWidgetUuid
 		FROM
-		`dashboard_widget` 
+		`dashboard_widget`
 		WHERE
 		uuid = #{value}
 	</select>
@@ -50,15 +164,92 @@
 		`dashboard_uuid` AS dashboardUuid,
 		`handler`,
 		`chart_type` AS chartType,
-		`position`,
-		`detail_widget_uuid` AS detailWidgetUuid,
-		`fcd`,
-		`fcu`,
-		`lcd`,
-		`lcu`
+		`x`,
+		`y`,
+		`i`,
+		`h`,
+		`w`,
+		`detail_widget_uuid` AS detailWidgetUuid
 		FROM
 		`dashboard_widget`
 		WHERE
 		dashboard_uuid = #{value}
 	</select>
+
+	<update id="updateDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
+		UPDATE
+		`dashboard`
+		SET
+		`name` = #{name},
+		`description` = #{description},
+		`is_active` = #{isActive},
+		`lcd` = NOW(),
+		`lcu` = #{lcu}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<insert id="insertDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
+		INSERT INTO `dashboard` (
+		`uuid`,
+		`name`,
+		`description`,
+		`is_active`,
+		`fcd`,
+		`fcu`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{description},
+		#{isActive},
+		NOW(),
+		#{fcu}
+		)
+	</insert>
+
+	<insert id="insertDashboardWidget" parameterType="codedriver.framework.dashboard.dto.DashboardWidgetVo">
+		INSERT INTO `dashboard_widget` (
+		`uuid`,
+		`name`,
+		`refresh_interval`,
+		`description`,
+		`dashboard_uuid`,
+		`handler`,
+		`chart_type`,
+		`condition_config`,
+		`chart_config`,
+		`detail_widget_uuid`,
+		`x`,
+		`y`,
+		`h`,
+		`w`,
+		`i`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{refreshInterval},
+		#{description},
+		#{dashboardUuid},
+		#{handler},
+		#{chartType},
+		#{conditionConfig},
+		#{chartConfig},
+		#{detailWidgetUuid},
+		#{x},
+		#{y},
+		#{h},
+		#{w},
+		#{i}
+		)
+	</insert>
+
+	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_widget`
+		WHERE `dashboard_uuid` = #{uuid}
+	</delete>
 </mapper>

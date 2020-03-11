@@ -29,5 +29,11 @@ public interface DashboardMapper {
 
 	public int insertDashboardWidget(DashboardWidgetVo dashboardWidgetVo);
 
+	public int deleteDashboardByUuid(String dashboardUuid);
+
 	public int deleteDashboardWidgetByDashboardUuid(String dashboardUuid);
+
+	public int deleteDashboardRoleByDashboardUuid(String dashboardUuid);
+
+	public int deleteDashboardDefaultUserByDashboardUuid(String dashboardUuid);
 }

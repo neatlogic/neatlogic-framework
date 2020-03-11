@@ -26,39 +26,51 @@
 		)
 	</select>
 
-	<select id="searchDashboardCount" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
-		SELECT
-		count(DISTINCT `uuid`)
-		FROM (
+	<sql id="searchDashboardCondition">
 		SELECT
 		a.*
 		FROM
 		`dashboard` a
 		WHERE a.fcu = #{fcu}
-		UNION
+		<if test="keyword!=null and keyword!=''">
+			AND a.name LIKE concat('%',#{keyword},'%')
+		</if>
+		<if test="type == 'all'">
+			UNION
+			SELECT
+			a.*
+			FROM
+			`dashboard` a
+			JOIN `dashboard_role` b
+			WHERE a.`uuid` = b.dashboard_uuid
+			AND (
+			b.user_id = #{fcu}
+			OR EXISTS
+			(SELECT
+			1
+			FROM
+			`user_team` ut
+			WHERE ut.user_id = #{fcu}
+			AND ut.`team_uuid` = b.team_uuid)
+			OR EXISTS
+			(SELECT
+			1
+			FROM
+			user_role ur
+			WHERE ur.`user_id` = #{fcu}
+			AND ur.`role_name` = b.role_name)
+			)
+			<if test="keyword!=null and keyword!=''">
+				WHERE a.name LIKE concat('%',#{keyword},'%')
+			</if>
+		</if>
+	</sql>
+
+	<select id="searchDashboardCount" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="int">
 		SELECT
-		a.*
-		FROM
-		`dashboard` a
-		JOIN `dashboard_role` b
-		WHERE a.`uuid` = b.dashboard_uuid
-		AND (
-		b.user_id = #{fcu}
-		OR EXISTS
-		(SELECT
-		1
-		FROM
-		`user_team` ut
-		WHERE ut.user_id = #{fcu}
-		AND ut.`team_uuid` = b.team_uuid)
-		OR EXISTS
-		(SELECT
-		1
-		FROM
-		user_role ur
-		WHERE ur.`user_id` = #{fcu}
-		AND ur.`role_name` = b.role_name)
-		)
+		count(DISTINCT `uuid`)
+		FROM (
+		<include refid="searchDashboardCondition" />
 		) tmp
 	</select>
 
@@ -72,35 +84,7 @@
 		fcu,
 		fcd
 		FROM (
-		SELECT
-		a.*
-		FROM
-		`dashboard` a
-		WHERE a.fcu = #{fcu}
-		UNION
-		SELECT
-		a.*
-		FROM
-		`dashboard` a
-		JOIN `dashboard_role` b
-		WHERE a.`uuid` = b.dashboard_uuid
-		AND (
-		b.user_id = #{fcu}
-		OR EXISTS
-		(SELECT
-		1
-		FROM
-		`user_team` ut
-		WHERE ut.user_id = #{fcu}
-		AND ut.`team_uuid` = b.team_uuid)
-		OR EXISTS
-		(SELECT
-		1
-		FROM
-		user_role ur
-		WHERE ur.`user_id` = #{fcu}
-		AND ur.`role_name` = b.role_name)
-		)
+		<include refid="searchDashboardCondition" />
 		) tmp
 		ORDER BY fcd DESC
 		LIMIT #{startNum}, #{pageSize}
@@ -250,6 +234,27 @@
 		DELETE
 		FROM
 		`dashboard_widget`
-		WHERE `dashboard_uuid` = #{uuid}
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardDefaultUserByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_userdefault`
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardRoleByDashboardUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_role`
+		WHERE `dashboard_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteDashboardByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard`
+		WHERE `uuid` = #{value}
 	</delete>
 </mapper>

@@ -16,7 +16,7 @@ import org.springframework.util.ClassUtils;
 import com.google.common.util.concurrent.RateLimiter;
 
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.restful.annotation.IsActive;
+import codedriver.framework.restful.annotation.IsActived;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -94,7 +94,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActive.class) != null) {
+					if (targetClass.getAnnotation(IsActived.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);
@@ -144,7 +144,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActive.class) != null) {
+					if (targetClass.getAnnotation(IsActived.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);
@@ -193,7 +193,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
 					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActive.class) != null) {
+					if (targetClass.getAnnotation(IsActived.class) != null) {
 						apiVo.setIsActive(1);
 					} else {
 						apiVo.setIsActive(0);

@@ -11,6 +11,8 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class DashboardVo extends BasePageVo {
+	private transient String keyword;
+	private transient String type = "all";
 	@EntityField(name = "仪表板uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "仪表板名称", type = ApiParamType.STRING)
@@ -113,5 +115,21 @@ public class DashboardVo extends BasePageVo {
 
 	public void setRoleList(List<String> roleList) {
 		this.roleList = roleList;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

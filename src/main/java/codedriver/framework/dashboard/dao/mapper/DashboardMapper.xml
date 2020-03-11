@@ -189,18 +189,6 @@
 		dashboard_uuid = #{value}
 	</select>
 
-	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
-		SELECT
-		`dashboard_uuid` AS dashboardUuid,
-		`user_id` AS userId,
-		`visit_count` AS visitCount
-		FROM
-		`dashboard_visitcounter`
-		WHERE
-		dashboard_uuid = #{dashboardUuid}
-		AND
-		user_id = #{userId}
-	</select>
 
 	<update id="updateDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
 		UPDATE

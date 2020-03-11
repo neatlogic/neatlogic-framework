@@ -278,7 +278,7 @@ public class ApiValidateAndHelpBase {
 										JSONObject paramObj = new JSONObject();
 										paramObj.put("name", p.name());
 										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
-										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) ? "" : paramNamePrefix + "[0].";
+										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) ? "" : paramNamePrefix + "[n].";
 										JSONArray elementObjList = new JSONArray();
 										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
 											Annotation[] annotations = field.getDeclaredAnnotations();

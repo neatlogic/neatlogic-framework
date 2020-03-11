@@ -7,8 +7,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import codedriver.framework.exception.user.NoUserException;
 
 public class UserContext implements Serializable {
 	private static final long serialVersionUID = -578199115176786224L;
@@ -92,6 +96,13 @@ public class UserContext implements Serializable {
 	}
 
 	public String getUserId() {
+		return userId;
+	}
+
+	public String getUserId(boolean need) {
+		if (StringUtils.isBlank(userId)) {
+			throw new NoUserException();
+		}
 		return userId;
 	}
 

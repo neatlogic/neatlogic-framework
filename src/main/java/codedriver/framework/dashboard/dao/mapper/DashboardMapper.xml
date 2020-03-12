@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
+	<select id="getDefaultDashboardUuidByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT
+		`dashboard_uuid`
+		FROM
+		`dashboard_userdefault`
+		WHERE user_id = #{value}
+	</select>
+
 	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
 		SELECT
 		`dashboard_uuid` AS dashboardUuid,
@@ -94,7 +102,9 @@
 		description,
 		is_active AS isActive,
 		fcu,
-		fcd
+		fcd,
+		lcu,
+		lcd
 		FROM (
 		<include refid="searchDashboardCondition" />
 		) tmp
@@ -111,6 +121,8 @@
 		is_active AS isActive,
 		fcu,
 		fcd,
+		lcu,
+		lcd,
 		b.visit_count
 		FROM (
 		<include refid="searchDashboardCondition" />
@@ -189,18 +201,6 @@
 		dashboard_uuid = #{value}
 	</select>
 
-	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
-		SELECT
-		`dashboard_uuid` AS dashboardUuid,
-		`user_id` AS userId,
-		`visit_count` AS visitCount
-		FROM
-		`dashboard_visitcounter`
-		WHERE
-		dashboard_uuid = #{dashboardUuid}
-		AND
-		user_id = #{userId}
-	</select>
 
 	<update id="updateDashboard" parameterType="codedriver.framework.dashboard.dto.DashboardVo">
 		UPDATE
@@ -298,7 +298,7 @@
 	<insert id="insertDashboardDefault">
 		INSERT INTO `dashboard_userdefault` (`dashboard_uuid`, `user_id`)
 		VALUES
-		('dashboard_uuid', 'user_id')
+		(#{dashboardUuid}, #{userId})
 	</insert>
 
 	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">

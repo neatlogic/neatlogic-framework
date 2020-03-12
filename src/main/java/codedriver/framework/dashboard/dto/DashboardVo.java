@@ -19,6 +19,8 @@ public class DashboardVo extends BasePageVo {
 	private String name;
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
 	private int isActive;
+	@EntityField(name = "是否默认面板", type = ApiParamType.INTEGER)
+	private int isDefault;
 	@EntityField(name = "描述", type = ApiParamType.STRING)
 	private String description;
 	@EntityField(name = "仪表板创建时间", type = ApiParamType.LONG)
@@ -131,5 +133,13 @@ public class DashboardVo extends BasePageVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public int getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(int isDefault) {
+		this.isDefault = isDefault;
 	}
 }

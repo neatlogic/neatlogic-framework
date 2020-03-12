@@ -9,6 +9,7 @@ import codedriver.framework.dashboard.dto.DashboardVo;
 import codedriver.framework.dashboard.dto.DashboardWidgetVo;
 
 public interface DashboardMapper {
+	public String getDefaultDashboardUuidByUserId(String userId);
 
 	public int searchDashboardCount(DashboardVo dashboardVo);
 

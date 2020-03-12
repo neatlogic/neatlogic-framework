@@ -2,12 +2,8 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
-
-import codedriver.framework.dto.RoleAuthVo;
-import codedriver.framework.dto.UserAuthVo;
-import codedriver.framework.dto.UserSessionVo;
-import codedriver.framework.dto.UserVo;
 
 public interface UserMapper {
 	public UserVo getUserBaseInfoByUserId(String userId);
@@ -40,6 +36,8 @@ public interface UserMapper {
 	public UserSessionVo getUserSessionByUserId(String userId);
 
 	public List<UserVo> getUserByUserIdList(List<String> userIdList);
+
+	public List<AuthVo> getUserCountByAuth();
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

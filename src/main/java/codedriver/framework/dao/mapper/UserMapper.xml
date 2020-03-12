@@ -258,6 +258,26 @@
 		</foreach>
 	</select>
 
+	<select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo">
+		SELECT f.`auth` as `name`,
+		COUNT(DISTINCT (f.`userId`)) as `userCount`
+		FROM (
+			SELECT
+			b.`user_id` as `userId`,
+			a.`auth`
+			FROM `user_authority` a
+			LEFT JOIN `user` b ON a.`user_id` = b.`user_id`
+			UNION
+			SELECT
+			e.`user_id` as `userId`,
+			c.`auth`
+			FROM `role_authority` c
+			LEFT JOIN `user_role` d ON c.`role_name` = d.`role_name`
+			LEFT JOIN `user` e ON d.`user_id` = e.`user_id`
+		) f
+		GROUP BY f.`auth`
+	</select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(
         `user_id`,

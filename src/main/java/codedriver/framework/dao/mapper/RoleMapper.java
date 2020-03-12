@@ -2,6 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.dto.AuthVo;
 import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.dto.UserVo;
@@ -19,6 +20,8 @@ public interface RoleMapper {
 	public RoleVo getRoleByRoleName(String name);
 
 	public List<RoleVo> getRoleByRoleNameList(List<String> roleNameList);
+
+	public List<AuthVo> getRoleCountByAuth();
 
 	public int insertRoleAuth(RoleAuthVo roleAuthVo);
 
@@ -39,4 +42,6 @@ public interface RoleMapper {
 	public int deleteUserRoleByRoleName(String name);
 
 	public int deleteTeamRoleByRoleName(String name);
+
+
 }

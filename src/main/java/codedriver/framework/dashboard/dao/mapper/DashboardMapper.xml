@@ -102,7 +102,9 @@
 		description,
 		is_active AS isActive,
 		fcu,
-		fcd
+		fcd,
+		lcu,
+		lcd
 		FROM (
 		<include refid="searchDashboardCondition" />
 		) tmp
@@ -119,6 +121,8 @@
 		is_active AS isActive,
 		fcu,
 		fcd,
+		lcu,
+		lcd,
 		b.visit_count
 		FROM (
 		<include refid="searchDashboardCondition" />

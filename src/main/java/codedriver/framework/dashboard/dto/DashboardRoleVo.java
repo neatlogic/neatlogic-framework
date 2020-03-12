@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class DashboardRoleVo {
 	public enum ActionType {
-		READ("read", "只读"), WRITE("write", "编辑"), SHARE("share", "共享");
+		READ("read", "只读"), WRITE("write", "编辑"), SHARE("share", "共享"), DELETE("delete", "删除");
 
 		private String value;
 		private String text;

@@ -129,6 +129,36 @@
         ORDER BY g.user_id
     </select>
 
+	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string">
+		SELECT
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as `isActive`,
+		a.`user_info` as `userInfo`
+		FROM `user` a
+		LEFT JOIN `user_authority` b ON a.`user_id` = b.`user_id`
+		WHERE b.`auth` = #{auth}
+
+	</select>
+
+	<select id="searchRoleUserByAuth" parameterType="string" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as `isActive`,
+		a.`user_info` as `userInfo`
+		FROM `user` a
+		LEFT JOIN `user_role` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `role_authority` c ON b.`role_name` = c.`role_name`
+		WHERE c.`auth` = #{auth}
+	</select>
+
 	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
 		SELECT `user_id` as `userId`,
 		`auth_group` as `authGroup`,

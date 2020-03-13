@@ -35,6 +35,8 @@ public class TeamVo extends BasePageVo {
 
 	private int userCount;
 
+	private List<String> userIdList;
+
 	public synchronized String getUuid() {
 		if (StringUtils.isBlank(uuid) && isAutoGenerateUuid) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -124,5 +126,13 @@ public class TeamVo extends BasePageVo {
 
 	public void setTagId(Long tagId) {
 		this.tagId = tagId;
+	}
+
+	public List<String> getUserIdList() {
+		return userIdList;
+	}
+
+	public void setUserIdList(List<String> userIdList) {
+		this.userIdList = userIdList;
 	}
 }

@@ -22,13 +22,13 @@
 		a.`parent_uuid` as `parentUuid`,
 		d.`id` as `tagId`,
 		d.`name` as `tagName`,
-		COUNT(DISTINCT(d.`user_id`)) AS `userCount`
+		COUNT(DISTINCT(e.`user_id`)) AS `userCount`
 		FROM
 		`team` a
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
-		LEFT JOIN `user_team` d ON a.uuid = d.`team_uuid`
+		LEFT JOIN `user_team` e ON a.uuid = e.`team_uuid`
 		WHERE
 		`uuid` != '0'
 		<if test="keyword != null and keyword != ''">

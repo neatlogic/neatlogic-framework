@@ -21,7 +21,20 @@
 		`user_id` = #{userId}
 	</select>
 
-	<select id="getDashboardRoleByDashboardUuid" resultType="java.lang.String">
+	<select id="getDashboardRoleByDashboardUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardRoleVo">
+		SELECT
+		`dashboard_uuid` AS dashboardUuid,
+		`user_id` AS userId,
+		`team_uuid` AS teamUuid,
+		`role_name` AS roleName,
+		`action`
+		FROM
+		`dashboard_role`
+		WHERE
+		dashboard_uuid = #{value}
+	</select>
+
+	<select id="getDashboardRoleByDashboardUuidAndUserId" resultType="java.lang.String">
 		SELECT
 		DISTINCT b.`action`
 		FROM
@@ -222,6 +235,24 @@
 		WHERE `dashboard_uuid` = #{dashboardUuid}
 		AND `user_id` = #{userId}
 	</update>
+
+	<insert id="insertDashboardRole" parameterType="codedriver.framework.dashboard.dto.DashboardRoleVo">
+		INSERT INTO `dashboard_role` (
+		`dashboard_uuid`,
+		`user_id`,
+		`team_uuid`,
+		`role_name`,
+		`action`
+		)
+		VALUES
+		(
+		#{dashboardUuid},
+		#{userId},
+		#{teamUuid},
+		#{roleName},
+		#{action}
+		)
+	</insert>
 
 	<insert id="insertDashboardVisitCounter" parameterType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
 		INSERT INTO `dashboard_visitcounter` (

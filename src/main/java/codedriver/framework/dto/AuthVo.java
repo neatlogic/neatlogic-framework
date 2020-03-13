@@ -7,6 +7,24 @@ public class AuthVo {
     public static final String AUTH_COVER = "cover";
     private String name;
     private String displayName;
+    private int userCount;
+    private int roleCount;
+
+    public int getUserCount() {
+        return userCount;
+    }
+
+    public void setUserCount(int userCount) {
+        this.userCount = userCount;
+    }
+
+    public int getRoleCount() {
+        return roleCount;
+    }
+
+    public void setRoleCount(int roleCount) {
+        this.roleCount = roleCount;
+    }
 
     public String getName() {
         return name;

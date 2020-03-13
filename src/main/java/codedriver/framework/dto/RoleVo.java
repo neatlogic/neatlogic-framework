@@ -22,10 +22,19 @@ public class RoleVo extends BasePageVo implements Serializable {
 	private int userCount;
 	private String authGroup;
 	private String auth;
+	private List<String> userIdList;
 	private List<RoleAuthVo> roleAuthList;
 
 	public List<RoleAuthVo> getRoleAuthList() {
 		return roleAuthList;
+	}
+
+	public List<String> getUserIdList() {
+		return userIdList;
+	}
+
+	public void setUserIdList(List<String> userIdList) {
+		this.userIdList = userIdList;
 	}
 
 	public void setRoleAuthList(List<RoleAuthVo> roleAuthList) {

@@ -10,7 +10,7 @@
 		SELECT
 		a.`name`,
 		a.`description`,
-		COUNT(b.`user_id`) as userCount
+		COUNT(DISTINCT (b.`user_id`)) as userCount
 		FROM `role` a
 		LEFT JOIN `user_role` b ON a.`name` = b.`role_name`
 		LEFT JOIN `role_authority` c ON a.`name` = c.`role_name`
@@ -87,6 +87,14 @@
 	<foreach collection="list" item="item" separator="," open="(" close=")">
 	#{item}
 	</foreach>
+	</select>
+
+	<select id="getRoleCountByAuth"  resultType="codedriver.framework.dto.AuthVo">
+		SELECT
+		`auth` as `name`,
+		COUNT(DISTINCT(`role_name`)) as `roleCount`
+		FROM `role_authority`
+		GROUP BY `auth`, `auth_group`
 	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">

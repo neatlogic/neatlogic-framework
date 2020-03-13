@@ -7,6 +7,7 @@
 		<result property="name" column="name"/>
 		<result property="sort" column="sort"/>
 		<result property="parentUuid" column="parentUuid"/>
+		<result property="userCount" column="userCount"/>
 		<collection property="tagList" ofType="codedriver.framework.dto.TagVo">
 			<id property="id" column="tagId"/>
 			<result property="name" column="tagName"/>
@@ -20,12 +21,14 @@
 		a.`sort`,
 		a.`parent_uuid` as `parentUuid`,
 		d.`id` as `tagId`,
-		d.`name` as `tagName`
+		d.`name` as `tagName`,
+		COUNT(DISTINCT(d.`user_id`)) AS `userCount`
 		FROM
 		`team` a
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
+		LEFT JOIN `user_team` d ON a.uuid = d.`team_uuid`
 		WHERE
 		`uuid` != '0'
 		<if test="keyword != null and keyword != ''">
@@ -34,6 +37,7 @@
 		<if test="parentUuid != null and parentUuid != ''">
 			and a.`parent_uuid` = #{parentUuid}
 		</if>
+		GROUP BY a.`uuid`
 		ORDER BY `sort`
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
@@ -47,10 +51,13 @@
 		a.`sort`,
 		a.`parent_uuid` as `parentUuid`,
 		c.`id` as `tagId`,
-		c.`name` as `tagName`
+		c.`name` as `tagName`,
+		COUNT(DISTINCT(d.`user_id`)) AS `userCount`
 		FROM `team` a
 		LEFT JOIN `team_tag` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `tag` c ON b.`tag_id` = c.`id`
+		LEFT JOIN `user_team` d ON a.uuid = d.`team_uuid`
+		GROUP BY a.`uuid`
 		ORDER BY `parentUuid`, `sort`
 	</select>
 

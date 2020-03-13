@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import codedriver.framework.dashboard.dto.DashboardRoleVo;
 import codedriver.framework.dashboard.dto.DashboardVisitCounterVo;
 import codedriver.framework.dashboard.dto.DashboardVo;
 import codedriver.framework.dashboard.dto.DashboardWidgetVo;
@@ -17,7 +18,9 @@ public interface DashboardMapper {
 
 	public List<DashboardVo> searchTopVisitDashboard(DashboardVo dashboardVo);
 
-	public List<String> getDashboardRoleByDashboardUuid(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId);
+	public List<String> getDashboardRoleByDashboardUuidAndUserId(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId);
+
+	public List<DashboardRoleVo> getDashboardRoleByDashboardUuid(String dashboardUuid);
 
 	public int checkDashboardNameIsExists(DashboardVo dashboardVo);
 
@@ -34,6 +37,8 @@ public interface DashboardMapper {
 	public int updateDashboardVisitCounter(DashboardVisitCounterVo dashboardVisitCounterVo);
 
 	public int insertDashboard(DashboardVo dashboardVo);
+
+	public int insertDashboardRole(DashboardRoleVo dashboardRoleVo);
 
 	public int insertDashboardWidget(DashboardWidgetVo dashboardWidgetVo);
 

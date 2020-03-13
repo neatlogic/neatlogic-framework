@@ -22,8 +22,8 @@
 		a.`user_info` as userInfo
 		FROM
 		`user` a
-		LEFT JOIN `user_password` b ON a.`user_id` = b.`user_id`
-		WHERE a.user_id = #{value} AND b.`is_active` = 1
+		LEFT JOIN `user_password` b ON a.`user_id` = b.`user_id` AND b.`is_active` = 1
+		WHERE a.user_id = #{value}
 	</select>
 
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
@@ -59,9 +59,9 @@
 		LEFT JOIN user_role b ON a.user_id = b.user_id
 		LEFT JOIN user_team c ON a.user_id = c.user_id
 		LEFT JOIN team d ON c.team_uuid = d.uuid
-		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id`
+		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
 		WHERE
-		a.user_id = #{value} AND e.`is_active` = 1
+		a.user_id = #{value} 
 	</select>
 
 	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String">

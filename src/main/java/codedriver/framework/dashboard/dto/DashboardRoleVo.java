@@ -39,6 +39,10 @@ public class DashboardRoleVo {
 	private String action;
 	private String actionText;
 
+	public DashboardRoleVo() {
+
+	}
+
 	public String getDashboardUuid() {
 		return dashboardUuid;
 	}
@@ -90,4 +94,42 @@ public class DashboardRoleVo {
 		this.actionText = actionText;
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (!(other instanceof DashboardRoleVo))
+			return false;
+
+		final DashboardRoleVo role = (DashboardRoleVo) other;
+		try {
+			if (getDashboardUuid().equals(role.getDashboardUuid()) && getAction().equals(role.getAction())) {
+				if (StringUtils.isNotBlank(getUserId()) && getUserId().equals(role.getUserId())) {
+					return true;
+				} else if (StringUtils.isNotBlank(getTeamUuid()) && getTeamUuid().equals(role.getTeamUuid())) {
+					return true;
+				} else if (StringUtils.isNotBlank(getRoleName()) && getRoleName().equals(role.getRoleName())) {
+					return true;
+				}
+			}
+		} catch (Exception ex) {
+			return false;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getDashboardUuid().hashCode() * 7 + getAction().hashCode() * 11;
+		if (StringUtils.isNotBlank(getUserId())) {
+			result += getUserId().hashCode() * 13;
+		} else if (StringUtils.isNotBlank(getTeamUuid())) {
+			result += getTeamUuid().hashCode() * 13;
+		} else if (StringUtils.isNotBlank(getRoleName())) {
+			result += getRoleName().hashCode() * 13;
+		}
+		return result;
+	}
 }

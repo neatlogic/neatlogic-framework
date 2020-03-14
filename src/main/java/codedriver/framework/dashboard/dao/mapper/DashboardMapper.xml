@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
+
 	<select id="getDefaultDashboardUuidByUserId" parameterType="java.lang.String" resultType="java.lang.String">
 		SELECT
 		`dashboard_uuid`
@@ -25,11 +26,14 @@
 		SELECT
 		`dashboard_uuid` AS dashboardUuid,
 		`user_id` AS userId,
+		(SELECT user_name FROM `user` u WHERE u.user_id = a.`user_id`) AS userName,
 		`team_uuid` AS teamUuid,
+		(SELECT NAME FROM `team` t WHERE t.uuid = a.team_uuid) AS teamName,
 		`role_name` AS roleName,
+		(SELECT description FROM `role` r WHERE r.name = a.role_name) AS roleDescription,
 		`action`
 		FROM
-		`dashboard_role`
+		`dashboard_role` a
 		WHERE
 		dashboard_uuid = #{value}
 	</select>

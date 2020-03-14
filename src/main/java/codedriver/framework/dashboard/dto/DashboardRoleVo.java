@@ -34,8 +34,11 @@ public class DashboardRoleVo {
 
 	private String dashboardUuid;
 	private String userId;
+	private String userName;
 	private String teamUuid;
+	private String teamName;
 	private String roleName;
+	private String roleDescription;
 	private String action;
 	private String actionText;
 
@@ -131,5 +134,29 @@ public class DashboardRoleVo {
 			result += getRoleName().hashCode() * 13;
 		}
 		return result;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getTeamName() {
+		return teamName;
+	}
+
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
+	}
+
+	public String getRoleDescription() {
+		return roleDescription;
+	}
+
+	public void setRoleDescription(String roleDescription) {
+		this.roleDescription = roleDescription;
 	}
 }

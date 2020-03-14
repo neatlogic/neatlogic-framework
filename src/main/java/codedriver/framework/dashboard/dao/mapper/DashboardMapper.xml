@@ -69,8 +69,8 @@
 		FROM
 		`dashboard` a
 		WHERE a.fcu = #{fcu}
-		<if test="keyword!=null and keyword!=''">
-			AND a.name LIKE concat('%',#{keyword},'%')
+		<if test="keyword !=null and keyword!=''">
+			AND a.name LIKE concat('%', #{keyword}, '%')
 		</if>
 		<if test="type == 'all'">
 			UNION
@@ -97,8 +97,8 @@
 			WHERE ur.`user_id` = #{fcu}
 			AND ur.`role_name` = b.role_name)
 			)
-			<if test="keyword!=null and keyword!=''">
-				WHERE a.name LIKE concat('%',#{keyword},'%')
+			<if test="keyword !=null and keyword!=''">
+				AND a.name LIKE concat('%', #{keyword},'%')
 			</if>
 		</if>
 	</sql>

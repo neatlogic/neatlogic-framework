@@ -24,6 +24,8 @@ public interface TeamMapper {
 
 	public List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
 
+	public List<String> getTeamUuidListByUserId(String userId);
+
 	public int deleteTeamByUuid(String uuid);
 
 	public int deleteTeamTagByUuid(String uuid);

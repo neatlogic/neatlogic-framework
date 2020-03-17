@@ -40,7 +40,9 @@ public class BasePageVo {
 	}
 
 	public void setPageSize(Integer pageSize) {
-		this.pageSize = pageSize;
+		if(pageSize != null) {
+			this.pageSize = pageSize;
+		}
 
 	}
 

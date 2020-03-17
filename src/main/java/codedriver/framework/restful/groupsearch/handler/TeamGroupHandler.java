@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dto.TeamVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -19,7 +20,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 	
 	@Override
 	public String getName() {
-		return "team";
+		return GroupSearch.TEAM.getValue();
 	}
 	
 	@Override

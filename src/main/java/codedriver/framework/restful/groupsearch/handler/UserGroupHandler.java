@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -19,7 +20,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 	
 	@Override
 	public String getName() {
-		return "user";
+		return GroupSearch.USER.getValue();
 	}
 
 	@Override

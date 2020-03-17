@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -19,7 +20,7 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 	
 	@Override
 	public String getName() {
-		return "role";
+		return GroupSearch.ROLE.getValue();
 	}
 	
 	@Override

@@ -8,6 +8,9 @@ import codedriver.framework.dashboard.dto.ChartDataVo;
 import codedriver.framework.dashboard.dto.DashboardWidgetVo;
 
 public interface IDashboardHandler {
+
+	public String getType();
+
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
@@ -19,7 +22,6 @@ public interface IDashboardHandler {
 	 * @return String
 	 */
 	public String getName();
-
 
 	/**
 	 * @Time:Mar 2, 2020

@@ -124,13 +124,4 @@ public class LoginController {
 			tenantContext.release();
 		}
 	}
-	
-	
-	@RequestMapping(value = "/init/check/{tenant}")
-	public void checkTenant(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		if(!TenantUtil.hasTenant(tenant)) {
-			ReturnJson.error("租户" + tenant + "不存在或已被禁用",response);
-		}
-		ReturnJson.success(response);
-	}
 }

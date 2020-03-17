@@ -3,6 +3,7 @@ package codedriver.framework.dashboard.dto;
 public class DashboardHandlerVo {
 	private String name;
 	private String handler;
+	private String type;
 	private String moduleId;
 
 	public String getName() {
@@ -27,6 +28,14 @@ public class DashboardHandlerVo {
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

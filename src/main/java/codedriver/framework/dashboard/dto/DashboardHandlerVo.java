@@ -1,9 +1,16 @@
 package codedriver.framework.dashboard.dto;
 
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.restful.annotation.EntityField;
+
 public class DashboardHandlerVo {
+	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "处理类", type = ApiParamType.STRING)
 	private String handler;
+	@EntityField(name = "类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "所属模块", type = ApiParamType.STRING)
 	private String moduleId;
 
 	public String getName() {

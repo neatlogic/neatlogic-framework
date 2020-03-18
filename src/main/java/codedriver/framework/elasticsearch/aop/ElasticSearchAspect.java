@@ -23,7 +23,7 @@ import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
 @Aspect
 @RootComponent
 public class ElasticSearchAspect {
-	private static final ThreadLocal<Map<String, List<Object>>> ES_HANDLERS = new ThreadLocal<>();
+	private static final ThreadLocal<Map<String, List<Object>>> ARGS_MAP = new ThreadLocal<>();
 
 	@After("@annotation(elasticSearch)")
 	public void ActionCheck(JoinPoint point, ElasticSearch elasticSearch) {
@@ -32,14 +32,14 @@ public class ElasticSearchAspect {
 				List<Object> argList = Arrays.asList(point.getArgs());
 				CachedThreadPool.execute(new ElasticSearchHandler(elasticSearch.type(), argList));
 			} else {
-				Map<String, List<Object>> argMap = ES_HANDLERS.get();
+				Map<String, List<Object>> argMap = ARGS_MAP.get();
 				if (argMap == null) {
 					argMap = new HashMap<>();
-					ES_HANDLERS.set(argMap);
+					ARGS_MAP.set(argMap);
 					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 						@Override
 						public void afterCommit() {
-							Map<String, List<Object>> argMap = ES_HANDLERS.get();
+							Map<String, List<Object>> argMap = ARGS_MAP.get();
 							Iterator<String> keys = argMap.keySet().iterator();
 							while (keys.hasNext()) {
 								String key = keys.next();
@@ -49,7 +49,7 @@ public class ElasticSearchAspect {
 
 						@Override
 						public void afterCompletion(int status) {
-							ES_HANDLERS.remove();
+							ARGS_MAP.remove();
 						}
 					});
 				}

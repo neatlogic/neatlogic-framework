@@ -13,8 +13,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.elasticsearch.annotation.ElasticSearch;
+import codedriver.framework.elasticsearch.core.ElasticSearchFactory;
 
 @Aspect
 @RootComponent
@@ -23,10 +25,10 @@ public class ElasticSearchAspect {
 
 	@After("@annotation(elasticSearch)")
 	public void ActionCheck(JoinPoint point, ElasticSearch elasticSearch) {
-		if (elasticSearch != null && StringUtils.isNotBlank(elasticSearch.type())) {
+		if (elasticSearch != null && StringUtils.isNotBlank(elasticSearch.type()) && ElasticSearchFactory.getHandler(elasticSearch.type()) != null) {
 			if (!TransactionSynchronizationManager.isSynchronizationActive()) {
 				List<Object> argList = Arrays.asList(point.getArgs());
-				// TODO 调用接口
+				ElasticSearchFactory.getHandler(elasticSearch.type()).doService(argList);
 			} else {
 				Map<String, List<Object>> argMap = ES_HANDLERS.get();
 				if (argMap == null) {
@@ -39,7 +41,7 @@ public class ElasticSearchAspect {
 							Iterator<String> keys = argMap.keySet().iterator();
 							while (keys.hasNext()) {
 								String key = keys.next();
-								// TODO 调用接口
+								ElasticSearchFactory.getHandler(key).doService(argMap.get(key));
 							}
 						}
 
@@ -58,4 +60,12 @@ public class ElasticSearchAspect {
 		}
 	}
 
+	private static class ElasticSearchHandler extends CodeDriverThread {
+
+		@Override
+		protected void execute() {
+
+		}
+
+	}
 }

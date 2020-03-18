@@ -7,22 +7,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import codedriver.framework.common.RootComponent;
 import codedriver.framework.exception.elasticsearch.ElatsticSearchHandlerNotFoundException;
 
+@RootComponent
 public class ElasticSearchFactory implements ApplicationListener<ContextRefreshedEvent> {
 	private static Map<String, IElasticSearchHandler> handlerMap = new HashMap<String, IElasticSearchHandler>();
-	
-	public static IElasticSearchHandler getAuthInstance(String handler) {
+
+	public static IElasticSearchHandler getHandler(String handler) {
 		return handlerMap.get(handler);
 	}
 
-	public static IElasticSearchHandler getHandler(String handler) {
-		if (!handlerMap.containsKey(handler) || handlerMap.get(handler) == null) {
-			throw new ElatsticSearchHandlerNotFoundException(handler);
-		}
-		return handlerMap.get(handler);
-	}
-	
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
@@ -35,6 +30,6 @@ public class ElasticSearchFactory implements ApplicationListener<ContextRefreshe
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 }

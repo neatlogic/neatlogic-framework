@@ -36,7 +36,7 @@
 
 	<!-- <aop:config proxy-target-class="true" /> -->
 	<!-- 启动expost-proxy,expose proxy在threadlocal -->
-	<aop:aspectj-autoproxy expose-proxy="true" />
+	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
 	<mvc:annotation-driven />
 	
 	

@@ -8,6 +8,7 @@ import codedriver.framework.dashboard.dto.DashboardRoleVo;
 import codedriver.framework.dashboard.dto.DashboardVisitCounterVo;
 import codedriver.framework.dashboard.dto.DashboardVo;
 import codedriver.framework.dashboard.dto.DashboardWidgetVo;
+import codedriver.framework.elasticsearch.annotation.ElasticSearch;
 
 public interface DashboardMapper {
 	public String getDefaultDashboardUuidByUserId(String userId);

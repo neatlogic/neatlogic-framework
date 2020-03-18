@@ -27,4 +27,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+            <groupId>com.techsure</groupId>
+            <artifactId>multiattr-search</artifactId>
+            <version>0.4-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+		</dependency> 
+	</dependencies>
 </project>

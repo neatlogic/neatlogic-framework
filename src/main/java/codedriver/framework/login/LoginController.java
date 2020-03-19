@@ -50,7 +50,6 @@ public class LoginController {
 		try {
 			String userId = jsonObj.getString("userid");
 			String password = jsonObj.getString("password");
-			String cookieDomain = null;
 			if (StringUtils.isBlank(tenant)) {
 				tenant = request.getHeader("Tenant");
 			}
@@ -64,7 +63,6 @@ public class LoginController {
 				if (tenantVo.getIsActive().equals(0)) {
 					throw new TenantUnActiveException(tenant);
 				}
-				cookieDomain = tenantVo.getCookieDomain();
 				tenantContext.switchTenant(tenant);
 				// 还原回租户库
 				tenantContext.setUseDefaultDatasource(false);
@@ -109,14 +107,19 @@ public class LoginController {
 
 				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
 				authCookie.setPath("/");
-				if (StringUtils.isNotBlank(cookieDomain)) {
-					authCookie.setDomain(cookieDomain);
+				String domainName = request.getServerName();
+				if (StringUtils.isNotBlank(domainName)) {
+					String[] ds = domainName.split("\\.");
+					int len = ds.length;
+					if (len > 2 && !StringUtils.isNumeric(ds[len - 1])) {
+						authCookie.setDomain(ds[len - 2] + "." + ds[len - 1]);
+					}
 				}
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
 				tenantCookie.setPath("/");
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
-				//允许跨域携带cookie
+				// 允许跨域携带cookie
 				response.setHeader("Access-Control-Allow-Credentials", "true");
 				response.setContentType(Config.RESPONSE_TYPE_JSON);
 				returnObj.put("Status", "OK");

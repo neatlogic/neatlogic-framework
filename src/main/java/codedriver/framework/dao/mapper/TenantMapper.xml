@@ -7,7 +7,6 @@
 		SELECT
 		`uuid`,
 		`name`,
-		`cookie_domain` AS cookieDomain,
 		`is_active` AS isActive
 		FROM
 		`tenant`
@@ -17,8 +16,7 @@
 	<select id="getAllActiveTenant" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
 		t.`uuid`,
-		t.`name`,
-		t.`cookie_domain` AS cookieDomain
+		t.`name`
 		FROM
 		`tenant` t
 		JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`

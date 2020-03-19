@@ -459,5 +459,9 @@
 		WHERE `user_id` = #{value}
 	</delete>
 
+	<delete id="deleteUserAuthByAuth" parameterType="string">
+		DELETE FROM `user_authority` WHERE `auth` = #{auth}
+	</delete>
+
 </mapper>
 

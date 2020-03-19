@@ -176,4 +176,8 @@
 		`team_role`
 		WHERE `role_name` = #{value}
 	</delete>
+
+	<delete id="deleteRoleAuthByAuth" parameterType="string">
+		DELETE FROM `role_authority` WHERE `auth` = #{auth}
+	</delete>
 </mapper>

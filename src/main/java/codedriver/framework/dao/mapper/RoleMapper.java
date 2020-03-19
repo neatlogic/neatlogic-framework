@@ -43,5 +43,7 @@ public interface RoleMapper {
 
 	public int deleteTeamRoleByRoleName(String name);
 
+	public int deleteRoleAuthByAuth(String auth);
+
 
 }

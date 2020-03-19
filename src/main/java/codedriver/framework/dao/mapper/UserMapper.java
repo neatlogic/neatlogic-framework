@@ -80,4 +80,6 @@ public interface UserMapper {
 	public int deleteUserSessionByUserId(String userId);
 
 	public int deleteUserTeamByUserId(String userId);
+
+	public int deleteUserAuthByAuth(String auth);
 }

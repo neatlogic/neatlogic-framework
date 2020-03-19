@@ -9,8 +9,8 @@ import codedriver.framework.restful.annotation.EntityField;
 public class ChartDataVo {
 	@EntityField(name = "值字段名称", type = ApiParamType.STRING)
 	private String valueField;
-	@EntityField(name = "图例字段名称", type = ApiParamType.STRING)
-	private String legendField;
+	@EntityField(name = "二级分组字段名称", type = ApiParamType.STRING)
+	private String subGroupField;
 	@EntityField(name = "分组字段名称", type = ApiParamType.STRING)
 	private String groupField;
 	@EntityField(name = "数据集", type = ApiParamType.JSONARRAY)
@@ -31,14 +31,6 @@ public class ChartDataVo {
 			dataList = new JSONArray();
 		}
 		dataList.add(data);
-	}
-
-	public String getLegendField() {
-		return legendField;
-	}
-
-	public void setLegendField(String legendField) {
-		this.legendField = legendField;
 	}
 
 	public JSONObject getConfigObj() {
@@ -63,5 +55,13 @@ public class ChartDataVo {
 
 	public void setGroupField(String groupField) {
 		this.groupField = groupField;
+	}
+
+	public String getSubGroupField() {
+		return subGroupField;
+	}
+
+	public void setSubGroupField(String subGroupField) {
+		this.subGroupField = subGroupField;
 	}
 }

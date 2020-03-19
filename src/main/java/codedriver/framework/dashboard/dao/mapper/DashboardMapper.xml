@@ -350,12 +350,12 @@
 		WHERE `dashboard_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteDashboardDefaultUser">
+	<delete id="deleteDashboardDefaultUserByUserId" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`dashboard_userdefault`
-		WHERE `dashboard_uuid` = #{dashboardUuid}
-		AND `user_id` = #{userId}
+		WHERE
+		`user_id` = #{userId}
 	</delete>
 
 	<delete id="deleteDashboardRoleByDashboardUuid" parameterType="java.lang.String">

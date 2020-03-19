@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.exception.elasticsearch.ElatsticSearchHandlerNotFoundException;
 
 @RootComponent
 public class ElasticSearchFactory implements ApplicationListener<ContextRefreshedEvent> {

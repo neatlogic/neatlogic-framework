@@ -6,7 +6,9 @@
 	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
 		`uuid`,
-		`name`
+		`name`,
+		`cookie_domain` AS cookieDomain,
+		`is_active` AS isActive
 		FROM
 		`tenant`
 		WHERE `uuid` = #{value}
@@ -15,7 +17,8 @@
 	<select id="getAllActiveTenant" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
 		t.`uuid`,
-		t.`name`
+		t.`name`,
+		t.`cookie_domain` AS cookieDomain
 		FROM
 		`tenant` t
 		JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`

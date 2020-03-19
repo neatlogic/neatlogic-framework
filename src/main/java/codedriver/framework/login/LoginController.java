@@ -23,10 +23,10 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
+import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
 import codedriver.framework.service.TenantService;
 import codedriver.framework.service.UserService;
@@ -50,6 +50,7 @@ public class LoginController {
 		try {
 			String userId = jsonObj.getString("userid");
 			String password = jsonObj.getString("password");
+			String cookieDomain = null;
 			if (StringUtils.isBlank(tenant)) {
 				tenant = request.getHeader("Tenant");
 			}
@@ -60,6 +61,10 @@ public class LoginController {
 				if (tenantVo == null) {
 					throw new TenantNotFoundException(tenant);
 				}
+				if (tenantVo.getIsActive().equals(0)) {
+					throw new TenantUnActiveException(tenant);
+				}
+				cookieDomain = tenantVo.getCookieDomain();
 				tenantContext.switchTenant(tenant);
 				// 还原回租户库
 				tenantContext.setUseDefaultDatasource(false);
@@ -104,10 +109,15 @@ public class LoginController {
 
 				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
 				authCookie.setPath("/");
+				if (StringUtils.isNotBlank(cookieDomain)) {
+					authCookie.setDomain(cookieDomain);
+				}
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
 				tenantCookie.setPath("/");
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
+				//允许跨域携带cookie
+				response.setHeader("Access-Control-Allow-Credentials", "true");
 				response.setContentType(Config.RESPONSE_TYPE_JSON);
 				returnObj.put("Status", "OK");
 				returnObj.put("JwtToken", jwthead + "." + jwtbody + "." + jwtsign);

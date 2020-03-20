@@ -10,6 +10,8 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
+
 import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
@@ -27,7 +29,7 @@ public class TestPublicJob extends PublicJobBase {
 		})
 	@Override
 	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
-		JobDetail jobDetail = context.getJobDetail();
+		/*JobDetail jobDetail = context.getJobDetail();
 		JobKey jobKey = jobDetail.getKey();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		System.out.println(jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "-" + sdf.format(new Date()));
@@ -35,7 +37,8 @@ public class TestPublicJob extends PublicJobBase {
 		if(obj instanceof JobAuditVo) {
 			JobAuditVo auditVo = (JobAuditVo) obj;
 			auditVo.appendContent(jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "-" + sdf.format(new Date()));
-		}
+		}*/
+		System.out.println(JSONObject.toJSONString(jobObject));
 	}
 
 	@Override

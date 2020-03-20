@@ -41,6 +41,7 @@ public class DashboardHandlerFactory implements ApplicationListener<ContextRefre
 				DashboardHandlerVo dashboardHandlerVo = new DashboardHandlerVo();
 				dashboardHandlerVo.setHandler(component.getClassName());
 				dashboardHandlerVo.setName(component.getName());
+				dashboardHandlerVo.setDisplayName(component.getDisplayName());
 				dashboardHandlerVo.setType(component.getType());
 				dashboardHandlerVo.setModuleId(context.getId());
 				dashboardHandlerList.add(dashboardHandlerVo);

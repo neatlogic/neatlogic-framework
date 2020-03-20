@@ -6,6 +6,8 @@ import codedriver.framework.restful.annotation.EntityField;
 public class DashboardHandlerVo {
 	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
+	@EntityField(name = "显示名称", type = ApiParamType.STRING)
+	private String displayName;
 	@EntityField(name = "处理类", type = ApiParamType.STRING)
 	private String handler;
 	@EntityField(name = "类型", type = ApiParamType.STRING)
@@ -43,6 +45,14 @@ public class DashboardHandlerVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 }

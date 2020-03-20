@@ -17,11 +17,20 @@ public interface IDashboardHandler {
 
 	/**
 	 * @Time:Mar 2, 2020
-	 * @Description: 获取中文名
+	 * @Description: 获取唯一名
 	 * @param @return
 	 * @return String
 	 */
 	public String getName();
+	
+	/**
+	* @Author: chenqiwei
+	* @Time:Mar 20, 2020
+	* @Description: 获取显示名 
+	* @param @return 
+	* @return String
+	 */
+	public String getDisplayName();
 
 	/**
 	 * @Time:Mar 2, 2020

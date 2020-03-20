@@ -38,7 +38,6 @@ public class TestPublicJob extends PublicJobBase {
 			JobAuditVo auditVo = (JobAuditVo) obj;
 			auditVo.appendContent(jobKey.getName() + "-" + jobKey.getGroup() + "-" + Config.SCHEDULE_SERVER_ID + "-" + sdf.format(new Date()));
 		}
-		System.out.println(JSONObject.toJSONString(jobObject));
 	}
 
 	@Override

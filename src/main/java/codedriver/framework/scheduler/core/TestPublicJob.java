@@ -10,8 +10,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.config.Config;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;

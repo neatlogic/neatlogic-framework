@@ -2,14 +2,10 @@ package codedriver.framework.elasticsearch.core;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+
 public interface IElasticSearchHandler {
 	
-	/**
-	 * poolName
-	 * @return
-	 */
-	public String getPoolName();
-
 	/**
 	 * 处理类
 	 * @return
@@ -25,5 +21,10 @@ public interface IElasticSearchHandler {
 	/**
 	 * 执行动作
 	 */
-	public void doService(List<Object> params);
+	public void doService(JSONObject paramObj);
+	
+	/**
+	 * 执行动作
+	 */
+	public JSONObject getConfig(List<Object> paramList);
 }

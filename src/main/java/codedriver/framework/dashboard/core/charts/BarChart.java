@@ -19,13 +19,19 @@ public class BarChart extends DashboardChartBase {
 		return "barchart";
 	}
 
+	public static void main(String[] argv) {
+		JSONObject obj = new JSONObject();
+		obj.put("value", "abc");
+		System.out.println(obj.getLongValue("value"));
+	}
+
 	@Override
 	public JSONArray getData(JSONArray dataList, JSONObject configObj) {
 		String valueField = configObj.getString("valueField");
 		String groupField = configObj.getString("groupField");
 		String subGroupField = configObj.getString("subGroupField");
 		String aggregate = configObj.getString("aggregate");
-		Map<String, Long> resultMap = new HashMap<>();
+		Map<String, Double> resultMap = new HashMap<>();
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < dataList.size(); i++) {
 				JSONObject data = dataList.getJSONObject(i);
@@ -34,13 +40,28 @@ public class BarChart extends DashboardChartBase {
 					group += "#" + data.getString(subGroupField);
 				}
 				if (!resultMap.containsKey(group)) {
-					resultMap.put(group, 1L);
+					resultMap.put(group, 1D);
 				} else {
-					resultMap.put(group, resultMap.get(group) + 1L);
+					resultMap.put(group, resultMap.get(group) + 1D);
 				}
 			}
 		} else if (aggregate.equals("sum")) {
+			for (int i = 0; i < dataList.size(); i++) {
+				JSONObject data = dataList.getJSONObject(i);
+				String group = data.getString(groupField);
+				if (StringUtils.isNotBlank(data.getString(subGroupField))) {
+					group += "#" + data.getString(subGroupField);
+				}
+				if (!resultMap.containsKey(group)) {
+					resultMap.put(group, StringUtils.isNumeric(data.getString(valueField)) ? data.getDouble(valueField) : 0D);
+				} else {
+					if (StringUtils.isNumeric(data.getString(valueField))) {
+						resultMap.put(group, resultMap.get(group) + data.getDouble(valueField));
+					}
+				}
+			}
 		}
+		
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			JSONArray returnList = new JSONArray();

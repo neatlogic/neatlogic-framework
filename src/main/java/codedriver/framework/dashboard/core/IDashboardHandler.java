@@ -26,6 +26,15 @@ public interface IDashboardHandler {
 	/**
 	* @Author: chenqiwei
 	* @Time:Mar 20, 2020
+	* @Description: 获取图标 
+	* @param @return 
+	* @return String
+	 */
+	public String getIcon();
+	
+	/**
+	* @Author: chenqiwei
+	* @Time:Mar 20, 2020
 	* @Description: 获取显示名 
 	* @param @return 
 	* @return String

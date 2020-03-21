@@ -12,6 +12,8 @@ public class DashboardHandlerVo {
 	private String handler;
 	@EntityField(name = "类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "图标", type = ApiParamType.STRING)
+	private String icon;
 	@EntityField(name = "所属模块", type = ApiParamType.STRING)
 	private String moduleId;
 
@@ -53,6 +55,14 @@ public class DashboardHandlerVo {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 }

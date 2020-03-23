@@ -16,8 +16,8 @@ import codedriver.framework.dashboard.core.DashboardChartBase;
 public class PieChart extends DashboardChartBase {
 
 	@Override
-	public String getName() {
-		return "piechart";
+	public String[] getSupportChart() {
+		return new String[] { "piechart" };
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class PieChart extends DashboardChartBase {
 				}
 			}
 		}
-		
+
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			JSONArray returnList = new JSONArray();

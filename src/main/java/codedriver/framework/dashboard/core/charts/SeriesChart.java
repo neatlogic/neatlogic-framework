@@ -12,11 +12,17 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.dashboard.core.DashboardChartBase;
 
-public class StackColumnChart extends DashboardChartBase {
+public class SeriesChart extends DashboardChartBase {
 
 	@Override
-	public String getName() {
-		return "stackcolumnchart";
+	public String[] getSupportChart() {
+		return new String[] { "barchart", "areachart", "columnchart", "linechart", "stackbarchart", "stackcolumnchart" };
+	}
+
+	public static void main(String[] argv) {
+		JSONObject obj = new JSONObject();
+		obj.put("value", "abc");
+		System.out.println(obj.getLongValue("value"));
 	}
 
 	@Override

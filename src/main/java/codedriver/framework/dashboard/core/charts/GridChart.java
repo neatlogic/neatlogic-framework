@@ -8,8 +8,8 @@ import codedriver.framework.dashboard.core.DashboardChartBase;
 public class GridChart extends DashboardChartBase {
 
 	@Override
-	public String getName() {
-		return "gridchart";
+	public String[] getSupportChart() {
+		return new String[] { "gridchart" };
 	}
 
 	@Override

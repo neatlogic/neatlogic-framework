@@ -12,7 +12,7 @@ public abstract class DashboardChartBase {
 	 * @param @return
 	 * @return String
 	 */
-	public abstract String getName();
+	public abstract String[] getSupportChart();
 
 	public abstract JSONArray getData(JSONArray dataList, JSONObject configObj);
 }

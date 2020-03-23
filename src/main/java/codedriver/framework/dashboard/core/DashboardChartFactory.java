@@ -15,7 +15,9 @@ public class DashboardChartFactory {
 			DashboardChartBase chart;
 			try {
 				chart = c.newInstance();
-				chartMap.put(chart.getName(), chart);
+				for (String ch : chart.getSupportChart()) {
+					chartMap.put(ch, chart);
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

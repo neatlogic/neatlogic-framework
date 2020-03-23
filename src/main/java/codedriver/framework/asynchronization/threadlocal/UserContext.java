@@ -23,7 +23,7 @@ public class UserContext implements Serializable {
 	private String userName;
 	private String userId;
 	private String timezone = "+8:00";
-	private List<String> roleNameList;
+	private List<String> roleNameList = new ArrayList<>();
 
 	public static UserContext init(UserContext _userContext) {
 		UserContext context = new UserContext();

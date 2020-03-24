@@ -238,8 +238,8 @@
 		FROM `user` a
 		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
 		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
-		LEFT JOIN `user_password` d ON a.`user_id` = d.`user_id`
-		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1 AND d.`is_active` = 1
+		LEFT JOIN `user_password` d ON a.`user_id` = d.`user_id` AND d.`is_active` = 1
+		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1
 	</select>
 
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
@@ -264,8 +264,8 @@
 		FROM
 		`user` a
 		LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `user_password` c ON a.`user_id` = c.`user_id`
-		WHERE a.user_id = #{userId} AND c.password = #{password} AND c.`is_active` = 1
+		LEFT JOIN `user_password` c ON a.`user_id` = c.`user_id` AND c.`is_active` = 1
+		WHERE a.user_id = #{userId} AND c.password = #{password}  AND a.`is_active` = 1
 	</select>
 
 	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">

@@ -3,6 +3,7 @@ package codedriver.framework.scheduler.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
 		List<String> moduleList = ModuleEnum.getModuleList(jobClassVo.getModuleId());
 		for (JobClassVo jobClass : jobClassList) {
-			if (!moduleList.contains(jobClass.getModuleId())) {
+			if (CollectionUtils.isNotEmpty(moduleList) && !moduleList.contains(jobClass.getModuleId())) {
 				continue;
 			}
 			if (jobClassVo.getKeyword() != null && !jobClass.getName().contains(jobClassVo.getKeyword())) {

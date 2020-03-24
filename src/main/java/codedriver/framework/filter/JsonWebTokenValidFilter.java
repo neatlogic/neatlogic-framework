@@ -154,7 +154,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
 	private boolean userExpirationValid() {
 		String userId = UserContext.get().getUserId();
-		if (UserSessionCache.getItem(userId) == null) {
+		String tenant = TenantContext.get().getTenantUuid();
+		if (UserSessionCache.getItem(tenant, userId) == null) {
 			UserSessionVo userSessionVo = userMapper.getUserSessionByUserId(userId);
 			if (null != userSessionVo) {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -167,7 +168,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 					Long expireTime = Long.parseLong(configVo != null ? configVo.getValue() : "60") * 60 * 1000 + visitTime.getTime();
 					if (now.getTime() < expireTime) {
 						userMapper.updateUserSession(userId);
-						UserSessionCache.addItem(userId);
+						UserSessionCache.addItem(tenant, userId);
 						return true;
 					}
 				} catch (ParseException e) {

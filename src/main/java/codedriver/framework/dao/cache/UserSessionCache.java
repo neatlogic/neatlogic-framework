@@ -27,12 +27,12 @@ public class UserSessionCache {
 		return CACHE_MANAGER.getEhcache("UserSessionCache");
 	}
 
-	public static void addItem(String userId) {
-		getCache().put(new Element(userId, userId));
+	public static void addItem(String tenant, String userId) {
+		getCache().put(new Element(tenant + ":" + userId, userId));
 	}
 
-	public static Object getItem(String userId) {
-		Element cachedElement = getCache().get(userId);
+	public static Object getItem(String tenant, String userId) {
+		Element cachedElement = getCache().get(tenant + ":" + userId);
 		if (cachedElement == null) {
 			return null;
 		}

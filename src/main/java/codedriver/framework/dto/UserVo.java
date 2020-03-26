@@ -220,6 +220,13 @@ public class UserVo extends BasePageVo {
 	}
 
 	public List<String> getTeamUuidList() {
+		if(CollectionUtils.isNotEmpty(teamList)){
+			List<String> uuidList = new ArrayList<>();
+			for (TeamVo teamVo : teamList){
+				uuidList.add(teamVo.getUuid());
+			}
+			return uuidList;
+		}
 		return teamUuidList;
 	}
 

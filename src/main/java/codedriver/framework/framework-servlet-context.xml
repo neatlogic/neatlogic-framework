@@ -15,7 +15,7 @@
 		http://codedriver.techsure.com/schema/codedriver
 		http://codedriver.techsure.com/schema/codedriver.xsd">
 
-	<codedriver:module id="framework" name="基础框架"/>
+	<codedriver:module id="framework" name="基础框架" groupName="系统管理" group="framework" groupSort="99"/>
 
 	<context:component-scan base-package="codedriver.framework" />
 	

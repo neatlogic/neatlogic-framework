@@ -41,11 +41,14 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				Element rootE = document.getRootElement();
 				Element codedriverE = rootE.element("module");
 				// Element nameE = rootE.element("name");
-				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null;
+				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null;
 				moduleId = codedriverE.attributeValue("id");
 				moduleName = codedriverE.attributeValue("name");
 				urlMapping = codedriverE.attributeValue("urlMapping");
 				moduleDescription = codedriverE.attributeValue("description");
+				group = codedriverE.attributeValue("group");
+				groupName = codedriverE.attributeValue("groupName");
+				groupSort = codedriverE.attributeValue("groupSort");
 
 				if (StringUtils.isNotBlank(moduleId)) {
 					version = Config.getProperty("META-INF/maven/com.techsure/codedriver-" + moduleId + "/pom.properties", "version");
@@ -55,7 +58,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
-					if(StringUtils.isNotBlank(urlMapping)) {
+					if (StringUtils.isNotBlank(urlMapping)) {
 						sr.addMapping(urlMapping);
 					}
 
@@ -71,6 +74,9 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					moduleVo.setName(moduleName);
 					moduleVo.setDescription(moduleName);
 					moduleVo.setVersion(version);
+					moduleVo.setGroup(group);
+					moduleVo.setGroupName(groupName);
+					moduleVo.setGroupSort(Integer.valueOf(groupSort));
 					ModuleUtil.addModule(moduleVo);
 				}
 			}

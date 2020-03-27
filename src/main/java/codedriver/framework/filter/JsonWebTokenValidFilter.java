@@ -28,10 +28,9 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.TenantUtil;
+import codedriver.framework.config.ConfigManager;
 import codedriver.framework.dao.cache.UserSessionCache;
-import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dao.mapper.UserMapper;
-import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.dto.UserSessionVo;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
@@ -39,9 +38,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
 	@Autowired
 	UserMapper userMapper;
-
-	@Autowired
-	ConfigMapper configMapper;
 
 	/**
 	 * Default constructor.
@@ -163,9 +159,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 					Date visitTime = formatter.parse(userSessionVo.getSessionTime());
 					Date now = new Date();
 					TenantContext.get().setUseDefaultDatasource(true);
-					ConfigVo configVo = configMapper.getConfigByKey(UserSessionVo.USER_EXPIRETIME);
+					String expire = ConfigManager.getConfig(UserSessionVo.USER_EXPIRETIME, "60");
 					TenantContext.get().setUseDefaultDatasource(false);
-					Long expireTime = Long.parseLong(configVo != null ? configVo.getValue() : "60") * 60 * 1000 + visitTime.getTime();
+					Long expireTime = Long.parseLong(expire) * 60 * 1000 + visitTime.getTime();
 					if (now.getTime() < expireTime) {
 						userMapper.updateUserSession(userId);
 						UserSessionCache.addItem(tenant, userId);

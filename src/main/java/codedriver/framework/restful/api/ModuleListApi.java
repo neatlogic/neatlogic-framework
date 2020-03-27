@@ -1,7 +1,9 @@
 package codedriver.framework.restful.api;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.common.constvalue.ModuleEnum;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
@@ -41,18 +43,35 @@ public class ModuleListApi extends ApiComponentBase {
 	}
 
 	@Input({})
-	@Output({@Param(explode = ModuleVo.class)})
+	@Output({ @Param(explode = ModuleVo.class) })
 	@Description(desc = "获取租户激活模块接口")
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
 		JSONArray resultArray = new JSONArray();
-		Map<String,String> activeModuleMap = ModuleEnum.getActiveModule();
-		for(Entry<String, String> module: activeModuleMap.entrySet()) {
-			JSONObject resultJson = new JSONObject();
-			resultJson.put("value", module.getKey());
-			resultJson.put("text", module.getValue());
-			resultArray.add(resultJson);
+		Set<String> checkSet = new HashSet<>();
+		for (ModuleVo moduleVo : TenantContext.get().getActiveModuleList()) {
+			if (!checkSet.contains(moduleVo.getGroup())) {
+				checkSet.add(moduleVo.getGroup());
+				JSONObject returnObj = new JSONObject();
+				returnObj.put("value", moduleVo.getGroup());
+				returnObj.put("text", moduleVo.getGroupName());
+				returnObj.put("sort", moduleVo.getGroupSort());
+				resultArray.add(returnObj);
+			}
 		}
+		Collections.sort(resultArray, new Comparator<Object>() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				try {
+					JSONObject obj1 = (JSONObject) o1;
+					JSONObject obj2 = (JSONObject) o2;
+					return obj1.getIntValue("sort") - obj2.getIntValue("sort");
+				} catch (Exception ex) {
+
+				}
+				return 0;
+			}
+		});
 		return resultArray;
 	}
 }

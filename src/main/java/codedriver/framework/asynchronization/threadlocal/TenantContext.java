@@ -82,7 +82,7 @@ public class TenantContext implements Serializable {
 			List<String> tenentModuleList = moduleMapper.getModuleListByTenantUuid(tenantUuid);
 			// 还原回租户库
 			this.setUseDefaultDatasource(false);
-			this.activeModuleList = ModuleUtil.getTenantActionModuleList(tenentModuleList);
+			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenentModuleList);
 			activeModuleMap = new HashMap<>();
 			if (activeModuleList != null && activeModuleList.size() > 0) {
 				for (ModuleVo module : activeModuleList) {

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
@@ -70,7 +69,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		userObj.put("text", "用户");
 		JSONArray userArray = new JSONArray();
 		JSONObject loginUser = new JSONObject();
-		loginUser.put("value", String.format("user#%s", UserContext.get().getUserId()));
+		loginUser.put("value", "{LOGIN_USER}");
 		loginUser.put("text", "当前登录用户");
 		userArray.add(loginUser);
 		for (T user : userList) {

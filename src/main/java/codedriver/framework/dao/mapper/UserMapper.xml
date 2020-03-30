@@ -91,7 +91,8 @@
         j.`name` as `teamName`
         FROM (
         SELECT
-        DISTINCT (a.`user_id`)
+        DISTINCT (a.`user_id`),
+		a.`id`
         FROM
        `user` a
         LEFT JOIN user_role b ON a.user_id = b.user_id
@@ -126,7 +127,7 @@
         LEFT JOIN `user_role` h ON g.user_id = h.`user_id`
         LEFT JOIN `user_team` i ON g.`user_id` = i.`user_id`
         LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
-        ORDER BY g.user_id
+        ORDER BY g.`id` DESC
     </select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string">
@@ -141,7 +142,7 @@
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`user_id` = b.`user_id`
 		WHERE b.`auth` = #{auth}
-
+		ORDER BY a.`id`	 DESC
 	</select>
 
 	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap">
@@ -158,6 +159,7 @@
 		LEFT JOIN `user_role` b ON a.`user_id` = b.`user_id`
 		LEFT JOIN `role_authority` c ON b.`role_name` = c.`role_name`
 		WHERE c.`auth` = #{auth}
+		ORDER BY a.`id` DESC
 	</select>
 
 	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
@@ -293,6 +295,7 @@
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>
+		ORDER BY `id` DESC
 	</select>
 
 	<select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo">

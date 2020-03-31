@@ -245,7 +245,11 @@ public class ApiValidateAndHelpBase {
 								paramObj.put("name", p.name());
 								paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
 								paramObj.put("isRequired", p.isRequired());
-								paramObj.put("description", p.desc());
+								String description = p.desc();
+								if(StringUtils.isNotBlank(p.rule())) {
+									description = description + "，规则：" + p.rule();
+								}
+								paramObj.put("description", description);
 								inputList.add(paramObj);
 							}
 						}

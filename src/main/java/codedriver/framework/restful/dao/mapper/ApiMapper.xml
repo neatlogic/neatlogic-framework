@@ -58,7 +58,7 @@
 		AND `is_active` = #{isActive}
 		</if>
 		<if test="keyword != null and keyword != ''">
-		AND `name` LIKE CONCAT('%', #{keyword}, '%')
+		AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `token` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 	</select>
 	

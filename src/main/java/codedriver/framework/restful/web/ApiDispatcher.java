@@ -80,7 +80,7 @@ public class ApiDispatcher {
 					returnObj.putAll(restComponent.help());
 				}
 			} else {
-				throw new ComponentNotFoundException("接口组件:" + restComponent.getClassName() + "不存在");
+				throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.STREAM)) {
 			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());

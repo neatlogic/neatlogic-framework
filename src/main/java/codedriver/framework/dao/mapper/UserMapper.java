@@ -42,6 +42,8 @@ public interface UserMapper {
 	public List<UserVo> getUserByUserIdList(List<String> userIdList);
 
 	public List<AuthVo> getUserCountByAuth();
+	
+	public List<UserProfileVo> getUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
@@ -58,6 +60,8 @@ public interface UserMapper {
 	public int insertUserTeam(@Param("userId")
 	String userId, @Param("teamUuid")
 	String teamUuid);
+	
+	public int insertUserProfile(UserProfileVo userProfileVo);
 
 	public int insertUserSession(String userId);
 
@@ -66,6 +70,8 @@ public interface UserMapper {
 	public int updateUserActive(UserVo userVo);
 
 	public int updateUserSession(String userId);
+	
+	public int updateUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId,@Param("config")String config);
 
 	public int deleteUserPasswordByLimit(@Param("userId") String userId,@Param("idList") List<Long> idList);
 
@@ -82,4 +88,6 @@ public interface UserMapper {
 	public int deleteUserTeamByUserId(String userId);
 
 	public int deleteUserAuthByAuth(String auth);
+	
+	public int deleteUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId);
 }

@@ -317,6 +317,19 @@
 		) f
 		GROUP BY f.`auth`
 	</select>
+	
+	<select id="getUserProfileByUserIdAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo">
+		SELECT 
+		  `user_id`,
+		  `module_id`,
+		  `config` 
+		FROM
+		  `user_profile` 
+		where `user_id` = #{userId}
+		<if test="moduleId !=null and moduleId !=''">
+			and `module_id` = #{moduleId}
+		</if>
+	</select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(
@@ -385,6 +398,12 @@
 		VALUES
 		(#{userId}, now()) ;
 	</insert>
+	
+	<insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo" >
+		INSERT INTO `user_profile` (`user_id`, `module_id`, `config`) 
+		VALUES
+		  (#{userId}, #{moduleId}, #{config}) ;
+	</insert>
 
 	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
 		UPDATE
@@ -417,6 +436,14 @@
 
 	<update id="updateUserSession" parameterType="java.lang.String">
 		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
+	</update>
+	
+	<update id="updateUserProfileByUserIdAndModuleId" parameterType="java.lang.String">
+		UPDATE `user_profile` set `config` = #{config} 
+		where `user_id` = #{userId}
+		<if test="moduleId !=null and moduleId !=''">
+			and `module_id` = #{moduleId}
+		</if>
 	</update>
 
 	<delete id="deleteUserPasswordByLimit">
@@ -471,6 +498,16 @@
 
 	<delete id="deleteUserAuthByAuth" parameterType="string">
 		DELETE FROM `user_authority` WHERE `auth` = #{auth}
+	</delete>
+	
+	<delete id="deleteUserProfileByUserIdAndModuleId" parameterType="String">
+		DELETE 
+		FROM
+		  `user_profile` 
+		where `user_id` = #{userId}
+		<if test="moduleId !=null and moduleId !=''">
+			and `module_id` = #{moduleId}
+		</if>
 	</delete>
 
 </mapper>

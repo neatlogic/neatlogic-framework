@@ -83,7 +83,29 @@
 		</if>
 	</select>
 
-	<select id="getTeamByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
+	<select id="getTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap">
+		SELECT
+		a.`uuid`,
+		a.`name`,
+		a.`sort`,
+		a.`parent_uuid` as `parentUuid`,
+		c.`id` as `tagId`,
+		c.`name` as `tagName`
+		FROM
+		`team` a
+		LEFT JOIN `team_tag` b ON a.`uuid` = b.`team_uuid`
+		LEFT JOIN `tag` c ON b.`tag_id` = c.`id`
+		<where>
+			<if test="uuid !=null and uuid != ''">
+				AND a.`uuid` = #{uuid}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.`name` = #{name}
+			</if>
+		</where>
+	</select>
+
+	<select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -91,8 +113,7 @@
 		`parent_uuid` as `parentUuid`
 		FROM
 		`team`
-		WHERE
-		uuid = #{value}
+		WHERE `uuid` = #{uuid}
 	</select>
 
 	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">

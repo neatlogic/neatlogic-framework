@@ -248,7 +248,7 @@ public class ApiValidateAndHelpBase {
 					EntityField entityField = (EntityField) annotation;
 					JSONObject paramObj = new JSONObject();
 					paramObj.put("name", field.getName());
-					paramObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
+					paramObj.put("type", entityField.type().getValue() + "[" + entityField.type().getText() + "]");
 					paramObj.put("description", entityField.name());
 
 					if (loop && field.getType().isAssignableFrom(List.class)) {
@@ -285,7 +285,7 @@ public class ApiValidateAndHelpBase {
 							for (Param p : params) {
 								JSONObject paramObj = new JSONObject();
 								paramObj.put("name", p.name());
-								paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+								paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
 								paramObj.put("isRequired", p.isRequired());
 								String description = p.desc();
 								if (StringUtils.isNotBlank(p.rule())) {
@@ -310,7 +310,7 @@ public class ApiValidateAndHelpBase {
 									} else {
 										JSONObject paramObj = new JSONObject();
 										paramObj.put("name", p.name());
-										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
+										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
 										paramObj.put("description", p.desc());
 										JSONArray elementObjList = new JSONArray();
 										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
@@ -325,7 +325,7 @@ public class ApiValidateAndHelpBase {
 								} else {
 									JSONObject paramObj = new JSONObject();
 									paramObj.put("name", p.name());
-									paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+									paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
 									paramObj.put("description", p.desc());
 									outputList.add(paramObj);
 								}

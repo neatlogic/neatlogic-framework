@@ -17,7 +17,7 @@
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
-			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+			AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
 		</if>
 		<if test="authGroup != null and authGroup != ''">
 			AND c.`auth_group` = #{authGroup}
@@ -50,7 +50,7 @@
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
-			AND (name LIKE CONCAT(#{keyword}, '%') OR description LIKE CONCAT(#{keyword}, '%'))
+			AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 		<if test="authGroup != null and authGroup != ''">
 			AND b.`auth_group` = #{authGroup}

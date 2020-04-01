@@ -9,7 +9,7 @@
 		FROM `tag`
 		<where>
 			<if test="name != null and name != ''">
-				and name LIKE CONCAT(#{name}, '%')
+				and name LIKE CONCAT('%', #{name}, '%')
 			</if>
 			<if test="id != null and id != 0L">
 				AND `id` = #{id}

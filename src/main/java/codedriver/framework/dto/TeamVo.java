@@ -37,6 +37,16 @@ public class TeamVo extends BasePageVo {
 
 	private List<String> userIdList;
 
+	private List<String> pathNameList;
+
+	public List<String> getPathNameList() {
+		return pathNameList;
+	}
+
+	public void setPathNameList(List<String> pathNameList) {
+		this.pathNameList = pathNameList;
+	}
+
 	public synchronized String getUuid() {
 		if (StringUtils.isBlank(uuid) && isAutoGenerateUuid) {
 			uuid = UUID.randomUUID().toString().replace("-", "");

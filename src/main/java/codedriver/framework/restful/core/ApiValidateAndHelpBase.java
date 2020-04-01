@@ -3,8 +3,11 @@ package codedriver.framework.restful.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -188,11 +191,11 @@ public class ApiValidateAndHelpBase {
 					if (params != null && params.length > 0) {
 						for (Param p : params) {
 							Object paramValue = null;
-							if(paramObj.containsKey(p.name())) {
+							if (paramObj.containsKey(p.name())) {
 								// 参数类型校验
 								paramValue = paramObj.get(p.name());
-								//如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
-								if(paramValue == null) {
+								// 如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
+								if (paramValue == null) {
 									paramObj.remove(p.name());
 								}
 							}
@@ -200,7 +203,7 @@ public class ApiValidateAndHelpBase {
 							if (p.isRequired() && !paramObj.containsKey(p.name())) {
 								throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
 							}
-							
+
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
 								encodeHtml(paramObj, p.name());
@@ -220,9 +223,48 @@ public class ApiValidateAndHelpBase {
 									paramObj.put(p.name(), paramValue.toString().trim());
 								}
 							}
-							
+
 						}
 					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @Author: chenqiwei
+	 * @Time:Apr 1, 2020
+	 * @Description: TODO
+	 * @param @param field
+	 * @param @param paramList
+	 * @param @param loop 是否继续递归
+	 * @return void
+	 */
+	private void drawFieldMessageRecursive(Field field, JSONArray paramList, boolean loop) {
+		Annotation[] annotations = field.getDeclaredAnnotations();
+		if (annotations != null && annotations.length > 0) {
+			for (Annotation annotation : annotations) {
+				if (annotation.annotationType().equals(EntityField.class)) {
+					EntityField entityField = (EntityField) annotation;
+					JSONObject paramObj = new JSONObject();
+					paramObj.put("name", field.getName());
+					paramObj.put("type", entityField.type().getValue() + "[" + entityField.type().getText() + "]");
+					paramObj.put("description", entityField.name());
+
+					if (loop && field.getType().isAssignableFrom(List.class)) {
+						Type genericType = field.getGenericType();
+						if (genericType != null && genericType instanceof ParameterizedType) {
+							ParameterizedType parameterizedType = (ParameterizedType) genericType;
+							Type actualType = parameterizedType.getActualTypeArguments()[0];
+							Class<?> integerClass = (Class<?>) actualType;
+							JSONArray subParamList = new JSONArray();
+							for (Field subField : integerClass.getDeclaredFields()) {
+								drawFieldMessageRecursive(subField, subParamList, false);
+							}
+							paramObj.put("children", subParamList);
+						}
+					}
+					paramList.add(paramObj);
 				}
 			}
 		}
@@ -243,10 +285,10 @@ public class ApiValidateAndHelpBase {
 							for (Param p : params) {
 								JSONObject paramObj = new JSONObject();
 								paramObj.put("name", p.name());
-								paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+								paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
 								paramObj.put("isRequired", p.isRequired());
 								String description = p.desc();
-								if(StringUtils.isNotBlank(p.rule())) {
+								if (StringUtils.isNotBlank(p.rule())) {
 									description = description + "，规则：" + p.rule();
 								}
 								paramObj.put("description", description);
@@ -263,52 +305,27 @@ public class ApiValidateAndHelpBase {
 									if (!p.explode().isArray()) {
 										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? "" : paramNamePrefix + ".";
 										for (Field field : p.explode().getDeclaredFields()) {
-											Annotation[] annotations = field.getDeclaredAnnotations();
-											if (annotations != null && annotations.length > 0) {
-												for (Annotation annotation : annotations) {
-													if (annotation.annotationType().equals(EntityField.class)) {
-														EntityField entityField = (EntityField) annotation;
-														JSONObject paramObj = new JSONObject();
-														paramObj.put("name", paramNamePrefix+ field.getName());
-														paramObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
-														paramObj.put("description", entityField.name());
-														outputList.add(paramObj);
-														break;
-													}
-												}
-											}
+											drawFieldMessageRecursive(field, outputList, true);
 										}
 									} else {
 										JSONObject paramObj = new JSONObject();
 										paramObj.put("name", p.name());
-										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "(" + ApiParamType.JSONARRAY.getText() + ")");
-										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) ? "" : paramNamePrefix + "[n].";
+										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
+										paramObj.put("description", p.desc());
 										JSONArray elementObjList = new JSONArray();
 										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
-											Annotation[] annotations = field.getDeclaredAnnotations();
-											if (annotations != null && annotations.length > 0) {
-												for (Annotation annotation : annotations) {
-													if (annotation.annotationType().equals(EntityField.class)) {
-														EntityField entityField = (EntityField) annotation;
-														JSONObject elementObj = new JSONObject();
-														elementObj.put("name", paramNamePrefix+ field.getName());
-														elementObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
-														elementObj.put("description", entityField.name());
-														elementObjList.add(elementObj);
-														break;
-													}
-												}
-											}
+											drawFieldMessageRecursive(field, elementObjList, true);
 										}
-										//paramObj.put("member", elementObjList);
-										paramObj.put("description", p.desc());
+										if (elementObjList.size() > 0) {
+											paramObj.put("children", elementObjList);
+										}
+
 										outputList.add(paramObj);
-										outputList.addAll(elementObjList);
 									}
 								} else {
 									JSONObject paramObj = new JSONObject();
 									paramObj.put("name", p.name());
-									paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
+									paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
 									paramObj.put("description", p.desc());
 									outputList.add(paramObj);
 								}

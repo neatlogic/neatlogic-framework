@@ -104,8 +104,8 @@
         1=1
         <if test="keyword !=null and keyword != ''">
             AND
-            (a.user_id LIKE CONCAT(#{keyword}, '%')
-            OR a.user_name LIKE CONCAT(#{keyword}, '%'))
+            (a.user_id LIKE CONCAT('%', #{keyword}, '%')
+            OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="teamUuid != null and teamUuid != ''">
             AND c.`team_uuid` = #{teamUuid}
@@ -205,8 +205,8 @@
 		1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
-			(a.`user_id` LIKE CONCAT(#{keyword}, '%')
-			OR a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+			(a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+			OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 
 		<if test="teamUuid != null and teamUuid != ''">

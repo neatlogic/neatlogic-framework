@@ -6,6 +6,8 @@ import codedriver.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
 
 public interface TeamMapper {
+	public TeamVo getTeam(TeamVo teamVo);
+
 	public TeamVo getTeamByUuid(String uuid);
 
 	public List<TeamVo> getTeamByParentUuid(String parentUuid);

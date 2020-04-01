@@ -188,11 +188,11 @@ public class ApiValidateAndHelpBase {
 					if (params != null && params.length > 0) {
 						for (Param p : params) {
 							Object paramValue = null;
-							if(paramObj.containsKey(p.name())) {
+							if (paramObj.containsKey(p.name())) {
 								// 参数类型校验
 								paramValue = paramObj.get(p.name());
-								//如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
-								if(paramValue == null) {
+								// 如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
+								if (paramValue == null) {
 									paramObj.remove(p.name());
 								}
 							}
@@ -200,7 +200,7 @@ public class ApiValidateAndHelpBase {
 							if (p.isRequired() && !paramObj.containsKey(p.name())) {
 								throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
 							}
-							
+
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
 								encodeHtml(paramObj, p.name());
@@ -220,7 +220,7 @@ public class ApiValidateAndHelpBase {
 									paramObj.put(p.name(), paramValue.toString().trim());
 								}
 							}
-							
+
 						}
 					}
 				}
@@ -246,7 +246,7 @@ public class ApiValidateAndHelpBase {
 								paramObj.put("type", p.type().getValue() + "(" + p.type().getText() + ")");
 								paramObj.put("isRequired", p.isRequired());
 								String description = p.desc();
-								if(StringUtils.isNotBlank(p.rule())) {
+								if (StringUtils.isNotBlank(p.rule())) {
 									description = description + "，规则：" + p.rule();
 								}
 								paramObj.put("description", description);
@@ -269,7 +269,7 @@ public class ApiValidateAndHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject paramObj = new JSONObject();
-														paramObj.put("name", paramNamePrefix+ field.getName());
+														paramObj.put("name", paramNamePrefix + field.getName());
 														paramObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
 														paramObj.put("description", entityField.name());
 														outputList.add(paramObj);
@@ -291,7 +291,7 @@ public class ApiValidateAndHelpBase {
 													if (annotation.annotationType().equals(EntityField.class)) {
 														EntityField entityField = (EntityField) annotation;
 														JSONObject elementObj = new JSONObject();
-														elementObj.put("name", paramNamePrefix+ field.getName());
+														elementObj.put("name", paramNamePrefix + field.getName());
 														elementObj.put("type", entityField.type().getValue() + "(" + entityField.type().getText() + ")");
 														elementObj.put("description", entityField.name());
 														elementObjList.add(elementObj);
@@ -300,7 +300,7 @@ public class ApiValidateAndHelpBase {
 												}
 											}
 										}
-										//paramObj.put("member", elementObjList);
+										// paramObj.put("member", elementObjList);
 										paramObj.put("description", p.desc());
 										outputList.add(paramObj);
 										outputList.addAll(elementObjList);

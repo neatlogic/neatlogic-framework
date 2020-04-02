@@ -23,10 +23,10 @@ public class TeamVo extends BasePageVo {
 	private String parentUuid;
 	@EntityField(name = "子节点数量",
 			type = ApiParamType.INTEGER)
-	private int childCount;
+	private Integer childCount;
 	@EntityField(name = "排序",
 			type = ApiParamType.INTEGER)
-	private int sort;
+	private Integer sort;
 
 	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
 	private List<TagVo> tagList;
@@ -74,11 +74,11 @@ public class TeamVo extends BasePageVo {
 		this.name = name;
 	}
 
-	public int getSort() {
+	public Integer getSort() {
 		return sort;
 	}
 
-	public void setSort(int sort) {
+	public void setSort(Integer sort) {
 		this.sort = sort;
 	}
 
@@ -98,11 +98,11 @@ public class TeamVo extends BasePageVo {
 		this.parentUuid = parentUuid;
 	}
 
-	public int getChildCount() {
+	public Integer getChildCount() {
 		return childCount;
 	}
 
-	public void setChildCount(int childCount) {
+	public void setChildCount(Integer childCount) {
 		this.childCount = childCount;
 	}
 

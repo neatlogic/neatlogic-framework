@@ -89,4 +89,9 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 	public Boolean isLimit() {
 		return true;
 	}
+
+	@Override
+	public JSONObject include(JSONObject json, List<String> includeList) {
+		return json;
+	}
 }

@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.common.constvalue.UserType;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -68,10 +69,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		userObj.put("value", "user");
 		userObj.put("text", "用户");
 		JSONArray userArray = new JSONArray();
-		JSONObject loginUser = new JSONObject();
-		loginUser.put("value", "{LOGIN_USER}");
-		loginUser.put("text", "当前登录用户");
-		userArray.add(loginUser);
+		
 		for (T user : userList) {
 			JSONObject userTmp = new JSONObject();
 			userTmp.put("value", getHeader() + ((UserVo) user).getUserId());
@@ -91,5 +89,21 @@ public class UserGroupHandler implements IGroupSearchHandler {
 	@Override
 	public Boolean isLimit() {
 		return true;
+	}
+
+	@Override
+	public JSONObject include(JSONObject json, List<String> includeList) {
+		JSONArray userArray = json.getJSONArray("dataList");
+		JSONObject allUser = new JSONObject();
+		allUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue());
+		allUser.put("text", UserType.ALL.getText());
+		userArray.add(allUser);
+		if(includeList.contains(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue())) {
+			JSONObject loginUser = new JSONObject();
+			loginUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue());
+			loginUser.put("text", UserType.LOGIN_USER.getText());
+			userArray.add(loginUser);
+		}
+		return json;
 	}
 }

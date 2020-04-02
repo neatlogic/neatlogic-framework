@@ -22,4 +22,6 @@ public interface IGroupSearchHandler {
 	<T> List<T> reload(JSONObject jsonObj);
 	
 	<T> JSONObject repack(List<T> dataList);
+
+	JSONObject include(JSONObject json, List<String> includeList);
 }

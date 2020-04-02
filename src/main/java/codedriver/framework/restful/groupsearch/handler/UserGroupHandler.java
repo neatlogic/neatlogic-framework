@@ -97,12 +97,12 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		JSONObject allUser = new JSONObject();
 		allUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue());
 		allUser.put("text", UserType.ALL.getText());
-		userArray.add(allUser);
+		userArray.add(0,allUser);
 		if(includeList.contains(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue())) {
 			JSONObject loginUser = new JSONObject();
 			loginUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue());
 			loginUser.put("text", UserType.LOGIN_USER.getText());
-			userArray.add(loginUser);
+			userArray.add(1,loginUser);
 		}
 		return json;
 	}

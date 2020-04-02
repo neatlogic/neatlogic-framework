@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
+	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
 	<select id="checkUserIsInTeam" resultType="int">
 		SELECT
 		count(1)
@@ -42,7 +43,7 @@
 		</collection>
 	</resultMap>
 
-	<select id="getUserByUserId" parameterType="java.lang.String" resultMap="userInfoMap">
+	<select id="getUserByUserId" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
 		SELECT
 		a.`user_id` as userId,
 		a.`user_name` as userName,

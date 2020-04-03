@@ -1,7 +1,7 @@
 package codedriver.framework.common.constvalue;
 
 public enum UserType {
-	ALL("all","所有人"),LOGIN_USER("loginuser","当前登录人");
+	ALL("{all}","所有人"),LOGIN_USER("{loginuser}","当前登录人");
 
 	private String status;
 	private String text;

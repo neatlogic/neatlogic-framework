@@ -52,13 +52,20 @@ public class UserGroupHandler implements IGroupSearchHandler {
 	public <T> List<T> reload(JSONObject jsonObj) {
 		List<UserVo> userList = new ArrayList<UserVo>();
 		List<String> userIdList = new ArrayList<String>();
-		for (Object value : jsonObj.getJSONArray("valueList")) {
+		List<String> valueList = JSONObject.parseArray(jsonObj.getJSONArray("valueList").toJSONString(), String.class);
+		for (Object value : valueList) {
 			if (value.toString().startsWith(getHeader())) {
 				userIdList.add(value.toString().replace(getHeader(), ""));
 			}
 		}
 		if (userIdList.size() > 0) {
 			userList = userMapper.getUserByUserIdList(userIdList);
+		}
+		if(valueList.contains(GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue())) {
+			userList.add(new UserVo(GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue(),UserType.ALL.getText()));
+		}
+		if(valueList.contains(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue())) {
+			userList.add(new UserVo(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue(),UserType.LOGIN_USER.getText()));
 		}
 		return (List<T>) userList;
 	}

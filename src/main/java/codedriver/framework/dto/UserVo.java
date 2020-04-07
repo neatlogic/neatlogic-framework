@@ -43,6 +43,15 @@ public class UserVo extends BasePageVo {
 	private List<TeamVo> teamList;
 	private List<UserAuthVo> userAuthList;
 
+	public UserVo() {
+
+	}
+
+	public UserVo(String userId, String userName) {
+		this.userId = userId;
+		this.userName = userName;
+	}
+
 	public List<UserAuthVo> getUserAuthList() {
 		return userAuthList;
 	}

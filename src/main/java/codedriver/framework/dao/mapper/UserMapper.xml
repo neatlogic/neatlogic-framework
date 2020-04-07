@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
-	<select id="checkUserIsInTeam" resultType="int">
+	<select id="checkUserIsInTeam" resultType="int" useCache="false">
 		SELECT
 		count(1)
 		FROM
@@ -11,7 +11,7 @@
 		AND team_uuid = #{teamUuid}
 	</select>
 
-	<select id="getUserBaseInfoByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	<select id="getUserBaseInfoByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
 		a.`user_id` as userId,
 		a.`user_name` as userName,
@@ -65,7 +65,7 @@
 		a.user_id = #{value} 
 	</select>
 
-	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String">
+	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String" useCache="false">
 		SELECT
 		`user_id` AS userId
 		FROM
@@ -79,7 +79,7 @@
 		</foreach>
 	</select>
 
-    <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap">
+    <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
         SELECT
         k.`user_id` as `userId`,
         k.`user_name` as `userName`,
@@ -131,7 +131,7 @@
         ORDER BY g.`id` DESC
     </select>
 
-	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string">
+	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">
 		SELECT
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
@@ -146,7 +146,7 @@
 		ORDER BY a.`id`	 DESC
 	</select>
 
-	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap">
+	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
 		SELECT
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
@@ -163,7 +163,7 @@
 		ORDER BY a.`id` DESC
 	</select>
 
-	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo">
+	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
 		SELECT `user_id` as `userId`,
 		`auth_group` as `authGroup`,
 		`auth`
@@ -171,7 +171,7 @@
 		WHERE `user_id` = #{userId}
 	</select>
 	
-	<select id="searchUserAllAuthByUserAuth" parameterType="codedriver.framework.dto.UserAuthVo" resultType="codedriver.framework.dto.UserAuthVo">
+	<select id="searchUserAllAuthByUserAuth" parameterType="codedriver.framework.dto.UserAuthVo" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
 		SELECT auth_group authGroup,auth FROM `user_role` ur 
 		JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` WHERE ur.`user_id` = #{userId} 
 		<if test="auth != null and auth != ''">
@@ -184,7 +184,7 @@
 		</if>
 	</select>
 
-	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo">
+	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo" useCache="false">
 		SELECT
 		a.`role_name` as `roleName`,
 		a.`auth_group` as `authGroup`,
@@ -194,7 +194,7 @@
 		WHERE b.`user_id` = #{userId}
 	</select>
 
-	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int">
+	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int" useCache="false">
 		SELECT
 		count(DISTINCT (a.`user_id`))
 		FROM
@@ -227,11 +227,11 @@
 		</if>
 	</select>
 
-	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string">
+	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">
 		SELECT id FROM `user_password` WHERE user_id = #{userId} ORDER BY id DESC LIMIT 2
 	</select>
 
-	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
@@ -260,7 +260,7 @@
 		</collection>
 	</resultMap>
 
-	<select id="getUserByUserIdAndPassword" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap">
+	<select id="getUserByUserIdAndPassword" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap" useCache="false">
 		SELECT
 		a.`user_id` AS userId,
 		a.`user_name` AS userName,
@@ -278,12 +278,12 @@
 		WHERE a.user_id = #{userId} AND c.password = #{password}  AND a.`is_active` = 1
 	</select>
 
-	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo">
+	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
 		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session`
 		WHERE `user_id` = #{value}
 	</select>
 
-	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
 		`user_id` AS userId,
 		`user_name` AS userName,
@@ -299,7 +299,7 @@
 		ORDER BY `id` DESC
 	</select>
 
-	<select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo">
+	<select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo" useCache="false">
 		SELECT f.`auth` as `name`,
 		COUNT(DISTINCT (f.`userId`)) as `userCount`
 		FROM (
@@ -319,7 +319,7 @@
 		GROUP BY f.`auth`
 	</select>
 	
-	<select id="getUserProfileByUserIdAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo">
+	<select id="getUserProfileByUserIdAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo" useCache="false">
 		SELECT 
 		  `user_id`,
 		  `module_id`,

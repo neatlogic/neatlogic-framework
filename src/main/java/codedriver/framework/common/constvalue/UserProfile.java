@@ -1,5 +1,8 @@
 package codedriver.framework.common.constvalue;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -8,26 +11,39 @@ import codedriver.framework.dto.UserProfileVo;
 import codedriver.framework.restful.api.IUserProfile;
 
 public enum UserProfile implements IUserProfile{
-	USER_CREATE_SUCESS("usercreatesuccess","用户创建成功"),
-	ROLE_CREATE_SUCESS("rolecreatesuccess","角色创建成功"),
-	TEAM_CREATE_SUCESS("teamcreatesuccess","用户组创建成功");
+	USER_CREATE_SUCESS("usercreatesuccess","用户创建成功",Arrays.asList(UserProfileOperate.KEEP_ON_CREATE,UserProfileOperate.EDIT_USER,UserProfileOperate.BACK_USER_LIST)),
+	ROLE_CREATE_SUCESS("rolecreatesuccess","角色创建成功",Arrays.asList(UserProfileOperate.KEEP_ON_CREATE,UserProfileOperate.EDIT_ROLE,UserProfileOperate.BACK_ROLE_LIST)),
+	TEAM_CREATE_SUCESS("teamcreatesuccess","用户组创建成功",Arrays.asList(UserProfileOperate.KEEP_ON_CREATE,UserProfileOperate.EDIT_TEAM,UserProfileOperate.BACK_TEAM_LIST));
 	
 	private String value;
 	private String text;
+	private List<UserProfileOperate> userProfileOperateList;
 	
-	private UserProfile(String _value,String _text){
+	private UserProfile(String _value,String _text,List<UserProfileOperate> _userProfileOperateList){
 		this.value = _value;
 		this.text = _text;
+		this.userProfileOperateList = _userProfileOperateList;
 	}
 
 	public String getValue() {
 		return value;
 	}
 
+	public JSONArray getUserProfileOperateList() {
+		JSONArray userProfileOperateArray = new JSONArray();
+		for(UserProfileOperate userProfileOperate : userProfileOperateList) {
+			JSONObject json = new JSONObject();
+			json.put("value", userProfileOperate.getValue());
+			json.put("text", userProfileOperate.getText());
+			userProfileOperateArray.add(json);
+		}
+		return userProfileOperateArray;
+	}
+
 	public String getText() {
 		return text;
 	}
-
+	
 	@Override
 	public UserProfileVo getUserProfile(){
 		UserProfileVo userProfileVo = new UserProfileVo();
@@ -38,6 +54,7 @@ public enum UserProfile implements IUserProfile{
         	JSONObject configJson = new JSONObject();
         	configJson.put("value", f.getValue());
         	configJson.put("text", f.getText());
+        	configJson.put("userProfileOperateList", f.getUserProfileOperateList());
         	userProfileArray.add(configJson);
         }
         userProfileVo.setConfig(userProfileArray.toJSONString());

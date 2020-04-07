@@ -144,6 +144,7 @@
 		<if test="handler != null and handler != ''">
 			AND a.handler = #{handler}
 		</if>
+		ORDER BY a.`fcd` DESC
 		limit #{startNum}, #{pageSize}
 	</select>
 
@@ -280,11 +281,12 @@
 		`uuid`,
 		`name`,
 		`handler`,
-		begin_time,
-		end_time,
-		cron,
-		is_active,
-		need_audit
+		`begin_time`,
+		`end_time`,
+		`cron`,
+		`is_active`,
+		`need_audit`,
+		`fcd`
 		) VALUES (
 		#{uuid},
 		#{name},
@@ -293,7 +295,8 @@
 		#{endTime},
 		#{cron},
 		#{isActive},
-		#{needAudit}
+		#{needAudit},
+		NOW()
 		)
 	</insert>
 

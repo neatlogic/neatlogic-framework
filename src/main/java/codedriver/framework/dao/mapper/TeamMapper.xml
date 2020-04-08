@@ -8,6 +8,7 @@
 		<result property="sort" column="sort"/>
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="userCount" column="userCount"/>
+        <result property="childCount" column="childCount"/>
 		<collection property="tagList" ofType="codedriver.framework.dto.TagVo">
 			<id property="id" column="tagId"/>
 			<result property="name" column="tagName"/>
@@ -22,24 +23,29 @@
 		a.`parent_uuid` as `parentUuid`,
 		d.`id` as `tagId`,
 		d.`name` as `tagName`,
-		(SELECT COUNT(1) FROM `user_team` e WHERE e.`team_uuid` = a.`uuid`)  AS `userCount` 
+		(SELECT COUNT(1) FROM `user_team` e WHERE e.`team_uuid` = a.`uuid`)  AS `userCount`,
+        (SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
 		FROM
-		`team` a
+        (
+          SELECT *
+            FROM `team`
+            WHERE
+            `uuid` != '0'
+            <if test="keyword != null and keyword != ''">
+                and `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="parentUuid != null and parentUuid != ''">
+                and `parent_uuid` = #{parentUuid}
+            </if>
+            ORDER BY `sort`
+            <if test="needPage == true">
+                LIMIT #{startNum}, #{pageSize}
+            </if>
+        ) a
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
-		WHERE
-		`uuid` != '0'
-		<if test="keyword != null and keyword != ''">
-			and a.`name` LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		<if test="parentUuid != null and parentUuid != ''">
-			and a.`parent_uuid` = #{parentUuid}
-		</if>
-		ORDER BY `sort`
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
+
 	</select>
 
 	<select id = "getTeamTree" resultMap="teamMap">

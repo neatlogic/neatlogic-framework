@@ -26,7 +26,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 
 	@Override
 	public String getHeader() {
-		return getName() + "#";
+		return GroupSearch.USER.getValuePlugin();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,11 +61,11 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		if (userIdList.size() > 0) {
 			userList = userMapper.getUserByUserIdList(userIdList);
 		}
-		if(valueList.contains(GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue())) {
-			userList.add(new UserVo(GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue(),UserType.ALL.getText()));
+		if(valueList.contains(getHeader()+UserType.ALL.getValue())) {
+			userList.add(new UserVo(UserType.ALL.getValue(),UserType.ALL.getText()));
 		}
-		if(valueList.contains(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue())) {
-			userList.add(new UserVo(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue(),UserType.LOGIN_USER.getText()));
+		if(valueList.contains(getHeader()+UserType.LOGIN_USER.getValue())) {
+			userList.add(new UserVo(UserType.LOGIN_USER.getValue(),UserType.LOGIN_USER.getText()));
 		}
 		return (List<T>) userList;
 	}

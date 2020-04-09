@@ -321,8 +321,8 @@
 	
 	<select id="getUserProfileByUserIdAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo" useCache="false">
 		SELECT 
-		  `user_id`,
-		  `module_id`,
+		  `user_id` as userId,
+		  `module_id` as moduleId,
 		  `config` 
 		FROM
 		  `user_profile` 

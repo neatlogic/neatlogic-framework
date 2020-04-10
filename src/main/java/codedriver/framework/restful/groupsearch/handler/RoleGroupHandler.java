@@ -82,16 +82,11 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 
 	@Override
 	public int getSort() {
-		return 3;
+		return 4;
 	}
 
 	@Override
 	public Boolean isLimit() {
 		return true;
-	}
-
-	@Override
-	public JSONObject include(JSONObject json, List<String> includeList) {
-		return json;
 	}
 }

@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.common.constvalue.UserType;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -61,12 +60,6 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		if (userIdList.size() > 0) {
 			userList = userMapper.getUserByUserIdList(userIdList);
 		}
-		if(valueList.contains(getHeader()+UserType.ALL.getValue())) {
-			userList.add(new UserVo(UserType.ALL.getValue(),UserType.ALL.getText()));
-		}
-		if(valueList.contains(getHeader()+UserType.LOGIN_USER.getValue())) {
-			userList.add(new UserVo(UserType.LOGIN_USER.getValue(),UserType.LOGIN_USER.getText()));
-		}
 		return (List<T>) userList;
 	}
 
@@ -90,27 +83,11 @@ public class UserGroupHandler implements IGroupSearchHandler {
 
 	@Override
 	public int getSort() {
-		return 1;
+		return 2;
 	}
 
 	@Override
 	public Boolean isLimit() {
 		return true;
-	}
-
-	@Override
-	public JSONObject include(JSONObject json, List<String> includeList) {
-		JSONArray userArray = json.getJSONArray("dataList");
-		JSONObject allUser = new JSONObject();
-		allUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.ALL.getValue());
-		allUser.put("text", UserType.ALL.getText());
-		userArray.add(0,allUser);
-		if(includeList.contains(GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue())) {
-			JSONObject loginUser = new JSONObject();
-			loginUser.put("value", GroupSearch.USER.getValuePlugin()+UserType.LOGIN_USER.getValue());
-			loginUser.put("text", UserType.LOGIN_USER.getText());
-			userArray.add(1,loginUser);
-		}
-		return json;
 	}
 }

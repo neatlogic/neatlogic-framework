@@ -81,16 +81,11 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 
 	@Override
 	public int getSort() {
-		return 2;
+		return 3;
 	}
 
 	@Override
 	public Boolean isLimit() {
 		return true;
-	}
-
-	@Override
-	public JSONObject include(JSONObject json, List<String> includeList) {
-		return json;
 	}
 }

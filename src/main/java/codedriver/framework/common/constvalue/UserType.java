@@ -1,14 +1,16 @@
 package codedriver.framework.common.constvalue;
 
 public enum UserType {
-	ALL("all","所有人"),LOGIN_USER("loginuser","当前登录人");
+	ALL("alluser","所有人",true),LOGIN_USER("loginuser","当前登录人",false);
 
 	private String status;
 	private String text;
+	private Boolean isDefultShow;
 
-	private UserType(String _status, String _text) {
+	private UserType(String _status, String _text,Boolean _isDefultShow) {
 		this.status = _status;
 		this.text = _text;
+		this.isDefultShow = _isDefultShow;
 	}
 
 	public String getValue() {
@@ -17,6 +19,10 @@ public enum UserType {
 
 	public String getText() {
 		return text;
+	}
+
+	public Boolean getIsDefultShow() {
+		return isDefultShow;
 	}
 
 	public static String getValue(String _status) {

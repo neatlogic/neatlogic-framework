@@ -24,4 +24,22 @@ public enum GroupSearch {
 	public String getText() {
 		return text;
 	}
+	
+	public static String getValue(String _value) {
+		for(GroupSearch gs : GroupSearch.values()) {
+			if(gs.value.equals(_value)) {
+				return gs.value;
+			}
+		}
+		return null;
+	}
+	
+	public static GroupSearch getGroupSearch(String _value) {
+		for(GroupSearch gs : GroupSearch.values()) {
+			if(gs.value.equals(_value)) {
+				return gs;
+			}
+		}
+		return null;
+	}
 }

@@ -19,7 +19,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.alibaba.fastjson.JSONObject;
@@ -29,10 +28,10 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
-import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.ApiComponentFactory;
-import codedriver.framework.restful.core.BinaryStreamApiComponent;
-import codedriver.framework.restful.core.JsonStreamApiComponent;
+import codedriver.framework.restful.core.IBinaryStreamApiComponent;
+import codedriver.framework.restful.core.IApiComponent;
+import codedriver.framework.restful.core.IJsonStreamApiComponent;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.service.ApiService;
 
@@ -73,9 +72,13 @@ public class ApiDispatcher {
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
 					Long endtime = System.currentTimeMillis();
-					returnObj.put("TimeCost", endtime - starttime);
-					returnObj.put("Return", returnV);
-					returnObj.put("Status", "OK");
+					if (!restComponent.isRaw()) {
+						returnObj.put("TimeCost", endtime - starttime);
+						returnObj.put("Return", returnV);
+						returnObj.put("Status", "OK");
+					} else {
+						returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+					}
 				} else {
 					returnObj.putAll(restComponent.help());
 				}
@@ -83,12 +86,19 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.STREAM)) {
-			JsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
+			IJsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
-					returnObj.put("Return", returnV);
-					returnObj.put("Status", "OK");
+					Long endtime = System.currentTimeMillis();
+					if (!restComponent.isRaw()) {
+						returnObj.put("TimeCost", endtime - starttime);
+						returnObj.put("Return", returnV);
+						returnObj.put("Status", "OK");
+					} else {
+						returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+					}
 				} else {
 					returnObj.putAll(restComponent.help());
 				}
@@ -96,12 +106,19 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.BINARY)) {
-			BinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
+			IBinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
-					returnObj.put("Return", returnV);
-					returnObj.put("Status", "OK");
+					Long endtime = System.currentTimeMillis();
+					if (!restComponent.isRaw()) {
+						returnObj.put("TimeCost", endtime - starttime);
+						returnObj.put("Return", returnV);
+						returnObj.put("Status", "OK");
+					} else {
+						returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+					}
 				} else {
 					returnObj.putAll(restComponent.help());
 				}
@@ -111,8 +128,7 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/rest/**",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/rest/**", method = RequestMethod.GET)
 	public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -149,10 +165,8 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/rest/**",
-			method = RequestMethod.POST)
-	public void dispatcherForPost(@RequestBody
-	String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/rest/**", method = RequestMethod.POST)
+	public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
@@ -198,8 +212,7 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/stream/**",
-			method = RequestMethod.POST)
+	@RequestMapping(value = "/stream/**", method = RequestMethod.POST)
 	public void displatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -273,8 +286,7 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/help/rest/**",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/help/rest/**", method = RequestMethod.GET)
 	public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -298,8 +310,7 @@ public class ApiDispatcher {
 		response.getWriter().print(returnObj.toJSONString());
 	}
 
-	@RequestMapping(value = "/help/stream/**",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/help/stream/**", method = RequestMethod.GET)
 	public void steamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -323,8 +334,7 @@ public class ApiDispatcher {
 		response.getWriter().print(returnObj.toJSONString());
 	}
 
-	@RequestMapping(value = "/help/binary/**",
-			method = RequestMethod.GET)
+	@RequestMapping(value = "/help/binary/**", method = RequestMethod.GET)
 	public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());

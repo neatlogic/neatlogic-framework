@@ -13,6 +13,11 @@ public interface IApiComponent {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
 
+	// true时返回格式不再包裹固定格式
+	public default boolean isRaw() {
+		return false;
+	}
+
 	public String getName();
 
 	public String getConfig();

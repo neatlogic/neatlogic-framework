@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.restful.dto.ApiVo;
 
-public interface JsonStreamApiComponent {
+public interface IJsonStreamApiComponent {
 	public String getToken();
 
 	public String getId();
@@ -13,6 +13,11 @@ public interface JsonStreamApiComponent {
 	public String getName();
 
 	public String getConfig();
+
+	// true时返回格式不再包裹固定格式
+	public default boolean isRaw() {
+		return false;
+	}
 
 	public boolean isPrivate();
 

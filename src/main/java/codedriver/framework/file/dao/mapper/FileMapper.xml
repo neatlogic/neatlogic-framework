@@ -9,7 +9,8 @@
 		`size`,
 		`user_id` AS userId,
 		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
-		`type`
+		`type`,
+		content_type AS contentType
 		FROM
 		`file`
 		WHERE `uuid` = #{value}
@@ -31,7 +32,8 @@
 		`size`,
 		`user_id`,
 		`upload_time`,
-		`type`
+		`type`,
+		content_type
 		)
 		VALUES
 		(
@@ -40,7 +42,8 @@
 		#{size},
 		#{userId},
 		NOW(),
-		#{type}
+		#{type},
+		#{contentType}
 		)
 	</insert>
 </mapper>

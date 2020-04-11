@@ -29,18 +29,18 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	private static List<ApiVo> apiList = new ArrayList<>();
 	private static Map<String, ApiVo> apiMap = new HashMap<>();
 	public static Map<String, RateLimiter> interfaceRateMap = new ConcurrentHashMap<>();
-	private static Map<String, JsonStreamApiComponent> streamComponentMap = new HashMap<>();
-	private static Map<String, BinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
+	private static Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
+	private static Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
 
 	public static IApiComponent getInstance(String componentId) {
 		return componentMap.get(componentId);
 	}
 
-	public static JsonStreamApiComponent getStreamInstance(String componentId) {
+	public static IJsonStreamApiComponent getStreamInstance(String componentId) {
 		return streamComponentMap.get(componentId);
 	}
 
-	public static BinaryStreamApiComponent getBinaryInstance(String componentId) {
+	public static IBinaryStreamApiComponent getBinaryInstance(String componentId) {
 		return binaryComponentMap.get(componentId);
 	}
 
@@ -64,8 +64,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
 		Map<String, IApiComponent> myMap = context.getBeansOfType(IApiComponent.class);
-		Map<String, JsonStreamApiComponent> myStreamMap = context.getBeansOfType(JsonStreamApiComponent.class);
-		Map<String, BinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(BinaryStreamApiComponent.class);
+		Map<String, IJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IJsonStreamApiComponent.class);
+		Map<String, IBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IBinaryStreamApiComponent.class);
 		for (Map.Entry<String, IApiComponent> entry : myMap.entrySet()) {
 			IApiComponent component = entry.getValue();
 			if (component.getClassName() != null) {
@@ -115,8 +115,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 			}
 		}
 
-		for (Map.Entry<String, JsonStreamApiComponent> entry : myStreamMap.entrySet()) {
-			JsonStreamApiComponent component = entry.getValue();
+		for (Map.Entry<String, IJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
+			IJsonStreamApiComponent component = entry.getValue();
 			if (component.getId() != null) {
 				streamComponentMap.put(component.getId(), component);
 				ApiHandlerVo restComponentVo = new ApiHandlerVo();
@@ -164,8 +164,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 			}
 		}
 
-		for (Map.Entry<String, BinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
-			BinaryStreamApiComponent component = entry.getValue();
+		for (Map.Entry<String, IBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
+			IBinaryStreamApiComponent component = entry.getValue();
 			if (component.getId() != null) {
 				binaryComponentMap.put(component.getId(), component);
 				ApiHandlerVo restComponentVo = new ApiHandlerVo();

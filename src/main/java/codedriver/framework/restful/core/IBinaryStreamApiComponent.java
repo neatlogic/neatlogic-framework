@@ -7,12 +7,17 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.restful.dto.ApiVo;
 
-public interface BinaryStreamApiComponent {
+public interface IBinaryStreamApiComponent {
 	public String getToken();
 
 	public String getId();
 
 	public String getName();
+
+	// true时返回格式不再包裹固定格式
+	public default boolean isRaw() {
+		return false;
+	}
 
 	public String getConfig();
 

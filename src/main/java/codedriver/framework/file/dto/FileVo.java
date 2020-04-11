@@ -8,27 +8,24 @@ import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class FileVo {
-	@EntityField(name = "附件uuid",
-			type = ApiParamType.STRING)
+	@EntityField(name = "附件uuid", type = ApiParamType.STRING)
 	private String uuid;
-	@EntityField(name = "附件保存路径",
-			type = ApiParamType.STRING)
+	@EntityField(name = "附件保存路径", type = ApiParamType.STRING)
 	private String path;
-	@EntityField(name = "附件名称",
-			type = ApiParamType.STRING)
+	@EntityField(name = "附件名称", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "附件大小（字节）",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "附件大小（字节）", type = ApiParamType.INTEGER)
 	private Long size;
-	@EntityField(name = "上传用户",
-			type = ApiParamType.STRING)
+	@EntityField(name = "上传用户", type = ApiParamType.STRING)
 	private String userId;
-	@EntityField(name = "上传时间",
-			type = ApiParamType.STRING)
+	@EntityField(name = "上传时间", type = ApiParamType.STRING)
 	private String uploadTime;
-	@EntityField(name = "附件归属",
-			type = ApiParamType.STRING)
+	@EntityField(name = "附件归属", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "扩展名", type = ApiParamType.STRING)
+	private String ext;
+	@EntityField(name = "内容类型", type = ApiParamType.STRING)
+	private String contentType;
 
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
@@ -87,6 +84,25 @@ public class FileVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getExt() {
+		if (StringUtils.isNotBlank(name) && name.indexOf(".") > -1) {
+			ext = name.substring(name.lastIndexOf(".") + 1);
+		}
+		return ext;
+	}
+
+	public void setExt(String ext) {
+		this.ext = ext;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
 }

@@ -63,6 +63,9 @@ public class ApiDispatcher {
 			if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
 				throw new ApiNotFoundException("token为“" + token + "”的接口不存在或已被禁用");
 			}
+		} else if (interfaceVo.getPathVariableObj() != null) {
+			// 融合路径参数
+			paramObj.putAll(interfaceVo.getPathVariableObj());
 		}
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {

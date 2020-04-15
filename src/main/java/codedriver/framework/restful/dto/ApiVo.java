@@ -1,22 +1,24 @@
 package codedriver.framework.restful.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.ApiComponentFactory;
 
-public class ApiVo extends BasePageVo implements Serializable{
+public class ApiVo extends BasePageVo implements Serializable {
 
 	private static final long serialVersionUID = 3689437871016436622L;
 
 	public enum Type {
-		OBJECT("object", "对象模式"),
-		STREAM("stream", "json流模式"),
-		BINARY("binary", "字节流模式");
+		OBJECT("object", "对象模式"), STREAM("stream", "json流模式"), BINARY("binary", "字节流模式");
 
 		private String name;
 		private String text;
@@ -73,7 +75,7 @@ public class ApiVo extends BasePageVo implements Serializable{
 	@EntityField(name = "模块ID", type = ApiParamType.STRING)
 	private String moduleId;
 	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
-	private Integer visitTimes = 0;	
+	private Integer visitTimes = 0;
 	@EntityField(name = "接口类型", type = ApiParamType.STRING)
 	private String type;
 	@EntityField(name = "接口类型名称", type = ApiParamType.STRING)
@@ -86,12 +88,24 @@ public class ApiVo extends BasePageVo implements Serializable{
 	private Integer isDeletable = 1;
 	@EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
 	private Boolean isPrivate;
-	
+	@JSONField(serialize = false)
+	private transient JSONObject pathVariableObj;
+	@JSONField(serialize = false)
+	private transient List<String> pathVariableList;
+	@JSONField(serialize = false)
 	private transient String keyword;
+	@JSONField(serialize = false)
 	private transient List<String> tokenList;
 //	private Long totalDataSize = 0l;
 //	private String totalDataSizeText;
-	
+
+	public void addPathVariable(String para) {
+		if (pathVariableList == null) {
+			pathVariableList = new ArrayList<>();
+		}
+		pathVariableList.add(para);
+	}
+
 	public String getKeyword() {
 		return keyword;
 	}
@@ -120,14 +134,14 @@ public class ApiVo extends BasePageVo implements Serializable{
 	}
 
 	public String getType() {
-		if(type != null) {
+		if (type != null) {
 			return type;
 		}
-		if(handler == null) {
+		if (handler == null) {
 			return null;
 		}
 		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
-		if(apiHandlerVo == null) {
+		if (apiHandlerVo == null) {
 			return null;
 		}
 		type = apiHandlerVo.getType();
@@ -171,14 +185,14 @@ public class ApiVo extends BasePageVo implements Serializable{
 	}
 
 	public String getHandlerName() {
-		if(handlerName != null) {
+		if (handlerName != null) {
 			return handlerName;
 		}
-		if(handler == null) {
+		if (handler == null) {
 			return null;
 		}
 		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
-		if(apiHandlerVo == null) {
+		if (apiHandlerVo == null) {
 			return null;
 		}
 		handlerName = apiHandlerVo.getName();
@@ -320,14 +334,14 @@ public class ApiVo extends BasePageVo implements Serializable{
 	}
 
 	public Boolean getIsPrivate() {
-		if(isPrivate != null) {
+		if (isPrivate != null) {
 			return isPrivate;
 		}
-		if(handler == null) {
+		if (handler == null) {
 			return null;
 		}
 		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
-		if(apiHandlerVo == null) {
+		if (apiHandlerVo == null) {
 			return null;
 		}
 		isPrivate = apiHandlerVo.isPrivate();
@@ -434,6 +448,22 @@ public class ApiVo extends BasePageVo implements Serializable{
 		} else if (!username.equals(other.username))
 			return false;
 		return true;
+	}
+
+	public JSONObject getPathVariableObj() {
+		return pathVariableObj;
+	}
+
+	public void setPathVariableObj(JSONObject pathVariableObj) {
+		this.pathVariableObj = pathVariableObj;
+	}
+
+	public List<String> getPathVariableList() {
+		return pathVariableList;
+	}
+
+	public void setPathVariableList(List<String> pathVariableList) {
+		this.pathVariableList = pathVariableList;
 	}
 
 //	@Override

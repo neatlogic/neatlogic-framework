@@ -35,7 +35,7 @@ public class CommonGroupHandler implements IGroupSearchHandler {
 		List<String> includeStrList = includeList.stream().map(object -> object.toString()).collect(Collectors.toList());
 		List<String> userTypeList = new ArrayList<String>();
 		for (UserType s : UserType.values()) {
-			if(s.getIsDefultShow()||(!s.getIsDefultShow()&&includeStrList.contains(getHeader()+s.getValue()))) {
+			if((s.getIsDefultShow()||(!s.getIsDefultShow()&&includeStrList.contains(getHeader()+s.getValue())))&&s.getText().contains(jsonObj.getString("keyword"))) {
 				userTypeList.add(s.getValue());
 			}
 		}

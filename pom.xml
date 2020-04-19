@@ -29,15 +29,26 @@
 	</build>
 	<dependencies>
 		<dependency>
-            <groupId>com.techsure</groupId>
-            <artifactId>multiattr-search</artifactId>
-            <version>0.4-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-            </exclusions>
-		</dependency> 
+			<groupId>com.techsure</groupId>
+			<artifactId>multiattr-search</artifactId>
+			<version>0.4-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- json结构转换 -->
+		<dependency>
+			<groupId>com.bazaarvoice.jolt</groupId>
+			<artifactId>jolt-core</artifactId>
+			<version>0.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bazaarvoice.jolt</groupId>
+			<artifactId>json-utils</artifactId>
+			<version>0.1.1</version>
+		</dependency>
 	</dependencies>
 </project>

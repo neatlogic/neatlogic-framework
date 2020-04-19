@@ -279,6 +279,12 @@ public class UserVo extends BasePageVo {
 	}
 
 	public List<String> getRoleNameList() {
+		if(CollectionUtils.isNotEmpty(roleList)) {
+			roleNameList = new ArrayList<String>();
+			for(RoleVo role : roleList) {
+				roleNameList.add(role.getName());
+			}
+		}
 		return roleNameList;
 	}
 

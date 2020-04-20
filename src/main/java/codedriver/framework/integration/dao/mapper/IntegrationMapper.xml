@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
+	<select id="getIntegrationByUuid" parameterType="java.lang.String" resultType="codedriver.framework.integration.dto.IntegrationVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		is_active AS isActive,
+		`config`
+		FROM
+		`integration`
+		WHERE
+		uuid = #{value}
+	</select>
+
+	<select id="searchIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.integration.dto.IntegrationVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		is_active AS isActive,
+		`config`
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+		</where>
+		ORDER BY fcd DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchIntegrationCount" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		INSERT INTO `integration` (
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		`config`,
+		`is_active`,
+		`fcd`,
+		`fcu`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{url},
+		#{handler},
+		#{method},
+		#{configStr},
+		#{isActive},
+		NOW(),
+		#{fcu}
+		)
+	</insert>
+</mapper>

@@ -387,7 +387,6 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler {
 							specObj = buildShiftSpec(specObj, returnVal, target);
 							shiftSpecObj.getJSONObject("spec").putAll(specObj);
 						}
-
 					}
 				}
 			}

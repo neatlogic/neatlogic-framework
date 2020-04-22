@@ -69,7 +69,7 @@
 		`name`,
 		`sort`,
 		`parent_uuid` as `parentUuid`
-		FROM `team` WHERE `sort` &gt; #{sort} AND `parent_uuid` = #{parentUuid}
+		FROM `team` WHERE `sort` &gt;= #{sort} AND `parent_uuid` = #{parentUuid}
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">

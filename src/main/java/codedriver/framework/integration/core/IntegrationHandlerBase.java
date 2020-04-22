@@ -37,7 +37,7 @@ import codedriver.framework.integration.authtication.core.AuthenticateHandlerFac
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
 import codedriver.framework.integration.dto.IntegrationVo;
 
-public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler {
+public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T> {
 	static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
 
 	static TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -243,8 +243,8 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler {
 	/**
 	 * @Author: chenqiwei
 	 * @Time:Apr 19, 2020
-	 * @Description: TODO 假设returnVal是a.b.[].c，则生成 {"a": {"b": {"*": {"c":"traget"}
-	 *               } } }这样的json
+	 * @Description: TODO 假设returnVal是a.b.[1].c，则生成 {"a": {"b": {"*": {"c":"traget"}
+	 *               } } }这样的json，同时需要根据数组编号转换target值
 	 * @param @param  specObj
 	 * @param @param  returnVal
 	 * @param @param  target
@@ -356,16 +356,27 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler {
 		}
 		specList.add(shiftSpecObj);
 		specList.add(defaultSpecObj);
-		System.out.println(specList.toJSONString());
+
+		Chainr chainr = Chainr.fromSpec(specList);
+
+		String tmp = "{\n" + "  \"return\": {\n" + "    \"userList\": [\n" + "      {\n" + "        \"username\": \"cqw\",\n" + "        \"password\": \"123\"\n" + "      },\n" + "      {\n" + "        \"username\": \"wantc\",\n" + "        \"password\": \"312\"\n" + "      }\n" + "    ]\n" + "  }\n" + "}";
+
+		JSONObject inputJSON = JSONObject.parseObject(tmp);
+
+		Object transformedOutput = chainr.transform(inputJSON);
+		System.out.println(JSONObject.toJSONString(transformedOutput));
 	}
 
 	public final T getData(IntegrationVo integrationVo) {
 		String result = sendRequest(integrationVo);
+		result = result.trim();
+
 		if (StringUtils.isNotBlank(result)) {
 			if (integrationVo.getConfig() != null) {
 				JSONArray outputConfig = integrationVo.getConfig().getJSONArray("outputConfig");
 				if (outputConfig != null && outputConfig.size() > 0) {
 					// 定义转换和默认值两种描述设置
+					JSONArray specList = new JSONArray();
 					JSONObject shiftSpecObj = new JSONObject();
 					shiftSpecObj.put("operation", "shift");
 					shiftSpecObj.put("spec", new JSONObject());
@@ -388,21 +399,28 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler {
 							shiftSpecObj.getJSONObject("spec").putAll(specObj);
 						}
 					}
+					specList.add(shiftSpecObj);
+					specList.add(defaultSpecObj);
+
+					Chainr chainr = Chainr.fromSpec(specList);
+					Object transformedOutput = null;
+					if (result.startsWith("{")) {
+						JSONObject resultObj = JSONObject.parseObject(result);
+						transformedOutput = chainr.transform(resultObj);
+					} else if (result.startsWith("[")) {
+						JSONArray resultList = JSONArray.parseArray(result);
+						transformedOutput = chainr.transform(resultList);
+					}
+					if (transformedOutput != null) {
+						return myGetData(JSONArray.parseArray(JSONArray.toJSONString(transformedOutput)));
+					}
 				}
 			}
-
-			result = result.trim();
-			if (result.startsWith("{")) {
-				JSONObject resultObj = JSONObject.parseObject(result);
-
-			} else if (result.startsWith("[")) {
-				JSONArray resultList = JSONArray.parseArray(result);
-			}
 		}
-		return null;
+		return myGetData(JSONArray.parseArray(result));
 	}
 
-	protected abstract T myGetData(IntegrationVo integrationVo);
+	protected abstract T myGetData(JSONArray result);
 
 	private static class NullHostNameVerifier implements HostnameVerifier {
 		@Override

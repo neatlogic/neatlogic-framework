@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import codedriver.framework.integration.dto.IntegrationVo;
+import com.alibaba.fastjson.JSONArray;
 
 @Component
-public class CustomIntegrationHandler<Object> extends IntegrationHandlerBase {
+public class CustomIntegrationHandler extends IntegrationHandlerBase<JSONArray> {
 	public String getName() {
 		return "自定义";
 	}
@@ -27,9 +27,8 @@ public class CustomIntegrationHandler<Object> extends IntegrationHandlerBase {
 	}
 
 	@Override
-	protected Object myGetData(IntegrationVo integrationVo) {
-		// TODO Auto-generated method stub
-		return null;
+	protected JSONArray myGetData(JSONArray result) {
+		return result;
 	}
 
 }

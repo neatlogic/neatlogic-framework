@@ -21,4 +21,5 @@ public interface IIntegrationHandler<T> {
 
 	// 输出参数模板
 	public List<PartternVo> getOutputPartternList();
+
 }

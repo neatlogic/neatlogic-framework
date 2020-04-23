@@ -45,7 +45,7 @@
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
-
+ 		ORDER BY a.`sort` 
 	</select>
 
 	<select id = "getTeamTree" resultMap="teamMap">

@@ -27,5 +27,7 @@ public @interface Param {
 
 	boolean xss() default false;
 
-	int length() default -1;
+	int maxLength() default -1;
+	
+	int minLength() default -1;
 }

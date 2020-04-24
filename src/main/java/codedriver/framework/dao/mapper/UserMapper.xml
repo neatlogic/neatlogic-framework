@@ -249,6 +249,18 @@
 		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1
 	</select>
 
+	<select id="getActiveUserByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	SELECT 
+	  `user_id` AS userId,
+	  `user_name` AS userName, 
+	  `email`,
+	  `phone`,
+	  `is_active` AS isActive
+	FROM `user` u
+	JOIN user_role ur ON ur.`user_id` = u.`user_id` AND ur.`role_name` = #{roleName}
+	WHERE u.`is_active` = 1
+	</select>
+	
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
 		<id property="userId" column="userId" />
 		<result property="userName" column="userName" />

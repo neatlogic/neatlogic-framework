@@ -35,6 +35,8 @@ public interface UserMapper {
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
 
+	public List<UserVo> getActiveUserByRoleName(String roleName);
+
 	public UserVo getUserByUserIdAndPassword(UserVo userVo);
 
 	public UserSessionVo getUserSessionByUserId(String userId);

@@ -6,7 +6,6 @@ import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 public interface ApiMapper {
-	public List<ApiVo> getApiByComponentId(String apiComponentId);
 
 	public ApiVo getApiByToken(String token);
 

@@ -33,6 +33,7 @@ import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
+import codedriver.framework.exception.type.ParamValueTooShortException;
 import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.EntityField;
@@ -209,10 +210,16 @@ public class ApiValidateAndHelpBase {
 								encodeHtml(paramObj, p.name());
 							}
 
-							// 判断长度
-							if (p.length() > 0 && paramValue != null && paramValue instanceof String) {
-								if (paramValue.toString().length() > p.length()) {
-									throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.length());
+							// 判断最大长度
+							if (p.maxLength() > 0 && paramValue != null && paramValue instanceof String) {
+								if (paramValue.toString().trim().length() > p.maxLength()) {
+									throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.maxLength());
+								}
+							}
+							// 判断最小长度
+							if (p.minLength() > 0 && paramValue != null && paramValue instanceof String) {
+								if (paramValue.toString().trim().length() < p.minLength()) {
+									throw new ParamValueTooShortException(p.name(), paramValue.toString().length(), p.minLength());
 								}
 							}
 							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {

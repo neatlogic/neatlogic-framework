@@ -45,7 +45,7 @@
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
-
+ 		ORDER BY a.`sort` 
 	</select>
 
 	<select id = "getTeamTree" resultMap="teamMap">
@@ -69,7 +69,25 @@
 		`name`,
 		`sort`,
 		`parent_uuid` as `parentUuid`
-		FROM `team` WHERE `sort` &gt; #{sort} AND `parent_uuid` = #{parentUuid}
+		FROM `team` WHERE `sort` &gt;= #{sort} AND `parent_uuid` = #{parentUuid}
+	</select>
+	
+	<select id="getTeamSortUpTeamList" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`parent_uuid` as `parentUuid`
+		FROM `team` WHERE `sort` &lt; #{sort} AND `sort` >= #{targetSort} AND `parent_uuid` = #{parentUuid}
+	</select>
+	
+	<select id="getTeamSortDownTeamList" resultType="codedriver.framework.dto.TeamVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`sort`,
+		`parent_uuid` as `parentUuid`
+		FROM `team` WHERE `sort` &lt;= #{targetSort} AND `sort` > #{sort} AND `parent_uuid` = #{parentUuid}
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
@@ -226,6 +244,10 @@
 
 	<update id="updateTeamSortAdd" parameterType="String">
 		UPDATE `team` SET `sort` = `sort` + 1 WHERE `uuid` = #{teamUuid}
+	</update>
+	
+	<update id="updateTeamSortDec" parameterType="String">
+		UPDATE `team` SET `sort` = `sort` - 1 WHERE `uuid` = #{teamUuid}
 	</update>
 
 	<delete id="deleteTeamByUuid" parameterType="java.lang.String">

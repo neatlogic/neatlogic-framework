@@ -19,6 +19,10 @@ public interface TeamMapper {
 	public List<TeamVo> getTeamTree();
 
 	public List<TeamVo> getTeamSortAfterTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
+	
+	public List<TeamVo> getTeamSortUpTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
+	
+	public List<TeamVo> getTeamSortDownTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
 
 	public int searchTeamCount(TeamVo teamVo);
 
@@ -49,4 +53,6 @@ public interface TeamMapper {
 	public void updateTeamSortAndParentUuid(TeamVo teamVo);
 
 	public void updateTeamSortAdd(String teamUuid);
+
+	public void updateTeamSortDec(String teamUuid);
 }

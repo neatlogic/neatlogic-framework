@@ -1,11 +1,11 @@
 package codedriver.framework.integration.authentication.costvalue;
 
-public enum ContentType {
+public enum BodyType {
 	RAW("raw"), X_WWW_FORM_URLENCODED("x-www-form-urlencoded");
 
 	private String type;
 
-	private ContentType(String _type) {
+	private BodyType(String _type) {
 		this.type = _type;
 	}
 

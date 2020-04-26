@@ -1,5 +1,6 @@
 package codedriver.framework.integration.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -29,11 +30,13 @@ public class IntegrationVo extends BasePageVo {
 	@EntityField(name = "请求方法", type = ApiParamType.STRING)
 	private String method;
 	@EntityField(name = "输入参数模板", type = ApiParamType.JSONARRAY)
-	private List<PartternVo> inputPartternList;
+	private List<PatternVo> inputPatternList = new ArrayList<>();
+	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
+	private List<PatternVo> outputPatternList = new ArrayList<>();
 	@EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
-	private JSONObject config;
+	private String config;
 	@JSONField(serialize = false)
-	private transient String configStr;
+	private transient JSONObject configObj;
 	// 请求参数
 	@JSONField(serialize = false)
 	private transient JSONObject paramObj;
@@ -72,14 +75,6 @@ public class IntegrationVo extends BasePageVo {
 		this.name = name;
 	}
 
-	public List<PartternVo> getInputPartternList() {
-		return inputPartternList;
-	}
-
-	public void setInputPartternList(List<PartternVo> inputPartternList) {
-		this.inputPartternList = inputPartternList;
-	}
-
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -101,7 +96,7 @@ public class IntegrationVo extends BasePageVo {
 
 	public String getHandlerName() {
 		if (StringUtils.isBlank(handlerName) && StringUtils.isNotBlank(handler)) {
-			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
 				handlerName = integrationHandler.getName();
 			}
@@ -113,23 +108,24 @@ public class IntegrationVo extends BasePageVo {
 		this.handlerName = handlerName;
 	}
 
+	@JSONField(serialize = false)
 	public String getConfigStr() {
-		if (StringUtils.isBlank(configStr) && config != null) {
-			configStr = config.toJSONString();
-		}
-		return configStr;
+		return config;
 	}
 
-	public void setConfigStr(String configStr) {
-		this.configStr = configStr;
-	}
-
-	public void setConfig(JSONObject config) {
+	public void setConfig(String config) {
 		this.config = config;
 	}
 
 	public JSONObject getConfig() {
-		return config;
+		if (configObj == null && StringUtils.isNotBlank(config)) {
+			try {
+				configObj = JSONObject.parseObject(config);
+			} catch (Exception ex) {
+
+			}
+		}
+		return configObj;
 	}
 
 	public JSONObject getParamObj() {
@@ -178,6 +174,22 @@ public class IntegrationVo extends BasePageVo {
 
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+
+	public List<PatternVo> getInputPatternList() {
+		return inputPatternList;
+	}
+
+	public void setInputPatternList(List<PatternVo> inputPatternList) {
+		this.inputPatternList = inputPatternList;
+	}
+
+	public List<PatternVo> getOutputPatternList() {
+		return outputPatternList;
+	}
+
+	public void setOutputPatternList(List<PatternVo> outputPatternList) {
+		this.outputPatternList = outputPatternList;
 	}
 
 }

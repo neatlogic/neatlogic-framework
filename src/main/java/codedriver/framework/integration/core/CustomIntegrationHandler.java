@@ -17,18 +17,23 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase<JSONArray> 
 	}
 
 	@Override
-	public List getInputPartternList() {
+	public List getInputPatternList() {
 		return null;
 	}
 
 	@Override
-	public List getOutputPartternList() {
+	public List getOutputPatternList() {
 		return null;
 	}
 
 	@Override
 	protected JSONArray myGetData(JSONArray result) {
 		return result;
+	}
+
+	@Override
+	public Boolean allowCustomPattern() {
+		return true;
 	}
 
 }

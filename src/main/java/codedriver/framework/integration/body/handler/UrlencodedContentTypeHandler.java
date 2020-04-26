@@ -1,4 +1,4 @@
-package codedriver.framework.integration.authtication.contenttype.handler;
+package codedriver.framework.integration.body.handler;
 
 import java.net.HttpURLConnection;
 
@@ -7,14 +7,14 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.integration.authentication.costvalue.ContentType;
-import codedriver.framework.integration.authtication.contenttype.core.IContentTypeHandler;
+import codedriver.framework.integration.authentication.costvalue.BodyType;
+import codedriver.framework.integration.body.core.IContentTypeHandler;
 
 public class UrlencodedContentTypeHandler implements IContentTypeHandler {
 
 	@Override
 	public String getType() {
-		return ContentType.X_WWW_FORM_URLENCODED.toString();
+		return BodyType.X_WWW_FORM_URLENCODED.toString();
 	}
 
 	@Override

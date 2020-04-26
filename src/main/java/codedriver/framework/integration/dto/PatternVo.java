@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class PartternVo {
+public class PatternVo {
 	public enum Type {
 		STRING("string", "字符"), NUMBER("number", "数字"), OBJECT("object", "对象"), OBJLIST("objlist", "对象数组"), STRLIST("strlist", "字符数组"), NUMLIST("numlist", "数字数组");
 
@@ -45,10 +45,10 @@ public class PartternVo {
 	}
 
 	@SuppressWarnings("unused")
-	private PartternVo() {
+	private PatternVo() {
 	}
 
-	public PartternVo(String _name, String _type) {
+	public PatternVo(String _name, String _type) {
 		name = _name;
 		type = _type;
 	}

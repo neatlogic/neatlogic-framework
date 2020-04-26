@@ -1,4 +1,4 @@
-package codedriver.framework.integration.authtication.contenttype.core;
+package codedriver.framework.integration.body.core;
 
 import java.net.HttpURLConnection;
 

@@ -1,4 +1,4 @@
-package codedriver.framework.integration.authtication.contenttype.handler;
+package codedriver.framework.integration.body.handler;
 
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
@@ -10,15 +10,15 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.integration.authentication.costvalue.ContentType;
-import codedriver.framework.integration.authtication.contenttype.core.IContentTypeHandler;
+import codedriver.framework.integration.authentication.costvalue.BodyType;
+import codedriver.framework.integration.body.core.IContentTypeHandler;
 
 public class RawContentTypeHandler implements IContentTypeHandler {
 	private static Pattern p = Pattern.compile("\\{\\{([^}]+)\\}\\}");
 
 	@Override
 	public String getType() {
-		return ContentType.RAW.toString();
+		return BodyType.RAW.toString();
 	}
 
 	@Override

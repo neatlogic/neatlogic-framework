@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.util.ClassUtils;
 
 import codedriver.framework.integration.dto.IntegrationVo;
-import codedriver.framework.integration.dto.PartternVo;
+import codedriver.framework.integration.dto.PatternVo;
 
 public interface IIntegrationHandler<T> {
 	public String getName();
@@ -13,13 +13,15 @@ public interface IIntegrationHandler<T> {
 	public default String getHandler() {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
+	
+	public Boolean allowCustomPattern();
 
 	public T getData(IntegrationVo integrationVo);
 
 	// 输入参数模板
-	public List<PartternVo> getInputPartternList();
+	public List<PatternVo> getInputPatternList();
 
 	// 输出参数模板
-	public List<PartternVo> getOutputPartternList();
+	public List<PatternVo> getOutputPatternList();
 
 }

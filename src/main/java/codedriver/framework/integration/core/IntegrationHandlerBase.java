@@ -31,10 +31,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.bazaarvoice.jolt.Chainr;
 
 import codedriver.framework.integration.authentication.costvalue.HttpMethod;
-import codedriver.framework.integration.authtication.contenttype.core.ContentTypeHandlerFactory;
-import codedriver.framework.integration.authtication.contenttype.core.IContentTypeHandler;
 import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
+import codedriver.framework.integration.body.core.ContentTypeHandlerFactory;
+import codedriver.framework.integration.body.core.IContentTypeHandler;
 import codedriver.framework.integration.dto.IntegrationVo;
 
 public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T> {
@@ -86,7 +86,6 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 					String type = item.getString("type");
 					String value = item.getString("value");
 					if (type.equals("custom")) {
-						requestParamObj.put(key, value);
 					} else if (type.equals("mapping")) {
 						requestParamObj.put(key, paramObj.get(value));
 					}
@@ -119,9 +118,10 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 			// 设置验证
 			if (authConfig != null) {
 				String type = authConfig.getString("type");
+				JSONObject authConf = authConfig.getJSONObject("config");
 				IAuthenticateHandler handler = AuthenticateHandlerFactory.getHandler(type);
 				if (handler != null) {
-					handler.authenticate(connection, authConfig);
+					handler.authenticate(connection, authConf);
 				}
 			}
 
@@ -373,7 +373,7 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 
 		if (StringUtils.isNotBlank(result)) {
 			if (integrationVo.getConfig() != null) {
-				JSONArray outputConfig = integrationVo.getConfig().getJSONArray("outputConfig");
+				JSONArray outputConfig = integrationVo.getConfig().getJSONArray("output");
 				if (outputConfig != null && outputConfig.size() > 0) {
 					// 定义转换和默认值两种描述设置
 					JSONArray specList = new JSONArray();

@@ -1,11 +1,17 @@
 package codedriver.framework.dto;
 
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+
+import codedriver.framework.common.dto.BasePageVo;
+
 /**
  * @program: codedriver
  * @description:
  * @create: 2019-12-09 16:47
  **/
-public class MailServerVo {
+public class MailServerVo extends BasePageVo {
     private String uuid;
     private String name;
     private Integer port;
@@ -16,7 +22,12 @@ public class MailServerVo {
     private int isActive;
     private String fromAddress;
 
+    private transient String keyword;
+    
     public String getUuid() {
+    	if(StringUtils.isBlank(uuid)) {
+    		uuid = UUID.randomUUID().toString().replace("-", "");
+    	}
         return uuid;
     }
 
@@ -87,4 +98,12 @@ public class MailServerVo {
     public void setFromAddress(String fromAddress) {
         this.fromAddress = fromAddress;
     }
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
 }

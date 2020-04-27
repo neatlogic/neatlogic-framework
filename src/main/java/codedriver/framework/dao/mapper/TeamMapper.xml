@@ -129,12 +129,13 @@
 
 	<select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`
+		a.`uuid`,
+		a.`name`,
+		a.`sort`,
+		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
+		a.`parent_uuid` as `parentUuid`
 		FROM
-		`team`
+		`team` a
 		WHERE `uuid` = #{uuid}
 	</select>
 

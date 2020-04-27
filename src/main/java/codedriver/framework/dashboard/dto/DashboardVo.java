@@ -6,13 +6,15 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.dto.AuthorityVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class DashboardVo extends BasePageVo {
 	private transient String keyword;
-	private transient String type = "all";
 	@EntityField(name = "仪表板uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "仪表板名称", type = ApiParamType.STRING)
@@ -27,15 +29,29 @@ public class DashboardVo extends BasePageVo {
 	private Date fcd;
 	@EntityField(name = "仪表板创建人", type = ApiParamType.STRING)
 	private String fcu;
+	@EntityField(name = "仪表板创建人名", type = ApiParamType.STRING)
+	private String fcuName;
 	@EntityField(name = "仪表板修改时间", type = ApiParamType.LONG)
 	private Date lcd;
 	@EntityField(name = "仪表板修改人", type = ApiParamType.STRING)
 	private String lcu;
+	@EntityField(name = "仪表板修改人名", type = ApiParamType.STRING)
+	private String lcuName;
 	@EntityField(name = "仪表板组件列表", type = ApiParamType.JSONOBJECT)
 	private List<DashboardWidgetVo> widgetList;
-	@EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
-	private List<String> roleList;
-
+	@EntityField(name = "system：系统分类  custom：自定义分类", type = ApiParamType.STRING)
+	private String type;
+	@EntityField(name = "授权列表", type = ApiParamType.STRING)
+	private List<String> valueList;
+	@EntityField(name = "custom类型,dashboard所属人", type = ApiParamType.ENUM)
+	private String owner;
+	@EntityField(name = "是否拥有编辑权限", type = ApiParamType.JSONARRAY)
+	private Integer isCanEdit;
+	@EntityField(name = "是否拥有授权权限", type = ApiParamType.JSONARRAY)
+	private Integer isCanRole;
+	@JSONField(serialize = false)
+	private List<AuthorityVo> authorityList;
+	
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -111,14 +127,6 @@ public class DashboardVo extends BasePageVo {
 		this.description = description;
 	}
 
-	public List<String> getRoleList() {
-		return roleList;
-	}
-
-	public void setRoleList(List<String> roleList) {
-		this.roleList = roleList;
-	}
-
 	public String getKeyword() {
 		return keyword;
 	}
@@ -141,5 +149,102 @@ public class DashboardVo extends BasePageVo {
 
 	public void setIsDefault(int isDefault) {
 		this.isDefault = isDefault;
+	}
+
+	public String getFcuName() {
+		return fcuName;
+	}
+
+	public void setFcuName(String fcuName) {
+		this.fcuName = fcuName;
+	}
+
+	public String getLcuName() {
+		return lcuName;
+	}
+
+	public void setLcuName(String lcuName) {
+		this.lcuName = lcuName;
+	}
+	
+	
+	public List<String> getValueList() {
+		return valueList;
+	}
+
+	public void setValueList(List<String> valueList) {
+		this.valueList = valueList;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public Integer getIsCanEdit() {
+		return isCanEdit;
+	}
+
+	public void setIsCanEdit(Integer isCanEdit) {
+		this.isCanEdit = isCanEdit;
+	}
+
+	public Integer getIsCanRole() {
+		return isCanRole;
+	}
+
+	public void setIsCanRole(Integer isCanRole) {
+		this.isCanRole = isCanRole;
+	}
+
+	public List<AuthorityVo> getAuthorityList() {
+		return authorityList;
+	}
+
+	public void setAuthorityList(List<AuthorityVo> authorityList) {
+		this.authorityList = authorityList;
+	}
+
+
+
+	public enum DashBoardType {
+		SYSTEM("system", "系统分类"), CUSTOM("custom", "自定义");
+		private String value;
+		private String name;
+
+		private DashBoardType(String _value, String _name) {
+			this.value = _value;
+			this.name = _name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public static String getValue(String _value) {
+			for (DashBoardType s : DashBoardType.values()) {
+				if (s.getValue().equals(_value)) {
+					return s.getValue();
+				}
+			}
+			return null;
+		}
+
+		public static String getName(String _value) {
+			for (DashBoardType s : DashBoardType.values()) {
+				if (s.getValue().equals(_value)) {
+					return s.getName();
+				}
+			}
+			return "";
+		}
+
 	}
 }

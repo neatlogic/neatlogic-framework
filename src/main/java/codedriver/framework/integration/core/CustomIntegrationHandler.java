@@ -1,7 +1,5 @@
 package codedriver.framework.integration.core;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
@@ -17,18 +15,18 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase<JSONArray> 
 	}
 
 	@Override
-	public List getInputPatternList() {
+	public JSONArray getInputPattern() {
 		return null;
 	}
 
 	@Override
-	public List getOutputPatternList() {
+	public JSONArray getOutputPattern() {
 		return null;
 	}
 
 	@Override
-	protected JSONArray myGetData(JSONArray result) {
-		return result;
+	protected JSONArray myGetData(String result) {
+		return null;
 	}
 
 	@Override

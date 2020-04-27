@@ -1,9 +1,8 @@
 package codedriver.framework.integration.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
+
+import com.alibaba.fastjson.JSONArray;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.integration.core.IIntegrationHandler;
@@ -16,9 +15,9 @@ public class IntegrationHandlerVo {
 	@EntityField(name = "处理器", type = ApiParamType.STRING)
 	private String handler;
 	@EntityField(name = "输入参数模板", type = ApiParamType.JSONARRAY)
-	private List<PatternVo> inputPatternList = new ArrayList<>();
+	private JSONArray inputPattern;
 	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
-	private List<PatternVo> outputPatternList = new ArrayList<>();
+	private JSONArray outputPattern;
 
 	@SuppressWarnings("unused")
 	private IntegrationHandlerVo() {
@@ -46,24 +45,24 @@ public class IntegrationHandlerVo {
 		this.handler = handler;
 	}
 
-	public List<PatternVo> getInputPatternList() {
-		if ((inputPatternList == null || inputPatternList.size() == 0) && StringUtils.isNotBlank(handler)) {
+	public JSONArray getInputPattern() {
+		if (inputPattern == null && StringUtils.isNotBlank(handler)) {
 			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
-				inputPatternList = integrationHandler.getInputPatternList();
+				inputPattern = integrationHandler.getInputPattern();
 			}
 		}
-		return inputPatternList;
+		return inputPattern;
 	}
 
-	public List<PatternVo> getOutputPatternList() {
-		if ((outputPatternList == null || outputPatternList.size() == 0) && StringUtils.isNotBlank(handler)) {
+	public JSONArray getOutputPattern() {
+		if (outputPattern == null && StringUtils.isNotBlank(handler)) {
 			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
-				outputPatternList = integrationHandler.getOutputPatternList();
+				outputPattern = integrationHandler.getOutputPattern();
 			}
 		}
-		return outputPatternList;
+		return outputPattern;
 	}
 
 }

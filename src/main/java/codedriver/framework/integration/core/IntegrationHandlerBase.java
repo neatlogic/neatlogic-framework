@@ -5,15 +5,9 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -28,14 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.bazaarvoice.jolt.Chainr;
 
-import codedriver.framework.integration.authentication.costvalue.HttpMethod;
 import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
-import codedriver.framework.integration.body.core.ContentTypeHandlerFactory;
-import codedriver.framework.integration.body.core.IContentTypeHandler;
 import codedriver.framework.integration.dto.IntegrationVo;
+import codedriver.framework.util.FreemarkerUtil;
 
 public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T> {
 	static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
@@ -57,15 +48,22 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 		}
 	} };
 
+	private static class NullHostNameVerifier implements HostnameVerifier {
+		@Override
+		public boolean verify(String paramString, SSLSession paramSSLSession) {
+			return true;
+		}
+	}
+
 	private static String sendRequest(IntegrationVo integrationVo) {
 		String url = integrationVo.getUrl();
 		JSONObject config = integrationVo.getConfig();
 		JSONObject otherConfig = config.getJSONObject("other");
-		JSONArray paramConfig = config.getJSONArray("param");
+		JSONObject inputConfig = config.getJSONObject("input");
 		JSONObject authConfig = config.getJSONObject("authentication");
 		JSONArray headConfig = config.getJSONArray("head");
-		JSONObject bodyConfig = config.getJSONObject("body");
-		StringBuilder result = new StringBuilder();
+		JSONObject outputConfig = config.getJSONObject("output");
+		String returnString = "";
 		JSONObject paramObj = integrationVo.getParamObj();
 		if (paramObj == null) {
 			paramObj = new JSONObject();
@@ -77,36 +75,21 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 			sc.init(null, trustAllCerts, new SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-			// 设置参数
-			JSONObject requestParamObj = new JSONObject();
-			if (paramConfig != null) {
-				for (int i = 0; i < paramConfig.size(); i++) {
-					JSONObject item = paramConfig.getJSONObject(i);
-					String key = item.getString("key");
-					String type = item.getString("type");
-					String value = item.getString("value");
-					if (type.equals("custom")) {
-					} else if (type.equals("mapping")) {
-						requestParamObj.put(key, paramObj.get(value));
-					}
-				}
-			}
-
-			// 把参数设到URL上
-			if (!requestParamObj.isEmpty()) {
-				String queryString = "";
-				Iterator<String> itKey = requestParamObj.keySet().iterator();
-				while (itKey.hasNext()) {
-					if (StringUtils.isNotBlank(queryString)) {
-						queryString += "&";
-					}
-					String key = itKey.next();
-					queryString += key + "=" + URLEncoder.encode(requestParamObj.getString(key), "utf-8");
-				}
-				if (StringUtils.isNotBlank(queryString)) {
-					url = url + "?" + queryString;
-				}
-			}
+			/*
+			 * // 设置参数 JSONObject requestParamObj = new JSONObject(); if (paramConfig !=
+			 * null) { for (int i = 0; i < paramConfig.size(); i++) { JSONObject item =
+			 * paramConfig.getJSONObject(i); String key = item.getString("key"); String type
+			 * = item.getString("type"); String value = item.getString("value"); if
+			 * (type.equals("custom")) { } else if (type.equals("mapping")) {
+			 * requestParamObj.put(key, paramObj.get(value)); } } }
+			 * 
+			 * // 把参数设到URL上 if (!requestParamObj.isEmpty()) { String queryString = "";
+			 * Iterator<String> itKey = requestParamObj.keySet().iterator(); while
+			 * (itKey.hasNext()) { if (StringUtils.isNotBlank(queryString)) { queryString +=
+			 * "&"; } String key = itKey.next(); queryString += key + "=" +
+			 * URLEncoder.encode(requestParamObj.getString(key), "utf-8"); } if
+			 * (StringUtils.isNotBlank(queryString)) { url = url + "?" + queryString; } }
+			 */
 
 			URL getUrl = new URL(url);
 			connection = (HttpURLConnection) getUrl.openConnection();
@@ -154,278 +137,67 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 			connection.connect();
 		} catch (Exception e) {
 			logger.error("connect: " + url + " failed", e);
-			return result.toString();
 		}
 		if (connection != null) {
-			// 设置body
-			if (integrationVo.getMethod().equals(HttpMethod.POST.toString())) {
-				if (bodyConfig != null) {
-					String type = bodyConfig.getString("type");
-					IContentTypeHandler contentTypeHandler = ContentTypeHandlerFactory.getHandler(type);
-					if (contentTypeHandler != null) {
-						String paramStr = contentTypeHandler.handleData(connection, integrationVo.getParamObj(), bodyConfig);
-						try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
-							out.write(paramStr.toString().getBytes("utf-8"));
-						} catch (Exception e) {
-							logger.error("http error :" + e.getMessage(), e);
-						}
-					}
+			// 转换输入参数
+			// if (integrationVo.getMethod().equals(HttpMethod.POST.toString())) {
+			if (inputConfig != null) {
+				String content = inputConfig.getString("content");
+				// 内容不为空代表需要通过freemarker转换
+				if (StringUtils.isNotBlank(content)) {
+					content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+				} else {
+					content = integrationVo.getParamObj().toJSONString();
+				}
+				try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
+					out.write(content.toString().getBytes("utf-8"));
+				} catch (Exception e) {
+					logger.error("http error :" + e.getMessage(), e);
 				}
 			}
+			// }
 
 			// 处理返回值
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));) {
 				int code = connection.getResponseCode();
 				if (String.valueOf(code).startsWith("2")) {
+					StringBuilder result = new StringBuilder();
 					String lines;
 					while ((lines = reader.readLine()) != null) {
 						result.append(lines);
 					}
+					returnString = result.toString();
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
+			}
+
+			if (outputConfig != null && StringUtils.isNotBlank(returnString)) {
+				String content = outputConfig.getString("content");
+				if (StringUtils.isNotBlank(content)) {
+					JSONObject output = new JSONObject();
+					returnString = returnString.trim();
+					if (returnString.startsWith("{")) {
+						output.put("Return", JSONObject.parseObject(returnString));
+					} else if (returnString.startsWith("[")) {
+						output.put("Return", JSONArray.parseArray(returnString));
+					}
+					returnString = FreemarkerUtil.transform(output, content);
+				}
 			}
 		}
 		// connection.disconnect(); //Indicates that other requests to the
 		// server are unlikely in the near future. Calling disconnect() should
 		// not imply that this HttpURLConnection
 		// instance can be reused for other requests.
-		return result.toString();
-	}
-
-	public static void main2(String[] argv) {
-		JSONArray specList = new JSONArray();
-		JSONObject specObj = new JSONObject();
-		specObj.put("operation", "shift");
-		specObj.put("spec", new JSONObject() {
-			{
-				this.put("Return", new JSONObject() {
-					{
-						this.put("username", "NewReturn.userId");
-					}
-				});
-			}
-		});
-
-		specObj.put("operation", "default");
-		specObj.put("spec", new JSONObject() {
-			{
-				this.put("Return", new JSONObject() {
-					{
-						this.put("username.default", "chenqw");
-					}
-				});
-			}
-		});
-		specList.add(specObj);
-		Chainr chainr = Chainr.fromSpec(specList);
-
-		JSONObject inputJSON = new JSONObject() {
-			{
-				this.put("Return", new JSONObject() {
-					{
-						this.put("username", "CHENQW");
-					}
-				});
-			}
-		};
-
-		Object transformedOutput = chainr.transform(inputJSON);
-		System.out.println(JSONObject.toJSONString(transformedOutput));
-	}
-
-	private void transferJson(JSONObject finalObj, JSONObject returnObj) {
-
-	}
-
-	private static Pattern pattern = Pattern.compile("\\[(\\d+)\\]");
-
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Apr 19, 2020
-	 * @Description: TODO 假设returnVal是a.b.[1].c，则生成 {"a": {"b": {"*": {"c":"traget"}
-	 *               } } }这样的json，同时需要根据数组编号转换target值
-	 * @param @param  specObj
-	 * @param @param  returnVal
-	 * @param @param  target
-	 * @param @return
-	 * @return JSONObject
-	 */
-	private static JSONObject buildShiftSpec(JSONObject specObj, String returnVal, String target) {
-		String[] returns = returnVal.split("\\.");
-		JSONObject currentObj = specObj;
-		Map<String, Integer> indexMap = new HashMap<>();
-		for (int i = 0; i < returns.length; i++) {
-			String re = returns[i];
-			if (i == returns.length - 1) {// 存入值
-				StringBuffer temp = new StringBuffer();
-				Matcher matcher = pattern.matcher(target);
-				while (matcher.find()) {
-					if (matcher.groupCount() > 0) {
-						Integer index = indexMap.get(matcher.group(1));
-						if (index != null) {
-							target = target.replaceAll("\\[(\\d+)\\]", "[&]");
-							matcher.appendReplacement(temp, "[&" + index + "]");
-						}
-					}
-				}
-				matcher.appendTail(temp);
-				currentObj.put(re, temp.toString());
-			} else {// 存入下一层结构
-				if (re.matches("\\[\\d+\\]")) {
-					// 记录数组位置
-					indexMap.put(re.replaceAll("\\[|\\]", ""), returns.length - i - 1);
-					re = "*";
-				}
-
-				JSONObject nextObj = currentObj.getJSONObject(re);
-				if (nextObj == null) {
-					nextObj = new JSONObject();
-				}
-				currentObj.put(re, nextObj);
-				currentObj = nextObj;
-			}
-
-		}
-		return specObj;
-	}
-
-	private static JSONObject buildDefaultSpec(JSONObject specObj, String target, String defaultValue) {
-		String[] returns = target.split("\\.");
-		JSONObject currentObj = specObj;
-		for (int i = 0; i < returns.length; i++) {
-			String re = returns[i];
-			if (i == returns.length - 1) {// 存入值
-				currentObj.put(re, defaultValue);
-			} else {// 存入下一层结构
-				JSONObject nextObj = currentObj.getJSONObject(re);
-				if (nextObj == null) {
-					nextObj = new JSONObject();
-				}
-				currentObj.put(re, nextObj);
-				currentObj = nextObj;
-			}
-
-		}
-		return specObj;
-	}
-
-	public static void main(String[] a) {
-		JSONArray outputConfig = new JSONArray() {
-			{
-				this.add(new JSONObject() {
-					{
-						this.put("target", "[10].username");
-						this.put("type", "mapping");
-						this.put("return", "return.userList.[10].username");
-					}
-				});
-				this.add(new JSONObject() {
-					{
-						this.put("target", "[10].password");
-						this.put("type", "mapping");
-						this.put("return", "return.userList.[10].password");
-					}
-				});
-			}
-		};
-
-		// 定义转换和默认值两种描述设置
-		JSONArray specList = new JSONArray();
-		JSONObject shiftSpecObj = new JSONObject();
-		shiftSpecObj.put("operation", "shift");
-		shiftSpecObj.put("spec", new JSONObject());
-		JSONObject defaultSpecObj = new JSONObject();
-		defaultSpecObj.put("operation", "default");
-		defaultSpecObj.put("spec", new JSONObject());
-
-		for (int i = 0; i < outputConfig.size(); i++) {
-			JSONObject item = outputConfig.getJSONObject(i);
-			String target = item.getString("target");
-			String type = item.getString("type");
-			String returnVal = item.getString("return");
-			if (type.equals("custom")) {
-				JSONObject specObj = defaultSpecObj.getJSONObject("spec");
-				specObj = buildDefaultSpec(specObj, returnVal, target);
-				defaultSpecObj.getJSONObject("spec").putAll(specObj);
-			} else if (type.equals("mapping")) {
-				JSONObject specObj = shiftSpecObj.getJSONObject("spec");
-				specObj = buildShiftSpec(specObj, returnVal, target);
-				shiftSpecObj.getJSONObject("spec").putAll(specObj);
-			}
-		}
-		specList.add(shiftSpecObj);
-		specList.add(defaultSpecObj);
-
-		Chainr chainr = Chainr.fromSpec(specList);
-
-		String tmp = "{\n" + "  \"return\": {\n" + "    \"userList\": [\n" + "      {\n" + "        \"username\": \"cqw\",\n" + "        \"password\": \"123\"\n" + "      },\n" + "      {\n" + "        \"username\": \"wantc\",\n" + "        \"password\": \"312\"\n" + "      }\n" + "    ]\n" + "  }\n" + "}";
-
-		JSONObject inputJSON = JSONObject.parseObject(tmp);
-
-		Object transformedOutput = chainr.transform(inputJSON);
-		System.out.println(JSONObject.toJSONString(transformedOutput));
+		return returnString;
 	}
 
 	public final T getData(IntegrationVo integrationVo) {
 		String result = sendRequest(integrationVo);
-		result = result.trim();
-
-		if (StringUtils.isNotBlank(result)) {
-			if (integrationVo.getConfig() != null) {
-				JSONArray outputConfig = integrationVo.getConfig().getJSONArray("output");
-				if (outputConfig != null && outputConfig.size() > 0) {
-					// 定义转换和默认值两种描述设置
-					JSONArray specList = new JSONArray();
-					JSONObject shiftSpecObj = new JSONObject();
-					shiftSpecObj.put("operation", "shift");
-					shiftSpecObj.put("spec", new JSONObject());
-					JSONObject defaultSpecObj = new JSONObject();
-					defaultSpecObj.put("operation", "default");
-					defaultSpecObj.put("spec", new JSONObject());
-
-					for (int i = 0; i < outputConfig.size(); i++) {
-						JSONObject item = outputConfig.getJSONObject(i);
-						String target = item.getString("target");
-						String type = item.getString("type");
-						String returnVal = item.getString("return");
-						if (type.equals("custom")) {
-							JSONObject specObj = defaultSpecObj.getJSONObject("spec");
-							specObj = buildDefaultSpec(specObj, returnVal, target);
-							defaultSpecObj.getJSONObject("spec").putAll(specObj);
-						} else if (type.equals("mapping")) {
-							JSONObject specObj = shiftSpecObj.getJSONObject("spec");
-							specObj = buildShiftSpec(specObj, returnVal, target);
-							shiftSpecObj.getJSONObject("spec").putAll(specObj);
-						}
-					}
-					specList.add(shiftSpecObj);
-					specList.add(defaultSpecObj);
-
-					Chainr chainr = Chainr.fromSpec(specList);
-					Object transformedOutput = null;
-					if (result.startsWith("{")) {
-						JSONObject resultObj = JSONObject.parseObject(result);
-						transformedOutput = chainr.transform(resultObj);
-					} else if (result.startsWith("[")) {
-						JSONArray resultList = JSONArray.parseArray(result);
-						transformedOutput = chainr.transform(resultList);
-					}
-					if (transformedOutput != null) {
-						return myGetData(JSONArray.parseArray(JSONArray.toJSONString(transformedOutput)));
-					}
-				}
-			}
-		}
-		return myGetData(JSONArray.parseArray(result));
+		return myGetData(result);
 	}
 
-	protected abstract T myGetData(JSONArray result);
+	protected abstract T myGetData(String result);
 
-	private static class NullHostNameVerifier implements HostnameVerifier {
-		@Override
-		public boolean verify(String paramString, SSLSession paramSSLSession) {
-			return true;
-		}
-	}
 }

@@ -23,6 +23,7 @@ public class UserContext implements Serializable {
 	private String userName;
 	private String userId;
 	private String timezone = "+8:00";
+	private String token;
 	private List<String> roleNameList = new ArrayList<>();
 
 	public static UserContext init(UserContext _userContext) {
@@ -32,6 +33,7 @@ public class UserContext implements Serializable {
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());
 			context.setTimezone(_userContext.getTimezone());
+			context.setToken(_userContext.getToken());
 			// context.setRequest(_userContext.getRequest());
 			// context.setResponse(_userContext.getResponse());
 			context.setRoleNameList(_userContext.getRoleNameList());
@@ -40,12 +42,13 @@ public class UserContext implements Serializable {
 		return context;
 	}
 
-	public static UserContext init(JSONObject jsonObj, String timezone, HttpServletRequest request, HttpServletResponse response) {
+	public static UserContext init(JSONObject jsonObj,String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();
 		context.setUserId(jsonObj.getString("userid"));
 		context.setUserName(jsonObj.getString("username"));
 		context.setTenant(jsonObj.getString("tenant"));
 		context.setRequest(request);
+		context.setToken(token);
 		context.setResponse(response);
 		context.setTimezone(timezone);
 		JSONArray roleList = jsonObj.getJSONArray("rolelist");
@@ -140,5 +143,13 @@ public class UserContext implements Serializable {
 
 	public void setResponse(HttpServletResponse response) {
 		this.response = response;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

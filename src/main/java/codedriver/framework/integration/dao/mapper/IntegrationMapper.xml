@@ -58,6 +58,20 @@
 		</where>
 	</select>
 
+	<update id="updateIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		UPDATE
+		`integration`
+		SET
+		`name` = #{name},
+		`url` = #{url},
+		`handler` = #{handler},
+		`method` = #{method},
+		`config` = #{configStr},
+		`lcd` = NOW(),
+		`lcu` = #{lcu}
+		WHERE `uuid` = #{uuid}
+	</update>
+
 	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		INSERT INTO `integration` (
 		`uuid`,

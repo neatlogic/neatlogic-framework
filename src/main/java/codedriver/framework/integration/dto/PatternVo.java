@@ -1,56 +1,22 @@
 package codedriver.framework.integration.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class PatternVo {
-	public enum Type {
-		STRING("string", "字符"), NUMBER("number", "数字"), OBJECT("object", "对象"), OBJLIST("objlist", "对象数组"), STRLIST("strlist", "字符数组"), NUMLIST("numlist", "数字数组");
-
-		private String status;
-		private String text;
-
-		private Type(String _status, String _text) {
-			this.status = _status;
-			this.text = _text;
-		}
-
-		public String getValue() {
-			return status;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public static String getValue(String _status) {
-			for (Type s : Type.values()) {
-				if (s.getValue().equals(_status)) {
-					return s.getValue();
-				}
-			}
-			return null;
-		}
-
-		public static String getText(String name) {
-			for (Type s : Type.values()) {
-				if (s.getValue().equals(name)) {
-					return s.getText();
-				}
-			}
-			return "";
-		}
-	}
 
 	@SuppressWarnings("unused")
 	private PatternVo() {
 	}
 
-	public PatternVo(String _name, String _type) {
+	public PatternVo(String _name, ApiParamType _type) {
 		name = _name;
-		type = _type;
+		type = _type.getValue();
 	}
 
 	@EntityField(name = "参数名", type = ApiParamType.STRING)
@@ -59,6 +25,8 @@ public class PatternVo {
 	private String type;
 	@EntityField(name = "参数类型名称", type = ApiParamType.STRING)
 	private String typeName;
+	@EntityField(name = "子参数", type = ApiParamType.JSONOBJECT)
+	private List<PatternVo> children;
 
 	public String getName() {
 		return name;
@@ -78,13 +46,28 @@ public class PatternVo {
 
 	public String getTypeName() {
 		if (StringUtils.isBlank(typeName) && StringUtils.isNotBlank(type)) {
-			typeName = Type.getText(type);
+			typeName = ApiParamType.getText(type);
 		}
 		return typeName;
 	}
 
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
+	}
+
+	public List<PatternVo> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<PatternVo> childPatternList) {
+		this.children = childPatternList;
+	}
+
+	public void addChild(PatternVo patternVo) {
+		if (this.children == null) {
+			this.children = new ArrayList<>();
+		}
+		this.children.add(patternVo);
 	}
 
 }

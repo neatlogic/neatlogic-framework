@@ -12,4 +12,6 @@ public interface IntegrationMapper {
 	public int searchIntegrationCount(IntegrationVo integrationVo);
 
 	public int insertIntegration(IntegrationVo integrationVo);
+
+	public int updateIntegration(IntegrationVo integrationVo);
 }

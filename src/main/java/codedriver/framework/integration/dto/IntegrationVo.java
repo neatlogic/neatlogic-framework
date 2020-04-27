@@ -29,6 +29,8 @@ public class IntegrationVo extends BasePageVo {
 	private String handlerName;
 	@EntityField(name = "请求方法", type = ApiParamType.STRING)
 	private String method;
+	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
+	private Integer isActive = 1;
 	@EntityField(name = "输入参数模板", type = ApiParamType.JSONARRAY)
 	private List<PatternVo> inputPatternList = new ArrayList<>();
 	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
@@ -190,6 +192,14 @@ public class IntegrationVo extends BasePageVo {
 
 	public void setOutputPatternList(List<PatternVo> outputPatternList) {
 		this.outputPatternList = outputPatternList;
+	}
+
+	public Integer getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Integer isActive) {
+		this.isActive = isActive;
 	}
 
 }

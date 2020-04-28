@@ -54,7 +54,7 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	a.`fcu` = #{userId}
+			or	a.`fcu` = #{fcu}
 			</if>
 		</where>
 	</sql>
@@ -119,7 +119,7 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	a.`fcu` = #{userId}
+			or	a.`fcu` = #{fcu}
 			</if>
 		</where>
 		ORDER BY a.fcd DESC
@@ -212,10 +212,6 @@
 		uuid = #{value}
 	</select>
 
-	<select id="getDashboardAuthorityListByDashboardUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.AuthorityVo">
-		
-	</select>
-
 	<select id="getDashboardByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardVo">
 		SELECT
 		d.`uuid`,
@@ -274,7 +270,7 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	d.`fcu` = #{userId}
+			or	d.`fcu` = #{fcu}
 			</if>
 			)
 		</where>

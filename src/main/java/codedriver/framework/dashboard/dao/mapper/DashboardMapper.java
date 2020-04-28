@@ -30,8 +30,6 @@ public interface DashboardMapper {
 
 	public List<DashboardWidgetVo> getDashboardWidgetByDashboardUuid(String dashboardUuid);
 	
-	public List<AuthorityVo> getDashboardAuthorityListByDashboardUuid(String dashboardUuid);
-
 	public int updateDashboard(DashboardVo dashboardVo);
 
 	public int updateDashboardVisitCounter(DashboardVisitCounterVo dashboardVisitCounterVo);

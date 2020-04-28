@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -178,15 +179,17 @@ public class DashboardVo extends BasePageVo {
 	
 	
 	public List<String> getValueList() {
-		if(valueList == null) {
+		if(CollectionUtils.isEmpty(valueList)) {
 			valueList = new ArrayList<String>();
-			for(AuthorityVo workcenterAuthorityVo : this.authorityList) {
-				if(workcenterAuthorityVo.getType().equals(GroupSearch.ROLE.getValue())) {
-					valueList.add(GroupSearch.ROLE.getValuePlugin() + workcenterAuthorityVo.getUuid());
-				}else if(workcenterAuthorityVo.getType().equals(GroupSearch.USER.getValue())){
-					valueList.add(GroupSearch.USER.getValuePlugin() + workcenterAuthorityVo.getUuid());
-				}else if(workcenterAuthorityVo.getType().equals(GroupSearch.TEAM.getValue())){
-					valueList.add(GroupSearch.TEAM.getValuePlugin() + workcenterAuthorityVo.getUuid());
+			if(CollectionUtils.isNotEmpty(authorityList)) {
+				for(AuthorityVo authorityVo : this.authorityList) {
+					if(authorityVo.getType().equals(GroupSearch.ROLE.getValue())) {
+						valueList.add(GroupSearch.ROLE.getValuePlugin() + authorityVo.getUuid());
+					}else if(authorityVo.getType().equals(GroupSearch.USER.getValue())){
+						valueList.add(GroupSearch.USER.getValuePlugin() + authorityVo.getUuid());
+					}else if(authorityVo.getType().equals(GroupSearch.TEAM.getValue())){
+						valueList.add(GroupSearch.TEAM.getValuePlugin() + authorityVo.getUuid());
+					}
 				}
 			}
 		}

@@ -236,7 +236,7 @@
 		`uuid` = #{value}
 	</select>
 	
-	<select id="getAuthorizedDashboardByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardVo">
+	<select id="getAuthorizedDashboardByUuid" parameterType="java.lang.String" resultMap="dashboardMap">
 		SELECT
 		d.`uuid`,
 		d.`name`,
@@ -247,14 +247,15 @@
 		d.`fcu`,
 		d.`lcd`,
 		d.`lcu`,
-		du.user_id as `defaultUser`
+		da.uuid as `authUuid`,
+		da.type as `authType`
 		FROM
 		`dashboard` d
-		LEFT JOIN dashboard_default du on d.uuid = du.dashboard_uuid
+		LEFT JOIN `dashboard_authority` da ON d.`uuid` = da.`dashboard_uuid`
 		<where>
-			`uuid` = #{value}
+			d.`uuid` = #{uuid}
 			and
-			((a.type = 'common' AND da.`uuid` = 'alluser')
+			((da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
 			  	OR	(da.type = 'user' AND da.`uuid` = #{userId})
 			</if>
@@ -273,7 +274,7 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	do.`user_id` = #{userId}
+			or	d.`fcu` = #{userId}
 			</if>
 			)
 		</where>

@@ -29,16 +29,16 @@
 		a.*
 		FROM
 		`dashboard` a
-		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`workcenter_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`workcenter_uuid`
-		WHERE a.fcu = #{fcu}
-		<if test="keyword !=null and keyword!=''">
-			AND a.name LIKE concat('%', #{keyword}, '%')
-		</if>
+		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
+		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
-			(da.type = 'common' AND da.`uuid` = 'alluser')
+			 a.fcu = #{fcu}
+			<if test="keyword !=null and keyword!=''">
+				AND a.name LIKE concat('%', #{keyword}, '%')
+			</if>
+				and (da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
-			  	OR	(da.type = 'user' AND da.`uuid` = #{userId})
+				OR	(da.type = 'user' AND da.`uuid` = #{userId})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -88,19 +88,19 @@
 		</collection>
 	</resultMap>
 	
-	<select id="searchDashboardUuid" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="java.lang.String">
+	<select id="searchAuthorizedDashboardUuid" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="java.lang.String">
 		SELECT
 		a.uuid
 		FROM
 		`dashboard` a
-		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`workcenter_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`workcenter_uuid`
-		WHERE a.fcu = #{fcu}
-		<if test="keyword !=null and keyword!=''">
-			AND a.name LIKE concat('%', #{keyword}, '%')
-		</if>
+		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
+		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
-			(da.type = 'common' AND da.`uuid` = 'alluser')
+			 a.fcu = #{fcu}
+			<if test="keyword !=null and keyword!=''">
+				AND a.name LIKE concat('%', #{keyword}, '%')
+			</if>
+				and (da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
 			  	OR	(da.type = 'user' AND da.`uuid` = #{userId})
 			</if>
@@ -130,23 +130,23 @@
 	<select id="getDashboardByUuidList" parameterType="java.util.List" resultMap="dashboardMap">
 		SELECT
 		DISTINCT
-		`uuid`,
-		`name`,
-		description,
-		is_active AS isActive,
-		fcu,
-		(SELECT user_name FROM `user` x WHERE x.user_id = `fcu`) AS fcuName,
-		fcd,
-		lcu,
-		(SELECT user_name FROM `user` x WHERE x.user_id = `lcu`) AS lcuName,
-		lcd,
+		a.`uuid`,
+		a.`name`,
+		a.description,
+		a.is_active AS isActive,
+		a.fcu,
+		(SELECT user_name FROM `user` x WHERE x.user_id = a.`fcu`) AS fcuName,
+		a.fcd,
+		a.lcu,
+		(SELECT user_name FROM `user` x WHERE x.user_id = a.`lcu`) AS lcuName,
+		a.lcd,
 		da.`type` as authType,
 		da.`uuid` as authUuid,
 		do.user_id as `owner`
 		FROM
 		`dashboard` a
-		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`workcenter_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`workcenter_uuid`
+		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
+		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
 			<if test="uuidList != null and uuidList.size() > 0">
 				 a.`uuid` IN 

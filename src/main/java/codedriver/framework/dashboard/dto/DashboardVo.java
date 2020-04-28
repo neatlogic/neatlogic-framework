@@ -52,6 +52,11 @@ public class DashboardVo extends BasePageVo {
 	@JSONField(serialize = false)
 	private List<AuthorityVo> authorityList;
 	
+	//params
+	private String userId;
+	private List<String> teamUuidList;
+	private List<String> roleNameList;
+	
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -206,6 +211,30 @@ public class DashboardVo extends BasePageVo {
 
 	public void setAuthorityList(List<AuthorityVo> authorityList) {
 		this.authorityList = authorityList;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public List<String> getTeamUuidList() {
+		return teamUuidList;
+	}
+
+	public void setTeamUuidList(List<String> teamUuidList) {
+		this.teamUuidList = teamUuidList;
+	}
+
+	public List<String> getRoleNameList() {
+		return roleNameList;
+	}
+
+	public void setRoleNameList(List<String> roleNameList) {
+		this.roleNameList = roleNameList;
 	}
 
 

@@ -306,6 +306,7 @@
 		`name` = #{name},
 		`description` = #{description},
 		`is_active` = #{isActive},
+		`type` = #{type},
 		`lcd` = NOW(),
 		`lcu` = #{lcu}
 		WHERE `uuid` = #{uuid}

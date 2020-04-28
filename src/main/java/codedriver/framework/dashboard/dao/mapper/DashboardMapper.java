@@ -40,7 +40,7 @@ public interface DashboardMapper {
 	
 	public int insertDashboardWidget(DashboardWidgetVo dashboardWidgetVo);
 
-	public int insertDashboardOwner(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId);
+	public int insertDashboardDefault(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId, @Param("type") String type);
 
 	public int insertDashboardVisitCounter(DashboardVisitCounterVo dashboardVisitCounterVo);
 
@@ -50,9 +50,9 @@ public interface DashboardMapper {
 
 	public int deleteDashboardAuthorityByUuid(@Param("dashboardUuid")String dashboardUuid);
 
-	public int deleteDashboardOwnerByDashboardUuid(String dashboardUuid);
+	public int deleteDashboardDefaultByDashboardUuid(String dashboardUuid);
 
 	public int deleteDashboardVisitCounterByDashboardUuid(String dashboardUuid);
 
-	public int deleteDashboardOwnerByUserId(String userId);
+	public int deleteDashboardDefaultByUserId(String userId);
 }

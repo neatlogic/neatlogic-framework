@@ -6,7 +6,7 @@
 		SELECT
 		`dashboard_uuid`
 		FROM
-		`dashboard_owner`
+		`dashboard_default`
 		WHERE (user_id = #{value} and type = 'user') or type = 'system'
 		order by type desc
 		limit 1
@@ -30,7 +30,6 @@
 		FROM
 		`dashboard` a
 		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
 			 a.fcu = #{fcu}
 			<if test="keyword !=null and keyword!=''">
@@ -55,7 +54,7 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	do.`user_id` = #{userId}
+			or	a.`fcu` = #{userId}
 			</if>
 		</where>
 	</sql>
@@ -78,7 +77,8 @@
 		<result column="lcu" property="lcu" />
 		<result column="lcuName" property="lcuName" />
 		<result column="lcd" property="lcd" />
-		<result column="owner" property="owner" />
+		<result column="defaultUser" property="defaultUser" />
+		<result column="defaultType" property="defaultType" />
 		<result column="type" property="type" />
 		<result column="sort" property="sort" />
 		<result column="condition_config" property="conditionConfig" />
@@ -90,11 +90,11 @@
 	
 	<select id="searchAuthorizedDashboardUuid" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="java.lang.String">
 		SELECT
+		DISTINCT
 		a.uuid
 		FROM
 		`dashboard` a
 		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
 			 a.fcu = #{fcu}
 			<if test="keyword !=null and keyword!=''">
@@ -119,9 +119,10 @@
 					)
 			</if>
 			<if test="userId != null and userId != ''">
-			or	do.`user_id` = #{userId}
+			or	a.`fcu` = #{userId}
 			</if>
 		</where>
+		ORDER BY a.fcd DESC
 		<if test="needPage">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
@@ -129,7 +130,6 @@
 
 	<select id="getDashboardByUuidList" parameterType="java.util.List" resultMap="dashboardMap">
 		SELECT
-		DISTINCT
 		a.`uuid`,
 		a.`name`,
 		a.description,
@@ -140,13 +140,15 @@
 		a.lcu,
 		(SELECT user_name FROM `user` x WHERE x.user_id = a.`lcu`) AS lcuName,
 		a.lcd,
+		a.type,
 		da.`type` as authType,
 		da.`uuid` as authUuid,
-		do.user_id as `owner`
+		do.user_id as `defaultUser`,
+		do.type as `defaultType`
 		FROM
 		`dashboard` a
 		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
-		LEFT JOIN `dashboard_owner` do ON a.`uuid` = do.`dashboard_uuid`
+		LEFT JOIN `dashboard_default` do ON a.`uuid` = do.`dashboard_uuid`
 		<where>
 			<if test="uuidList != null and uuidList.size() > 0">
 				 a.`uuid` IN 
@@ -221,10 +223,10 @@
 		d.`fcu`,
 		d.`lcd`,
 		d.`lcu`,
-		du.user_id as `owner`
+		du.user_id as `defaultUser`
 		FROM
 		`dashboard` d
-		LEFT JOIN dashboard_owner du on d.uuid = du.dashboard_uuid
+		LEFT JOIN dashboard_default du on d.uuid = du.dashboard_uuid
 		WHERE
 		`uuid` = #{value}
 	</select>
@@ -240,10 +242,10 @@
 		d.`fcu`,
 		d.`lcd`,
 		d.`lcu`,
-		du.user_id as `owner`
+		du.user_id as `defaultUser`
 		FROM
 		`dashboard` d
-		LEFT JOIN dashboard_owner du on d.uuid = du.dashboard_uuid
+		LEFT JOIN dashboard_default du on d.uuid = du.dashboard_uuid
 		<where>
 			`uuid` = #{value}
 			and
@@ -348,6 +350,7 @@
 		INSERT INTO `dashboard` (
 		`uuid`,
 		`name`,
+		`type`,
 		`description`,
 		`is_active`,
 		`fcd`,
@@ -357,6 +360,7 @@
 		(
 		#{uuid},
 		#{name},
+		#{type},
 		#{description},
 		#{isActive},
 		NOW(),
@@ -402,10 +406,10 @@
 		)
 	</insert>
 
-	<insert id="insertDashboardOwner">
-		INSERT INTO `dashboard_owner` (`dashboard_uuid`, `user_id`)
+	<insert id="insertDashboardDefault">
+		INSERT INTO `dashboard_default` (`dashboard_uuid`, `user_id`,`type`)
 		VALUES
-		(#{dashboardUuid}, #{userId})
+		(#{dashboardUuid}, #{userId},#{type})
 	</insert>
 
 	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">
@@ -415,17 +419,17 @@
 		WHERE `dashboard_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteDashboardOwnerByDashboardUuid" parameterType="java.lang.String">
+	<delete id="deleteDashboardDefaultByDashboardUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
-		`dashboard_owner`
+		`dashboard_default`
 		WHERE `dashboard_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteDashboardOwnerByUserId" parameterType="java.lang.String">
+	<delete id="deleteDashboardDefaultByUserId" parameterType="java.lang.String">
 		DELETE
 		FROM
-		`dashboard_owner`
+		`dashboard_default`
 		WHERE
 		`user_id` = #{userId}
 	</delete>

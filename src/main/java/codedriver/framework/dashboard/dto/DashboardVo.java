@@ -43,8 +43,10 @@ public class DashboardVo extends BasePageVo {
 	private String type;
 	@EntityField(name = "授权列表", type = ApiParamType.STRING)
 	private List<String> valueList;
-	@EntityField(name = "custom类型,dashboard所属人", type = ApiParamType.ENUM)
-	private String owner;
+	@EntityField(name = "默认用户", type = ApiParamType.STRING)
+	private String defaultUser;
+	@EntityField(name = "默认用户", type = ApiParamType.STRING)
+	private String defaultType;
 	@EntityField(name = "是否拥有编辑权限", type = ApiParamType.JSONARRAY)
 	private Integer isCanEdit;
 	@EntityField(name = "是否拥有授权权限", type = ApiParamType.JSONARRAY)
@@ -181,12 +183,20 @@ public class DashboardVo extends BasePageVo {
 		this.valueList = valueList;
 	}
 
-	public String getOwner() {
-		return owner;
+	public String getDefaultUser() {
+		return defaultUser;
 	}
 
-	public void setOwner(String owner) {
-		this.owner = owner;
+	public void setDefaultUser(String defaultUser) {
+		this.defaultUser = defaultUser;
+	}
+
+	public String getDefaultType() {
+		return defaultType;
+	}
+
+	public void setDefaultType(String defaultType) {
+		this.defaultType = defaultType;
 	}
 
 	public Integer getIsCanEdit() {

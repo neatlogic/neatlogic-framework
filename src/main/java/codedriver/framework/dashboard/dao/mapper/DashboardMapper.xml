@@ -223,7 +223,8 @@
 		d.`fcu`,
 		d.`lcd`,
 		d.`lcu`,
-		du.user_id as `defaultUser`
+		du.user_id as `defaultUser`,
+		du.type as `defaultType`
 		FROM
 		`dashboard` d
 		LEFT JOIN dashboard_default du on d.uuid = du.dashboard_uuid

@@ -14,7 +14,7 @@ public interface DashboardMapper {
 
 	public List<String> searchAuthorizedDashboardUuid(DashboardVo dashboardVo);
 	
-	public List<DashboardVo> getDashboardByUuidList(@Param("uuidList")List<String> uuidList);
+	public List<DashboardVo> getDashboardListByUuidList(@Param("uuidList")List<String> uuidList);
 
 	public List<DashboardVo> searchTopVisitDashboard(DashboardVo dashboardVo);
 
@@ -24,11 +24,13 @@ public interface DashboardMapper {
 
 	public DashboardVo getDashboardByUuid(String dashboardUuid);
 	
-	public DashboardVo getAuthorizedDashboardByUuid(String dashboardUuid);
+	public DashboardVo getAuthorizedDashboardByUuid(DashboardVo dashboardVo);
 
 	public DashboardVisitCounterVo getDashboardVisitCounter(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId);
 
 	public List<DashboardWidgetVo> getDashboardWidgetByDashboardUuid(String dashboardUuid);
+	
+	public List<AuthorityVo> getDashboardAuthorityListByDashboardUuid(String dashboardUuid);
 
 	public int updateDashboard(DashboardVo dashboardVo);
 

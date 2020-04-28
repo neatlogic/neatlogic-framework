@@ -128,7 +128,7 @@
 		</if>
 	</select>
 
-	<select id="getDashboardByUuidList" parameterType="java.util.List" resultMap="dashboardMap">
+	<select id="getDashboardListByUuidList" parameterType="java.util.List" resultMap="dashboardMap">
 		SELECT
 		a.`uuid`,
 		a.`name`,
@@ -210,6 +210,10 @@
 		`dashboard_widget`
 		WHERE
 		uuid = #{value}
+	</select>
+
+	<select id="getDashboardAuthorityListByDashboardUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.AuthorityVo">
+		
 	</select>
 
 	<select id="getDashboardByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardVo">

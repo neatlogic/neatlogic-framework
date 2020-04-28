@@ -1,5 +1,6 @@
 package codedriver.framework.dashboard.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.dto.AuthorityVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -176,6 +178,18 @@ public class DashboardVo extends BasePageVo {
 	
 	
 	public List<String> getValueList() {
+		if(valueList == null) {
+			valueList = new ArrayList<String>();
+			for(AuthorityVo workcenterAuthorityVo : this.authorityList) {
+				if(workcenterAuthorityVo.getType().equals(GroupSearch.ROLE.getValue())) {
+					valueList.add(GroupSearch.ROLE.getValuePlugin() + workcenterAuthorityVo.getUuid());
+				}else if(workcenterAuthorityVo.getType().equals(GroupSearch.USER.getValue())){
+					valueList.add(GroupSearch.USER.getValuePlugin() + workcenterAuthorityVo.getUuid());
+				}else if(workcenterAuthorityVo.getType().equals(GroupSearch.TEAM.getValue())){
+					valueList.add(GroupSearch.TEAM.getValuePlugin() + workcenterAuthorityVo.getUuid());
+				}
+			}
+		}
 		return valueList;
 	}
 

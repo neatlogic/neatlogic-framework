@@ -15,14 +15,14 @@ import codedriver.framework.integration.dto.IntegrationHandlerVo;
 @RootComponent
 public class IntegrationHandlerFactory implements ApplicationListener<ContextRefreshedEvent> {
 
-	private static Map<String, IIntegrationHandler<?>> componentMap = new HashMap<>();
+	private static Map<String, IIntegrationHandler> componentMap = new HashMap<>();
 	private static List<IntegrationHandlerVo> handlerList = new ArrayList<>();
 
-	public static IIntegrationHandler<?> getHandler(String handler) {
+	public static IIntegrationHandler getHandler(String handler) {
 		return componentMap.get(handler);
 	}
 
-	public static IIntegrationHandler<?> getHandler(IIntegrationHandler handler) {
+	public static IIntegrationHandler getHandler(IIntegrationHandler handler) {
 		return componentMap.get(handler.getHandler());
 	}
 

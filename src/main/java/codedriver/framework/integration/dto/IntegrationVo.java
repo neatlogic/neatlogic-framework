@@ -98,7 +98,7 @@ public class IntegrationVo extends BasePageVo {
 
 	public String getHandlerName() {
 		if (StringUtils.isBlank(handlerName) && StringUtils.isNotBlank(handler)) {
-			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
 				handlerName = integrationHandler.getName();
 			}

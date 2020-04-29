@@ -26,7 +26,8 @@ public class Config {
     public static String DATA_HOME;// 数据文件根路径
     public static final Map<String, String> ES_CLUSTERS;
     public static final boolean ES_ENABLE;
-
+    public static final String HOME_URL;
+    
     private static final String CONFIG_FILE = "config.properties";
 
     static {
@@ -56,7 +57,12 @@ public class Config {
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.heart.threshold变量");
             throw ex;
         }
-
+        try {
+            HOME_URL = getProperty(CONFIG_FILE, "home.url", "");
+        } catch (Exception ex) {
+            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置home.url变量");
+            throw ex;
+        }
         boolean esEnable = false;
         Map<String, String> map = null;
         try (InputStream in = Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {

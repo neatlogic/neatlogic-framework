@@ -25,10 +25,11 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
+import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.util.FreemarkerUtil;
 
-public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T> {
+public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 	static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
 
 	static TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
@@ -55,7 +56,11 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 		}
 	}
 
-	private static String sendRequest(IntegrationVo integrationVo) {
+	protected abstract void beforeSend(IntegrationVo integrationVo);
+
+	protected abstract void afterReturn(IntegrationVo integrationVo);
+
+	public IntegrationResultVo sendRequest(IntegrationVo integrationVo) {
 		String url = integrationVo.getUrl();
 		JSONObject config = integrationVo.getConfig();
 		JSONObject otherConfig = config.getJSONObject("other");
@@ -63,7 +68,7 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 		JSONObject authConfig = config.getJSONObject("authentication");
 		JSONArray headConfig = config.getJSONArray("head");
 		JSONObject outputConfig = config.getJSONObject("output");
-		String returnString = "";
+		IntegrationResultVo resultVo = new IntegrationResultVo();
 		JSONObject paramObj = integrationVo.getParamObj();
 		if (paramObj == null) {
 			paramObj = new JSONObject();
@@ -75,26 +80,10 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 			sc.init(null, trustAllCerts, new SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-			/*
-			 * // 设置参数 JSONObject requestParamObj = new JSONObject(); if (paramConfig !=
-			 * null) { for (int i = 0; i < paramConfig.size(); i++) { JSONObject item =
-			 * paramConfig.getJSONObject(i); String key = item.getString("key"); String type
-			 * = item.getString("type"); String value = item.getString("value"); if
-			 * (type.equals("custom")) { } else if (type.equals("mapping")) {
-			 * requestParamObj.put(key, paramObj.get(value)); } } }
-			 * 
-			 * // 把参数设到URL上 if (!requestParamObj.isEmpty()) { String queryString = "";
-			 * Iterator<String> itKey = requestParamObj.keySet().iterator(); while
-			 * (itKey.hasNext()) { if (StringUtils.isNotBlank(queryString)) { queryString +=
-			 * "&"; } String key = itKey.next(); queryString += key + "=" +
-			 * URLEncoder.encode(requestParamObj.getString(key), "utf-8"); } if
-			 * (StringUtils.isNotBlank(queryString)) { url = url + "?" + queryString; } }
-			 */
-
 			URL getUrl = new URL(url);
 			connection = (HttpURLConnection) getUrl.openConnection();
 			// 设置http method
-			connection.setRequestMethod(integrationVo.getMethod());
+			connection.setRequestMethod(integrationVo.getMethod().toUpperCase());
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);
 
@@ -123,16 +112,12 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 				for (int i = 0; i < headConfig.size(); i++) {
 					JSONObject item = headConfig.getJSONObject(i);
 					String key = item.getString("key");
-					String type = item.getString("type");
 					String value = item.getString("value");
-					if (type.equals("custom")) {
-						connection.setRequestProperty(key, value);
-					} else if (type.equals("mapping")) {
-						connection.setRequestProperty(key, paramObj.getString(value));
-					}
-
+					connection.setRequestProperty(key, value);
 				}
 			}
+			// 设置默认header
+			connection.setRequestProperty("Content-Type", "application/json; utf-8");
 
 			connection.connect();
 		} catch (Exception e) {
@@ -146,11 +131,13 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 				// 内容不为空代表需要通过freemarker转换
 				if (StringUtils.isNotBlank(content)) {
 					content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+					resultVo.setTransformedParam(content);
 				} else {
 					content = integrationVo.getParamObj().toJSONString();
 				}
 				try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
-					out.write(content.toString().getBytes("utf-8"));
+					// out.write(content.toString().getBytes());
+					out.writeBytes(content);
 				} catch (Exception e) {
 					logger.error("http error :" + e.getMessage(), e);
 				}
@@ -160,29 +147,32 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 			// 处理返回值
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));) {
 				int code = connection.getResponseCode();
+				resultVo.setStatusCode(code);
 				if (String.valueOf(code).startsWith("2")) {
-					StringBuilder result = new StringBuilder();
 					String lines;
 					while ((lines = reader.readLine()) != null) {
-						result.append(lines);
+						resultVo.appendResult(lines);
 					}
-					returnString = result.toString();
+				} else {
+					String lines;
+					while ((lines = reader.readLine()) != null) {
+						resultVo.appendError(lines);
+					}
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
 
-			if (outputConfig != null && StringUtils.isNotBlank(returnString)) {
+			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
 				String content = outputConfig.getString("content");
 				if (StringUtils.isNotBlank(content)) {
 					JSONObject output = new JSONObject();
-					returnString = returnString.trim();
-					if (returnString.startsWith("{")) {
-						output.put("Return", JSONObject.parseObject(returnString));
-					} else if (returnString.startsWith("[")) {
-						output.put("Return", JSONArray.parseArray(returnString));
+					if (resultVo.getRawResult().startsWith("{")) {
+						output.put("Return", JSONObject.parseObject(resultVo.getRawResult()));
+					} else if (resultVo.getRawResult().startsWith("[")) {
+						output.put("Return", JSONArray.parseArray(resultVo.getRawResult()));
 					}
-					returnString = FreemarkerUtil.transform(output, content);
+					resultVo.setTransformedResult(FreemarkerUtil.transform(output, content));
 				}
 			}
 		}
@@ -190,14 +180,7 @@ public abstract class IntegrationHandlerBase<T> implements IIntegrationHandler<T
 		// server are unlikely in the near future. Calling disconnect() should
 		// not imply that this HttpURLConnection
 		// instance can be reused for other requests.
-		return returnString;
+		return resultVo;
 	}
-
-	public final T getData(IntegrationVo integrationVo) {
-		String result = sendRequest(integrationVo);
-		return myGetData(result);
-	}
-
-	protected abstract T myGetData(String result);
 
 }

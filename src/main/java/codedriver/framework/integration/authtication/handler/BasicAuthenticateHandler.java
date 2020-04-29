@@ -14,7 +14,7 @@ public class BasicAuthenticateHandler implements IAuthenticateHandler {
 
 	@Override
 	public String getType() {
-		return AuthenticateType.BASIC.toString();
+		return AuthenticateType.BASIC.getValue();
 	}
 
 	@Override

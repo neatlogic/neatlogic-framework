@@ -12,7 +12,7 @@ import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
 public class BearerAuthenticateHandler implements IAuthenticateHandler {
 	@Override
 	public String getType() {
-		return AuthenticateType.BEARER.toString();
+		return AuthenticateType.BEARER.getValue();
 	}
 
 	@Override

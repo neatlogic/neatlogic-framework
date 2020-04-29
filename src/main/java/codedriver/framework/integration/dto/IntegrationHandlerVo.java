@@ -47,7 +47,7 @@ public class IntegrationHandlerVo {
 
 	public JSONArray getInputPattern() {
 		if (inputPattern == null && StringUtils.isNotBlank(handler)) {
-			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
 				inputPattern = integrationHandler.getInputPattern();
 			}
@@ -57,7 +57,7 @@ public class IntegrationHandlerVo {
 
 	public JSONArray getOutputPattern() {
 		if (outputPattern == null && StringUtils.isNotBlank(handler)) {
-			IIntegrationHandler<?> integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
 				outputPattern = integrationHandler.getOutputPattern();
 			}

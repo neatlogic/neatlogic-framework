@@ -1,22 +1,53 @@
 package codedriver.framework.dto;
 
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
+
 /**
  * @program: codedriver
  * @description:
  * @create: 2019-12-09 16:47
  **/
-public class MailServerVo {
+public class MailServerVo extends BasePageVo {
+	
+	@EntityField(name = "uuid", type = ApiParamType.STRING)
     private String uuid;
+	
+	@EntityField(name = "名称", type = ApiParamType.STRING)
     private String name;
+	
+	@EntityField(name = "smtp端口", type = ApiParamType.INTEGER)
     private Integer port;
+	
+	@EntityField(name = "smtp主机", type = ApiParamType.STRING)
     private String host;
+	
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
     private String userName;
+	
+	@EntityField(name = "密码", type = ApiParamType.STRING)
     private String password;
+	
+	@EntityField(name = "域名", type = ApiParamType.STRING)
     private String domain;
+	
+	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
     private int isActive;
+	
+	@EntityField(name = "邮箱地址", type = ApiParamType.EMAIL)
     private String fromAddress;
 
+    private transient String keyword;
+    
     public String getUuid() {
+    	if(StringUtils.isBlank(uuid)) {
+    		uuid = UUID.randomUUID().toString().replace("-", "");
+    	}
         return uuid;
     }
 
@@ -87,4 +118,12 @@ public class MailServerVo {
     public void setFromAddress(String fromAddress) {
         this.fromAddress = fromAddress;
     }
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
 }

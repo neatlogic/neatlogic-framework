@@ -16,7 +16,7 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] { "barchart", "areachart", "columnchart", "linechart", "stackbarchart", "stackcolumnchart" };
+		return new String[] {"areachart", "columnchart", "linechart", "stackbarchart", "stackcolumnchart" };
 	}
 
 	public static void main(String[] argv) {
@@ -79,6 +79,12 @@ public class SeriesChart extends DashboardChartBase {
 			}
 			return returnList;
 		}
+		return null;
+	}
+
+	@Override
+	public JSONObject getChartConfig() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

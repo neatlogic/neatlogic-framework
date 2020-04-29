@@ -15,4 +15,12 @@ public abstract class DashboardChartBase {
 	public abstract String[] getSupportChart();
 
 	public abstract JSONArray getData(JSONArray dataList, JSONObject configObj);
+	
+	/**
+	 * 
+	 * @Description: 回显规则
+	 * @param @return
+	 * @return JSONObject
+	 */
+	public abstract JSONObject getChartConfig(); 
 }

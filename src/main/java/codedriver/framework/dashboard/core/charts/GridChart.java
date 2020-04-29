@@ -17,4 +17,10 @@ public class GridChart extends DashboardChartBase {
 		return null;
 	}
 
+	@Override
+	public JSONObject getChartConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

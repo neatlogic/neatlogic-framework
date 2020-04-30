@@ -130,8 +130,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				String content = inputConfig.getString("content");
 				// 内容不为空代表需要通过freemarker转换
 				if (StringUtils.isNotBlank(content)) {
-					content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
-					resultVo.setTransformedParam(content);
+					try {
+						content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+						resultVo.setTransformedParam(content);
+					} catch (Exception ex) {
+						resultVo.appendError(ex.getMessage());
+					}
 				} else {
 					content = integrationVo.getParamObj().toJSONString();
 				}
@@ -172,7 +176,11 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					} else if (resultVo.getRawResult().startsWith("[")) {
 						output.put("Return", JSONArray.parseArray(resultVo.getRawResult()));
 					}
-					resultVo.setTransformedResult(FreemarkerUtil.transform(output, content));
+					try {
+						resultVo.setTransformedResult(FreemarkerUtil.transform(output, content));
+					} catch (Exception ex) {
+						resultVo.appendError(ex.getMessage());
+					}
 				}
 			}
 		}

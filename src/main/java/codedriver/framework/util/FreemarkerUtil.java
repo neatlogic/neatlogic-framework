@@ -18,8 +18,10 @@ import freemarker.template.TemplateException;
 public class FreemarkerUtil {
 	static Logger logger = LoggerFactory.getLogger(FreemarkerUtil.class);
 
-	public static String transform(JSONObject dataObj, String content) throws FreemarkerTransformException {
+	public static String transform(Object paramObj, String content) throws FreemarkerTransformException {
 		String resultStr = "";
+		JSONObject dataObj = new JSONObject();
+		dataObj.put("DATA", paramObj);
 		try {
 			if (content != null) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
@@ -42,8 +44,10 @@ public class FreemarkerUtil {
 		return resultStr;
 	}
 
-	public static void transform(JSONObject dataObj, String content, Writer out) throws FreemarkerTransformException {
+	public static void transform(Object paramObj, String content, Writer out) throws FreemarkerTransformException {
 		// String resultStr = "";
+		JSONObject dataObj = new JSONObject();
+		dataObj.put("DATA", paramObj);
 		try {
 			if (content != null && !content.equals("")) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);

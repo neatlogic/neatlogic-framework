@@ -170,14 +170,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
 				String content = outputConfig.getString("content");
 				if (StringUtils.isNotBlank(content)) {
-					JSONObject output = new JSONObject();
-					if (resultVo.getRawResult().startsWith("{")) {
-						output.put("Return", JSONObject.parseObject(resultVo.getRawResult()));
-					} else if (resultVo.getRawResult().startsWith("[")) {
-						output.put("Return", JSONArray.parseArray(resultVo.getRawResult()));
-					}
 					try {
-						resultVo.setTransformedResult(FreemarkerUtil.transform(output, content));
+						if (resultVo.getRawResult().startsWith("{")) {
+							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONObject.parseObject(resultVo.getRawResult()), content));
+						} else if (resultVo.getRawResult().startsWith("[")) {
+							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
+						}
 					} catch (Exception ex) {
 						resultVo.appendError(ex.getMessage());
 					}

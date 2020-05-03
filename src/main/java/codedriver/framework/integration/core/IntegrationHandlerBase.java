@@ -121,7 +121,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 			connection.connect();
 		} catch (Exception e) {
-			logger.error("connect: " + url + " failed", e);
+			resultVo.appendError(e.getMessage());
 		}
 		if (connection != null) {
 			// 转换输入参数
@@ -143,7 +143,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					// out.write(content.toString().getBytes());
 					out.writeBytes(content);
 				} catch (Exception e) {
-					logger.error("http error :" + e.getMessage(), e);
+					resultVo.appendError(e.getMessage());
 				}
 			}
 			// }
@@ -164,7 +164,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				resultVo.appendError(e.getMessage());
 			}
 
 			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {

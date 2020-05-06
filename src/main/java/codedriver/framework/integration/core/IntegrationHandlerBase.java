@@ -121,7 +121,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 			connection.connect();
 		} catch (Exception e) {
-			logger.error("connect: " + url + " failed", e);
+			resultVo.appendError(e.getMessage());
 		}
 		if (connection != null) {
 			// 转换输入参数
@@ -130,8 +130,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				String content = inputConfig.getString("content");
 				// 内容不为空代表需要通过freemarker转换
 				if (StringUtils.isNotBlank(content)) {
-					content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
-					resultVo.setTransformedParam(content);
+					try {
+						content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+						resultVo.setTransformedParam(content);
+					} catch (Exception ex) {
+						resultVo.appendError(ex.getMessage());
+					}
 				} else {
 					content = integrationVo.getParamObj().toJSONString();
 				}
@@ -139,7 +143,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					// out.write(content.toString().getBytes());
 					out.writeBytes(content);
 				} catch (Exception e) {
-					logger.error("http error :" + e.getMessage(), e);
+					resultVo.appendError(e.getMessage());
 				}
 			}
 			// }
@@ -160,19 +164,21 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				resultVo.appendError(e.getMessage());
 			}
 
 			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
 				String content = outputConfig.getString("content");
 				if (StringUtils.isNotBlank(content)) {
-					JSONObject output = new JSONObject();
-					if (resultVo.getRawResult().startsWith("{")) {
-						output.put("Return", JSONObject.parseObject(resultVo.getRawResult()));
-					} else if (resultVo.getRawResult().startsWith("[")) {
-						output.put("Return", JSONArray.parseArray(resultVo.getRawResult()));
+					try {
+						if (resultVo.getRawResult().startsWith("{")) {
+							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONObject.parseObject(resultVo.getRawResult()), content));
+						} else if (resultVo.getRawResult().startsWith("[")) {
+							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
+						}
+					} catch (Exception ex) {
+						resultVo.appendError(ex.getMessage());
 					}
-					resultVo.setTransformedResult(FreemarkerUtil.transform(output, content));
 				}
 			}
 		}

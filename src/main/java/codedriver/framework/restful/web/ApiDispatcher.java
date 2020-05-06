@@ -25,12 +25,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiException;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.restful.core.ApiComponentFactory;
-import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IApiComponent;
+import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.service.ApiService;
@@ -155,6 +156,11 @@ public class ApiDispatcher {
 			returnObj.put("ErrorCode", ex.getErrorCode());
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
+		} catch (ApiException ex) {
+			response.setStatus(500);
+			returnObj.put("Error", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(500);
@@ -172,32 +178,37 @@ public class ApiDispatcher {
 	public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
-		JSONObject paramObj = null;
-		if (StringUtils.isNotBlank(jsonStr)) {
-			try {
-				paramObj = JSONObject.parseObject(jsonStr);
-			} catch (Exception e) {
-				throw new Exception("参数不是json格式,错误信息为：" + e.getMessage());
-			}
-		} else {
-			paramObj = new JSONObject();
-		}
-
-		Enumeration<String> paraNames = request.getParameterNames();
-		while (paraNames.hasMoreElements()) {
-			String p = paraNames.nextElement();
-			String[] vs = request.getParameterValues(p);
-			if (vs.length > 1) {
-				paramObj.put(p, vs);
-			} else {
-				paramObj.put(p, request.getParameter(p));
-			}
-		}
 		JSONObject returnObj = new JSONObject();
 		try {
+			JSONObject paramObj = null;
+			if (StringUtils.isNotBlank(jsonStr)) {
+				try {
+					paramObj = JSONObject.parseObject(jsonStr);
+				} catch (Exception e) {
+					throw new ApiRuntimeException("请求参数需要符合JSON格式");
+				}
+			} else {
+				paramObj = new JSONObject();
+			}
+
+			Enumeration<String> paraNames = request.getParameterNames();
+			while (paraNames.hasMoreElements()) {
+				String p = paraNames.nextElement();
+				String[] vs = request.getParameterValues(p);
+				if (vs.length > 1) {
+					paramObj.put(p, vs);
+				} else {
+					paramObj.put(p, request.getParameter(p));
+				}
+			}
+
 			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
+			response.setStatus(500);
+			returnObj.put("Error", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (ApiException ex) {
 			response.setStatus(500);
 			returnObj.put("Error", ex.getErrorCode());
 			returnObj.put("Status", "ERROR");
@@ -237,6 +248,11 @@ public class ApiDispatcher {
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(500);
 			returnObj.put("ErrorCode", ex.getErrorCode());
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (ApiException ex) {
+			response.setStatus(500);
+			returnObj.put("Error", ex.getErrorCode());
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {

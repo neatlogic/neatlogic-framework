@@ -12,13 +12,21 @@ public class GridChart extends DashboardChartBase {
 		return new String[] { "gridchart" };
 	}
 
+
 	@Override
-	public JSONArray getData(JSONArray dataList, JSONObject configObj) {
+	public JSONObject getChartConfig() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JSONObject getChartConfig() {
+	public JSONArray getData(JSONObject dataMap) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
 		// TODO Auto-generated method stub
 		return null;
 	}

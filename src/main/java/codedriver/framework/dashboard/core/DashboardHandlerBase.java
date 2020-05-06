@@ -13,8 +13,11 @@ public abstract class DashboardHandlerBase implements IDashboardHandler {
 		
 		ChartDataVo chartDataVo = new ChartDataVo();
 		chartDataVo.setGroupField(chartConfigObj.getString("groupField"));
+		chartDataVo.setGroupFieldText(chartConfigObj.getString("groupFieldText"));
 		chartDataVo.setSubGroupField(chartConfigObj.getString("subGroupField"));
+		chartDataVo.setSubGroupFieldText(chartConfigObj.getString("subGroupFieldText"));
 		chartDataVo.setValueField(chartConfigObj.getString("valueField"));
+		chartDataVo.setValueFieldText(chartConfigObj.getString("valueFieldText"));
 		chartDataVo.setDataList(dataList);
 		
 		chartDataVo.setConfigObj(widgetVo.getChartConfigObj());

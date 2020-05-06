@@ -7,12 +7,18 @@ import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ChartDataVo {
-	@EntityField(name = "值字段名称", type = ApiParamType.STRING)
+	@EntityField(name = "值字段", type = ApiParamType.STRING)
 	private String valueField;
-	@EntityField(name = "二级分组字段名称", type = ApiParamType.STRING)
+	@EntityField(name = "值字段名称", type = ApiParamType.STRING)
+	private String valueFieldText;
+	@EntityField(name = "二级分组字段", type = ApiParamType.STRING)
 	private String subGroupField;
-	@EntityField(name = "分组字段名称", type = ApiParamType.STRING)
+	@EntityField(name = "二级分组字段名称", type = ApiParamType.STRING)
+	private String subGroupFieldText;
+	@EntityField(name = "分组字段", type = ApiParamType.STRING)
 	private String groupField;
+	@EntityField(name = "分组字段名称", type = ApiParamType.STRING)
+	private String groupFieldText;
 	@EntityField(name = "数据集", type = ApiParamType.JSONARRAY)
 	private JSONArray dataList;
 	@EntityField(name = "图表配置", type = ApiParamType.JSONOBJECT)
@@ -64,4 +70,29 @@ public class ChartDataVo {
 	public void setSubGroupField(String subGroupField) {
 		this.subGroupField = subGroupField;
 	}
+
+	public String getValueFieldText() {
+		return valueFieldText;
+	}
+
+	public void setValueFieldText(String valueFieldText) {
+		this.valueFieldText = valueFieldText;
+	}
+
+	public String getSubGroupFieldText() {
+		return subGroupFieldText;
+	}
+
+	public void setSubGroupFieldText(String subGroupFieldText) {
+		this.subGroupFieldText = subGroupFieldText;
+	}
+
+	public String getGroupFieldText() {
+		return groupFieldText;
+	}
+
+	public void setGroupFieldText(String groupFieldText) {
+		this.groupFieldText = groupFieldText;
+	}
+	
 }

@@ -14,7 +14,23 @@ public abstract class DashboardChartBase {
 	 */
 	public abstract String[] getSupportChart();
 
-	public abstract JSONArray getData(JSONArray dataList, JSONObject configObj);
+	/**
+	 * 
+	 * @Description: 流式返回数据
+	 * @param @return
+	 * @return JSONObject
+	 */
+	public abstract JSONArray getData(JSONObject dataMap);
+	
+	/**
+	 * 
+	 * @Description: 流式累加统计
+	 * @param nextDataList
+	 * @param configObj
+	 * @param preDatas
+	 * @return
+	 */
+	public abstract JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas);
 	
 	/**
 	 * 

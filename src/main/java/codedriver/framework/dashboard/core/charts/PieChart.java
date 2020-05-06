@@ -1,6 +1,5 @@
 package codedriver.framework.dashboard.core.charts;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -18,26 +17,16 @@ public class PieChart extends DashboardChartBase {
 	public String[] getSupportChart() {
 		return new String[] { "piechart" };
 	}
+	
+	@Override
+	public JSONObject getChartConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
-	public JSONArray getData(JSONArray dataList, JSONObject configObj) {
-		String groupField = configObj.getString("groupField");
-		String aggregate = configObj.getString("aggregate");
-		Map<String, Double> resultMap = new HashMap<>();
-		if (aggregate.equals("count")) {
-			for (int i = 0; i < dataList.size(); i++) {
-				JSONObject data = dataList.getJSONObject(i);
-				String group = data.getString(groupField);
-				if(StringUtils.isNotBlank(group)){
-					if (!resultMap.containsKey(group)) {
-						resultMap.put(group, 1D);
-					} else {
-						resultMap.put(group, resultMap.get(group) + 1D);
-					}
-				}
-			}
-		} 
-
+	public JSONArray getData(JSONObject dataMap) {
+		Map<String,Object> resultMap = (Map<String,Object>)dataMap;
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			JSONArray returnList = new JSONArray();
@@ -54,9 +43,24 @@ public class PieChart extends DashboardChartBase {
 	}
 
 	@Override
-	public JSONObject getChartConfig() {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
+		String groupField = configObj.getString("groupField");
+		String aggregate = configObj.getString("aggregate");
+		Map<String, Object> resultMap = (Map<String,Object>)preDatas;
+		if (aggregate.equals("count")) {
+			for (int i = 0; i < nextDataList.size(); i++) {
+				JSONObject data = nextDataList.getJSONObject(i);
+				String group = data.getString(groupField);
+				if(StringUtils.isNotBlank(group)){
+					if (!resultMap.containsKey(group)) {
+						resultMap.put(group, 1);
+					} else {
+						resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
+					}
+				}
+			}
+		} 
+		return new JSONObject(resultMap);
 	}
 
 }

@@ -91,6 +91,7 @@
         k.`pinyin`,
         k.`is_active` as `isActive`,
         h.`role_name` as `roleName`,
+        r.`description`,
         j.`uuid` as `teamUuid`,
         j.`name` as `teamName`
         FROM (
@@ -98,7 +99,7 @@
         DISTINCT (a.`user_id`),
 		a.`id`
         FROM
-       `user` a
+        `user` a
         LEFT JOIN user_role b ON a.user_id = b.user_id
         LEFT JOIN user_team c ON a.user_id = c.user_id
         LEFT JOIN team d ON c.team_uuid = d.uuid
@@ -131,6 +132,7 @@
         LEFT JOIN `user_role` h ON g.user_id = h.`user_id`
         LEFT JOIN `user_team` i ON g.`user_id` = i.`user_id`
         LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+        LEFT JOIN `role` r ON h.`role_name` = r.`name`
         ORDER BY g.`id` DESC
     </select>
 

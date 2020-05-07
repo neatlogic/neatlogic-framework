@@ -9,6 +9,7 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -37,6 +38,7 @@ public class UserVo extends BasePageVo {
 	private String authGroup;
 	private JSONObject userInfoObj;
 	private List<String> roleNameList;
+	private List<String> roleDescriptionList;
 	private List<RoleVo> roleList;
 	private List<String> teamUuidList;
 	private List<String> teamNameList;
@@ -232,7 +234,7 @@ public class UserVo extends BasePageVo {
 		if(CollectionUtils.isNotEmpty(teamList)){
 			List<String> uuidList = new ArrayList<>();
 			for (TeamVo teamVo : teamList){
-				uuidList.add(teamVo.getUuid());
+				uuidList.add(GroupSearch.TEAM.getValuePlugin()+teamVo.getUuid());
 			}
 			return uuidList;
 		}
@@ -278,11 +280,21 @@ public class UserVo extends BasePageVo {
 		this.userInfoObj = userInfoObj;
 	}
 
+	public List<String> getRoleDescriptionList() {
+		if(CollectionUtils.isNotEmpty(roleList)) {
+			roleDescriptionList = new ArrayList<String>();
+			for(RoleVo role : roleList) {
+				roleDescriptionList.add(role.getDescription());
+			}
+		}
+		return roleDescriptionList;
+	}
+
 	public List<String> getRoleNameList() {
 		if(CollectionUtils.isNotEmpty(roleList)) {
 			roleNameList = new ArrayList<String>();
 			for(RoleVo role : roleList) {
-				roleNameList.add(role.getName());
+				roleNameList.add(GroupSearch.ROLE.getValuePlugin()+role.getName());
 			}
 		}
 		return roleNameList;

@@ -7,8 +7,8 @@
 		`dashboard_uuid`
 		FROM
 		`dashboard_default`
-		WHERE (user_id = #{value} and type = 'user') or type = 'system'
-		order by type desc
+		WHERE (user_id = #{value} and type = 'custom') or type = 'system'
+		order by type asc
 		limit 1
 	</select>
 
@@ -35,9 +35,9 @@
 			<if test="keyword !=null and keyword!=''">
 				AND a.name LIKE concat('%', #{keyword}, '%')
 			</if>
-				and (da.type = 'common' AND da.`uuid` = 'alluser')
+				and ((da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
-				OR	(da.type = 'user' AND da.`uuid` = #{userId})
+				OR	(da.type = 'custom' AND da.`uuid` = #{userId})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -53,9 +53,10 @@
 					</foreach>
 					)
 			</if>
-			<if test="userId != null and userId != ''">
+			<if test="fcu != null and fcu != ''">
 			or	a.`fcu` = #{fcu}
 			</if>
+			)
 		</where>
 	</sql>
 
@@ -96,13 +97,12 @@
 		`dashboard` a
 		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
 		<where>
-			 a.fcu = #{fcu}
 			<if test="keyword !=null and keyword!=''">
 				AND a.name LIKE concat('%', #{keyword}, '%')
 			</if>
 				and (da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
-			  	OR	(da.type = 'user' AND da.`uuid` = #{userId})
+			  	OR	(da.type = 'custom' AND da.`uuid` = #{userId})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -118,7 +118,7 @@
 					</foreach>
 					)
 			</if>
-			<if test="userId != null and userId != ''">
+			<if test="fcu != null and fcu != ''">
 			or	a.`fcu` = #{fcu}
 			</if>
 		</where>
@@ -222,13 +222,10 @@
 		d.`fcd`,
 		d.`fcu`,
 		d.`lcd`,
-		d.`lcu`,
-		du.user_id as `defaultUser`,
-		du.type as `defaultType`
+		d.`lcu`
 		FROM
 		`dashboard` d
-		LEFT JOIN dashboard_default du on d.uuid = du.dashboard_uuid
-		WHERE
+		where
 		`uuid` = #{value}
 	</select>
 	
@@ -253,7 +250,7 @@
 			and
 			((da.type = 'common' AND da.`uuid` = 'alluser')
 			<if test="userId != null and userId != ''">
-			  	OR	(da.type = 'user' AND da.`uuid` = #{userId})
+			  	OR	(da.type = 'custom' AND da.`uuid` = #{userId})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -433,8 +430,12 @@
 		DELETE
 		FROM
 		`dashboard_default`
-		WHERE
-		`user_id` = #{userId}
+		<where>
+			<if test="type != 'system'">
+			`user_id` = #{userId} 
+			</if>
+			and `type` = #{type}
+		</where>
 	</delete>
 
 	<delete id="deleteDashboardAuthorityByUuid" parameterType="java.lang.String">

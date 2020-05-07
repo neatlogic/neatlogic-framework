@@ -54,5 +54,5 @@ public interface DashboardMapper {
 
 	public int deleteDashboardVisitCounterByDashboardUuid(String dashboardUuid);
 
-	public int deleteDashboardDefaultByUserId(String userId);
+	public int deleteDashboardDefaultByUserId(@Param("userId")String userId,@Param("type")String type);
 }

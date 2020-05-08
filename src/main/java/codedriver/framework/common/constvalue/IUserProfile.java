@@ -1,4 +1,4 @@
-package codedriver.framework.restful.api;
+package codedriver.framework.common.constvalue;
 
 import codedriver.framework.dto.UserProfileVo;
 

@@ -2,13 +2,15 @@ package codedriver.framework.dashboard.dao.mapper;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import codedriver.framework.dashboard.dto.DashboardDefaultVo;
 import codedriver.framework.dashboard.dto.DashboardVisitCounterVo;
 import codedriver.framework.dashboard.dto.DashboardVo;
 import codedriver.framework.dashboard.dto.DashboardWidgetVo;
 import codedriver.framework.dto.AuthorityVo;
 
 public interface DashboardMapper {
-	public String getDefaultDashboardUuidByUserId(String userId);
+	public List<DashboardDefaultVo> getDefaultDashboardUuidByUserId(String userId);
 
 	public int searchDashboardCount(DashboardVo dashboardVo);
 

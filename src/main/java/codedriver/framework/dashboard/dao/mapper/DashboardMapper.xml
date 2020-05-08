@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
 
-	<select id="getDefaultDashboardUuidByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="getDefaultDashboardUuidByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardDefaultVo">
 		SELECT
-		`dashboard_uuid`
+		`dashboard_uuid` as dashboardUuid,
+		`user_id` as userId,
+		`type`
 		FROM
 		`dashboard_default`
-		WHERE (user_id = #{value} and type = 'custom') or type = 'system'
-		order by type asc
-		limit 1
+		WHERE user_id = #{value} 
 	</select>
 
 	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">

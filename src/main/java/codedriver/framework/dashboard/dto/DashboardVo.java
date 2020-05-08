@@ -24,8 +24,10 @@ public class DashboardVo extends BasePageVo {
 	private String name;
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
 	private int isActive;
-	@EntityField(name = "是否默认面板", type = ApiParamType.INTEGER)
-	private int isDefault;
+	@EntityField(name = "是否系统默认面板", type = ApiParamType.INTEGER)
+	private int isSystemDefault;
+	@EntityField(name = "是否个人默认面板", type = ApiParamType.INTEGER)
+	private int isCustomDefault;
 	@EntityField(name = "描述", type = ApiParamType.STRING)
 	private String description;
 	@EntityField(name = "仪表板创建时间", type = ApiParamType.LONG)
@@ -153,12 +155,20 @@ public class DashboardVo extends BasePageVo {
 		this.type = type;
 	}
 
-	public int getIsDefault() {
-		return isDefault;
+	public int getIsSystemDefault() {
+		return isSystemDefault;
 	}
 
-	public void setIsDefault(int isDefault) {
-		this.isDefault = isDefault;
+	public void setIsSystemDefault(int isSystemDefault) {
+		this.isSystemDefault = isSystemDefault;
+	}
+
+	public int getIsCustomDefault() {
+		return isCustomDefault;
+	}
+
+	public void setIsCustomDefault(int isCustomDefault) {
+		this.isCustomDefault = isCustomDefault;
 	}
 
 	public String getFcuName() {

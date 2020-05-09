@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.module.ModuleEnumFactory;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
@@ -43,7 +43,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
 		List<String> moduleList = new ArrayList<>();
 		if(StringUtils.isNoneBlank(jobClassVo.getModuleId())) {
-			moduleList = ModuleEnumFactory.getModuleEnumMap().get(jobClassVo.getModuleId()).getModuleList();
+			moduleList = ModuleUtil.getModuleGroup(jobClassVo.getModuleId()).getModuleIdList();
 		}
 		for (JobClassVo jobClass : jobClassList) {
 			if (CollectionUtils.isNotEmpty(moduleList) && !moduleList.contains(jobClass.getModuleId())) {

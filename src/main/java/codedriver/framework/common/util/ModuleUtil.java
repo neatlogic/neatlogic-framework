@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.constvalue.ModuleEnum;
+import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 
 public class ModuleUtil {
@@ -45,5 +45,26 @@ public class ModuleUtil {
 			}
 		}
 		return returnList;
+	}
+	
+	public static ModuleGroupVo getModuleGroup(String group) {
+		ModuleGroupVo moduleGroup = null;
+		Set<Entry<String, ModuleVo>> moduleSet = moduleMap.entrySet();
+		for(Entry<String, ModuleVo> moduleEntry :moduleSet) {
+			ModuleVo moduleVo = moduleEntry.getValue();
+			if(moduleVo.getGroup().equals(group)) {
+				if(moduleGroup == null) {
+					moduleGroup = new ModuleGroupVo();
+					moduleGroup.setGroup(moduleVo.getGroup());
+					moduleGroup.setGroupName(moduleVo.getGroupName());
+					List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
+					moduleList.add(moduleVo);
+					moduleGroup.setModuleList(moduleList);
+				}else {
+					moduleGroup.getModuleList().add(moduleVo);
+				}
+			}
+		}
+		return moduleGroup;
 	}
 }

@@ -57,7 +57,7 @@
 			</if>
 		</where>
 	</select>
-
+	
 	<select id="searchActiveIntegrationForSelect" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.common.dto.ValueTextVo">
 		SELECT
 		`uuid` AS value,
@@ -73,7 +73,15 @@
 		LIMIT #{pageSize}
 		</if>
 	</select>
-	
+
+	<update id="updateIntegrationActive" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		UPDATE
+		`integration`
+		SET
+		is_active = #{isActive}
+		WHERE `uuid` = #{uuid}
+	</update>
+
 	<update id="updateIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		UPDATE
 		`integration`
@@ -87,6 +95,20 @@
 		`lcu` = #{lcu}
 		WHERE `uuid` = #{uuid}
 	</update>
+
+	<insert id="replaceIntegrationInvoke" parameterType="codedriver.framework.integration.dto.IntegrationInvokeVo">
+		REPLACE INTO `integration_invoke` (
+		`integration_uuid`,
+		`invoke_config`,
+		`invoke_hash`
+		)
+		VALUES
+		(
+		#{integrationUuid},
+		#{invokeConfigStr},
+		#{invokeHash}
+		)
+	</insert>
 
 	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		INSERT INTO `integration` (
@@ -113,4 +135,11 @@
 		#{fcu}
 		)
 	</insert>
+
+	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`integration`
+		WHERE `uuid` = #{value}
+	</delete>
 </mapper>

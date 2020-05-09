@@ -12,9 +12,9 @@ import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.auth.core.AuthBase;
 import codedriver.framework.auth.core.AuthFactory;
+import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.AuthGroupVo;
 import codedriver.framework.dto.AuthVo;
-import codedriver.framework.module.ModuleEnumFactory;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.Output;
@@ -59,7 +59,7 @@ public class AuthSearchApi extends ApiComponentBase {
             }
             AuthGroupVo authGroupVo = new AuthGroupVo();
             authGroupVo.setName(authGroupName);
-            authGroupVo.setDisplayName(ModuleEnumFactory.getModuleEnumMap().get(authGroupName).getText());
+            authGroupVo.setDisplayName(ModuleUtil.getModuleGroup(authGroupName).getGroupName());
             List<AuthBase> authList = authGroupMap.get(authGroupName);
             if (authList != null && authList.size() > 0){
                 List<AuthVo> authArray = new ArrayList<>();

@@ -41,7 +41,7 @@ public class IntegrationVo extends BasePageVo {
 	private transient JSONObject configObj;
 	// 请求参数
 	@JSONField(serialize = false)
-	private transient JSONObject paramObj;
+	private transient JSONObject paramObj = new JSONObject();
 	@EntityField(name = "创建人", type = ApiParamType.STRING)
 	private String fcu;
 	@EntityField(name = "创建时间", type = ApiParamType.INTEGER)

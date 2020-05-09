@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
+import codedriver.framework.common.constvalue.IUserProfile;
 import codedriver.framework.dto.UserProfileVo;
-import codedriver.framework.restful.api.IUserProfile;
 
 public class UserProfileFactory {
 	private static Map<String, UserProfileVo> userProfileMap = new HashMap<String, UserProfileVo>();

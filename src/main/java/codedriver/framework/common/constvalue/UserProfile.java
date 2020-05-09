@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.UserProfileVo;
-import codedriver.framework.restful.api.IUserProfile;
 
 public enum UserProfile implements IUserProfile{
 	USER_CREATE_SUCESS("usercreatesuccess","用户创建成功",Arrays.asList(UserProfileOperate.KEEP_ON_CREATE,UserProfileOperate.EDIT_USER,UserProfileOperate.BACK_USER_LIST)),

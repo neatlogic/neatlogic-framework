@@ -11,6 +11,7 @@ public interface IntegrationMapper {
 	public List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);
 
 	public int searchIntegrationCount(IntegrationVo integrationVo);
+	public List<ValueTextVo> searchActiveIntegrationForSelect(IntegrationVo integrationVo);
 
 	public int insertIntegration(IntegrationVo integrationVo);
 

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import codedriver.framework.common.config.Config;
-import codedriver.framework.common.constvalue.ModuleEnum;
 import codedriver.framework.common.util.PageUtil;
+import codedriver.framework.module.ModuleEnumFactory;
 import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobAuditVo;
@@ -40,7 +41,10 @@ public class SchedulerServiceImpl implements SchedulerService {
 	public List<JobClassVo> searchJobClassList(JobClassVo jobClassVo) {
 		List<JobClassVo> jobClassList = SchedulerManager.getAllPublicJobClassList();
 		List<JobClassVo> jobClassFilterList = new ArrayList<>();
-		List<String> moduleList = ModuleEnum.getModuleList(jobClassVo.getModuleId());
+		List<String> moduleList = new ArrayList<>();
+		if(StringUtils.isNoneBlank(jobClassVo.getModuleId())) {
+			moduleList = ModuleEnumFactory.getModuleEnumMap().get(jobClassVo.getModuleId()).getModuleList();
+		}
 		for (JobClassVo jobClass : jobClassList) {
 			if (CollectionUtils.isNotEmpty(moduleList) && !moduleList.contains(jobClass.getModuleId())) {
 				continue;

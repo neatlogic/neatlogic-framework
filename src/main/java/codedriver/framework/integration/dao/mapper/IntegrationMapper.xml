@@ -57,22 +57,6 @@
 			</if>
 		</where>
 	</select>
-	
-	<select id="searchActiveIntegrationForSelect" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.common.dto.ValueTextVo">
-		SELECT
-		`uuid` AS value,
-		`name` AS text
-		FROM `integration`
-		WHERE `is_active` = 1
-		<if test="keyword != null and keyword != ''">
-			AND (`name`` LIKE concat('%', #{keyword}, '%')
-			OR `url` LIKE concat('%', #{keyword}, '%'))
-		</if>
-		ORDER BY fcd DESC
-		<if test="needPage">
-		LIMIT #{pageSize}
-		</if>
-	</select>
 
 	<update id="updateIntegrationActive" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		UPDATE

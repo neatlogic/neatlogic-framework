@@ -2,6 +2,7 @@ package codedriver.framework.integration.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.integration.dto.IntegrationInvokeVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 

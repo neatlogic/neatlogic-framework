@@ -3,7 +3,7 @@ package codedriver.framework.auth.label;
 import codedriver.framework.auth.core.AuthBase;
 import codedriver.framework.common.constvalue.ModuleEnum;
 
-public class INTEGRATION_MODIFY extends AuthBase {
+public class INTEGRATION_EDIT extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {

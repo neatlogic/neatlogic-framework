@@ -7,16 +7,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
-import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleVo;
 
-@RootComponent
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@RootConfiguration
 public class TenantContext implements Serializable {
 	private static final long serialVersionUID = -5977938340288247600L;
 	private static ThreadLocal<TenantContext> instance = new ThreadLocal<TenantContext>();

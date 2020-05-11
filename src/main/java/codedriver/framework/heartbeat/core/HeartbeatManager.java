@@ -30,7 +30,7 @@ import codedriver.framework.heartbeat.dto.ServerClusterVo;
 import codedriver.framework.heartbeat.dto.ServerCounterVo;
 
 @RootComponent
-public class HeartbeatManager extends ApplicationListenerBase  {
+public class HeartbeatManager extends ApplicationListenerBase {
 	private Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 	@Autowired
 	private ServerMapper serverMapper;
@@ -41,7 +41,6 @@ public class HeartbeatManager extends ApplicationListenerBase  {
 
 	public final void myInit() {
 		// 服务器重启时，先重置与自己相关的数据
-		System.out.println("--------------------------------------------- config-heartbeat--------------------------------------------------------");
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		// 重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
@@ -88,8 +87,7 @@ public class HeartbeatManager extends ApplicationListenerBase  {
 	/**
 	 * 
 	 * @Description: 将故障服务器状态设置为停止，删除与该服务器相关的计数器数据
-	 * @param serverId
-	 *            故障服务器id
+	 * @param serverId 故障服务器id
 	 * @return boolean
 	 */
 	public boolean getServerLock(Integer serverId) {

@@ -37,8 +37,8 @@ public class Config {
 	private static Map<String, String> ES_CLUSTERS;
 	private static boolean ES_ENABLE;
 	private static String DATA_HOME;// 存储文件路径
-	private static int SERVER_HEARTBEAT_RATE = 1;// 心跳频率
-	private static int SERVER_HEARTBEAT_THRESHOLD = 3;// 心跳失败上限次数
+	private static int SERVER_HEARTBEAT_RATE;// 心跳频率
+	private static int SERVER_HEARTBEAT_THRESHOLD ;// 心跳失败上限次数
 	private static String HOME_URL;
 
 	static {
@@ -53,10 +53,6 @@ public class Config {
 			System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
 			throw ex;
 		}
-	}
-	
-	public Config() {
-		System.out.println("-----------------------init config");
 	}
 
 	public static final String CODEDRIVER_HOME() {
@@ -119,7 +115,6 @@ public class Config {
 			DATA_HOME = prop.getProperty("data.home", "/app/data");
 			SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
 			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
-			System.out.println("--------------------------------------------- config-init--------------------------------------------------------");
 			HOME_URL = prop.getProperty("home.url");
 			JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
 

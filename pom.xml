@@ -50,5 +50,5 @@
 			<artifactId>json-utils</artifactId>
 			<version>0.1.1</version>
 		</dependency>
-	</dependencies> 
+	</dependencies>
 </project> 

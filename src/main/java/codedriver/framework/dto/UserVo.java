@@ -9,7 +9,6 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -234,7 +233,7 @@ public class UserVo extends BasePageVo {
 		if(CollectionUtils.isNotEmpty(teamList)){
 			List<String> uuidList = new ArrayList<>();
 			for (TeamVo teamVo : teamList){
-				uuidList.add(GroupSearch.TEAM.getValuePlugin()+teamVo.getUuid());
+				uuidList.add(teamVo.getUuid());
 			}
 			return uuidList;
 		}
@@ -294,7 +293,7 @@ public class UserVo extends BasePageVo {
 		if(CollectionUtils.isNotEmpty(roleList)) {
 			roleNameList = new ArrayList<String>();
 			for(RoleVo role : roleList) {
-				roleNameList.add(GroupSearch.ROLE.getValuePlugin()+role.getName());
+				roleNameList.add(role.getName());
 			}
 		}
 		return roleNameList;

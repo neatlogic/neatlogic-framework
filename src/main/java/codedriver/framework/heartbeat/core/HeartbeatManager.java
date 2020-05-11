@@ -41,6 +41,7 @@ public class HeartbeatManager extends ApplicationListenerBase  {
 
 	public final void myInit() {
 		// 服务器重启时，先重置与自己相关的数据
+		System.out.println("--------------------------------------------- config-heartbeat--------------------------------------------------------");
 		getServerLock(Config.SCHEDULE_SERVER_ID);
 		// 重新插入一条服务器信息
 		ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);

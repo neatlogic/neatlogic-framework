@@ -58,6 +58,10 @@ public class Config {
 			throw ex;
 		}
 	}
+	
+	public Config() {
+		System.out.println("-----------------------init config");
+	}
 
 	public static final String CODEDRIVER_HOME() {
 		return CODEDRIVER_HOME;

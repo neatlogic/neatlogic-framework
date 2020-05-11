@@ -13,9 +13,9 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -25,6 +25,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import codedriver.framework.common.RootComponent;
 
 @RootComponent
+@Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE) // 配置文件类第一个加载
 public class Config {
 	private static Logger logger = LoggerFactory.getLogger(Config.class);

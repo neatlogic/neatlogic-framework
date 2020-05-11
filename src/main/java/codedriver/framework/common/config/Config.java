@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -118,6 +119,7 @@ public class Config {
 			DATA_HOME = prop.getProperty("data.home", "/app/data");
 			SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
 			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
+			System.out.println("--------------------------------------------- config-init--------------------------------------------------------");
 			HOME_URL = prop.getProperty("home.url");
 			JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
 

@@ -39,4 +39,5 @@ public abstract class DashboardChartBase {
 	 * @return JSONObject
 	 */
 	public abstract JSONObject getChartConfig(); 
+	
 }

@@ -62,5 +62,4 @@ public class PieChart extends DashboardChartBase {
 		} 
 		return new JSONObject(resultMap);
 	}
-
 }

@@ -55,6 +55,6 @@ public interface IDashboardHandler {
 	 * @param @return
 	 * @return JSONObject
 	 */
-	public JSONObject getChartConfig();
-
+	public JSONObject getChartConfig(DashboardWidgetVo widgetVo);
+	
 }

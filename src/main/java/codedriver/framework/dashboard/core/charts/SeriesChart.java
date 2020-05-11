@@ -1,6 +1,5 @@
 package codedriver.framework.dashboard.core.charts;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -16,26 +15,26 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] {"areachart", "columnchart", "linechart", "stackbarchart", "stackcolumnchart" };
-	}
-
-	public static void main(String[] argv) {
-		JSONObject obj = new JSONObject();
-		obj.put("value", "abc");
-		System.out.println(obj.getLongValue("value"));
+		return new String[] {"areachart", "linechart", "stackbarchart", "stackcolumnchart" };
 	}
 
 	@Override
 	public JSONArray getData(JSONObject dataMap) {
 		Map<String,Object> resultMap = (Map<String,Object>)dataMap;
-
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			JSONArray returnList = new JSONArray();
 			while (itKey.hasNext()) {
-				//String key = itKey.next();
+				String key = itKey.next();
 				JSONObject data = new JSONObject();
-				
+				String[] keys = key.split("#"); 
+				if(keys.length >1) {
+					data.put("column", keys[0]);
+					data.put("type", keys[1]);
+				}else {
+					data.put("column", key);
+				}
+				data.put("value", resultMap.get(key));
 				returnList.add(data);
 			}
 			return returnList;
@@ -51,43 +50,40 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
-		String valueField = configObj.getString("valueField");
 		String groupField = configObj.getString("groupField");
 		String subGroupField = configObj.getString("subGroupField");
 		String aggregate = configObj.getString("aggregate");
-		Map<String, Double> resultMap = new HashMap<>();
+		String subGroup = StringUtils.EMPTY;
+		Map<String, Object> resultMap = (Map<String,Object>)preDatas;
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
 				String group = data.getString(groupField);
-				if (StringUtils.isNotBlank(data.getString(subGroupField))) {
-					group += "#" + data.getString(subGroupField);
-				}
-				if (!resultMap.containsKey(group)) {
-					resultMap.put(group, 1D);
-				} else {
-					resultMap.put(group, resultMap.get(group) + 1D);
-				}
-			}
-		} else if (aggregate.equals("sum")) {
-			for (int i = 0; i < nextDataList.size(); i++) {
-				JSONObject data = nextDataList.getJSONObject(i);
-				String group = data.getString(groupField);
-				if (StringUtils.isNotBlank(data.getString(subGroupField))) {
-					group += "#" + data.getString(subGroupField);
-				}
-				if (!resultMap.containsKey(group)) {
-					resultMap.put(group, StringUtils.isNumeric(data.getString(valueField)) ? data.getDouble(valueField) : 0D);
-				} else {
-					if (StringUtils.isNumeric(data.getString(valueField))) {
-						resultMap.put(group, resultMap.get(group) + data.getDouble(valueField));
+				if(StringUtils.isBlank(group)){
+					//throw new DashboardFieldNotFoundException(groupField);
+				}else {
+					if(StringUtils.isNotBlank(subGroupField)) {
+						subGroup = data.getString(subGroupField);
+						if(StringUtils.isBlank(subGroup)){
+							//throw new DashboardFieldNotFoundException(subGroup);
+						}else {
+							String groupCombine = group+"#"+subGroup;
+							if (!resultMap.containsKey(groupCombine)) {
+								resultMap.put(groupCombine, 1);
+							} else {
+								resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
+							}
+						}
+					}else {
+						if (!resultMap.containsKey(group)) {
+							resultMap.put(group, 1);
+						} else {
+							resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
+						}
 					}
 				}
 			}
-		}
-		return null;
+		} 
+		return new JSONObject(resultMap);
 	}
-
-
-
 }

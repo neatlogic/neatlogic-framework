@@ -12,11 +12,11 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.dashboard.core.DashboardChartBase;
 
-public class BarChart extends DashboardChartBase {
+public class SimpleChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] { "barchart" };
+		return new String[] { "barchart","piechart","columnchart" };
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class BarChart extends DashboardChartBase {
 				String key = itKey.next();
 				JSONObject data = new JSONObject();
 				data.put("column", key);
-				data.put("num", resultMap.get(key));
+				data.put("value", resultMap.get(key));
 				returnList.add(data);
 			}
 			return returnList;

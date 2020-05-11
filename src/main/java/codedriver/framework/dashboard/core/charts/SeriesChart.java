@@ -15,13 +15,7 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] {"areachart", "columnchart", "linechart", "stackbarchart", "stackcolumnchart" };
-	}
-
-	public static void main(String[] argv) {
-		JSONObject obj = new JSONObject();
-		obj.put("value", "abc");
-		System.out.println(obj.getLongValue("value"));
+		return new String[] {"areachart", "linechart", "stackbarchart", "stackcolumnchart" };
 	}
 
 	@Override
@@ -35,12 +29,12 @@ public class SeriesChart extends DashboardChartBase {
 				JSONObject data = new JSONObject();
 				String[] keys = key.split("#"); 
 				if(keys.length >1) {
-					data.put("column_x", keys[0]);
-					data.put("column_y", keys[1]);
+					data.put("column", keys[0]);
+					data.put("type", keys[1]);
 				}else {
 					data.put("column", key);
 				}
-				data.put("num", resultMap.get(key));
+				data.put("value", resultMap.get(key));
 				returnList.add(data);
 			}
 			return returnList;

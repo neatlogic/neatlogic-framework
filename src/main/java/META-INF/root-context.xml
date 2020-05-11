@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hdp="http://www.springframework.org/schema/hadoop" 
+<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" 
+xmlns:context="http://www.springframework.org/schema/context" 
+xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:hdp="http://www.springframework.org/schema/hadoop"
+xmlns:nacos="http://nacos.io/schema/nacos"
 xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/beans
@@ -7,9 +12,11 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/hadoop 
-		http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+		http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+		http://nacos.io/schema/nacos
+		http://nacos.io/schema/nacos.xsd">
 
-	<bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
@@ -17,7 +24,18 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 				<value>classpath:config.properties</value>
 			</list>
 		</property>
-	</bean>
+	</bean> -->
+	<!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:config.properties</value>
+        </property>
+    </bean> -->
+
+	<nacos:annotation-driven></nacos:annotation-driven>
+	<!--指定nacos配置地址 -->
+	<nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
+	<!--指定dataId,group-id, 是否是自动刷新 -->
+	<nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="true" />
 
 	<!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
 	<!-- org.apache.commons.dbcp2.BasicDataSource -->

@@ -18,7 +18,7 @@ public class ElasticSearchPoolManager {
 	public static MultiAttrsObjectPool getObjectPool(String poolName){
 		if(workcenterObjectPool == null) {
 			if (!Config.ES_ENABLE()) {
-				throw new IllegalStateException("ES未启用，求修改配置");
+				throw new IllegalStateException("ES未启用，请修改对应配置");
 	        }
 			Map<String, String> esClusters = Config.ES_CLUSTERS();
 			if (esClusters.isEmpty()) {

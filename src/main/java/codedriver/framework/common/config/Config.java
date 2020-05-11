@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import com.alibaba.nacos.api.annotation.NacosInjected;
@@ -23,7 +24,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import codedriver.framework.common.RootComponent;
 
 @RootComponent
-@Order(1) // 配置文件类第一个加载
+@Order(Ordered.HIGHEST_PRECEDENCE) // 配置文件类第一个加载
 public class Config {
 	private static Logger logger = LoggerFactory.getLogger(Config.class);
 	@NacosInjected

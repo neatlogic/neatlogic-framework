@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" 
-xmlns:context="http://www.springframework.org/schema/context" 
-xmlns="http://www.springframework.org/schema/beans" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns:hdp="http://www.springframework.org/schema/hadoop"
-xmlns:nacos="http://nacos.io/schema/nacos"
-xsi:schemaLocation="http://www.springframework.org/schema/aop
+<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:nacos="http://nacos.io/schema/nacos" xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -16,24 +10,12 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://nacos.io/schema/nacos
 		http://nacos.io/schema/nacos.xsd">
 
-	<!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="locations">
-			<list>
-				<value>classpath:config.properties</value>
-			</list>
-		</property>
-	</bean> -->
-	<!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="location">
-            <value>classpath:config.properties</value>
-        </property>
-    </bean> -->
+	<!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
+	<!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
 
 	<nacos:annotation-driven></nacos:annotation-driven>
 	<!--指定nacos配置地址 -->
-	<nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
+	<nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}" />
 	<!--指定dataId,group-id, 不能自动刷新 -->
 	<nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="false" />
 
@@ -65,7 +47,11 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 			<value>${conn.initialSize}</value>
 		</property>
 	</bean>
-	
+
+	<!-- 配置需要在rootComponent前加载 -->
+	<context:component-scan base-package="codedriver" use-default-filters="false">
+		<context:include-filter type="annotation" expression="codedriver.framework.common.RootConfiguration" />
+	</context:component-scan>
 
 	<context:component-scan base-package="codedriver" use-default-filters="false">
 		<context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent" />

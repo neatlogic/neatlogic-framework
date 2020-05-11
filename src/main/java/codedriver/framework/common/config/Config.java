@@ -41,8 +41,8 @@ public class Config {
 	private static Map<String, String> ES_CLUSTERS;
 	private static boolean ES_ENABLE;
 	private static String DATA_HOME;// 存储文件路径
-	private static int SERVER_HEARTBEAT_RATE;// 心跳频率
-	private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
+	private static int SERVER_HEARTBEAT_RATE = 1;// 心跳频率
+	private static int SERVER_HEARTBEAT_THRESHOLD = 3;// 心跳失败上限次数
 	private static String HOME_URL;
 
 	static {

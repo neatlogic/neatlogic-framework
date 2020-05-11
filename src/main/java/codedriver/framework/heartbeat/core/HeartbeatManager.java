@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -30,6 +32,7 @@ import codedriver.framework.heartbeat.dto.ServerClusterVo;
 import codedriver.framework.heartbeat.dto.ServerCounterVo;
 
 @RootComponent
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class HeartbeatManager extends ApplicationListenerBase  {
 	private Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 	@Autowired

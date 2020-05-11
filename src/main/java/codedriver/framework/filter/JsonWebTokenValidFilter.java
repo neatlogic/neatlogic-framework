@@ -94,7 +94,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 					String jwt = authorization.substring(7);
 					String[] jwtParts = jwt.split("\\.");
 					if (jwtParts.length == 3) {
-						SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET.getBytes(), "HmacSHA1");
+						SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
 						Mac mac;
 						try {
 							mac = Mac.getInstance("HmacSHA1");

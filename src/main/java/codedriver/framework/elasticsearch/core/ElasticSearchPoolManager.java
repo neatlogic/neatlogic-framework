@@ -17,10 +17,10 @@ public class ElasticSearchPoolManager {
 	
 	public static MultiAttrsObjectPool getObjectPool(String poolName){
 		if(workcenterObjectPool == null) {
-			if (!Config.ES_ENABLE) {
+			if (!Config.ES_ENABLE()) {
 	            return null;
 	        }
-			Map<String, String> esClusters = Config.ES_CLUSTERS;
+			Map<String, String> esClusters = Config.ES_CLUSTERS();
 			if (esClusters.isEmpty()) {
 				throw new IllegalStateException("ES集群信息未配置，es.cluster.<cluster-name>=<ip:port>[,<ip:port>...]");
 			}

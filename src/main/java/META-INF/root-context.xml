@@ -65,6 +65,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 			<value>${conn.initialSize}</value>
 		</property>
 	</bean>
+	
 
 	<context:component-scan base-package="codedriver" use-default-filters="false">
 		<context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent" />

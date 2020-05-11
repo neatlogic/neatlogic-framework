@@ -59,7 +59,7 @@ public class HeartbeatManager extends ApplicationListenerBase  {
 			protected void execute() {
 				try {
 					// 查找故障服务器
-					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD);
+					List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
 					for (ServerClusterVo server : list) {
 						if (getServerLock(server.getServerId())) {
 							// 如果抢到锁，开始处理
@@ -81,7 +81,7 @@ public class HeartbeatManager extends ApplicationListenerBase  {
 				}
 			}
 		};
-		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE, Config.SERVER_HEARTBEAT_RATE, TimeUnit.MINUTES);
+		heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE(), Config.SERVER_HEARTBEAT_RATE(), TimeUnit.MINUTES);
 	}
 
 	/**

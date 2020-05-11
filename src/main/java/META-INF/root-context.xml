@@ -34,8 +34,8 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
 	<nacos:annotation-driven></nacos:annotation-driven>
 	<!--指定nacos配置地址 -->
 	<nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
-	<!--指定dataId,group-id, 是否是自动刷新 -->
-	<nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="true" />
+	<!--指定dataId,group-id, 不能自动刷新 -->
+	<nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="false" />
 
 	<!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
 	<!-- org.apache.commons.dbcp2.BasicDataSource -->

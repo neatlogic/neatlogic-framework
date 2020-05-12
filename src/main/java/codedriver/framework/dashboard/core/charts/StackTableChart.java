@@ -81,7 +81,7 @@ public class StackTableChart extends DashboardChartBase {
 				if(StringUtils.isNotBlank(subGroup)){
 					String group = dataJson.getString(groupField);
 					if(StringUtils.isNotBlank(group)){
-						if(!theadArray.stream().anyMatch(o->((JSONObject)o).getString("name").equals(group))) {
+						if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", group,group)))) {
 							theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", group,group)));
 						}
 						if(dataMap.containsKey(subGroup)) {

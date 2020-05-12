@@ -20,21 +20,23 @@ public class SimpleChart extends DashboardChartBase {
 	}
 
 	@Override
-	public JSONArray getData(JSONObject dataMap) {
+	public JSONObject getData(JSONObject dataMap) {
+		JSONObject dataJson = new JSONObject();
+		JSONArray dataList = new JSONArray();
 		Map<String,Object> resultMap = (Map<String,Object>)dataMap;
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
-			JSONArray returnList = new JSONArray();
+			
 			while (itKey.hasNext()) {
 				String key = itKey.next();
 				JSONObject data = new JSONObject();
 				data.put("column", key);
 				data.put("value", resultMap.get(key));
-				returnList.add(data);
+				dataList.add(data);
 			}
-			return returnList;
+			dataJson.put("dataList", dataList);
 		}
-		return null;
+		return dataJson;
 	}
 
 	@Override

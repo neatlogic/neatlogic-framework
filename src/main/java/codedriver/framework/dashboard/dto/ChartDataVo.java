@@ -1,6 +1,5 @@
 package codedriver.framework.dashboard.dto;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.apiparam.core.ApiParamType;
@@ -20,23 +19,16 @@ public class ChartDataVo {
 	@EntityField(name = "分组字段名称", type = ApiParamType.STRING)
 	private String groupFieldText;
 	@EntityField(name = "数据集", type = ApiParamType.JSONARRAY)
-	private JSONArray dataList;
+	private JSONObject data;
 	@EntityField(name = "图表配置", type = ApiParamType.JSONOBJECT)
 	private JSONObject configObj;
 
-	public JSONArray getDataList() {
-		return dataList;
+	public JSONObject getData() {
+		return data;
 	}
 
-	public void setDataList(JSONArray dataList) {
-		this.dataList = dataList;
-	}
-
-	public void addData(JSONObject data) {
-		if (dataList == null) {
-			dataList = new JSONArray();
-		}
-		dataList.add(data);
+	public void setData(JSONObject data) {
+		this.data = data;
 	}
 
 	public JSONObject getConfigObj() {

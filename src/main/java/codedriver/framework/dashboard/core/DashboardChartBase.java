@@ -20,7 +20,7 @@ public abstract class DashboardChartBase {
 	 * @param @return
 	 * @return JSONObject
 	 */
-	public abstract JSONArray getData(JSONObject dataMap);
+	public abstract JSONObject getData(JSONObject dataMap);
 	
 	/**
 	 * 

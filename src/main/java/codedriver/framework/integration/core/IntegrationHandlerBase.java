@@ -140,8 +140,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					content = integrationVo.getParamObj().toJSONString();
 				}
 				try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
-					// out.write(content.toString().getBytes());
-					out.writeBytes(content);
+					 out.write(content.toString().getBytes("utf-8"));
+					//out.writeBytes(content);
 				} catch (Exception e) {
 					resultVo.appendError(e.getMessage());
 				}

@@ -431,7 +431,9 @@
 		`email` = #{email},
 		`phone` = #{phone},
 		`pinyin` = #{pinyin},
+		<if test="isActive != null">
 		`is_active` = #{isActive},
+		</if>
 		`user_info` = #{userInfo, typeHandler=XssHandler}
 		WHERE `user_id` = #{userId}
 	</update>

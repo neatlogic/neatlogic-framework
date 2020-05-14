@@ -89,15 +89,16 @@ public class TableChart extends DashboardChartBase {
 			preDatas.put("columnList",columnArray);
 		}
 		if (aggregate.equals("count")) {
-			for (int i = 0; i < nextDataList.size(); i++) {
-				JSONObject dataJson = nextDataList.getJSONObject(i);
-				String group = dataJson.getString(groupField);
-				String subGroup = dataJson.getString(subGroupField);
-				if(StringUtils.isNotBlank(subGroup)){
+			if(StringUtils.isNotBlank(subGroupField)){
+				for (int i = 0; i < nextDataList.size(); i++) {
+					JSONObject dataJson = nextDataList.getJSONObject(i);
+					String group = dataJson.getString(groupField);
+					String subGroup = dataJson.getString(subGroupField);
 					if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subGroup,subGroup)))) {
 						theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subGroup,subGroup)));
 					}
 					if(dataMap.containsKey(group)) {
+						System.out.println(group);
 						 Map<String, Integer> subGroupMap = (Map<String, Integer>)dataMap.get(group);
 						if(subGroupMap.containsKey(subGroup)) {
 							Integer num = subGroupMap.get(subGroup);
@@ -111,7 +112,11 @@ public class TableChart extends DashboardChartBase {
 						subGoupMap.put(subGroup, 1);
 						dataMap.put(group, subGoupMap);
 					}
-				}else {
+				}
+			}else {
+				for (int i = 0; i < nextDataList.size(); i++) {
+					JSONObject dataJson = nextDataList.getJSONObject(i);
+					String group = dataJson.getString(groupField);
 					if(dataMap.containsKey(group)) {
 						dataMap.put(group, ((int)dataMap.get(group))+1);
 					}else {

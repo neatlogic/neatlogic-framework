@@ -9,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.dashboard.core.DashboardChartBase;
+import codedriver.framework.dashboard.dto.DashboardShowConfigVo;
 
 public class SeriesChart extends DashboardChartBase {
 
@@ -45,8 +47,15 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public JSONObject getChartConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject charConfig = new JSONObject();
+		JSONObject showConfig = new JSONObject();
+		showConfig.put(DashboardShowConfig.AGGREGATE.getValue(),new DashboardShowConfigVo(DashboardShowConfig.AGGREGATE.getValue(),DashboardShowConfig.AGGREGATE.getText(),JSONArray.parseArray("[{'value':'count','text':'计数'}]")));
+		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD.getValue(),DashboardShowConfig.GROUPFIELD.getText(),new JSONArray()));
+		showConfig.put(DashboardShowConfig.SUBGROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.SUBGROUPFIELD.getValue(),DashboardShowConfig.SUBGROUPFIELD.getText(),new JSONArray()));
+		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),new DashboardShowConfigVo(DashboardShowConfig.MAXGROUP.getValue(),DashboardShowConfig.MAXGROUP.getText(),JSONArray.parseArray("[{'value':'10','text':'10'},{'value':'20','text':'20'}]")));
+		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),new DashboardShowConfigVo(DashboardShowConfig.REFRESHTIME.getValue(),DashboardShowConfig.REFRESHTIME.getText(),JSONArray.parseArray("[{'value':'-1','text':'不刷新'},{'value':'30','text':'30'}]")));
+		charConfig.put("showConfig", showConfig);
+		return charConfig;
 	}
 
 	@Override

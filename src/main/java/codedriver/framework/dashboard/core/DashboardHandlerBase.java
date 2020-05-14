@@ -14,4 +14,10 @@ public abstract class DashboardHandlerBase implements IDashboardHandler {
 	}
 
 	protected abstract JSONObject myGetData(DashboardWidgetVo widgetVo);
+	
+	public final JSONObject getConfig(DashboardWidgetVo widgetVo) {
+		return myGetConfig(widgetVo);
+	}
+	
+	protected abstract JSONObject myGetConfig(DashboardWidgetVo widgetVo);
 }

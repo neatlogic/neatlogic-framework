@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.dashboard.core.DashboardChartBase;
+import codedriver.framework.dashboard.dto.DashboardShowConfigVo;
 
 public class SimpleChart extends DashboardChartBase {
 
@@ -43,40 +44,11 @@ public class SimpleChart extends DashboardChartBase {
 	public JSONObject getChartConfig() {
 		JSONObject charConfig = new JSONObject();
 		JSONObject showConfig = new JSONObject();
-		//AGGREGATE
-		JSONObject aggregateJson = new JSONObject();
-		aggregateJson.put("setting", DashboardShowConfig.AGGREGATE.getValue());
-		aggregateJson.put("settingName", DashboardShowConfig.AGGREGATE.getText());
-		JSONArray aggregateDataList = JSONArray.parseArray("[{'value':'count','text':'计数'}]");
-		aggregateJson.put("dataList", aggregateDataList);
-		showConfig.put(DashboardShowConfig.AGGREGATE.getValue(),aggregateJson);
-		//GROUPFIELD
-		JSONObject groupFieldJson = new JSONObject();
-		groupFieldJson.put("setting", DashboardShowConfig.GROUPFIELD.getValue());
-		groupFieldJson.put("settingName", DashboardShowConfig.GROUPFIELD.getText());
-		groupFieldJson.put("dataList", new JSONArray());
-		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),groupFieldJson);
-		//SUBGROUPFIELD
-		JSONObject subgroupFieldJson = new JSONObject();
-		subgroupFieldJson.put("setting", DashboardShowConfig.SUBGROUPFIELD.getValue());
-		subgroupFieldJson.put("settingName", DashboardShowConfig.SUBGROUPFIELD.getText());
-		subgroupFieldJson.put("dataList", new JSONArray());
-		showConfig.put(DashboardShowConfig.SUBGROUPFIELD.getValue(),subgroupFieldJson);
-		//MAXGROUP
-		JSONObject maxgroupJson = new JSONObject();
-		maxgroupJson.put("setting", DashboardShowConfig.MAXGROUP.getValue());
-		maxgroupJson.put("settingName", DashboardShowConfig.MAXGROUP.getText());
-		JSONArray maxgroupDataList = JSONArray.parseArray("[{'value':'10','text':'10'},{'value':'20','text':'20'}]");
-		maxgroupJson.put("dataList", maxgroupDataList);
-		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),maxgroupJson);
-		//REFRESHTIME
-		JSONObject refreshtimeJson = new JSONObject();
-		refreshtimeJson.put("setting", DashboardShowConfig.REFRESHTIME.getValue());
-		refreshtimeJson.put("settingName", DashboardShowConfig.REFRESHTIME.getText());
-		JSONArray refreshtimeDataList = JSONArray.parseArray("[{'value':'-1','text':'不刷新'},{'value':'30','text':'30'}]");
-		refreshtimeJson.put("dataList", refreshtimeDataList);
-		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),refreshtimeJson);
-		
+		showConfig.put(DashboardShowConfig.AGGREGATE.getValue(),new DashboardShowConfigVo(DashboardShowConfig.AGGREGATE.getValue(),DashboardShowConfig.AGGREGATE.getText(),JSONArray.parseArray("[{'value':'count','text':'计数'}]")));
+		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD.getValue(),DashboardShowConfig.GROUPFIELD.getText(),new JSONArray()));
+		showConfig.put(DashboardShowConfig.SUBGROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.SUBGROUPFIELD.getValue(),DashboardShowConfig.SUBGROUPFIELD.getText(),new JSONArray()));
+		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),new DashboardShowConfigVo(DashboardShowConfig.MAXGROUP.getValue(),DashboardShowConfig.MAXGROUP.getText(),JSONArray.parseArray("[{'value':'10','text':'10'},{'value':'20','text':'20'}]")));
+		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),new DashboardShowConfigVo(DashboardShowConfig.REFRESHTIME.getValue(),DashboardShowConfig.REFRESHTIME.getText(),JSONArray.parseArray("[{'value':'-1','text':'不刷新'},{'value':'30','text':'30'}]")));
 		charConfig.put("showConfig", showConfig);
 		return charConfig;
 	}

@@ -10,7 +10,7 @@ public class BasePageVo {
 	private transient Boolean needPage = true;
 	@JSONField(serialize = false)
 	@EntityField(name = "每页条数", type = ApiParamType.INTEGER)
-	private transient Integer pageSize = 10;
+	private transient Integer pageSize = 20;
 	@JSONField(serialize = false)
 	@EntityField(name = "当前页数", type = ApiParamType.INTEGER)
 	private transient Integer currentPage = 1;

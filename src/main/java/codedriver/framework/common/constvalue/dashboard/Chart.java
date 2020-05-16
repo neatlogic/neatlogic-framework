@@ -8,7 +8,7 @@ public enum Chart {
 	BARCHART("barchart","柱状图","tsfont-chart-bar"),
 	PIECHART("piechart","饼图","tsfont-chart-pie"),
 	LINECHART("linechart","曲线图","tsfont-chart-line"),
-	TABLECHART("tablechart","表格","tsfont-chart-pie"),
+	TABLECHART("tablechart","表格","tsfont-chart-table"),
 	NUMBERCHART("numberchart","值图","tsfont-chart-number"),
 	AREACHART("areachart","面积图","tsfont-chart-area"),
 	;

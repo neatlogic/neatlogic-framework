@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public enum SubChart {
+public enum ChartType {
 	BARCHART("barchart","柱状图",Chart.BARCHART,false),
 	STACKBARCHART("stackbarchart","堆叠柱状图",Chart.BARCHART,false),
 	COLUMNCHART("columnchart","条形图",Chart.BARCHART,true),
@@ -24,7 +24,7 @@ public enum SubChart {
 	private Chart chart;
 	private Boolean isDefault;
 
-	private SubChart(String _value, String _text,Chart _chart,Boolean _isDefault) {
+	private ChartType(String _value, String _text,Chart _chart,Boolean _isDefault) {
 		this.value = _value;
 		this.text = _text;
 		this.chart = _chart;
@@ -48,7 +48,7 @@ public enum SubChart {
 	}
 
 	public static String getValue(String _status) {
-		for (SubChart s : SubChart.values()) {
+		for (ChartType s : ChartType.values()) {
 			if (s.getValue().equals(_status)) {
 				return s.getValue();
 			}
@@ -57,7 +57,7 @@ public enum SubChart {
 	}
 
 	public static String getText(String _status) {
-		for (SubChart s : SubChart.values()) {
+		for (ChartType s : ChartType.values()) {
 			if (s.getValue().equals(_status)) {
 				return s.getText();
 			}
@@ -67,7 +67,7 @@ public enum SubChart {
 	
 	public static Map<String,JSONArray> getSubChartMap(){
 		Map<String,JSONArray> subCharMap = new HashMap<String,JSONArray>();
-		for (SubChart s : SubChart.values()) {
+		for (ChartType s : ChartType.values()) {
 			String chart = s.getChart().getValue();
 			JSONArray subChartArray = subCharMap.get(chart);
 			JSONObject subChartJson = new JSONObject();
@@ -85,7 +85,7 @@ public enum SubChart {
 	
 	public static JSONArray getSubChartList(String value){
 		JSONArray subChartArray = new JSONArray();
-		for (SubChart s : SubChart.values()) {
+		for (ChartType s : ChartType.values()) {
 			String chart = s.getChart().getValue();
 			if(StringUtils.isNotBlank(value)&&chart.equals(value)) {
 				JSONObject subChartJson = new JSONObject();

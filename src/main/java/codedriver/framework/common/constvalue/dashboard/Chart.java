@@ -60,7 +60,7 @@ public enum Chart {
 			chart.put("value", s.getValue());
 			chart.put("text", s.getText());
 			chart.put("icon", s.getIcon());
-			chart.put("chartTypeList", SubChart.getSubChartList(s.getValue()));
+			chart.put("chartTypeList", ChartType.getSubChartList(s.getValue()));
 			chartArray.add(chart);
 		}
 		return chartArray;

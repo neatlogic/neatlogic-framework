@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
+import codedriver.framework.common.constvalue.dashboard.ChartType;
 import codedriver.framework.dashboard.core.DashboardChartBase;
 import codedriver.framework.dashboard.dto.DashboardShowConfigVo;
 
@@ -16,7 +17,7 @@ public class TableChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] {"tablechart"};
+		return new String[] {ChartType.TABLECHART.getValue()};
 	}
 
 	@SuppressWarnings("unchecked")

@@ -458,4 +458,11 @@
 		`dashboard_visitcounter`
 		WHERE `dashboard_uuid` = #{dashboardUuid}
 	</delete>
+	
+	<delete id="deleteDashboardWidgetByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`dashboard_widget`
+		WHERE `uuid` = #{uuid}
+	</delete>
 </mapper>

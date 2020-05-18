@@ -33,7 +33,7 @@ public interface UserMapper {
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
 
-	public List<UserVo> getActiveUserByRoleName(String roleName);
+	public List<UserVo> getActiveUserByRoleUuid(String roleUuid);
 
 	public UserVo getUserByUserIdAndPassword(UserVo userVo);
 

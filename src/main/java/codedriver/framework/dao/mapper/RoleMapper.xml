@@ -10,7 +10,7 @@
 		SELECT
 		a.`name`,
 		a.`description`,
-		COUNT(DISTINCT (b.`user_id`)) as userCount
+		COUNT(DISTINCT (b.`user_uuid`)) as userCount
 		FROM `role` a
 		LEFT JOIN `user_role` b ON a.`name` = b.`role_name`
 		LEFT JOIN `role_authority` c ON a.`name` = c.`role_name`

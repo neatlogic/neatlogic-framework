@@ -9,9 +9,12 @@ import codedriver.framework.dto.UserVo;
 
 
 public interface RoleMapper {
+
+	public int checkRoleIsExists(String uuid);
+	
 	public List<RoleVo> searchRole(RoleVo roleVo);
 
-	public List<RoleAuthVo> searchRoleAuthByRoleName(String name);
+	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String name);
 
 	public int searchRoleCount(RoleVo roleVO);
 
@@ -31,7 +34,7 @@ public interface RoleMapper {
 
 	public int updateRole(RoleVo roleVo);
 
-	public int deleteRoleAuthByRoleName(String roleName);
+	public int deleteRoleAuthByRoleUuid(String roleName);
 
 	public int deleteRoleAuth(RoleVo roleVo);
 
@@ -39,7 +42,7 @@ public interface RoleMapper {
 
 	public int deleteMenuRoleByRoleName(String name);
 
-	public int deleteUserRoleByRoleName(String name);
+	public int deleteUserRoleByRoleUuid(String name);
 
 	public int deleteTeamRoleByRoleName(String name);
 

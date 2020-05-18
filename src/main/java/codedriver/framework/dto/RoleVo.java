@@ -2,6 +2,9 @@ package codedriver.framework.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
@@ -13,6 +16,9 @@ public class RoleVo extends BasePageVo implements Serializable {
 
 	public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
 	private transient String keyword;
+	@EntityField(name = "角色uuis",
+			type = ApiParamType.STRING)
+	private String uuid;
 	@EntityField(name = "角色名称",
 			type = ApiParamType.STRING)
 	private String name;
@@ -55,6 +61,17 @@ public class RoleVo extends BasePageVo implements Serializable {
 
 	public void setAuth(String auth) {
 		this.auth = auth;
+	}
+
+	public synchronized String getUuid() {
+		if (StringUtils.isBlank(uuid)) {
+			uuid = UUID.randomUUID().toString().replace("-", "");
+		}
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {

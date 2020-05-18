@@ -39,7 +39,7 @@ public interface UserMapper {
 
 	public UserSessionVo getUserSessionByUserUuid(String userUuid);
 
-	public List<UserVo> getUserByUserIdList(List<String> userIdList);
+	public List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
 	public List<AuthVo> getUserCountByAuth();
 	

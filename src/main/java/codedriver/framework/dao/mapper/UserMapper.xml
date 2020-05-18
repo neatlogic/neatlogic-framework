@@ -304,16 +304,16 @@
 		SELECT `user_uuid` as userUuid,`visit_time` as sessionTime FROM `user_session` WHERE `user_uuid` = #{value}
 	</select>
 
-	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	<select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
+		`uuid`,
 		`user_id` AS userId,
 		`user_name` AS userName,
 		`email`,
 		`phone`,
 		`is_active` AS isActive
-		FROM
-		`user`
-		Where `user_id` in
+		FROM `user`
+		Where `uuid` in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>

@@ -229,7 +229,7 @@
 	</update>
 
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE 	`team`
+		UPDATE `team`
 		SET
 		`name` = #{name}
 		WHERE `uuid` = #{uuid}

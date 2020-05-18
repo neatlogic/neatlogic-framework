@@ -50,14 +50,13 @@
 
 	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
 		SELECT
-		COUNT(DISTINCT (a.`name`))
-		FROM
-		`role` a
-		LEFT JOIN `role_authority` b ON a.`name` = b.`role_name`
+		COUNT(DISTINCT (a.`uuid`))
+		FROM `role` a
+		LEFT JOIN `role_authority` b ON a.`uuid` = b.`role_uuid`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
-			AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+			AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 		<if test="authGroup != null and authGroup != ''">
 			AND b.`auth_group` = #{authGroup}
@@ -67,31 +66,30 @@
 		</if>
 	</select>
 
-	<select id="searchRoleUserCountByRoleName" parameterType="java.lang.String" resultType = "int">
+	<select id="searchRoleUserCountByRoleUuid" parameterType="java.lang.String" resultType = "int">
 		SELECT
 		COUNT(1)
 		FROM
 		`user_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</select>
 
-	<select id="getRoleByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	<select id="getRoleByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
 		SELECT
+		`uuid`,
 		`name`,
 		`description`
-		FROM
-		`role`
-		WHERE
-		`name` = #{value}
+		FROM `role`
+		WHERE `uuid` = #{value}
 	</select>
 	
-	<select id="getRoleByRoleNameList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	<select id="getRoleByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
 	SELECT
+		`uuid`,
 		`name`,
 		`description`
-		FROM
-		`role`
-	WHERE `name` in 
+	FROM `role`
+	WHERE `uuid` in 
 	<foreach collection="list" item="item" separator="," open="(" close=")">
 	#{item}
 	</foreach>
@@ -100,7 +98,7 @@
 	<select id="getRoleCountByAuth"  resultType="codedriver.framework.dto.AuthVo">
 		SELECT
 		`auth` as `name`,
-		COUNT(DISTINCT(`role_name`)) as `roleCount`
+		COUNT(DISTINCT(`role_uuid`)) as `roleCount`
 		FROM `role_authority`
 		GROUP BY `auth`, `auth_group`
 	</select>
@@ -136,24 +134,21 @@
 		WHERE `uuid` = #{uuid}
 	</update>
 
-	<delete id="deleteRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteRoleByUuid" parameterType="java.lang.String">
 		DELETE
-		FROM
-		`role`
-		WHERE `name` = #{value}
+		FROM `role`
+		WHERE `uuid` = #{value}
 	</delete>
 
 	<delete id="deleteRoleAuthByRoleUuid" parameterType="string">
 		DELETE
-		FROM
-		`role_authority`
+		FROM `role_authority`
 		WHERE `role_uuid` = #{roleUuid}
 	</delete>
 
 	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleVo">
 		DELETE
-		FROM
-		`role_authority`
+		FROM `role_authority`
 		WHERE `role_uuid` = #{uuid}
 		<if test="roleAuthList != null and roleAuthList.size > 0">
 			AND `auth` IN
@@ -163,11 +158,11 @@
 		</if>
 	</delete>
 
-	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteMenuRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`menu_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteUserRoleByRoleUuid" parameterType="java.lang.String">
@@ -177,11 +172,11 @@
 		WHERE `role_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteTeamRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`team_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteRoleAuthByAuth" parameterType="string">

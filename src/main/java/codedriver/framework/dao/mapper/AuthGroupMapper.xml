@@ -3,8 +3,8 @@
 <mapper namespace="codedriver.framework.dao.mapper.AuthGroupMapper">
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
 	
-	<select id="getRoleNameListByAuthGroupName" parameterType="java.lang.String" resultType="java.lang.String">
-		SELECT DISTINCT role_name FROM auth_group_role WHERE auth_group_name = #{value}
+	<select id="getRoleUuidListByAuthGroupName" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT DISTINCT `role_uuid` FROM `auth_group_role` WHERE `auth_group_name` = #{value}
 	</select>
 
 </mapper>

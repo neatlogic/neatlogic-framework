@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface AuthGroupMapper {
 	
-	public List<String> getRoleNameListByAuthGroupName(String authGroupName);
+	public List<String> getRoleUuidListByAuthGroupName(String authGroupName);
 }

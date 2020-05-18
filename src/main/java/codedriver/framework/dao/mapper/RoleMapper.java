@@ -14,15 +14,15 @@ public interface RoleMapper {
 	
 	public List<RoleVo> searchRole(RoleVo roleVo);
 
-	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String name);
+	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
 
-	public int searchRoleCount(RoleVo roleVO);
+	public int searchRoleCount(RoleVo roleVo);
 
-	public int searchRoleUserCountByRoleName(String roleName);
+	public int searchRoleUserCountByRoleUuid(String roleUuid);
 
-	public RoleVo getRoleByRoleName(String name);
+	public RoleVo getRoleByUuid(String uuid);
 
-	public List<RoleVo> getRoleByRoleNameList(List<String> roleNameList);
+	public List<RoleVo> getRoleByUuidList(List<String> uuidList);
 
 	public List<AuthVo> getRoleCountByAuth();
 
@@ -34,17 +34,17 @@ public interface RoleMapper {
 
 	public int updateRole(RoleVo roleVo);
 
-	public int deleteRoleAuthByRoleUuid(String roleName);
+	public int deleteRoleAuthByRoleUuid(String roleUuid);
 
 	public int deleteRoleAuth(RoleVo roleVo);
 
-	public int deleteRoleByRoleName(String name);
+	public int deleteRoleByUuid(String uuid);
 
-	public int deleteMenuRoleByRoleName(String name);
+	public int deleteMenuRoleByRoleUuid(String roleUuid);
 
-	public int deleteUserRoleByRoleUuid(String name);
+	public int deleteUserRoleByRoleUuid(String roleUuid);
 
-	public int deleteTeamRoleByRoleName(String name);
+	public int deleteTeamRoleByRoleUuid(String roleUuid);
 
 	public int deleteRoleAuthByAuth(String auth);
 

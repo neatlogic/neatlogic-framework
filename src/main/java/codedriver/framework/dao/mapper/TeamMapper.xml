@@ -202,10 +202,10 @@
 	<insert id="insertTeamUser">
 		INSERT INTO `user_team` (
 		`team_uuid`,
-		`user_id`
+		`user_uuid`
 		) VALUES (
 		#{teamUuid},
-		#{userId}
+		#{userUuid}
 		)
 	</insert>
 

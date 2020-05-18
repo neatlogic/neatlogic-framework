@@ -35,7 +35,7 @@ public class TeamVo extends BasePageVo {
 
 	private int userCount;
 
-	private List<String> userIdList;
+	private List<String> userUuidList;
 
 	private List<String> pathNameList;
 
@@ -138,11 +138,12 @@ public class TeamVo extends BasePageVo {
 		this.tagId = tagId;
 	}
 
-	public List<String> getUserIdList() {
-		return userIdList;
+	public List<String> getUserUuidList() {
+		return userUuidList;
 	}
 
-	public void setUserIdList(List<String> userIdList) {
-		this.userIdList = userIdList;
+	public void setUserUuidList(List<String> userUuidList) {
+		this.userUuidList = userUuidList;
 	}
+
 }

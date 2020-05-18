@@ -33,8 +33,8 @@
 				AND a.name LIKE concat('%', #{keyword}, '%')
 			</if>
 				and ((da.type = 'common' AND da.`uuid` = 'alluser')
-			<if test="userId != null and userId != ''">
-				OR	(da.type = 'custom' AND da.`uuid` = #{userId})
+			<if test="userUuid != null and userUuid != ''">
+				OR	(da.type = 'custom' AND da.`uuid` = #{userUuid})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -98,8 +98,8 @@
 				AND a.name LIKE concat('%', #{keyword}, '%')
 			</if>
 				and (da.type = 'common' AND da.`uuid` = 'alluser')
-			<if test="userId != null and userId != ''">
-			  	OR	(da.type = 'custom' AND da.`uuid` = #{userId})
+			<if test="userUuid != null and userUuid != ''">
+			  	OR	(da.type = 'custom' AND da.`uuid` = #{userUuid})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 

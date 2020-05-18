@@ -34,7 +34,6 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
     private String moduleIcon;
     private String moduleDesc;
     private String configValue;
-//    private String userId;
     private String userName;
     @EntityField( name = "插件订阅者信息", type = ApiParamType.JSONOBJECT)
     private GlobalReminderSubscribeVo reminderSubscribeVo;
@@ -100,14 +99,6 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
     }
-
-//    public String getUserId() {
-//        return userId;
-//    }
-//
-//    public void setUserId(String userId) {
-//        this.userId = userId;
-//    }
 
     public List<GlobalReminderParamVo> getReminderParamList() {
         return reminderParamList;

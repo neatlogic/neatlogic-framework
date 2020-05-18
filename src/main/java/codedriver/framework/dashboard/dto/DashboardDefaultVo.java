@@ -2,7 +2,7 @@ package codedriver.framework.dashboard.dto;
 
 public class DashboardDefaultVo {
 	private String dashboardUuid;
-	private String userId;
+	private String userUuid;
 	private String type;
 	public String getDashboardUuid() {
 		return dashboardUuid;
@@ -10,11 +10,11 @@ public class DashboardDefaultVo {
 	public void setDashboardUuid(String dashboardUuid) {
 		this.dashboardUuid = dashboardUuid;
 	}
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 	public String getType() {
 		return type;

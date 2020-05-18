@@ -38,7 +38,7 @@ public interface GlobalCounterMapper {
 
     /** 
     * @Description: 清空用户消息统计插件排序
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: void  
     */ 
     void deleteCounterUserSortByUserUuid(String userUuid);

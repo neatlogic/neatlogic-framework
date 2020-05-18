@@ -1,7 +1,6 @@
 package codedriver.framework.reminder.dao.mapper;
 
 import codedriver.framework.reminder.dto.GlobalReminderSubscribeVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,14 +18,14 @@ public interface GlobalReminderMapper {
     * @Param: [teamIdList] 
     * @return: java.util.List<java.lang.String>  
     */ 
-    List<String> getUserIdListByTeamIdList(@Param("teamIdList") List<Long> teamIdList);
+    List<String> getUserUuidListByTeamUuidList(List<Long> teamIdList);
 
     /** 
     * @Description: 获取插件的所有订阅用户 
     * @Param: [reminderId] 
     * @return: java.util.List<java.lang.String>  
     */ 
-    List<String> getSubscribeUserIdListByPluginId(String pluginId);
+    List<String> getSubscribeUserUuidListByPluginId(String pluginId);
 
     /** 
     * @Description: 更新订阅信息（控件设置） 

@@ -42,7 +42,7 @@ public interface TeamMapper {
 
 	public  int insertTeam(TeamVo teamVo);
 
-	public int insertTeamUser(@Param("teamUuid") String teamUuid, @Param("userId") String userId);
+	public int insertTeamUser(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid);
 
 	public int insertTeamTag(TeamVo teamVo);
 

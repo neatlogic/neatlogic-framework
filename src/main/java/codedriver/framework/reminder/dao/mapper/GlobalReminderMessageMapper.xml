@@ -36,7 +36,7 @@
         e.`id` as `subscribeId`,
         e.`param` as `param`,
         (SELECT `user_name` FROM `user` WHERE `uuid` = #{userUuid}) as `userName`,
-        (${userUuid}) as `userId`
+        (${userUuid}) as `userUuid`
         FROM `reminder_message_user` a
         LEFT JOIN `reminder_message` b ON a.`reminder_message_id` = b.`id`
         LEFT JOIN `user` c ON a.`user_uuid` = c.`uuid`

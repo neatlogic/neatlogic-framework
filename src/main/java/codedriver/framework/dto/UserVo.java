@@ -52,7 +52,7 @@ public class UserVo extends BasePageVo {
 	private List<String> teamNameList = new ArrayList<>();
 	
 	@EntityField(name = "用户角色uuid列表", type = ApiParamType.JSONARRAY)
-	private List<String> roleNameList = new ArrayList<>();
+	private List<String> roleUuidList = new ArrayList<>();
 	private List<String> roleDescriptionList = new ArrayList<>();
 	
 	@EntityField(name = "用户角色信息列表", type = ApiParamType.JSONARRAY)
@@ -308,17 +308,17 @@ public class UserVo extends BasePageVo {
 		return roleDescriptionList;
 	}
 
-	public List<String> getRoleNameList() {
-		if(CollectionUtils.isEmpty(roleNameList) && CollectionUtils.isNotEmpty(roleList)) {
+	public List<String> getRoleUuidList() {
+		if(CollectionUtils.isEmpty(roleUuidList) && CollectionUtils.isNotEmpty(roleList)) {
 			for(RoleVo role : roleList) {
-				roleNameList.add(role.getName());
+				roleUuidList.add(role.getName());
 			}
 		}
-		return roleNameList;
+		return roleUuidList;
 	}
 
-	public void setRoleNameList(List<String> roleNameList) {
-		this.roleNameList = roleNameList;
+	public void setRoleUuidList(List<String> roleUuidList) {
+		this.roleUuidList = roleUuidList;
 	}
 
 	public List<RoleVo> getRoleList() {
@@ -329,28 +329,29 @@ public class UserVo extends BasePageVo {
 		this.roleList = roleList;
 	}
 
-//	@Override
-//	public boolean equals(Object other) {
-//		if (this == other)
-//			return true;
-//		if (other == null)
-//			return false;
-//		if (!(other instanceof UserVo))
-//			return false;
-//
-//		final UserVo user = (UserVo) other;
-//		try {
-//			if (getUserId().equals(user.getUserId()))
-//				return true;
-//		} catch (Exception ex) {
-//			return false;
-//		}
-//		return false;
-//	}
-//
-//	@Override
-//	public int hashCode() {
-//		int result = getUserId().hashCode() * 7;
-//		return result;
-//	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserVo other = (UserVo) obj;
+		if (uuid == null) {
+			if (other.uuid != null)
+				return false;
+		} else if (!uuid.equals(other.uuid))
+			return false;
+		return true;
+	}
+
 }

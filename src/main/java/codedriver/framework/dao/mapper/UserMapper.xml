@@ -413,8 +413,8 @@
 	</insert>
 
 	<insert id="insertUserRole">
-		INSERT INTO `user_role` (`user_uuid`, `role_name`)
-		VALUES (#{userUuid}, #{roleName})
+		INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
+		VALUES (#{userUuid}, #{roleUuid})
 	</insert>
 
 	<insert id="insertUserSession" parameterType="java.lang.String">

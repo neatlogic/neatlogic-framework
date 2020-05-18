@@ -8,6 +8,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,9 +90,9 @@ public class LoginController {
 				jwtBodyObj.put("userid", checkUserVo.getUserId());
 				jwtBodyObj.put("username", checkUserVo.getUserName());
 				jwtBodyObj.put("tenant", tenant);
-				if (checkUserVo.getRoleNameList() != null && checkUserVo.getRoleNameList().size() > 0) {
+				if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
 					JSONArray roleList = new JSONArray();
-					for (String role : checkUserVo.getRoleNameList()) {
+					for (String role : checkUserVo.getRoleUuidList()) {
 						roleList.add(role);
 					}
 					jwtBodyObj.put("rolelist", roleList);

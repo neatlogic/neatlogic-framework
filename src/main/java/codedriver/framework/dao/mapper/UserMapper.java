@@ -53,7 +53,7 @@ public interface UserMapper {
 
 	public int updateUserPasswordActive(String userUuid);
 
-	public int insertUserRole(@Param("userUuid") String userUuid, @Param("roleName") String roleName);
+	public int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
 	public int insertUserTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
 	

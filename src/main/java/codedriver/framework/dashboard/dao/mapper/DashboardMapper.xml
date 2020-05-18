@@ -43,10 +43,10 @@
 				</foreach>
 					)
 			</if>
-			<if test="roleNameList != null and roleNameList.size() > 0">
+			<if test="roleUuidList != null and roleUuidList.size() > 0">
 				OR (da.type = 'role' AND da.`uuid` IN 
-					<foreach collection="roleNameList" item="roleName" open="(" separator=","  close=")">
-						#{roleName}
+					<foreach collection="roleUuidList" item="roleUuid" open="(" separator=","  close=")">
+						#{roleUuid}
 					</foreach>
 					)
 			</if>

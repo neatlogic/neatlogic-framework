@@ -2,26 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dashboard.dao.mapper.DashboardMapper">
 
-	<select id="getDefaultDashboardUuidByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardDefaultVo">
+	<select id="getDefaultDashboardUuidByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dashboard.dto.DashboardDefaultVo">
 		SELECT
 		`dashboard_uuid` as dashboardUuid,
-		`user_id` as userId,
+		`user_uuid` as userUuid,
 		`type`
-		FROM
-		`dashboard_default`
-		WHERE user_id = #{value} 
+		FROM `dashboard_default`
+		WHERE `user_uuid` = #{value} 
 	</select>
 
 	<select id="getDashboardVisitCounter" resultType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
 		SELECT
 		`dashboard_uuid` AS dashboardUuid,
-		`user_id` AS userId,
+		`user_uuid` AS userUuid,
 		`visit_count` AS visitCount
-		FROM
-		`dashboard_visitcounter`
-		WHERE
-		`dashboard_uuid` = #{dashboardUuid} AND
-		`user_id` = #{userId}
+		FROM `dashboard_visitcounter`
+		WHERE `dashboard_uuid` = #{dashboardUuid} 
+		AND `user_uuid` = #{userUuid}
 	</select>
 
 	<sql id="searchDashboardCondition">
@@ -135,16 +132,16 @@
 		a.description,
 		a.is_active AS isActive,
 		a.fcu,
-		(SELECT user_name FROM `user` x WHERE x.user_id = a.`fcu`) AS fcuName,
+		(SELECT user_name FROM `user` x WHERE x.uuid = a.`fcu`) AS fcuName,
 		a.fcd,
 		a.lcu,
-		(SELECT user_name FROM `user` x WHERE x.user_id = a.`lcu`) AS lcuName,
+		(SELECT user_name FROM `user` x WHERE x.uuid = a.`lcu`) AS lcuName,
 		a.lcd,
 		a.type,
 		da.`type` as authType,
 		da.`uuid` as authUuid,
-		do.user_id as `defaultUser`,
-		do.type as `defaultType`
+		do.`user_uuid` as `defaultUser`,
+		do.`type` as `defaultType`
 		FROM
 		`dashboard` a
 		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
@@ -174,7 +171,8 @@
 		b.visit_count
 		FROM (
 		<include refid="searchDashboardCondition" />
-		) tmp LEFT JOIN dashboard_visitcounter b ON tmp.uuid = b.dashboard_uuid AND b.user_id = #{fcu}
+		) tmp 
+		LEFT JOIN dashboard_visitcounter b ON tmp.uuid = b.dashboard_uuid AND b.user_uuid = #{fcu}
 		ORDER BY b.visit_count DESC, fcd DESC
 		LIMIT #{pageSize}
 	</select>
@@ -242,15 +240,14 @@
 		d.`lcu`,
 		da.uuid as `authUuid`,
 		da.type as `authType`
-		FROM
-		`dashboard` d
+		FROM `dashboard` d
 		LEFT JOIN `dashboard_authority` da ON d.`uuid` = da.`dashboard_uuid`
 		<where>
 			d.`uuid` = #{uuid}
 			and
 			((da.type = 'common' AND da.`uuid` = 'alluser')
-			<if test="userId != null and userId != ''">
-			  	OR	(da.type = 'custom' AND da.`uuid` = #{userId})
+			<if test="userUuid != null and userUuid != ''">
+			  	OR	(da.type = 'custom' AND da.`uuid` = #{userUuid})
 			</if>
 			<if test="teamUuidList != null and teamUuidList.size() > 0">
 				OR (da.type = 'team' AND da.`uuid` IN 
@@ -266,7 +263,7 @@
 					</foreach>
 					)
 			</if>
-			<if test="userId != null and userId != ''">
+			<if test="fcu != null and fcu != ''">
 			or	d.`fcu` = #{fcu}
 			</if>
 			)
@@ -315,7 +312,7 @@
 		SET
 		`visit_count` = `visit_count` + 1
 		WHERE `dashboard_uuid` = #{dashboardUuid}
-		AND `user_id` = #{userId}
+		AND `user_uuid` = #{userUuid}
 	</update>
 
 	<insert id="insertDashboardAuthority">
@@ -335,13 +332,13 @@
 	<insert id="insertDashboardVisitCounter" parameterType="codedriver.framework.dashboard.dto.DashboardVisitCounterVo">
 		INSERT INTO `dashboard_visitcounter` (
 		`dashboard_uuid`,
-		`user_id`,
+		`user_uuid`,
 		`visit_count`
 		)
 		VALUES
 		(
 		#{dashboardUuid},
-		#{userId},
+		#{userUuid},
 		#{visitCount}
 		)
 	</insert>
@@ -407,9 +404,8 @@
 	</insert>
 
 	<insert id="insertDashboardDefault">
-		INSERT INTO `dashboard_default` (`dashboard_uuid`, `user_id`,`type`)
-		VALUES
-		(#{dashboardUuid}, #{userId},#{type})
+		INSERT INTO `dashboard_default` (`dashboard_uuid`, `user_uuid`, `type`)
+		VALUES (#{dashboardUuid}, #{userUuid}, #{type})
 	</insert>
 
 	<delete id="deleteDashboardWidgetByDashboardUuid" parameterType="java.lang.String">
@@ -426,13 +422,13 @@
 		WHERE `dashboard_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteDashboardDefaultByUserId" parameterType="java.lang.String">
+	<delete id="deleteDashboardDefaultByUserUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`dashboard_default`
 		<where>
 			<if test="type != 'system'">
-			`user_id` = #{userId} 
+			`user_uuid` = #{userUuid} 
 			</if>
 			and `type` = #{type}
 		</where>

@@ -30,7 +30,7 @@ public interface TeamMapper {
 
 	public List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
 
-	public List<String> getTeamUuidListByUserId(String userId);
+	public List<String> getTeamUuidListByUserUuid(String userUuid);
 
 	public int deleteTeamByUuid(String uuid);
 

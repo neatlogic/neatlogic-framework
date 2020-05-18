@@ -8,18 +8,18 @@ package codedriver.framework.reminder.dto;
 public class ReminderMessageSearchVo {
     public static final Integer DEFAULT_SHOW_COUNT = 5;
     public static final Integer DEFAULT_ADD_COUNT = 2;
-    private String userId;
+    private String userUuid;
     private Integer messageCount;
     private String startTime;
     private String endTime;
     private Long messageId;
 
-    public String getUserId() {
-        return userId;
+    public String getUserUuid() {
+        return userUuid;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     public Integer getMessageCount() {

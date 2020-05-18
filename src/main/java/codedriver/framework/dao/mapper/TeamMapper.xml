@@ -177,12 +177,12 @@
 		</foreach>
 	</select>
 
-	<select id="getTeamUuidListByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
 	SELECT 
 	  ut.`team_uuid`
 	FROM `user_team` ut
 	JOIN team t ON t.`uuid`=ut.`team_uuid`
-	WHERE ut.`user_id`=#{userId};
+	WHERE ut.`user_uuid`=#{userUuid};
 	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

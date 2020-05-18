@@ -12,37 +12,37 @@
         <association property="counterSubscribeVo" javaType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
             <id column="subId" property="id"/>
             <result column="id" property="pluginId"/>
-            <result column="userId" property="userId"/>
+            <result column="userUuid" property="userUuid"/>
         </association>
     </resultMap>
     
-    <select id="getSubscribeCounterListByUserId" resultMap="counterMap" parameterType="java.lang.String">
+    <select id="getSubscribeCounterListByUserUuid" resultMap="counterMap" parameterType="java.lang.String">
         SELECT
         a.`plugin_id` as `pluginId`,
         a.`id` as `subId`,
-        a.`user_id` as `userId`,
+        a.`user_uuid` as `userUuid`,
         d.`sort` as `userSort`
         FROM `counter_subscribe` a
         LEFT JOIN `counter_user_sort` d ON a.`plugin_id` = d.`plugin_id`
-        WHERE a.`user_id` = #{value}
+        WHERE a.`user_uuid` = #{value}
     </select>
 
-    <select id="getCounterSubscribeByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
+    <select id="getCounterSubscribeByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
         SELECT
         `id`,
         `plugin_id` as `pluginId`,
-        `user_id` as `userId`
+        `user_uuid` as `userUuid`
         FROM `counter_subscribe`
-        WHERE `user_id` = #{userId}
+        WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="getCounterSortListByUserId" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
+    <select id="getCounterSortListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
         SELECT
         `plugin_id` as `pluginId`,
-        `user_id` as `userId`,
+        `user_uuid` as `userUuid`,
         `sort`
         FROM `counter_user_sort`
-        WHERE `user_id` = #{userId}
+        WHERE `user_uuid` = #{userUuid}
     </select>
     
     <insert id="insertCounterSubscribe" parameterType="codedriver.framework.counter.dto.GlobalCounterSubscribeVo">
@@ -51,21 +51,21 @@
         </selectKey>
         INSERT INTO `counter_subscribe`(
         `plugin_id`,
-        `user_id`
+        `user_uuid`
         ) VALUES(
         #{pluginId},
-        #{userId}
+        #{userUuid}
         )
     </insert>
     
     <insert id="insertCounterUserSort" parameterType="codedriver.framework.counter.dto.GlobalCounterUserSortVo">
         INSERT INTO `counter_user_sort`(
           `plugin_id`,
-          `user_id`,
+          `user_uuid`,
           `sort`
         )VALUES(
         #{pluginId},
-        #{userId},
+        #{userUuid},
         #{sort}
         )
     </insert>
@@ -74,7 +74,7 @@
         DELETE FROM `counter_subscribe` WHERE id = #{value}
     </delete>
 
-    <delete id="deleteCounterUserSortByUserId" parameterType="java.lang.String">
-        DELETE FROM `counter_user_sort` WHERE `user_id` = #{value}
+    <delete id="deleteCounterUserSortByUserUuid" parameterType="java.lang.String">
+        DELETE FROM `counter_user_sort` WHERE `user_uuid` = #{value}
     </delete>
 </mapper>

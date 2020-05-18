@@ -9,7 +9,9 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -19,38 +21,49 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 
 public class UserVo extends BasePageVo {
 	private transient String keyword;
+	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
+	private String uuid;
+	@EntityField(name = "用户id", type = ApiParamType.STRING)
 	private String userId;
+	@EntityField(name = "用户姓名", type = ApiParamType.STRING)
 	private String userName;
 	private String pinyin;
 	private String tenant;
+	@EntityField(name = "邮箱", type = ApiParamType.STRING)
 	private String email;
 	private String password;
 	private String roleName;
+	@EntityField(name = "是否激活(1:激活;0:未激活)", type = ApiParamType.INTEGER)
 	private Integer isActive;
+	@EntityField(name = "电话", type = ApiParamType.STRING)
 	private String phone;
 	private String dept;
 	private String company;
 	private String position;
+	@EntityField(name = "其他属性", type = ApiParamType.STRING)
 	private String userInfo;
 	private String teamUuid;
 	private String auth;
 	private String authGroup;
 	private JSONObject userInfoObj;
-	private List<String> roleNameList;
-	private List<String> roleDescriptionList;
-	private List<RoleVo> roleList;
-	private List<String> teamUuidList;
-	private List<String> teamNameList;
-	private List<TeamVo> teamList;
-	private List<UserAuthVo> userAuthList;
+	
+	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
+	private List<String> teamUuidList = new ArrayList<>();
+	private List<String> teamNameList = new ArrayList<>();
+	
+	@EntityField(name = "用户角色uuid列表", type = ApiParamType.JSONARRAY)
+	private List<String> roleNameList = new ArrayList<>();
+	private List<String> roleDescriptionList = new ArrayList<>();
+	
+	@EntityField(name = "用户角色信息列表", type = ApiParamType.JSONARRAY)
+	private List<RoleVo> roleList = new ArrayList<>();
+	@EntityField(name = "用户所在组信息列表", type = ApiParamType.JSONARRAY)
+	private List<TeamVo> teamList = new ArrayList<>();
+	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
+	private List<UserAuthVo> userAuthList = new ArrayList<>();
 
 	public UserVo() {
 
-	}
-
-	public UserVo(String userId, String userName) {
-		this.userId = userId;
-		this.userName = userName;
 	}
 
 	public List<UserAuthVo> getUserAuthList() {
@@ -75,6 +88,14 @@ public class UserVo extends BasePageVo {
 
 	public void setAuthGroup(String authGroup) {
 		this.authGroup = authGroup;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getUserId() {
@@ -230,12 +251,10 @@ public class UserVo extends BasePageVo {
 	}
 
 	public List<String> getTeamUuidList() {
-		if(CollectionUtils.isNotEmpty(teamList)){
-			List<String> uuidList = new ArrayList<>();
+		if(CollectionUtils.isEmpty(teamUuidList) && CollectionUtils.isNotEmpty(teamList)){
 			for (TeamVo teamVo : teamList){
-				uuidList.add(teamVo.getUuid());
+				teamUuidList.add(teamVo.getUuid());
 			}
-			return uuidList;
 		}
 		return teamUuidList;
 	}
@@ -290,8 +309,7 @@ public class UserVo extends BasePageVo {
 	}
 
 	public List<String> getRoleNameList() {
-		if(CollectionUtils.isNotEmpty(roleList)) {
-			roleNameList = new ArrayList<String>();
+		if(CollectionUtils.isEmpty(roleNameList) && CollectionUtils.isNotEmpty(roleList)) {
 			for(RoleVo role : roleList) {
 				roleNameList.add(role.getName());
 			}
@@ -311,28 +329,28 @@ public class UserVo extends BasePageVo {
 		this.roleList = roleList;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (this == other)
-			return true;
-		if (other == null)
-			return false;
-		if (!(other instanceof UserVo))
-			return false;
-
-		final UserVo user = (UserVo) other;
-		try {
-			if (getUserId().equals(user.getUserId()))
-				return true;
-		} catch (Exception ex) {
-			return false;
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = getUserId().hashCode() * 7;
-		return result;
-	}
+//	@Override
+//	public boolean equals(Object other) {
+//		if (this == other)
+//			return true;
+//		if (other == null)
+//			return false;
+//		if (!(other instanceof UserVo))
+//			return false;
+//
+//		final UserVo user = (UserVo) other;
+//		try {
+//			if (getUserId().equals(user.getUserId()))
+//				return true;
+//		} catch (Exception ex) {
+//			return false;
+//		}
+//		return false;
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		int result = getUserId().hashCode() * 7;
+//		return result;
+//	}
 }

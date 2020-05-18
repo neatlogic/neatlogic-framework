@@ -22,6 +22,7 @@ public class UserContext implements Serializable {
 	private String tenant;
 	private String userName;
 	private String userId;
+	private String userUuid;
 	private String timezone = "+8:00";
 	private String token;
 	private List<String> roleNameList = new ArrayList<>();
@@ -30,6 +31,7 @@ public class UserContext implements Serializable {
 		UserContext context = new UserContext();
 		if (_userContext != null) {
 			context.setUserId(_userContext.getUserId());
+			context.setUserUuid(_userContext.getUserUuid());
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());
 			context.setTimezone(_userContext.getTimezone());
@@ -45,6 +47,7 @@ public class UserContext implements Serializable {
 	public static UserContext init(JSONObject jsonObj,String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();
 		context.setUserId(jsonObj.getString("userid"));
+		context.setUserUuid(jsonObj.getString("useruuid"));
 		context.setUserName(jsonObj.getString("username"));
 		context.setTenant(jsonObj.getString("tenant"));
 		context.setRequest(request);
@@ -111,6 +114,21 @@ public class UserContext implements Serializable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getUserUuid() {
+		return userUuid;
+	}
+	
+	public String getUserUuid(boolean need) {
+		if (StringUtils.isBlank(userUuid)) {
+			throw new NoUserException();
+		}
+		return userUuid;
+	}
+
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public List<String> getRoleNameList() {

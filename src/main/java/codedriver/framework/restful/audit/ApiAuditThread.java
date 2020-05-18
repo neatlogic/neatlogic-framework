@@ -68,7 +68,7 @@ public class ApiAuditThread extends CodeDriverThread {
 		log.append(apiAuditVo.getUuid());
 		log.append("\n");
 		log.append("user: ");
-		log.append(apiAuditVo.getUserId());
+		log.append(apiAuditVo.getUserUuid());
 		log.append("\n");
 		log.append("time: ");
 		log.append(sdf.format(new Date()));

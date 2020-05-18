@@ -1,12 +1,12 @@
 package codedriver.framework.dto;
 
 public class UserSessionVo {
-	private String userId;
+	private String userUuid;
 	private String sessionTime;
 	public static final String USER_EXPIRETIME = "USER_EXPIRETIME";
 	
-	public UserSessionVo(String userId, String sessionTime) {
-		this.userId = userId;
+	public UserSessionVo(String userUuid, String sessionTime) {
+		this.userUuid = userUuid;
 		this.sessionTime = sessionTime;
 	}
 	
@@ -14,11 +14,11 @@ public class UserSessionVo {
 		super();
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public String getSessionTime() {

@@ -23,13 +23,13 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
 import codedriver.framework.service.TenantService;
-import codedriver.framework.service.UserService;
 
 @Controller
 @RequestMapping("/login/")
@@ -37,7 +37,7 @@ public class LoginController {
 	Logger logger = LoggerFactory.getLogger(LoginController.class);
 
 	@Autowired
-	private UserService userService;
+	private UserMapper userMapper;
 
 	@Autowired
 	private TenantService tenantService;
@@ -73,11 +73,14 @@ public class LoginController {
 			userVo.setPassword(password);
 			userVo.setTenant(tenant);
 
-			UserVo checkUserVo = userService.getUserByUserIdAndPassword(userVo);
+			UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
 			if (checkUserVo != null) {
 				// 保存 user 登录访问时间
-				userService.saveUserSession(checkUserVo.getUserId());
-
+				if(userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {
+					userMapper.updateUserSession(checkUserVo.getUuid());
+				}else {
+					userMapper.insertUserSession(checkUserVo.getUuid());
+				}
 				JSONObject jwtHeadObj = new JSONObject();
 				jwtHeadObj.put("alg", "HS256");
 				jwtHeadObj.put("typ", "JWT");

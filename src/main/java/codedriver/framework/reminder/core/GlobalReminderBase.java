@@ -94,7 +94,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         returnObj.put("remindName", messageVo.getReminderVo().getName());
         returnObj.put("moduleName", messageVo.getReminderVo().getModuleName());
         returnObj.put("moduleIcon", messageVo.getReminderVo().getModuleIcon());
-        returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserId());
+        returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserUuid());
         returnObj.put("receiverName", messageVo.getReminderSubscribeVo().getUserName());
         returnObj.put("isKeep", messageVo.getIsKeep());
         returnObj.put("showTemplate", reminder.getShowTemplate());
@@ -107,7 +107,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         //是否为新消息（新消息会触发一系列动作）
         returnObj.put("isNew", messageVo.getIsNew());
         if (messageVo.getIsNew() == 1){
-            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderSubscribeVo().getUserId());
+            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderSubscribeVo().getUserUuid());
         }
         //自定义信息参数，例：告警的级别
         String messageParam = messageVo.getParam();

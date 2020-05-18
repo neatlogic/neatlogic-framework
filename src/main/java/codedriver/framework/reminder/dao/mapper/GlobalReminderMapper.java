@@ -1,8 +1,6 @@
 package codedriver.framework.reminder.dao.mapper;
 
-import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.reminder.dto.GlobalReminderSubscribeVo;
-import codedriver.framework.reminder.dto.GlobalReminderVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,10 +9,10 @@ public interface GlobalReminderMapper {
 
     /**
     * @Description: 获取用户订阅的实时动态插件集合
-    * @Param: [userId]
+    * @Param: [userUuid]
     * @return: java.util.List<codedriver.framework.reminder.dto.GlobalReminderSubscribeVo>
     */
-    List<GlobalReminderSubscribeVo> getReminderSubscribeListByUserId(String userId);
+    List<GlobalReminderSubscribeVo> getReminderSubscribeListByUserUuid(String userUuid);
 
     /** 
     * @Description: 获取用户组涉及的用户集合 

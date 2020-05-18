@@ -17,14 +17,14 @@
         </association>
     </resultMap>
 
-    <select id="getReminderSubscribeListByUserId" parameterType="java.lang.String" resultType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+    <select id="getReminderSubscribeListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         SELECT
         `id`,
         `plugin_id` as `pluginId`,
-        `user_id` as `userId`,
+        `user_uuid` as `userUuid`,
         `param`
         FROM `reminder_subscribe`
-        WHERE `user_id` = #{userId}
+        WHERE `user_uuid` = #{userUuid}
     </select>
 
     <select id="getUserIdListByTeamIdList" resultType="java.lang.String">

@@ -100,14 +100,13 @@
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`name`, `description`)
-		VALUES
-		(#{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
+		VALUES (#{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
 	</insert>
 
 	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
-		INSERT INTO `user_role` (`user_id`, `role_name`)
+		INSERT INTO `user_role` (`user_uuid`, `role_name`)
 		VALUES
-		(#{userId}, #{roleName})
+		(#{uuid}, #{roleName})
 	</insert>
 
 	<insert id="insertRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">
@@ -123,10 +122,8 @@
 	</insert>
 
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
-		UPDATE
-		`role`
-		SET
-		`description` = #{description, typeHandler=XssHandler}
+		UPDATE `role`
+		SET `description` = #{description, typeHandler=XssHandler}
 		WHERE `name` = #{name}
 	</update>
 

@@ -19,7 +19,7 @@ public class ApiAuditVo extends BasePageVo {
 	@EntityField(name = "地址", type = ApiParamType.STRING)
 	private String token;
 	@EntityField(name = "用户ID", type = ApiParamType.STRING)
-	private String userId;
+	private String userUuid;
 	@EntityField(name = "认证方式", type = ApiParamType.STRING)
 	private String authtype;
 	@EntityField(name = "服务器ID", type = ApiParamType.STRING)
@@ -63,12 +63,12 @@ public class ApiAuditVo extends BasePageVo {
 		this.token = token;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public String getAuthtype() {

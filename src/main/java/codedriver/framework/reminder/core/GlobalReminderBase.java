@@ -89,7 +89,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         returnObj.put("title", messageVo.getTitle());
         returnObj.put("content", messageVo.getContent());
         returnObj.put("createTime", messageVo.getCreateTime());
-        returnObj.put("fromUserId", messageVo.getFromUser());
+        returnObj.put("fromUserUuid", messageVo.getFromUser());
         returnObj.put("fromUserName", messageVo.getFromUserName());
         returnObj.put("remindName", messageVo.getReminderVo().getName());
         returnObj.put("moduleName", messageVo.getReminderVo().getModuleName());

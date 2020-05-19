@@ -46,7 +46,6 @@ public class SimpleChart extends DashboardChartBase {
 		JSONObject showConfig = new JSONObject();
 		showConfig.put(DashboardShowConfig.AGGREGATE.getValue(),new DashboardShowConfigVo(DashboardShowConfig.AGGREGATE,JSONArray.parseArray("[{'value':'count','text':'计数'}]")));
 		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD,new JSONArray()));
-		showConfig.put(DashboardShowConfig.SUBGROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.SUBGROUPFIELD,new JSONArray()));
 		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),new DashboardShowConfigVo(DashboardShowConfig.MAXGROUP,JSONArray.parseArray("[{'value':'10','text':'10'},{'value':'20','text':'20'}]")));
 		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),new DashboardShowConfigVo(DashboardShowConfig.REFRESHTIME,JSONArray.parseArray("[{'value':'-1','text':'不刷新'},{'value':'30','text':'30'}]")));
 		charConfig.put("showConfig", showConfig);
@@ -55,10 +54,8 @@ public class SimpleChart extends DashboardChartBase {
 
 	@Override
 	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
-		String groupField = configObj.getString("groupField");
-		String subGroupField = configObj.getString("subGroupField");
-		String aggregate = configObj.getString("aggregate");
-		String subGroup = StringUtils.EMPTY;
+		String groupField = configObj.getString(DashboardShowConfig.GROUPFIELD.getValue());
+		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
 		Map<String, Object> resultMap = (Map<String,Object>)preDatas;
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
@@ -67,24 +64,10 @@ public class SimpleChart extends DashboardChartBase {
 				if(StringUtils.isBlank(group)){
 					//throw new DashboardFieldNotFoundException(groupField);
 				}else {
-					if(StringUtils.isNotBlank(subGroupField)) {
-						subGroup = data.getString(subGroupField);
-						if(StringUtils.isBlank(subGroup)){
-							//throw new DashboardFieldNotFoundException(subGroup);
-						}else {
-							String groupCombine = group+"#"+subGroup;
-							if (!resultMap.containsKey(groupCombine)) {
-								resultMap.put(groupCombine, 1);
-							} else {
-								resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
-							}
-						}
-					}else {
-						if (!resultMap.containsKey(group)) {
-							resultMap.put(group, 1);
-						} else {
-							resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
-						}
+					if (!resultMap.containsKey(group)) {
+						resultMap.put(group, 1);
+					} else {
+						resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
 					}
 				}
 			}

@@ -60,9 +60,9 @@ public class SeriesChart extends DashboardChartBase {
 
 	@Override
 	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
-		String groupField = configObj.getString("groupField");
-		String subGroupField = configObj.getString("subGroupField");
-		String aggregate = configObj.getString("aggregate");
+		String groupField = configObj.getString(DashboardShowConfig.GROUPFIELD.getValue());
+		String subGroupField = configObj.getString(DashboardShowConfig.SUBGROUPFIELD.getValue());
+		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
 		String subGroup = StringUtils.EMPTY;
 		Map<String, Object> resultMap = (Map<String,Object>)preDatas;
 		if (aggregate.equals("count")) {

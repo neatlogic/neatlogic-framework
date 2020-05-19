@@ -87,6 +87,7 @@ public class LoginController {
 				jwtHeadObj.put("typ", "JWT");
 
 				JSONObject jwtBodyObj = new JSONObject();
+				jwtBodyObj.put("useruuid", checkUserVo.getUuid());
 				jwtBodyObj.put("userid", checkUserVo.getUserId());
 				jwtBodyObj.put("username", checkUserVo.getUserName());
 				jwtBodyObj.put("tenant", tenant);

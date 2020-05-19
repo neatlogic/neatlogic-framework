@@ -18,7 +18,7 @@ public class BarColumnChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] {ChartType.AREACHART.getValue(),ChartType.STACKBARCHART.getValue(),ChartType.COLUMNCHART.getValue(),ChartType.STACKCOLUMNCHART.getValue()};
+		return new String[] {ChartType.BARCHART.getValue(),ChartType.STACKBARCHART.getValue(),ChartType.COLUMNCHART.getValue(),ChartType.STACKCOLUMNCHART.getValue()};
 	}
 
 	@Override

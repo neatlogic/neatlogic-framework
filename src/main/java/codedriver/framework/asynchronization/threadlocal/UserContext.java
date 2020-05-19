@@ -25,7 +25,6 @@ public class UserContext implements Serializable {
 	private String userUuid;
 	private String timezone = "+8:00";
 	private String token;
-//	private List<String> roleNameList = new ArrayList<>();
 	private List<String> roleUuidList = new ArrayList<>();
 	
 	public static UserContext init(UserContext _userContext) {
@@ -39,7 +38,6 @@ public class UserContext implements Serializable {
 			context.setToken(_userContext.getToken());
 			// context.setRequest(_userContext.getRequest());
 			// context.setResponse(_userContext.getResponse());
-//			context.setRoleNameList(_userContext.getRoleNameList());
 			context.setRoleUuidList(_userContext.getRoleUuidList());
 		}
 		instance.set(context);
@@ -67,13 +65,6 @@ public class UserContext implements Serializable {
 	}
 
 	public void addRole(String role) {
-//		if (roleNameList == null) {
-//			roleNameList = new ArrayList<>();
-//		}
-//		if (!roleNameList.contains(role)) {
-//			roleNameList.add(role);
-//		}
-
 		if (!roleUuidList.contains(role)) {
 			roleUuidList.add(role);
 		}
@@ -136,14 +127,6 @@ public class UserContext implements Serializable {
 	public void setUserUuid(String userUuid) {
 		this.userUuid = userUuid;
 	}
-
-//	public List<String> getRoleNameList() {
-//		return roleNameList;
-//	}
-//
-//	public void setRoleNameList(List<String> roleNameList) {
-//		this.roleNameList = roleNameList;
-//	}
 
 	public List<String> getRoleUuidList() {
 		return roleUuidList;

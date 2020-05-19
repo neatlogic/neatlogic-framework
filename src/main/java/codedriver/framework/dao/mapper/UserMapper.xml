@@ -179,7 +179,7 @@
 		ra.`auth_group` AS authGroup,
 		ra.`auth`
 		FROM `user_role` ur 
-		JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` 
+		JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid` 
 		WHERE ur.`user_uuid` = #{userUuid} 
 		<if test="auth != null and auth != ''">
 			AND ra.`auth` = #{auth}
@@ -197,11 +197,11 @@
 
 	<select id="searchUserRoleAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo" useCache="false">
 		SELECT
-		a.`role_name` as `roleName`,
+		a.`role_uuid` as `roleUuid`,
 		a.`auth_group` as `authGroup`,
 		a.`auth`
 		FROM `role_authority` a
-		LEFT JOIN `user_role` b ON a.`role_name` = b.`role_name`
+		LEFT JOIN `user_role` b ON a.`role_uuid` = b.`role_uuid`
 		WHERE b.`user_uuid` = #{userUuid}
 	</select>
 
@@ -338,7 +338,7 @@
 			e.`user_id` as `userId`,
 			c.`auth`
 			FROM `role_authority` c
-			LEFT JOIN `user_role` d ON c.`role_name` = d.`role_name`
+			LEFT JOIN `user_role` d ON c.`role_uuid` = d.`role_uuid`
 			LEFT JOIN `user` e ON d.`user_uuid` = e.`uuid`
 		) f
 		GROUP BY f.`auth`

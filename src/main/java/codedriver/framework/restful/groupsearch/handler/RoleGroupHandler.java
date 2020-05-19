@@ -71,8 +71,8 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 		JSONArray roleArray = new JSONArray();
 		for(T role:roleList) {
 			JSONObject roleTmp = new JSONObject();
-			roleTmp.put("value", getHeader()+((RoleVo) role).getName());
-			roleTmp.put("text", ((RoleVo) role).getDescription());
+			roleTmp.put("value", getHeader()+((RoleVo) role).getUuid());
+			roleTmp.put("text", ((RoleVo) role).getName());
 			roleArray.add(roleTmp);
 		}
 		roleObj.put("sort", getSort());

@@ -1,5 +1,8 @@
 package codedriver.framework.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,10 +18,11 @@ public class HtmlUtil {
 		}
 		return "";
 	}
-	
+
 	private static final Pattern SCRIPTPATTREN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>");// 定义script的正则表达式
 	private static final Pattern STYLEPATTREN = Pattern.compile("<style[^>]*?>[\\s\\S]*?<\\/style>");// 定义style的正则表达式
 	private static final Pattern HTMLPATTREN = Pattern.compile("<[^>]+>");// 定义HTML标签的正则表达式
+
 	public static String removeHtml(String htmlStr, Integer length) {
 		Matcher m_script = SCRIPTPATTREN.matcher(htmlStr);
 		htmlStr = m_script.replaceAll(""); // 过滤script标签
@@ -35,4 +39,5 @@ public class HtmlUtil {
 		}
 		return htmlStr;
 	}
+
 }

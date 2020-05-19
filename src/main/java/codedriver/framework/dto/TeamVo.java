@@ -10,6 +10,9 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class TeamVo extends BasePageVo {
+	
+	public static final String DEFAULT_PARENTUUID = "0";
+	
 	private transient String keyword;
 	private transient Boolean isAutoGenerateUuid = true;
 	@EntityField(name = "分组uuid",

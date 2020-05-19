@@ -395,7 +395,7 @@
 
 	<insert id="insertUserPassword" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user_password` (
-			`uuid`,
+			`user_uuid`,
 			`user_id`,
 			`password`,
 			`create_time`,

@@ -382,7 +382,7 @@
 		)
 		VALUES
 		(
-		#{uuid}
+		#{uuid},
 		#{userId},
 		#{userName},
 		#{email},

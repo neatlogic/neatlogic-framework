@@ -3,6 +3,7 @@ package codedriver.framework.common.constvalue.dashboard;
 import codedriver.framework.common.constvalue.FormHandlerType;
 
 public enum DashboardShowConfig {
+	TYPE("type", "类型",FormHandlerType.RADIO.toString(),false),
 	AGGREGATE("aggregate", "聚合方式",FormHandlerType.SELECT.toString(),false),
 	GROUPFIELD("groupfield", "分组条件",FormHandlerType.SELECT.toString(),false),
 	SUBGROUPFIELD("subgroupfield", "二级分组条件",FormHandlerType.SELECT.toString(),false),

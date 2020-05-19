@@ -67,9 +67,9 @@ public class TableChart extends DashboardChartBase {
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
-		String groupField = configObj.getString("groupField");
-		String subGroupField = configObj.getString("subGroupField");
-		String aggregate = configObj.getString("aggregate");
+		String groupField = configObj.getString(DashboardShowConfig.GROUPFIELD.getValue());
+		String subGroupField = configObj.getString(DashboardShowConfig.SUBGROUPFIELD.getValue());
+		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
 		Map<String,Object> dataMap = null;
 		JSONArray theadArray = null;
 		JSONArray columnArray = null;

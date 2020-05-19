@@ -31,7 +31,7 @@ public class TableChart extends DashboardChartBase {
 		for(Object columnObj : columnArray) {
 			String column = ((JSONObject)columnObj).getString("name");
 			JSONObject dataJson = new JSONObject();
-			if(StringUtils.isNotBlank(configObj.getString("subGroupField"))) {
+			if(StringUtils.isNotBlank(configObj.getString(DashboardShowConfig.SUBGROUPFIELD.getValue()))) {
 				for(Object theadObj : theadArray ) {
 					String thead = ((JSONObject)theadObj).getString("name");
 					 Map<String, Integer> theadMap = (Map<String, Integer>)dataMap.get(column);

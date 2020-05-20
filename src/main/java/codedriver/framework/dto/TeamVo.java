@@ -15,30 +15,29 @@ public class TeamVo extends BasePageVo {
 	
 	private transient String keyword;
 	private transient Boolean isAutoGenerateUuid = true;
-	@EntityField(name = "分组uuid",
-			type = ApiParamType.STRING)
+	
+	@EntityField(name = "分组uuid", type = ApiParamType.STRING)
 	private String uuid;
-	@EntityField(name = "分组名称",
-			type = ApiParamType.STRING)
+	@EntityField(name = "分组名称", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "父分组uuid",
-			type = ApiParamType.STRING)
+	@EntityField(name = "父分组uuid", type = ApiParamType.STRING)
 	private String parentUuid;
-	@EntityField(name = "子节点数量",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "子节点数量", type = ApiParamType.INTEGER)
 	private Integer childCount;
-	@EntityField(name = "排序",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "排序", type = ApiParamType.INTEGER)
 	private Integer sort;
 
 	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
 	private List<TagVo> tagList;
-
+	
+	@EntityField(name = "左编码", type = ApiParamType.INTEGER)
+	private Integer lft;
+	@EntityField(name = "右编码", type = ApiParamType.INTEGER)
+	private Integer rht;
+	
 	private Long tagId;
 
 	private int userCount;
-
-	private List<String> userUuidList;
 
 	private List<String> pathNameList;
 
@@ -139,14 +138,6 @@ public class TeamVo extends BasePageVo {
 
 	public void setTagId(Long tagId) {
 		this.tagId = tagId;
-	}
-
-	public List<String> getUserUuidList() {
-		return userUuidList;
-	}
-
-	public void setUserUuidList(List<String> userUuidList) {
-		this.userUuidList = userUuidList;
 	}
 
 }

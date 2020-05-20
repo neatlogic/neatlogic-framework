@@ -463,6 +463,6 @@
 		DELETE
 		FROM
 		`dashboard_widget`
-		WHERE `uuid` = #{uuid}
+		WHERE `dashboard_uuid`= #{dashboardUuid} and `uuid` = #{uuid}
 	</delete>
 </mapper>

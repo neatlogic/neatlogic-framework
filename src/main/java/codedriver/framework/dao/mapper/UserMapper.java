@@ -6,6 +6,8 @@ import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
+	
+	public int checkUserIsExists(String uuid);
 
 	public int checkUserIsInTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
 	

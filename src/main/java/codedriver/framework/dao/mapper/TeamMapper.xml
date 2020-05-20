@@ -138,7 +138,11 @@
 		`team` a
 		WHERE `uuid` = #{uuid}
 	</select>
-
+	
+	<select id="checkTeamIsExists" parameterType="string" resultType="int">
+		SELECT COUNT(`uuid`) FROM `team` WHERE `uuid` = #{uuid}
+	</select>
+	
 	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,

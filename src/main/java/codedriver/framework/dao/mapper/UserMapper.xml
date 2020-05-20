@@ -8,6 +8,10 @@
 		AND `team_uuid` = #{teamUuid}
 	</select>
 
+	<select id="checkUserIsExists" parameterType="java.lang.String" resultType="int">
+	SELECT COUNT(`uuid`) FROM `user` WHERE `uuid` = #{value}
+	</select>
+	
 	<select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
 		a.`uuid`,

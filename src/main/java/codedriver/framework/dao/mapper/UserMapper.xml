@@ -19,7 +19,6 @@
 		a.`user_name` as userName,
 		a.`email`,
 		a.`phone`,
-		b.`password`,
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		a.`user_info` as userInfo

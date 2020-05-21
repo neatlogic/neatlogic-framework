@@ -2,6 +2,9 @@ package codedriver.framework.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
@@ -13,6 +16,9 @@ public class RoleVo extends BasePageVo implements Serializable {
 
 	public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
 	private transient String keyword;
+	@EntityField(name = "角色uuis",
+			type = ApiParamType.STRING)
+	private String uuid;
 	@EntityField(name = "角色名称",
 			type = ApiParamType.STRING)
 	private String name;
@@ -22,19 +28,19 @@ public class RoleVo extends BasePageVo implements Serializable {
 	private int userCount;
 	private String authGroup;
 	private String auth;
-	private List<String> userIdList;
+	private List<String> userUuidList;
 	private List<RoleAuthVo> roleAuthList;
 
 	public List<RoleAuthVo> getRoleAuthList() {
 		return roleAuthList;
 	}
 
-	public List<String> getUserIdList() {
-		return userIdList;
+	public List<String> getUserUuidList() {
+		return userUuidList;
 	}
 
-	public void setUserIdList(List<String> userIdList) {
-		this.userIdList = userIdList;
+	public void setUserUuidList(List<String> userUuidList) {
+		this.userUuidList = userUuidList;
 	}
 
 	public void setRoleAuthList(List<RoleAuthVo> roleAuthList) {
@@ -55,6 +61,17 @@ public class RoleVo extends BasePageVo implements Serializable {
 
 	public void setAuth(String auth) {
 		this.auth = auth;
+	}
+
+	public synchronized String getUuid() {
+		if (StringUtils.isBlank(uuid)) {
+			uuid = UUID.randomUUID().toString().replace("-", "");
+		}
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {

@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.reminder.dao.mapper.GlobalReminderMapper">
-    <resultMap id="reminderMap"  type="codedriver.framework.reminder.dto.GlobalReminderVo">
-        <id column="id" property="id"/>
-        <result column="name" property="name"/>
-        <result column="pluginId" property="pluginId"/>
-        <result column="description" property="description"/>
-        <result column="isActive" property="isActive"/>
-        <result column="config" property="config"/>
-        <result column="moduleId" property="moduleId"/>
-        <association property="reminderSubscribeVo" javaType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
-            <id column="subId" property="id"/>
-            <result column="id" property="pluginId"/>
-            <result column="userId" property="userId"/>
-            <result column="param" property="param"/>
-        </association>
-    </resultMap>
 
-    <select id="getReminderSubscribeListByUserId" parameterType="java.lang.String" resultType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
+    <select id="getReminderSubscribeListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         SELECT
         `id`,
         `plugin_id` as `pluginId`,
-        `user_id` as `userId`,
+        `user_uuid` as `userUuid`,
         `param`
         FROM `reminder_subscribe`
-        WHERE `user_id` = #{userId}
+        WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="getUserIdListByTeamIdList" resultType="java.lang.String">
-        SELECT DISTINCT (`user_id`) FROM `user_team` WHERE `team_id` IN
-        <foreach collection="teamIdList" open="(" separator="," close=")" item="teamId">
-            #{teamId}
+    <select id="getUserUuidListByTeamUuidList" resultType="java.lang.String">
+        SELECT DISTINCT (`user_uuid`) FROM `user_team` WHERE `team_uuid` IN
+        <foreach collection="list" open="(" separator="," close=")" item="teamUuid">
+            #{teamUuid}
         </foreach>
     </select>
 
-    <select id="getSubscribeUserIdListByPluginId" resultType="java.lang.String" parameterType="java.lang.String">
-        SELECT DISTINCT (`user_id`) FROM `reminder_subscribe` WHERE `plugin_id` = #{pluginId}
+    <select id="getSubscribeUserUuidListByPluginId" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT DISTINCT (`user_uuid`) FROM `reminder_subscribe` WHERE `plugin_id` = #{pluginId}
     </select>
 
     <update id="updateReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
-        UPDATE `reminder_subscribe` SET `param` = #{param}
-        WHERE
-        `user_id` = #{userId}
+        UPDATE `reminder_subscribe` 
+        SET `param` = #{param}
+        WHERE `user_uuid` = #{userUuid}
         AND `plugin_id` = #{pluginId}
     </update>
 
@@ -51,18 +36,18 @@
         </selectKey>
         INSERT INTO `reminder_subscribe`(
         `plugin_id`,
-        `user_id`,
+        `user_uuid`,
         `param`
         ) VALUES(
         #{pluginId},
-        #{userId},
+        #{userUuid},
         #{param}
         )
     </insert>
 
     <delete id="deleteReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         DELETE FROM `reminder_subscribe`
-        WHERE `user_id` = #{userId}
+        WHERE `user_uuid` = #{userUuid}
         AND `plugin_id` = #{pluginId}
     </delete>
 </mapper>

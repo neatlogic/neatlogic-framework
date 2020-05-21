@@ -149,10 +149,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	}
 
 	private boolean userExpirationValid() {
-		String userId = UserContext.get().getUserId();
+		String userUuid = UserContext.get().getUserUuid();
 		String tenant = TenantContext.get().getTenantUuid();
-		if (UserSessionCache.getItem(tenant, userId) == null) {
-			UserSessionVo userSessionVo = userMapper.getUserSessionByUserId(userId);
+		if (UserSessionCache.getItem(tenant, userUuid) == null) {
+			UserSessionVo userSessionVo = userMapper.getUserSessionByUserUuid(userUuid);
 			if (null != userSessionVo) {
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				try {
@@ -163,8 +163,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 					TenantContext.get().setUseDefaultDatasource(false);
 					Long expireTime = Long.parseLong(expire) * 60 * 1000 + visitTime.getTime();
 					if (now.getTime() < expireTime) {
-						userMapper.updateUserSession(userId);
-						UserSessionCache.addItem(tenant, userId);
+						userMapper.updateUserSession(userUuid);
+						UserSessionCache.addItem(tenant, userUuid);
 						return true;
 					}
 				} catch (ParseException e) {

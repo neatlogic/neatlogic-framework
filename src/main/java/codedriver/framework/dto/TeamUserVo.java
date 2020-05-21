@@ -11,7 +11,7 @@ public class TeamUserVo  extends BasePageVo{
 	public static int TYPE_MANAGER;
 	
 	private String teamUuid;
-	private String userId;
+	private String userUuid;
 	private String userName;
 	private String teamName;
 	private int type;
@@ -29,12 +29,12 @@ public class TeamUserVo  extends BasePageVo{
 	public void setTeamUuid(String teamUuid) {
 		this.teamUuid = teamUuid;
 	}
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public String getUserName() {

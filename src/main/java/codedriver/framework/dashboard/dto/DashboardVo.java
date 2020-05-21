@@ -60,9 +60,9 @@ public class DashboardVo extends BasePageVo {
 	private List<AuthorityVo> authorityList;
 	
 	//params
-	private String userId;
+	private String userUuid;
 	private List<String> teamUuidList;
-	private List<String> roleNameList;
+	private List<String> roleUuidList;
 	
 	public String getUuid() {
 		if (StringUtils.isBlank(uuid)) {
@@ -250,12 +250,12 @@ public class DashboardVo extends BasePageVo {
 		this.authorityList = authorityList;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public List<String> getTeamUuidList() {
@@ -266,12 +266,12 @@ public class DashboardVo extends BasePageVo {
 		this.teamUuidList = teamUuidList;
 	}
 
-	public List<String> getRoleNameList() {
-		return roleNameList;
+	public List<String> getRoleUuidList() {
+		return roleUuidList;
 	}
 
-	public void setRoleNameList(List<String> roleNameList) {
-		this.roleNameList = roleNameList;
+	public void setRoleUuidList(List<String> roleUuidList) {
+		this.roleUuidList = roleUuidList;
 	}
 
 

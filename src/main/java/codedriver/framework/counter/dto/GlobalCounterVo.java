@@ -23,7 +23,6 @@ public class GlobalCounterVo extends BasePageVo implements Comparable<GlobalCoun
     @EntityField( name = "模块ID", type = ApiParamType.STRING)
     private String moduleId;
     //扩充字段
-    private String userId;
     @EntityField( name = "预览图路径", type = ApiParamType.STRING)
     private String previewPath;
     @EntityField( name = "展示模板路径", type = ApiParamType.STRING)
@@ -98,14 +97,6 @@ public class GlobalCounterVo extends BasePageVo implements Comparable<GlobalCoun
 
     public void setCounterSubscribeVo(GlobalCounterSubscribeVo counterSubscribeVo) {
         this.counterSubscribeVo = counterSubscribeVo;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getPreviewPath() {

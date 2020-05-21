@@ -51,14 +51,14 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 	@Override
 	public <T> List<T> reload(JSONObject jsonObj) {
 		List<RoleVo> roleList = new ArrayList<RoleVo>();
-		List<String> roleNameList = new ArrayList<String>();
+		List<String> roleUuidList = new ArrayList<String>();
 		for(Object value :jsonObj.getJSONArray("valueList")) {
 			if(value.toString().startsWith(getHeader())){
-				roleNameList.add(value.toString().replace(getHeader(), ""));
+				roleUuidList.add(value.toString().replace(getHeader(), ""));
 			}
 		}
-		if(roleNameList.size()>0) {
-			roleList = roleMapper.getRoleByRoleNameList(roleNameList);
+		if(roleUuidList.size()>0) {
+			roleList = roleMapper.getRoleByUuidList(roleUuidList);
 		}
 		return (List<T>) roleList;
 	}
@@ -71,8 +71,8 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 		JSONArray roleArray = new JSONArray();
 		for(T role:roleList) {
 			JSONObject roleTmp = new JSONObject();
-			roleTmp.put("value", getHeader()+((RoleVo) role).getName());
-			roleTmp.put("text", ((RoleVo) role).getDescription());
+			roleTmp.put("value", getHeader()+((RoleVo) role).getUuid());
+			roleTmp.put("text", ((RoleVo) role).getName());
 			roleArray.add(roleTmp);
 		}
 		roleObj.put("sort", getSort());

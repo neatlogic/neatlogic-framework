@@ -5,19 +5,19 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class RoleAuthVo extends BasePageVo {
-    @EntityField(name = "角色名称", type = ApiParamType.STRING)
-    private String roleName;
+    @EntityField(name = "角色uuid", type = ApiParamType.STRING)
+    private String roleUuid;
     @EntityField(name = "权限", type = ApiParamType.STRING)
     private String auth;
     @EntityField(name = "权限组", type = ApiParamType.STRING)
     private String authGroup;
 
-    public String getRoleName() {
-        return roleName;
+    public String getRoleUuid() {
+        return roleUuid;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public void setRoleUuid(String roleUuid) {
+        this.roleUuid = roleUuid;
     }
 
     public String getAuth() {

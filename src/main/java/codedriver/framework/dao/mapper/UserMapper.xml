@@ -3,40 +3,41 @@
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>
 	<select id="checkUserIsInTeam" resultType="int" useCache="false">
-		SELECT
-		count(1)
-		FROM
-		`user_team`
-		WHERE user_id = #{userId}
-		AND team_uuid = #{teamUuid}
+		SELECT count(1) FROM `user_team`
+		WHERE `user_uuid` = #{userUuid}
+		AND `team_uuid` = #{teamUuid}
 	</select>
 
-	<select id="getUserBaseInfoByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	<select id="checkUserIsExists" parameterType="java.lang.String" resultType="int">
+	SELECT COUNT(`uuid`) FROM `user` WHERE `uuid` = #{value}
+	</select>
+	
+	<select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
+		a.`uuid`,
 		a.`user_id` as userId,
 		a.`user_name` as userName,
 		a.`email`,
 		a.`phone`,
-		b.`password`,
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		a.`user_info` as userInfo
-		FROM
-		`user` a
-		LEFT JOIN `user_password` b ON a.`user_id` = b.`user_id` AND b.`is_active` = 1
-		WHERE a.user_id = #{value}
+		FROM `user` a
+		WHERE a.`uuid` = #{value}
 	</select>
 
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
-		<id property="userId" column="userId" />
+		<id property="uuid" column="uuid" />
+		<result property="userId" column="userId" />
 		<result property="userName" column="userName" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone" />
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
 		<collection property="roleList" ofType="codedriver.framework.dto.RoleVo">
-			<id property="name" column="roleName"/>
-			<id property="description" column="description" />
+			<id property="uuid" column="roleUuid"/>
+			<result property="name" column="roleName"/>
+			<result property="description" column="description" />
 		</collection>
 		<collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
 			<id property="uuid" column="teamUuid" />
@@ -44,8 +45,9 @@
 		</collection>
 	</resultMap>
 
-	<select id="getUserByUserId" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
+	<select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
 		SELECT
+		a.`uuid`,
 		a.`user_id` AS userId,
 		a.`user_name` AS userName,
 		a.`email`,
@@ -53,30 +55,26 @@
 		e.`password`,
 		a.`pinyin`,
 		a.`is_active` AS isActive,
-		b.role_name AS roleName,
+		b.`role_uuid` AS roleUuid,
+		r.`name` AS roleName,
 		r.`description`,
-		c.team_uuid AS teamUuid,
-		d.name AS teamName
-		FROM
-		`user` a
-		LEFT JOIN user_role b ON a.user_id = b.user_id
-		LEFT JOIN user_team c ON a.user_id = c.user_id
-		LEFT JOIN team d ON c.team_uuid = d.uuid
-		LEFT JOIN role r ON b.`role_name` = r.`name`
+		c.`team_uuid` AS teamUuid,
+		d.`name` AS teamName
+		FROM `user` a
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+		LEFT JOIN `user_team`c ON a.`uuid` = c.`user_uuid`
+		LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+		LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
 		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
-		WHERE
-		a.user_id = #{value} 
+		WHERE a.`uuid` = #{value} 
 	</select>
 
-	<select id="getLeaderUserIdByTeamIds" resultType="java.lang.String" useCache="false">
+	<select id="getLeaderUserUuidByTeamIds" resultType="java.lang.String" useCache="false">
 		SELECT
-		`user_id` AS userId
-		FROM
-		`user_team_role`
-		WHERE
-		role = 'leader'
-		AND
-		team_uuid IN
+		`user_uuid`
+		FROM `user_team_role`
+		WHERE `role` = 'leader'
+		AND team_uuid IN
 		<foreach collection="teamUuidIdList" item="item" open="(" separator="," close=")">
 			#{item}
 		</foreach>
@@ -84,29 +82,29 @@
 
     <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
         SELECT
+        k.`uuid`,
         k.`user_id` as `userId`,
         k.`user_name` as `userName`,
         k.`email`,
         k.`phone`,
         k.`pinyin`,
         k.`is_active` as `isActive`,
-        h.`role_name` as `roleName`,
+        h.`role_uuid` as `roleUuid`,
+        r.`name` as `roleName`,
         r.`description`,
         j.`uuid` as `teamUuid`,
         j.`name` as `teamName`
         FROM (
         SELECT
-        DISTINCT (a.`user_id`),
-		a.`id`
+        DISTINCT (a.`uuid`) AS `uuid`
         FROM
         `user` a
-        LEFT JOIN user_role b ON a.user_id = b.user_id
-        LEFT JOIN user_team c ON a.user_id = c.user_id
+        LEFT JOIN user_role b ON a.uuid = b.user_uuid
+        LEFT JOIN user_team c ON a.uuid = c.user_uuid
         LEFT JOIN team d ON c.team_uuid = d.uuid
-        LEFT JOIN `user_authority` f ON a.`user_id` = f.`user_id`
-		LEFT JOIN `role_authority` l ON b.`role_name` = l.`role_name`
-        WHERE
-        1=1
+        LEFT JOIN `user_authority` f ON a.`uuid` = f.`user_uuid`
+		LEFT JOIN `role_authority` l ON b.`role_uuid` = l.`role_uuid`
+        WHERE 1=1
         <if test="keyword !=null and keyword != ''">
             AND
             (a.user_id LIKE CONCAT('%', #{keyword}, '%')
@@ -121,23 +119,24 @@
         <if test="auth != null and auth != ''">
             AND f.`auth` = #{auth} OR l.`auth` = #{auth}
         </if>
-        <if test="roleName != null and roleName != ''">
-            AND b.`role_name` = #{roleName}
+        <if test="roleUuid != null and roleUuid != ''">
+            AND b.`role_uuid` = #{roleUuid}
         </if>
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
         ) g
-        LEFT JOIN `user` k ON g.`user_id` = k.`user_id`
-        LEFT JOIN `user_role` h ON g.user_id = h.`user_id`
-        LEFT JOIN `user_team` i ON g.`user_id` = i.`user_id`
+        JOIN `user` k ON g.`uuid` = k.`uuid`
+        LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
         LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
-        LEFT JOIN `role` r ON h.`role_name` = r.`name`
-        ORDER BY g.`id` DESC
+        LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        ORDER BY k.`id` DESC
     </select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">
 		SELECT
+		a.`uuid`,
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
 		a.`email`,
@@ -146,13 +145,14 @@
 		a.`is_active` as `isActive`,
 		a.`user_info` as `userInfo`
 		FROM `user` a
-		LEFT JOIN `user_authority` b ON a.`user_id` = b.`user_id`
+		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
 		ORDER BY a.`id`	 DESC
 	</select>
 
 	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
 		SELECT
+		a.`uuid`,
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
 		a.`email`,
@@ -160,53 +160,61 @@
 		a.`pinyin`,
 		a.`is_active` as `isActive`,
 		a.`user_info` as `userInfo`,
-		b.`role_name` as `roleName`
+		b.`role_uuid` as `roleUuid`
 		FROM `user` a
-		LEFT JOIN `user_role` b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `role_authority` c ON b.`role_name` = c.`role_name`
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+		LEFT JOIN `role_authority` c ON b.`role_uuid` = c.`role_uuid`
 		WHERE c.`auth` = #{auth}
 		ORDER BY a.`id` DESC
 	</select>
 
-	<select id="searchUserAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
-		SELECT `user_id` as `userId`,
+	<select id="searchUserAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
+		SELECT 
+		`user_uuid` as `userUid`,
 		`auth_group` as `authGroup`,
 		`auth`
 		FROM `user_authority`
-		WHERE `user_id` = #{userId}
+		WHERE `user_uuid` = #{userUuid}
 	</select>
 	
 	<select id="searchUserAllAuthByUserAuth" parameterType="codedriver.framework.dto.UserAuthVo" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
-		SELECT auth_group authGroup,auth FROM `user_role` ur 
-		JOIN `role_authority` ra ON ur.`role_name` = ra.`role_name` WHERE ur.`user_id` = #{userId} 
+		SELECT 
+		ra.`auth_group` AS authGroup,
+		ra.`auth`
+		FROM `user_role` ur 
+		JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid` 
+		WHERE ur.`user_uuid` = #{userUuid} 
 		<if test="auth != null and auth != ''">
-			AND `auth` = #{auth}
+			AND ra.`auth` = #{auth}
 		</if>
 		UNION
-		SELECT auth_group authGroup,auth FROM `user_authority` WHERE user_id = #{userId}
+		SELECT 
+		`auth_group` AS authGroup,
+		`auth` 
+		FROM `user_authority` 
+		WHERE `user_uuid` = #{userUuid}
 		<if test="auth != null and auth != ''">
 			AND `auth` = #{auth}
 		</if>
 	</select>
 
-	<select id="searchUserRoleAuthByUserId" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo" useCache="false">
+	<select id="searchUserRoleAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo" useCache="false">
 		SELECT
-		a.`role_name` as `roleName`,
+		a.`role_uuid` as `roleUuid`,
 		a.`auth_group` as `authGroup`,
 		a.`auth`
 		FROM `role_authority` a
-		LEFT JOIN `user_role` b ON a.`role_name` = b.`role_name`
-		WHERE b.`user_id` = #{userId}
+		LEFT JOIN `user_role` b ON a.`role_uuid` = b.`role_uuid`
+		WHERE b.`user_uuid` = #{userUuid}
 	</select>
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int" useCache="false">
 		SELECT
-		count(DISTINCT (a.`user_id`))
-		FROM
-		`user` a
-		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `user_authority` c ON a.`user_id` = c.`user_id`
-		LEFT JOIN `user_role` d ON a.`user_id` = d.`user_id`
+		count(DISTINCT (a.`uuid`))
+		FROM `user` a
+		LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+		LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
+		LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
 		WHERE
 		1=1
 		<if test="keyword !=null and keyword != ''">
@@ -227,17 +235,18 @@
 			AND c.`auth` = #{auth}
 		</if>
 
-		<if test="roleName != null and roleName != ''">
-			AND d.`role_name` = #{roleName}
+		<if test="roleUuid != null and roleUuid != ''">
+			AND d.`role_uuid` = #{roleUuid}
 		</if>
 	</select>
 
 	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">
-		SELECT id FROM `user_password` WHERE user_id = #{userId} ORDER BY id DESC LIMIT 2
+		SELECT `id` FROM `user_password` WHERE `user_uuid` = #{userUuid} ORDER BY id DESC LIMIT 2
 	</select>
 
 	<select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
+		a.`uuid`,
 		a.`user_id` as `userId`,
 		a.`user_name` as `userName`,
 		a.`email`,
@@ -245,26 +254,28 @@
 		d.`password`,
 		a.`is_active` as `isActive`
 		FROM `user` a
-		LEFT JOIN `user_team` b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
-		LEFT JOIN `user_password` d ON a.`user_id` = d.`user_id` AND d.`is_active` = 1
-		WHERE c.`uuid` = #{teamId} AND a.`is_active` = 1
+		JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+		JOIN `team` c ON b.`team_uuid` = c.`uuid` AND c.`uuid` = #{teamUuid}
+		JOIN `user_password` d ON a.`uuid` = d.`user_uuid` AND d.`is_active` = 1
+		WHERE a.`is_active` = 1
 	</select>
 
-	<select id="getActiveUserByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	<select id="getActiveUserByRoleUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 	SELECT 
+	  `uuid`,
 	  `user_id` AS userId,
 	  `user_name` AS userName, 
 	  `email`,
 	  `phone`,
 	  `is_active` AS isActive
 	FROM `user` u
-	JOIN user_role ur ON ur.`user_id` = u.`user_id` AND ur.`role_name` = #{roleName}
+	JOIN user_role ur ON ur.`user_uuid` = u.`uuid` AND ur.`role_uuid` = #{roleUuid}
 	WHERE u.`is_active` = 1
 	</select>
 	
 	<resultMap id="userRoleMap" type="codedriver.framework.dto.UserVo">
-		<id property="userId" column="userId" />
+		<id property="uuid" column="uuid" />
+		<result property="userId" column="userId" />
 		<result property="userName" column="userName" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone"/>
@@ -272,13 +283,14 @@
 		<result property="password" column="password" />
 		<result property="isActive" column="isActive" />
 		<result property="userInfo" column="userInfo"/>
-		<collection property="roleNameList" ofType="java.lang.String">
-			<result column="roleName" />
+		<collection property="roleUuidList" ofType="java.lang.String">
+			<result column="roleUuid" />
 		</collection>
 	</resultMap>
 
 	<select id="getUserByUserIdAndPassword" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap" useCache="false">
-		SELECT
+		SELECT	
+		a.`uuid`,
 		a.`user_id` AS userId,
 		a.`user_name` AS userName,
 		a.`email`,
@@ -287,29 +299,27 @@
 		a.`user_info` as `userInfo`,
 		c.`password`,
 		a.`is_active` AS isActive,
-		b.`role_name` AS roleName
-		FROM
-		`user` a
-		LEFT JOIN user_role b ON a.`user_id` = b.`user_id`
-		LEFT JOIN `user_password` c ON a.`user_id` = c.`user_id` AND c.`is_active` = 1
+		b.`role_uuid` AS roleUuid
+		FROM `user` a
+		LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
+		JOIN `user_password` c ON a.`uuid` = c.`user_uuid` AND c.`is_active` = 1
 		WHERE a.user_id = #{userId} AND c.password = #{password}  AND a.`is_active` = 1
 	</select>
 
-	<select id="getUserSessionByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
-		SELECT `user_id` as userId,`visit_time` as sessionTime FROM `user_session`
-		WHERE `user_id` = #{value}
+	<select id="getUserSessionByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
+		SELECT `user_uuid` as userUuid,`visit_time` as sessionTime FROM `user_session` WHERE `user_uuid` = #{value}
 	</select>
 
-	<select id="getUserByUserIdList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	<select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
+		`uuid`,
 		`user_id` AS userId,
 		`user_name` AS userName,
 		`email`,
 		`phone`,
 		`is_active` AS isActive
-		FROM
-		`user`
-		Where `user_id` in
+		FROM `user`
+		Where `uuid` in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>
@@ -317,33 +327,33 @@
 	</select>
 
 	<select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo" useCache="false">
-		SELECT f.`auth` as `name`,
+		SELECT 
+		f.`auth` as `name`,
 		COUNT(DISTINCT (f.`userId`)) as `userCount`
 		FROM (
 			SELECT
 			b.`user_id` as `userId`,
 			a.`auth`
 			FROM `user_authority` a
-			LEFT JOIN `user` b ON a.`user_id` = b.`user_id`
+			LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
 			UNION
 			SELECT
 			e.`user_id` as `userId`,
 			c.`auth`
 			FROM `role_authority` c
-			LEFT JOIN `user_role` d ON c.`role_name` = d.`role_name`
-			LEFT JOIN `user` e ON d.`user_id` = e.`user_id`
+			LEFT JOIN `user_role` d ON c.`role_uuid` = d.`role_uuid`
+			LEFT JOIN `user` e ON d.`user_uuid` = e.`uuid`
 		) f
 		GROUP BY f.`auth`
 	</select>
 	
-	<select id="getUserProfileByUserIdAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo" useCache="false">
+	<select id="getUserProfileByUserUuidAndModuleId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserProfileVo" useCache="false">
 		SELECT 
-		  `user_id` as userId,
+		  `user_uuid` as userUuid,
 		  `module_id` as moduleId,
 		  `config` 
-		FROM
-		  `user_profile` 
-		where `user_id` = #{userId}
+		FROM `user_profile` 
+		where `user_uuid` = #{userUuid}
 		<if test="moduleId !=null and moduleId !=''">
 			and `module_id` = #{moduleId}
 		</if>
@@ -351,12 +361,12 @@
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(
-        `user_id`,
+        `user_uuid`,
         `auth_group`,
         `auth`
         ) VALUES
         (
-         #{userId},
+         #{userUuid},
          #{authGroup},
          #{auth}
         )
@@ -364,6 +374,7 @@
 
 	<insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user` (
+		`uuid`,
 		`user_id`,
 		`user_name`,
 		`email`,
@@ -374,6 +385,7 @@
 		)
 		VALUES
 		(
+		#{uuid},
 		#{userId},
 		#{userName},
 		#{email},
@@ -386,12 +398,14 @@
 
 	<insert id="insertUserPassword" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user_password` (
+			`user_uuid`,
 			`user_id`,
 			`password`,
 			`create_time`,
 			`is_active`
 		) VALUES
 		(
+		#{uuid},
 		#{userId},
 		#{password},
 		NOW(),
@@ -400,33 +414,30 @@
 	</insert>
 
 	<insert id="insertUserTeam">
-		INSERT INTO `user_team` (`team_uuid`, `user_id`)
-		VALUES
-		(#{teamUuid}, #{userId})
+		INSERT INTO `user_team` (`team_uuid`, `user_uuid`)
+		VALUES (#{teamUuid}, #{userUuid})
 	</insert>
 
 	<insert id="insertUserRole">
-		INSERT INTO `user_role` (`user_id`, `role_name`)
-		VALUES
-		(#{userId}, #{roleName})
+		INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
+		VALUES (#{userUuid}, #{roleUuid})
 	</insert>
 
 	<insert id="insertUserSession" parameterType="java.lang.String">
-		INSERT INTO `user_session` (`user_id`, `visit_time`)
+		INSERT INTO `user_session` (`user_uuid`, `visit_time`)
 		VALUES
-		(#{userId}, now()) ;
+		(#{userUuid}, now()) ;
 	</insert>
 	
 	<insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo" >
-		INSERT INTO `user_profile` (`user_id`, `module_id`, `config`) 
-		VALUES
-		  (#{userId}, #{moduleId}, #{config}) ;
+		INSERT INTO `user_profile` (`user_uuid`, `module_id`, `config`) 
+		VALUES (#{userUuid}, #{moduleId}, #{config})
 	</insert>
 
 	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
-		UPDATE
-		`user`
+		UPDATE `user`
 		SET
+		`user_id` = #{userId},
 		`user_name` = #{userName, typeHandler=XssHandler},
 		`email` = #{email},
 		`phone` = #{phone},
@@ -435,7 +446,7 @@
 		`is_active` = #{isActive},
 		</if>
 		`user_info` = #{userInfo, typeHandler=XssHandler}
-		WHERE `user_id` = #{userId}
+		WHERE `uuid` = #{uuid}
 	</update>
 
 	<update id="updateUserPasswordActive" parameterType="java.lang.String">
@@ -443,24 +454,23 @@
 		`user_password`
 		SET
 		`is_active` = 0
-		WHERE `user_id` = #{userId}
+		WHERE `user_uuid` = #{userUuid}
 	</update>
 
 	<update id="updateUserActive" parameterType="codedriver.framework.dto.UserVo">
-		UPDATE
-		`user`
-		SET
-		`is_active` = #{isActive}
-		WHERE `user_id` = #{userId}
+		UPDATE `user`
+		SET `is_active` = #{isActive}
+		WHERE `uuid` = #{uuid}
 	</update>
 
 	<update id="updateUserSession" parameterType="java.lang.String">
-		UPDATE `user_session` set `visit_time` = now() WHERE `user_id` = #{userId}
+		UPDATE `user_session` set `visit_time` = now() WHERE `user_uuid` = #{userUuid}
 	</update>
 	
-	<update id="updateUserProfileByUserIdAndModuleId" parameterType="java.lang.String">
-		UPDATE `user_profile` set `config` = #{config} 
-		where `user_id` = #{userId}
+	<update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">
+		UPDATE `user_profile` 
+		set `config` = #{config} 
+		where `user_uuid` = #{userUuid}
 		<if test="moduleId !=null and moduleId !=''">
 			and `module_id` = #{moduleId}
 		</if>
@@ -468,32 +478,25 @@
 
 	<delete id="deleteUserPasswordByLimit">
 		DELETE FROM `user_password`
-		WHERE `user_id` = #{userId}
+		WHERE `user_uuid` = #{userUuid}
 		AND `id` NOT IN
 		<foreach collection="idList" item="id" open="(" close=")" separator=",">
 			#{id}
 		</foreach>
 	</delete>
 
-	<delete id="deleteUserByUserId" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`user`
-		WHERE `user_id` = #{value}
+	<delete id="deleteUserByUuid" parameterType="java.lang.String">
+		DELETE FROM `user` WHERE `uuid` = #{value}
 	</delete>
 
-    <delete id="deleteUserAuthByUserId" parameterType="java.lang.String">
-        DELETE
-        FROM
-        `user_authority` WHERE `user_id` = #{userId}
+    <delete id="deleteUserAuthByUserUuid" parameterType="java.lang.String">
+        DELETE FROM `user_authority` WHERE `user_uuid` = #{userUuid}
     </delete>
 
 	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
-		DELETE
-		FROM
-		`user_authority`
-		WHERE `user_id` = #{userId}
-		<if test="userAuthList != null and userAuthList.size > 0">
+		DELETE FROM `user_authority`
+		WHERE `user_uuid` = #{uuid}
+		<if test="userAuthList != null and userAuthList.size() > 0">
 			AND `auth` IN
 			<foreach collection="userAuthList" open="(" separator="," close=")" item="userAuth">
 				#{userAuth.auth}
@@ -501,30 +504,25 @@
 		</if>
 	</delete>
 
-	<delete id="deleteUserSessionByUserId" parameterType="java.lang.String">
-		DELETE FROM `user_session` where `user_id` = #{value}
+	<delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
+		DELETE FROM `user_session` where `user_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserRoleByUserId" parameterType="java.lang.String">
-		DELETE FROM `user_role` where `user_id` = #{value}
+	<delete id="deleteUserRoleByUserUuid" parameterType="java.lang.String">
+		DELETE FROM `user_role` where `user_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserTeamByUserId" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`user_team`
-		WHERE `user_id` = #{value}
+	<delete id="deleteUserTeamByUserUuid" parameterType="java.lang.String">
+		DELETE FROM `user_team` WHERE `user_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteUserAuthByAuth" parameterType="string">
 		DELETE FROM `user_authority` WHERE `auth` = #{auth}
 	</delete>
 	
-	<delete id="deleteUserProfileByUserIdAndModuleId" parameterType="String">
-		DELETE 
-		FROM
-		  `user_profile` 
-		where `user_id` = #{userId}
+	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="String">
+		DELETE  FROM `user_profile` 
+		where `user_uuid` = #{userUuid}
 		<if test="moduleId !=null and moduleId !=''">
 			and `module_id` = #{moduleId}
 		</if>

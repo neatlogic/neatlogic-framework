@@ -2,16 +2,16 @@ package codedriver.framework.dashboard.dto;
 
 public class DashboardVisitCounterVo {
 	private String dashboardUuid;
-	private String userId;
+	private String userUuid;
 	private Integer visitCount = 1;
 
 	public DashboardVisitCounterVo() {
 
 	}
 
-	public DashboardVisitCounterVo(String _dashboardUuid, String _userId) {
+	public DashboardVisitCounterVo(String _dashboardUuid, String _userUuid) {
 		dashboardUuid = _dashboardUuid;
-		userId = _userId;
+		userUuid = _userUuid;
 	}
 
 	public String getDashboardUuid() {
@@ -22,12 +22,12 @@ public class DashboardVisitCounterVo {
 		this.dashboardUuid = dashboardUuid;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public Integer getVisitCount() {

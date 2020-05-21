@@ -10,7 +10,7 @@ import codedriver.framework.dashboard.dto.DashboardWidgetVo;
 import codedriver.framework.dto.AuthorityVo;
 
 public interface DashboardMapper {
-	public List<DashboardDefaultVo> getDefaultDashboardUuidByUserId(String userId);
+	public List<DashboardDefaultVo> getDefaultDashboardUuidByUserUuid(String userUuid);
 
 	public int searchDashboardCount(DashboardVo dashboardVo);
 
@@ -28,7 +28,7 @@ public interface DashboardMapper {
 	
 	public DashboardVo getAuthorizedDashboardByUuid(DashboardVo dashboardVo);
 
-	public DashboardVisitCounterVo getDashboardVisitCounter(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId);
+	public DashboardVisitCounterVo getDashboardVisitCounter(@Param("dashboardUuid") String dashboardUuid, @Param("userUuid") String userUuid);
 
 	public List<DashboardWidgetVo> getDashboardWidgetByDashboardUuid(String dashboardUuid);
 	
@@ -42,7 +42,7 @@ public interface DashboardMapper {
 	
 	public int insertDashboardWidget(DashboardWidgetVo dashboardWidgetVo);
 
-	public int insertDashboardDefault(@Param("dashboardUuid") String dashboardUuid, @Param("userId") String userId, @Param("type") String type);
+	public int insertDashboardDefault(@Param("dashboardUuid") String dashboardUuid, @Param("userUuid") String userUuid, @Param("type") String type);
 
 	public int insertDashboardVisitCounter(DashboardVisitCounterVo dashboardVisitCounterVo);
 
@@ -56,7 +56,7 @@ public interface DashboardMapper {
 
 	public int deleteDashboardVisitCounterByDashboardUuid(String dashboardUuid);
 
-	public int deleteDashboardDefaultByUserId(@Param("userId")String userId,@Param("type")String type);
+	public int deleteDashboardDefaultByUserUuid(@Param("userUuid") String userUuid, @Param("type") String type);
 
 	public int deleteDashboardWidgetByUuid(@Param("dashboardUuid")String dashboardUuid,@Param("uuid")String uuid);
 }

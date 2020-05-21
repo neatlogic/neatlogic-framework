@@ -21,10 +21,10 @@ public class AuthActionChecker {
 	public static Boolean check(String action) {
 		UserContext userContext = UserContext.get();
 		if (userContext != null) {
-			List<String> roleNameList = authGroupMapper.getRoleNameListByAuthGroupName(action);
-			if (roleNameList != null && roleNameList.size() > 0) {
-				for (String roleName : roleNameList) {
-					if (null != userContext.getRoleNameList()&&userContext.getRoleNameList().contains(roleName)) {
+			List<String> roleUuidList = authGroupMapper.getRoleUuidListByAuthGroupName(action);
+			if (roleUuidList != null && roleUuidList.size() > 0) {
+				for (String roleUuid : roleUuidList) {
+					if (null != userContext.getRoleUuidList() && userContext.getRoleUuidList().contains(roleUuid)) {
 						return true;
 					}
 				}

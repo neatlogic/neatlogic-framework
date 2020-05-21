@@ -9,8 +9,8 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class UserAuthVo extends BasePageVo {
-    @EntityField(name = "用户ID", type = ApiParamType.STRING)
-    private String userId;
+    @EntityField(name = "用户Uuid", type = ApiParamType.STRING)
+    private String userUuid;
     @EntityField(name = "权限", type = ApiParamType.STRING)
     private String auth;
     @EntityField(name = "权限组", type = ApiParamType.STRING)
@@ -23,21 +23,21 @@ public class UserAuthVo extends BasePageVo {
 		
 	}
     
-    public UserAuthVo(String _userId) {
-		this.userId = _userId;
+    public UserAuthVo(String _userUuid) {
+		this.userUuid = _userUuid;
    	}
     
-    public UserAuthVo(String _userId,String _auth) {
-		this.userId = _userId;
+    public UserAuthVo(String _userUuid,String _auth) {
+		this.userUuid = _userUuid;
 		this.auth = _auth;
    	}
 
-	public String getUserId() {
-        return userId;
+	public String getUserUuid() {
+        return userUuid;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     public String getAuth() {

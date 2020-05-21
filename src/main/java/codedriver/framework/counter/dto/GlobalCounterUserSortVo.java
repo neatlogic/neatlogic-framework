@@ -8,7 +8,7 @@ package codedriver.framework.counter.dto;
 public class GlobalCounterUserSortVo {
 
     private String pluginId;
-    private String userId;
+    private String userUuid;
     private Integer sort;
 
     public String getPluginId() {
@@ -19,12 +19,12 @@ public class GlobalCounterUserSortVo {
         this.pluginId = pluginId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserUuid() {
+        return userUuid;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     public Integer getSort() {

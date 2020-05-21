@@ -63,7 +63,7 @@
 		ORDER BY `parentUuid`, `sort`
 	</select> -->
 
-	<select id="getTeamSortAfterTeamList" resultType="codedriver.framework.dto.TeamVo">
+	<!-- <select id="getTeamSortAfterTeamList" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -74,9 +74,9 @@
 		FROM `team` 
 		WHERE `sort` &gt;= #{sort} 
 		AND `parent_uuid` = #{parentUuid}
-	</select>
+	</select> -->
 	
-	<select id="getTeamSortUpTeamList" resultType="codedriver.framework.dto.TeamVo">
+	<!-- <select id="getTeamSortUpTeamList" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -88,9 +88,9 @@
 		WHERE `sort` &lt; #{sort} 
 		AND `sort` >= #{targetSort} 
 		AND `parent_uuid` = #{parentUuid}
-	</select>
+	</select> -->
 	
-	<select id="getTeamSortDownTeamList" resultType="codedriver.framework.dto.TeamVo">
+	<!-- <select id="getTeamSortDownTeamList" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -102,7 +102,7 @@
 		WHERE `sort` &lt;= #{targetSort} 
 		AND `sort` > #{sort} 
 		AND `parent_uuid` = #{parentUuid}
-	</select>
+	</select> -->
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
 		SELECT
@@ -300,24 +300,48 @@
 		WHERE `uuid` = #{uuid}
 	</update>
 
-	<update id="updateTeamSortAdd" parameterType="String">
+<!-- 	<update id="updateTeamSortAdd" parameterType="String">
 		UPDATE `team` SET `sort` = `sort` + 1 WHERE `uuid` = #{teamUuid}
-	</update>
+	</update> -->
 	
-	<update id="updateTeamSortDec" parameterType="String">
+<!-- 	<update id="updateTeamSortDec" parameterType="String">
 		UPDATE `team` SET `sort` = `sort` - 1 WHERE `uuid` = #{teamUuid}
-	</update>
+	</update> -->
 
 	<update id="updateTeamLeftRightCode">
 	UPDATE `team` SET `lft` = #{lft}, `rht` = #{rht} WHERE `uuid` = #{uuid}
 	</update>
 	
 	<update id="batchUpdateTeamLeftCode">
-	update `team` set `lft` = `lft` + #{step} WHERE `lft` >= #{minCode}
+	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` >= #{minCode}
 	</update>
 	
 	<update id="batchUpdateTeamRightCode">
-	update `team` set `rht` = `rht` + #{step} WHERE `rht` >= #{minCode}
+	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` >= #{minCode}
+	</update>
+	
+	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
+	UPDATE `team` SET `lft` = #{lft} + #{step}, `rht` = #{rht} + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
+	</update>
+	
+	<update id="updateSortIncrement">
+	UPDATE `catalog` 
+	SET `sort` = `sort` + 1 
+	WHERE `parent_uuid` = #{parentUuid} 
+	AND `sort` &gt;= #{fromSort} 
+	<if test="toSort != null">
+	AND `sort` &lt;= #{toSort}
+	</if>
+	</update>
+
+	<update id="updateSortDecrement">
+	UPDATE `catalog` 
+	SET `sort` = `sort` - 1 
+	WHERE `parent_uuid` = #{parentUuid} 
+	AND `sort` &gt;= #{fromSort} 
+	<if test="toSort != null">
+	AND `sort` &lt;= #{toSort}
+	</if>
 	</update>
 	
 	<delete id="deleteTeamByUuid" parameterType="java.lang.String">

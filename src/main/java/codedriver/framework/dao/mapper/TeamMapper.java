@@ -20,11 +20,11 @@ public interface TeamMapper {
 
 //	public List<TeamVo> getTeamTree();
 
-	public List<TeamVo> getTeamSortAfterTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
+//	public List<TeamVo> getTeamSortAfterTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
 	
-	public List<TeamVo> getTeamSortUpTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
+//	public List<TeamVo> getTeamSortUpTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
 	
-	public List<TeamVo> getTeamSortDownTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
+//	public List<TeamVo> getTeamSortDownTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort, @Param("targetSort") int targetSort);
 
 	public int searchTeamCount(TeamVo teamVo);
 
@@ -62,13 +62,19 @@ public interface TeamMapper {
 
 	public int updateTeamSortAndParentUuid(TeamVo teamVo);
 
-	public int updateTeamSortAdd(String teamUuid);
-
-	public int updateTeamSortDec(String teamUuid);
+//	public int updateTeamSortAdd(String teamUuid);
+//
+//	public int updateTeamSortDec(String teamUuid);
 
 	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 
 	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
 	
 	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
+
+	public int updateSortIncrement(@Param("parentUuid")String parentUuid, @Param("fromSort")Integer fromSort, @Param("toSort")Integer toSort);
+
+	public int updateSortDecrement(@Param("parentUuid")String parentUuid, @Param("fromSort")Integer fromSort, @Param("toSort")Integer toSort);
+
+	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 }

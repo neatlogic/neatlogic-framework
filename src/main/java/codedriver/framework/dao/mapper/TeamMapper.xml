@@ -48,62 +48,6 @@
  		ORDER BY a.`sort` 
 	</select>
 
-<!-- 	<select id = "getTeamTree" resultMap="teamMap">
-		SELECT
-		a.`uuid`,
-		a.`name`,
-		a.`sort`,
-		a.`parent_uuid` as `parentUuid`,
-		c.`id` as `tagId`,
-		c.`name` as `tagName`,
-		(select count(DISTINCT(user_uuid)) FROM `user_team` ut where ut.`team_uuid` = a.`uuid`) as `userCount`
-		FROM `team` a
-		LEFT JOIN `team_tag` b ON a.`uuid` = b.`team_uuid`
-		LEFT JOIN `tag` c ON b.`tag_id` = c.`id`
-		ORDER BY `parentUuid`, `sort`
-	</select> -->
-
-	<!-- <select id="getTeamSortAfterTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`,
-		a.`lft`,
-		a.`rht`
-		FROM `team` 
-		WHERE `sort` &gt;= #{sort} 
-		AND `parent_uuid` = #{parentUuid}
-	</select> -->
-	
-	<!-- <select id="getTeamSortUpTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`,
-		a.`lft`,
-		a.`rht`
-		FROM `team` 
-		WHERE `sort` &lt; #{sort} 
-		AND `sort` >= #{targetSort} 
-		AND `parent_uuid` = #{parentUuid}
-	</select> -->
-	
-	<!-- <select id="getTeamSortDownTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`,
-		a.`lft`,
-		a.`rht`
-		FROM `team` 
-		WHERE `sort` &lt;= #{targetSort} 
-		AND `sort` > #{sort} 
-		AND `parent_uuid` = #{parentUuid}
-	</select> -->
-
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
 		SELECT
 		COUNT(1)
@@ -277,15 +221,6 @@
 		)
 	</insert>
 
-<!-- 	<update id="updateTeamByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team`
-		SET
-		`name` = #{name},
-		`sort` = #{sort},
-		`parent_uuid` = #{parentUuid}
-		WHERE `uuid` = #{uuid}
-	</update> -->
-
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
 		UPDATE `team`
 		SET
@@ -300,14 +235,6 @@
 		`parent_uuid` = #{parentUuid}
 		WHERE `uuid` = #{uuid}
 	</update>
-
-<!-- 	<update id="updateTeamSortAdd" parameterType="String">
-		UPDATE `team` SET `sort` = `sort` + 1 WHERE `uuid` = #{teamUuid}
-	</update> -->
-	
-<!-- 	<update id="updateTeamSortDec" parameterType="String">
-		UPDATE `team` SET `sort` = `sort` - 1 WHERE `uuid` = #{teamUuid}
-	</update> -->
 
 	<update id="updateTeamLeftRightCode">
 	UPDATE `team` SET `lft` = #{lft}, `rht` = #{rht} WHERE `uuid` = #{uuid}

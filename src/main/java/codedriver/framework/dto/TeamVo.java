@@ -11,7 +11,8 @@ import codedriver.framework.restful.annotation.EntityField;
 
 public class TeamVo extends BasePageVo {
 	
-	public static final String DEFAULT_PARENTUUID = "0";
+	public static final String ROOT_PARENTUUID = "-1";
+	public static final String ROOT_UUID = "0";
 	
 	private transient String keyword;
 	private transient Boolean isAutoGenerateUuid = true;
@@ -138,6 +139,22 @@ public class TeamVo extends BasePageVo {
 
 	public void setTagId(Long tagId) {
 		this.tagId = tagId;
+	}
+
+	public Integer getLft() {
+		return lft;
+	}
+
+	public void setLft(Integer lft) {
+		this.lft = lft;
+	}
+
+	public Integer getRht() {
+		return rht;
+	}
+
+	public void setRht(Integer rht) {
+		this.rht = rht;
 	}
 
 }

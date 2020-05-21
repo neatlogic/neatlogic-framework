@@ -18,7 +18,7 @@ public interface TeamMapper {
 
 	public List<TeamVo> searchTeam(TeamVo teamVo);
 
-	public List<TeamVo> getTeamTree();
+//	public List<TeamVo> getTeamTree();
 
 	public List<TeamVo> getTeamSortAfterTeamList(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
 	
@@ -34,6 +34,12 @@ public interface TeamMapper {
 
 	public List<String> getTeamUuidListByUserUuid(String userUuid);
 
+	public String getTeamLockByUuid(String uuid);
+
+	public TeamVo getTeamByParentUuidAndSort(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
+
+	public int getTeamCountByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
 	public int deleteTeamByUuid(String uuid);
 
 	public int deleteTeamTagByUuid(String uuid);
@@ -42,19 +48,27 @@ public interface TeamMapper {
 
 	public int deleteUserTeamRoleByTeamUuid(String uuid);
 
+	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
 	public  int insertTeam(TeamVo teamVo);
 
 	public int insertTeamUser(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid);
 
 	public int insertTeamTag(TeamVo teamVo);
 
-	public void updateTeamByUuid(TeamVo teamVo);
+//	public int updateTeamByUuid(TeamVo teamVo);
 
-	public void updateTeamNameByUuid(TeamVo teamVo);
+	public int updateTeamNameByUuid(TeamVo teamVo);
 
-	public void updateTeamSortAndParentUuid(TeamVo teamVo);
+	public int updateTeamSortAndParentUuid(TeamVo teamVo);
 
-	public void updateTeamSortAdd(String teamUuid);
+	public int updateTeamSortAdd(String teamUuid);
 
-	public void updateTeamSortDec(String teamUuid);
+	public int updateTeamSortDec(String teamUuid);
+
+	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
+
+	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
+	
+	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 }

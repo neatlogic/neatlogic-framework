@@ -102,8 +102,12 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         String param = messageVo.getReminderSubscribeVo().getParam();
         boolean hasParam = param != null && !("").equals(param);
         //弹窗类型
-        String popUpValue = JSONObject.parseObject(param).getString("popUp");
-        returnObj.put("popUp", hasParam? popUpValue : "close");
+        String popUpValue = "close";
+        JSONObject paramJson = JSONObject.parseObject(param);
+        if(hasParam&&paramJson!=null) {
+        	popUpValue = paramJson.getString("popUp");
+        }
+        returnObj.put("popUp", popUpValue);
         //是否为新消息（新消息会触发一系列动作）
         returnObj.put("isNew", messageVo.getIsNew());
         if (messageVo.getIsNew() == 1){

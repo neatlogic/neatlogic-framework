@@ -38,7 +38,7 @@ public interface TeamMapper {
 
 	public TeamVo getTeamByParentUuidAndSort(@Param("parentUuid") String parentUuid, @Param("sort") int sort);
 
-	public int getTeamCountByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+	public int checkTeamIsExistsByLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 
 	public int deleteTeamByUuid(String uuid);
 

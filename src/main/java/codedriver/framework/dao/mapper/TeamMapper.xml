@@ -180,6 +180,7 @@
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{value}
+		ORDER BY `SORT` ASC
 	</select>
 
 	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
@@ -199,8 +200,8 @@
 		`name`,
 		`sort`,
 		`parent_uuid`,
-		a.`lft`,
-		a.`rht`
+		`lft`,
+		`rht`
 		FROM
 		`team`
 		WHERE `uuid` in
@@ -234,9 +235,9 @@
 		AND a.`sort` = #{sort}
 	</select>
 	
-	<insert id="getTeamCountByLeftRightCode">
-	SELECT COUNT(1) FROM `team` WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
-	</insert>
+	<select id="checkTeamIsExistsByLeftRightCode" resultType="int">
+	SELECT COUNT(1) FROM `team` WHERE `uuid` = #{uuid} AND `lft` &gt; #{lft} AND `rht` &lt; #{rht}
+	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
@@ -321,11 +322,11 @@
 	</update>
 	
 	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
-	UPDATE `team` SET `lft` = #{lft} + #{step}, `rht` = #{rht} + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
+	UPDATE `team` SET `lft` = `lft` + #{step}, `rht` = `rht` + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
 	</update>
 	
 	<update id="updateSortIncrement">
-	UPDATE `catalog` 
+	UPDATE `team` 
 	SET `sort` = `sort` + 1 
 	WHERE `parent_uuid` = #{parentUuid} 
 	AND `sort` &gt;= #{fromSort} 
@@ -335,7 +336,7 @@
 	</update>
 
 	<update id="updateSortDecrement">
-	UPDATE `catalog` 
+	UPDATE `team` 
 	SET `sort` = `sort` - 1 
 	WHERE `parent_uuid` = #{parentUuid} 
 	AND `sort` &gt;= #{fromSort} 

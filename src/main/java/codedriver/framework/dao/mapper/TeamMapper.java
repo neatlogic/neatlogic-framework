@@ -32,13 +32,9 @@ public interface TeamMapper {
 
 	public int checkTeamIsExistsByLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 
-	public int deleteTeamByUuid(String uuid);
-
 	public int deleteTeamTagByUuid(String uuid);
 
 	public int deleteUserTeamByTeamUuid(String uuid);
-
-	public int deleteUserTeamRoleByTeamUuid(String uuid);
 
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
@@ -50,17 +46,13 @@ public interface TeamMapper {
 
 	public int updateTeamNameByUuid(TeamVo teamVo);
 
-	public int updateTeamSortAndParentUuid(TeamVo teamVo);
+	public int updateTeamParentUuidByUuid(TeamVo teamVo);
 
 	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 
 	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
 	
 	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
-
-	public int updateSortIncrement(@Param("parentUuid")String parentUuid, @Param("fromSort")Integer fromSort, @Param("toSort")Integer toSort);
-
-	public int updateSortDecrement(@Param("parentUuid")String parentUuid, @Param("fromSort")Integer fromSort, @Param("toSort")Integer toSort);
 
 	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 }

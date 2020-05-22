@@ -290,16 +290,40 @@ public class ApiValidateAndHelpBase {
 						Param[] params = input.value();
 						if (params != null && params.length > 0) {
 							for (Param p : params) {
-								JSONObject paramObj = new JSONObject();
-								paramObj.put("name", p.name());
-								paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
-								paramObj.put("isRequired", p.isRequired());
-								String description = p.desc();
-								if (StringUtils.isNotBlank(p.rule())) {
-									description = description + "，规则：" + p.rule();
+								if (!p.explode().getName().equals(NotDefined.class.getName())) {
+									String paramNamePrefix = p.name();
+									if (!p.explode().isArray()) {
+										paramNamePrefix = StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? "" : paramNamePrefix + ".";
+										for (Field field : p.explode().getDeclaredFields()) {
+											drawFieldMessageRecursive(field, inputList, true);
+										}
+									} else {
+										JSONObject paramObj = new JSONObject();
+										paramObj.put("name", p.name());
+										paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
+										paramObj.put("description", p.desc());
+										JSONArray elementObjList = new JSONArray();
+										for (Field field : p.explode().getComponentType().getDeclaredFields()) {
+											drawFieldMessageRecursive(field, elementObjList, true);
+										}
+										if (elementObjList.size() > 0) {
+											paramObj.put("children", elementObjList);
+										}
+
+										inputList.add(paramObj);
+									}
+								} else {
+									JSONObject paramObj = new JSONObject();
+									paramObj.put("name", p.name());
+									paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
+									paramObj.put("isRequired", p.isRequired());
+									String description = p.desc();
+									if (StringUtils.isNotBlank(p.rule())) {
+										description = description + "，规则：" + p.rule();
+									}
+									paramObj.put("description", description);
+									inputList.add(paramObj);
 								}
-								paramObj.put("description", description);
-								inputList.add(paramObj);
 							}
 						}
 					} else if (anno.annotationType().equals(Output.class)) {

@@ -10,24 +10,24 @@ public interface GlobalCounterMapper {
 
     /** 
     * @Description: 获取用户订阅的消息统计插件集合
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: java.util.List<com.techsure.balantflow.dto.globalcounter.GlobalCounterVo>  
     */ 
-    List<GlobalCounterVo> getSubscribeCounterListByUserId(String userId);
+    List<GlobalCounterVo> getSubscribeCounterListByUserUuid(String userUuid);
 
     /**
     * @Description: 根据用户名获取counter排序
-    * @Param: [userId]
+    * @Param: [userUuid]
     * @return: java.util.List<codedriver.framework.counter.dto.GlobalCounterUserSortVo>
     */
-    List<GlobalCounterUserSortVo> getCounterSortListByUserId(String userId);
+    List<GlobalCounterUserSortVo> getCounterSortListByUserUuid(String userUuid);
 
     /**
     * @Description:  根据用户名获取订阅插件集合
-    * @Param: [userId]
+    * @Param: [userUuid]
     * @return: java.util.List<codedriver.framework.counter.dto.GlobalCounterSubscribeVo>
     */
-    List<GlobalCounterSubscribeVo> getCounterSubscribeByUserId(String userId);
+    List<GlobalCounterSubscribeVo> getCounterSubscribeByUserUuid(String userUuid);
 
     /** 
     * @Description: 取消消息统计插件订阅
@@ -38,10 +38,10 @@ public interface GlobalCounterMapper {
 
     /** 
     * @Description: 清空用户消息统计插件排序
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: void  
     */ 
-    void deleteCounterUserSortByUserId(String userId);
+    void deleteCounterUserSortByUserUuid(String userUuid);
 
 
     /** 

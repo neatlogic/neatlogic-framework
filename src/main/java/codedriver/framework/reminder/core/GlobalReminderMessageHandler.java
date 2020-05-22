@@ -105,22 +105,22 @@ public class GlobalReminderMessageHandler {
                 message.setParam(mess.getParamObj() == null ? "" : mess.getParamObj().toString());
                 reminderMessageMapper.insertReminderMessage(message);
                 reminderMessageMapper.insertReminderMessageContent(message);
-                List<String> userIdList = new ArrayList<>();
+                List<String> userUuidList = new ArrayList<>();
                 if (mess.getReceiveTeamList() != null && mess.getReceiveTeamList().size() > 0){
-                    userIdList = reminderMapper.getUserIdListByTeamIdList(mess.getReceiveTeamList());
+                	userUuidList = reminderMapper.getUserUuidListByTeamUuidList(mess.getReceiveTeamList());
                 }
                 if (mess.getReceiverList() != null && mess.getReceiverList().size() > 0){
-                    for (String userId : mess.getReceiverList()){
-                        if (!userIdList.contains(userId)){
-                            userIdList.add(userId);
+                    for (String userUuid : mess.getReceiverList()){
+                        if (!userUuidList.contains(userUuid)){
+                        	userUuidList.add(userUuid);
                         }
                     }
                 }
                 //获取订阅者名单
-                List<String> subUserIdList = reminderMapper.getSubscribeUserIdListByPluginId(message.getPluginId());
-                subUserIdList.retainAll(userIdList);
-                for (String userId : subUserIdList){
-                    reminderMessageMapper.insertReminderMessageUser(message.getId(), userId);
+                List<String> subUserUuidList = reminderMapper.getSubscribeUserUuidListByPluginId(message.getPluginId());
+                subUserUuidList.retainAll(userUuidList);
+                for (String userUuid : subUserUuidList){
+                    reminderMessageMapper.insertReminderMessageUser(message.getId(), userUuid);
                 }
 
             }catch (Exception ex){

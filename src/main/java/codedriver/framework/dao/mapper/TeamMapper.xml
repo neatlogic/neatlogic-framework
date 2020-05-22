@@ -5,7 +5,7 @@
 	<resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
 		<id property="uuid" column="uuid"/>
 		<result property="name" column="name"/>
-		<result property="sort" column="sort"/>
+		<!-- <result property="sort" column="sort"/> -->
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="userCount" column="userCount"/>
         <result property="childCount" column="childCount"/>
@@ -19,7 +19,7 @@
 		SELECT
 		a.`uuid`,
 		a.`name`,
-		a.`sort`,
+		a.`lft`,
 		a.`parent_uuid` as `parentUuid`,
 		d.`id` as `tagId`,
 		d.`name` as `tagName`,
@@ -37,7 +37,7 @@
             <if test="parentUuid != null and parentUuid != ''">
                 and `parent_uuid` = #{parentUuid}
             </if>
-            ORDER BY `sort`
+            ORDER BY `lft`
             <if test="needPage == true">
                 LIMIT #{startNum}, #{pageSize}
             </if>
@@ -45,49 +45,7 @@
 		LEFT JOIN `user_team` b ON a.`uuid` = b.`team_uuid`
 		LEFT JOIN `team_tag` c ON a.`uuid` = c.`team_uuid`
 		LEFT JOIN `tag` d ON c.`tag_id` = d.`id`
- 		ORDER BY a.`sort` 
-	</select>
-
-	<select id = "getTeamTree" resultMap="teamMap">
-		SELECT
-		a.`uuid`,
-		a.`name`,
-		a.`sort`,
-		a.`parent_uuid` as `parentUuid`,
-		c.`id` as `tagId`,
-		c.`name` as `tagName`,
-		(select count(DISTINCT(user_id)) FROM `user_team` ut where ut.`team_uuid` = a.`uuid`) as `userCount`
-		FROM `team` a
-		LEFT JOIN `team_tag` b ON a.`uuid` = b.`team_uuid`
-		LEFT JOIN `tag` c ON b.`tag_id` = c.`id`
-		ORDER BY `parentUuid`, `sort`
-	</select>
-
-	<select id="getTeamSortAfterTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`
-		FROM `team` WHERE `sort` &gt;= #{sort} AND `parent_uuid` = #{parentUuid}
-	</select>
-	
-	<select id="getTeamSortUpTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`
-		FROM `team` WHERE `sort` &lt; #{sort} AND `sort` >= #{targetSort} AND `parent_uuid` = #{parentUuid}
-	</select>
-	
-	<select id="getTeamSortDownTeamList" resultType="codedriver.framework.dto.TeamVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid` as `parentUuid`
-		FROM `team` WHERE `sort` &lt;= #{targetSort} AND `sort` > #{sort} AND `parent_uuid` = #{parentUuid}
+ 		ORDER BY a.`lft` 
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
@@ -109,7 +67,7 @@
 		SELECT
 		a.`uuid`,
 		a.`name`,
-		a.`sort`,
+		a.`lft`,
 		a.`parent_uuid` as `parentUuid`,
 		c.`id` as `tagId`,
 		c.`name` as `tagName`
@@ -131,81 +89,116 @@
 		SELECT
 		a.`uuid`,
 		a.`name`,
-		a.`sort`,
+		a.`lft`,
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
-		a.`parent_uuid` as `parentUuid`
+		a.`parent_uuid` as `parentUuid`,
+		a.`lft`,
+		a.`rht`
 		FROM
 		`team` a
 		WHERE `uuid` = #{uuid}
 	</select>
-
-	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
+	
+	<select id="checkTeamIsExists" parameterType="string" resultType="int">
+		SELECT COUNT(`uuid`) FROM `team` WHERE `uuid` = #{uuid}
+	</select>
+	
+	<resultMap id="childrenTeamMap" type="codedriver.framework.dto.TeamVo">
+		<id property="uuid" column="uuid"/>
+		<result property="name" column="name"/>
+		<result property="parentUuid" column="parentUuid"/>
+		<result property="lft" column="lft"/>
+		<result property="rht" column="rht"/>
+        <result property="childCount" column="childCount"/>
+	</resultMap>
+	
+	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultMap="childrenTeamMap">
 		SELECT
-		`uuid`,
-		`name`,
-		`sort`,
-		`parent_uuid`
-		FROM
-		`team`
-		WHERE
-		parent_uuid = #{value}
+		a.`uuid`,
+		a.`name`,
+		a.`parent_uuid` AS parentUuid,
+		a.`lft`,
+		a.`rht`,
+		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
+		FROM `team` a
+		WHERE a.`parent_uuid` = #{value}
+		ORDER BY `lft` ASC
 	</select>
 
 	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
-		SELECT MAX(`sort`) FROM `team` WHERE `parent_uuid` = #{parentUuid}
+		SELECT IFNULL(MAX(`sort`), 0) FROM `team` WHERE `parent_uuid` = #{parentUuid}
 	</select>
 
 	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM `user_team`
-		WHERE
-		`team_uuid` = #{value}
+		SELECT COUNT(1) FROM `user_team` WHERE `team_uuid` = #{value}
 	</select>
 	
 	<select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo">
 		SELECT
 		`uuid`,
 		`name`,
-		`sort`,
-		`parent_uuid`
-		FROM
-		`team`
+		`parent_uuid`,
+		`lft`,
+		`rht`
+		FROM `team`
 		WHERE `uuid` in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 		#{item}
 		</foreach>
 	</select>
 
-	<select id="getTeamUuidListByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
 	SELECT 
 	  ut.`team_uuid`
 	FROM `user_team` ut
 	JOIN team t ON t.`uuid`=ut.`team_uuid`
-	WHERE ut.`user_id`=#{userId};
+	WHERE ut.`user_uuid`=#{userUuid};
+	</select>
+	
+	<select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String">
+	SELECT `uuid` FROM `team` WHERE `uuid` = #{value} FOR UPDATE
+	</select>
+	
+	<select id="getTeamByParentUuidAndSort" resultType="codedriver.framework.dto.TeamVo">
+	SELECT
+		a.`uuid`,
+		a.`name`,
+		a.`parent_uuid` AS parentUuid,
+		a.`lft`,
+		a.`rht`
+		FROM `team` a
+		WHERE a.`parent_uuid` = #{parentUuid}
+		ORDER BY a.`lft` ASC
+		limit #{sort}, 1
+	</select>
+	
+	<select id="checkTeamIsExistsByLeftRightCode" resultType="int">
+	SELECT COUNT(1) FROM `team` WHERE `uuid` = #{uuid} AND `lft` &gt; #{lft} AND `rht` &lt; #{rht}
 	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
 		`uuid`,
 		`name`,
-		`sort`,
-		`parent_uuid`
+		`parent_uuid`,
+		`lft`,
+		`rht`
 		) VALUES (
 		#{uuid},
 		#{name},
-		#{sort},
-		#{parentUuid}
+		#{parentUuid},
+		#{lft},
+		#{rht}
 		)
 	</insert>
 	
 	<insert id="insertTeamUser">
 		INSERT INTO `user_team` (
 		`team_uuid`,
-		`user_id`
+		`user_uuid`
 		) VALUES (
 		#{teamUuid},
-		#{userId}
+		#{userUuid}
 		)
 	</insert>
 
@@ -219,64 +212,44 @@
 		)
 	</insert>
 
-	<update id="updateTeamByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team`
-		SET
-		`name` = #{name},
-		`sort` = #{sort},
-		`parent_uuid` = #{parentUuid}
-		WHERE `uuid` = #{uuid}
-	</update>
-
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE 	`team`
-		SET
-		`name` = #{name}
-		WHERE `uuid` = #{uuid}
+	UPDATE `team` SET `name` = #{name} WHERE `uuid` = #{uuid}
 	</update>
 
-	<update id="updateTeamSortAndParentUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team`
-		SET
-		`sort` = #{sort},
-		`parent_uuid` = #{parentUuid}
-		WHERE `uuid` = #{uuid}
+	<update id="updateTeamParentUuidByUuid" parameterType="codedriver.framework.dto.TeamVo">
+	UPDATE `team` SET `parent_uuid` = #{parentUuid} WHERE `uuid` = #{uuid}
 	</update>
 
-	<update id="updateTeamSortAdd" parameterType="String">
-		UPDATE `team` SET `sort` = `sort` + 1 WHERE `uuid` = #{teamUuid}
+	<update id="updateTeamLeftRightCode">
+	UPDATE `team` SET `lft` = #{lft}, `rht` = #{rht} WHERE `uuid` = #{uuid}
 	</update>
 	
-	<update id="updateTeamSortDec" parameterType="String">
-		UPDATE `team` SET `sort` = `sort` - 1 WHERE `uuid` = #{teamUuid}
+	<update id="batchUpdateTeamLeftCode">
+	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` >= #{minCode}
+	</update>
+	
+	<update id="batchUpdateTeamRightCode">
+	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` >= #{minCode}
+	</update>
+	
+	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
+	UPDATE `team` SET `lft` = `lft` + #{step}, `rht` = `rht` + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
 	</update>
 
-	<delete id="deleteTeamByUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`team`
-		WHERE `uuid` = #{value}
-	</delete>
-
 	<delete id="deleteTeamTagByUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`team_tag`
-		WHERE `team_uuid` = #{uuid}
-	</delete>
-
-	<delete id="deleteUserTeamRoleByTeamUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`user_team_role`
-		WHERE
-		`team_uuid` = #{value}
+		DELETE FROM `team_tag` WHERE `team_uuid` = #{uuid}
 	</delete>
 
 	<delete id="deleteUserTeamByTeamUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`user_team`
-		WHERE `team_uuid` = #{value}
+		DELETE FROM `user_team` WHERE `team_uuid` = #{value}
+	</delete>
+	
+	<delete id="deleteTeamByLeftRightCode">
+	DELETE a, b, c, d
+	FROM `team` a
+	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
+	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
+	LEFT JOIN `user_team_role` d ON d.`team_uuid` = a.`uuid`
+	WHERE a.`lft` &gt;= #{lft} AND b.`rht` &lt;= #{rht}
 	</delete>
 </mapper>

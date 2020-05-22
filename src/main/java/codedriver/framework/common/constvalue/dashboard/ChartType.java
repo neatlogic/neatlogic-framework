@@ -16,7 +16,8 @@ public enum ChartType {
 	PIECHART("piechart","饼图",Chart.PIECHART,true),
 	AREACHART("areachart","面积图",Chart.AREACHART,true),
 	LINECHART("linechart","曲线图",Chart.LINECHART,true),
-	TABLECHART("tablechart","表格",Chart.TABLECHART,true)
+	TABLECHART("tablechart","表格",Chart.TABLECHART,true),
+	NUMBERCHART("numberchart","值图",Chart.NUMBERCHART,true)
 	;
 
 	private String value;

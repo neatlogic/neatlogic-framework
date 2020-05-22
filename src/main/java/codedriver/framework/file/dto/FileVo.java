@@ -17,7 +17,7 @@ public class FileVo {
 	@EntityField(name = "附件大小（字节）", type = ApiParamType.INTEGER)
 	private Long size;
 	@EntityField(name = "上传用户", type = ApiParamType.STRING)
-	private String userId;
+	private String userUuid;
 	@EntityField(name = "上传时间", type = ApiParamType.STRING)
 	private String uploadTime;
 	@EntityField(name = "附件归属", type = ApiParamType.STRING)
@@ -62,12 +62,12 @@ public class FileVo {
 		this.size = size;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 
 	public String getUploadTime() {

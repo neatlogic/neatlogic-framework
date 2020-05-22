@@ -80,7 +80,7 @@
 	SELECT 
 	  `uuid`,
 	  `token`,
-	  `user_id` AS userId,
+	  `user_uuid` AS userUuid,
 	  `authtype`,
 	  `server_id` AS serverId,
 	  `ip`,
@@ -175,8 +175,8 @@
 	</insert>
 
 	<insert id="insertApiAudit">
-		INSERT INTO `api_audit`(`uuid`, `token`, `user_id`, `authtype`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
-		VALUES(#{uuid}, #{token}, #{userId}, #{authtype}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
+		INSERT INTO `api_audit`(`uuid`, `token`, `user_uuid`, `authtype`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
+		VALUES(#{uuid}, #{token}, #{userUuid}, #{authtype}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

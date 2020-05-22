@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.RoleMapper">
+	
+	<select id="checkRoleIsExists" parameterType="java.lang.String" resultType="int">
+	SELECT COUNT(`uuid`) FROM `role` WHERE `uuid` = #{uuid}
+	</select>
+	
 	<resultMap id="roleMap" type="codedriver.framework.dto.RoleVo">
-		<id column="name" property="name"/>
+		<id column="uuid" property="uuid"/>
+		<result column="name" property="name"/>
 		<result column="description" property="description"/>
 	</resultMap>
 
 	<select id="searchRole" parameterType="codedriver.framework.dto.RoleVo" resultMap = "roleMap">
 		SELECT
+		a.`uuid`,
 		a.`name`,
 		a.`description`,
-		COUNT(DISTINCT (b.`user_id`)) as userCount
+		COUNT(DISTINCT (b.`user_uuid`)) as userCount
 		FROM `role` a
-		LEFT JOIN `user_role` b ON a.`name` = b.`role_name`
-		LEFT JOIN `role_authority` c ON a.`name` = c.`role_name`
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`role_uuid`
+		LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
@@ -32,25 +39,24 @@
 		</if>
 	</select>
 
-	<select id = "searchRoleAuthByRoleName" parameterType = "String" resultType = "codedriver.framework.dto.RoleAuthVo">
+	<select id = "searchRoleAuthByRoleUuid" parameterType = "String" resultType = "codedriver.framework.dto.RoleAuthVo">
 		SELECT
-		`role_name` as `roleName`,
+		`role_uuid` as `roleUuid`,
 		`auth_group` as `authGroup`,
 		`auth`
 		FROM `role_authority`
-		WHERE `role_name` = #{roleName}
+		WHERE `role_uuid` = #{roleUuid}
 	</select>
 
 	<select id="searchRoleCount" parameterType="codedriver.framework.dto.RoleVo" resultType="int">
 		SELECT
-		COUNT(DISTINCT (a.`name`))
-		FROM
-		`role` a
-		LEFT JOIN `role_authority` b ON a.`name` = b.`role_name`
+		COUNT(DISTINCT (a.`uuid`))
+		FROM `role` a
+		LEFT JOIN `role_authority` b ON a.`uuid` = b.`role_uuid`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
-			AND (name LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+			AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 		<if test="authGroup != null and authGroup != ''">
 			AND b.`auth_group` = #{authGroup}
@@ -60,31 +66,30 @@
 		</if>
 	</select>
 
-	<select id="searchRoleUserCountByRoleName" parameterType="java.lang.String" resultType = "int">
+	<select id="searchRoleUserCountByRoleUuid" parameterType="java.lang.String" resultType = "int">
 		SELECT
 		COUNT(1)
 		FROM
 		`user_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</select>
 
-	<select id="getRoleByRoleName" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	<select id="getRoleByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
 		SELECT
+		`uuid`,
 		`name`,
 		`description`
-		FROM
-		`role`
-		WHERE
-		`name` = #{value}
+		FROM `role`
+		WHERE `uuid` = #{value}
 	</select>
 	
-	<select id="getRoleByRoleNameList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
+	<select id="getRoleByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo">
 	SELECT
+		`uuid`,
 		`name`,
 		`description`
-		FROM
-		`role`
-	WHERE `name` in 
+	FROM `role`
+	WHERE `uuid` in 
 	<foreach collection="list" item="item" separator="," open="(" close=")">
 	#{item}
 	</foreach>
@@ -93,62 +98,58 @@
 	<select id="getRoleCountByAuth"  resultType="codedriver.framework.dto.AuthVo">
 		SELECT
 		`auth` as `name`,
-		COUNT(DISTINCT(`role_name`)) as `roleCount`
+		COUNT(DISTINCT(`role_uuid`)) as `roleCount`
 		FROM `role_authority`
 		GROUP BY `auth`, `auth_group`
 	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
-		INSERT INTO `role` (`name`, `description`)
-		VALUES
-		(#{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
+		INSERT INTO `role` (`uuid`, `name`, `description`)
+		VALUES (#{uuid}, #{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
 	</insert>
 
 	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
-		INSERT INTO `user_role` (`user_id`, `role_name`)
+		INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
 		VALUES
-		(#{userId}, #{roleName})
+		(#{uuid}, #{roleUuid})
 	</insert>
 
 	<insert id="insertRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">
 		INSERT INTO `role_authority` (
-			`role_name`,
+			`role_uuid`,
 			`auth_group`,
 			`auth`
 		) VALUES (
-			#{roleName},
+			#{roleUuid},
 			#{authGroup},
 			#{auth}
 		)
 	</insert>
 
 	<update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
-		UPDATE
-		`role`
-		SET
+		UPDATE `role`
+		SET 
+		`name` = #{name},
 		`description` = #{description, typeHandler=XssHandler}
-		WHERE `name` = #{name}
+		WHERE `uuid` = #{uuid}
 	</update>
 
-	<delete id="deleteRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteRoleByUuid" parameterType="java.lang.String">
 		DELETE
-		FROM
-		`role`
-		WHERE `name` = #{value}
+		FROM `role`
+		WHERE `uuid` = #{value}
 	</delete>
 
-	<delete id="deleteRoleAuthByRoleName" parameterType="string">
+	<delete id="deleteRoleAuthByRoleUuid" parameterType="string">
 		DELETE
-		FROM
-		`role_authority`
-		WHERE `role_name` = #{roleName}
+		FROM `role_authority`
+		WHERE `role_uuid` = #{roleUuid}
 	</delete>
 
 	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleVo">
 		DELETE
-		FROM
-		`role_authority`
-		WHERE `role_name` = #{name}
+		FROM `role_authority`
+		WHERE `role_uuid` = #{uuid}
 		<if test="roleAuthList != null and roleAuthList.size > 0">
 			AND `auth` IN
 			<foreach collection="roleAuthList" open="(" separator="," close=")" item="roleAuth">
@@ -157,25 +158,25 @@
 		</if>
 	</delete>
 
-	<delete id="deleteMenuRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteMenuRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`menu_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteUserRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`user_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteTeamRoleByRoleName" parameterType="java.lang.String">
+	<delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE
 		FROM
 		`team_role`
-		WHERE `role_name` = #{value}
+		WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteRoleAuthByAuth" parameterType="string">

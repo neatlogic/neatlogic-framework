@@ -6,7 +6,7 @@ import codedriver.framework.restful.annotation.EntityField;
 public class UserProfileVo implements Cloneable{
 	@EntityField(name = "个性化所属用户",
 			type = ApiParamType.STRING)
-	private String userId;
+	private String userUuid;
 	@EntityField(name = "个性化所属模块id",
 			type = ApiParamType.STRING)
 	private String moduleId;
@@ -23,17 +23,17 @@ public class UserProfileVo implements Cloneable{
 		
 	}
 	
-	public UserProfileVo(String userId, String moduleId, String config) {
-		this.userId = userId;
+	public UserProfileVo(String userUuid, String moduleId, String config) {
+		this.userUuid = userUuid;
 		this.moduleId = moduleId;
 		this.config = config;
 	}
 	
-	public String getUserId() {
-		return userId;
+	public String getUserUuid() {
+		return userUuid;
 	}
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
 	}
 	public String getModuleId() {
 		return moduleId;

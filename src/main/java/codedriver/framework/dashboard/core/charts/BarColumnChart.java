@@ -14,11 +14,11 @@ import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.dashboard.core.DashboardChartBase;
 import codedriver.framework.dashboard.dto.DashboardShowConfigVo;
 
-public class SeriesChart extends DashboardChartBase {
+public class BarColumnChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] {ChartType.AREACHART.getValue(), ChartType.LINECHART.getValue()};
+		return new String[] {ChartType.BARCHART.getValue(),ChartType.STACKBARCHART.getValue(),ChartType.COLUMNCHART.getValue(),ChartType.STACKCOLUMNCHART.getValue()};
 	}
 
 	@Override
@@ -50,6 +50,7 @@ public class SeriesChart extends DashboardChartBase {
 	public JSONObject getChartConfig() {
 		JSONObject charConfig = new JSONObject();
 		JSONObject showConfig = new JSONObject();
+		showConfig.put(DashboardShowConfig.TYPE.getValue(),new DashboardShowConfigVo(DashboardShowConfig.TYPE,JSONArray.parseArray("[{'value':'bar','text':'横向'},{'value':'column','text':'纵向','isDefault':1}]")));
 		showConfig.put(DashboardShowConfig.AGGREGATE.getValue(),new DashboardShowConfigVo(DashboardShowConfig.AGGREGATE,JSONArray.parseArray("[{'value':'count','text':'计数','isDefault':1}]")));
 		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD,new JSONArray()));
 		showConfig.put(DashboardShowConfig.SUBGROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.SUBGROUPFIELD,new JSONArray()));

@@ -77,7 +77,7 @@ public class ApiValidateAndHelpBase {
 			}
 		}
 		UserContext userContext = UserContext.get();
-		audit.setUserId(userContext.getUserId());
+		audit.setUserUuid(userContext.getUserUuid(true));
 		HttpServletRequest request = userContext.getRequest();
 		String requestIp = IpUtil.getIpAddr(request);
 		audit.setIp(requestIp);

@@ -10,32 +10,35 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class TeamVo extends BasePageVo {
+	
+	public static final String ROOT_PARENTUUID = "-1";
+	public static final String ROOT_UUID = "0";
+	
 	private transient String keyword;
 	private transient Boolean isAutoGenerateUuid = true;
-	@EntityField(name = "分组uuid",
-			type = ApiParamType.STRING)
+	
+	@EntityField(name = "分组uuid", type = ApiParamType.STRING)
 	private String uuid;
-	@EntityField(name = "分组名称",
-			type = ApiParamType.STRING)
+	@EntityField(name = "分组名称", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "父分组uuid",
-			type = ApiParamType.STRING)
+	@EntityField(name = "父分组uuid", type = ApiParamType.STRING)
 	private String parentUuid;
-	@EntityField(name = "子节点数量",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "子节点数量", type = ApiParamType.INTEGER)
 	private Integer childCount;
-	@EntityField(name = "排序",
-			type = ApiParamType.INTEGER)
-	private Integer sort;
+//	@EntityField(name = "排序", type = ApiParamType.INTEGER)
+//	private Integer sort;
 
 	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
 	private List<TagVo> tagList;
-
+	
+	@EntityField(name = "左编码", type = ApiParamType.INTEGER)
+	private Integer lft;
+	@EntityField(name = "右编码", type = ApiParamType.INTEGER)
+	private Integer rht;
+	
 	private Long tagId;
 
 	private int userCount;
-
-	private List<String> userIdList;
 
 	private List<String> pathNameList;
 
@@ -74,13 +77,13 @@ public class TeamVo extends BasePageVo {
 		this.name = name;
 	}
 
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
+//	public Integer getSort() {
+//		return sort;
+//	}
+//
+//	public void setSort(Integer sort) {
+//		this.sort = sort;
+//	}
 
 	public String getKeyword() {
 		return keyword;
@@ -138,11 +141,20 @@ public class TeamVo extends BasePageVo {
 		this.tagId = tagId;
 	}
 
-	public List<String> getUserIdList() {
-		return userIdList;
+	public Integer getLft() {
+		return lft;
 	}
 
-	public void setUserIdList(List<String> userIdList) {
-		this.userIdList = userIdList;
+	public void setLft(Integer lft) {
+		this.lft = lft;
 	}
+
+	public Integer getRht() {
+		return rht;
+	}
+
+	public void setRht(Integer rht) {
+		this.rht = rht;
+	}
+
 }

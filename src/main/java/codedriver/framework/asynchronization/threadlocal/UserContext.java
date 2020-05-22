@@ -22,21 +22,23 @@ public class UserContext implements Serializable {
 	private String tenant;
 	private String userName;
 	private String userId;
+	private String userUuid;
 	private String timezone = "+8:00";
 	private String token;
-	private List<String> roleNameList = new ArrayList<>();
-
+	private List<String> roleUuidList = new ArrayList<>();
+	
 	public static UserContext init(UserContext _userContext) {
 		UserContext context = new UserContext();
 		if (_userContext != null) {
 			context.setUserId(_userContext.getUserId());
+			context.setUserUuid(_userContext.getUserUuid());
 			context.setUserName(_userContext.getUserName());
 			context.setTenant(_userContext.getTenant());
 			context.setTimezone(_userContext.getTimezone());
 			context.setToken(_userContext.getToken());
 			// context.setRequest(_userContext.getRequest());
 			// context.setResponse(_userContext.getResponse());
-			context.setRoleNameList(_userContext.getRoleNameList());
+			context.setRoleUuidList(_userContext.getRoleUuidList());
 		}
 		instance.set(context);
 		return context;
@@ -45,6 +47,7 @@ public class UserContext implements Serializable {
 	public static UserContext init(JSONObject jsonObj,String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();
 		context.setUserId(jsonObj.getString("userid"));
+		context.setUserUuid(jsonObj.getString("useruuid"));
 		context.setUserName(jsonObj.getString("username"));
 		context.setTenant(jsonObj.getString("tenant"));
 		context.setRequest(request);
@@ -62,11 +65,8 @@ public class UserContext implements Serializable {
 	}
 
 	public void addRole(String role) {
-		if (roleNameList == null) {
-			roleNameList = new ArrayList<>();
-		}
-		if (!roleNameList.contains(role)) {
-			roleNameList.add(role);
+		if (!roleUuidList.contains(role)) {
+			roleUuidList.add(role);
 		}
 	}
 
@@ -113,12 +113,27 @@ public class UserContext implements Serializable {
 		this.userId = userId;
 	}
 
-	public List<String> getRoleNameList() {
-		return roleNameList;
+	public String getUserUuid() {
+		return userUuid;
+	}
+	
+	public String getUserUuid(boolean need) {
+		if (StringUtils.isBlank(userUuid)) {
+			throw new NoUserException();
+		}
+		return userUuid;
 	}
 
-	public void setRoleNameList(List<String> roleNameList) {
-		this.roleNameList = roleNameList;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
+	}
+
+	public List<String> getRoleUuidList() {
+		return roleUuidList;
+	}
+
+	public void setRoleUuidList(List<String> roleUuidList) {
+		this.roleUuidList = roleUuidList;
 	}
 
 	public String getTenant() {

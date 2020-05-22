@@ -6,16 +6,16 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.core.ApiComponentBase;
-import codedriver.framework.service.UserService;
 
 @Service
 public class LogoutApi extends ApiComponentBase {
 	@Autowired
-	UserService userService;
+	UserMapper userMapper;
 
 	@Override
 	public String getToken() {
@@ -37,9 +37,7 @@ public class LogoutApi extends ApiComponentBase {
 	@Description(desc = "登出接口")
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
-		JSONObject json = new JSONObject();
-		UserContext userContext = UserContext.get();
-		userService.deleteUserSessionByUserId(userContext.getUserId());
-		return json; 
+		userMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
+		return null; 
 	}
 }

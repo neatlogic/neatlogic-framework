@@ -3,10 +3,12 @@ package codedriver.framework.common.constvalue.dashboard;
 import codedriver.framework.common.constvalue.FormHandlerType;
 
 public enum DashboardShowConfig {
+	TYPE("type", "类型",FormHandlerType.RADIO.toString(),false),
 	AGGREGATE("aggregate", "聚合方式",FormHandlerType.SELECT.toString(),false),
 	GROUPFIELD("groupfield", "分组条件",FormHandlerType.SELECT.toString(),false),
 	SUBGROUPFIELD("subgroupfield", "二级分组条件",FormHandlerType.SELECT.toString(),false),
 	MAXGROUP("maxgroup","最大组数量",FormHandlerType.SELECT.toString(),false),
+	COLOR("color","颜色",FormHandlerType.RADIO.toString(),false),
 	REFRESHTIME("refeshtime","刷新时间",FormHandlerType.SELECT.toString(),false)
 	;
 	

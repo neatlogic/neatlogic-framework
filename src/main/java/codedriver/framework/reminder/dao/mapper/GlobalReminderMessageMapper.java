@@ -19,7 +19,7 @@ public interface GlobalReminderMessageMapper {
     * @Param: [searchVo] 
     * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.GlobalReminderMessageVo>  
     */ 
-    List<GlobalReminderMessageVo> getShowReminderMessageListByIdListAndUserId(ReminderMessageSearchVo searchVo);
+    List<GlobalReminderMessageVo> getShowReminderMessageListByIdListAndUserUuid(ReminderMessageSearchVo searchVo);
 
     /**
     * @Description: 获取指定实时动态历史消息
@@ -37,10 +37,10 @@ public interface GlobalReminderMessageMapper {
 
     /** 
     * @Description: 定时获取最新消息 
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.GlobalReminderMessageVo>  
     */ 
-    List<GlobalReminderMessageVo> getScheduleMessageList(String userId);
+    List<GlobalReminderMessageVo> getScheduleMessageList(String userUuid);
 
     /** 
     * @Description: 获取当天消息数量
@@ -51,10 +51,10 @@ public interface GlobalReminderMessageMapper {
 
     /** 
     * @Description: 获取消息数量
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: int  
     */ 
-    int getReminderMessageCount(String userId);
+    int getReminderMessageCount(String userUuid);
 
     /** 
     * @Description: 插入新消息 
@@ -72,31 +72,31 @@ public interface GlobalReminderMessageMapper {
 
     /** 
     * @Description: 关联消息接收人 
-    * @Param: [messageId, userId] 
+    * @Param: [messageId, userUuid] 
     * @return: int  
     */ 
-    int insertReminderMessageUser(@Param("messageId") Long messageId, @Param("userId") String userId);
+    int insertReminderMessageUser(@Param("messageId") Long messageId, @Param("userUuid") String userUuid);
 
     /** 
     * @Description: 更新新消息是否为旧消息
-    * @Param: [userMessageId, userId] 
+    * @Param: [userMessageId, userUuid] 
     * @return: void  
     */ 
-    void updateUserMessageNewStatus(@Param("userMessageId") Long userMessageId, @Param("userId") String userId);
+    void updateUserMessageNewStatus(@Param("userMessageId") Long userMessageId, @Param("userUuid") String userUuid);
 
     /** 
     * @Description: 更新单个消息有效性
-    * @Param: [messageId, userId] 
+    * @Param: [messageId, userUuid] 
     * @return: void  
     */ 
-    void updateMessageActiveById(@Param("messageId") Long messageId, @Param("userId") String userId);
+    void updateMessageActiveById(@Param("messageId") Long messageId, @Param("userUuid") String userUuid);
 
     /** 
     * @Description: 更新所有消息有效性 
-    * @Param: [userId] 
+    * @Param: [userUuid] 
     * @return: void  
     */ 
-    void updateAllMessageActive(@Param("userId") String userId);
+    void updateAllMessageActive(String userUuid);
 
     /** 
     * @Description: 跟新当天新消息有效性 
@@ -107,15 +107,15 @@ public interface GlobalReminderMessageMapper {
 
     /** 
     * @Description: 跟新消息弹窗性 
-    * @Param: [userId, messageId] 
+    * @Param: [userUuid, messageId] 
     * @return: void  
     */ 
-    void updateMessageKeepStatus(@Param("userId") String userId, @Param("messageId") Long messageId);
+    void updateMessageKeepStatus(@Param("userUuid") String userUuid, @Param("messageId") Long messageId);
 
     /** 
     * @Description: 跟新用户插件的所有消息有效性
-    * @Param: [userId, reminderId] 
+    * @Param: [userUuid, reminderId] 
     * @return: int  
     */
-    int updateMessageActiveByReminderId(@Param("userId") String userId, @Param("pluginId") String pluginId);
+    int updateMessageActiveByReminderId(@Param("userUuid") String userUuid, @Param("pluginId") String pluginId);
 }

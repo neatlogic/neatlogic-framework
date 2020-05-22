@@ -6,16 +6,16 @@ import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
-	public UserVo getUserBaseInfoByUserId(String userId);
+	
+	public int checkUserIsExists(String uuid);
 
-	public int checkUserIsInTeam(@Param("userId")
-	String userId, @Param("teamUuid")
-	String teamUuid);
+	public int checkUserIsInTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
+	
+	public UserVo getUserBaseInfoByUuid(String userUuid);
 
-	public UserVo getUserByUserId(String userId);
+	public UserVo getUserByUuid(String uuid);
 
-	public List<String> getLeaderUserIdByTeamIds(@Param("teamUuidIdList")
-	List<String> teamUuidIdList);
+	public List<String> getLeaderUserUuidByTeamIds(@Param("teamUuidIdList") List<String> teamUuidIdList);
 
 	public List<UserVo> searchUser(UserVo userVo);
 
@@ -23,29 +23,29 @@ public interface UserMapper {
 
 	public List<UserVo> searchRoleUserByAuth(String auth);
 
-	public List<UserAuthVo> searchUserAuthByUserId(String userId);
+	public List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 	
 	public List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
 
-	public List<RoleAuthVo> searchUserRoleAuthByUserId(String userId);
+	public List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
 
-	public List<Long> getLimitUserPasswordIdList(String userId);
+	public List<Long> getLimitUserPasswordIdList(String userUuid);
 
 	public int searchUserCount(UserVo userVo);
 
 	public List<UserVo> getActiveUserByTeamId(String teamId);
 
-	public List<UserVo> getActiveUserByRoleName(String roleName);
+	public List<UserVo> getActiveUserByRoleUuid(String roleUuid);
 
 	public UserVo getUserByUserIdAndPassword(UserVo userVo);
 
-	public UserSessionVo getUserSessionByUserId(String userId);
+	public UserSessionVo getUserSessionByUserUuid(String userUuid);
 
-	public List<UserVo> getUserByUserIdList(List<String> userIdList);
+	public List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
 	public List<AuthVo> getUserCountByAuth();
 	
-	public List<UserProfileVo> getUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId);
+	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
@@ -53,43 +53,39 @@ public interface UserMapper {
 
 	public int insertUserPassword(UserVo userVo);
 
-	public int updateUserPasswordActive(String userId);
+	public int updateUserPasswordActive(String userUuid);
 
-	public int insertUserRole(@Param("userId")
-	String userId, @Param("roleName")
-	String roleName);
+	public int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
-	public int insertUserTeam(@Param("userId")
-	String userId, @Param("teamUuid")
-	String teamUuid);
+	public int insertUserTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
 	
 	public int insertUserProfile(UserProfileVo userProfileVo);
 
-	public int insertUserSession(String userId);
+	public int insertUserSession(String userUuid);
 
 	public int updateUser(UserVo userVo);
 
 	public int updateUserActive(UserVo userVo);
 
-	public int updateUserSession(String userId);
+	public int updateUserSession(String userUuid);
 	
-	public int updateUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId,@Param("config")String config);
+	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId, @Param("config")String config);
 
-	public int deleteUserPasswordByLimit(@Param("userId") String userId,@Param("idList") List<Long> idList);
+	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid,@Param("idList") List<Long> idList);
 
-	public int deleteUserByUserId(String userId);
+	public int deleteUserByUuid(String uuid);
 
-	public int deleteUserAuthByUserId(String userId);
+	public int deleteUserAuthByUserUuid(String userUuid);
 
 	public int deleteUserAuth(UserVo userVo);
 
-	public int deleteUserRoleByUserId(String userId);
+	public int deleteUserRoleByUserUuid(String userUuid);
 
-	public int deleteUserSessionByUserId(String userId);
+	public int deleteUserSessionByUserUuid(String userUuid);
 
-	public int deleteUserTeamByUserId(String userId);
+	public int deleteUserTeamByUserUuid(String userUuid);
 
 	public int deleteUserAuthByAuth(String auth);
 	
-	public int deleteUserProfileByUserIdAndModuleId(@Param("userId")String userId,@Param("moduleId")String moduleId);
+	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId);
 }

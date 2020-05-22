@@ -89,12 +89,12 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         returnObj.put("title", messageVo.getTitle());
         returnObj.put("content", messageVo.getContent());
         returnObj.put("createTime", messageVo.getCreateTime());
-        returnObj.put("fromUserId", messageVo.getFromUser());
+        returnObj.put("fromUserUuid", messageVo.getFromUser());
         returnObj.put("fromUserName", messageVo.getFromUserName());
         returnObj.put("remindName", messageVo.getReminderVo().getName());
         returnObj.put("moduleName", messageVo.getReminderVo().getModuleName());
         returnObj.put("moduleIcon", messageVo.getReminderVo().getModuleIcon());
-        returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserId());
+        returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserUuid());
         returnObj.put("receiverName", messageVo.getReminderSubscribeVo().getUserName());
         returnObj.put("isKeep", messageVo.getIsKeep());
         returnObj.put("showTemplate", reminder.getShowTemplate());
@@ -102,12 +102,16 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         String param = messageVo.getReminderSubscribeVo().getParam();
         boolean hasParam = param != null && !("").equals(param);
         //弹窗类型
-        String popUpValue = JSONObject.parseObject(param).getString("popUp");
-        returnObj.put("popUp", hasParam? popUpValue : "close");
+        String popUpValue = "close";
+        JSONObject paramJson = JSONObject.parseObject(param);
+        if(hasParam&&paramJson!=null) {
+        	popUpValue = paramJson.getString("popUp");
+        }
+        returnObj.put("popUp", popUpValue);
         //是否为新消息（新消息会触发一系列动作）
         returnObj.put("isNew", messageVo.getIsNew());
         if (messageVo.getIsNew() == 1){
-            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderSubscribeVo().getUserId());
+            reminderMessageMapper.updateUserMessageNewStatus(messageVo.getId(), messageVo.getReminderSubscribeVo().getUserUuid());
         }
         //自定义信息参数，例：告警的级别
         String messageParam = messageVo.getParam();

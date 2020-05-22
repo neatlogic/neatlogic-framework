@@ -27,6 +27,7 @@ public interface IApiComponent {
 	public int needAudit();
 
 	public Object doService(ApiVo apiVo, JSONObject jsonObj) throws Exception;
+	
 
 	public JSONObject help();
 }

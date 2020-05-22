@@ -35,11 +35,34 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 				Object proxy = AopContext.currentProxy();
 				Class<?> targetClass = AopUtils.getTargetClass(proxy);
 				validApi(targetClass, paramObj, JSONObject.class);
-				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
-				result = method.invoke(proxy, paramObj);
+				boolean canRun = false;
+				if (apiVo.getIsActive().equals(0)) {
+					Method method = proxy.getClass().getMethod("myDoTest", JSONObject.class);
+					result = method.invoke(proxy, paramObj);
+					if (result == null) {
+						canRun = true;
+					}
+				} else {
+					canRun = true;
+				}
+				if (canRun) {
+					Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
+					result = method.invoke(proxy, paramObj);
+				}
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
 				validApi(this.getClass(), paramObj, JSONObject.class);
-				result = myDoService(paramObj);
+				boolean canRun = false;
+				if (apiVo.getIsActive().equals(0)) {
+					result = myDoTest(paramObj);
+					if (result == null) {
+						canRun = true;
+					}
+				} else {
+					canRun = true;
+				}
+				if (canRun) {
+					result = myDoService(paramObj);
+				}
 			} catch (Exception ex) {
 				if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
 					throw new ApiRuntimeException(ex.getCause().getMessage());

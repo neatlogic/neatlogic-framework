@@ -8,6 +8,7 @@ public enum DashboardShowConfig {
 	GROUPFIELD("groupfield", "分组条件",FormHandlerType.SELECT.toString(),false),
 	SUBGROUPFIELD("subgroupfield", "二级分组条件",FormHandlerType.SELECT.toString(),false),
 	MAXGROUP("maxgroup","最大组数量",FormHandlerType.SELECT.toString(),false),
+	COLOR("color","颜色",FormHandlerType.RADIO.toString(),false),
 	REFRESHTIME("refeshtime","刷新时间",FormHandlerType.SELECT.toString(),false)
 	;
 	

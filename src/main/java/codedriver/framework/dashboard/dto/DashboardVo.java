@@ -45,7 +45,7 @@ public class DashboardVo extends BasePageVo {
 	@EntityField(name = "仪表板组件列表", type = ApiParamType.JSONOBJECT)
 	private List<DashboardWidgetVo> widgetList;
 	@EntityField(name = "system：系统分类  custom：自定义分类", type = ApiParamType.STRING)
-	private String type;
+	private String type = "custom";
 	@EntityField(name = "授权列表", type = ApiParamType.STRING)
 	private List<String> valueList;
 	@EntityField(name = "默认用户", type = ApiParamType.STRING)

@@ -32,7 +32,7 @@
 		<if test="auth != null and auth != ''">
 			AND c.`auth` = #{auth}
 		</if>
-		GROUP BY a.`name`
+		GROUP BY a.`uuid`
 		ORDER BY a.`id` DESC
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
@@ -135,15 +135,11 @@
 	</update>
 
 	<delete id="deleteRoleByUuid" parameterType="java.lang.String">
-		DELETE
-		FROM `role`
-		WHERE `uuid` = #{value}
+		DELETE FROM `role` WHERE `uuid` = #{value}
 	</delete>
 
 	<delete id="deleteRoleAuthByRoleUuid" parameterType="string">
-		DELETE
-		FROM `role_authority`
-		WHERE `role_uuid` = #{roleUuid}
+		DELETE FROM `role_authority` WHERE `role_uuid` = #{roleUuid}
 	</delete>
 
 	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleVo">
@@ -159,24 +155,15 @@
 	</delete>
 
 	<delete id="deleteMenuRoleByRoleUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`menu_role`
-		WHERE `role_uuid` = #{value}
+		DELETE FROM `menu_role` WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteUserRoleByRoleUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`user_role`
-		WHERE `role_uuid` = #{value}
+		DELETE FROM `user_role` WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
-		DELETE
-		FROM
-		`team_role`
-		WHERE `role_uuid` = #{value}
+		DELETE FROM `team_role` WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteRoleAuthByAuth" parameterType="string">

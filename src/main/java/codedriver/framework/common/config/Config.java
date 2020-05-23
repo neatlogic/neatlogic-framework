@@ -38,8 +38,9 @@ public class Config {
 	private static boolean ES_ENABLE;
 	private static String DATA_HOME;// 存储文件路径
 	private static int SERVER_HEARTBEAT_RATE;// 心跳频率
-	private static int SERVER_HEARTBEAT_THRESHOLD ;// 心跳失败上限次数
+	private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
 	private static String HOME_URL;
+	public static final String RC4KEY = "codedriver.key.20200101";
 
 	static {
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");

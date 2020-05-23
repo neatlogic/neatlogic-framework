@@ -1,5 +1,6 @@
 package codedriver.framework.dashboard.core.charts;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -21,11 +22,13 @@ public class SeriesChart extends DashboardChartBase {
 		return new String[] {ChartType.AREACHART.getValue(), ChartType.LINECHART.getValue()};
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject getData(JSONObject dataMap) {
 		JSONObject dataJson = new JSONObject();
 		JSONArray dataList = new JSONArray();
-		Map<String,Object> resultMap = (Map<String,Object>)dataMap;
+		Map<String,Object> resultMap = (Map<String,Object>)dataMap.get("resultMap");
+		Map<String, String> valueTextMap = (Map<String,String>)dataMap.get("valueTextMap");
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			while (itKey.hasNext()) {
@@ -33,10 +36,10 @@ public class SeriesChart extends DashboardChartBase {
 				JSONObject data = new JSONObject();
 				String[] keys = key.split("#"); 
 				if(keys.length >1) {
-					data.put("column", keys[0]);
+					data.put("column", valueTextMap.get(keys[0]));
 					data.put("type", keys[1]);
 				}else {
-					data.put("column", key);
+					data.put("column", valueTextMap.get(key));
 				}
 				data.put("value", resultMap.get(key));
 				dataList.add(data);
@@ -59,42 +62,64 @@ public class SeriesChart extends DashboardChartBase {
 		return charConfig;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject getDataMap(JSONArray nextDataList, JSONObject configObj, JSONObject preDatas) {
 		String groupField = configObj.getString(DashboardShowConfig.GROUPFIELD.getValue());
 		String subGroupField = configObj.getString(DashboardShowConfig.SUBGROUPFIELD.getValue());
 		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
-		String subGroup = StringUtils.EMPTY;
-		Map<String, Object> resultMap = (Map<String,Object>)preDatas;
+		JSONObject subGroup = null;
+		Map<String, Object> resultMap = null;
+		Map<String, String> valueTextMap = null;
+		if(preDatas.containsKey("resultMap")) {
+			resultMap = (Map<String,Object>)preDatas.get("resultMap");
+		}else {
+			resultMap =  new HashMap<String,Object>();
+			preDatas.put("resultMap", resultMap);
+		}
+		if(preDatas.containsKey("valueTextMap")) {
+			valueTextMap = (Map<String,String>)preDatas.get("valueTextMap");
+		}else {
+			valueTextMap =  new HashMap<String,String>();
+			preDatas.put("valueTextMap", valueTextMap);
+		}
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
-				String group = data.getString(groupField);
-				if(StringUtils.isBlank(group)){
+				JSONObject group = data.getJSONObject(groupField);
+				String value = StringUtils.EMPTY;
+				if(group != null) {
+					value = group.getString("value");
+					valueTextMap.put(value, group.getString("text"));
+				}
+				if(StringUtils.isBlank(value)){
 					//throw new DashboardFieldNotFoundException(groupField);
 				}else {
 					if(StringUtils.isNotBlank(subGroupField)) {
-						subGroup = data.getString(subGroupField);
-						if(StringUtils.isBlank(subGroup)){
-							//throw new DashboardFieldNotFoundException(subGroup);
-						}else {
-							String groupCombine = group+"#"+subGroup;
-							if (!resultMap.containsKey(groupCombine)) {
-								resultMap.put(groupCombine, 1);
-							} else {
-								resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
-							}
+						subGroup = data.getJSONObject(subGroupField);
+						String subValue = StringUtils.EMPTY;
+						if(subGroup != null) {
+							subValue = subGroup.getString("value");
+							valueTextMap.put(subValue, subGroup.getString("text"));
 						}
-					}else {
-						if (!resultMap.containsKey(group)) {
-							resultMap.put(group, 1);
+
+						String groupCombine = value+"#"+subValue;
+						if (!resultMap.containsKey(groupCombine)) {
+							resultMap.put(groupCombine, 1);
 						} else {
-							resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
+							resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
+						}
+
+					}else {
+						if (!resultMap.containsKey(value)) {
+							resultMap.put(value, 1);
+						} else {
+							resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
 						}
 					}
 				}
 			}
 		} 
-		return new JSONObject(resultMap);
+		return preDatas;
 	}
 }

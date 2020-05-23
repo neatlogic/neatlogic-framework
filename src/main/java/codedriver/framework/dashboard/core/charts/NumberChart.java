@@ -56,7 +56,7 @@ public class NumberChart extends DashboardChartBase {
 		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD,new JSONArray()));
 		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),new DashboardShowConfigVo(DashboardShowConfig.MAXGROUP,JSONArray.parseArray("[{'value':'10','text':'10','isDefault':1},{'value':'20','text':'20'}]")));
 		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),new DashboardShowConfigVo(DashboardShowConfig.REFRESHTIME,JSONArray.parseArray("[{'value':'-1','text':'不刷新','isDefault':1},{'value':'30','text':'30'}]")));
-		showConfig.put(DashboardShowConfig.COLOR.getValue(),new DashboardShowConfigVo(DashboardShowConfig.COLOR,JSONArray.parseArray("['#D18CBD','#FFBA5A','#78D8DE','#A78375','#B9D582','#898DDD','#F3E67B','#527CA6','#50BFF2','#FF6666','#15BF81','#90A4AE']")));
+		showConfig.put(DashboardShowConfig.COLOR.getValue(),new DashboardShowConfigVo(DashboardShowConfig.COLOR,JSONArray.parseArray("[{'value':'#D18CBD','isDefault':1},{'value':'#FFBA5A'},{'value':'#78D8DE'},{'value':'#A78375'},{'value':'#B9D582'},{'value':'#898DDD'},{'value':'#F3E67B'},{'value':'#527CA6'},{'value':'#50BFF2'},{'value':'#FF6666'},{'value':'#15BF81'},{'value':'#90A4AE'}]")));
 		charConfig.put("showConfig", showConfig);
 		return charConfig;
 	}

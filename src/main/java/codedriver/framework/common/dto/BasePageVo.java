@@ -1,5 +1,7 @@
 package codedriver.framework.common.dto;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.apiparam.core.ApiParamType;
@@ -20,6 +22,7 @@ public class BasePageVo {
 	@JSONField(serialize = false)
 	private transient Integer startNum;
 	@JSONField(serialize = false)
+	private transient String keyword;
 	@EntityField(name = "总条数", type = ApiParamType.INTEGER)
 	private transient Integer rowNum = 0;
 
@@ -82,5 +85,15 @@ public class BasePageVo {
 
 	public void setPageCount(Integer pageCount) {
 		this.pageCount = pageCount;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		if (StringUtils.isNotBlank(keyword)) {
+			this.keyword = keyword.trim();
+		}
 	}
 }

@@ -7,7 +7,6 @@ public class StringApiParam extends ApiParamBase {
 
 	@Override
 	public String getName() {
-
 		return "字符串";
 	}
 

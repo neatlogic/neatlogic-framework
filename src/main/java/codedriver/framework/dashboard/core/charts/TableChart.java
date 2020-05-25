@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.common.constvalue.dashboard.ChartType;
+import codedriver.framework.common.constvalue.dashboard.DashboardShowConfig;
 import codedriver.framework.dashboard.core.DashboardChartBase;
 import codedriver.framework.dashboard.dto.DashboardShowConfigVo;
 
@@ -102,36 +102,38 @@ public class TableChart extends DashboardChartBase {
 			if(StringUtils.isNotBlank(subGroupField)){
 				for (int i = 0; i < nextDataList.size(); i++) {
 					JSONObject dataJson = nextDataList.getJSONObject(i);
-					String group = dataJson.getString(groupField);
-					String subGroup = dataJson.getString(subGroupField);
-					if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subGroup,subGroup)))) {
-						theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subGroup,subGroup)));
+					JSONObject group = dataJson.getJSONObject(groupField);
+					JSONObject subGroup = dataJson.getJSONObject(subGroupField);
+					String value = group.getString("value");
+					String subValue = subGroup.getString("value");
+					if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))))) {
+						theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))));
 					}
-					if(dataMap.containsKey(group)) {
-						System.out.println(group);
-						 Map<String, Integer> subGroupMap = (Map<String, Integer>)dataMap.get(group);
-						if(subGroupMap.containsKey(subGroup)) {
-							Integer num = subGroupMap.get(subGroup);
-							subGroupMap.put(subGroup, num+1);
+					if(dataMap.containsKey(value)) {
+						 Map<String, Integer> subGroupMap = (Map<String, Integer>)dataMap.get(value);
+						if(subGroupMap.containsKey(subValue)) {
+							Integer num = subGroupMap.get(subValue);
+							subGroupMap.put(subValue, num+1);
 						}else {
-							subGroupMap.put(subGroup, 1);
+							subGroupMap.put(subValue, 1);
 						}
 					}else {
-						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", group,group)));
+						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value, group.getString("text"))));
 						Map<String,Integer> subGoupMap = new HashMap<String,Integer>();
-						subGoupMap.put(subGroup, 1);
-						dataMap.put(group, subGoupMap);
+						subGoupMap.put(subValue, 1);
+						dataMap.put(value, subGoupMap);
 					}
 				}
 			}else {
 				for (int i = 0; i < nextDataList.size(); i++) {
 					JSONObject dataJson = nextDataList.getJSONObject(i);
-					String group = dataJson.getString(groupField);
-					if(dataMap.containsKey(group)) {
-						dataMap.put(group, ((int)dataMap.get(group))+1);
+					JSONObject group = dataJson.getJSONObject(groupField);
+					String value = group.getString("value");
+					if(dataMap.containsKey(value)) {
+						dataMap.put(value, ((int)dataMap.get(value))+1);
 					}else {
-						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", group,group)));
-						dataMap.put(group, 1);
+						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value,group.getString("text"))));
+						dataMap.put(value, 1);
 					}
 				}	
 			}

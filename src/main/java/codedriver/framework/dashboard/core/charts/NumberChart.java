@@ -29,12 +29,13 @@ public class NumberChart extends DashboardChartBase {
 		JSONObject dataJson = new JSONObject();
 		JSONArray dataList = new JSONArray();
 		Map<String,Object> resultMap = (Map<String,Object>)dataMap.get("resultMap");
+		Map<String, String> valueTextMap = (Map<String,String>)dataMap.get("valueTextMap");
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			while (itKey.hasNext()) {
 				String key = itKey.next();
 				JSONObject data = new JSONObject();
-				data.put("column", key);
+				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));
 				dataList.add(data);
 			}
@@ -56,7 +57,7 @@ public class NumberChart extends DashboardChartBase {
 		showConfig.put(DashboardShowConfig.GROUPFIELD.getValue(),new DashboardShowConfigVo(DashboardShowConfig.GROUPFIELD,new JSONArray()));
 		showConfig.put(DashboardShowConfig.MAXGROUP.getValue(),new DashboardShowConfigVo(DashboardShowConfig.MAXGROUP,JSONArray.parseArray("[{'value':'10','text':'10','isDefault':1},{'value':'20','text':'20'}]")));
 		showConfig.put(DashboardShowConfig.REFRESHTIME.getValue(),new DashboardShowConfigVo(DashboardShowConfig.REFRESHTIME,JSONArray.parseArray("[{'value':'-1','text':'不刷新','isDefault':1},{'value':'30','text':'30'}]")));
-		showConfig.put(DashboardShowConfig.COLOR.getValue(),new DashboardShowConfigVo(DashboardShowConfig.COLOR,JSONArray.parseArray("['#D18CBD','#FFBA5A','#78D8DE','#A78375','#B9D582','#898DDD','#F3E67B','#527CA6','#50BFF2','#FF6666','#15BF81','#90A4AE']")));
+		showConfig.put(DashboardShowConfig.COLOR.getValue(),new DashboardShowConfigVo(DashboardShowConfig.COLOR,JSONArray.parseArray("[{'value':'#D18CBD','isDefault':1},{'value':'#FFBA5A'},{'value':'#78D8DE'},{'value':'#A78375'},{'value':'#B9D582'},{'value':'#898DDD'},{'value':'#F3E67B'},{'value':'#527CA6'},{'value':'#50BFF2'},{'value':'#FF6666'},{'value':'#15BF81'},{'value':'#90A4AE'}]")));
 		charConfig.put("showConfig", showConfig);
 		return charConfig;
 	}
@@ -68,12 +69,19 @@ public class NumberChart extends DashboardChartBase {
 		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
 		JSONArray configList = configObj.getJSONArray("configlist");
 		Map<String, Object> resultMap = null;
+		Map<String, String> valueTextMap = null;
 		Integer total = 0;
 		if(preDatas.containsKey("resultMap")) {
 			resultMap = (Map<String,Object>)preDatas.get("resultMap");
 		}else {
 			resultMap =  new HashMap<String,Object>();
 			preDatas.put("resultMap", resultMap);
+		}
+		if(preDatas.containsKey("valueTextMap")) {
+			valueTextMap = (Map<String,String>)preDatas.get("valueTextMap");
+		}else {
+			valueTextMap =  new HashMap<String,String>();
+			preDatas.put("valueTextMap", valueTextMap);
 		}
 		
 		if(preDatas.containsKey("total")) {
@@ -82,15 +90,18 @@ public class NumberChart extends DashboardChartBase {
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
-				String group = data.getString(groupField);
+				JSONObject group = data.getJSONObject(groupField);
+				String value = StringUtils.EMPTY;
+				if(group != null) {
+					value = group.getString("value");
+					valueTextMap.put(value, group.getString("text"));
+				}
 				if(CollectionUtils.isNotEmpty(configList)) {
-					if(StringUtils.isBlank(group)){
-						//throw new DashboardFieldNotFoundException(groupField);
-					}else if(configList.contains(group)){
-						if (!resultMap.containsKey(group)) {
-							resultMap.put(group, 1);
+					if(configList.contains(value)){
+						if (!resultMap.containsKey(value)) {
+							resultMap.put(value, 1);
 						} else {
-							resultMap.put(group, Integer.valueOf(resultMap.get(group).toString()) + 1);
+							resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
 						}
 						total++;
 					}
@@ -98,7 +109,6 @@ public class NumberChart extends DashboardChartBase {
 			}
 		} 
 		preDatas.put("total", total);
-		
 		return preDatas;
 	}
 }

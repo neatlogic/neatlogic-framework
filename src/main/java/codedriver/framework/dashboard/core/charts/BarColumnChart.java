@@ -37,7 +37,7 @@ public class BarColumnChart extends DashboardChartBase {
 				String[] keys = key.split("#"); 
 				if(keys.length >1) {
 					data.put("column", valueTextMap.get(keys[0]));
-					data.put("type", keys[1]);
+					data.put("type", valueTextMap.get(keys[1]));
 				}else {
 					data.put("column", valueTextMap.get(key));
 				}

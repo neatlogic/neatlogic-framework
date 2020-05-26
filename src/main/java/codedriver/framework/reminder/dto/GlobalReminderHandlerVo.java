@@ -3,7 +3,7 @@ package codedriver.framework.reminder.dto;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.reminder.dto.param.GlobalReminderParamVo;
+import codedriver.framework.reminder.dto.param.GlobalReminderHandlerParamVo;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -17,12 +17,12 @@ import java.util.Objects;
  * @description: 实时动态插件实体类
  * @create: 2019-09-10 15:10
  **/
-public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalReminderVo>{
+public class GlobalReminderHandlerVo extends BasePageVo implements Comparable<GlobalReminderHandlerVo>{
     //数据库对应
     @EntityField( name = "插件名称", type = ApiParamType.STRING)
     private String name;
     @EntityField( name = "插件ID", type = ApiParamType.STRING)
-    private String pluginId;
+    private String handler;
     @EntityField( name = "插件描述", type = ApiParamType.STRING)
     private String description;
     @EntityField( name = "插件配置信息", type = ApiParamType.STRING)
@@ -38,7 +38,7 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
     @EntityField( name = "插件订阅者信息", type = ApiParamType.JSONOBJECT)
     private GlobalReminderSubscribeVo reminderSubscribeVo;
     @EntityField( name = "插件默认参数集合", type = ApiParamType.JSONARRAY)
-    private List<GlobalReminderParamVo> reminderParamList;
+    private List<GlobalReminderHandlerParamVo> reminderParamList;
 
     public String getName() {
         return name;
@@ -48,12 +48,12 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
         this.name = name;
     }
 
-    public String getPluginId() {
-        return pluginId;
+    public String getHandler() {
+        return handler;
     }
 
-    public void setPluginId(String pluginId) {
-        this.pluginId = pluginId;
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public String getDescription() {
@@ -100,11 +100,11 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
         this.moduleId = moduleId;
     }
 
-    public List<GlobalReminderParamVo> getReminderParamList() {
+    public List<GlobalReminderHandlerParamVo> getReminderParamList() {
         return reminderParamList;
     }
 
-    public void setReminderParamList(List<GlobalReminderParamVo> reminderParamList) {
+    public void setReminderParamList(List<GlobalReminderHandlerParamVo> reminderParamList) {
         this.reminderParamList = reminderParamList;
     }
 
@@ -149,8 +149,8 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
     }
 
     @Override
-    public int compareTo(GlobalReminderVo obj) {
-        return this.pluginId.compareTo(obj.getPluginId());
+    public int compareTo(GlobalReminderHandlerVo obj) {
+        return this.handler.compareTo(obj.getHandler());
     }
 
     @Override
@@ -158,17 +158,17 @@ public class GlobalReminderVo extends BasePageVo implements Comparable<GlobalRem
         if (this == o) {
             return true;
         }
-        if (!(o instanceof GlobalReminderVo)){
+        if (!(o instanceof GlobalReminderHandlerVo)){
             return false;
         }
-        GlobalReminderVo reminderVo = (GlobalReminderVo) o;
-        return Objects.equals(pluginId, reminderVo.pluginId);
+        GlobalReminderHandlerVo reminderVo = (GlobalReminderHandlerVo) o;
+        return Objects.equals(handler, reminderVo.handler);
     }
 
     @Override
     public int hashCode() {
         int result = 17;
-        result = result + pluginId.hashCode();
+        result = result + handler.hashCode();
         return result;
     }
 }

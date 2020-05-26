@@ -278,6 +278,7 @@
 		`refresh_interval` AS refreshInterval,
 		`description`,
 		`dashboard_uuid` AS dashboardUuid,
+		`chart_config` AS chartConfig,
 		`handler`,
 		`chart_type` AS chartType,
 		`x`,

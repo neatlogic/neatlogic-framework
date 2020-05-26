@@ -5,7 +5,7 @@
     <select id="getReminderSubscribeListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         SELECT
         `id`,
-        `plugin_id` as `pluginId`,
+        `handler` as `handler`,
         `user_uuid` as `userUuid`,
         `param`
         FROM `reminder_subscribe`
@@ -20,14 +20,14 @@
     </select>
 
     <select id="getSubscribeUserUuidListByPluginId" resultType="java.lang.String" parameterType="java.lang.String">
-        SELECT DISTINCT (`user_uuid`) FROM `reminder_subscribe` WHERE `plugin_id` = #{pluginId}
+        SELECT DISTINCT (`user_uuid`) FROM `reminder_subscribe` WHERE `handler` = #{handler}
     </select>
 
     <update id="updateReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         UPDATE `reminder_subscribe` 
         SET `param` = #{param}
         WHERE `user_uuid` = #{userUuid}
-        AND `plugin_id` = #{pluginId}
+        AND `handler` = #{handler}
     </update>
 
     <insert id="insertReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
@@ -35,11 +35,11 @@
             SELECT LAST_INSERT_ID() as id
         </selectKey>
         INSERT INTO `reminder_subscribe`(
-        `plugin_id`,
+        `handler`,
         `user_uuid`,
         `param`
         ) VALUES(
-        #{pluginId},
+        #{handler},
         #{userUuid},
         #{param}
         )
@@ -48,6 +48,6 @@
     <delete id="deleteReminderSubscribe" parameterType="codedriver.framework.reminder.dto.GlobalReminderSubscribeVo">
         DELETE FROM `reminder_subscribe`
         WHERE `user_uuid` = #{userUuid}
-        AND `plugin_id` = #{pluginId}
+        AND `handler` = #{handler}
     </delete>
 </mapper>

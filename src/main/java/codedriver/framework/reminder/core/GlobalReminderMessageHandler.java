@@ -101,7 +101,7 @@ public class GlobalReminderMessageHandler {
                 message.setTitle(mess.getTitle());
                 message.setContent(mess.getContent());
                 message.setFromUser(mess.getFromUser());
-                message.setPluginId(pluginId);
+                message.setHandler(pluginId);
                 message.setParam(mess.getParamObj() == null ? "" : mess.getParamObj().toString());
                 reminderMessageMapper.insertReminderMessage(message);
                 reminderMessageMapper.insertReminderMessageContent(message);
@@ -117,7 +117,7 @@ public class GlobalReminderMessageHandler {
                     }
                 }
                 //获取订阅者名单
-                List<String> subUserUuidList = reminderMapper.getSubscribeUserUuidListByPluginId(message.getPluginId());
+                List<String> subUserUuidList = reminderMapper.getSubscribeUserUuidListByHandler(message.getHandler());
                 subUserUuidList.retainAll(userUuidList);
                 for (String userUuid : subUserUuidList){
                     reminderMessageMapper.insertReminderMessageUser(message.getId(), userUuid);

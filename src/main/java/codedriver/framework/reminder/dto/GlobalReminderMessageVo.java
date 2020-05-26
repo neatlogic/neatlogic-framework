@@ -16,7 +16,7 @@ public class GlobalReminderMessageVo implements Comparable<GlobalReminderMessage
     Logger logger = LoggerFactory.getLogger(GlobalReminderMessageVo.class);
     public static final int SHOW_DAY = 3;
     private Long id;
-    private String pluginId;
+    private String handler;
     private String title;
     private String content;
     private String createTime;
@@ -27,7 +27,7 @@ public class GlobalReminderMessageVo implements Comparable<GlobalReminderMessage
     private int isNew;
     private int isKeep;
 
-    private GlobalReminderVo reminderVo;
+    private GlobalReminderHandlerVo reminderVo;
 
     private GlobalReminderSubscribeVo reminderSubscribeVo;
 
@@ -39,12 +39,12 @@ public class GlobalReminderMessageVo implements Comparable<GlobalReminderMessage
         this.id = id;
     }
 
-    public String getPluginId() {
-        return pluginId;
+    public String getHandler() {
+        return handler;
     }
 
-    public void setPluginId(String pluginId) {
-        this.pluginId = pluginId;
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public String getTitle() {
@@ -130,11 +130,11 @@ public class GlobalReminderMessageVo implements Comparable<GlobalReminderMessage
         this.isKeep = isKeep;
     }
 
-    public GlobalReminderVo getReminderVo() {
+    public GlobalReminderHandlerVo getReminderVo() {
         return reminderVo;
     }
 
-    public void setReminderVo(GlobalReminderVo reminderVo) {
+    public void setReminderVo(GlobalReminderHandlerVo reminderVo) {
         this.reminderVo = reminderVo;
     }
 

@@ -16,9 +16,9 @@ import codedriver.framework.reminder.dto.GlobalReminderHandlerVo;
 @RootComponent
 public class GlobalReminderHandlerFactory implements ApplicationListener<ContextRefreshedEvent> {
 
-	private static List<GlobalReminderHandlerVo> reminderVoList = new ArrayList<>();
+	private static List<GlobalReminderHandlerVo> reminderHandlerList = new ArrayList<>();
 	private static Map<String, IGlobalReminderHandler> reminderMap = new HashMap<>();
-	private static Map<String, GlobalReminderHandlerVo> reminderVoMap = new HashMap<>();
+	private static Map<String, GlobalReminderHandlerVo> reminderHandlerMap = new HashMap<>();
 
 	public static IGlobalReminderHandler getReminder(String name) {
 		if (!reminderMap.containsKey(name)) {
@@ -27,12 +27,12 @@ public class GlobalReminderHandlerFactory implements ApplicationListener<Context
 		return reminderMap.get(name);
 	}
 
-	public static List<GlobalReminderHandlerVo> getReminderVoList(){
-		return reminderVoList;
+	public static List<GlobalReminderHandlerVo> getReminderHandlerList(){
+		return reminderHandlerList;
 	}
 
-	public static Map<String, GlobalReminderHandlerVo> getReminderVoMap(){
-		return reminderVoMap;
+	public static Map<String, GlobalReminderHandlerVo> getReminderHandlerMap(){
+		return reminderHandlerMap;
 	}
 
 	@Override
@@ -43,13 +43,13 @@ public class GlobalReminderHandlerFactory implements ApplicationListener<Context
 			IGlobalReminderHandler reminder = entry.getValue();
 			GlobalReminderHandlerVo reminderHandlerVo = new GlobalReminderHandlerVo();
 			reminderHandlerVo.setName(reminder.getName());
-			reminderHandlerVo.setReminderParamList(reminder.getConfig());
+			reminderHandlerVo.setParamList(reminder.getConfig());
 			reminderHandlerVo.setModuleId(context.getId());
 			reminderHandlerVo.setDescription(reminder.getDescription());
 			reminderHandlerVo.setHandler(reminder.getHandler());
-			reminderVoList.add(reminderHandlerVo);
+			reminderHandlerList.add(reminderHandlerVo);
 			reminderMap.put(reminder.getHandler(), reminder);
-			reminderVoMap.put(reminder.getHandler(), reminderHandlerVo);
+			reminderHandlerMap.put(reminder.getHandler(), reminderHandlerVo);
 		}
 	}
 }

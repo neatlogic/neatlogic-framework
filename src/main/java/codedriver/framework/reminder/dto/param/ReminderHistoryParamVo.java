@@ -14,7 +14,7 @@ public class ReminderHistoryParamVo extends BasePageVo {
     private String startTime;
     private String endTime;
     private String userUuid;
-    private List<String> pluginIdList;
+    private List<String> handlerList;
 
     public String getModuleId() {
         return moduleId;
@@ -49,10 +49,10 @@ public class ReminderHistoryParamVo extends BasePageVo {
     }
 
     public List<String> getPluginIdList() {
-        return pluginIdList;
+        return handlerList;
     }
 
-    public void setPluginIdList(List<String> pluginIdList) {
-        this.pluginIdList = pluginIdList;
+    public void setHandlerList(List<String> handlerList) {
+        this.handlerList = handlerList;
     }
 }

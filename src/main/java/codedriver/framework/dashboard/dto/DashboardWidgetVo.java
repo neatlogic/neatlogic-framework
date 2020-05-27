@@ -27,7 +27,7 @@ public class DashboardWidgetVo {
 	private transient String conditionConfig;
 	private transient String chartConfig;
 	private transient JSONObject conditionConfigObj;
-	private transient JSONObject chartConfigObj;
+	private JSONObject chartConfigObj;
 	@EntityField(name = "明细组件uuid", type = ApiParamType.STRING)
 	private String detailWidgetUuid;
 	@EntityField(name = "x坐标", type = ApiParamType.INTEGER)

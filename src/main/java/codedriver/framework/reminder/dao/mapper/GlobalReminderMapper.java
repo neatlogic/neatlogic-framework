@@ -25,7 +25,7 @@ public interface GlobalReminderMapper {
     * @Param: [reminderId] 
     * @return: java.util.List<java.lang.String>  
     */ 
-    List<String> getSubscribeUserUuidListByPluginId(String pluginId);
+    List<String> getSubscribeUserUuidListByHandler(String handler);
 
     /** 
     * @Description: 更新订阅信息（控件设置） 

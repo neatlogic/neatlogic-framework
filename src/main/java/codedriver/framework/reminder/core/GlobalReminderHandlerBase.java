@@ -2,7 +2,7 @@ package codedriver.framework.reminder.core;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;
-import codedriver.framework.reminder.dto.param.GlobalReminderParamVo;
+import codedriver.framework.reminder.dto.param.GlobalReminderHandlerConfigVo;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper;
 import com.alibaba.fastjson.JSON;
@@ -25,9 +25,9 @@ import java.util.List;
  **/
 
 @Transactional
-public abstract class GlobalReminderBase implements IGlobalReminder{
+public abstract class GlobalReminderHandlerBase implements IGlobalReminderHandler{
 
-    static Logger logger = LoggerFactory.getLogger(GlobalReminderBase.class);
+    static Logger logger = LoggerFactory.getLogger(GlobalReminderHandlerBase.class);
 
     protected static GlobalReminderMapper reminderMapper;
 
@@ -49,9 +49,9 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
    * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.param.GlobalReminderParamVo>  
    */ 
     @Override
-    public List<GlobalReminderParamVo> getConfig() {
-        List<GlobalReminderParamVo> paramVoList = new ArrayList<>();
-        GlobalReminderParamVo popParam = new GlobalReminderParamVo();
+    public List<GlobalReminderHandlerConfigVo> getConfig() {
+        List<GlobalReminderHandlerConfigVo> paramVoList = new ArrayList<>();
+        GlobalReminderHandlerConfigVo popParam = new GlobalReminderHandlerConfigVo();
         popParam.setShowName("弹框提醒");
         popParam.setName("popUp");
         popParam.setType(ControlEnum.RADIO.getValue());
@@ -84,7 +84,7 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
     @Override
     public Object packData(GlobalReminderMessageVo messageVo) {
         JSONObject returnObj = new JSONObject();
-        IGlobalReminder reminder = GlobalReminderFactory.getReminder(messageVo.getReminderVo().getPluginId());
+        //IGlobalReminderHandler reminder = GlobalReminderHandlerFactory.getReminder(messageVo.getReminderVo().getPluginId());
         returnObj.put("id", messageVo.getId());
         returnObj.put("title", messageVo.getTitle());
         returnObj.put("content", messageVo.getContent());
@@ -97,8 +97,6 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         returnObj.put("receiver", messageVo.getReminderSubscribeVo().getUserUuid());
         returnObj.put("receiverName", messageVo.getReminderSubscribeVo().getUserName());
         returnObj.put("isKeep", messageVo.getIsKeep());
-        returnObj.put("showTemplate", reminder.getShowTemplate());
-        returnObj.put("popUpTemplate", reminder.getPopUpTemplate());
         String param = messageVo.getReminderSubscribeVo().getParam();
         boolean hasParam = param != null && !("").equals(param);
         //弹窗类型
@@ -149,12 +147,6 @@ public abstract class GlobalReminderBase implements IGlobalReminder{
         * @Description: 各模块自行额外增加的参数控件（比如监控的声音设置）
         * @Param: [paramVoList]
         * @return: void*/
-    public abstract void myConfig(List<GlobalReminderParamVo> paramVoList);
+    public abstract void myConfig(List<GlobalReminderHandlerConfigVo> paramVoList);
 
-    /**
-     * @Description: 弹窗面板路径
-     * @Param: []
-     * @return: java.lang.String
-     */
-    public abstract String getPopUpTemplate();
 }

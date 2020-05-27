@@ -75,6 +75,9 @@ public class NumberChart extends DashboardChartBase {
 			resultMap = (Map<String,Object>)preDatas.get("resultMap");
 		}else {
 			resultMap =  new HashMap<String,Object>();
+			for(Object config:configList) {
+				resultMap.put(config.toString(), 0);
+			}
 			preDatas.put("resultMap", resultMap);
 		}
 		if(preDatas.containsKey("valueTextMap")) {
@@ -97,12 +100,8 @@ public class NumberChart extends DashboardChartBase {
 					valueTextMap.put(value, group.getString("text"));
 				}
 				if(CollectionUtils.isNotEmpty(configList)) {
-					if(configList.contains(value)){
-						if (!resultMap.containsKey(value)) {
-							resultMap.put(value, 1);
-						} else {
-							resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
-						}
+					if (resultMap.containsKey(value)) {
+						resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
 						total++;
 					}
 				}

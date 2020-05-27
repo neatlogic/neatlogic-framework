@@ -14,9 +14,17 @@ public class PatternVo {
 	private PatternVo() {
 	}
 
+	public PatternVo(String _name, ApiParamType _type, Integer _isRequired, String _description) {
+		name = _name;
+		type = _type.getValue();
+		isRequired = _isRequired;
+		description = _description;
+	}
+
 	public PatternVo(String _name, ApiParamType _type) {
 		name = _name;
 		type = _type.getValue();
+		isRequired = 0;
 	}
 
 	@EntityField(name = "参数名", type = ApiParamType.STRING)
@@ -27,6 +35,10 @@ public class PatternVo {
 	private String typeName;
 	@EntityField(name = "子参数", type = ApiParamType.JSONOBJECT)
 	private List<PatternVo> children;
+	@EntityField(name = "是否必填", type = ApiParamType.INTEGER)
+	private Integer isRequired;
+	@EntityField(name = "描述", type = ApiParamType.STRING)
+	private String description;
 
 	public String getName() {
 		return name;
@@ -68,6 +80,22 @@ public class PatternVo {
 			this.children = new ArrayList<>();
 		}
 		this.children.add(patternVo);
+	}
+
+	public Integer getIsRequired() {
+		return isRequired;
+	}
+
+	public void setIsRequired(Integer isRequired) {
+		this.isRequired = isRequired;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

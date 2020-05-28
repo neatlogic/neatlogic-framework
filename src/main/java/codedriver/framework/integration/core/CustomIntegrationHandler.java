@@ -1,10 +1,11 @@
 package codedriver.framework.integration.core;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONArray;
-
 import codedriver.framework.integration.dto.IntegrationVo;
+import codedriver.framework.integration.dto.PatternVo;
 
 @Component
 public class CustomIntegrationHandler extends IntegrationHandlerBase {
@@ -17,25 +18,28 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase {
 	}
 
 	@Override
-	public JSONArray getInputPattern() {
+	public List<PatternVo> getInputPattern() {
 		return null;
 	}
 
 	@Override
-	public JSONArray getOutputPattern() {
+	public List<PatternVo> getOutputPattern() {
 		return null;
 	}
 
 	@Override
 	protected void beforeSend(IntegrationVo integrationVo) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void afterReturn(IntegrationVo integrationVo) {
-		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Integer hasPattern() {
+		return 0;
 	}
 
 }

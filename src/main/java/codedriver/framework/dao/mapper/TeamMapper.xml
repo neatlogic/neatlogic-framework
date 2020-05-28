@@ -250,6 +250,6 @@
 	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team_role` d ON d.`team_uuid` = a.`uuid`
-	WHERE a.`lft` &gt;= #{lft} AND b.`rht` &lt;= #{rht}
+	WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
 	</delete>
 </mapper>

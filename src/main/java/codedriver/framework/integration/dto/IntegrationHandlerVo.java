@@ -1,8 +1,8 @@
 package codedriver.framework.integration.dto;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.integration.core.IIntegrationHandler;
@@ -15,9 +15,9 @@ public class IntegrationHandlerVo {
 	@EntityField(name = "处理器", type = ApiParamType.STRING)
 	private String handler;
 	@EntityField(name = "输入参数模板", type = ApiParamType.JSONARRAY)
-	private JSONArray inputPattern;
+	private List<PatternVo> inputPattern;
 	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
-	private JSONArray outputPattern;
+	private List<PatternVo> outputPattern;
 	@EntityField(name = "是否拥有参数模板", type = ApiParamType.INTEGER)
 	private Integer hasPattern;
 
@@ -47,7 +47,7 @@ public class IntegrationHandlerVo {
 		this.handler = handler;
 	}
 
-	public JSONArray getInputPattern() {
+	public List<PatternVo> getInputPattern() {
 		if (inputPattern == null && StringUtils.isNotBlank(handler)) {
 			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {
@@ -57,7 +57,7 @@ public class IntegrationHandlerVo {
 		return inputPattern;
 	}
 
-	public JSONArray getOutputPattern() {
+	public List<PatternVo> getOutputPattern() {
 		if (outputPattern == null && StringUtils.isNotBlank(handler)) {
 			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
 			if (integrationHandler != null) {

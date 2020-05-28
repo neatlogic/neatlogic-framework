@@ -87,39 +87,41 @@
 	</resultMap>
 	
 	<select id="searchAuthorizedDashboardUuid" parameterType="codedriver.framework.dashboard.dto.DashboardVo" resultType="java.lang.String">
-		SELECT
-		DISTINCT
-		a.uuid
-		FROM
-		`dashboard` a
-		LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
-		<where>
-			<if test="keyword !=null and keyword!=''">
-				AND a.name LIKE concat('%', #{keyword}, '%')
-			</if>
-				and (da.type = 'common' AND da.`uuid` = 'alluser')
-			<if test="userUuid != null and userUuid != ''">
-			  	OR	(da.type = 'custom' AND da.`uuid` = #{userUuid})
-			</if>
-			<if test="teamUuidList != null and teamUuidList.size() > 0">
-				OR (da.type = 'team' AND da.`uuid` IN 
-				<foreach collection="teamUuidList" item="teamUuid" open="(" separator=","  close=")">
-					#{teamUuid}
-				</foreach>
-					)
-			</if>
-			<if test="roleUuidList != null and roleUuidList.size() > 0">
-				OR (da.type = 'role' AND da.`uuid` IN 
-					<foreach collection="roleUuidList" item="roleUuid" open="(" separator=","  close=")">
-						#{roleUuid}
+		SELECT b.uuid FROM ( 
+			SELECT
+			DISTINCT
+			a.uuid
+			FROM
+			`dashboard` a
+			LEFT JOIN `dashboard_authority` da ON a.`uuid` = da.`dashboard_uuid`
+			<where>
+				<if test="keyword !=null and keyword!=''">
+					AND a.name LIKE concat('%', #{keyword}, '%')
+				</if>
+					and (da.type = 'common' AND da.`uuid` = 'alluser')
+				<if test="userUuid != null and userUuid != ''">
+				  	OR	(da.type = 'custom' AND da.`uuid` = #{userUuid})
+				</if>
+				<if test="teamUuidList != null and teamUuidList.size() > 0">
+					OR (da.type = 'team' AND da.`uuid` IN 
+					<foreach collection="teamUuidList" item="teamUuid" open="(" separator=","  close=")">
+						#{teamUuid}
 					</foreach>
-					)
-			</if>
-			<if test="fcu != null and fcu != ''">
-			or	a.`fcu` = #{fcu}
-			</if>
-		</where>
-		ORDER BY a.fcd DESC
+						)
+				</if>
+				<if test="roleUuidList != null and roleUuidList.size() > 0">
+					OR (da.type = 'role' AND da.`uuid` IN 
+						<foreach collection="roleUuidList" item="roleUuid" open="(" separator=","  close=")">
+							#{roleUuid}
+						</foreach>
+						)
+				</if>
+				<if test="fcu != null and fcu != ''">
+				or	a.`fcu` = #{fcu}
+				</if>
+			</where>
+		)b LEFT JOIN `dashboard` c on b.uuid = c.uuid
+		ORDER BY c.fcd DESC
 		<if test="needPage">
 			LIMIT #{startNum}, #{pageSize}
 		</if>

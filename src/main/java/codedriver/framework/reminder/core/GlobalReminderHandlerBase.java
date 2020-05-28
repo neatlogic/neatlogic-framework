@@ -2,7 +2,7 @@ package codedriver.framework.reminder.core;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;
-import codedriver.framework.reminder.dto.param.GlobalReminderHandlerParamVo;
+import codedriver.framework.reminder.dto.param.GlobalReminderHandlerConfigVo;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMapper;
 import codedriver.framework.reminder.dao.mapper.GlobalReminderMessageMapper;
 import com.alibaba.fastjson.JSON;
@@ -49,9 +49,9 @@ public abstract class GlobalReminderHandlerBase implements IGlobalReminderHandle
    * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.param.GlobalReminderParamVo>  
    */ 
     @Override
-    public List<GlobalReminderHandlerParamVo> getConfig() {
-        List<GlobalReminderHandlerParamVo> paramVoList = new ArrayList<>();
-        GlobalReminderHandlerParamVo popParam = new GlobalReminderHandlerParamVo();
+    public List<GlobalReminderHandlerConfigVo> getConfig() {
+        List<GlobalReminderHandlerConfigVo> paramVoList = new ArrayList<>();
+        GlobalReminderHandlerConfigVo popParam = new GlobalReminderHandlerConfigVo();
         popParam.setShowName("弹框提醒");
         popParam.setName("popUp");
         popParam.setType(ControlEnum.RADIO.getValue());
@@ -147,6 +147,6 @@ public abstract class GlobalReminderHandlerBase implements IGlobalReminderHandle
         * @Description: 各模块自行额外增加的参数控件（比如监控的声音设置）
         * @Param: [paramVoList]
         * @return: void*/
-    public abstract void myConfig(List<GlobalReminderHandlerParamVo> paramVoList);
+    public abstract void myConfig(List<GlobalReminderHandlerConfigVo> paramVoList);
 
 }

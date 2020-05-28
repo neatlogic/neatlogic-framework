@@ -14,6 +14,7 @@ public enum ChartType {
 	COLUMNCHART("columnchart","条形图",Chart.BARCHART,true),
 	STACKCOLUMNCHART("stackcolumnchart","堆叠条形图",Chart.BARCHART,false),
 	PIECHART("piechart","饼图",Chart.PIECHART,true),
+	DONUTCHART("donutchart","环形图",Chart.PIECHART,true),
 	AREACHART("areachart","面积图",Chart.AREACHART,true),
 	LINECHART("linechart","曲线图",Chart.LINECHART,true),
 	TABLECHART("tablechart","表格",Chart.TABLECHART,true),

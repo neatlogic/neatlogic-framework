@@ -1,16 +1,17 @@
 package codedriver.framework.reminder.dto;
 
 
-import codedriver.framework.apiparam.core.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.reminder.dto.param.GlobalReminderHandlerParamVo;
-import codedriver.framework.restful.annotation.EntityField;
+import java.util.List;
+import java.util.Objects;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import java.util.List;
-import java.util.Objects;
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.reminder.dto.param.GlobalReminderHandlerConfigVo;
+import codedriver.framework.restful.annotation.EntityField;
 
 /**
  * @program: balantflow
@@ -38,7 +39,7 @@ public class GlobalReminderHandlerVo extends BasePageVo implements Comparable<Gl
     @EntityField( name = "插件订阅者信息", type = ApiParamType.JSONOBJECT)
     private GlobalReminderSubscribeVo reminderSubscribeVo;
     @EntityField( name = "插件默认参数集合", type = ApiParamType.JSONARRAY)
-    private List<GlobalReminderHandlerParamVo> reminderParamList;
+    private List<GlobalReminderHandlerConfigVo> paramList;
 
     public String getName() {
         return name;
@@ -65,8 +66,8 @@ public class GlobalReminderHandlerVo extends BasePageVo implements Comparable<Gl
     }
 
     public String getConfig() {
-        if (reminderParamList != null && reminderParamList.size() > 0){
-            return JSON.toJSONString(reminderParamList);
+        if (paramList != null && paramList.size() > 0){
+            return JSON.toJSONString(paramList);
         }
         return config;
     }
@@ -100,12 +101,12 @@ public class GlobalReminderHandlerVo extends BasePageVo implements Comparable<Gl
         this.moduleId = moduleId;
     }
 
-    public List<GlobalReminderHandlerParamVo> getReminderParamList() {
-        return reminderParamList;
+    public List<GlobalReminderHandlerConfigVo> getParamList() {
+        return paramList;
     }
 
-    public void setReminderParamList(List<GlobalReminderHandlerParamVo> reminderParamList) {
-        this.reminderParamList = reminderParamList;
+    public void setParamList(List<GlobalReminderHandlerConfigVo> paramList) {
+        this.paramList = paramList;
     }
 
     public GlobalReminderSubscribeVo getReminderSubscribeVo() {

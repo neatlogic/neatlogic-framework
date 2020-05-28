@@ -18,6 +18,8 @@ public class IntegrationHandlerVo {
 	private JSONArray inputPattern;
 	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
 	private JSONArray outputPattern;
+	@EntityField(name = "是否拥有参数模板", type = ApiParamType.INTEGER)
+	private Integer hasPattern;
 
 	@SuppressWarnings("unused")
 	private IntegrationHandlerVo() {
@@ -63,6 +65,20 @@ public class IntegrationHandlerVo {
 			}
 		}
 		return outputPattern;
+	}
+
+	public Integer getHasPattern() {
+		if (hasPattern == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				hasPattern = integrationHandler.hasPattern();
+			}
+		}
+		return hasPattern;
+	}
+
+	public void setHasPattern(Integer hasPattern) {
+		this.hasPattern = hasPattern;
 	}
 
 }

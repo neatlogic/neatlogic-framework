@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONArray;
  * @description: 控件参数类
  * @create: 2019-08-08 15:45
  **/
-public class GlobalReminderHandlerParamVo {
+public class GlobalReminderHandlerConfigVo {
     private String showName;
     private String name;
     private String type;

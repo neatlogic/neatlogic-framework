@@ -19,7 +19,7 @@ public class PieChart extends DashboardChartBase {
 
 	@Override
 	public String[] getSupportChart() {
-		return new String[] { ChartType.PIECHART.getValue() };
+		return new String[] { ChartType.PIECHART.getValue(),ChartType.DONUTCHART.getValue()  };
 	}
 
 	@SuppressWarnings("unchecked")

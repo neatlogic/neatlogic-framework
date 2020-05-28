@@ -38,4 +38,9 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase {
 
 	}
 
+	@Override
+	public Integer hasPattern() {
+		return 0;
+	}
+
 }

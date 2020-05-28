@@ -15,6 +15,8 @@ public interface IIntegrationHandler {
 	}
 
 	public IntegrationResultVo sendRequest(IntegrationVo integrationVo);
+	
+	public Integer hasPattern();
 
 	public JSONArray getInputPattern();
 

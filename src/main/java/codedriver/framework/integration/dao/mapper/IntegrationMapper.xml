@@ -35,6 +35,9 @@
 			<if test="handler != null and handler != ''">
 				AND handler = #{handler}
 			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
+			</if>
 		</where>
 		ORDER BY fcd DESC
 		<if test="needPage == true">
@@ -54,6 +57,9 @@
 			</if>
 			<if test="handler != null and handler != ''">
 				AND handler = #{handler}
+			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
 			</if>
 		</where>
 	</select>

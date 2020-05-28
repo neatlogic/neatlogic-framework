@@ -2,7 +2,7 @@ package codedriver.framework.reminder.core;
 
 import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
 import codedriver.framework.reminder.dto.ReminderMessageVo;
-import codedriver.framework.reminder.dto.param.GlobalReminderHandlerParamVo;
+import codedriver.framework.reminder.dto.param.GlobalReminderHandlerConfigVo;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface IGlobalReminderHandler {
     * @Param: [] 
     * @return: java.lang.String  
     */ 
-    List<GlobalReminderHandlerParamVo> getConfig();
+    List<GlobalReminderHandlerConfigVo> getConfig();
 
     /**
      * @Description: 数据处理

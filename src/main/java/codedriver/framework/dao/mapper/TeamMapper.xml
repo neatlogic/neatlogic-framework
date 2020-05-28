@@ -225,11 +225,11 @@
 	</update>
 	
 	<update id="batchUpdateTeamLeftCode">
-	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` >= #{minCode}
+	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` &gt;= #{minCode}
 	</update>
 	
 	<update id="batchUpdateTeamRightCode">
-	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` >= #{minCode}
+	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` &gt;= #{minCode}
 	</update>
 	
 	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">

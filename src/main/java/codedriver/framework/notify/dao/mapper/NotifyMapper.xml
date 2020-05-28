@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.notify.dao.mapper.NotifyMapper">
+	<select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`title`,
+		`content`,
+		`type`,
+		`notify_handler` AS notifyHandler,
+		`trigger`
+		FROM
+		`process_notifytemplate`
+		WHERE
+		uuid = #{value}
+	</select>
+
+	<select id="searchNotifyTemplateCount" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM `process_notifytemplate`
+		<where>
+			<if test="notifyHandler != null and notifyHandler != ''">
+				AND `notify_handler` = #{notifyHandler}
+			</if>
+			<if test="trigger != null and trigger != ''">
+				AND `trigger` = #{trigger}
+			</if>
+			<if test="type != null and type != ''">
+				AND `type` = #{type}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+	</select>
+
+	<select id="searchNotifyTemplate" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`title`,
+		`content`,
+		`type`,
+		`notify_handler` AS notifyHandler,
+		`trigger`
+		FROM `process_notifytemplate`
+		<where>
+			<if test="notifyHandler != null and notifyHandler != ''">
+				AND `notify_handler` = #{notifyHandler}
+			</if>
+			<if test="trigger != null and trigger != ''">
+				AND `trigger` = #{trigger}
+			</if>
+			<if test="type != null and type != ''">
+				AND `type` = #{type}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+		ORDER BY `fcd` DESC
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+	
+	<select id="getNotifyTemplateTypeList" resultType="java.lang.String">
+	SELECT 
+	  DISTINCT `type`
+	FROM `process_notifytemplate` 
+	ORDER BY `type`
+	</select>
+	
+	<select id="getNotifyTemplateListForSelect" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+	SELECT
+	`uuid` AS value,
+	`name` AS text
+	FROM `process_notifytemplate`
+	<where>
+		<if test="notifyHandler != null and notifyHandler != ''">
+		AND `notify_handler` = #{notifyHandler}
+		</if>
+		<if test="trigger != null and trigger != ''">
+		AND `trigger` = #{trigger}
+		</if>
+	</where>
+	ORDER BY `name`
+	</select>
+	
+	<select id="checkNotifyTemplateNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="int">
+	SELECT COUNT(1) FROM `process_notifytemplate` WHERE `name` = #{name} AND `uuid` != #{uuid}
+	</select>
+	
+	<insert id="insertNotifyTemplate" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo">
+	INSERT INTO `process_notifytemplate` (
+	  `uuid`,
+	  `name`,
+	  `title`,
+	  `content`,
+	  `type`,
+	  `notify_handler`,
+	  `trigger`,
+	  `fcd`,
+	  `fcu`
+	) 
+	VALUES
+	  (
+	    #{uuid},
+	    #{name},
+	    #{title},
+	    #{content},
+	    #{type},
+	    #{notifyHandler},
+	    #{trigger},
+	    NOW(),
+	    #{fcu}
+	  ) 
+	</insert>
+	
+	<update id="updateNotifyTemplateByUuid" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo">
+	UPDATE 
+	  `process_notifytemplate` 
+	SET
+	  `name` = #{name},
+	  `title` = #{title},
+	  `content` = #{content},
+	  `type` = #{type},
+	  `notify_handler`=#{notifyHandler},
+	  `trigger`=#{trigger},
+	  `lcd` = NOW(),
+	  `lcu` = #{lcu} 
+	WHERE `uuid` = #{uuid}
+	</update>
+	
+	<delete id="deleteNotifyTemplateByUuid" parameterType="java.lang.String">
+	DELETE FROM `process_notifytemplate` where `uuid`=#{uuid}
+	</delete>
+</mapper>

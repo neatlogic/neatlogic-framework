@@ -14,7 +14,9 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.constvalue.NotifyPolicyActionType;
+import codedriver.framework.notify.core.NotifyPolicyHandlerFactory;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class NotifyPolicyVo extends BaseEditorVo {
@@ -39,16 +41,13 @@ public class NotifyPolicyVo extends BaseEditorVo {
 			}
 			JSONObject configObj = new JSONObject();
 			JSONArray triggerList = new JSONArray();
-//			for (NotifyTriggerType notifyTriggerType : NotifyTriggerType.values()) {
-//				if(NotifyTriggerType.TIMEOUT == notifyTriggerType) {
-//					continue;
-//				}
-//				JSONObject triggerObj = new JSONObject();
-//				triggerObj.put("trigger", notifyTriggerType.getTrigger());
-//				triggerObj.put("triggerName", notifyTriggerType.getText());
-//				triggerObj.put("handlerList", new JSONArray());
-//				triggerList.add(triggerObj);
-//			}
+			for (ValueTextVo notifyTrigger : NotifyPolicyHandlerFactory.getHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler").getNotifyTriggerList()) {
+				JSONObject triggerObj = new JSONObject();
+				triggerObj.put("trigger", notifyTrigger.getValue());
+				triggerObj.put("triggerName", notifyTrigger.getText());
+				triggerObj.put("handlerList", new JSONArray());
+				triggerList.add(triggerObj);
+			}
 			configObj.put("triggerList", triggerList);
 			notifyPolicyVo.setConfig(configObj.toJSONString());
 			notifyPolicyMap.put(notifyPolicyVo.getUuid(), notifyPolicyVo);
@@ -71,8 +70,8 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	@EntityField(name = "配置项信息", type = ApiParamType.STRING)
 	private String config;
 	private transient JSONObject configObj;
-	@EntityField(name = "模块id", type = ApiParamType.STRING)
-	private String moduleId;
+	@EntityField(name = "通知策略类型", type = ApiParamType.STRING)
+	private String policyHandler;
 	public synchronized String getUuid() {
 		if(StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");
@@ -165,10 +164,11 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	public void setConfigObj(JSONObject configObj) {
 		this.configObj = configObj;
 	}
-	public String getModuleId() {
-		return moduleId;
+	public String getPolicyHandler() {
+		return policyHandler;
 	}
-	public void setModuleId(String moduleId) {
-		this.moduleId = moduleId;
+	public void setPolicyHandler(String policyHandler) {
+		this.policyHandler = policyHandler;
 	}
+
 }

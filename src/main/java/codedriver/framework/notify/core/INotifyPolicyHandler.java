@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.util.ClassUtils;
 
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.notify.dto.NotifyPolicyParamTypeVo;
 
 public interface INotifyPolicyHandler {
 	
@@ -12,7 +13,7 @@ public interface INotifyPolicyHandler {
 	
 	public List<ValueTextVo> getNotifyTriggerList();
 	
-	public List<ValueTextVo> getVariableTypeList();
+	public List<NotifyPolicyParamTypeVo> getParamTypeList();
 	
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();

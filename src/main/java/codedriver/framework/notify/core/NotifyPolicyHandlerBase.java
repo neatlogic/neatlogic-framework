@@ -7,6 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.notify.dto.NotifyPolicyParamTypeVo;
 
 public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 
@@ -18,17 +19,17 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	protected abstract List<ValueTextVo> myNotifyTriggerList();
 	
 	@Override
-	public List<ValueTextVo> getVariableTypeList() {
-		List<ValueTextVo> resultList = new ArrayList<>();
+	public List<NotifyPolicyParamTypeVo> getParamTypeList() {
+		List<NotifyPolicyParamTypeVo> resultList = new ArrayList<>();
 		for (ApiParamType type : ApiParamType.values()) {
-			resultList.add(new ValueTextVo(type.getValue(), type.getText()));
+//			resultList.add(new ValueTextVo(type.getValue(), type.getText()));
 		}
-		List<ValueTextVo> variableTypeList = myVariableTypeList();
-		if(CollectionUtils.isNotEmpty(variableTypeList)) {
-			resultList.addAll(variableTypeList);
+		List<NotifyPolicyParamTypeVo> paramTypeList = myParamTypeList();
+		if(CollectionUtils.isNotEmpty(paramTypeList)) {
+			resultList.addAll(paramTypeList);
 		}
 		return resultList;
 	}
 
-	protected abstract List<ValueTextVo> myVariableTypeList();
+	protected abstract List<NotifyPolicyParamTypeVo> myParamTypeList();
 }

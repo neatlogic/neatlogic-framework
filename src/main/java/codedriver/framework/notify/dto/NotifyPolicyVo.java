@@ -26,9 +26,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 		for(int i = 0; i < 100; i++) {
 			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo();
 			notifyPolicyVo.setName("test" + i);
-			notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
 			notifyPolicyVo.setReferenceCount(i%10);
 			if(i % 2 == 0) {
+				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
 				notifyPolicyVo.setFcu("linbq");
 				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + (i * 1000)));
 				notifyPolicyVo.setFcuName("林邦泉");
@@ -36,6 +36,7 @@ public class NotifyPolicyVo extends BaseEditorVo {
 				notifyPolicyVo.setLcd(new Date(currentDate.getTime() + (i * 1000)));
 				notifyPolicyVo.setLcuName("吕佐康");
 			}else {
+				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.TestNotifyPolicyHandler");
 				notifyPolicyVo.setFcu("linbq");
 				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + (i * 1000)));
 				notifyPolicyVo.setFcuName("林邦泉");

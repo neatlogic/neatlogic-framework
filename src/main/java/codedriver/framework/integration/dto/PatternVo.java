@@ -10,8 +10,8 @@ import codedriver.framework.restful.annotation.EntityField;
 
 public class PatternVo {
 
-	@SuppressWarnings("unused")
-	private PatternVo() {
+	public PatternVo() {
+
 	}
 
 	public PatternVo(String _name, ApiParamType _type, Integer _isRequired, String _description) {

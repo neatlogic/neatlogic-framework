@@ -1,11 +1,12 @@
 package codedriver.framework.integration.core;
 
-import org.springframework.util.ClassUtils;
+import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
+import org.springframework.util.ClassUtils;
 
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
+import codedriver.framework.integration.dto.PatternVo;
 
 public interface IIntegrationHandler {
 	public String getName();
@@ -18,8 +19,8 @@ public interface IIntegrationHandler {
 	
 	public Integer hasPattern();
 
-	public JSONArray getInputPattern();
+	public List<PatternVo> getInputPattern();
 
-	public JSONArray getOutputPattern();
+	public List<PatternVo> getOutputPattern();
 
 }

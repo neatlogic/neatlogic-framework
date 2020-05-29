@@ -26,6 +26,7 @@ public class NotifyPolicyVo extends BaseEditorVo {
 		for(int i = 0; i < 100; i++) {
 			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo();
 			notifyPolicyVo.setName("test" + i);
+			notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
 			notifyPolicyVo.setReferenceCount(i%10);
 			if(i % 2 == 0) {
 				notifyPolicyVo.setFcu("linbq");

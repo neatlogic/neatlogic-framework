@@ -24,21 +24,20 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	static {
 		Date currentDate = new Date();
 		for(int i = 0; i < 100; i++) {
-			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo();
-			notifyPolicyVo.setName("test" + i);
+			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo("test" + i, "");
 			notifyPolicyVo.setReferenceCount(i%10);
 			if(i % 2 == 0) {
 				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
 				notifyPolicyVo.setFcu("linbq");
-				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + (i * 1000)));
+				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
 				notifyPolicyVo.setFcuName("林邦泉");
 				notifyPolicyVo.setLcu("lvzk");
-				notifyPolicyVo.setLcd(new Date(currentDate.getTime() + (i * 1000)));
+				notifyPolicyVo.setLcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
 				notifyPolicyVo.setLcuName("吕佐康");
 			}else {
 				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.TestNotifyPolicyHandler");
 				notifyPolicyVo.setFcu("linbq");
-				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + (i * 1000)));
+				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
 				notifyPolicyVo.setFcuName("林邦泉");
 			}
 			JSONObject configObj = new JSONObject();
@@ -74,6 +73,13 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	private transient JSONObject configObj;
 	@EntityField(name = "通知策略类型", type = ApiParamType.STRING)
 	private String policyHandler;
+	
+	
+	public NotifyPolicyVo(String name, String policyHandler) {
+		this.name = name;
+		this.policyHandler = policyHandler;
+	}
+	
 	public synchronized String getUuid() {
 		if(StringUtils.isBlank(uuid)) {
 			uuid = UUID.randomUUID().toString().replace("-", "");

@@ -8,6 +8,8 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -23,10 +25,16 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.apiparam.core.ApiParamFactory;
+import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.exception.integration.ParamTypeNotFoundException;
+import codedriver.framework.exception.type.ParamIrregularException;
+import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
+import codedriver.framework.integration.dto.PatternVo;
 import codedriver.framework.util.FreemarkerUtil;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
@@ -68,11 +76,51 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 		JSONObject authConfig = config.getJSONObject("authentication");
 		JSONArray headConfig = config.getJSONArray("head");
 		JSONObject outputConfig = config.getJSONObject("output");
-		IntegrationResultVo resultVo = new IntegrationResultVo();
-		JSONObject paramObj = integrationVo.getParamObj();
-		if (paramObj == null) {
-			paramObj = new JSONObject();
+		JSONObject paramObj = config.getJSONObject("param");
+		JSONObject requestParamObj = integrationVo.getParamObj();
+		/**
+		 * 校验请求参数开始
+		 */
+		if (paramObj != null && paramObj.getInteger("needValid") != null && paramObj.getInteger("needValid").equals(1)) {
+			List<PatternVo> patternList = null;
+			// 包含内置参数
+			if (this.hasPattern().equals(1)) {
+				patternList = this.getInputPattern();
+			} else {// 自定义参数
+				patternList = new ArrayList<>();
+				JSONArray paramList = paramObj.getJSONArray("paramList");
+				if (paramList != null && paramList.size() > 0) {
+					for (int i = 0; i < paramList.size(); i++) {
+						JSONObject pObj = paramList.getJSONObject(i);
+						PatternVo patternVo = JSONObject.toJavaObject(pObj, PatternVo.class);
+						patternList.add(patternVo);
+					}
+				}
+			}
+			if (patternList != null && patternList.size() > 0) {
+				for (PatternVo patternVo : patternList) {
+					if (patternVo.getIsRequired() != null && patternVo.getIsRequired().equals(1)) {
+						if (!requestParamObj.containsKey(patternVo.getName())) {
+							throw new ParamNotExistsException("参数：“" + patternVo.getName() + "”不能为空");
+						}
+
+					}
+					Object paramValue = requestParamObj.get(patternVo.getName());
+					ApiParamType apiParamType = ApiParamType.getApiParamType(patternVo.getType());
+					if (apiParamType == null) {
+						throw new ParamTypeNotFoundException(patternVo.getType());
+					}
+					if (paramValue != null && !ApiParamFactory.getAuthInstance(apiParamType).validate(paramValue, null)) {
+						throw new ParamIrregularException("参数“" + patternVo.getName() + "”不符合格式要求");
+					}
+				}
+			}
 		}
+		/**
+		 * 校验请求参数结束
+		 */
+
+		IntegrationResultVo resultVo = new IntegrationResultVo();
 		HttpURLConnection connection = null;
 		try {
 			HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
@@ -140,8 +188,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					content = integrationVo.getParamObj().toJSONString();
 				}
 				try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
-					 out.write(content.toString().getBytes("utf-8"));
-					//out.writeBytes(content);
+					out.write(content.toString().getBytes("utf-8"));
+					// out.writeBytes(content);
 				} catch (Exception e) {
 					resultVo.appendError(e.getMessage());
 				}

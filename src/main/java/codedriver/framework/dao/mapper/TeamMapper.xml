@@ -225,11 +225,11 @@
 	</update>
 	
 	<update id="batchUpdateTeamLeftCode">
-	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` >= #{minCode}
+	UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` &gt;= #{minCode}
 	</update>
 	
 	<update id="batchUpdateTeamRightCode">
-	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` >= #{minCode}
+	UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` &gt;= #{minCode}
 	</update>
 	
 	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
@@ -250,6 +250,6 @@
 	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team_role` d ON d.`team_uuid` = a.`uuid`
-	WHERE a.`lft` &gt;= #{lft} AND b.`rht` &lt;= #{rht}
+	WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
 	</delete>
 </mapper>

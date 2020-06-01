@@ -54,8 +54,8 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 
 	@Override
 	public List<NotifyPolicyParamVo> getSystemParamList() {
-		return null;
+		return mySystemParamList();
 	}
 	
-	protected abstract List<NotifyPolicyParamTypeVo> mySystemParamList();
+	protected abstract List<NotifyPolicyParamVo> mySystemParamList();
 }

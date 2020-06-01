@@ -36,9 +36,7 @@ public class IntegrationVo extends BasePageVo {
 	@EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)
 	private List<PatternVo> outputPatternList = new ArrayList<>();
 	@EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
-	private String config;
-	@JSONField(serialize = false)
-	private transient JSONObject configObj;
+	private JSONObject config;
 	// 请求参数
 	@JSONField(serialize = false)
 	private transient JSONObject paramObj = new JSONObject();
@@ -50,6 +48,9 @@ public class IntegrationVo extends BasePageVo {
 	private String lcu;
 	@EntityField(name = "修改时间", type = ApiParamType.INTEGER)
 	private Date lcd;
+	@EntityField(name = "是否有帮助", type = ApiParamType.INTEGER)
+	private Integer hasHelp;
+
 	@JSONField(serialize = false)
 	private transient String keyword;
 
@@ -112,22 +113,22 @@ public class IntegrationVo extends BasePageVo {
 
 	@JSONField(serialize = false)
 	public String getConfigStr() {
-		return config;
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
 
 	public void setConfig(String config) {
-		this.config = config;
+		try {
+			this.config = JSONObject.parseObject(config);
+		} catch (Exception ex) {
+
+		}
 	}
 
 	public JSONObject getConfig() {
-		if (configObj == null && StringUtils.isNotBlank(config)) {
-			try {
-				configObj = JSONObject.parseObject(config);
-			} catch (Exception ex) {
-
-			}
-		}
-		return configObj;
+		return config;
 	}
 
 	public JSONObject getParamObj() {
@@ -200,6 +201,25 @@ public class IntegrationVo extends BasePageVo {
 
 	public void setIsActive(Integer isActive) {
 		this.isActive = isActive;
+	}
+
+	public Integer getHasHelp() {
+		if (hasHelp == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				hasHelp = integrationHandler.hasPattern();
+			}
+			if (hasHelp.equals(0) && this.config != null && this.config.containsKey("param")) {
+				if (this.config.getJSONObject("param").containsKey("paramList") && this.config.getJSONObject("param").getJSONArray("paramList").size() > 0) {
+					hasHelp = 1;
+				}
+			}
+		}
+		return hasHelp;
+	}
+
+	public void setHasHelp(Integer hasHelp) {
+		this.hasHelp = hasHelp;
 	}
 
 }

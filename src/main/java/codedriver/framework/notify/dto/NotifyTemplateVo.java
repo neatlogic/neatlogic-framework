@@ -1,7 +1,5 @@
 package codedriver.framework.notify.dto;
 
-import java.util.UUID;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Objects;
@@ -11,10 +9,11 @@ import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.core.INotifyHandler;
 import codedriver.framework.notify.core.NotifyHandlerFactory;
 import codedriver.framework.notify.core.NotifyHandlerType;
+import codedriver.framework.util.SnowflakeUtil;
 
 public class NotifyTemplateVo extends BasePageVo {
 
-	private String uuid;
+	private Long id;
 	private String name;
 	private String title;
 	private String content;
@@ -34,8 +33,8 @@ public class NotifyTemplateVo extends BasePageVo {
 	public NotifyTemplateVo() {
 	}
 
-	public NotifyTemplateVo(String uuid, String name, String type, Integer isReadOnly, String notifyHandlerType, String trigger, String title, String content) {
-		this.uuid = uuid;
+	public NotifyTemplateVo(Long id, String name, String type, Integer isReadOnly, String notifyHandlerType, String trigger, String title, String content) {
+		this.id = id;
 		this.name = name;
 		this.title = title;
 		this.content = content;
@@ -45,15 +44,15 @@ public class NotifyTemplateVo extends BasePageVo {
 		this.trigger = trigger;
 	}
 
-	public synchronized String getUuid() {
-		if (StringUtils.isBlank(uuid)) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
+	public Long getId() {
+		if(id == null) {
+			id = SnowflakeUtil.uniqueLong();
 		}
-		return uuid;
+		return id;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName() {

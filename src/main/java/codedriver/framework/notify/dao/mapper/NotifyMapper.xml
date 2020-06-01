@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.notify.dao.mapper.NotifyMapper">
-	<select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
+	<!-- <select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -136,5 +136,91 @@
 	
 	<delete id="deleteNotifyTemplateByUuid" parameterType="java.lang.String">
 	DELETE FROM `process_notifytemplate` where `uuid`=#{uuid}
+	</delete> -->
+	
+	<!-- public NotifyPolicyVo getNotifyPolicyById(Long id); -->
+	<select id="getNotifyPolicyById" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu
+	FROM `notify_policy`
+	WHERE `id` = #{id}
+	</select>
+	<!-- public int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo); -->
+	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT COUNT(1) FROM `notify_policy` WHERE `name` = #{name} AND `id` != #{id}
+	</select>
+	<!-- public List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo); -->
+	<select id="getNotifyPolicyList" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu
+	FROM `notify_policy`
+	<where>
+		<if test="keyword != null and keyword != ''">
+			`name` LIKE concat('%',#{keyword},'%') 
+		</if>
+	</where>
+	ORDER BY `id` DESC
+	<if test="needPage">
+	limit #{startNum}, #{pageSize}
+	</if>
+	</select>
+	<!-- public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo); -->
+	<select id="getNotifyPolicyCount" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT 
+	COUNT(`id`)
+	FROM `notify_policy`
+	<where>
+		<if test="keyword != null and keyword != ''">
+			`name` LIKE concat('%',#{keyword},'%') 
+		</if>
+	</where>
+	</select>
+	<!-- public int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo); -->
+	<insert id="insertNotifyPolicy">
+	insert into `notify_policy` 
+	(
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcu`,
+	`fcd`
+	) 
+	values 
+	(
+	#{id},
+	#{name},
+	#{handler},
+	#{config},
+	#{fcd},
+	NOW(3)
+	)
+	</insert>
+	
+	<!-- public int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo); -->
+	<update id="updateNotifyPolicyById">
+	UPDATE `notify_policy` SET
+	`name` = #{name},
+	`config` = #{config},
+	`lcu` = #{lcu},
+	`lcd` = NOW(3)
+	WHERE `id` = #{id}
+	</update>
+	<!-- public int deleteNotifyPolicyById(Long id); -->
+	<delete id="">
+	DELETE FROM `notify_policy` WHERE id = #{id}
 	</delete>
 </mapper>

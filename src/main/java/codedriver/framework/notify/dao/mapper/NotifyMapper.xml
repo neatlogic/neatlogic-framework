@@ -188,7 +188,7 @@
 	</where>
 	</select>
 	
-	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.list" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.List" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
 	SELECT 
 	  `policy_id` AS id,
 	  COUNT(`policy_id`) AS invokerCount 

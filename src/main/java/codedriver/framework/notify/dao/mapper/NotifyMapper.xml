@@ -200,6 +200,16 @@
 	GROUP BY `policy_id`
 	</select>
 
+	<select id="getNotifyPolicyInvokerList" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo" resultType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	SELECT 
+	  `policy_id` AS policyId,
+	  `invoker`,
+	  `config` 
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
+	LIMIT #{startNum}, #{pageSize}
+	</select>
+	
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
 	VALUES (#{id}, #{name}, #{handler}, #{config}, #{fcd}, NOW(3))

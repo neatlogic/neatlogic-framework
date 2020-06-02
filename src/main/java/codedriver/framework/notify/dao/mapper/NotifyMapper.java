@@ -2,6 +2,7 @@ package codedriver.framework.notify.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.notify.dto.NotifyPolicyInvokerVo;
 import codedriver.framework.notify.dto.NotifyPolicyVo;
 
 public interface NotifyMapper {
@@ -32,10 +33,16 @@ public interface NotifyMapper {
 
 	public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
 
+	public List<NotifyPolicyVo> getNotifyPolicyInvokerCountListByPolicyIdList(List<Long> policyIdList);
+
 	public int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo);
+
+	public int insertNotifyPolicyInvoker(NotifyPolicyInvokerVo notifyPolicyInvokerVo);
 
 	public int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo);
 
 	public int deleteNotifyPolicyById(Long id);
+
+	public int deleteNotifyPolicyInvoker(NotifyPolicyInvokerVo notifyPolicyInvokerVo);
 
 }

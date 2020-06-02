@@ -16,7 +16,7 @@ public class NotifyPolicyFactory {
 		Date currentDate = new Date();
 		for(int i = 0; i < 100; i++) {
 			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo("test" + i, "");
-			notifyPolicyVo.setReferenceCount(i%10);
+			notifyPolicyVo.setInvokerCount(i%10);
 			if(i % 2 == 0) {
 				notifyPolicyVo.setHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
 				notifyPolicyVo.setFcu("linbq");

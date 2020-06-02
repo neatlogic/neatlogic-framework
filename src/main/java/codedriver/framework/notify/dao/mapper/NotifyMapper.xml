@@ -138,7 +138,6 @@
 	DELETE FROM `process_notifytemplate` where `uuid`=#{uuid}
 	</delete> -->
 	
-	<!-- public NotifyPolicyVo getNotifyPolicyById(Long id); -->
 	<select id="getNotifyPolicyById" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
 	SELECT 
 	`id`,
@@ -152,11 +151,11 @@
 	FROM `notify_policy`
 	WHERE `id` = #{id}
 	</select>
-	<!-- public int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo); -->
+
 	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
 	SELECT COUNT(1) FROM `notify_policy` WHERE `name` = #{name} AND `id` != #{id}
 	</select>
-	<!-- public List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo); -->
+
 	<select id="getNotifyPolicyList" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
 	SELECT 
 	`id`,
@@ -177,7 +176,7 @@
 	limit #{startNum}, #{pageSize}
 	</if>
 	</select>
-	<!-- public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo); -->
+
 	<select id="getNotifyPolicyCount" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
 	SELECT 
 	COUNT(`id`)
@@ -188,29 +187,29 @@
 		</if>
 	</where>
 	</select>
-	<!-- public int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo); -->
+	
+	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.list" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	  `policy_id` AS id,
+	  COUNT(`policy_id`) AS invokerCount 
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` IN 
+	<foreach collection="list" item="policyId" open="(" separator="," close=")">
+	#{policyId}
+	</foreach>
+	GROUP BY `policy_id`
+	</select>
+
 	<insert id="insertNotifyPolicy">
-	insert into `notify_policy` 
-	(
-	`id`,
-	`name`,
-	`handler`,
-	`config`,
-	`fcu`,
-	`fcd`
-	) 
-	values 
-	(
-	#{id},
-	#{name},
-	#{handler},
-	#{config},
-	#{fcd},
-	NOW(3)
-	)
+	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
+	VALUES (#{id}, #{name}, #{handler}, #{config}, #{fcd}, NOW(3))
 	</insert>
 	
-	<!-- public int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo); -->
+	<insert id="insertNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	INSERT INTO `notify_policy_invoke` (`policy_id`, `invoker`, `config`) 
+	VALUES (#{policyId}, #{invoker}, #{config})
+	</insert>
+
 	<update id="updateNotifyPolicyById">
 	UPDATE `notify_policy` SET
 	`name` = #{name},
@@ -219,8 +218,14 @@
 	`lcd` = NOW(3)
 	WHERE `id` = #{id}
 	</update>
-	<!-- public int deleteNotifyPolicyById(Long id); -->
-	<delete id="">
+
+	<delete id="deleteNotifyPolicyById">
 	DELETE FROM `notify_policy` WHERE id = #{id}
+	</delete>
+	
+	<delete id="deleteNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	DELETE FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
+	AND `invoker` = #{invoker}
 	</delete>
 </mapper>

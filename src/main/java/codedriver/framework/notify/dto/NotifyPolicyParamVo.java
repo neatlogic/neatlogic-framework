@@ -5,7 +5,6 @@ public class NotifyPolicyParamVo {
 	private String name;
 	private String type;
 	private String description;
-	private String config;
 	public String getName() {
 		return name;
 	}
@@ -23,11 +22,5 @@ public class NotifyPolicyParamVo {
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public String getConfig() {
-		return config;
-	}
-	public void setConfig(String config) {
-		this.config = config;
 	}
 }

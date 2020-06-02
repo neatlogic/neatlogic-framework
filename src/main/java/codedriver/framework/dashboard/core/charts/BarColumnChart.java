@@ -28,8 +28,21 @@ public class BarColumnChart extends DashboardChartBase {
 		JSONObject dataJson = new JSONObject();
 		JSONArray dataList = new JSONArray();
 		Map<String,Object> resultMap = (Map<String,Object>)dataMap.get("resultMap");
+		Map<String,Integer> columnTotalMap = new HashMap<String,Integer>();
 		Map<String, String> valueTextMap = (Map<String,String>)dataMap.get("valueTextMap");
 		if (MapUtils.isNotEmpty(resultMap)) {
+			Iterator<String> itKey1 = resultMap.keySet().iterator();
+			//统计column total，后续排序 limit
+			while (itKey1.hasNext()) {
+				String key = itKey1.next();
+				String[] keys = key.split("#");
+				int total = 0;
+				if(columnTotalMap.containsKey(keys[0])) {
+					total = columnTotalMap.get(keys[0]);
+				}
+				columnTotalMap.put(keys[0],total+(int)resultMap.get(key));
+
+			}
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			while (itKey.hasNext()) {
 				String key = itKey.next();
@@ -41,6 +54,7 @@ public class BarColumnChart extends DashboardChartBase {
 				}else {
 					data.put("column", valueTextMap.get(key));
 				}
+				data.put("total", columnTotalMap.get(keys[0]));
 				data.put("value", resultMap.get(key));
 				dataList.add(data);
 			}

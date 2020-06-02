@@ -37,6 +37,7 @@ public class NumberChart extends DashboardChartBase {
 				JSONObject data = new JSONObject();
 				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));
+				data.put("total", resultMap.get(key));
 				dataList.add(data);
 			}
 			dataJson.put("dataList", dataList);
@@ -75,8 +76,10 @@ public class NumberChart extends DashboardChartBase {
 			resultMap = (Map<String,Object>)preDatas.get("resultMap");
 		}else {
 			resultMap =  new HashMap<String,Object>();
-			for(Object config:configList) {
-				resultMap.put(config.toString(), 0);
+			if(CollectionUtils.isNotEmpty(configList)) {
+				for(Object config:configList) {
+					resultMap.put(config.toString(), 0);
+				}
 			}
 			preDatas.put("resultMap", resultMap);
 		}

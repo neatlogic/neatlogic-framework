@@ -36,6 +36,7 @@ public class PieChart extends DashboardChartBase {
 				JSONObject data = new JSONObject();
 				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));
+				data.put("total", resultMap.get(key));
 				dataList.add(data);
 			}
 			dataJson.put("dataList", dataList);

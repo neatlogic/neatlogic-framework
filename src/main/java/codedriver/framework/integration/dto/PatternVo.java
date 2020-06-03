@@ -14,23 +14,27 @@ public class PatternVo {
 
 	}
 
-	public PatternVo(String _name, ApiParamType _type, Integer _isRequired, String _description) {
+	public PatternVo(String _name, String _mode, ApiParamType _type, Integer _isRequired, String _description) {
 		name = _name;
 		type = _type.getValue();
+		mode = _mode;
 		isRequired = _isRequired;
 		description = _description;
 	}
 
-	public PatternVo(String _name, ApiParamType _type) {
+	public PatternVo(String _name, String _mode, ApiParamType _type) {
 		name = _name;
+		mode = _mode;
 		type = _type.getValue();
 		isRequired = 0;
 	}
 
 	@EntityField(name = "参数名", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "参数类型", type = ApiParamType.STRING)
+	@EntityField(name = "数据类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "参数类型", type = ApiParamType.STRING)
+	private String mode;
 	@EntityField(name = "参数类型名称", type = ApiParamType.STRING)
 	private String typeName;
 	@EntityField(name = "子参数", type = ApiParamType.JSONOBJECT)
@@ -96,6 +100,14 @@ public class PatternVo {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 }

@@ -147,7 +147,7 @@
 	`fcd`,
 	`fcu`,
 	`lcd`,
-	`lcu
+	`lcu`
 	FROM `notify_policy`
 	WHERE `id` = #{id}
 	</select>
@@ -164,7 +164,7 @@
 	`fcd`,
 	`fcu`,
 	`lcd`,
-	`lcu
+	`lcu`
 	FROM `notify_policy`
 	<where>
 		<if test="keyword != null and keyword != ''">

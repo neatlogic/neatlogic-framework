@@ -2,16 +2,24 @@ package codedriver.framework.notify.dto;
 
 import java.io.Serializable;
 
-public class ProcessExpressionVo implements Serializable {
+import codedriver.framework.common.constvalue.Expression;
+
+public class ExpressionVo implements Serializable {
 
 	private static final long serialVersionUID = -2045500057556272026L;
 	private String expression;
 	private String expressionName;
 	private String expressionEs;
 	
-	public ProcessExpressionVo() {
+	public ExpressionVo() {
 	}
 
+	public ExpressionVo(Expression expression) {
+		this.expression = expression.getExpression();
+		this.expressionName = expression.getExpressionName();
+		this.expressionEs = expression.getExpressionEs();
+	}
+	
 	public String getExpression() {
 		return expression;
 	}

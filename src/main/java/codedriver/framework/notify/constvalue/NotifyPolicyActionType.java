@@ -16,4 +16,12 @@ public enum NotifyPolicyActionType {
 	public String getText() {
 		return text;
 	}
+	public static String getText(String value) {
+		for(NotifyPolicyActionType type : values()) {
+			if(type.getValue().equals(value)) {
+				return type.getText();
+			}
+		}
+		return "";
+	}
 }

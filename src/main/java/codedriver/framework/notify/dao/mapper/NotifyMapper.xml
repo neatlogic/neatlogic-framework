@@ -166,11 +166,10 @@
 	`lcd`,
 	`lcu`
 	FROM `notify_policy`
-	<where>
-		<if test="keyword != null and keyword != ''">
-			`name` LIKE concat('%',#{keyword},'%') 
-		</if>
-	</where>
+	where `handler` = #{handler}
+	<if test="keyword != null and keyword != ''">
+		 AND `name` LIKE concat('%',#{keyword},'%') 
+	</if>
 	ORDER BY `id` DESC
 	<if test="needPage">
 	limit #{startNum}, #{pageSize}

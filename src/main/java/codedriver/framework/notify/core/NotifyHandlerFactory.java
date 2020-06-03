@@ -28,10 +28,7 @@ public class NotifyHandlerFactory implements ApplicationListener<ContextRefreshe
 	}
 
 	public static INotifyHandler getHandler(String handler) {
-		if (notifyHandlerMap.containsKey(handler)) {
-			return notifyHandlerMap.get(handler);
-		}
-		return null;
+		return notifyHandlerMap.get(handler);
 	}
 
 	@Override

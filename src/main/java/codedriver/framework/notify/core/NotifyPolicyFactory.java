@@ -41,7 +41,7 @@ public class NotifyPolicyFactory {
 				triggerList.add(triggerObj);
 			}
 			configObj.put("triggerList", triggerList);
-			configObj.put("paramList", new JSONArray());
+			configObj.put("paramList", NotifyPolicyHandlerFactory.getHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler").getSystemParamList());
 			configObj.put("templateList", new JSONArray());
 			notifyPolicyVo.setConfig(configObj.toJSONString());
 			notifyPolicyMap.put(notifyPolicyVo.getId(), notifyPolicyVo);

@@ -110,6 +110,9 @@
             (a.user_id LIKE CONCAT('%', #{keyword}, '%')
             OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
         </if>
+         <if test="isActive != null">
+            AND a.`is_active` = #{isActive}
+        </if>
         <if test="teamUuid != null and teamUuid != ''">
             AND c.`team_uuid` = #{teamUuid}
         </if>

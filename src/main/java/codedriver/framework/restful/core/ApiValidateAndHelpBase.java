@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -95,12 +96,12 @@ public class ApiValidateAndHelpBase {
 		ApiAuditManager.saveAudit(audit);
 	}
 
-	private static void encodeHtml(JSONObject paramObj, String key) {
+	private static void escapeXss(JSONObject paramObj, String key) {
 		Object value = paramObj.get(key);
 		if (value instanceof String) {
 			try {
 				JSONObject valObj = JSONObject.parseObject(value.toString());
-				encodeHtml(valObj);
+				escapeXss(valObj);
 				paramObj.replace(key, valObj.toJSONString());
 			} catch (Exception ex) {
 				try {
@@ -108,11 +109,11 @@ public class ApiValidateAndHelpBase {
 					encodeHtml(valList);
 					paramObj.replace(key, valList.toJSONString());
 				} catch (Exception e) {
-					paramObj.replace(key, encodeHtml(value.toString()));
+					paramObj.replace(key, escapeXss(value.toString()));
 				}
 			}
 		} else if (value instanceof JSONObject) {
-			encodeHtml((JSONObject) value);
+			escapeXss((JSONObject) value);
 			paramObj.replace(key, value);
 		} else if (value instanceof JSONArray) {
 			encodeHtml((JSONArray) value);
@@ -120,35 +121,49 @@ public class ApiValidateAndHelpBase {
 		}
 	}
 
-	private static String encodeHtml(String str) {
+	private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
+	private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
+	private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+	private static String escapeXss(String str) {
 		if (StringUtils.isNotBlank(str)) {
-			// str = str.replace("&", "&amp;");
+			// 处理js xss注入
+			// str = scriptPattern.matcher(str).replaceAll("");
+			// str = javascriptPattern.matcher(str).replaceAll("");
+			// str = evalPattern.matcher(str).replaceAll("");
+			str = str.replace("&", "&amp;");
 			str = str.replace("<", "&lt;");
 			str = str.replace(">", "&gt;");
 			str = str.replace("'", "&#39;");
 			str = str.replace("\"", "&quot;");
+
 			return str;
 		}
 		return "";
 	}
 
-	private static void encodeHtml(JSONObject j) {
+	public static void main(String[] argcv) {
+		String a = "<Script>alert</Script>asdasd\neval(\"abc\")df";
+		System.out.println(escapeXss(a));
+	}
+
+	private static void escapeXss(JSONObject j) {
 		Set<String> set = j.keySet();
 		Iterator<String> it = set.iterator();
 		while (it.hasNext()) {
 			String key = it.next().toString();
-			String newKey = encodeHtml(key);
+			String newKey = escapeXss(key);
 			if (!newKey.equals(key)) {
 				Object value = j.get(key);
 				j.remove(key);
 				j.replace(newKey, value);
 			}
 			if (j.get(newKey) instanceof JSONObject) {
-				encodeHtml(j.getJSONObject(newKey));
+				escapeXss(j.getJSONObject(newKey));
 			} else if (j.get(newKey) instanceof JSONArray) {
 				encodeHtml(j.getJSONArray(newKey));
 			} else if (j.get(newKey) instanceof String) {
-				j.replace(newKey, encodeHtml(j.getString(newKey)));
+				j.replace(newKey, escapeXss(j.getString(newKey)));
 			}
 		}
 	}
@@ -156,11 +171,11 @@ public class ApiValidateAndHelpBase {
 	private static void encodeHtml(JSONArray j) {
 		for (int i = 0; i < j.size(); i++) {
 			if (j.get(i) instanceof JSONObject) {
-				encodeHtml(j.getJSONObject(i));
+				escapeXss(j.getJSONObject(i));
 			} else if (j.get(i) instanceof JSONArray) {
 				encodeHtml(j.getJSONArray(i));
 			} else if (j.get(i) instanceof String) {
-				j.set(i, encodeHtml(j.getString(i)));
+				j.set(i, escapeXss(j.getString(i)));
 			}
 		}
 	}
@@ -193,7 +208,7 @@ public class ApiValidateAndHelpBase {
 						for (Param p : params) {
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
-								encodeHtml(paramObj, p.name());
+								escapeXss(paramObj, p.name());
 							}
 
 							Object paramValue = null;

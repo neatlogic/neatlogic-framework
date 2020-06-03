@@ -5,6 +5,7 @@ public class NotifyPolicyParamVo {
 	private String name;
 	private String type;
 	private String description;
+	private int isDeletable = 1;
 	public String getName() {
 		return name;
 	}
@@ -22,5 +23,11 @@ public class NotifyPolicyParamVo {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public int getIsDeletable() {
+		return isDeletable;
+	}
+	public void setIsDeletable(int isDeletable) {
+		this.isDeletable = isDeletable;
 	}
 }

@@ -41,6 +41,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		userVo.setNeedPage(true);
 		userVo.setPageSize(total);
 		userVo.setCurrentPage(1);
+		userVo.setIsActive(1);
 		userVo.setKeyword(jsonObj.getString("keyword"));
 		userList = userMapper.searchUser(userVo);
 		return (List<T>) userList;

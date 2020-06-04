@@ -30,11 +30,19 @@ public class NumberChart extends DashboardChartBase {
 		JSONArray dataList = new JSONArray();
 		Map<String,Object> resultMap = (Map<String,Object>)dataMap.get("resultMap");
 		Map<String, String> valueTextMap = (Map<String,String>)dataMap.get("valueTextMap");
+		JSONObject configObj = dataMap.getJSONObject("configObj");
 		if (MapUtils.isNotEmpty(resultMap)) {
 			Iterator<String> itKey = resultMap.keySet().iterator();
+			JSONObject data = new JSONObject();
+			if(configObj.getString("type").equals("many")) {
+				data.put("column", "总数");
+				data.put("value", dataMap.get("total"));
+				data.put("total", dataMap.get("total"));
+				dataList.add(data);
+			}
 			while (itKey.hasNext()) {
 				String key = itKey.next();
-				JSONObject data = new JSONObject();
+				data = new JSONObject();
 				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));
 				data.put("total", resultMap.get(key));
@@ -45,7 +53,6 @@ public class NumberChart extends DashboardChartBase {
 			dataJson.put("dataList", CollectionUtils.EMPTY_COLLECTION);
 			
 		}
-		dataJson.put("total", dataMap.get("total"));
 		return dataJson;
 	}
 
@@ -102,11 +109,12 @@ public class NumberChart extends DashboardChartBase {
 					value = group.getString("value");
 					valueTextMap.put(value, group.getString("text"));
 				}
-				if(CollectionUtils.isNotEmpty(configList)) {
-					if (resultMap.containsKey(value)) {
-						resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
-						total++;
-					}
+				if(CollectionUtils.isEmpty(configList)) {
+					break;
+				}
+				if (resultMap.containsKey(value)) {
+					resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+					total++;
 				}
 			}
 		} 

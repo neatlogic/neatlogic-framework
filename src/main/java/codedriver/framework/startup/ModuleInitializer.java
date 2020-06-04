@@ -1,7 +1,6 @@
 package codedriver.framework.startup;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -41,7 +40,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				Element rootE = document.getRootElement();
 				Element codedriverE = rootE.element("module");
 				// Element nameE = rootE.element("name");
-				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null;
+				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null, groupDescription = null;
 				moduleId = codedriverE.attributeValue("id");
 				moduleName = codedriverE.attributeValue("name");
 				urlMapping = codedriverE.attributeValue("urlMapping");
@@ -49,13 +48,14 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				group = codedriverE.attributeValue("group");
 				groupName = codedriverE.attributeValue("groupName");
 				groupSort = codedriverE.attributeValue("groupSort");
+				groupDescription = codedriverE.attributeValue("groupDescription");
 
 				if (StringUtils.isNotBlank(moduleId)) {
 					version = Config.getProperty("META-INF/maven/com.techsure/codedriver-" + moduleId + "/pom.properties", "version");
 					XmlWebApplicationContext appContext = new XmlWebApplicationContext();
 					appContext.setConfigLocation("classpath*:" + path);
 					appContext.setId(moduleId);
-					InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
+					//InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
 					if (StringUtils.isNotBlank(urlMapping)) {
@@ -72,11 +72,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					ModuleVo moduleVo = new ModuleVo();
 					moduleVo.setId(moduleId);
 					moduleVo.setName(moduleName);
-					moduleVo.setDescription(moduleName);
+					moduleVo.setDescription(moduleDescription);
 					moduleVo.setVersion(version);
 					moduleVo.setGroup(group);
 					moduleVo.setGroupName(groupName);
 					moduleVo.setGroupSort(Integer.valueOf(groupSort));
+					moduleVo.setGroupDescription(groupDescription);
 					ModuleUtil.addModule(moduleVo);
 				}
 			}

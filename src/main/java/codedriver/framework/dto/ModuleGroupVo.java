@@ -14,6 +14,10 @@ public class ModuleGroupVo {
 	private String group;
 	@EntityField(name = "分组名称", type = ApiParamType.STRING)
 	private String groupName;
+	@EntityField(name = "分组排序", type = ApiParamType.STRING)
+	private Integer groupSort;
+	@EntityField(name = "分组描述", type = ApiParamType.INTEGER)
+	private String groupDescription;
 	@EntityField(name = "分组对应的moduleVo列表", type = ApiParamType.STRING)
 	private List<ModuleVo> moduleList;
 	
@@ -41,6 +45,22 @@ public class ModuleGroupVo {
 		this.moduleList = moduleList;
 	}
 	
+	public String getGroupDescription() {
+		return groupDescription;
+	}
+
+	public void setGroupDescription(String groupDescription) {
+		this.groupDescription = groupDescription;
+	}
+
+	public Integer getGroupSort() {
+		return groupSort;
+	}
+
+	public void setGroupSort(Integer groupSort) {
+		this.groupSort = groupSort;
+	}
+
 	public List<String> getModuleIdList() {
 		List<String> moduleIdList = new ArrayList<String>();
 		if(CollectionUtils.isNotEmpty(this.moduleList)) {

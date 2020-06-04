@@ -16,6 +16,8 @@ public class ModuleVo {
 	private String group;
 	@EntityField(name = "分组名称", type = ApiParamType.STRING)
 	private String groupName;
+	@EntityField(name = "分组描述", type = ApiParamType.STRING)
+	private String groupDescription;
 	@EntityField(name = "分组排序", type = ApiParamType.INTEGER)
 	private int groupSort;
 
@@ -75,4 +77,13 @@ public class ModuleVo {
 		this.groupSort = groupSort;
 	}
 
+	public String getGroupDescription() {
+		return groupDescription;
+	}
+
+	public void setGroupDescription(String groupDescription) {
+		this.groupDescription = groupDescription;
+	}
+
+	
 }

@@ -42,6 +42,9 @@ public class NumberChart extends DashboardChartBase {
 			}
 			while (itKey.hasNext()) {
 				String key = itKey.next();
+				if(!valueTextMap.containsKey(key)) {
+					continue;
+				}
 				data = new JSONObject();
 				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));

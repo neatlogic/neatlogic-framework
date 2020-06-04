@@ -35,6 +35,7 @@ public class BarColumnChart extends DashboardChartBase {
 			//统计column total，后续排序 limit
 			while (itKey1.hasNext()) {
 				String key = itKey1.next();
+				
 				String[] keys = key.split("#");
 				int total = 0;
 				if(columnTotalMap.containsKey(keys[0])) {
@@ -49,9 +50,15 @@ public class BarColumnChart extends DashboardChartBase {
 				JSONObject data = new JSONObject();
 				String[] keys = key.split("#"); 
 				if(keys.length >1) {
+					if(!valueTextMap.containsKey(keys[0])||!valueTextMap.containsKey(keys[1])) {//过滤被删掉的属性
+						continue;
+					}
 					data.put("column", valueTextMap.get(keys[0]));
 					data.put("type", valueTextMap.get(keys[1]));
 				}else {
+					if(!valueTextMap.containsKey(key)) {//过滤被删掉的属性
+						continue;
+					}
 					data.put("column", valueTextMap.get(key));
 				}
 				data.put("total", columnTotalMap.get(keys[0]));
@@ -103,7 +110,7 @@ public class BarColumnChart extends DashboardChartBase {
 				JSONObject data = nextDataList.getJSONObject(i);
 				JSONObject group = data.getJSONObject(groupField);
 				String value = StringUtils.EMPTY;
-				if(group != null) {
+				if(group != null&&group.getString("value")!= null&&group.getString("text")!= null) {
 					value = group.getString("value");
 					valueTextMap.put(value, group.getString("text"));
 				}
@@ -113,7 +120,7 @@ public class BarColumnChart extends DashboardChartBase {
 					if(StringUtils.isNotBlank(subGroupField)) {
 						subGroup = data.getJSONObject(subGroupField);
 						String subValue = StringUtils.EMPTY;
-						if(subGroup != null) {
+						if(subGroup != null&&subGroup.getString("value")!= null&&subGroup.getString("text")!= null) {
 							subValue = subGroup.getString("value");
 							valueTextMap.put(subValue, subGroup.getString("text"));
 						}

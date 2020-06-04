@@ -33,6 +33,9 @@ public class PieChart extends DashboardChartBase {
 			Iterator<String> itKey = resultMap.keySet().iterator();
 			while (itKey.hasNext()) {
 				String key = itKey.next();
+				if(!valueTextMap.containsKey(key)) {
+					continue;
+				}
 				JSONObject data = new JSONObject();
 				data.put("column", valueTextMap.get(key));
 				data.put("value", resultMap.get(key));

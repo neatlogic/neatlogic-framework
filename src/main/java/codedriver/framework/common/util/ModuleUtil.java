@@ -57,6 +57,8 @@ public class ModuleUtil {
 					moduleGroup = new ModuleGroupVo();
 					moduleGroup.setGroup(moduleVo.getGroup());
 					moduleGroup.setGroupName(moduleVo.getGroupName());
+					moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
+					moduleGroup.setGroupSort(moduleVo.getGroupSort());
 					List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
 					moduleList.add(moduleVo);
 					moduleGroup.setModuleList(moduleList);

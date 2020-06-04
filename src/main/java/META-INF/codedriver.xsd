@@ -13,6 +13,7 @@
 					<xsd:attribute name="description" type="xsd:string" />
 					<xsd:attribute name="groupSort" type="xsd:int" use="required"/>
 					<xsd:attribute name="urlMapping" type="xsd:string" />
+					<xsd:attribute name="groupDescription" type="xsd:string" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

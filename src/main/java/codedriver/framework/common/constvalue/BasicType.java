@@ -36,6 +36,14 @@ public enum BasicType {
 		return defaultExpression;
 	}
 
+	public static BasicType getBasicType(String name) {
+		for(BasicType type : values()) {
+			if(type.getName().equals(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
 	
 	
 }

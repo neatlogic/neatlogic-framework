@@ -1,63 +1,21 @@
 package codedriver.framework.notify.dto;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.constvalue.NotifyPolicyActionType;
-import codedriver.framework.notify.core.NotifyPolicyHandlerFactory;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 public class NotifyPolicyVo extends BaseEditorVo {
-	public final static Map<String, NotifyPolicyVo> notifyPolicyMap = new HashMap<>();
-	static {
-		Date currentDate = new Date();
-		for(int i = 0; i < 100; i++) {
-			NotifyPolicyVo notifyPolicyVo = new NotifyPolicyVo("test" + i, "");
-			notifyPolicyVo.setReferenceCount(i%10);
-			if(i % 2 == 0) {
-				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler");
-				notifyPolicyVo.setFcu("linbq");
-				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
-				notifyPolicyVo.setFcuName("林邦泉");
-				notifyPolicyVo.setLcu("lvzk");
-				notifyPolicyVo.setLcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
-				notifyPolicyVo.setLcuName("吕佐康");
-			}else {
-				notifyPolicyVo.setPolicyHandler("codedriver.module.process.notify.handler.TestNotifyPolicyHandler");
-				notifyPolicyVo.setFcu("linbq");
-				notifyPolicyVo.setFcd(new Date(currentDate.getTime() + ((i - 99) * 1000)));
-				notifyPolicyVo.setFcuName("林邦泉");
-			}
-			JSONObject configObj = new JSONObject();
-			JSONArray triggerList = new JSONArray();
-			for (ValueTextVo notifyTrigger : NotifyPolicyHandlerFactory.getHandler("codedriver.module.process.notify.handler.ProcessNotifyPolicyHandler").getNotifyTriggerList()) {
-				JSONObject triggerObj = new JSONObject();
-				triggerObj.put("trigger", notifyTrigger.getValue());
-				triggerObj.put("triggerName", notifyTrigger.getText());
-				triggerObj.put("notifyList", new JSONArray());
-				triggerList.add(triggerObj);
-			}
-			configObj.put("triggerList", triggerList);
-			configObj.put("paramList", new JSONArray());
-			configObj.put("templateList", new JSONArray());
-			notifyPolicyVo.setConfig(configObj.toJSONString());
-			notifyPolicyMap.put(notifyPolicyVo.getUuid(), notifyPolicyVo);
-		}
-	}
-	@EntityField(name = "策略uuid", type = ApiParamType.STRING)
-	private String uuid;
+	
+	@EntityField(name = "策略id", type = ApiParamType.LONG)
+	private Long id;
 	@EntityField(name = "策略名", type = ApiParamType.STRING)
 	private String name;
 	@EntityField(name = "操作用户", type = ApiParamType.STRING)
@@ -69,31 +27,36 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	@EntityField(name = "操作类型名，创建|修改", type = ApiParamType.STRING)
 	private String actionName;
 	@EntityField(name = "引用数量", type = ApiParamType.INTEGER)
-	private int referenceCount;
-	@EntityField(name = "配置项信息", type = ApiParamType.STRING)
-	private String config;
-	private transient JSONObject configObj;
-	@EntityField(name = "通知策略类型", type = ApiParamType.STRING)
-	private String policyHandler;
+	private int invokerCount;
+	@EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
+	private JSONObject config;
+	@EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
+	private String handler;
 	
+	public NotifyPolicyVo() {
+		
+	}
 	
-	public NotifyPolicyVo(String name, String policyHandler) {
+	public NotifyPolicyVo(String name, String handler) {
 		this.name = name;
-		this.policyHandler = policyHandler;
+		this.handler = handler;
 	}
 	
-	public synchronized String getUuid() {
-		if(StringUtils.isBlank(uuid)) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
+	public Long getId() {
+		if(id == null) {
+			id = SnowflakeUtil.uniqueLong();
 		}
-		return uuid;
+		return id;
 	}
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
+	
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -149,36 +112,39 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	public void setActionName(String actionName) {
 		this.actionName = actionName;
 	}
-	public int getReferenceCount() {
-		return referenceCount;
+
+	public int getInvokerCount() {
+		return invokerCount;
 	}
-	public void setReferenceCount(int referenceCount) {
-		this.referenceCount = referenceCount;
+
+	public void setInvokerCount(int invokerCount) {
+		this.invokerCount = invokerCount;
 	}
-	public String getConfig() {
+
+	public JSONObject getConfig() {
 		return config;
 	}
 	public void setConfig(String config) {
-		this.config = config;
-	}
-	public JSONObject getConfigObj() {
-		if(configObj == null && StringUtils.isNotBlank(config)) {
-			try {
-				configObj = JSON.parseObject(config);
-			}catch(JSONException e) {
-				//TODO linbq打印日志
-			}
+		try {
+			this.config = JSONObject.parseObject(config);
+		}catch(Exception ex) {
+			
 		}
-		return configObj;
 	}
-	public void setConfigObj(JSONObject configObj) {
-		this.configObj = configObj;
+	
+	@JSONField(serialize = false)
+	public String getConfigStr() {
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
-	public String getPolicyHandler() {
-		return policyHandler;
+	
+	public String getHandler() {
+		return handler;
 	}
-	public void setPolicyHandler(String policyHandler) {
-		this.policyHandler = policyHandler;
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.notify.dao.mapper.NotifyMapper">
-	<select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
+	<!-- <select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
 		SELECT
 		`uuid`,
 		`name`,
@@ -136,5 +136,105 @@
 	
 	<delete id="deleteNotifyTemplateByUuid" parameterType="java.lang.String">
 	DELETE FROM `process_notifytemplate` where `uuid`=#{uuid}
+	</delete> -->
+	
+	<select id="getNotifyPolicyById" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `id` = #{id}
+	</select>
+
+	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT COUNT(1) FROM `notify_policy` WHERE `name` = #{name} AND `id` != #{id}
+	</select>
+
+	<select id="getNotifyPolicyList" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	where `handler` = #{handler}
+	<if test="keyword != null and keyword != ''">
+		 AND `name` LIKE concat('%',#{keyword},'%') 
+	</if>
+	ORDER BY `id` DESC
+	<if test="needPage">
+	limit #{startNum}, #{pageSize}
+	</if>
+	</select>
+
+	<select id="getNotifyPolicyCount" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT 
+	COUNT(`id`)
+	FROM `notify_policy`
+	<where>
+		<if test="keyword != null and keyword != ''">
+			`name` LIKE concat('%',#{keyword},'%') 
+		</if>
+	</where>
+	</select>
+	
+	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.List" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	  `policy_id` AS id,
+	  COUNT(`policy_id`) AS invokerCount 
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` IN 
+	<foreach collection="list" item="policyId" open="(" separator="," close=")">
+	#{policyId}
+	</foreach>
+	GROUP BY `policy_id`
+	</select>
+
+	<select id="getNotifyPolicyInvokerList" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo" resultType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	SELECT 
+	  `policy_id` AS policyId,
+	  `invoker`,
+	  `config` 
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
+	LIMIT #{startNum}, #{pageSize}
+	</select>
+	
+	<insert id="insertNotifyPolicy">
+	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
+	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcd}, NOW(3))
+	</insert>
+	
+	<insert id="insertNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	INSERT INTO `notify_policy_invoke` (`policy_id`, `invoker`, `config`) 
+	VALUES (#{policyId}, #{invoker}, #{configStr})
+	</insert>
+
+	<update id="updateNotifyPolicyById">
+	UPDATE `notify_policy` SET
+	`name` = #{name},
+	`config` = #{configStr},
+	`lcu` = #{lcu},
+	`lcd` = NOW(3)
+	WHERE `id` = #{id}
+	</update>
+
+	<delete id="deleteNotifyPolicyById">
+	DELETE FROM `notify_policy` WHERE id = #{id}
+	</delete>
+	
+	<delete id="deleteNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	DELETE FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
+	AND `invoker` = #{invoker}
 	</delete>
 </mapper>

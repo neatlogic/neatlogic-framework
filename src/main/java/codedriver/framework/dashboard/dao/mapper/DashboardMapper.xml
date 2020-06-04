@@ -280,6 +280,7 @@
 		`refresh_interval` AS refreshInterval,
 		`description`,
 		`dashboard_uuid` AS dashboardUuid,
+		`condition_config` AS conditionConfig,
 		`chart_config` AS chartConfig,
 		`handler`,
 		`chart_type` AS chartType,

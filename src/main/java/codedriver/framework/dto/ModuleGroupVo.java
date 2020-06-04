@@ -12,13 +12,13 @@ public class ModuleGroupVo {
 	
 	@EntityField(name = "模块分组", type = ApiParamType.STRING)
 	private String group;
-	@EntityField(name = "分组名称", type = ApiParamType.STRING)
+	@EntityField(name = "模块分组名称", type = ApiParamType.STRING)
 	private String groupName;
-	@EntityField(name = "分组排序", type = ApiParamType.STRING)
+	@EntityField(name = "模块分组排序", type = ApiParamType.STRING)
 	private Integer groupSort;
-	@EntityField(name = "分组描述", type = ApiParamType.INTEGER)
+	@EntityField(name = "模块分组描述", type = ApiParamType.INTEGER)
 	private String groupDescription;
-	@EntityField(name = "分组对应的moduleVo列表", type = ApiParamType.STRING)
+	@EntityField(name = "模块分组对应的moduleVo列表", type = ApiParamType.STRING)
 	private List<ModuleVo> moduleList;
 	
 	public String getGroup() {

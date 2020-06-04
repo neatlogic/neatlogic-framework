@@ -5,14 +5,12 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.Description;
@@ -44,7 +42,7 @@ public class ModuleListApi extends ApiComponentBase {
 		return null;
 	}
 
-	@Input({@Param( name = "includeList", type = ApiParamType.JSONARRAY, desc = "白名单")})
+	@Input({})
 	@Output({ @Param(explode = ModuleVo.class) })
 	@Description(desc = "获取租户激活模块接口")
 	@Override
@@ -60,15 +58,6 @@ public class ModuleListApi extends ApiComponentBase {
 				returnObj.put("sort", moduleVo.getGroupSort());
 				resultArray.add(returnObj);
 			}
-		}
-		JSONArray includeList = jsonObj.getJSONArray("includeList");
-		if(CollectionUtils.isNotEmpty(includeList)&&includeList.contains("dashboard")) {
-			//添加仪表板
-			JSONObject returnObj = new JSONObject();
-			returnObj.put("value", "dashboard");
-			returnObj.put("text", "仪表板");
-			returnObj.put("sort", 0);
-			resultArray.add(returnObj);
 		}
 		Collections.sort(resultArray, new Comparator<Object>() {
 			@Override

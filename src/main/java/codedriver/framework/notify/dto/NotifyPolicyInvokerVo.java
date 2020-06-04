@@ -1,13 +1,10 @@
 package codedriver.framework.notify.dto;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.dto.BasePageVo;
 
@@ -15,8 +12,7 @@ public class NotifyPolicyInvokerVo extends BasePageVo {
 
 	private Long policyId;
 	private String invoker;
-	private String config;
-	private transient JSONObject configObj;
+	private JSONObject config;
 	private String function;
 	private String name;
 	
@@ -32,36 +28,40 @@ public class NotifyPolicyInvokerVo extends BasePageVo {
 	public void setInvoker(String invoker) {
 		this.invoker = invoker;
 	}
-	public String getConfig() {
-		if(StringUtils.isBlank(config)) {
-			Map<String, Object> configMap = new HashMap<>();
+	public JSONObject getConfig() {
+		if(MapUtils.isEmpty(config)) {
+			JSONObject configObj = new JSONObject();
 			if(StringUtils.isNotBlank(function)) {
-				configMap.put("function", function);
+				configObj.put("function", function);
 			}
 			if(StringUtils.isNotBlank(name)) {
-				configMap.put("name", name);
+				configObj.put("name", name);
 			}
-			if(MapUtils.isNotEmpty(configMap)) {
-				config = JSON.toJSONString(configMap);
+			if(MapUtils.isNotEmpty(configObj)) {
+				config = configObj;
 			}
 		}
 		return config;
 	}
 	public void setConfig(String config) {
-		this.config = config;
-	}
-	public JSONObject getConfigObj() {
-		if(configObj == null && StringUtils.isNotBlank(config)) {
-			configObj = JSON.parseObject(config);
+		try {
+			this.config = JSONObject.parseObject(config);
+		} catch (Exception ex) {
+
 		}
-		return configObj;
 	}
-	public void setConfigObj(JSONObject configObj) {
-		this.configObj = configObj;
+	
+	@JSONField(serialize = false)
+	public String getConfigStr() {
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
+	
 	public String getFunction() {
-		if(StringUtils.isBlank(function) && MapUtils.isNotEmpty(getConfigObj())) {
-			function = getConfigObj().getString("function");
+		if(StringUtils.isBlank(function) && MapUtils.isNotEmpty(config)) {
+			function = config.getString("function");
 		}
 		return function;
 	}
@@ -69,8 +69,8 @@ public class NotifyPolicyInvokerVo extends BasePageVo {
 		this.function = function;
 	}
 	public String getName() {
-		if(StringUtils.isBlank(name) && MapUtils.isNotEmpty(getConfigObj())) {
-			name = getConfigObj().getString("name");
+		if(StringUtils.isBlank(name) && MapUtils.isNotEmpty(config)) {
+			name = config.getString("name");
 		}
 		return name;
 	}

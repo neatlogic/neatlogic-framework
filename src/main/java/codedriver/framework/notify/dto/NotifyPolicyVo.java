@@ -3,10 +3,8 @@ package codedriver.framework.notify.dto;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
@@ -30,9 +28,8 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	private String actionName;
 	@EntityField(name = "引用数量", type = ApiParamType.INTEGER)
 	private int invokerCount;
-	@EntityField(name = "配置项信息", type = ApiParamType.STRING)
-	private String config;
-	private transient JSONObject configObj;
+	@EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
+	private JSONObject config;
 	@EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
 	private String handler;
 	
@@ -124,25 +121,25 @@ public class NotifyPolicyVo extends BaseEditorVo {
 		this.invokerCount = invokerCount;
 	}
 
-	public String getConfig() {
+	public JSONObject getConfig() {
 		return config;
 	}
 	public void setConfig(String config) {
-		this.config = config;
-	}
-	public JSONObject getConfigObj() {
-		if(configObj == null && StringUtils.isNotBlank(config)) {
-			try {
-				configObj = JSON.parseObject(config);
-			}catch(JSONException e) {
-				//TODO linbq打印日志
-			}
+		try {
+			this.config = JSONObject.parseObject(config);
+		}catch(Exception ex) {
+			
 		}
-		return configObj;
 	}
-	public void setConfigObj(JSONObject configObj) {
-		this.configObj = configObj;
+	
+	@JSONField(serialize = false)
+	public String getConfigStr() {
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
+	
 	public String getHandler() {
 		return handler;
 	}

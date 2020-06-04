@@ -3,13 +3,17 @@ package codedriver.framework.notify.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class NotifyPolicyParamVo {
 
 	private String handler;
 	private String handlerName;
 	private String handlerType;
 	private Boolean isMultiple;
-	private String config;
+	private JSONObject config;
 	private String type;
 	private String basicType;
 	private String basicTypeName;
@@ -40,11 +44,22 @@ public class NotifyPolicyParamVo {
 	public void setIsMultiple(Boolean isMultiple) {
 		this.isMultiple = isMultiple;
 	}
-	public String getConfig() {
+	public JSONObject getConfig() {
 		return config;
 	}
 	public void setConfig(String config) {
-		this.config = config;
+		try {
+			this.config = JSON.parseObject(config);
+		}catch(Exception e) {
+			
+		}
+	}
+	@JSONField(serialize = false)
+	public String getConfigStr() {
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
 	public String getType() {
 		return type;

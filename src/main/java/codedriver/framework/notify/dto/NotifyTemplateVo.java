@@ -40,8 +40,6 @@ public class NotifyTemplateVo extends BasePageVo {
 	
 //	private transient String fcu;
 //	private transient String lcu;
-	
-	private transient String keyword;
 
 	public NotifyTemplateVo() {
 	}
@@ -99,14 +97,6 @@ public class NotifyTemplateVo extends BasePageVo {
 //	public void setType(String type) {
 //		this.type = type;
 //	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
 
 //	public String getFcu() {
 //		return fcu;

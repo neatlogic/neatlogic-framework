@@ -211,18 +211,18 @@
 	
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
-	VALUES (#{id}, #{name}, #{handler}, #{config}, #{fcd}, NOW(3))
+	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcd}, NOW(3))
 	</insert>
 	
 	<insert id="insertNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
 	INSERT INTO `notify_policy_invoke` (`policy_id`, `invoker`, `config`) 
-	VALUES (#{policyId}, #{invoker}, #{config})
+	VALUES (#{policyId}, #{invoker}, #{configStr})
 	</insert>
 
 	<update id="updateNotifyPolicyById">
 	UPDATE `notify_policy` SET
 	`name` = #{name},
-	`config` = #{config},
+	`config` = #{configStr},
 	`lcu` = #{lcu},
 	`lcd` = NOW(3)
 	WHERE `id` = #{id}

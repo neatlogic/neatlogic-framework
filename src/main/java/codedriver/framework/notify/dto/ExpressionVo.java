@@ -19,10 +19,16 @@ public class ExpressionVo implements Serializable {
 		this.expressionName = expression.getExpressionName();
 		this.expressionEs = expression.getExpressionEs();
 	}
+
+	public ExpressionVo(String expression, String expressionName) {
+		this.expression = expression;
+		this.expressionName = expressionName;
+	}
 	
 	public String getExpression() {
 		return expression;
 	}
+
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}

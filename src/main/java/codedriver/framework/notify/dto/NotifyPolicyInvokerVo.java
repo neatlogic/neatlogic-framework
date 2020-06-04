@@ -16,7 +16,7 @@ public class NotifyPolicyInvokerVo extends BasePageVo {
 	private Long policyId;
 	private String invoker;
 	private String config;
-	private JSONObject configObj;
+	private transient JSONObject configObj;
 	private String function;
 	private String name;
 	

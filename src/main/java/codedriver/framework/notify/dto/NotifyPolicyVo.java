@@ -36,6 +36,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	@EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
 	private String handler;
 	
+	public NotifyPolicyVo() {
+		
+	}
 	
 	public NotifyPolicyVo(String name, String handler) {
 		this.name = name;

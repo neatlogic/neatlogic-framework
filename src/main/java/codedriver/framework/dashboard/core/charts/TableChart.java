@@ -102,38 +102,74 @@ public class TableChart extends DashboardChartBase {
 			if(StringUtils.isNotBlank(subGroupField)){
 				for (int i = 0; i < nextDataList.size(); i++) {
 					JSONObject dataJson = nextDataList.getJSONObject(i);
-					JSONObject group = dataJson.getJSONObject(groupField);
-					JSONObject subGroup = dataJson.getJSONObject(subGroupField);
-					String value = group.getString("value");
-					String subValue = subGroup.getString("value");
-					if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))))) {
-						theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))));
-					}
-					if(dataMap.containsKey(value)) {
-						 Map<String, Integer> subGroupMap = (Map<String, Integer>)dataMap.get(value);
-						if(subGroupMap.containsKey(subValue)) {
-							Integer num = subGroupMap.get(subValue);
-							subGroupMap.put(subValue, num+1);
-						}else {
-							subGroupMap.put(subValue, 1);
-						}
+					JSONArray  groupArray = new JSONArray();
+					Object groupObj = dataJson.get(groupField);
+					if(groupObj instanceof JSONObject) {
+						groupArray.add(groupObj);
+					}else if(groupObj instanceof JSONArray){
+						groupArray = (JSONArray) groupObj;
 					}else {
-						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value, group.getString("text"))));
-						Map<String,Integer> subGoupMap = new HashMap<String,Integer>();
-						subGoupMap.put(subValue, 1);
-						dataMap.put(value, subGoupMap);
+						continue;
+					}
+					Object subGroupObj = dataJson.get(subGroupField);
+					JSONArray  subGroupArray = new JSONArray();
+					if(subGroupObj instanceof JSONObject) {
+						subGroupArray.add(subGroupObj);
+					}else if(subGroupObj instanceof JSONArray){
+						subGroupArray = (JSONArray) subGroupObj;
+					}else {
+						continue;
+					}
+					for(Object groupTmp :groupArray) {
+						JSONObject group = ((JSONObject)groupTmp);
+						String value = group.getString("value");
+						for(Object subGroupTmp :subGroupArray) {
+							JSONObject subGroup = ((JSONObject)subGroupTmp);
+							String subValue = subGroup.getString("value");
+							if(StringUtils.isBlank(subValue)||StringUtils.isBlank(subGroup.getString("text"))) {
+								continue;
+							}
+							if(!theadArray.contains(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))))) {
+								theadArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", subValue,subGroup.getString("text"))));
+							}
+							if(dataMap.containsKey(value)) {
+								 Map<String, Integer> subGroupMap = (Map<String, Integer>)dataMap.get(value);
+								if(subGroupMap.containsKey(subValue)) {
+									Integer num = subGroupMap.get(subValue);
+									subGroupMap.put(subValue, num+1);
+								}else {
+									subGroupMap.put(subValue, 1);
+								}
+							}else {
+								columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value, group.getString("text"))));
+								Map<String,Integer> subGoupMap = new HashMap<String,Integer>();
+								subGoupMap.put(subValue, 1);
+								dataMap.put(value, subGoupMap);
+							}
+						}
 					}
 				}
 			}else {
 				for (int i = 0; i < nextDataList.size(); i++) {
 					JSONObject dataJson = nextDataList.getJSONObject(i);
-					JSONObject group = dataJson.getJSONObject(groupField);
-					String value = group.getString("value");
-					if(dataMap.containsKey(value)) {
-						dataMap.put(value, ((int)dataMap.get(value))+1);
+					JSONArray  groupArray = new JSONArray();
+					Object groupObj = dataJson.get(groupField);
+					if(groupObj instanceof JSONObject) {
+						groupArray.add(groupObj);
+					}else if(groupObj instanceof JSONArray){
+						groupArray = (JSONArray) groupObj;
 					}else {
-						columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value,group.getString("text"))));
-						dataMap.put(value, 1);
+						continue;
+					}
+					for(Object groupTmp :groupArray) {
+						JSONObject group = ((JSONObject)groupTmp);
+						String value = group.getString("value");
+						if(dataMap.containsKey(value)) {
+							dataMap.put(value, ((int)dataMap.get(value))+1);
+						}else {
+							columnArray.add(JSONObject.parse(String.format("{'name': '%s','displayName':'%s'}", value,group.getString("text"))));
+							dataMap.put(value, 1);
+						}
 					}
 				}	
 			}

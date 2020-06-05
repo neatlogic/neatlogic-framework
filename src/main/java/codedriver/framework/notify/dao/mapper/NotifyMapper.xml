@@ -150,6 +150,7 @@
 	`lcu`
 	FROM `notify_policy`
 	WHERE `id` = #{id}
+	FOR UPDATE
 	</select>
 
 	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">

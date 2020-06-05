@@ -210,6 +210,13 @@
 	LIMIT #{startNum}, #{pageSize}
 	</select>
 	
+	<select id="getNotifyPolicyInvokerCountByPolicyId">
+	SELECT 
+	  COUNT(1)
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
+	</select>
+	
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
 	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcd}, NOW(3))

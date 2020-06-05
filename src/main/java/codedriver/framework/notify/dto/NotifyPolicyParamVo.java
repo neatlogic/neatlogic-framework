@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
-public class NotifyPolicyParamVo  {
+public class NotifyPolicyParamVo {
 
 	private String handler;
 	private String handlerName;

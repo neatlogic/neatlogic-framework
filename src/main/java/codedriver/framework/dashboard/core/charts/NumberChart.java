@@ -106,18 +106,28 @@ public class NumberChart extends DashboardChartBase {
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
-				JSONObject group = data.getJSONObject(groupField);
-				String value = StringUtils.EMPTY;
-				if(group != null) {
-					value = group.getString("value");
-					valueTextMap.put(value, group.getString("text"));
+				JSONArray  groupArray = new JSONArray();
+				Object groupObj = data.get(groupField);
+				if(groupObj instanceof JSONObject) {
+					groupArray.add(groupObj);
+				}else if(groupObj instanceof JSONArray){
+					groupArray = (JSONArray) groupObj;
+				}else {
+					continue;
 				}
-				if(CollectionUtils.isEmpty(configList)) {
-					break;
-				}
-				if (resultMap.containsKey(value)) {
-					resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
-					total++;
+				for(Object group :groupArray) {
+					String value = StringUtils.EMPTY;
+					if(group != null) {
+						value = ((JSONObject)group).getString("value");
+						valueTextMap.put(value, ((JSONObject)group).getString("text"));
+					}
+					if(CollectionUtils.isEmpty(configList)) {
+						break;
+					}
+					if (resultMap.containsKey(value)) {
+						resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+						total++;
+					}
 				}
 			}
 		} 

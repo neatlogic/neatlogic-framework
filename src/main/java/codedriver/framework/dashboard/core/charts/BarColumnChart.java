@@ -90,7 +90,6 @@ public class BarColumnChart extends DashboardChartBase {
 		String groupField = configObj.getString(DashboardShowConfig.GROUPFIELD.getValue());
 		String subGroupField = configObj.getString(DashboardShowConfig.SUBGROUPFIELD.getValue());
 		String aggregate = configObj.getString(DashboardShowConfig.AGGREGATE.getValue());
-		JSONObject subGroup = null;
 		Map<String, Object> resultMap = null;
 		Map<String, String> valueTextMap = null;
 		if(preDatas.containsKey("resultMap")) {
@@ -108,35 +107,56 @@ public class BarColumnChart extends DashboardChartBase {
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
-				JSONObject group = data.getJSONObject(groupField);
-				String value = StringUtils.EMPTY;
-				if(group != null&&group.getString("value")!= null&&group.getString("text")!= null) {
-					value = group.getString("value");
-					valueTextMap.put(value, group.getString("text"));
-				}
-				if(StringUtils.isBlank(value)){
-					//throw new DashboardFieldNotFoundException(groupField);
+				JSONArray  groupArray = new JSONArray();
+				Object groupObj = data.get(groupField);
+				if(groupObj instanceof JSONObject) {
+					groupArray.add(groupObj);
+				}else if(groupObj instanceof JSONArray){
+					groupArray = (JSONArray) groupObj;
 				}else {
-					if(StringUtils.isNotBlank(subGroupField)) {
-						subGroup = data.getJSONObject(subGroupField);
-						String subValue = StringUtils.EMPTY;
-						if(subGroup != null&&subGroup.getString("value")!= null&&subGroup.getString("text")!= null) {
-							subValue = subGroup.getString("value");
-							valueTextMap.put(subValue, subGroup.getString("text"));
-						}
-
-						String groupCombine = value+"#"+subValue;
-						if (!resultMap.containsKey(groupCombine)) {
-							resultMap.put(groupCombine, 1);
-						} else {
-							resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
-						}
-
+					continue;
+				}
+				for(Object groupTmp :groupArray) {
+					JSONObject group = ((JSONObject)groupTmp);
+					String value = StringUtils.EMPTY;
+					if(group != null&&group.getString("value")!= null&&group.getString("text")!= null) {
+						value = group.getString("value");
+						valueTextMap.put(value, group.getString("text"));
+					}
+					if(StringUtils.isBlank(value)){
+						//throw new DashboardFieldNotFoundException(groupField);
 					}else {
-						if (!resultMap.containsKey(value)) {
-							resultMap.put(value, 1);
-						} else {
-							resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+						if(StringUtils.isNotBlank(subGroupField)) {
+							JSONArray  subGroupArray = new JSONArray();
+							Object subGroupObj = data.get(subGroupField);
+							if(subGroupObj instanceof JSONObject) {
+								subGroupArray.add(subGroupObj);
+							}else if(subGroupObj instanceof JSONArray){
+								subGroupArray = (JSONArray) subGroupObj;
+							}else {
+								continue;
+							}
+							for(Object subGroupTmp :subGroupArray) {
+								JSONObject subGroup = ((JSONObject)subGroupTmp);
+								String subValue = StringUtils.EMPTY;
+								if(subGroup != null&&subGroup.getString("value")!= null&&subGroup.getString("text")!= null) {
+									subValue = subGroup.getString("value");
+									valueTextMap.put(subValue, subGroup.getString("text"));
+								}
+		
+								String groupCombine = value+"#"+subValue;
+								if (!resultMap.containsKey(groupCombine)) {
+									resultMap.put(groupCombine, 1);
+								} else {
+									resultMap.put(groupCombine, Integer.valueOf(resultMap.get(groupCombine).toString()) + 1);
+								}
+							}
+						}else {
+							if (!resultMap.containsKey(value)) {
+								resultMap.put(value, 1);
+							} else {
+								resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+							}
 						}
 					}
 				}

@@ -70,28 +70,38 @@ public class PieChart extends DashboardChartBase {
 		if (aggregate.equals("count")) {
 			for (int i = 0; i < nextDataList.size(); i++) {
 				JSONObject data = nextDataList.getJSONObject(i);
-				JSONObject group = data.getJSONObject(groupField);
-				String value = StringUtils.EMPTY;
-				if(preDatas.containsKey("resultMap")) {
-					resultMap = (Map<String,Object>)preDatas.get("resultMap");
+				JSONArray  groupArray = new JSONArray();
+				Object groupObj = data.get(groupField);
+				if(groupObj instanceof JSONObject) {
+					groupArray.add(groupObj);
+				}else if(groupObj instanceof JSONArray){
+					groupArray = (JSONArray) groupObj;
 				}else {
-					resultMap =  new HashMap<String,Object>();
-					preDatas.put("resultMap", resultMap);
+					continue;
 				}
-				if(preDatas.containsKey("valueTextMap")) {
-					valueTextMap = (Map<String,String>)preDatas.get("valueTextMap");
-				}else {
-					valueTextMap =  new HashMap<String,String>();
-					preDatas.put("valueTextMap", valueTextMap);
-				}
-				if(group != null) {
-					value = group.getString("value");
-					valueTextMap.put(value, group.getString("text"));
-				}
-				if (!resultMap.containsKey(value)) {
-					resultMap.put(value, 1);
-				} else {
-					resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+				for(Object group :groupArray) {
+					String value = StringUtils.EMPTY;
+					if(preDatas.containsKey("resultMap")) {
+						resultMap = (Map<String,Object>)preDatas.get("resultMap");
+					}else {
+						resultMap =  new HashMap<String,Object>();
+						preDatas.put("resultMap", resultMap);
+					}
+					if(preDatas.containsKey("valueTextMap")) {
+						valueTextMap = (Map<String,String>)preDatas.get("valueTextMap");
+					}else {
+						valueTextMap =  new HashMap<String,String>();
+						preDatas.put("valueTextMap", valueTextMap);
+					}
+					if(group != null) {
+						value = ((JSONObject)group).getString("value");
+						valueTextMap.put(value, ((JSONObject)group).getString("text"));
+					}
+					if (!resultMap.containsKey(value)) {
+						resultMap.put(value, 1);
+					} else {
+						resultMap.put(value, Integer.valueOf(resultMap.get(value).toString()) + 1);
+					}
 				}
 			}
 		} 

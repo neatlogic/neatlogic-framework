@@ -210,7 +210,7 @@
 	LIMIT #{startNum}, #{pageSize}
 	</select>
 	
-	<select id="getNotifyPolicyInvokerCountByPolicyId">
+	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
 	SELECT 
 	  COUNT(1)
 	FROM `notify_policy_invoke` 

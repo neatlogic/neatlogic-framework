@@ -164,8 +164,10 @@
 	`handler`,
 	`fcd`,
 	`fcu`,
+	(SELECT `user_name` FROM `user` WHERE `uuid` = `fcu`) AS fcuName,
 	`lcd`,
-	`lcu`
+	`lcu`,
+	(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName
 	FROM `notify_policy`
 	where `handler` = #{handler}
 	<if test="keyword != null and keyword != ''">

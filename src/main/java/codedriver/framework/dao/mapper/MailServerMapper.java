@@ -29,5 +29,7 @@ public interface MailServerMapper {
 
 	public int activeMailServerByUuid(String uuid);
 
+	public int updateMailServerByUuid(MailServerVo mailServerVo);
+
 	public int deleteMailServerByUuid(String string);
 }

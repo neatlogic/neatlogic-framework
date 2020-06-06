@@ -150,6 +150,7 @@
 	`lcu`
 	FROM `notify_policy`
 	WHERE `id` = #{id}
+	FOR UPDATE
 	</select>
 
 	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
@@ -163,8 +164,10 @@
 	`handler`,
 	`fcd`,
 	`fcu`,
+	(SELECT `user_name` FROM `user` WHERE `uuid` = `fcu`) AS fcuName,
 	`lcd`,
-	`lcu`
+	`lcu`,
+	(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName
 	FROM `notify_policy`
 	where `handler` = #{handler}
 	<if test="keyword != null and keyword != ''">
@@ -207,6 +210,13 @@
 	FROM `notify_policy_invoke` 
 	WHERE `policy_id` = #{policyId}
 	LIMIT #{startNum}, #{pageSize}
+	</select>
+	
+	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
+	SELECT 
+	  COUNT(1)
+	FROM `notify_policy_invoke` 
+	WHERE `policy_id` = #{policyId}
 	</select>
 	
 	<insert id="insertNotifyPolicy">

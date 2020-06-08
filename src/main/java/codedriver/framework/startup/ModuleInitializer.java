@@ -69,7 +69,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					} else {
 						sr.setLoadOnStartup(2);
 					}
-
+					System.out.println("initializing module " + moduleId + "...");
 					ModuleVo moduleVo = new ModuleVo();
 					moduleVo.setId(moduleId);
 					moduleVo.setName(moduleName);

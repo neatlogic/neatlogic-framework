@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.exception.dashboard.DashboardHandlerNotFoundException;
+import codedriver.framework.exception.groupsearch.GroupSearchHandlerNotFoundException;
 
 @RootComponent
 public class GroupSearchHandlerFactory implements ApplicationListener<ContextRefreshedEvent> {
@@ -16,7 +16,7 @@ public class GroupSearchHandlerFactory implements ApplicationListener<ContextRef
 
 	public static IGroupSearchHandler getHandler(String handler) {
 		if (!componentMap.containsKey(handler) || componentMap.get(handler) == null) {
-			throw new DashboardHandlerNotFoundException(handler);
+			throw new GroupSearchHandlerNotFoundException(handler);
 		}
 		return componentMap.get(handler);
 	}

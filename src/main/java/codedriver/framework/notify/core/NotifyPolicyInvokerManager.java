@@ -15,7 +15,7 @@ public class NotifyPolicyInvokerManager {
 		notifyMapper.insertNotifyPolicyInvoker(notifyPolicyInvokerVo);
 	}
 	
-	public void removeInvoker(NotifyPolicyInvokerVo notifyPolicyInvokerVo) {
-		notifyMapper.deleteNotifyPolicyInvoker(notifyPolicyInvokerVo);
+	public void removeInvoker(String invoker) {
+		notifyMapper.deleteNotifyPolicyInvoker(invoker);
 	}
 }

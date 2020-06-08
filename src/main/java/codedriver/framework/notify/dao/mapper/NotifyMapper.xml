@@ -208,8 +208,17 @@
 	  `invoker`,
 	  `config` 
 	FROM `notify_policy_invoke` 
-	WHERE `policy_id` = #{policyId}
+	<where>
+		<if test="policyId != null">
+			AND `policy_id` = #{policyId}
+		</if>
+		<if test="invoker != null and invoker != ''">
+			AND `invoker` = #{invoker}
+		</if>
+	</where> 
+	<if test="needPage">
 	LIMIT #{startNum}, #{pageSize}
+	</if>
 	</select>
 	
 	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
@@ -242,9 +251,8 @@
 	DELETE FROM `notify_policy` WHERE id = #{id}
 	</delete>
 	
-	<delete id="deleteNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	<delete id="deleteNotifyPolicyInvoker" parameterType="java.lang.String">
 	DELETE FROM `notify_policy_invoke` 
-	WHERE `policy_id` = #{policyId}
-	AND `invoker` = #{invoker}
+	WHERE `invoker` = #{invoker}
 	</delete>
 </mapper>

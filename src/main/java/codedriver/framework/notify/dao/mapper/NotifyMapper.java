@@ -47,6 +47,6 @@ public interface NotifyMapper {
 
 	public int deleteNotifyPolicyById(Long id);
 
-	public int deleteNotifyPolicyInvoker(NotifyPolicyInvokerVo notifyPolicyInvokerVo);
+	public int deleteNotifyPolicyInvoker(String invoker);
 
 }

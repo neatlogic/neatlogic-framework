@@ -221,7 +221,7 @@
 	
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
-	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcd}, NOW(3))
+	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3))
 	</insert>
 	
 	<insert id="insertNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">

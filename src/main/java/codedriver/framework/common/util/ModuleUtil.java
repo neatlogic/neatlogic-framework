@@ -69,4 +69,29 @@ public class ModuleUtil {
 		}
 		return moduleGroup;
 	}
+	
+	public static Map<String,ModuleGroupVo> getModuleGroupMap() {
+		Map<String,ModuleGroupVo> moduleGroupMap = new HashMap<String,ModuleGroupVo>();
+		Set<Entry<String, ModuleVo>> moduleSet = moduleMap.entrySet();
+		for(Entry<String, ModuleVo> moduleEntry :moduleSet) {
+			ModuleVo moduleVo = moduleEntry.getValue();
+			ModuleGroupVo moduleGroupVo = null;
+			if(moduleGroupMap.containsKey(moduleVo.getGroup())) {
+				moduleGroupVo = (ModuleGroupVo) moduleGroupMap.get(moduleVo.getGroup());
+				moduleGroupVo.getModuleList().add(moduleVo);
+			}else {
+				moduleGroupVo = new ModuleGroupVo();
+				moduleGroupVo.setGroup(moduleVo.getGroup());
+				moduleGroupVo.setGroupName(moduleVo.getGroupName());
+				moduleGroupVo.setGroupDescription(moduleVo.getGroupDescription());
+				moduleGroupVo.setGroupSort(moduleVo.getGroupSort());
+				List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
+				moduleList.add(moduleVo);
+				moduleGroupVo.setModuleList(moduleList);
+			}
+			moduleGroupMap.put(moduleGroupVo.getGroup(), moduleGroupVo);
+			
+		}
+		return moduleGroupMap;
+	}
 }

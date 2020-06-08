@@ -30,6 +30,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext context) throws ServletException {
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		String moduleId = null;
 		try {
 			Resource[] resources = resolver.getResources("classpath*:codedriver/**/*-servlet-context.xml");
 			for (Resource resource : resources) {
@@ -40,7 +41,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				Element rootE = document.getRootElement();
 				Element codedriverE = rootE.element("module");
 				// Element nameE = rootE.element("name");
-				String moduleId = null, moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null, groupDescription = null;
+				String moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null, groupDescription = null;
 				moduleId = codedriverE.attributeValue("id");
 				moduleName = codedriverE.attributeValue("name");
 				urlMapping = codedriverE.attributeValue("urlMapping");
@@ -55,7 +56,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					XmlWebApplicationContext appContext = new XmlWebApplicationContext();
 					appContext.setConfigLocation("classpath*:" + path);
 					appContext.setId(moduleId);
-					//InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
+					// InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
 					ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
 					if (StringUtils.isNotBlank(urlMapping)) {
@@ -82,7 +83,11 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				}
 			}
 		} catch (IOException | DocumentException ex) {
-			logger.error(ex.getMessage(), ex);
+			if (moduleId != null) {
+				logger.error("初始化模块：" + moduleId + "失败", ex);
+			} else {
+				logger.error(ex.getMessage(), ex);
+			}
 		}
 
 	}

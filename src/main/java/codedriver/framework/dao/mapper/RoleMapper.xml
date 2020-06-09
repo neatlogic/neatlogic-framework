@@ -105,7 +105,7 @@
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)
-		VALUES (#{uuid}, #{name, typeHandler=XssHandler}, #{description, typeHandler=XssHandler})
+		VALUES (#{uuid}, #{name}, #{description})
 	</insert>
 
 	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
@@ -130,7 +130,7 @@
 		UPDATE `role`
 		SET 
 		`name` = #{name},
-		`description` = #{description, typeHandler=XssHandler}
+		`description` = #{description}
 		WHERE `uuid` = #{uuid}
 	</update>
 

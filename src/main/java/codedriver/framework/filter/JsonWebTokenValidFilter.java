@@ -37,7 +37,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 	// private ServletContext context;
 
 	@Autowired
-	UserMapper userMapper;
+	private UserMapper userMapper;
 
 	/**
 	 * Default constructor.
@@ -125,12 +125,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		} else {
 			JSONObject redirectObj = new JSONObject();
 			if (!hasTenant) {
+				response.setStatus(521);
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
 			} else if (!isAuth) {
+				response.setStatus(522);
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "没有找到登录信息，请登录");
 			} else if (!isUnExpired) {
+				response.setStatus(522);
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
 			}

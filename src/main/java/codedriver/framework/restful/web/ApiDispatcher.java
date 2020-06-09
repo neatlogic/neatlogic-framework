@@ -152,19 +152,16 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (ApiException ex) {
-			response.setStatus(500);
-			returnObj.put("Error", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
@@ -173,7 +170,7 @@ public class ApiDispatcher {
 			response.getWriter().print(returnObj);
 		}
 	}
-
+	
 	@RequestMapping(value = "/rest/**", method = RequestMethod.POST)
 	public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -204,18 +201,15 @@ public class ApiDispatcher {
 
 			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("Error", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (ApiException ex) {
-			response.setStatus(500);
-			returnObj.put("Error", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
-			response.setStatus(500);
-			returnObj.put("Error", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
 			logger.error(ex.getMessage(), ex);
@@ -246,19 +240,16 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (ApiException ex) {
-			response.setStatus(500);
-			returnObj.put("Error", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
@@ -288,14 +279,12 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
@@ -314,14 +303,12 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
@@ -338,14 +325,12 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}
@@ -362,14 +347,12 @@ public class ApiDispatcher {
 		try {
 			doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
-			response.setStatus(500);
-			returnObj.put("ErrorCode", ex.getErrorCode());
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			response.setStatus(500);
-			returnObj.put("ErrorCode", 500);
+			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
 		}

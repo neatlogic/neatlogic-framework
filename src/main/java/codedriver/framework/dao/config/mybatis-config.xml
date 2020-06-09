@@ -6,7 +6,7 @@
 	<typeAliases>
 		<typeAlias type="codedriver.framework.dao.typehandler.XssHandler" alias="XssHandler" />
 	</typeAliases>
-	<typeHandlers>
+	<!--  <typeHandlers>
 		<typeHandler jdbcType="VARCHAR" javaType="String" handler="codedriver.framework.dao.typehandler.XssHandler" />
-	</typeHandlers>
+	</typeHandlers>-->
 </configuration>

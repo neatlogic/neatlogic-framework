@@ -110,6 +110,8 @@
 
 	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
+
+
 	<hdp:configuration id="hadoopConfiguration">
 		fs.defaultFS=${hadoop.url}
 	</hdp:configuration>

@@ -441,14 +441,14 @@
 		UPDATE `user`
 		SET
 		`user_id` = #{userId},
-		`user_name` = #{userName, typeHandler=XssHandler},
+		`user_name` = #{userName},
 		`email` = #{email},
 		`phone` = #{phone},
 		`pinyin` = #{pinyin},
 		<if test="isActive != null">
 		`is_active` = #{isActive},
 		</if>
-		`user_info` = #{userInfo, typeHandler=XssHandler}
+		`user_info` = #{userInfo}
 		WHERE `uuid` = #{uuid}
 	</update>
 

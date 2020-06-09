@@ -209,7 +209,7 @@ public class IntegrationVo extends BasePageVo {
 			if (integrationHandler != null) {
 				hasHelp = integrationHandler.hasPattern();
 			}
-			if (hasHelp.equals(0) && this.config != null && this.config.containsKey("param")) {
+			if ((hasHelp == null || hasHelp.equals(0)) && this.config != null && this.config.containsKey("param")) {
 				if (this.config.getJSONObject("param").containsKey("paramList") && this.config.getJSONObject("param").getJSONArray("paramList").size() > 0) {
 					hasHelp = 1;
 				}

@@ -23,6 +23,8 @@ public class NotifyVo {
 	private String templateContent;
 	private String templateTitle;
 
+	private List<String> exceptionNotifyUserUuidList;
+	
 	private NotifyVo(Builder builder) {
 		this.templateTitle = builder.templateTitle;
 		this.templateContent = builder.templateContent;
@@ -30,6 +32,7 @@ public class NotifyVo {
 		this.toUserUuidList = builder.toUserUuidList;
 		this.toTeamIdList = builder.toTeamIdList;
 		this.toRoleUuidList = builder.toRoleUuidList;
+		this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
 	}
 
 	private NotifyVo() {
@@ -110,6 +113,10 @@ public class NotifyVo {
 		return toRoleUuidList;
 	}
 
+	public List<String> getExceptionNotifyUserUuidList() {
+		return exceptionNotifyUserUuidList;
+	}
+
 	public static class Builder {
 
 		// 可选参数
@@ -119,7 +126,8 @@ public class NotifyVo {
 		private List<String> toUserUuidList = new ArrayList<>();
 		private List<String> toTeamIdList = new ArrayList<>();
 		private List<String> toRoleUuidList = new ArrayList<>();
-
+		private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
+		
 		public Builder withContentTemplate(String contentTemplate) {
 			templateContent = contentTemplate;
 			return this;
@@ -157,6 +165,11 @@ public class NotifyVo {
 			if (!toRoleUuidList.contains(roleUuid)) {
 				toRoleUuidList.add(roleUuid);
 			}
+			return this;
+		}
+
+		public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
+			this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;
 			return this;
 		}
 	}

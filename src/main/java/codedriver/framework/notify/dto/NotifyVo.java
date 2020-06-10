@@ -24,15 +24,27 @@ public class NotifyVo {
 	private String templateTitle;
 
 	private List<String> exceptionNotifyUserUuidList;
+	private List<UserVo> exceptionNotifyUserList = new ArrayList<>();
+	private StringBuilder errorBuilder;
 	
 	private NotifyVo(Builder builder) {
-		this.templateTitle = builder.templateTitle;
-		this.templateContent = builder.templateContent;
+//		this.templateTitle = builder.templateTitle;
+//		this.templateContent = builder.templateContent;
 		this.data = builder.data;
 		this.toUserUuidList = builder.toUserUuidList;
 		this.toTeamIdList = builder.toTeamIdList;
 		this.toRoleUuidList = builder.toRoleUuidList;
 		this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
+		try {
+			title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
+		} catch (Exception e) {
+			this.appendError(e.getMessage());
+		}
+		try {
+			content = FreemarkerUtil.transform(builder.data, builder.templateContent);
+		} catch (Exception e) {
+			this.appendError(e.getMessage());
+		}
 	}
 
 	private NotifyVo() {
@@ -46,22 +58,22 @@ public class NotifyVo {
 	}
 
 	public String getTitle() {
-		if (StringUtils.isBlank(title) && StringUtils.isNotBlank(this.getTemplateTitle())) {
-			try {
-				title = FreemarkerUtil.transform(this.getData(), this.getTemplateTitle());
-			} catch (Exception e) {
-			}
-		}
+//		if (StringUtils.isBlank(title) && StringUtils.isNotBlank(this.getTemplateTitle())) {
+//			try {
+//				title = FreemarkerUtil.transform(this.getData(), this.getTemplateTitle());
+//			} catch (Exception e) {
+//			}
+//		}
 		return title;
 	}
 
 	public String getContent() {
-		if (StringUtils.isBlank(content) && StringUtils.isNotBlank(this.getTemplateContent())) {
-			try {
-				content = FreemarkerUtil.transform(this.getData(), this.getTemplateContent());
-			} catch (Exception e) {
-			}
-		}
+//		if (StringUtils.isBlank(content) && StringUtils.isNotBlank(this.getTemplateContent())) {
+//			try {
+//				content = FreemarkerUtil.transform(this.getData(), this.getTemplateContent());
+//			} catch (Exception e) {
+//			}
+//		}
 		return content;
 	}
 
@@ -117,6 +129,30 @@ public class NotifyVo {
 		return exceptionNotifyUserUuidList;
 	}
 
+	public List<UserVo> getExceptionNotifyUserList() {
+		return exceptionNotifyUserList;
+	}
+
+	public void setExceptionNotifyUserList(List<UserVo> exceptionNotifyUserList) {
+		this.exceptionNotifyUserList = exceptionNotifyUserList;
+	}
+
+	public String getError() {
+		if(errorBuilder != null) {
+			return errorBuilder.toString().trim();
+		}
+		return null;
+	}
+	
+	public void appendError(String errorInfo) {
+		if(StringUtils.isNotBlank(errorInfo)) {
+			if(errorBuilder == null) {
+				errorBuilder = new StringBuilder();
+			}
+			errorBuilder.append(errorInfo);
+		}
+	}
+	
 	public static class Builder {
 
 		// 可选参数

@@ -3,7 +3,8 @@ package codedriver.framework.notify.core;
 public enum NotifyHandlerType {
 
 	EMAIL("email","邮件通知"),
-	REMIND("remind","消息通知");
+	REMIND("remind","消息通知")
+	;
 	
 	private String value;
 	private String text;

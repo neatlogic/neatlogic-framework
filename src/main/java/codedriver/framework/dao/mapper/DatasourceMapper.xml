@@ -7,7 +7,7 @@
 		`tenant_uuid` AS tenantUuid,
 		`url`,
 		`username`,
-		`password`,
+		`password` AS passwordCipher,
 		`driver`
 		FROM
 		`datasource` a

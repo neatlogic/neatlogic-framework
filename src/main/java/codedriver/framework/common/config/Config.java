@@ -36,6 +36,9 @@ public class Config {
 	private static String CODEDRIVER_HOME;
 	private static Map<String, String> ES_CLUSTERS;
 	private static boolean ES_ENABLE;
+	private static String DB_HOST;
+	private static Integer DB_PORT;
+	private static String DB_DRIVER;
 	private static String DATA_HOME;// 存储文件路径
 	private static int SERVER_HEARTBEAT_RATE;// 心跳频率
 	private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
@@ -70,6 +73,18 @@ public class Config {
 
 	public static final boolean ES_ENABLE() {
 		return ES_ENABLE;
+	}
+
+	public static final String DB_HOST() {
+		return DB_HOST;
+	}
+
+	public static final Integer DB_PORT() {
+		return DB_PORT;
+	}
+
+	public static final String DB_DRIVER() {
+		return DB_DRIVER;
 	}
 
 	public static final String DATA_HOME() {
@@ -118,7 +133,9 @@ public class Config {
 			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
 			HOME_URL = prop.getProperty("home.url");
 			JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
-
+			DB_HOST = prop.getProperty("db.host", "localhost");
+			DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
+			DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
 			ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
 			ES_CLUSTERS = new HashMap<>();
 			for (Map.Entry<Object, Object> el : prop.entrySet()) {

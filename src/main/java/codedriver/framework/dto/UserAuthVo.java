@@ -2,9 +2,9 @@ package codedriver.framework.dto;
 
 import org.apache.commons.lang.StringUtils;
 
-import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.auth.core.AuthBase;
 import codedriver.framework.auth.core.AuthFactory;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 

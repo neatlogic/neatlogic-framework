@@ -15,4 +15,27 @@
 		ON a.tenant_uuid = b.uuid
 		AND b.is_active = 1
 	</select>
+
+	<insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+		INSERT INTO `datasource` (
+		`tenant_uuid`,
+		`url`,
+		`username`,
+		`password`,
+		`driver`
+		)
+		VALUES
+		(
+		#{tenantUuid},
+		#{url},
+		#{username},
+		#{passwordCipher},
+		#{driver}
+		)
+	</insert>
+
+	<insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+		CREATE DATABASE `codedriver_${tenantUuid}`;
+		GRANT ALL ON `codedriver_${tenantUuid}`.* to ${tenantUuid}@localhost identified by '${passwordPlain}';
+	</insert>
 </mapper>

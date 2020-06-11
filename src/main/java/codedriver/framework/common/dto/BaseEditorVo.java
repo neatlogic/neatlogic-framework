@@ -2,7 +2,7 @@ package codedriver.framework.common.dto;
 
 import java.util.Date;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class BaseEditorVo extends BasePageVo {

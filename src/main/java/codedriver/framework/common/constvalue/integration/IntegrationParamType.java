@@ -1,6 +1,6 @@
 package codedriver.framework.common.constvalue.integration;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 
 public enum IntegrationParamType {
 	NUMBER("number", "数字"), STRING("string", "字符型"), JSONOBJECT("jsonObject", "json对象"), JSONARRAY("jsonArray", "json数组");

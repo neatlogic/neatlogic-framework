@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ModuleGroupVo {

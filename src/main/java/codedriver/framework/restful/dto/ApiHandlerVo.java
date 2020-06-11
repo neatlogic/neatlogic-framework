@@ -2,7 +2,7 @@ package codedriver.framework.restful.dto;
 
 import java.util.List;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ApiHandlerVo {

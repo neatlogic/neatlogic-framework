@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
-	<!--  <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache>-->
+	<!-- <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache> -->
+	<select id="checkTenantUuidIsExists" parameterType="codedriver.framework.dto.TenantVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`tenant`
+		WHERE
+		uuid = #{uuid}
+		<if test="id != null">
+			AND id != #{id}
+		</if>
+	</select>
 
 	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
@@ -22,5 +33,47 @@
 		JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
 		WHERE t.`is_active` = 1
 	</select>
+
+	<insert id="insertTenant" parameterType="codedriver.framework.dto.TenantVo">
+		INSERT INTO `tenant` (
+		`uuid`,
+		`name`,
+		`is_active`,
+		`expire_date`,
+		`description`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{isActive},
+		#{expireDate},
+		#{description}
+		)
+	</insert>
+
+	<insert id="insertTenantModule">
+		INSERT INTO `tenant_module` (`tenant_uuid`, `module_id`)
+		VALUES
+		(#{tenantUuid}, #{moduleId})
+	</insert>
+
+	<update id="updateTenant" parameterType="codedriver.framework.dto.TenantVo">
+		UPDATE
+		`tenant`
+		SET
+		`name` = #{name},
+		`is_active` = #{isActive},
+		`expire_date` = #{expireDate},
+		`description` = #{description}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<delete id="deleteTenantModuleByTenantUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`tenant_module`
+		WHERE `tenant_uuid` = #{value}
+	</delete>
 </mapper>
 

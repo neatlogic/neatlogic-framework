@@ -1,6 +1,6 @@
 package codedriver.framework.scheduler.dto;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;

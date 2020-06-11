@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 

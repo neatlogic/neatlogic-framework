@@ -43,7 +43,7 @@ public class DatasourceInitializer {
 				tenantDatasource.setUrl(datasourceVo.getUrl());
 				tenantDatasource.setDriverClassName(datasourceVo.getDriver());
 				tenantDatasource.setUsername(datasourceVo.getUsername());
-				tenantDatasource.setPassword(datasourceVo.getPassword());
+				tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
 				datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
 				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}

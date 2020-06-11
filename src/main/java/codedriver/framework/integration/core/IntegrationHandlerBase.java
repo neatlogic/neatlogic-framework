@@ -25,8 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.apiparam.core.ApiParamFactory;
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
@@ -35,6 +34,8 @@ import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
+import codedriver.framework.param.validate.core.ParamValidatorBase;
+import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.util.FreemarkerUtil;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
@@ -106,12 +107,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 					}
 					Object paramValue = requestParamObj.get(patternVo.getName());
-					ApiParamType apiParamType = ApiParamType.getApiParamType(patternVo.getType());
-					if (apiParamType == null) {
+					ParamType paramType = ParamType.getParamType(patternVo.getType());
+					if (paramType == null) {
 						throw new ParamTypeNotFoundException(patternVo.getType());
 					}
-					if (paramValue != null && !ApiParamFactory.getAuthInstance(apiParamType).validate(paramValue, null)) {
-						throw new ParamIrregularException("参数“" + patternVo.getName() + "”不符合格式要求");
+					if (paramValue != null) {
+						ParamValidatorBase validator = ParamValidatorFactory.getAuthInstance(paramType);
+						if (validator != null && !validator.validate(paramValue, null)) {
+							throw new ParamIrregularException("参数“" + patternVo.getName() + "”不符合格式要求");
+						}
 					}
 				}
 			}

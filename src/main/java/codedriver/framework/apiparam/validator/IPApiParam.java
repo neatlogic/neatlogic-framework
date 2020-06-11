@@ -2,10 +2,10 @@ package codedriver.framework.apiparam.validator;
 
 import java.util.regex.Pattern;
 
-import codedriver.framework.apiparam.core.ApiParamBase;
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.param.validate.core.ApiParamValidatorBase;
 
-public class IPApiParam extends ApiParamBase {
+public class IPApiParam extends ApiParamValidatorBase {
 
 	@Override
 	public String getName() {

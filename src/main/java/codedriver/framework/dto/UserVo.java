@@ -9,7 +9,7 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import net.sourceforge.pinyin4j.PinyinHelper;

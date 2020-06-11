@@ -21,13 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.apiparam.core.ApiParamFactory;
-import codedriver.framework.apiparam.core.ApiParamType;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.dto.ConfigVo;
@@ -36,6 +35,7 @@ import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
 import codedriver.framework.exception.type.ParamValueTooShortException;
 import codedriver.framework.exception.type.PermissionDeniedException;
+import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.annotation.Example;
@@ -244,7 +244,7 @@ public class ApiValidateAndHelpBase {
 									throw new ParamValueTooShortException(p.name(), paramValue.toString().length(), p.minLength());
 								}
 							}
-							if (paramValue != null && !ApiParamFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
+							if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
 								throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
 							}
 						}

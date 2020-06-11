@@ -2,10 +2,10 @@ package codedriver.framework.apiparam.validator;
 
 import com.alibaba.fastjson.JSONArray;
 
-import codedriver.framework.apiparam.core.ApiParamBase;
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.param.validate.core.ApiParamValidatorBase;
 
-public class JSONArrayApiParam extends ApiParamBase {
+public class JSONArrayApiParam extends ApiParamValidatorBase {
 
 	@Override
 	public String getName() {

@@ -23,7 +23,6 @@ import org.springframework.web.servlet.DispatcherServlet;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
-
 public class ModuleInitializer implements WebApplicationInitializer {
 	static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
 
@@ -52,6 +51,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				groupDescription = codedriverE.attributeValue("groupDescription");
 
 				if (StringUtils.isNotBlank(moduleId)) {
+					System.out.println("start to initialize module " + moduleId + "...");
 					version = Config.getProperty("META-INF/maven/com.techsure/codedriver-" + moduleId + "/pom.properties", "version");
 					XmlWebApplicationContext appContext = new XmlWebApplicationContext();
 					appContext.setConfigLocation("classpath*:" + path);
@@ -69,7 +69,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					} else {
 						sr.setLoadOnStartup(2);
 					}
-					System.out.println("initializing module " + moduleId + "...");
+
 					ModuleVo moduleVo = new ModuleVo();
 					moduleVo.setId(moduleId);
 					moduleVo.setName(moduleName);

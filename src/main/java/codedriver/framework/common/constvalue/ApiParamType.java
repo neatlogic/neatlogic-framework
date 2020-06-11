@@ -1,4 +1,4 @@
-package codedriver.framework.apiparam.core;
+package codedriver.framework.common.constvalue;
 
 public enum ApiParamType {
 	INTEGER("int", "整型"),

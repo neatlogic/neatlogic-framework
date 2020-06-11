@@ -1,9 +1,9 @@
 package codedriver.framework.apiparam.validator;
 
-import codedriver.framework.apiparam.core.ApiParamBase;
-import codedriver.framework.apiparam.core.ApiParamType;
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.param.validate.core.ApiParamValidatorBase;
 
-public class IntegerApiParam extends ApiParamBase {
+public class IntegerApiParam extends ApiParamValidatorBase {
 
 	@Override
 	public String getName() {

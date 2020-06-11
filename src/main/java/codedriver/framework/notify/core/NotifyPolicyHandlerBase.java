@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.common.constvalue.BasicType;
+import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.dto.NotifyPolicyParamVo;
@@ -22,7 +22,7 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	@Override
 	public List<ValueTextVo> getParamTypeList() {
 		List<ValueTextVo> resultList = new ArrayList<>();
-		for(BasicType type : BasicType.values()) {
+		for(ParamType type : ParamType.values()) {
 			resultList.add(new ValueTextVo(type.getName(), type.getText()));
 		}
 		return resultList;

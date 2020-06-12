@@ -3,8 +3,14 @@ package codedriver.framework.common.constvalue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 public enum ParamType {
 	STRING("string","字符串",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE),Expression.LIKE),
+	NUMBER("number","数字",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN),Expression.EQUAL),
 	ARRAY("array","数组",Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE),Expression.INCLUDE), 
 	DATE("date","日期",Arrays.asList(Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN),Expression.BETWEEN)
 	;
@@ -30,6 +36,19 @@ public enum ParamType {
 
 	public List<Expression> getExpressionList() {
 		return expressionList;
+	}
+	
+	public JSONArray getExpressionJSONArray() {
+		JSONArray expresstionArray = new JSONArray();
+		if(CollectionUtils.isNotEmpty(expressionList)) {
+			for(Expression express:expressionList) {
+				JSONObject expressionObj = new JSONObject();
+				expressionObj.put("expression", express.getExpression());
+				expressionObj.put("expressionName", express.getExpressionName());
+				expresstionArray.add(expressionObj);
+			}
+		}
+		return expresstionArray;
 	}
 
 	public Expression getDefaultExpression() {

@@ -1,4 +1,4 @@
-package codedriver.framework.notify.dto;
+package codedriver.framework.dto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,37 +7,21 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
-public class NotifyPolicyParamVo {
+import codedriver.framework.notify.dto.ExpressionVo;
 
-	private String handler;
-	private String handlerName;
-	private String handlerType;
-	private Boolean isMultiple;
+public class ConditionParamVo {
+	private String name;
+	private String displayName;
+	private String controller;
+	private Boolean isMultiple = false;
 	private JSONObject config;
 	private String type;
-	private String basicType;
-	private String basicTypeName;
+	private String paramType;
+	private String paramTypeName;
 	private String defaultExpression;
 	private List<ExpressionVo> expressionList = new ArrayList<>();
 	private int isEditable = 1;
-	public String getHandler() {
-		return handler;
-	}
-	public void setHandler(String handler) {
-		this.handler = handler;
-	}
-	public String getHandlerName() {
-		return handlerName;
-	}
-	public void setHandlerName(String handlerName) {
-		this.handlerName = handlerName;
-	}
-	public String getHandlerType() {
-		return handlerType;
-	}
-	public void setHandlerType(String handlerType) {
-		this.handlerType = handlerType;
-	}
+
 	public Boolean getIsMultiple() {
 		return isMultiple;
 	}
@@ -67,18 +51,7 @@ public class NotifyPolicyParamVo {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public String getBasicType() {
-		return basicType;
-	}
-	public void setBasicType(String basicType) {
-		this.basicType = basicType;
-	}
-	public String getBasicTypeName() {
-		return basicTypeName;
-	}
-	public void setBasicTypeName(String basicTypeName) {
-		this.basicTypeName = basicTypeName;
-	}
+
 	public String getDefaultExpression() {
 		return defaultExpression;
 	}
@@ -96,5 +69,38 @@ public class NotifyPolicyParamVo {
 	}
 	public void setIsEditable(int isEditable) {
 		this.isEditable = isEditable;
+	}
+	public String getParamType() {
+		return paramType;
+	}
+	public void setParamType(String paramType) {
+		this.paramType = paramType;
+	}
+	public String getParamTypeName() {
+		return paramTypeName;
+	}
+	public void setParamTypeName(String paramTypeName) {
+		this.paramTypeName = paramTypeName;
+	}
+	public void setConfig(JSONObject config) {
+		this.config = config;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getDisplayName() {
+		return displayName;
+	}
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+	public String getController() {
+		return controller;
+	}
+	public void setController(String controller) {
+		this.controller = controller;
 	}
 }

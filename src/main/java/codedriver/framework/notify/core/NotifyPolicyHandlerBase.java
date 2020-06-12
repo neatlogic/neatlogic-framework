@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.notify.dto.NotifyPolicyParamVo;
+import codedriver.framework.dto.ConditionParamVo;
 
 public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 
@@ -29,11 +29,11 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	}
 
 	@Override
-	public List<NotifyPolicyParamVo> getSystemParamList() {
+	public List<ConditionParamVo> getSystemParamList() {
 		return mySystemParamList();
 	}
 	
-	protected abstract List<NotifyPolicyParamVo> mySystemParamList();
+	protected abstract List<ConditionParamVo> mySystemParamList();
 
 	@Override
 	public JSONObject getAuthorityConfig() {

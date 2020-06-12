@@ -7,7 +7,7 @@ import org.springframework.util.ClassUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.notify.dto.NotifyPolicyParamVo;
+import codedriver.framework.dto.ConditionParamVo;
 
 public interface INotifyPolicyHandler {
 	
@@ -17,7 +17,7 @@ public interface INotifyPolicyHandler {
 	
 	public List<ValueTextVo> getParamTypeList();
 	
-	public List<NotifyPolicyParamVo> getSystemParamList();
+	public List<ConditionParamVo> getSystemParamList();
 	
 	public JSONObject getAuthorityConfig();
 	

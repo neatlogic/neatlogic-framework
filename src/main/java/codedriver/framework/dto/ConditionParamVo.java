@@ -11,7 +11,7 @@ import codedriver.framework.notify.dto.ExpressionVo;
 
 public class ConditionParamVo {
 	private String name;
-	private String displayName;
+	private String label;
 	private String controller;
 	private Boolean isMultiple = false;
 	private JSONObject config;
@@ -91,11 +91,11 @@ public class ConditionParamVo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getDisplayName() {
-		return displayName;
+	public String getLabel() {
+		return label;
 	}
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 	public String getController() {
 		return controller;

@@ -38,6 +38,12 @@
 			<if test="isActive != null">
 				AND is_active = #{isActive}
 			</if>
+			<if test="valueList != null and valueList.size() >0">
+				AND uuid in
+				<foreach collection="valueList" item="uuid" open="(" separator=","  close=")">
+					#{uuid}
+				</foreach>
+			</if>
 		</where>
 		ORDER BY fcd DESC
 		<if test="needPage == true">

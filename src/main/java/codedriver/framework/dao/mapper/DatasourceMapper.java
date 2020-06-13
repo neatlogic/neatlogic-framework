@@ -9,5 +9,5 @@ public interface DatasourceMapper {
 
 	public int insertDatasource(DatasourceVo datasourceVo);
 
-	public int createDatasource(String tenantUuid);
+	public int createDatasource(DatasourceVo datasourceVo);
 }

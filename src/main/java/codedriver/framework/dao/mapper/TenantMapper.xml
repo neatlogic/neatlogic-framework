@@ -2,6 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
 	<!-- <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache> -->
+
+	<select id="searchTenant" parameterType="codedriver.framework.dto.TenantVo" resultType="codedriver.framework.dto.TenantVo">
+		SELECT
+		`id`,
+		`uuid`,
+		`name`,
+		`is_active` AS isActive,
+		`expire_date` AS expireDate,
+		`description`
+		FROM
+		`tenant`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND name LIKE concat('%', #{keyword}, '#')
+			</if>
+		</where>
+	</select>
+
+	<select id="searchTenantCount" parameterType="codedriver.framework.dto.TenantVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`tenant`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND name LIKE concat('%', #{keyword}, '#')
+			</if>
+		</where>
+	</select>
+
 	<select id="checkTenantUuidIsExists" parameterType="codedriver.framework.dto.TenantVo" resultType="int">
 		SELECT
 		COUNT(1)
@@ -36,6 +66,7 @@
 
 	<insert id="insertTenant" parameterType="codedriver.framework.dto.TenantVo">
 		INSERT INTO `tenant` (
+		`id`,
 		`uuid`,
 		`name`,
 		`is_active`,
@@ -44,6 +75,7 @@
 		)
 		VALUES
 		(
+		#{id},
 		#{uuid},
 		#{name},
 		#{isActive},
@@ -57,6 +89,37 @@
 		VALUES
 		(#{tenantUuid}, #{moduleId})
 	</insert>
+
+	<insert id="insertTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
+		INSERT INTO `tenant_audit` (
+		`id`,
+		`tenant_uuid`,
+		`start_time`,
+		`log_path`,
+		`module_id`,
+		`version`,
+		`status`
+		)
+		VALUES
+		(
+		#{id},
+		#{tenantUuid},
+		NOW(),
+		#{logPath},
+		#{moduleId},
+		#{version},
+		#{status}
+		)
+	</insert>
+
+	<update id="updateTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
+		UPDATE
+		`tenant_audit`
+		SET
+		`end_time` = NOW(),
+		`status` = #{status}
+		WHERE `id` = #{id}
+	</update>
 
 	<update id="updateTenant" parameterType="codedriver.framework.dto.TenantVo">
 		UPDATE

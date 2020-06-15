@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 
@@ -28,7 +26,6 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.TenantUtil;
-import codedriver.framework.config.ConfigManager;
 import codedriver.framework.dao.cache.UserSessionCache;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserSessionVo;
@@ -110,9 +107,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 						if (isAuth) {
 							String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
 							JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+							UserContext.init(jwtBodyObj, authorization, timezone, request, response);
 							TenantContext.init();
 							TenantContext.get().switchTenant(tenant);
-							UserContext.init(jwtBodyObj,authorization, timezone, request, response);
 							isUnExpired = userExpirationValid();
 						}
 
@@ -157,21 +154,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		if (UserSessionCache.getItem(tenant, userUuid) == null) {
 			UserSessionVo userSessionVo = userMapper.getUserSessionByUserUuid(userUuid);
 			if (null != userSessionVo) {
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				try {
-					Date visitTime = formatter.parse(userSessionVo.getSessionTime());
-					Date now = new Date();
-					TenantContext.get().setUseDefaultDatasource(true);
-					String expire = ConfigManager.getConfig(UserSessionVo.USER_EXPIRETIME, "60");
-					TenantContext.get().setUseDefaultDatasource(false);
-					Long expireTime = Long.parseLong(expire) * 60 * 1000 + visitTime.getTime();
-					if (now.getTime() < expireTime) {
-						userMapper.updateUserSession(userUuid);
-						UserSessionCache.addItem(tenant, userUuid);
-						return true;
-					}
-				} catch (ParseException e) {
-					e.printStackTrace();
+				Date visitTime = userSessionVo.getSessionTime();
+				Date now = new Date();
+				int expire = Config.USER_EXPIRETIME();
+				Long expireTime = expire * 60 * 1000 + visitTime.getTime();
+				if (now.getTime() < expireTime) {
+					userMapper.updateUserSession(userUuid);
+					UserSessionCache.addItem(tenant, userUuid);
+					return true;
 				}
 			}
 		} else {

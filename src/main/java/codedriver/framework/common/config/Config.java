@@ -43,6 +43,7 @@ public class Config {
 	private static int SERVER_HEARTBEAT_RATE;// 心跳频率
 	private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
 	private static String HOME_URL;
+	private static String USER_EXPIRETIME; // 会话超时时间
 	public static final String RC4KEY = "codedriver.key.20200101";
 
 	static {
@@ -103,6 +104,10 @@ public class Config {
 		return HOME_URL;
 	}
 
+	public static final int USER_EXPIRETIME() {
+		return Integer.valueOf(USER_EXPIRETIME);
+	}
+
 	@PostConstruct
 	public void init() {
 		try {
@@ -133,11 +138,13 @@ public class Config {
 			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
 			HOME_URL = prop.getProperty("home.url");
 			JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
+			USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
 			DB_HOST = prop.getProperty("db.host", "localhost");
 			DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
 			DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
 			ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
 			ES_CLUSTERS = new HashMap<>();
+
 			for (Map.Entry<Object, Object> el : prop.entrySet()) {
 				Object k = el.getKey();
 				Object v = el.getValue();

@@ -15,6 +15,13 @@ import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
+/**
+ * 
+ * @Author:chenqiwei
+ * @Time:Jun 11, 2020
+ * @ClassName: DatasourceInitializer
+ * @Description: 此类在root-context.xml中初始化
+ */
 public class DatasourceInitializer {
 	@Autowired
 	private DatasourceMapper datasourceMapper;
@@ -31,7 +38,6 @@ public class DatasourceInitializer {
 
 	@PostConstruct
 	public void init() {
-		// TenantContext context = TenantContext.init("master");
 		List<DatasourceVo> datasourceList = datasourceMapper.getAllActiveTenantDatasource();
 		if (!datasourceMap.containsKey("master")) {
 			datasourceMap.put("master", masterDatasource);
@@ -48,7 +54,7 @@ public class DatasourceInitializer {
 				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}
 		}
-		if (instance == null && datasource != null){
+		if (instance == null && datasource != null) {
 			instance = datasource;
 		}
 		if (!datasourceMap.isEmpty()) {
@@ -60,13 +66,15 @@ public class DatasourceInitializer {
 		}
 	}
 
-	public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource){
-	    datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
-        instance.setTargetDataSources(datasourceMap);
-        if (datasourceMap.containsKey("master")) {
-            instance.setDefaultTargetDataSource(datasourceMap.get("master"));
-        }
-        instance.afterPropertiesSet();
-    }
+	public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource) {
+		if (!datasourceMap.containsKey(tenantUuid)) {
+			datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
+			instance.setTargetDataSources(datasourceMap);
+			if (datasourceMap.containsKey("master")) {
+				instance.setDefaultTargetDataSource(datasourceMap.get("master"));
+			}
+			instance.afterPropertiesSet();
+		}
+	}
 
 }

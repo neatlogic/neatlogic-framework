@@ -11,14 +11,23 @@ public class DatasourceVo {
 	private String username;
 	private String passwordPlain;
 	private String passwordCipher;
-	private String driver;
+	private String driver = "com.mysql.jdbc.Driver";
 
 	public DatasourceVo() {
 
 	}
 
-	public DatasourceVo(String _tenantUuid) {
+	public DatasourceVo(String _tenantUuid, boolean generatePwd) {
 		this.tenantUuid = _tenantUuid;
+		// 生成随机密码
+		if (generatePwd) {
+			this.passwordPlain = "123456";
+			/*
+			 * Random rand = new Random(); String password = ""; for (int i = 0; i < 6; i++)
+			 * { int randNumber = rand.nextInt(126 - 48 + 1) + 48; char c = (char)
+			 * randNumber; password += c; } this.passwordPlain = password;
+			 */
+		}
 	}
 
 	public String getTenantUuid() {
@@ -31,7 +40,7 @@ public class DatasourceVo {
 
 	public String getUrl() {
 		if (StringUtils.isBlank(url)) {
-			url = "jdbc:mysql://" + Config.DB_HOST() + ":" + Config.DB_PORT() + "/codedriver_" + this.tenantUuid + "?characterEncoding=UTF-8&jdbcCompliantTruncation=false";
+			url = "jdbc:mysql://" + Config.DB_HOST() + ":" + Config.DB_PORT() + "/codedriver_" + this.tenantUuid + "?characterEncoding=UTF-8&jdbcCompliantTruncation=false&allowMultiQueries=true";
 		}
 		return url;
 	}
@@ -41,6 +50,9 @@ public class DatasourceVo {
 	}
 
 	public String getUsername() {
+		if (StringUtils.isBlank(username)) {
+			username = this.tenantUuid;
+		}
 		return username;
 	}
 

@@ -4,10 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
-public class TenantVo {
+public class TenantVo extends BasePageVo {
 	@EntityField(name = "id", type = ApiParamType.LONG)
 	private Long id;
 	@EntityField(name = "uuid", type = ApiParamType.STRING)
@@ -22,6 +23,10 @@ public class TenantVo {
 	private Date expireDate;
 	@EntityField(name = "激活模块", type = ApiParamType.JSONARRAY)
 	private List<ModuleVo> moduleList;
+
+	public TenantVo() {
+		this.setPageSize(20);
+	}
 
 	public String getUuid() {
 		return uuid;
@@ -75,10 +80,6 @@ public class TenantVo {
 		if (id == null) {
 			id = SnowflakeUtil.uniqueLong();
 		}
-		return id;
-	}
-
-	public Long getId(Boolean original) {
 		return id;
 	}
 

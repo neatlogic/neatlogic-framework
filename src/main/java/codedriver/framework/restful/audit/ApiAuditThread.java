@@ -64,8 +64,8 @@ public class ApiAuditThread extends CodeDriverThread {
 	public static String formatContent(ApiAuditVo apiAuditVo) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		StringBuilder log = new StringBuilder();
-		log.append(">>>>>>>>>>>>>\nuuid: ");
-		log.append(apiAuditVo.getUuid());
+		log.append(">>>>>>>>>>>>>\nid: ");
+		log.append(apiAuditVo.getId());
 		log.append("\n");
 		log.append("user: ");
 		log.append(apiAuditVo.getUserUuid());
@@ -150,7 +150,6 @@ public class ApiAuditThread extends CodeDriverThread {
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

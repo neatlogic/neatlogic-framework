@@ -1,5 +1,6 @@
 package codedriver.framework.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -147,6 +148,27 @@ public class TeamVo extends BasePageVo {
 
 	public void setRht(Integer rht) {
 		this.rht = rht;
+	}
+	
+	private transient TeamVo parent;
+	
+	private List<TeamVo> children = new ArrayList<>();
+
+	public TeamVo getParent() {
+		return parent;
+	}
+
+	public void setParent(TeamVo parent) {
+		this.parent = parent;
+		parent.getChildren().add(this);
+	}
+
+	public List<TeamVo> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<TeamVo> children) {
+		this.children = children;
 	}
 
 	public String getLevel() {

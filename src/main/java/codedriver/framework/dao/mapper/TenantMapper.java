@@ -9,6 +9,10 @@ import codedriver.framework.dto.TenantVo;
 
 public interface TenantMapper {
 
+	public List<TenantAuditVo> searchTenantAudit(TenantAuditVo tenantAuditVo);
+
+	public int searchTenantAuditCount(TenantAuditVo tenantAuditVo);
+
 	public int searchTenantCount(TenantVo tenantVo);
 
 	public List<TenantVo> searchTenant(TenantVo tenantVo);

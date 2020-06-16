@@ -1,21 +1,25 @@
 package codedriver.framework.restful.dto;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 public class ApiAuditVo extends BasePageVo {
 
 	public final static String SUCCEED = "succeed";
 	public final static String FAILED = "failed";
 
-	@EntityField(name = "主键", type = ApiParamType.STRING)
-	private String uuid;
+	@EntityField(name = "主键", type = ApiParamType.LONG)
+	private Long id;
 	@EntityField(name = "地址", type = ApiParamType.STRING)
 	private String token;
 	@EntityField(name = "用户ID", type = ApiParamType.STRING)
@@ -34,25 +38,24 @@ public class ApiAuditVo extends BasePageVo {
 	private Long timeCost;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
+	@EntityField(name = "参数内容", type = ApiParamType.STRING)
 	private String param;
+	@EntityField(name = "异常内容", type = ApiParamType.STRING)
 	private String error;
+	@EntityField(name = "结果内容", type = ApiParamType.STRING)
 	private Object result;
-	private String logPath;
+
+	@JSONField(serialize = false)
+	private String paramHash;
+	@JSONField(serialize = false)
+	private String errorHash;
+	@JSONField(serialize = false)
+	private String resultHash;
+	private transient String logPath;
 	private transient String tenant;
 
 	public ApiAuditVo() {
 		this.setPageSize(20);
-	}
-
-	public synchronized String getUuid() {
-		if (StringUtils.isBlank(uuid)) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
-		}
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public String getToken() {
@@ -165,6 +168,50 @@ public class ApiAuditVo extends BasePageVo {
 
 	public void setResult(Object result) {
 		this.result = result;
+	}
+
+	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
+		}
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getParamHash() {
+		if (StringUtils.isBlank(paramHash) && StringUtils.isNotBlank(param)) {
+			paramHash = DigestUtils.md5DigestAsHex(param.getBytes());
+		}
+		return paramHash;
+	}
+
+	public void setParamHash(String paramHash) {
+		this.paramHash = paramHash;
+	}
+
+	public String getErrorHash() {
+		if (StringUtils.isBlank(errorHash) && StringUtils.isNotBlank(error)) {
+			errorHash = DigestUtils.md5DigestAsHex(error.getBytes());
+		}
+		return errorHash;
+	}
+
+	public void setErrorHash(String errorHash) {
+		this.errorHash = errorHash;
+	}
+
+	public String getResultHash() {
+		if (StringUtils.isBlank(resultHash) && result != null) {
+			resultHash = DigestUtils.md5DigestAsHex(JSON.toJSONString(result).getBytes());
+		}
+		return resultHash;
+	}
+
+	public void setResultHash(String resultHash) {
+		this.resultHash = resultHash;
 	}
 
 }

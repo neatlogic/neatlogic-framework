@@ -54,8 +54,10 @@ public class TenantAuditVo extends BasePageVo {
 	private String moduleId;
 	@EntityField(name = "版本序号", type = ApiParamType.INTEGER)
 	private int version;
-	@EntityField(name = "日志路径", type = ApiParamType.STRING)
+	@EntityField(name = "执行日志路径", type = ApiParamType.STRING)
 	private String logPath;
+	@EntityField(name = "错误日志路径", type = ApiParamType.STRING)
+	private String errPath;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
 	private Date startTime;
 	@EntityField(name = "结束时间", type = ApiParamType.LONG)
@@ -128,6 +130,14 @@ public class TenantAuditVo extends BasePageVo {
 
 	public void setVersion(int version) {
 		this.version = version;
+	}
+
+	public String getErrPath() {
+		return errPath;
+	}
+
+	public void setErrPath(String errPath) {
+		this.errPath = errPath;
 	}
 
 }

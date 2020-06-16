@@ -2,6 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
 	<!-- <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache> -->
+	<sql id="searchTenantAuditCondition">
+		<where>
+			tenant_uuid = #{tenantUuid}
+			<if test="moduleId != null and moduleId != ''">
+				AND module_id = #{moduleId}
+			</if>
+		</where>
+	</sql>
+
+	<select id="searchTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo" resultType="codedriver.framework.dto.TenantAuditVo">
+		SELECT
+		`id`,
+		`tenant_uuid` as tenantUuid,
+		`module_id` as moduleId,
+		`version`,
+		`start_time` as startTime,
+		`end_time` as endTime,
+		`log_path` as logPath,
+		`err_path` as errPath,
+		`status`
+		FROM
+		`tenant_audit`
+		<include refid="searchTenantAuditCondition"></include>
+		ORDER BY id DESC
+	</select>
+
+	<select id="searchTenantAuditCount" parameterType="codedriver.framework.dto.TenantAuditVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`tenant_audit`
+		<include refid="searchTenantAuditCondition"></include>
+	</select>
+
+	<sql id="searchTenantCondition">
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND name LIKE concat('%', #{keyword}, '#')
+			</if>
+		</where>
+	</sql>
 
 	<select id="searchTenant" parameterType="codedriver.framework.dto.TenantVo" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
@@ -13,11 +54,8 @@
 		`description`
 		FROM
 		`tenant`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				AND name LIKE concat('%', #{keyword}, '#')
-			</if>
-		</where>
+		<include refid="searchTenantCondition"></include>
+		ORDER BY id DESC
 	</select>
 
 	<select id="searchTenantCount" parameterType="codedriver.framework.dto.TenantVo" resultType="int">
@@ -25,11 +63,7 @@
 		COUNT(1)
 		FROM
 		`tenant`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				AND name LIKE concat('%', #{keyword}, '#')
-			</if>
-		</where>
+		<include refid="searchTenantCondition"></include>
 	</select>
 
 	<select id="checkTenantUuidIsExists" parameterType="codedriver.framework.dto.TenantVo" resultType="int">
@@ -96,6 +130,7 @@
 		`tenant_uuid`,
 		`start_time`,
 		`log_path`,
+		`err_path`,
 		`module_id`,
 		`version`,
 		`status`
@@ -106,6 +141,7 @@
 		#{tenantUuid},
 		NOW(),
 		#{logPath},
+		#{errPath},
 		#{moduleId},
 		#{version},
 		#{status}

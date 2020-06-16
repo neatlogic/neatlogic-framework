@@ -105,6 +105,10 @@ public class ApiVo extends BasePageVo implements Serializable {
 		}
 		pathVariableList.add(para);
 	}
+	
+	public ApiVo() {
+		this.setPageSize(20);
+	}
 
 	public String getKeyword() {
 		return keyword;

@@ -16,7 +16,7 @@
 		`expire`,
 		`description`,
 		`authtype`,
-		`type`,		
+		`type`,
 		`qps`,
 		`timeout`,
 		`need_audit` AS needAudit
@@ -24,26 +24,26 @@
 		WHERE
 		token = #{value}
 	</select>
-	
+
 	<select id="getApiTokenList" parameterType="codedriver.framework.restful.dto.ApiVo" resultType="java.lang.String">
 		SELECT
 		`token`
 		FROM `api`
 		WHERE 1=1
 		<if test="moduleId != null">
-		AND `module_id` = #{moduleId}
+			AND `module_id` = #{moduleId}
 		</if>
 		<if test="handler != null">
-		AND `handler` = #{handler}
+			AND `handler` = #{handler}
 		</if>
 		<if test="isActive != null">
-		AND `is_active` = #{isActive}
+			AND `is_active` = #{isActive}
 		</if>
 		<if test="keyword != null and keyword != ''">
-		AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `token` LIKE CONCAT('%', #{keyword}, '%'))
+			AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `token` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 	</select>
-	
+
 	<select id="getApiListByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
 		SELECT
 		`name`,
@@ -62,51 +62,51 @@
 		`timeout`,
 		`need_audit` AS needAudit
 		FROM `api`
-		WHERE `token` IN 
+		WHERE `token` IN
 		<foreach collection="list" item="token" separator="," open="(" close=")">
-		#{token}
+			#{token}
 		</foreach>
 	</select>
 
 	<select id="getApiAuditCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int">
-	SELECT 
-	  count(`token`) 
-	FROM
-	  `api_audit` 
-	WHERE `token` = #{token}
+		SELECT
+		count(`token`)
+		FROM
+		`api_audit`
+		WHERE `token` = #{token}
 	</select>
 
 	<select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo">
-	SELECT 
-	  `uuid`,
-	  `token`,
-	  `user_uuid` AS userUuid,
-	  `authtype`,
-	  `server_id` AS serverId,
-	  `ip`,
-	  `start_time` AS startTime,
-	  `end_time` AS endTime,
-	  `time_cost` AS timeCost,
-	  `status` 
-	FROM
-	  `api_audit` 
-	WHERE `token` = #{token}
-	ORDER BY `start_time` DESC
-	LIMIT #{startNum}, #{pageSize}
+		SELECT
+		`id`,
+		`token`,
+		`user_uuid` AS userUuid,
+		`authtype`,
+		`server_id` AS serverId,
+		`ip`,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`time_cost` AS timeCost,
+		`status`
+		FROM
+		`api_audit`
+		WHERE `token` = #{token}
+		ORDER BY `start_time` DESC
+		LIMIT #{startNum}, #{pageSize}
 	</select>
-	
+
 	<select id="getApiVisitTimesListByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo">
-		SELECT	
+		SELECT
 		`token`,
 		COUNT(`token`) AS visitTimes
 		FROM `api_audit`
-		WHERE `token` IN 
+		WHERE `token` IN
 		<foreach collection="list" item="token" separator="," open="(" close=")">
-		#{token}
+			#{token}
 		</foreach>
 		GROUP BY `token`
 	</select>
-	
+
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
 		UPDATE `api`
 		SET
@@ -114,27 +114,27 @@
 		WHERE
 		id = #{id}
 	</update>
-	
+
 	<update id="batchUpdate" parameterType="codedriver.framework.restful.dto.ApiVo">
-		UPDATE `api` 
+		UPDATE `api`
 		SET
 		<if test="isActive != null">
-		`is_active` = #{isActive},
+			`is_active` = #{isActive},
 		</if>
 		<if test="expire != null">
-		`expire` = #{expire},
+			`expire` = #{expire},
 		</if>
 		<if test="timeout != null">
-		`timeout` = #{timeout},
+			`timeout` = #{timeout},
 		</if>
 		`token` = `token`
-		WHERE `token` IN 
+		WHERE `token` IN
 		<foreach collection="tokenList" item="token" separator="," open="(" close=")">
-		#{token}
+			#{token}
 		</foreach>
-			
+
 	</update>
-	
+
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api`
 		(
@@ -174,12 +174,46 @@
 		)
 	</insert>
 
-	<insert id="insertApiAudit">
-		INSERT INTO `api_audit`(`uuid`, `token`, `user_uuid`, `authtype`, `server_id`, `ip`, `start_time`, `end_time`, `time_cost`, `status`) 
-		VALUES(#{uuid}, #{token}, #{userUuid}, #{authtype}, #{serverId}, #{ip}, #{startTime}, #{endTime}, #{timeCost}, #{status})
+	<insert id="insertApiAudit" parameterType="codedriver.framework.restful.dto.ApiAuditVo">
+		INSERT INTO `api_audit` (
+		`id`,
+		`token`,
+		`user_uuid`,
+		`authtype`,
+		`server_id`,
+		`ip`,
+		`start_time`,
+		`end_time`,
+		`time_cost`,
+		`status`,
+		`param_hash`,
+		`result_hash`,
+		`error_hash`
+		)
+		VALUES
+		(#{id},
+		#{token},
+		#{userUuid},
+		#{authtype},
+		#{serverId},
+		#{ip},
+		#{startTime},
+		#{endTime},
+		#{timeCost},
+		#{status},
+		#{paramHash},
+		#{resultHash},
+		#{errorHash}
+		)
+	</insert>
+
+	<insert id="replaceApiAuditDetail">
+		REPLACE INTO `api_audit_detail` (`hash`, `content`)
+		VALUES
+		(#{hash}, #{content})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">
-	DELETE FROM `api` WHERE `token` = #{token}
+		DELETE FROM `api` WHERE `token` = #{token}
 	</delete>
 </mapper>

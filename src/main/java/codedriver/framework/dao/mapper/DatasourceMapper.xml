@@ -35,7 +35,7 @@
 	</insert>
 
 	<insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
-		CREATE DATABASE `codedriver_${tenantUuid}`;
+		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
 		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
 	</insert>
 </mapper>

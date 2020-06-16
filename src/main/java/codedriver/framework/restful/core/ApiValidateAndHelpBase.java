@@ -23,13 +23,13 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dao.mapper.ConfigMapper;
-import codedriver.framework.dto.ConfigVo;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
@@ -43,7 +43,7 @@ import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.NotDefined;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
-import codedriver.framework.restful.audit.ApiAuditManager;
+import codedriver.framework.restful.audit.ApiAuditSaveThread;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
@@ -58,7 +58,7 @@ public class ApiValidateAndHelpBase {
 	private ConfigMapper configMapper;
 
 	protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
-		ConfigVo configVo = configMapper.getConfigByKey(API_AUDIT_CONFIG_KEY);
+		//ConfigVo configVo = configMapper.getConfigByKey(API_AUDIT_CONFIG_KEY);
 		ApiAuditVo audit = new ApiAuditVo();
 		audit.setToken(apiVo.getToken());
 		audit.setTenant(TenantContext.get().getTenantUuid());
@@ -67,7 +67,7 @@ public class ApiValidateAndHelpBase {
 		audit.setStartTime(new Date(startTime));
 		audit.setEndTime(new Date(endTime));
 		audit.setTimeCost(endTime - startTime);
-		if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
+		/*if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
 			try {
 				JSONObject auditConfig = JSONObject.parseObject(configVo.getValue());
 				if (auditConfig.containsKey("savepath")) {
@@ -76,7 +76,7 @@ public class ApiValidateAndHelpBase {
 			} catch (Exception ex) {
 
 			}
-		}
+		}*/
 		UserContext userContext = UserContext.get();
 		audit.setUserUuid(userContext.getUserUuid(true));
 		HttpServletRequest request = userContext.getRequest();
@@ -92,8 +92,9 @@ public class ApiValidateAndHelpBase {
 		if (result != null) {
 			audit.setResult(result);
 		}
-		apiMapper.insertApiAudit(audit);
-		ApiAuditManager.saveAudit(audit);
+		CommonThreadPool.execute(new ApiAuditSaveThread(audit));
+		//apiMapper.insertApiAudit(audit);
+		//ApiAuditManager.saveAudit(audit);
 	}
 
 	private static void escapeXss(JSONObject paramObj, String key) {

@@ -88,7 +88,6 @@
 		SELECT
 		a.`uuid`,
 		a.`name`,
-		a.`lft`,
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
 		a.`parent_uuid` as `parentUuid`,
 		a.`lft`,

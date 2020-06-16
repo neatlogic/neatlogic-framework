@@ -169,7 +169,7 @@
 	`lcu`,
 	(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName
 	FROM `notify_policy`
-	where `handler` = #{handler}
+	WHERE `handler` = #{handler}
 	<if test="keyword != null and keyword != ''">
 		 AND `name` LIKE concat('%',#{keyword},'%') 
 	</if>
@@ -183,11 +183,10 @@
 	SELECT 
 	COUNT(`id`)
 	FROM `notify_policy`
-	<where>
-		<if test="keyword != null and keyword != ''">
-			`name` LIKE concat('%',#{keyword},'%') 
-		</if>
-	</where>
+	WHERE `handler` = #{handler}
+	<if test="keyword != null and keyword != ''">
+		AND `name` LIKE concat('%',#{keyword},'%') 
+	</if>
 	</select>
 	
 	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.List" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">

@@ -31,6 +31,13 @@ public interface TeamMapper {
 
 	public int checkTeamIsExistsByLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 
+	public List<String> getTeamUserUuidListByLftRhtLevelTitle(
+			@Param("lft") Integer lft, 
+			@Param("rht") Integer rht, 
+			@Param("level") String level, 
+			@Param("title") String title
+	);
+
 	public int deleteTeamTagByUuid(String uuid);
 
 	public int deleteUserTeamByTeamUuid(String uuid);
@@ -49,6 +56,8 @@ public interface TeamMapper {
 	public int updateTeamParentUuidByUuid(TeamVo teamVo);
 
 	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
+
+	public int updateTeamUserTitle(TeamUserVo teamUserVo);
 
 	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
 	

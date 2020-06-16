@@ -6,7 +6,7 @@ public class TeamUserVo {
 	private String userUuid;
 	private String userName;
 	private String teamName;
-	private String title = "staff";
+	private String title = "generalstaff";
 	
 	public TeamUserVo() {
 	}

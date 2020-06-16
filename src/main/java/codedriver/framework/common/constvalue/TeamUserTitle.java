@@ -2,7 +2,7 @@ package codedriver.framework.common.constvalue;
 
 public enum TeamUserTitle {
 
-	STAFF("staff", "员工"),
+	GENERALSTAFF("generalstaff", "普通员工"),
 	DEPARTMENTLEADER("departmentleader", "部门长"),
 	TEAMLEADER("teamleader", "组长"),
 	CENTERLEADER("centerleader", "中心总监"),
@@ -19,6 +19,14 @@ public enum TeamUserTitle {
 	}
 	public String getText() {
 		return text;
+	}
+	public static String getValue(String _value) {
+		for(TeamUserTitle type : values()) {
+			if(type.getValue().equals(_value)) {
+				return type.getValue();
+			}
+		}
+		return null;
 	}
 	
 }

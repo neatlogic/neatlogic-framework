@@ -5,7 +5,6 @@
 	<resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
 		<id property="uuid" column="uuid"/>
 		<result property="name" column="name"/>
-		<!-- <result property="sort" column="sort"/> -->
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="userCount" column="userCount"/>
         <result property="childCount" column="childCount"/>
@@ -93,7 +92,8 @@
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
 		a.`parent_uuid` as `parentUuid`,
 		a.`lft`,
-		a.`rht`
+		a.`rht`,
+		a.`level`
 		FROM
 		`team` a
 		WHERE `uuid` = #{uuid}
@@ -123,10 +123,6 @@
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{value}
 		ORDER BY `lft` ASC
-	</select>
-
-	<select id = "getMaxTeamSortByParentUuid" parameterType="java.lang.String" resultType = "int">
-		SELECT IFNULL(MAX(`sort`), 0) FROM `team` WHERE `parent_uuid` = #{parentUuid}
 	</select>
 
 	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int">
@@ -159,7 +155,7 @@
 	SELECT `uuid` FROM `team` WHERE `uuid` = #{value} FOR UPDATE
 	</select>
 	
-	<select id="getTeamByParentUuidAndSort" resultType="codedriver.framework.dto.TeamVo">
+	<select id="getTeamByParentUuidAndStartNum" resultType="codedriver.framework.dto.TeamVo">
 	SELECT
 		a.`uuid`,
 		a.`name`,
@@ -169,7 +165,7 @@
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{parentUuid}
 		ORDER BY a.`lft` ASC
-		limit #{sort}, 1
+		limit #{startNum}, 1
 	</select>
 	
 	<select id="checkTeamIsExistsByLeftRightCode" resultType="int">
@@ -182,23 +178,27 @@
 		`name`,
 		`parent_uuid`,
 		`lft`,
-		`rht`
+		`rht`,
+		`level`
 		) VALUES (
 		#{uuid},
 		#{name},
 		#{parentUuid},
 		#{lft},
-		#{rht}
+		#{rht},
+		#{level}
 		)
 	</insert>
 	
-	<insert id="insertTeamUser">
+	<insert id="insertTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
 		INSERT INTO `user_team` (
 		`team_uuid`,
-		`user_uuid`
+		`user_uuid`,
+		`title`
 		) VALUES (
 		#{teamUuid},
-		#{userUuid}
+		#{userUuid},
+		#{title}
 		)
 	</insert>
 
@@ -249,7 +249,6 @@
 	FROM `team` a
 	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
-	LEFT JOIN `user_team_role` d ON d.`team_uuid` = a.`uuid`
 	WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
 	</delete>
 </mapper>

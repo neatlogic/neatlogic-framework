@@ -25,8 +25,6 @@ public class TeamVo extends BasePageVo {
 	private String parentUuid;
 	@EntityField(name = "子节点数量", type = ApiParamType.INTEGER)
 	private Integer childCount;
-//	@EntityField(name = "排序", type = ApiParamType.INTEGER)
-//	private Integer sort;
 
 	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
 	private List<TagVo> tagList;
@@ -41,7 +39,9 @@ public class TeamVo extends BasePageVo {
 	private int userCount;
 
 	private List<String> pathNameList;
-
+	@EntityField(name = "级别", type = ApiParamType.STRING)
+	private String level;
+	
 	public List<String> getPathNameList() {
 		return pathNameList;
 	}
@@ -76,14 +76,6 @@ public class TeamVo extends BasePageVo {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-//	public Integer getSort() {
-//		return sort;
-//	}
-//
-//	public void setSort(Integer sort) {
-//		this.sort = sort;
-//	}
 
 	public String getKeyword() {
 		return keyword;
@@ -155,6 +147,14 @@ public class TeamVo extends BasePageVo {
 
 	public void setRht(Integer rht) {
 		this.rht = rht;
+	}
+
+	public String getLevel() {
+		return level;
+	}
+
+	public void setLevel(String level) {
+		this.level = level;
 	}
 
 }

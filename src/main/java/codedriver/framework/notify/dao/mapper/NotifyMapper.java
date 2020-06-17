@@ -39,6 +39,8 @@ public interface NotifyMapper {
 
 	public int getNotifyPolicyInvokerCountByPolicyId(Long policyId);
 
+	public int checkNotifyPolicyIsExists(Long policyId);
+
 	public int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo);
 
 	public int insertNotifyPolicyInvoker(NotifyPolicyInvokerVo notifyPolicyInvokerVo);

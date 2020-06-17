@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.scheduler.core.SchedulerManager;
@@ -17,7 +16,6 @@ import codedriver.framework.scheduler.dto.JobAuditVo;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobPropVo;
-import codedriver.framework.scheduler.dto.JobStatusVo;
 import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleJobNameRepeatException;
 import codedriver.framework.scheduler.exception.ScheduleJobNotFoundException;
@@ -81,12 +79,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 	}
 
 	@Override
-	public int updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {
-		schedulerMapper.updateJobStatus(jobStatusVo);
-		return schedulerMapper.updateJobLock(jobLockVo);
-	}
-
-	@Override
 	public int saveJob(JobVo job) {
 		String uuid = job.getUuid();
 		if (schedulerMapper.checkJobNameIsExists(job) > 0) {
@@ -108,24 +100,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 		return 1;
 	}
 
-	@Override
-	public JobLockVo getJobLock(String jobName, String jobGroup) {
-		JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
-		if (jobLockVo == null) {
-			// 没有锁的情况证明作业已经被删除
-			return null;
-		} else {
-			// 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
-			if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
-				return null;
-			}
-		}
-		// 修改锁状态
-		jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
-		jobLockVo.setLock(JobLockVo.RUNNING);
-		schedulerMapper.updateJobLock(jobLockVo);
-		return jobLockVo;
-	}
 
 	@Override
 	public int resetRunningJobLockByServerId(Integer serverId) {

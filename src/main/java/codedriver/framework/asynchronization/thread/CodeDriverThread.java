@@ -20,11 +20,12 @@ public abstract class CodeDriverThread implements Runnable {
 	public final void run() {
 		TenantContext.init(tenantContext);
 		UserContext.init(userContext);
+		String oldThreadName = Thread.currentThread().getName();
 		if (StringUtils.isNotBlank(threadName)) {
 			Thread.currentThread().setName(threadName);
 		}
 		execute();
-
+		Thread.currentThread().setName(oldThreadName);
 	}
 
 	protected abstract void execute();

@@ -40,7 +40,7 @@
 			</if>
 			<if test="valueList != null and valueList.size() >0">
 				AND uuid in
-				<foreach collection="valueList" item="uuid" open="(" separator=","  close=")">
+				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
 					#{uuid}
 				</foreach>
 			</if>
@@ -130,6 +130,45 @@
 		NOW(),
 		#{fcu}
 		)
+	</insert>
+
+	<insert id="insertIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo">
+		INSERT INTO `integration_audit` (
+		`id`,
+		`integration_uuid`,
+		`user_uuid`,
+		`request_from`,
+		`server_id`,
+		`start_time`,
+		`end_time`,
+		`time_cost`,
+		`status`,
+		`param_hash`,
+		`result_hash`,
+		`error_hash`
+		)
+		VALUES
+		(
+		#{id},
+		#{integrationUuid},
+		#{userUuid},
+		#{requestFrom},
+		#{serverId},
+		#{startTime},
+		#{endTime},
+		#{timeCost},
+		#{status},
+		#{paramHash},
+		#{resultHash},
+		#{errorHash}
+		)
+	</insert>
+
+	<insert id="replaceIntegrationAuditDetail">
+		REPLACE INTO `integration_audit_detail` (`hash`, `content`)
+		VALUES
+		(#{hash},
+		#{content})
 	</insert>
 
 	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.scheduler.dao.mapper.SchedulerMapper">
-	
+
 	<resultMap id="jobMap" type="codedriver.framework.scheduler.dto.JobVo">
 		<id column="uuid" property="uuid" />
 		<result column="name" property="name" />
@@ -17,7 +17,7 @@
 			<result column="prop_value" property="value" />
 		</collection>
 	</resultMap>
-	
+
 	<select id="getJobByUuid" parameterType="java.lang.String" resultMap="jobMap">
 		SELECT
 		a.uuid,
@@ -35,7 +35,7 @@
 		LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
 		WHERE a.uuid = #{uuid}
 	</select>
-	
+
 	<select id="getJobBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobVo">
 		SELECT
 		`uuid`,
@@ -105,19 +105,19 @@
 		<result column="need_audit" property="needAudit" />
 		<result column="begin_time" property="beginTime" />
 		<result column="end_time" property="endTime" />
-		<association property="jobStatus" resultMap="jobStatusMap"/>
+		<association property="jobStatus" resultMap="jobStatusMap" />
 	</resultMap>
 
 	<resultMap id="jobStatusMap" type="codedriver.framework.scheduler.dto.JobStatusVo">
-		<result column="job_name" property="jobName"/>
-		<result column="job_group" property="jobGroup"/>
-		<result column="handler" property="handler"/>
-		<result column="next_fire_time" property="nextFireTime"/>
-		<result column="last_fire_time" property="lastFireTime"/>
-		<result column="last_finish_time" property="lastFinishTime"/>
-		<result column="exec_count" property="execCount"/>
+		<result column="job_name" property="jobName" />
+		<result column="job_group" property="jobGroup" />
+		<result column="handler" property="handler" />
+		<result column="next_fire_time" property="nextFireTime" />
+		<result column="last_fire_time" property="lastFireTime" />
+		<result column="last_finish_time" property="lastFinishTime" />
+		<result column="exec_count" property="execCount" />
 	</resultMap>
-	
+
 	<select id="searchJob" resultMap="jobDetailMap">
 		SELECT
 		a.`uuid`,
@@ -134,7 +134,7 @@
 		sjs.last_finish_time,
 		sjs.next_fire_time,
 		sjs.exec_count
-		FROM schedule_job a 
+		FROM schedule_job a
 		LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_name
 		WHERE
 		1=1
@@ -164,7 +164,7 @@
 		`end_time` AS endTime,
 		`status`,
 		server_id AS serverId,
-		IFNULL(LENGTH(content),0) AS contentLength
+		content_hash AS contentHash
 		FROM `schedule_job_audit`
 		WHERE `job_uuid` = #{jobUuid}
 		ORDER BY `id` DESC
@@ -177,11 +177,14 @@
 		`job_uuid` AS jobUuid,
 		`start_time` AS startTime,
 		`end_time` AS endTime,
-		`content`,
+		`content_hash` AS contentHash,
+		b.`content`,
 		`status`,
 		`server_id` AS serverId
 		FROM
-		`schedule_job_audit`
+		`schedule_job_audit` a
+		LEFT JOIN 
+		`schedule_job_audit_detail` b ON a.content_hash = b.hash
 		WHERE
 		id = #{value}
 	</select>
@@ -258,7 +261,7 @@
 		SET
 		end_time = now(),
 		status = #{status},
-		content = #{content}
+		content_hash = #{contentHash}
 		WHERE id = #{id}
 	</update>
 
@@ -274,6 +277,10 @@
 	<update id="updateJobLockByServerId">
 		UPDATE `schedule_job_lock` SET `lock`=#{lock} WHERE `server_id`=#{serverId}
 	</update>
+
+	<insert id="replaceJobAuditDetail">
+		REPLACE INTO schedule_job_audit_detail (hash, content) values (#{hash}, #{content})
+	</insert>
 
 	<insert id="insertJob" parameterType="codedriver.framework.scheduler.dto.JobVo">
 		INSERT INTO schedule_job
@@ -320,9 +327,9 @@
 		VALUES (#{jobUuid}, #{name}, #{value})
 	</insert>
 
-	<insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		INSERT INTO schedule_job_audit (job_uuid,start_time,status,server_id)
-		VALUES (#{jobUuid},now(),#{status},#{serverId})
+	<insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
+		INSERT INTO schedule_job_audit (id, job_uuid,start_time,status,server_id)
+		VALUES (#{id},#{jobUuid},now(),#{status},#{serverId})
 	</insert>
 
 	<insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">

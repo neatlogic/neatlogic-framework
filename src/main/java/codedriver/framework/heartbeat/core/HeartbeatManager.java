@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
@@ -28,6 +25,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
 import codedriver.framework.heartbeat.dto.ServerClusterVo;
 import codedriver.framework.heartbeat.dto.ServerCounterVo;
+import codedriver.framework.transaction.util.TransactionUtil;
 
 @RootComponent
 public class HeartbeatManager extends ApplicationListenerBase {
@@ -35,7 +33,7 @@ public class HeartbeatManager extends ApplicationListenerBase {
 	@Autowired
 	private ServerMapper serverMapper;
 	@Autowired
-	private DataSourceTransactionManager dataSourceTransactionManager;
+	private TransactionUtil transactionUtil;
 
 	private static Set<IHeartbreakHandler> set = new HashSet<>();
 
@@ -91,10 +89,7 @@ public class HeartbeatManager extends ApplicationListenerBase {
 	 * @return boolean
 	 */
 	public boolean getServerLock(Integer serverId) {
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(def);
+		TransactionStatus transactionStatus = transactionUtil.openTx();
 		boolean returnVal = false;
 		try {
 			ServerClusterVo serverVo = serverMapper.getServerByServerId(serverId);
@@ -106,10 +101,10 @@ public class HeartbeatManager extends ApplicationListenerBase {
 					returnVal = true;
 				}
 			}
-			dataSourceTransactionManager.commit(transactionStatus);
+			transactionUtil.commitTx(transactionStatus);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			dataSourceTransactionManager.rollback(transactionStatus);
+			transactionUtil.rollbackTx(transactionStatus);
 		}
 		return returnVal;
 	}

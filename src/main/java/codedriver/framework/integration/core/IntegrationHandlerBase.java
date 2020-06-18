@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -25,12 +26,16 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
+import codedriver.framework.integration.dto.IntegrationAuditVo;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
@@ -124,6 +129,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 		 * 校验请求参数结束
 		 */
 
+		/**
+		 * 创建审计记录
+		 */
+		IntegrationAuditVo integrationAuditVo = new IntegrationAuditVo();
+		integrationAuditVo.setUserUuid(UserContext.get().getUserUuid(true));
+		integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
+		integrationAuditVo.setStartTime(new Date());
+		integrationAuditVo.setParam(requestParamObj.toString());
+
 		IntegrationResultVo resultVo = new IntegrationResultVo();
 		HttpURLConnection connection = null;
 		try {
@@ -173,7 +187,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 			connection.connect();
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			integrationAuditVo.appendError(e.getMessage());
 			resultVo.appendError(e.getMessage());
+			integrationAuditVo.setStatus("failed");
 		}
 		if (connection != null) {
 			// 转换输入参数
@@ -186,7 +203,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 						content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
 						resultVo.setTransformedParam(content);
 					} catch (Exception ex) {
+						logger.error(ex.getMessage(), ex);
 						resultVo.appendError(ex.getMessage());
+						integrationAuditVo.appendError(ex.getMessage());
+						integrationAuditVo.setStatus("failed");
 					}
 				} else {
 					content = integrationVo.getParamObj().toJSONString();
@@ -195,7 +215,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					out.write(content.toString().getBytes("utf-8"));
 					// out.writeBytes(content);
 				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
 					resultVo.appendError(e.getMessage());
+					integrationAuditVo.appendError(e.getMessage());
+					integrationAuditVo.setStatus("failed");
 				}
 			}
 			// }
@@ -216,7 +239,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					}
 				}
 			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 				resultVo.appendError(e.getMessage());
+				integrationAuditVo.appendError(e.getMessage());
+				integrationAuditVo.setStatus("failed");
 			}
 
 			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
@@ -229,11 +255,24 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
 						}
 					} catch (Exception ex) {
+						logger.error(ex.getMessage(), ex);
 						resultVo.appendError(ex.getMessage());
+						integrationAuditVo.appendError(ex.getMessage());
+						integrationAuditVo.setStatus("failed");
 					}
 				}
 			}
+
+			integrationAuditVo.setResult(resultVo.getRawResult());
 		}
+		if (integrationAuditVo.getStatus() != null) {
+			integrationAuditVo.setStatus("succeed");
+		}
+		integrationAuditVo.setEndTime(new Date());
+		CodeDriverThread thread = new IntegrationAuditSaveThread();
+		thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
+		CommonThreadPool.execute(thread);
+
 		// connection.disconnect(); //Indicates that other requests to the
 		// server are unlikely in the near future. Calling disconnect() should
 		// not imply that this HttpURLConnection

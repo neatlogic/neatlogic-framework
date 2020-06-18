@@ -16,9 +16,7 @@ public interface SchedulerMapper {
 
 	public JobVo getJobBaseInfoByUuid(String uuid);
 
-	public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName")
-	String jobName, @Param("jobGroup")
-	String jobGroup);
+	public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
 	public List<JobVo> getJobByHandler(String handler);
 
@@ -32,9 +30,7 @@ public interface SchedulerMapper {
 
 	public JobAuditVo getJobAuditById(Long auditId);
 
-	public JobLockVo getJobLockByJobNameGroup(@Param("jobName")
-	String jobName, @Param("jobGroup")
-	String jobGroup);
+	public JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
 	public List<JobLockVo> getJobLockByServerId(Integer serverId);
 
@@ -64,6 +60,8 @@ public interface SchedulerMapper {
 
 	public int insertJobLock(JobLockVo jobLock);
 
+	public int replaceJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
+
 	// DELETE
 	public int deleteJobByUuid(String uuid);
 
@@ -71,12 +69,8 @@ public interface SchedulerMapper {
 
 	public int deleteJobAuditByJobUuid(String jobUuid);
 
-	public int deleteJobStatus(@Param("jobName")
-	String jobName, @Param("jobGroup")
-	String jobGroup);
+	public int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-	public int deleteJobLock(@Param("jobName")
-	String jobName, @Param("jobGroup")
-	String jobGroup);
+	public int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
 }

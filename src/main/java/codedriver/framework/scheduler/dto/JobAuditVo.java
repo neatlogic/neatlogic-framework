@@ -3,10 +3,14 @@ package codedriver.framework.scheduler.dto;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 public class JobAuditVo extends BasePageVo {
 
@@ -15,31 +19,25 @@ public class JobAuditVo extends BasePageVo {
 	public final static String SUCCEED = "succeed";
 
 	public final static String FAILED = "failed";
-	@EntityField(name = "记录id",
-			type = ApiParamType.LONG)
+	@EntityField(name = "记录id", type = ApiParamType.LONG)
 	private Long id;
-	@EntityField(name = "定时作业uuid",
-			type = ApiParamType.STRING)
+	@EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
 	private String jobUuid;
-	@EntityField(name = "开始时间",
-			type = ApiParamType.LONG)
+	@EntityField(name = "开始时间", type = ApiParamType.LONG)
 	private Date startTime;
-	@EntityField(name = "结束时间",
-			type = ApiParamType.LONG)
+	@EntityField(name = "结束时间", type = ApiParamType.LONG)
 	private Date endTime;
-//	@EntityField(name = "日志内容",
-//			type = ApiParamType.STRING)
+	@EntityField(name = "日志内容", type = ApiParamType.STRING)
 	private String content;
-	@EntityField(name = "执行状态(succeed：成功；failed:失败；running：进行中)",
-			type = ApiParamType.STRING)
+	@JSONField(serialize = false)
+	private transient String contentHash;
+	@EntityField(name = "执行状态(succeed：成功；failed:失败；running：进行中)", type = ApiParamType.STRING)
 	private String status = RUNNING;
-	@EntityField(name = "服务器id",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "服务器id", type = ApiParamType.INTEGER)
 	private Integer serverId;
-	@EntityField(name = "日志内容长度",
-			type = ApiParamType.INTEGER)
+	@EntityField(name = "日志内容长度", type = ApiParamType.INTEGER)
 	private int contentLength;
-	
+
 	public JobAuditVo() {
 		this.setPageSize(20);
 	}
@@ -50,6 +48,9 @@ public class JobAuditVo extends BasePageVo {
 	}
 
 	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
+		}
 		return id;
 	}
 
@@ -120,5 +121,16 @@ public class JobAuditVo extends BasePageVo {
 
 	public void setContentLength(int contentLength) {
 		this.contentLength = contentLength;
+	}
+
+	public String getContentHash() {
+		if (StringUtils.isBlank(contentHash) && StringUtils.isNotBlank(content)) {
+			contentHash = DigestUtils.md5DigestAsHex(content.getBytes());
+		}
+		return contentHash;
+	}
+
+	public void setContentHash(String contentHash) {
+		this.contentHash = contentHash;
 	}
 }

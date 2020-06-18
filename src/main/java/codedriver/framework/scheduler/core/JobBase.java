@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -16,6 +17,7 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.TransactionStatus;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
@@ -31,7 +33,7 @@ import codedriver.framework.scheduler.dto.JobVo;
 import codedriver.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import codedriver.framework.scheduler.exception.ScheduleIllegalParameterException;
 import codedriver.framework.scheduler.exception.ScheduleParamNotExistsException;
-import codedriver.framework.scheduler.service.SchedulerService;
+import codedriver.framework.transaction.util.TransactionUtil;
 
 /**
  * 定时任务处理模块基类，所新增的定时任务类必须继承此类，新Job类必须实现接口内的2个方法。
@@ -43,7 +45,12 @@ public abstract class JobBase implements IJob {
 
 	protected static SchedulerManager schedulerManager;
 
-	protected static SchedulerService schedulerService;
+	private static TransactionUtil transactionUtil;
+
+	@Autowired
+	public void setTransactionUtil(TransactionUtil _transactionUtil) {
+		transactionUtil = _transactionUtil;
+	}
 
 	@Autowired
 	public void setSchedulerMapper(SchedulerMapper schMapper) {
@@ -55,9 +62,33 @@ public abstract class JobBase implements IJob {
 		schedulerManager = schManager;
 	}
 
-	@Autowired
-	protected void setSchedulerService(SchedulerService schService) {
-		schedulerService = schService;
+	private JobLockVo getJobLock(String jobName, String jobGroup) {
+		// 开启事务，获取作业锁
+		TransactionStatus ts = transactionUtil.openTx();
+		JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
+
+		if (jobLockVo != null) {
+			// 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
+			if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+				jobLockVo = null;
+			}
+		}
+		if (jobLockVo != null) {
+			// 修改锁状态
+			jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+			jobLockVo.setLock(JobLockVo.RUNNING);
+			schedulerMapper.updateJobLock(jobLockVo);
+		}
+		transactionUtil.commitTx(ts);
+		return jobLockVo;
+	}
+
+	private void updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {
+		// 开启事务，获取作业锁
+		TransactionStatus ts = transactionUtil.openTx();
+		schedulerMapper.updateJobStatus(jobStatusVo);
+		schedulerMapper.updateJobLock(jobLockVo);
+		transactionUtil.commitTx(ts);
 	}
 
 	@Override
@@ -81,13 +112,15 @@ public abstract class JobBase implements IJob {
 			jobHandler.reloadJob(jobObject);
 			return;
 		}
-		Date currentFireTime = context.getFireTime();//本次执行激活时间
+		Date currentFireTime = context.getFireTime();// 本次执行激活时间
 		JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
-		//如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
-		if(beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
+		// 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
+		if (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
 			return;
 		}
-		JobLockVo jobLockVo = schedulerService.getJobLock(jobName, jobGroup);
+
+		JobLockVo jobLockVo = getJobLock(jobName, jobGroup);
+
 		// 取不到锁，不允许执行
 		if (jobLockVo == null) {
 			return;
@@ -98,7 +131,6 @@ public abstract class JobBase implements IJob {
 			return;
 		}
 		try {
-
 			JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobName);
 			// 如果作业存在并且设置为需要审计
 			if (jobVo != null && jobVo.getNeedAudit().equals(1)) {
@@ -113,13 +145,16 @@ public abstract class JobBase implements IJob {
 					auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
 					logger.error(ex.getMessage(), ex);
 				} finally {
+					if (StringUtils.isNotBlank(auditVo.getContentHash())) {
+						schedulerMapper.replaceJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());
+					}
 					schedulerMapper.updateJobAudit(auditVo);
 				}
 			} else {
 				jobHandler.executeInternal(context, jobObject);
 			}
 			// 执行完业务逻辑后，更新定时作业状态信息
-			
+
 			oldJobStatusVo.setLastFinishTime(new Date());
 			oldJobStatusVo.setLastFireTime(fireTime);
 
@@ -131,7 +166,7 @@ public abstract class JobBase implements IJob {
 				schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
 				schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
 			}
-			
+
 			oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -140,7 +175,7 @@ public abstract class JobBase implements IJob {
 
 			jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
 			jobLockVo.setLock(JobLockVo.WAITING);
-			schedulerService.updateJobLockAndStatus(jobLockVo, oldJobStatusVo);
+			updateJobLockAndStatus(jobLockVo, oldJobStatusVo);
 		}
 	}
 
@@ -149,17 +184,6 @@ public abstract class JobBase implements IJob {
 	 */
 	@Override
 	public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
-
-	// private String getFilePath() {
-	// Calendar calendar = Calendar.getInstance();
-	// String path = Config.SCHEDULE_AUDIT_PATH + File.separator +
-	// calendar.get(Calendar.YEAR) + File.separator +
-	// (calendar.get(Calendar.MONTH) +1)+ File.separator +
-	// calendar.get(Calendar.DAY_OF_MONTH) + File.separator;
-	// path =
-	// path.replace(Config.TENANT_UUID,TenantContext.get().getTenantUuid());
-	// return path;
-	// }
 
 	@Override
 	public boolean valid(List<JobPropVo> propVoList) {

@@ -227,6 +227,10 @@
 	WHERE `policy_id` = #{policyId}
 	</select>
 	
+	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
+	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
+	</select>
+	
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
 	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3))

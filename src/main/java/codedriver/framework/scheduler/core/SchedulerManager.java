@@ -123,7 +123,11 @@ public class SchedulerManager extends ApplicationListenerBase {
 				} else if (jobObject.getIntervalInSeconds() != null && jobObject.getIntervalInSeconds() > 0) {
 					SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
 					ssb = ssb.withIntervalInSeconds(jobObject.getIntervalInSeconds());
-					ssb = ssb.repeatForever();
+					if(jobObject.getRepeatCount()!=null) {
+						ssb.withRepeatCount(jobObject.getRepeatCount());
+					}else {
+						ssb = ssb.repeatForever();
+					}
 					triggerBuilder.withSchedule(ssb);
 				} else {
 					return null;

@@ -41,9 +41,6 @@ public class ConditionGroupVo implements Serializable{
 		for(int i = 0; i < conditionArray.size(); i++) {
 			JSONObject condition = conditionArray.getJSONObject(i);
 			ConditionVo conditionVo = new ConditionVo(condition);
-			/*if(CollectionUtils.isEmpty(conditionVo.getValueList())){
-				throw new ParamIrregularException("'conditionList.valueList'参数不能为空数组");
-			}*/
 			conditionList.add(conditionVo);
 			conditionMap.put(conditionVo.getUuid(), conditionVo);
 		}
@@ -63,9 +60,6 @@ public class ConditionGroupVo implements Serializable{
 	}
 
 	public String getUuid() {
-		/*if(uuid == null) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
-		}*/
 		return uuid;
 	}
 

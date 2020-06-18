@@ -9,8 +9,7 @@ public enum Expression {
 	EXCLUDE("exclude", "不包含", " not %s contains any ( %s ) "),
 	BETWEEN("between","属于"," %s between '%s' and '%s' "),
 	GREATERTHAN("greater-than", "晚于", " %s > %s ) "),
-	LESSTHAN("less-than", "早于", " %s < %s ) ")
-	;
+	LESSTHAN("less-than", "早于", " %s < %s ) ");
 	
 	private String expression;
 	private String expressionName;

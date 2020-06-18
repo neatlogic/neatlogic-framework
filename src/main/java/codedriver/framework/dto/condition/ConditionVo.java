@@ -129,21 +129,6 @@ public class ConditionVo implements Serializable{
 		List<String> curentValueList = new ArrayList<>();
 		ConditionParamContext context = ConditionParamContext.get();
 		if(context != null) {
-//			if(ProcessFieldType.CUSTOM.getValue().equals(this.type)) {
-//				List<ParamMappingVo> paramMappingList = context.getParamMappingList();
-//				if(CollectionUtils.isNotEmpty(paramMappingList)) {
-//					for(ParamMappingVo paramMappingVo : paramMappingList) {
-//						if(Objects.equals(this.name, paramMappingVo.getName())) {
-//							if(ProcessFieldType.CONSTANT.getValue().equals(paramMappingVo.getType())) {
-//								paramValue = paramMappingVo.getValue();
-//							}else {
-//								this.type = paramMappingVo.getType();
-//								this.name = paramMappingVo.getValue();
-//							}
-//						}
-//					}
-//				}
-//			}
 			JSONObject paramData = context.getParamData();
 			paramValue = paramData.get(this.name);
 		}
@@ -157,9 +142,5 @@ public class ConditionVo implements Serializable{
 		}
 		return ConditionUtil.predicate(curentValueList, expression, valueList);
 	}
-
-//	public String getConditionValue() {
-//		return ProcessWorkcenterField.getConditionValue(name);
-//	}
 	
 }

@@ -18,10 +18,6 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 	@Autowired
 	private ApiMapper apiMapper;
 
-	public boolean isPrivate() {
-		return true;
-	}
-
 	public int needAudit() {
 		return 0;
 	}

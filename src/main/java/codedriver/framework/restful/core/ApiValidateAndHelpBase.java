@@ -9,14 +9,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -29,7 +27,6 @@ import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
-import codedriver.framework.dao.mapper.ConfigMapper;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
 import codedriver.framework.exception.type.ParamValueTooLongException;
@@ -44,21 +41,14 @@ import codedriver.framework.restful.annotation.NotDefined;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.audit.ApiAuditSaveThread;
-import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 public class ApiValidateAndHelpBase {
 	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
-	private static final String API_AUDIT_CONFIG_KEY = "api_audit_config";
-	@Autowired
-	private ApiMapper apiMapper;
 
-	@Autowired
-	private ConfigMapper configMapper;
 
 	protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
-		//ConfigVo configVo = configMapper.getConfigByKey(API_AUDIT_CONFIG_KEY);
 		ApiAuditVo audit = new ApiAuditVo();
 		audit.setToken(apiVo.getToken());
 		audit.setTenant(TenantContext.get().getTenantUuid());
@@ -67,16 +57,6 @@ public class ApiValidateAndHelpBase {
 		audit.setStartTime(new Date(startTime));
 		audit.setEndTime(new Date(endTime));
 		audit.setTimeCost(endTime - startTime);
-		/*if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
-			try {
-				JSONObject auditConfig = JSONObject.parseObject(configVo.getValue());
-				if (auditConfig.containsKey("savepath")) {
-					audit.setLogPath(auditConfig.getString("savepath"));
-				}
-			} catch (Exception ex) {
-
-			}
-		}*/
 		UserContext userContext = UserContext.get();
 		audit.setUserUuid(userContext.getUserUuid(true));
 		HttpServletRequest request = userContext.getRequest();
@@ -93,8 +73,6 @@ public class ApiValidateAndHelpBase {
 			audit.setResult(result);
 		}
 		CommonThreadPool.execute(new ApiAuditSaveThread(audit));
-		//apiMapper.insertApiAudit(audit);
-		//ApiAuditManager.saveAudit(audit);
 	}
 
 	private static void escapeXss(JSONObject paramObj, String key) {
@@ -122,9 +100,9 @@ public class ApiValidateAndHelpBase {
 		}
 	}
 
-	private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
-	private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
-	private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+	//private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
+	//private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
+	//private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
 	private static String escapeXss(String str) {
 		if (StringUtils.isNotBlank(str)) {
@@ -181,7 +159,7 @@ public class ApiValidateAndHelpBase {
 		}
 	}
 
-	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException {
+	protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException,PermissionDeniedException {
 		// 获取目标类
 		Boolean isAuth = false;
 		if (apiClass != null) {

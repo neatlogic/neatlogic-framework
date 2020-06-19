@@ -1,8 +1,8 @@
 package codedriver.framework.exception.type;
 
-import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.ApiException;
 
-public class PermissionDeniedException extends ApiRuntimeException {
+public class PermissionDeniedException extends ApiException {
 
 	/** 
 	* @Fields serialVersionUID : TODO 

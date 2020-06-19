@@ -25,14 +25,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.common.config.Config;
-import codedriver.framework.exception.core.ApiException;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
+import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
+import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.service.ApiService;
 
@@ -67,6 +68,16 @@ public class ApiDispatcher {
 		} else if (interfaceVo.getPathVariableObj() != null) {
 			// 融合路径参数
 			paramObj.putAll(interfaceVo.getPathVariableObj());
+		}
+
+		// 判断是否master模块接口，如果是不允许访问
+		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler());
+		if (apiHandlerVo != null) {
+			if (apiHandlerVo.getModuleId().equals("master")) {
+				throw new PermissionDeniedException();
+			}
+		} else {
+			throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 		}
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
@@ -155,8 +166,8 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-		} catch (ApiException ex) {
-			response.setStatus(520);
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
@@ -170,7 +181,7 @@ public class ApiDispatcher {
 			response.getWriter().print(returnObj);
 		}
 	}
-	
+
 	@RequestMapping(value = "/rest/**", method = RequestMethod.POST)
 	public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -204,8 +215,8 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-		} catch (ApiException ex) {
-			response.setStatus(520);
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
@@ -243,8 +254,8 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-		} catch (ApiException ex) {
-			response.setStatus(520);
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
@@ -282,6 +293,10 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(520);
@@ -306,6 +321,10 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(520);
@@ -328,6 +347,10 @@ public class ApiDispatcher {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(520);
@@ -348,6 +371,10 @@ public class ApiDispatcher {
 			doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
 		} catch (ApiRuntimeException ex) {
 			response.setStatus(520);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
 		} catch (Exception ex) {

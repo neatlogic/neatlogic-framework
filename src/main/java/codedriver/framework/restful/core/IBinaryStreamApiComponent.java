@@ -21,7 +21,9 @@ public interface IBinaryStreamApiComponent {
 
 	public String getConfig();
 
-	public boolean isPrivate();
+	public default boolean isPrivate() {
+		return true;
+	}
 
 	public int needAudit();
 

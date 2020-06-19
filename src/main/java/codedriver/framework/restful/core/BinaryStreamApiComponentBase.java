@@ -24,10 +24,6 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
 	@Autowired
 	private ApiMapper apiMapper;
 
-	public boolean isPrivate() {
-		return true;
-	}
-
 	public int needAudit() {
 		return 0;
 	}

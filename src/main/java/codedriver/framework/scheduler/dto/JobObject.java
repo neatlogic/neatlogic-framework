@@ -18,6 +18,8 @@ public class JobObject implements Serializable {
 	private Integer needAudit;
 	private String tenantUuid;
 	private Integer intervalInSeconds;
+	private Integer repeatCount;
+	
 	private Map<String, Object> dataMap;
 
 	private JobObject(Builder builder) {
@@ -32,6 +34,7 @@ public class JobObject implements Serializable {
 		this.type = builder.type;
 		this.intervalInSeconds = builder.intervalInSeconds;
 		this.dataMap = builder.dataMap;
+		this.repeatCount = builder.repeatCount;
 	}
 
 	private JobObject() {
@@ -88,6 +91,7 @@ public class JobObject implements Serializable {
 		private Integer needAudit = 0;
 		private String type = "private";
 		private Integer intervalInSeconds;
+		private Integer repeatCount;
 		private Map<String, Object> dataMap;
 
 		public Builder(String jobId, String jobGroup, String jobHandler, String tenantUuid) {
@@ -126,6 +130,11 @@ public class JobObject implements Serializable {
 			intervalInSeconds = _intervalInSeconds;
 			return this;
 		}
+		
+		public Builder withRepeatCount(Integer _repeatCount) {
+			repeatCount = _repeatCount;
+			return this;
+		}
 
 		public Builder addData(String key, Object data) {
 			if (dataMap == null) {
@@ -151,4 +160,9 @@ public class JobObject implements Serializable {
 		return intervalInSeconds;
 	}
 
+	public Integer getRepeatCount() {
+		return repeatCount;
+	}
+
+	
 }

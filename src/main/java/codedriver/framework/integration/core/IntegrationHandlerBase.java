@@ -133,7 +133,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 		 * 创建审计记录
 		 */
 		IntegrationAuditVo integrationAuditVo = new IntegrationAuditVo();
-		integrationAuditVo.setUserUuid(UserContext.get().getUserUuid(true));
+		integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());//用户非必填，因作业不存在登录用户
 		integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
 		integrationAuditVo.setStartTime(new Date());
 		integrationAuditVo.setParam(requestParamObj.toString());

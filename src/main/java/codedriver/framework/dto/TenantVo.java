@@ -23,6 +23,8 @@ public class TenantVo extends BasePageVo {
 	private Date expireDate;
 	@EntityField(name = "激活模块", type = ApiParamType.JSONARRAY)
 	private List<ModuleVo> moduleList;
+	@EntityField(name = "激活模块分组", type = ApiParamType.JSONARRAY)
+	private List<ModuleGroupVo> moduleGroupList;
 
 	public TenantVo() {
 		this.setPageSize(20);
@@ -85,6 +87,14 @@ public class TenantVo extends BasePageVo {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public List<ModuleGroupVo> getModuleGroupList() {
+		return moduleGroupList;
+	}
+
+	public void setModuleGroupList(List<ModuleGroupVo> moduleGroupList) {
+		this.moduleGroupList = moduleGroupList;
 	}
 
 }

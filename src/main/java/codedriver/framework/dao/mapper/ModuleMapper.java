@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface ModuleMapper {
 
-	public List<String> getModuleListByTenantUuid(String tenantUuid);
+	public List<String> getModuleGroupListByTenantUuid(String tenantUuid);
 
 }

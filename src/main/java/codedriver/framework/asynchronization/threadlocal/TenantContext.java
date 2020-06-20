@@ -1,6 +1,7 @@
 package codedriver.framework.asynchronization.threadlocal;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
+import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 
 @RootConfiguration
@@ -20,6 +22,7 @@ public class TenantContext implements Serializable {
 	private String tenantUuid;
 	private Boolean useDefaultDatasource = false;
 	private List<ModuleVo> activeModuleList;
+	private List<ModuleGroupVo> activeModuleGroupList;
 	private Map<String, ModuleVo> activeModuleMap;
 
 	private static ModuleMapper moduleMapper;
@@ -77,10 +80,17 @@ public class TenantContext implements Serializable {
 			this.tenantUuid = tenantUuid;
 			// 使用master库
 			this.setUseDefaultDatasource(true);
-			List<String> tenentModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
+			List<String> tenantModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
+			this.activeModuleGroupList = new ArrayList<>();
+			if (tenantModuleGroupList != null) {
+				for (String group : tenantModuleGroupList) {
+					this.activeModuleGroupList.add(ModuleUtil.getModuleGroup(group));
+				}
+			}
+
 			// 还原回租户库
 			this.setUseDefaultDatasource(false);
-			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenentModuleGroupList);
+			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
 			activeModuleMap = new HashMap<>();
 			if (activeModuleList != null && activeModuleList.size() > 0) {
 				for (ModuleVo module : activeModuleList) {
@@ -109,6 +119,10 @@ public class TenantContext implements Serializable {
 
 	public List<ModuleVo> getActiveModuleList() {
 		return activeModuleList;
+	}
+	
+	public List<ModuleGroupVo> getActiveModuleGroupList() {
+		return activeModuleGroupList;
 	}
 
 	public void setActiveModuleList(List<ModuleVo> activeModuleList) {

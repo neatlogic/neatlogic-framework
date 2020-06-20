@@ -174,7 +174,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 	public boolean unloadJob(JobObject jobObject) {
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
-			System.out.println(jobObject.getJobName()+" "+jobObject.getJobGroup());
 			JobKey jobKey = new JobKey(jobObject.getJobName(), jobObject.getJobGroup());
 			if (scheduler.getJobDetail(jobKey) != null) {
 				scheduler.deleteJob(jobKey);

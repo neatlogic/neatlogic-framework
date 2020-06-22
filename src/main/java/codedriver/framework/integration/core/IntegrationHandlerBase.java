@@ -74,7 +74,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 	protected abstract void afterReturn(IntegrationVo integrationVo);
 
-	public IntegrationResultVo sendRequest(IntegrationVo integrationVo) {
+	public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom) {
+
 		String url = integrationVo.getUrl();
 		JSONObject config = integrationVo.getConfig();
 		JSONObject otherConfig = config.getJSONObject("other");
@@ -133,7 +134,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 		 * 创建审计记录
 		 */
 		IntegrationAuditVo integrationAuditVo = new IntegrationAuditVo();
-		integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());//用户非必填，因作业不存在登录用户
+		integrationAuditVo.setRequestFrom(iRequestFrom.toString());
+		integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());// 用户非必填，因作业不存在登录用户
 		integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
 		integrationAuditVo.setStartTime(new Date());
 		integrationAuditVo.setParam(requestParamObj.toString());
@@ -269,7 +271,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 			integrationAuditVo.setStatus("succeed");
 		}
 		integrationAuditVo.setEndTime(new Date());
-		CodeDriverThread thread = new IntegrationAuditSaveThread();
+		CodeDriverThread thread = new IntegrationAuditSaveThread(integrationAuditVo);
 		thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
 		CommonThreadPool.execute(thread);
 

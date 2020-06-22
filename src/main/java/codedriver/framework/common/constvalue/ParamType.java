@@ -64,4 +64,18 @@ public enum ParamType {
 		return null;
 	}
 	
+	public String getFreemarkerTemplate(String name) {
+		switch(this) {
+			case STRING : 				
+				return "${DATA." + name + "}";
+			case NUMBER : 
+				return "${DATA." + name + "}";
+			case ARRAY : 
+				return "<#list DATA." + name + " as item>${item_index}-${item}<#if item_has_next>,</#if></#list>";
+			case DATE : 
+				return "${DATA." + name + "}";
+			default : break;
+		}
+		return null;
+	}
 }

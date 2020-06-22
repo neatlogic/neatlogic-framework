@@ -361,6 +361,17 @@
 		</if>
 	</select>
 
+	<select id="getUserUuidListByteamUuidList" parameterType="java.util.List" resultType="java.lang.String">
+	SELECT 
+	a.`user_uuid` 
+	FROM user_team a 
+	JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+	WHERE a.`team_uuid` IN 
+	<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+	#{teamUuid}
+	</foreach>
+	</select>
+	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,

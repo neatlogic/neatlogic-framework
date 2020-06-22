@@ -47,6 +47,8 @@ public interface UserMapper {
 	
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
+	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

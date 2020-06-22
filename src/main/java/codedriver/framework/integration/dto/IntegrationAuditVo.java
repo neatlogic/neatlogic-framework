@@ -7,6 +7,7 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -20,7 +21,7 @@ public class IntegrationAuditVo extends BasePageVo {
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String userUuid;
 	@EntityField(name = "请求来源", type = ApiParamType.STRING)
-	private String requestForm;
+	private String requestFrom;
 	@JSONField(serialize = false)
 	private transient Integer serverId;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
@@ -45,7 +46,7 @@ public class IntegrationAuditVo extends BasePageVo {
 	private String error;
 
 	public Long getId() {
-		if (id != null) {
+		if (id == null) {
 			id = SnowflakeUtil.uniqueLong();
 		}
 		return id;
@@ -71,15 +72,10 @@ public class IntegrationAuditVo extends BasePageVo {
 		this.userUuid = userUuid;
 	}
 
-	public String getRequestForm() {
-		return requestForm;
-	}
-
-	public void setRequestForm(String requestForm) {
-		this.requestForm = requestForm;
-	}
-
 	public Integer getServerId() {
+		if(serverId == null) {
+			serverId = Config.SCHEDULE_SERVER_ID;
+		}
 		return serverId;
 	}
 
@@ -185,6 +181,14 @@ public class IntegrationAuditVo extends BasePageVo {
 		if (StringUtils.isNotBlank(error)) {
 			this.error += "\n" + error;
 		}
+	}
+
+	public String getRequestFrom() {
+		return requestFrom;
+	}
+
+	public void setRequestFrom(String requestFrom) {
+		this.requestFrom = requestFrom;
 	}
 
 }

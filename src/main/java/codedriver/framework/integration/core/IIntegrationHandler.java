@@ -15,8 +15,8 @@ public interface IIntegrationHandler {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
 
-	public IntegrationResultVo sendRequest(IntegrationVo integrationVo);
-	
+	public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);
+
 	public Integer hasPattern();
 
 	public List<PatternVo> getInputPattern();

@@ -11,9 +11,9 @@ import codedriver.framework.dto.TenantVo;
 import codedriver.framework.heartbeat.core.IHeartbreakHandler;
 import codedriver.framework.scheduler.core.IJob;
 import codedriver.framework.scheduler.core.SchedulerManager;
+import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
-import codedriver.framework.scheduler.service.SchedulerService;
 
 @Service
 public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
@@ -22,7 +22,7 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 	private SchedulerManager schedulerManager;
 
 	@Autowired
-	private SchedulerService schedulerService;
+	private SchedulerMapper schedulerMapper;
 
 	@Autowired
 	private TenantMapper tenantMapper;
@@ -37,9 +37,9 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			// 切换到租户库
 			TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
 			// 重置异常server的作业锁状态为waiting
-			schedulerService.resetRunningJobLockByServerId(serverId);
+			schedulerMapper.resetJobLockByServerId(serverId);
 			// 接管异常server的作业
-			List<JobLockVo> jobLockList = schedulerService.getJobLockByServerId(serverId);
+			List<JobLockVo> jobLockList = schedulerMapper.getJobLockByServerId(serverId);
 			// TODO 获取所有tenant
 			for (JobLockVo jobLockVo : jobLockList) {
 				if (!schedulerManager.checkJobIsExists(jobLockVo.getJobName(), jobLockVo.getJobGroup())) {

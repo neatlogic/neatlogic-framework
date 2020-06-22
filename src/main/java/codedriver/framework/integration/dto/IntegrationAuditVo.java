@@ -20,6 +20,8 @@ public class IntegrationAuditVo extends BasePageVo {
 	private String integrationUuid;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String userUuid;
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
+	private String userName;
 	@EntityField(name = "请求来源", type = ApiParamType.STRING)
 	private String requestFrom;
 	@JSONField(serialize = false)
@@ -32,12 +34,12 @@ public class IntegrationAuditVo extends BasePageVo {
 	private Long timeCost;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
-	@JSONField(serialize = false)
-	private transient String paramHash;
-	@JSONField(serialize = false)
-	private transient String resultHash;
-	@JSONField(serialize = false)
-	private transient String errorHash;
+	@EntityField(name = "参数内容hash", type = ApiParamType.STRING)
+	private String paramHash;
+	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
+	private String resultHash;
+	@EntityField(name = "错误内容hash", type = ApiParamType.STRING)
+	private String errorHash;
 	@EntityField(name = "请求参数", type = ApiParamType.STRING)
 	private String param;
 	@EntityField(name = "返回结果", type = ApiParamType.STRING)
@@ -73,7 +75,7 @@ public class IntegrationAuditVo extends BasePageVo {
 	}
 
 	public Integer getServerId() {
-		if(serverId == null) {
+		if (serverId == null) {
 			serverId = Config.SCHEDULE_SERVER_ID;
 		}
 		return serverId;
@@ -189,6 +191,14 @@ public class IntegrationAuditVo extends BasePageVo {
 
 	public void setRequestFrom(String requestFrom) {
 		this.requestFrom = requestFrom;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

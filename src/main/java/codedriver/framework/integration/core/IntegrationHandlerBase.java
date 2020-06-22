@@ -267,7 +267,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 			integrationAuditVo.setResult(resultVo.getRawResult());
 		}
-		if (integrationAuditVo.getStatus() != null) {
+		if (StringUtils.isBlank(integrationAuditVo.getStatus())) {
 			integrationAuditVo.setStatus("succeed");
 		}
 		integrationAuditVo.setEndTime(new Date());

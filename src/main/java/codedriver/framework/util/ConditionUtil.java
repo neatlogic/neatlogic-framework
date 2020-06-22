@@ -19,6 +19,14 @@ public class ConditionUtil {
 					return false;
 				}
 				return curentValueList.get(0).contains(targetValueList.get(0));
+			case NOTLIKE: 
+				if(CollectionUtils.isEmpty(targetValueList)) {
+					return false;
+				}
+				if(CollectionUtils.isEmpty(curentValueList)) {
+					return true;
+				}
+				return !curentValueList.get(0).contains(targetValueList.get(0));
 			case EQUAL: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;

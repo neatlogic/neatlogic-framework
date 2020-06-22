@@ -2,6 +2,11 @@ package codedriver.framework.dto;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -64,6 +69,14 @@ public class TenantAuditVo extends BasePageVo {
 	private Date endTime;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
+	@EntityField(name = "result", type = ApiParamType.STRING)
+	private String result;
+	@EntityField(name = "error", type = ApiParamType.STRING)
+	private String error;
+	@JSONField(serialize = false)
+	private transient String resultHash;
+	@JSONField(serialize = false)
+	private transient String errorHash;
 
 	public String getTenantUuid() {
 		return tenantUuid;
@@ -138,6 +151,44 @@ public class TenantAuditVo extends BasePageVo {
 
 	public void setErrPath(String errPath) {
 		this.errPath = errPath;
+	}
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
+	public String getResultHash() {
+		if (StringUtils.isBlank(resultHash) && StringUtils.isNotBlank(result)) {
+			resultHash = DigestUtils.md5DigestAsHex(result.getBytes());
+		}
+		return resultHash;
+	}
+
+	public void setResultHash(String resultHash) {
+		this.resultHash = resultHash;
+	}
+
+	public String getErrorHash() {
+		if (StringUtils.isBlank(errorHash) && StringUtils.isNotBlank(error)) {
+			errorHash = DigestUtils.md5DigestAsHex(error.getBytes());
+		}
+		return errorHash;
+	}
+
+	public void setErrorHash(String errorHash) {
+		this.errorHash = errorHash;
 	}
 
 }

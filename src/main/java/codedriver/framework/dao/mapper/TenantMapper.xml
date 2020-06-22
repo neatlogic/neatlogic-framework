@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
-	<!-- <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="1024" readOnly="true"></cache> -->
+
+	<select id="getTenantModuleGroupByTenantId" parameterType="java.lang.Long" resultType="java.lang.String">
+		SELECT
+		`module_group` AS moduleGroup
+		FROM
+		`tenant_modulegroup`
+		WHERE
+		tenant_id = #{value}
+	</select>
+
 	<sql id="searchTenantAuditCondition">
 		<where>
 			tenant_uuid = #{tenantUuid}
@@ -80,12 +89,28 @@
 
 	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">
 		SELECT
+		`id`,
 		`uuid`,
 		`name`,
-		`is_active` AS isActive
+		`is_active` AS isActive,
+		`expire_date` AS expireDate,
+		`description`
 		FROM
 		`tenant`
 		WHERE `uuid` = #{value}
+	</select>
+
+	<select id="getTenantById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.TenantVo">
+		SELECT
+		`id`,
+		`uuid`,
+		`name`,
+		`is_active` AS isActive,
+		`expire_date` AS expireDate,
+		`description`
+		FROM
+		`tenant`
+		WHERE `id` = #{value}
 	</select>
 
 	<select id="getAllActiveTenant" resultType="codedriver.framework.dto.TenantVo">
@@ -118,10 +143,10 @@
 		)
 	</insert>
 
-	<insert id="insertTenantModule">
-		INSERT INTO `tenant_module` (`tenant_uuid`, `module_id`)
+	<insert id="insertTenantModuleGroup">
+		INSERT INTO `tenant_modulegroup` (`tenant_id`, `module_group`)
 		VALUES
-		(#{tenantUuid}, #{moduleId})
+		(#{tenantId}, #{moduleGroup})
 	</insert>
 
 	<insert id="insertTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
@@ -148,6 +173,12 @@
 		)
 	</insert>
 
+	<insert id="replaceTenantAuditDetail">
+		REPLACE INTO `tenant_audit_detail` (`hash`, `content`)
+		VALUES
+		(#{hash}, #{content})
+	</insert>
+
 	<update id="updateTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
 		UPDATE
 		`tenant_audit`
@@ -168,11 +199,11 @@
 		WHERE `uuid` = #{uuid}
 	</update>
 
-	<delete id="deleteTenantModuleByTenantUuid" parameterType="java.lang.String">
+	<delete id="deleteTenantModuleGroupByTenantId" parameterType="java.lang.Long">
 		DELETE
 		FROM
-		`tenant_module`
-		WHERE `tenant_uuid` = #{value}
+		`tenant_modulegroup`
+		WHERE `tenant_id` = #{value}
 	</delete>
 </mapper>
 

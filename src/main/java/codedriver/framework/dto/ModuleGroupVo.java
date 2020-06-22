@@ -9,18 +9,18 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ModuleGroupVo {
-	
+
 	@EntityField(name = "模块分组", type = ApiParamType.STRING)
 	private String group;
 	@EntityField(name = "模块分组名称", type = ApiParamType.STRING)
 	private String groupName;
-	@EntityField(name = "模块分组排序", type = ApiParamType.STRING)
+	@EntityField(name = "模块分组排序", type = ApiParamType.INTEGER)
 	private Integer groupSort;
-	@EntityField(name = "模块分组描述", type = ApiParamType.INTEGER)
+	@EntityField(name = "模块分组描述", type = ApiParamType.STRING)
 	private String groupDescription;
-	@EntityField(name = "模块分组对应的moduleVo列表", type = ApiParamType.STRING)
+	@EntityField(name = "模块列表", type = ApiParamType.JSONOBJECT)
 	private List<ModuleVo> moduleList;
-	
+
 	public String getGroup() {
 		return group;
 	}
@@ -44,7 +44,7 @@ public class ModuleGroupVo {
 	public void setModuleList(List<ModuleVo> moduleList) {
 		this.moduleList = moduleList;
 	}
-	
+
 	public String getGroupDescription() {
 		return groupDescription;
 	}
@@ -63,8 +63,8 @@ public class ModuleGroupVo {
 
 	public List<String> getModuleIdList() {
 		List<String> moduleIdList = new ArrayList<String>();
-		if(CollectionUtils.isNotEmpty(this.moduleList)) {
-			for(ModuleVo moduleVo : this.moduleList) {
+		if (CollectionUtils.isNotEmpty(this.moduleList)) {
+			for (ModuleVo moduleVo : this.moduleList) {
 				moduleIdList.add(moduleVo.getId());
 			}
 		}

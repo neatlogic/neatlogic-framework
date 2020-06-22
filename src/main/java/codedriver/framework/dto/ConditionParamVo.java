@@ -3,10 +3,13 @@ package codedriver.framework.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.notify.dto.ExpressionVo;
 
 public class ConditionParamVo {
@@ -21,7 +24,8 @@ public class ConditionParamVo {
 	private String defaultExpression;
 	private List<ExpressionVo> expressionList = new ArrayList<>();
 	private int isEditable = 1;
-
+	private String freemarkerTemplate;
+	
 	public Boolean getIsMultiple() {
 		return isMultiple;
 	}
@@ -102,5 +106,17 @@ public class ConditionParamVo {
 	}
 	public void setController(String controller) {
 		this.controller = controller;
+	}
+	public String getFreemarkerTemplate() {
+		if(StringUtils.isBlank(freemarkerTemplate) && StringUtils.isNotBlank(paramType) && StringUtils.isNotBlank(name)) {
+			ParamType paramTypeEnum = ParamType.getParamType(paramType);
+			if(paramTypeEnum != null) {
+				freemarkerTemplate = paramTypeEnum.getFreemarkerTemplate(name);
+			}
+		}
+		return freemarkerTemplate;
+	}
+	public void setFreemarkerTemplate(String freemarkerTemplate) {
+		this.freemarkerTemplate = freemarkerTemplate;
 	}
 }

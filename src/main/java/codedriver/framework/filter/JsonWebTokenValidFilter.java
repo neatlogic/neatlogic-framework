@@ -146,6 +146,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
 			response.getWriter().print(redirectObj.toJSONString());
 		}
+		// 清除所有threadlocal
+		if (TenantContext.get() != null) {
+			TenantContext.get().release();
+		}
+		if (UserContext.get() != null) {
+			UserContext.get().release();
+		}
 	}
 
 	private boolean userExpirationValid() {

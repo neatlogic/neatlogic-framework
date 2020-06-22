@@ -1,7 +1,9 @@
 package codedriver.framework.common.util;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,6 +24,31 @@ public class ModuleUtil {
 		return moduleList;
 	}
 
+	public static List<ModuleGroupVo> getAllModuleGroupList() {
+		List<ModuleGroupVo> moduleGroupList = new ArrayList<>();
+		Set<String> groupSet = new HashSet<>();
+		for (ModuleVo moduleVo : moduleList) {
+			// master模块不允许用户添加,framework模块必选
+			if (!moduleVo.getId().equals("master") && !moduleVo.getGroup().equals("framework") && !groupSet.contains(moduleVo.getGroup())) {
+				groupSet.add(moduleVo.getGroup());
+				ModuleGroupVo moduleGroup = new ModuleGroupVo();
+				moduleGroup.setGroup(moduleVo.getGroup());
+				moduleGroup.setGroupName(moduleVo.getGroupName());
+				moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
+				moduleGroup.setGroupSort(moduleVo.getGroupSort());
+				moduleGroupList.add(moduleGroup);
+			}
+		}
+		moduleGroupList.sort(new Comparator<ModuleGroupVo>() {
+			@Override
+			public int compare(ModuleGroupVo o1, ModuleGroupVo o2) {
+				return o1.getGroupSort() - o2.getGroupSort();
+			}
+
+		});
+		return moduleGroupList;
+	}
+
 	public static ModuleVo getModuleById(String moduleId) {
 		return moduleMap.get(moduleId);
 	}
@@ -31,29 +58,28 @@ public class ModuleUtil {
 		moduleList.add(moduleVo);
 	}
 
-
-	public static List<ModuleVo> getTenantActiveModuleList(List<String> tenantModuleList) {
+	public static List<ModuleVo> getTenantActiveModuleList(List<String> tenantModuleGroupList) {
 		List<ModuleVo> returnList = new ArrayList<>();
-		if (!tenantModuleList.contains("framework")) {
-			tenantModuleList.add("framework");
+		if (!tenantModuleGroupList.contains("framework")) {
+			tenantModuleGroupList.add("framework");
 		}
-		ModuleVo module = null;
-		for (String moduleId : tenantModuleList) {
-			module = moduleMap.get(moduleId);
-			if (module != null) {
-				returnList.add(module);
+
+		for (ModuleVo moduleVo : moduleList) {
+			if (tenantModuleGroupList.contains(moduleVo.getGroup())) {
+				returnList.add(moduleVo);
 			}
 		}
+
 		return returnList;
 	}
-	
+
 	public static ModuleGroupVo getModuleGroup(String group) {
 		ModuleGroupVo moduleGroup = null;
 		Set<Entry<String, ModuleVo>> moduleSet = moduleMap.entrySet();
-		for(Entry<String, ModuleVo> moduleEntry :moduleSet) {
+		for (Entry<String, ModuleVo> moduleEntry : moduleSet) {
 			ModuleVo moduleVo = moduleEntry.getValue();
-			if(moduleVo.getGroup().equals(group)) {
-				if(moduleGroup == null) {
+			if (moduleVo.getGroup().equals(group)) {
+				if (moduleGroup == null) {
 					moduleGroup = new ModuleGroupVo();
 					moduleGroup.setGroup(moduleVo.getGroup());
 					moduleGroup.setGroupName(moduleVo.getGroupName());
@@ -62,24 +88,24 @@ public class ModuleUtil {
 					List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
 					moduleList.add(moduleVo);
 					moduleGroup.setModuleList(moduleList);
-				}else {
+				} else {
 					moduleGroup.getModuleList().add(moduleVo);
 				}
 			}
 		}
 		return moduleGroup;
 	}
-	
-	public static Map<String,ModuleGroupVo> getModuleGroupMap() {
-		Map<String,ModuleGroupVo> moduleGroupMap = new HashMap<String,ModuleGroupVo>();
+
+	public static Map<String, ModuleGroupVo> getModuleGroupMap() {
+		Map<String, ModuleGroupVo> moduleGroupMap = new HashMap<String, ModuleGroupVo>();
 		Set<Entry<String, ModuleVo>> moduleSet = moduleMap.entrySet();
-		for(Entry<String, ModuleVo> moduleEntry :moduleSet) {
+		for (Entry<String, ModuleVo> moduleEntry : moduleSet) {
 			ModuleVo moduleVo = moduleEntry.getValue();
 			ModuleGroupVo moduleGroupVo = null;
-			if(moduleGroupMap.containsKey(moduleVo.getGroup())) {
+			if (moduleGroupMap.containsKey(moduleVo.getGroup())) {
 				moduleGroupVo = (ModuleGroupVo) moduleGroupMap.get(moduleVo.getGroup());
 				moduleGroupVo.getModuleList().add(moduleVo);
-			}else {
+			} else {
 				moduleGroupVo = new ModuleGroupVo();
 				moduleGroupVo.setGroup(moduleVo.getGroup());
 				moduleGroupVo.setGroupName(moduleVo.getGroupName());
@@ -90,7 +116,7 @@ public class ModuleUtil {
 				moduleGroupVo.setModuleList(moduleList);
 			}
 			moduleGroupMap.put(moduleGroupVo.getGroup(), moduleGroupVo);
-			
+
 		}
 		return moduleGroupMap;
 	}

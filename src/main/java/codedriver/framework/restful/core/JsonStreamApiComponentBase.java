@@ -22,9 +22,6 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 	@Autowired
 	private ApiMapper apiMapper;
 
-	public boolean isPrivate() {
-		return true;
-	}
 
 	public int needAudit() {
 		return 0;

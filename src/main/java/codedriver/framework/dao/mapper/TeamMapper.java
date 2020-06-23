@@ -38,6 +38,12 @@ public interface TeamMapper {
 			@Param("title") String title
 	);
 
+	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
+
+	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
+
 	public int deleteTeamTagByUuid(String uuid);
 
 	public int deleteUserTeamByTeamUuid(String uuid);
@@ -64,8 +70,4 @@ public interface TeamMapper {
 	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 
 	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
-
-	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
-
-	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
 }

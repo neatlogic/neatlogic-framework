@@ -180,6 +180,46 @@
 	WHERE a.`level` = #{level} AND a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
 	</select>
 	
+	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap">
+	SELECT
+	a.`uuid`,
+	a.`name`,
+	a.`parent_uuid` AS parentUuid,
+	a.`lft`,
+	a.`rht`,
+	0 as `childCount`
+	FROM `team` a
+	WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+	ORDER BY `lft` ASC
+	</select>
+	
+	<select id="getTeamUserCountAndChildCountListByUuidList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo">
+	SELECT 
+	  a.`uuid`,
+	  COUNT(DISTINCT b.`user_uuid`) AS userCount,
+	  COUNT(DISTINCT c.`uuid`) AS childCount
+	FROM `team` a
+	LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
+	LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
+	WHERE a.`uuid` IN
+	<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+	#{teamUuid}
+	</foreach>
+	GROUP BY a.`uuid`
+	</select>
+	
+	<select id="getTeamUserListByTeamUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamUserVo">
+	SELECT 
+	  a.`team_uuid` AS teamUuid,
+	  a.`user_uuid` AS userUuid,
+	  a.`title`,
+	  b.`user_id` AS userId,
+	  b.`user_name` AS userName 
+	FROM `user_team` a
+	JOIN `user` b ON b.`uuid`=a.`user_uuid`
+	WHERE a.`team_uuid` = #{value}
+	</select>
+	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
 		`uuid`,
@@ -266,32 +306,4 @@
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
 	WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
 	</delete>
-	
-	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap">
-	SELECT
-	a.`uuid`,
-	a.`name`,
-	a.`parent_uuid` AS parentUuid,
-	a.`lft`,
-	a.`rht`,
-	0 as `childCount`
-	FROM `team` a
-	WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
-	ORDER BY `lft` ASC
-	</select>
-	
-	<select id="getTeamUserCountAndChildCountListByUuidList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo">
-	SELECT 
-	  a.`uuid`,
-	  COUNT(DISTINCT b.`user_uuid`) AS userCount,
-	  COUNT(DISTINCT c.`uuid`) AS childCount
-	FROM `team` a
-	LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
-	LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
-	WHERE a.`uuid` IN
-	<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
-	#{teamUuid}
-	</foreach>
-	GROUP BY a.`uuid`
-	</select>
 </mapper>

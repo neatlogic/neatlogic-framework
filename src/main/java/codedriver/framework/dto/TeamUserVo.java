@@ -3,9 +3,10 @@ package codedriver.framework.dto;
 public class TeamUserVo {
 	
 	private String teamUuid;
+	private String teamName;
 	private String userUuid;
 	private String userName;
-	private String teamName;
+	private String userId;
 	private String title = "generalstaff";
 	
 	public TeamUserVo() {
@@ -36,6 +37,14 @@ public class TeamUserVo {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getTeamName() {

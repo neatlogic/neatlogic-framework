@@ -11,7 +11,7 @@ public class TeamUserVo {
 	private String userUuid;
 	private String userName;
 	private String userId;
-	private String title = "generalstaff";
+	private String title;
 	private String titleText;
 	public TeamUserVo() {
 	}

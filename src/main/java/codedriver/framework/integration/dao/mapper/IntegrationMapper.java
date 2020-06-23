@@ -9,6 +9,12 @@ import codedriver.framework.integration.dto.IntegrationInvokeVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 
 public interface IntegrationMapper {
+	public String getIntegrationAuditDetailByHash(String hash);
+
+	public List<IntegrationAuditVo> searchIntegrationAudit(IntegrationAuditVo integrationAuditVo);
+
+	public int searchIntegrationAuditCount(IntegrationAuditVo integrationAuditVo);
+
 	public IntegrationVo getIntegrationByUuid(String uuid);
 
 	public List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);

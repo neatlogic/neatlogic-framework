@@ -140,7 +140,11 @@ public class ConditionVo implements Serializable{
 				curentValueList.add(value);
 			}
 		}
-		return ConditionUtil.predicate(curentValueList, expression, valueList);
+		List<String> targetValueList = new ArrayList<>();
+		for(String value : valueList) {
+			targetValueList.add(GroupSearch.removePrefix(value));
+		}
+		return ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
 	}
 	
 }

@@ -18,7 +18,7 @@ public enum GroupSearch {
 	}
 	
 	public String getValuePlugin() {
-		return value+"#";
+		return value + "#";
 	}
 
 	public String getText() {
@@ -41,5 +41,14 @@ public enum GroupSearch {
 			}
 		}
 		return null;
+	}
+	
+	public static String removePrefix(String _value) {
+		for(GroupSearch gs : GroupSearch.values()) {
+			if(_value.startsWith(gs.getValuePlugin())) {
+				return _value.substring(gs.getValuePlugin().length());
+			}
+		}
+		return _value;
 	}
 }

@@ -28,5 +28,12 @@ public enum TeamUserTitle {
 		}
 		return null;
 	}
-	
+	public static String getText(String _value) {
+		for(TeamUserTitle type : values()) {
+			if(type.getValue().equals(_value)) {
+				return type.getText();
+			}
+		}
+		return "";
+	}
 }

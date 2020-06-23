@@ -1,5 +1,9 @@
 package codedriver.framework.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
+import codedriver.framework.common.constvalue.TeamUserTitle;
+
 public class TeamUserVo {
 	
 	private String teamUuid;
@@ -8,7 +12,7 @@ public class TeamUserVo {
 	private String userName;
 	private String userId;
 	private String title = "generalstaff";
-	
+	private String titleText;
 	public TeamUserVo() {
 	}
 
@@ -61,6 +65,17 @@ public class TeamUserVo {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getTitleText() {
+		if(StringUtils.isBlank(titleText) && StringUtils.isNotBlank(title)) {
+			titleText = TeamUserTitle.getText(title);
+		}
+		return titleText;
+	}
+
+	public void setTitleText(String titleText) {
+		this.titleText = titleText;
 	}
 	
 }

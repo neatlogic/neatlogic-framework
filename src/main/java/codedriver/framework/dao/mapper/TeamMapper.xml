@@ -261,7 +261,12 @@
 	</insert>
 
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
-	UPDATE `team` SET `name` = #{name} WHERE `uuid` = #{uuid}
+	UPDATE `team` SET 
+	<if test="level != null and level != ''">
+	`level` = #{level},
+	</if>
+	`name` = #{name} 
+	WHERE `uuid` = #{uuid}
 	</update>
 
 	<update id="updateTeamParentUuidByUuid" parameterType="codedriver.framework.dto.TeamVo">

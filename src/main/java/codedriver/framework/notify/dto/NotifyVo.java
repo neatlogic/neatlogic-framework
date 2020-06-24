@@ -8,9 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
+
+	private INotifyTriggerType triggerType;
 	private String title;
 	private String content;
 	private List<UserVo> toUserList = new ArrayList<>();
@@ -30,6 +33,7 @@ public class NotifyVo {
 	private NotifyVo(Builder builder) {
 //		this.templateTitle = builder.templateTitle;
 //		this.templateContent = builder.templateContent;
+		this.triggerType = builder.triggerType;
 		this.data = builder.data;
 		this.toUserUuidList = builder.toUserUuidList;
 		this.toTeamIdList = builder.toTeamIdList;
@@ -153,6 +157,10 @@ public class NotifyVo {
 		}
 	}
 	
+	public INotifyTriggerType getTriggerType() {
+		return this.triggerType;
+	}
+
 	public static class Builder {
 
 		// 可选参数
@@ -164,6 +172,16 @@ public class NotifyVo {
 		private List<String> toRoleUuidList = new ArrayList<>();
 		private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 		
+		private INotifyTriggerType triggerType;
+		
+		public Builder(INotifyTriggerType _triggerType) {
+			this.triggerType = _triggerType;
+		}
+		
+		public INotifyTriggerType getTriggerType() {
+			return triggerType;
+		}
+
 		public Builder withContentTemplate(String contentTemplate) {
 			templateContent = contentTemplate;
 			return this;

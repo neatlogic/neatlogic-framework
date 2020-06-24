@@ -7,6 +7,7 @@ import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -19,8 +20,10 @@ public class IntegrationAuditVo extends BasePageVo {
 	private String integrationUuid;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String userUuid;
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
+	private String userName;
 	@EntityField(name = "请求来源", type = ApiParamType.STRING)
-	private String requestForm;
+	private String requestFrom;
 	@JSONField(serialize = false)
 	private transient Integer serverId;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
@@ -31,12 +34,12 @@ public class IntegrationAuditVo extends BasePageVo {
 	private Long timeCost;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
-	@JSONField(serialize = false)
-	private transient String paramHash;
-	@JSONField(serialize = false)
-	private transient String resultHash;
-	@JSONField(serialize = false)
-	private transient String errorHash;
+	@EntityField(name = "参数内容hash", type = ApiParamType.STRING)
+	private String paramHash;
+	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
+	private String resultHash;
+	@EntityField(name = "错误内容hash", type = ApiParamType.STRING)
+	private String errorHash;
 	@EntityField(name = "请求参数", type = ApiParamType.STRING)
 	private String param;
 	@EntityField(name = "返回结果", type = ApiParamType.STRING)
@@ -45,7 +48,7 @@ public class IntegrationAuditVo extends BasePageVo {
 	private String error;
 
 	public Long getId() {
-		if (id != null) {
+		if (id == null) {
 			id = SnowflakeUtil.uniqueLong();
 		}
 		return id;
@@ -71,15 +74,10 @@ public class IntegrationAuditVo extends BasePageVo {
 		this.userUuid = userUuid;
 	}
 
-	public String getRequestForm() {
-		return requestForm;
-	}
-
-	public void setRequestForm(String requestForm) {
-		this.requestForm = requestForm;
-	}
-
 	public Integer getServerId() {
+		if (serverId == null) {
+			serverId = Config.SCHEDULE_SERVER_ID;
+		}
 		return serverId;
 	}
 
@@ -185,6 +183,22 @@ public class IntegrationAuditVo extends BasePageVo {
 		if (StringUtils.isNotBlank(error)) {
 			this.error += "\n" + error;
 		}
+	}
+
+	public String getRequestFrom() {
+		return requestFrom;
+	}
+
+	public void setRequestFrom(String requestFrom) {
+		this.requestFrom = requestFrom;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

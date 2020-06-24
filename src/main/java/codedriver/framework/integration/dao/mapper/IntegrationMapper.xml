@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
+	<select id="getIntegrationAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT
+		`content`
+		FROM
+		`integration_audit_detail`
+		WHERE hash = #{value}
+	</select>
+
+	<sql id="searchIntegrationAuditCondition">
+		<where>
+			<if test="integrationUuid != null and integrationUuid != ''">
+				AND integration_uuid = #{integrationUuid}
+			</if>
+		</where>
+	</sql>
+
+	<select id="searchIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="codedriver.framework.integration.dto.IntegrationAuditVo">
+		SELECT
+		`id`,
+		`integration_uuid` AS integrationUuid,
+		`user_uuid` AS userUuid,
+		(SELECT user_name FROM user WHERE uuid = user_uuid) AS userName,
+		`request_from` AS requestFrom,
+		`server_id` AS serverId,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`status`,
+		`param_hash` AS paramHash,
+		`result_hash` AS resultHash,
+		`error_hash` AS errorHash,
+		(UNIX_TIMESTAMP(IFNULL(end_time, NOW())) - UNIX_TIMESTAMP(start_time)) AS timeCost
+		FROM
+		`integration_audit`
+		<include refid="searchIntegrationAuditCondition" />
+	</select>
+
+	<select id="searchIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`integration_audit`
+		<include refid="searchIntegrationAuditCondition" />
+	</select>
+
 	<select id="getIntegrationByUuid" parameterType="java.lang.String" resultType="codedriver.framework.integration.dto.IntegrationVo">
 		SELECT
 		`uuid`,
@@ -141,7 +185,6 @@
 		`server_id`,
 		`start_time`,
 		`end_time`,
-		`time_cost`,
 		`status`,
 		`param_hash`,
 		`result_hash`,
@@ -156,7 +199,6 @@
 		#{serverId},
 		#{startTime},
 		#{endTime},
-		#{timeCost},
 		#{status},
 		#{paramHash},
 		#{resultHash},

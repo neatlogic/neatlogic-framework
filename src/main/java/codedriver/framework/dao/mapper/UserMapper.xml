@@ -361,6 +361,15 @@
 		</if>
 	</select>
 
+	<select id="getUserDataByUserUuidAndType" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserDataVo" useCache="false">
+		SELECT
+		`user_uuid` as userUuid,
+		`data` as data,
+		`type` as type
+		FROM `user_data`
+		where `user_uuid` = #{userUuid} and `type` = #{type}
+	</select>
+
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,
@@ -434,6 +443,11 @@
 	<insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
 		INSERT INTO `user_profile` (`user_uuid`, `module_id`, `config`)
 		VALUES (#{userUuid}, #{moduleId}, #{config})
+	</insert>
+
+	<insert id="insertUserData" parameterType="codedriver.framework.dto.UserDataVo">
+		INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
+		VALUES (#{userUuid}, #{data}, #{type})
 	</insert>
 
 	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">

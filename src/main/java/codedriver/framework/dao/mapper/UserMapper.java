@@ -47,6 +47,8 @@ public interface UserMapper {
 	
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
+	public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
@@ -62,6 +64,8 @@ public interface UserMapper {
 	public int insertUserProfile(UserProfileVo userProfileVo);
 
 	public int insertUserSession(String userUuid);
+
+	public int insertUserData(UserDataVo userDataVo);
 
 	public int updateUser(UserVo userVo);
 

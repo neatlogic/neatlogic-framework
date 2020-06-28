@@ -81,7 +81,7 @@ public interface UserMapper {
 
 	public int deleteUserAuthByUserUuid(String userUuid);
 
-	public int deleteUserAuth(UserVo userVo);
+//	public int deleteUserAuth(UserVo userVo);
 
 	public int deleteUserRoleByUserUuid(String userUuid);
 

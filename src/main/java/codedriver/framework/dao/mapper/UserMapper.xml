@@ -532,7 +532,7 @@
 		DELETE FROM `user_authority` WHERE `user_uuid` = #{userUuid}
 	</delete>
 
-	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
+	<!-- <delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
 		DELETE FROM `user_authority`
 		WHERE `user_uuid` = #{uuid}
 		<if test="userAuthList != null and userAuthList.size() > 0">
@@ -541,7 +541,7 @@
 				#{userAuth.auth}
 			</foreach>
 		</if>
-	</delete>
+	</delete> -->
 
 	<delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
 		DELETE FROM `user_session` where `user_uuid` = #{value}
@@ -559,7 +559,7 @@
 		DELETE FROM `user_authority` WHERE `auth` = #{auth}
 	</delete> -->
 
-	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="String">
+	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="string">
 		DELETE FROM `user_profile`
 		where `user_uuid` = #{userUuid}
 		<if test="moduleId !=null and moduleId !=''">

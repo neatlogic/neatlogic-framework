@@ -82,7 +82,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 		if (StringUtils.isBlank(authorization)) {
 			authorization = authorizationFromCookie;
 		}
-		
+
 		if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
 			if (TenantUtil.hasTenant(tenant)) {
 				hasTenant = true;

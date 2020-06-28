@@ -1,11 +1,14 @@
 package codedriver.framework.dto;
 
+import java.util.Random;
+
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.RC4Util;
 
 public class DatasourceVo {
+	private Long tenantId;
 	private String tenantUuid;
 	private String url;
 	private String username;
@@ -17,16 +20,20 @@ public class DatasourceVo {
 
 	}
 
-	public DatasourceVo(String _tenantUuid, boolean generatePwd) {
+	public DatasourceVo(Long _tenantId, String _tenantUuid, boolean generatePwd) {
+		this.tenantId = _tenantId;
 		this.tenantUuid = _tenantUuid;
 		// 生成随机密码
 		if (generatePwd) {
-			this.passwordPlain = "123456";
-			/*
-			 * Random rand = new Random(); String password = ""; for (int i = 0; i < 6; i++)
-			 * { int randNumber = rand.nextInt(126 - 48 + 1) + 48; char c = (char)
-			 * randNumber; password += c; } this.passwordPlain = password;
-			 */
+			// this.passwordPlain = "123456";
+			Random rand = new Random();
+			String password = "";
+			for (int i = 0; i < 6; i++) {
+				int randNumber = rand.nextInt(126 - 48 + 1) + 48;
+				char c = (char) randNumber;
+				password += c;
+			}
+			this.passwordPlain = password;
 		}
 	}
 
@@ -96,6 +103,14 @@ public class DatasourceVo {
 
 	public void setDriver(String driver) {
 		this.driver = driver;
+	}
+
+	public Long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(Long tenantId) {
+		this.tenantId = tenantId;
 	}
 
 }

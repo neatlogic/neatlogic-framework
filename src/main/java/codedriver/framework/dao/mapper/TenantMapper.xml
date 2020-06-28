@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TenantMapper">
 
+	<select id="getTenantAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT
+		`content`
+		FROM
+		`tenant_audit_detail`
+		WHERE
+		`hash` = #{value}
+	</select>
+
 	<select id="getTenantModuleGroupByTenantId" parameterType="java.lang.Long" resultType="java.lang.String">
 		SELECT
 		`module_group` AS moduleGroup
@@ -13,9 +22,9 @@
 
 	<sql id="searchTenantAuditCondition">
 		<where>
-			tenant_uuid = #{tenantUuid}
-			<if test="moduleId != null and moduleId != ''">
-				AND module_id = #{moduleId}
+			tenant_id = #{tenantId}
+			<if test="groupId != null">
+				AND group_id = #{groupId}
 			</if>
 		</where>
 	</sql>
@@ -23,13 +32,16 @@
 	<select id="searchTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo" resultType="codedriver.framework.dto.TenantAuditVo">
 		SELECT
 		`id`,
-		`tenant_uuid` as tenantUuid,
+		`group_id` AS groupId,
+		`tenant_id` as tenantId,
 		`module_id` as moduleId,
+		`module_group` as moduleGroup,
 		`version`,
 		`start_time` as startTime,
 		`end_time` as endTime,
-		`log_path` as logPath,
-		`err_path` as errPath,
+		(UNIX_TIMESTAMP(IFNULL(end_time, NOW(3)))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost,
+		`result_hash` as resultHash,
+		`error_hash` as errorHash,
 		`status`
 		FROM
 		`tenant_audit`
@@ -130,6 +142,7 @@
 		`name`,
 		`is_active`,
 		`expire_date`,
+		`status`,
 		`description`
 		)
 		VALUES
@@ -139,6 +152,7 @@
 		#{name},
 		#{isActive},
 		#{expireDate},
+		#{status},
 		#{description}
 		)
 	</insert>
@@ -152,22 +166,22 @@
 	<insert id="insertTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
 		INSERT INTO `tenant_audit` (
 		`id`,
-		`tenant_uuid`,
+		`tenant_id`,
+		`group_id`,
 		`start_time`,
-		`log_path`,
-		`err_path`,
 		`module_id`,
+		`module_group`,
 		`version`,
 		`status`
 		)
 		VALUES
 		(
 		#{id},
-		#{tenantUuid},
-		NOW(),
-		#{logPath},
-		#{errPath},
+		#{tenantId},
+		#{groupId},
+		NOW(3),
 		#{moduleId},
+		#{moduleGroup},
 		#{version},
 		#{status}
 		)
@@ -179,11 +193,28 @@
 		(#{hash}, #{content})
 	</insert>
 
+	<insert id="insertTenantModule" parameterType="codedriver.framework.dto.TenantModuleVo">
+		INSERT INTO `tenant_module` (
+		`tenant_id`,
+		`module_id`,
+		`fcd`
+		)
+		VALUES
+		(
+		#{tenantId},
+		#{moduleId},
+		NOW()
+		)
+	</insert>
+
 	<update id="updateTenantAudit" parameterType="codedriver.framework.dto.TenantAuditVo">
 		UPDATE
 		`tenant_audit`
 		SET
-		`end_time` = NOW(),
+		`result_hash` = #{resultHash},
+		`error_hash` = #{errorHash},
+		`version` = #{version},
+		`end_time` = NOW(3),
 		`status` = #{status}
 		WHERE `id` = #{id}
 	</update>
@@ -196,7 +227,26 @@
 		`is_active` = #{isActive},
 		`expire_date` = #{expireDate},
 		`description` = #{description}
-		WHERE `uuid` = #{uuid}
+		WHERE `id` = #{id}
+	</update>
+
+	<update id="updateTenantStatus" parameterType="codedriver.framework.dto.TenantVo">
+		UPDATE
+		`tenant`
+		SET
+		`status` = #{status}
+		WHERE `id` = #{id}
+	</update>
+
+	<update id="updateTenantModule" parameterType="codedriver.framework.dto.TenantModuleVo">
+		UPDATE
+		`tenant_module`
+		SET
+		`version` = #{version},
+		`lcd` = NOW()
+		WHERE
+		`tenant_id` = #{tenantId}
+		AND `module_id` = #{moduleId}
 	</update>
 
 	<delete id="deleteTenantModuleGroupByTenantId" parameterType="java.lang.Long">

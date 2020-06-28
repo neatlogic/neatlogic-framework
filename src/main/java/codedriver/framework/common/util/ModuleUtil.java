@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +29,19 @@ public class ModuleUtil {
 		List<ModuleGroupVo> moduleGroupList = new ArrayList<>();
 		Set<String> groupSet = new HashSet<>();
 		for (ModuleVo moduleVo : moduleList) {
-			// master模块不允许用户添加,framework模块必选
-			if (!moduleVo.getId().equals("master") && !moduleVo.getGroup().equals("framework") && !groupSet.contains(moduleVo.getGroup())) {
-				groupSet.add(moduleVo.getGroup());
-				ModuleGroupVo moduleGroup = new ModuleGroupVo();
-				moduleGroup.setGroup(moduleVo.getGroup());
-				moduleGroup.setGroupName(moduleVo.getGroupName());
-				moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
-				moduleGroup.setGroupSort(moduleVo.getGroupSort());
-				moduleGroupList.add(moduleGroup);
+			// master模块不允许用户添加
+			if (!moduleVo.getId().equals("master")) {
+				if (!groupSet.contains(moduleVo.getGroup())) {
+					if (StringUtils.isNotBlank(moduleVo.getGroup()) && StringUtils.isNotBlank(moduleVo.getGroupName()) && StringUtils.isNotBlank(moduleVo.getGroupDescription())) {
+						ModuleGroupVo moduleGroup = new ModuleGroupVo();
+						moduleGroup.setGroup(moduleVo.getGroup());
+						moduleGroup.setGroupName(moduleVo.getGroupName());
+						moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
+						moduleGroup.setGroupSort(moduleVo.getGroupSort());
+						moduleGroupList.add(moduleGroup);
+						groupSet.add(moduleVo.getGroup());
+					}
+				}
 			}
 		}
 		moduleGroupList.sort(new Comparator<ModuleGroupVo>() {

@@ -21,6 +21,14 @@ public class ModuleGroupVo {
 	@EntityField(name = "模块列表", type = ApiParamType.JSONOBJECT)
 	private List<ModuleVo> moduleList;
 
+	public ModuleGroupVo() {
+
+	}
+
+	public ModuleGroupVo(String _group) {
+		group = _group;
+	}
+
 	public String getGroup() {
 		return group;
 	}

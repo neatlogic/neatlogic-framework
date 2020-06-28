@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.common.RootComponent;
 
 @RootComponent
-public class ElasticSearchFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class ElasticSearchFactory extends ApplicationListenerBase {
 	private static Map<String, IElasticSearchHandler> handlerMap = new HashMap<String, IElasticSearchHandler>();
 
 	public static IElasticSearchHandler getHandler(String handler) {
@@ -29,6 +29,12 @@ public class ElasticSearchFactory implements ApplicationListener<ContextRefreshe
 				e.printStackTrace();
 			}
 		}
+
+	}
+
+	@Override
+	protected void myInit() {
+		// TODO Auto-generated method stub
 
 	}
 }

@@ -31,7 +31,7 @@
 		`param_hash` AS paramHash,
 		`result_hash` AS resultHash,
 		`error_hash` AS errorHash,
-		(UNIX_TIMESTAMP(IFNULL(end_time, NOW())) - UNIX_TIMESTAMP(start_time)) AS timeCost
+		(UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
 		FROM
 		`integration_audit`
 		<include refid="searchIntegrationAuditCondition" />

@@ -111,7 +111,7 @@
 	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
 		INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
 		VALUES
-		(#{uuid}, #{roleUuid})
+		(#{userUuid}, #{roleUuid})
 	</insert>
 
 	<insert id="insertRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">

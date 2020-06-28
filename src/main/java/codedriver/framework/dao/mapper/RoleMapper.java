@@ -2,10 +2,11 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import codedriver.framework.dto.AuthVo;
 import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.RoleVo;
-import codedriver.framework.dto.UserVo;
 
 
 public interface RoleMapper {
@@ -30,7 +31,7 @@ public interface RoleMapper {
 
 	public int insertRole(RoleVo roleVo);
 
-	public int insertRoleUser(UserVo userVo);
+	public int insertRoleUser(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
 	public int updateRole(RoleVo roleVo);
 

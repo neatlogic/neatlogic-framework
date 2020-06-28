@@ -1,26 +1,24 @@
 package codedriver.framework.dto;
 
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.constvalue.TeamUserTitle;
 
-
-
-public class TeamUserVo  extends BasePageVo{
-	public static int TYPE_USER;
-	public static int TYPE_MANAGER;
+public class TeamUserVo {
 	
 	private String teamUuid;
+	private String teamName;
 	private String userUuid;
 	private String userName;
-	private String teamName;
-	private int type;
-	List<Long> teamIdList ; 
-	
+	private String userId;
+	private String title;
+	private String titleText;
 	public TeamUserVo() {
 	}
-	public TeamUserVo(List<Long> teamIdList) {
-		this.teamIdList = teamIdList ; 
+
+	public TeamUserVo(String teamUuid, String userUuid) {
+		this.teamUuid = teamUuid;
+		this.userUuid = userUuid;
 	}
 
 	public String getTeamUuid() {
@@ -45,6 +43,14 @@ public class TeamUserVo  extends BasePageVo{
 		this.userName = userName;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	public String getTeamName() {
 		return teamName;
 	}
@@ -53,20 +59,23 @@ public class TeamUserVo  extends BasePageVo{
 		this.teamName = teamName;
 	}
 
-	public int getType() {
-		return type;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public List<Long> getTeamIdList() {
-		return teamIdList;
+	public String getTitleText() {
+		if(StringUtils.isBlank(titleText) && StringUtils.isNotBlank(title)) {
+			titleText = TeamUserTitle.getText(title);
+		}
+		return titleText;
 	}
 
-	public void setTeamIdList(List<Long> teamIdList) {
-		this.teamIdList = teamIdList;
+	public void setTitleText(String titleText) {
+		this.titleText = titleText;
 	}
 	
 }

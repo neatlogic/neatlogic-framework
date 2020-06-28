@@ -9,6 +9,10 @@ import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
 public class TenantVo extends BasePageVo {
+	public enum Status {
+		BUILDING, BUILDED;
+	}
+
 	@EntityField(name = "id", type = ApiParamType.LONG)
 	private Long id;
 	@EntityField(name = "uuid", type = ApiParamType.STRING)
@@ -25,6 +29,8 @@ public class TenantVo extends BasePageVo {
 	private List<ModuleVo> moduleList;
 	@EntityField(name = "激活模块分组", type = ApiParamType.JSONARRAY)
 	private List<ModuleGroupVo> moduleGroupList;
+	@EntityField(name = "状态", type = ApiParamType.STRING)
+	private String status;
 
 	public TenantVo() {
 		this.setPageSize(20);
@@ -95,6 +101,14 @@ public class TenantVo extends BasePageVo {
 
 	public void setModuleGroupList(List<ModuleGroupVo> moduleGroupList) {
 		this.moduleGroupList = moduleGroupList;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

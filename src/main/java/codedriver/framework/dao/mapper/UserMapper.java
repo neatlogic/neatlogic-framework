@@ -15,8 +15,6 @@ public interface UserMapper {
 
 	public UserVo getUserByUuid(String uuid);
 
-//	public List<String> getLeaderUserUuidByTeamIds(@Param("teamUuidIdList") List<String> teamUuidIdList);
-
 	public List<UserVo> searchUser(UserVo userVo);
 
 	public List<UserVo> searchUserByAuth(String auth);

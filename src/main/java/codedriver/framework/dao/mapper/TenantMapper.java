@@ -5,9 +5,12 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.dto.TenantAuditVo;
+import codedriver.framework.dto.TenantModuleVo;
 import codedriver.framework.dto.TenantVo;
 
 public interface TenantMapper {
+
+	public String getTenantAuditDetailByHash(String hash);
 
 	public List<TenantAuditVo> searchTenantAudit(TenantAuditVo tenantAuditVo);
 
@@ -31,11 +34,17 @@ public interface TenantMapper {
 
 	public int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
+	public int insertTenantModule(TenantModuleVo tenantModuleVo);
+
 	public int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
 	public int updateTenant(TenantVo tenantVo);
 
 	public int updateTenantAudit(TenantAuditVo tenantAuditVo);
+
+	public int updateTenantStatus(TenantVo tenantVo);
+
+	public int updateTenantModule(TenantModuleVo tenantModuleVo);
 
 	public int checkTenantUuidIsExists(TenantVo tenantVo);
 

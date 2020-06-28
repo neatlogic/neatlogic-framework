@@ -18,6 +18,7 @@
 
 	<insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
 		INSERT INTO `datasource` (
+		`tenant_id`,
 		`tenant_uuid`,
 		`url`,
 		`username`,
@@ -26,6 +27,7 @@
 		)
 		VALUES
 		(
+		#{tenantId},
 		#{tenantUuid},
 		#{url},
 		#{username},

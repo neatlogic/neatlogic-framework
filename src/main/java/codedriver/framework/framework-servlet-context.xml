@@ -15,20 +15,20 @@
 		http://codedriver.techsure.com/schema/codedriver
 		http://codedriver.techsure.com/schema/codedriver.xsd">
 
-	<codedriver:module id="framework" name="基础框架" groupName="系统管理" group="framework" groupSort="99" groupDescription="修改系统配置"/>
+	<codedriver:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99" groupDescription="基础模块，提供各种基础功能" />
 
 	<context:component-scan base-package="codedriver.framework" />
-	
-	<!-- TODO 临时后端测试页面试用  start-->
+
+	<!-- TODO 临时后端测试页面试用 start -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/views/" />
 		<property name="suffix" value=".jsp" />
 	</bean>
-	
+
 	<mvc:resources mapping="/resources/**" location="classpath:/override_resources/, classpath:/META-INF/override_resources/,  /resources/" />
 	<mvc:resources mapping="/WEB-INF/views/commons/**" location="classpath:/resources/WEB-INF/views/commons/" />
-	<!-- TODO 临时后端测试页面试用  end-->
-	
+	<!-- TODO 临时后端测试页面试用 end -->
+
 	<!-- enable autowire -->
 	<context:annotation-config />
 
@@ -36,10 +36,10 @@
 
 	<!-- <aop:config proxy-target-class="true" /> -->
 	<!-- 启动expost-proxy,expose proxy在threadlocal -->
-	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
+	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false" />
 	<mvc:annotation-driven />
-	
-	
+
+
 
 	<!-- 启动Api方法拦截器 -->
 	<!-- <bean id="AuthApiInterceptor" class="codedriver.framework.auth.core.AuthInterceptor"/> <aop:config proxy-target-class="true"> <aop:pointcut id="apiAction" expression="execution(* codedriver.**.myDoService(..))"/> <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/> </aop:config> -->

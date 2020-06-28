@@ -1,8 +1,8 @@
 package codedriver.framework.integration.core;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -19,6 +19,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +167,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 			}
 
 			// 设置超时时间
+			connection.setConnectTimeout(0);
+			connection.setReadTimeout(0);
 			if (otherConfig != null) {
 				if (otherConfig.containsKey("connectTimeout")) {
 					connection.setConnectTimeout(otherConfig.getIntValue("connectTimeout"));
@@ -185,7 +188,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				}
 			}
 			// 设置默认header
-			connection.setRequestProperty("Content-Type", "application/json; utf-8");
+			connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
 			connection.connect();
 		} catch (Exception e) {
@@ -215,6 +218,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				}
 				try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
 					out.write(content.toString().getBytes("utf-8"));
+					out.flush();
+					out.close();
 					// out.writeBytes(content);
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
@@ -226,19 +231,16 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 			// }
 
 			// 处理返回值
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));) {
+			try {
+				InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "utf-8");
+				StringWriter writer = new StringWriter();
+				IOUtils.copy(reader, writer);
 				int code = connection.getResponseCode();
 				resultVo.setStatusCode(code);
 				if (String.valueOf(code).startsWith("2")) {
-					String lines;
-					while ((lines = reader.readLine()) != null) {
-						resultVo.appendResult(lines);
-					}
+					resultVo.appendResult(writer.toString());
 				} else {
-					String lines;
-					while ((lines = reader.readLine()) != null) {
-						resultVo.appendError(lines);
-					}
+					resultVo.appendError(writer.toString());
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);

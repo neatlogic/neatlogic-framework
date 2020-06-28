@@ -528,9 +528,9 @@
 		DELETE FROM `user` WHERE `uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserAuthByUserUuid" parameterType="java.lang.String">
+	<!-- <delete id="deleteUserAuthByUserUuid" parameterType="java.lang.String">
 		DELETE FROM `user_authority` WHERE `user_uuid` = #{userUuid}
-	</delete>
+	</delete> -->
 
 	<!-- <delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
 		DELETE FROM `user_authority`
@@ -569,10 +569,14 @@
 	
 	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		DELETE FROM `user_authority` 
-		WHERE `auth` = #{auth}
-		<if test="userUuid != null and userUuid != ''">
-		AND `user_uuid` = #{userUuid}
-		</if>
+		<where>
+			<if test="auth != null and auth != ''">
+			AND `auth` = #{auth}
+			</if>
+			<if test="userUuid != null and userUuid != ''">
+			AND `user_uuid` = #{userUuid}
+			</if>
+		</where>
 	</delete>
 </mapper>
 

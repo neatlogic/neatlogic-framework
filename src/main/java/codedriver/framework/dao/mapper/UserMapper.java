@@ -79,7 +79,7 @@ public interface UserMapper {
 
 	public int deleteUserByUuid(String uuid);
 
-	public int deleteUserAuthByUserUuid(String userUuid);
+//	public int deleteUserAuthByUserUuid(String userUuid);
 
 //	public int deleteUserAuth(UserVo userVo);
 

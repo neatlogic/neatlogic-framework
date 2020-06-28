@@ -530,6 +530,12 @@
 		</if>
 	</update>
 
+	<update id="updateUserData" parameterType="codedriver.framework.dto.UserDataVo">
+		UPDATE `user_data`
+		SET `data` = #{data}
+		WHERE `user_uuid` = #{userUuid} and `type` = #{type}
+	</update>
+
 	<delete id="deleteUserPasswordByLimit">
 		DELETE FROM `user_password`
 		WHERE `user_uuid` = #{userUuid}

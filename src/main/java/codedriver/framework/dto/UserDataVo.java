@@ -4,13 +4,13 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class UserDataVo implements Cloneable{
-	@EntityField(name = "个性化所属用户",
+	@EntityField(name = "用户uuid",
 			type = ApiParamType.STRING)
 	private String userUuid;
-	@EntityField(name = "个性化数据",
+	@EntityField(name = "数据",
 			type = ApiParamType.STRING)
 	private String data;
-	@EntityField(name = "类型",
+	@EntityField(name = "功能类型",
 			type = ApiParamType.STRING)
 	private String type;
 

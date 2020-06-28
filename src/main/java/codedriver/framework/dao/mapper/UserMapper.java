@@ -74,7 +74,9 @@ public interface UserMapper {
 	public int updateUserActive(UserVo userVo);
 
 	public int updateUserSession(String userUuid);
-	
+
+	public int updateUserData(UserDataVo userDataVo);
+
 	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId, @Param("config")String config);
 
 	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid,@Param("idList") List<Long> idList);

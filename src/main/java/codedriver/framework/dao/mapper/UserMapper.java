@@ -15,8 +15,6 @@ public interface UserMapper {
 
 	public UserVo getUserByUuid(String uuid);
 
-	public List<String> getLeaderUserUuidByTeamIds(@Param("teamUuidIdList") List<String> teamUuidIdList);
-
 	public List<UserVo> searchUser(UserVo userVo);
 
 	public List<UserVo> searchUserByAuth(String auth);
@@ -46,6 +44,10 @@ public interface UserMapper {
 	public List<AuthVo> getUserCountByAuth();
 	
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
+
+	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
+
+	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

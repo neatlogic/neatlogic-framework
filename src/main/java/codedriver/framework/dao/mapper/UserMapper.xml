@@ -388,6 +388,16 @@
 	</foreach>
 	</select>
 	
+	<select id="checkUserUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String">
+	SELECT
+	DISTINCT `uuid`
+	FROM `user` 
+	WHERE `uuid` IN 
+	<foreach collection="list" item="userUuid" open="(" close=")" separator=",">
+	#{userUuid}
+	</foreach>
+	</select>
+	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,

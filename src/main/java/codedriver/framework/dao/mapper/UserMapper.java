@@ -49,6 +49,8 @@ public interface UserMapper {
 
 	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 
+	public List<String> checkUserUuidListIsExists(List<String> userUuidList);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

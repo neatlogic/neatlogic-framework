@@ -21,6 +21,12 @@ public class TeamUserVo {
 		this.userUuid = userUuid;
 	}
 
+	public TeamUserVo(String teamUuid, String userUuid, String title) {
+		this.teamUuid = teamUuid;
+		this.userUuid = userUuid;
+		this.title = title;
+	}
+
 	public String getTeamUuid() {
 		return teamUuid;
 	}

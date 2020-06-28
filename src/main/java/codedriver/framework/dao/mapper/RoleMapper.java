@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.dto.AuthVo;
 import codedriver.framework.dto.RoleAuthVo;
+import codedriver.framework.dto.RoleUserVo;
 import codedriver.framework.dto.RoleVo;
 
 
@@ -37,17 +38,19 @@ public interface RoleMapper {
 
 	public int deleteRoleAuthByRoleUuid(String roleUuid);
 
-	public int deleteRoleAuth(RoleVo roleVo);
+	public int deleteRoleAuth(RoleAuthVo roleAuthVo);
 
 	public int deleteRoleByUuid(String uuid);
 
 	public int deleteMenuRoleByRoleUuid(String roleUuid);
 
-	public int deleteUserRoleByRoleUuid(String roleUuid);
+//	public int deleteUserRoleByRoleUuid(String roleUuid);
 
 	public int deleteTeamRoleByRoleUuid(String roleUuid);
 
 	public int deleteRoleAuthByAuth(String auth);
+
+	public int deleteRoleUser(RoleUserVo roleUserVo);
 
 
 }

@@ -555,9 +555,9 @@
 		DELETE FROM `user_team` WHERE `user_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserAuthByAuth" parameterType="string">
+	<!-- <delete id="deleteUserAuthByAuth" parameterType="string">
 		DELETE FROM `user_authority` WHERE `auth` = #{auth}
-	</delete>
+	</delete> -->
 
 	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="String">
 		DELETE FROM `user_profile`
@@ -566,6 +566,13 @@
 			and `module_id` = #{moduleId}
 		</if>
 	</delete>
-
+	
+	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
+		DELETE FROM `user_authority` 
+		WHERE `auth` = #{auth}
+		<if test="userUuid != null and userUuid != ''">
+		AND `user_uuid` = #{userUuid}
+		</if>
+	</delete>
 </mapper>
 

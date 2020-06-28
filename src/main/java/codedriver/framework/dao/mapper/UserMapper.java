@@ -89,7 +89,9 @@ public interface UserMapper {
 
 	public int deleteUserTeamByUserUuid(String userUuid);
 
-	public int deleteUserAuthByAuth(String auth);
+//	public int deleteUserAuthByAuth(String auth);
 	
 	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId);
+
+	public int deleteUserAuth(UserAuthVo userAuthVo);
 }

@@ -35,6 +35,10 @@
 		FROM
 		`integration_audit`
 		<include refid="searchIntegrationAuditCondition" />
+		ORDER BY id DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
 	</select>
 
 	<select id="searchIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">

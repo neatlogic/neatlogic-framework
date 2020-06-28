@@ -45,11 +45,11 @@ public interface UserMapper {
 	
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
-	public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
-
 	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
 
 	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
+
+    public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

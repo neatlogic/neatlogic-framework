@@ -111,7 +111,7 @@ public class LoginController {
 				String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
 
 				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
-				authCookie.setPath("/" + tenant);
+				authCookie.setPath("/");
 				String domainName = request.getServerName();
 				if (StringUtils.isNotBlank(domainName)) {
 					String[] ds = domainName.split("\\.");
@@ -121,7 +121,7 @@ public class LoginController {
 					}
 				}
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
-				tenantCookie.setPath("/" + tenant);
+				tenantCookie.setPath("/");
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
 				// 允许跨域携带cookie

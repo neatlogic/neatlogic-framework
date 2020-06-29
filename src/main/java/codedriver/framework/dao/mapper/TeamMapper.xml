@@ -314,7 +314,7 @@
 	
 	<delete id="deleteTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
 	DELETE FROM `user_team` 
-	WHERE `team_uuid` = #{value}
+	WHERE `team_uuid` = #{teamUuid}
 	<if test="userUuid != null and userUuid != ''">
 	AND `user_uuid` = #{userUuid}
 	</if>

@@ -135,10 +135,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
 			}
 			// 清除cookies
-			Cookie authCookie = new Cookie("codedriver_authorization", null);
+			Cookie authCookie = new Cookie("codedriver_authorization", "test");
 			authCookie.setMaxAge(0);
 			authCookie.setPath("/"+tenant);
-			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
+			Cookie tenantCookie = new Cookie("codedriver_tenant", "test");
 			tenantCookie.setMaxAge(0);
 			tenantCookie.setPath("/"+tenant);
 			response.addCookie(authCookie);

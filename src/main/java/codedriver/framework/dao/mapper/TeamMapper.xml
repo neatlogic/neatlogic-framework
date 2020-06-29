@@ -299,10 +299,6 @@
 	<delete id="deleteTeamTagByUuid" parameterType="java.lang.String">
 		DELETE FROM `team_tag` WHERE `team_uuid` = #{uuid}
 	</delete>
-
-	<delete id="deleteUserTeamByTeamUuid" parameterType="java.lang.String">
-		DELETE FROM `user_team` WHERE `team_uuid` = #{value}
-	</delete>
 	
 	<delete id="deleteTeamByLeftRightCode">
 	DELETE a, b, c, d
@@ -310,5 +306,13 @@
 	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
 	WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
+	</delete>
+	
+	<delete id="deleteTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
+	DELETE FROM `user_team` 
+	WHERE `team_uuid` = #{teamUuid}
+	<if test="userUuid != null and userUuid != ''">
+	AND `user_uuid` = #{userUuid}
+	</if>
 	</delete>
 </mapper>

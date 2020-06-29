@@ -12,7 +12,15 @@ public class RoleAuthVo extends BasePageVo {
     @EntityField(name = "权限组", type = ApiParamType.STRING)
     private String authGroup;
 
-    public String getRoleUuid() {
+    public RoleAuthVo() {
+	}
+
+	public RoleAuthVo(String roleUuid, String auth) {
+		this.roleUuid = roleUuid;
+		this.auth = auth;
+	}
+
+	public String getRoleUuid() {
         return roleUuid;
     }
 

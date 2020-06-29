@@ -49,6 +49,8 @@ public interface UserMapper {
 
 	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 
+	public List<String> checkUserUuidListIsExists(List<String> userUuidList);
+
     public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
@@ -83,17 +85,13 @@ public interface UserMapper {
 
 	public int deleteUserByUuid(String uuid);
 
-	public int deleteUserAuthByUserUuid(String userUuid);
-
-	public int deleteUserAuth(UserVo userVo);
-
 	public int deleteUserRoleByUserUuid(String userUuid);
 
 	public int deleteUserSessionByUserUuid(String userUuid);
 
 	public int deleteUserTeamByUserUuid(String userUuid);
-
-	public int deleteUserAuthByAuth(String auth);
 	
 	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId);
+
+	public int deleteUserAuth(UserAuthVo userAuthVo);
 }

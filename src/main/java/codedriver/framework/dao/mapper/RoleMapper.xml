@@ -142,24 +142,22 @@
 		DELETE FROM `role_authority` WHERE `role_uuid` = #{roleUuid}
 	</delete>
 
-	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleVo">
+	<delete id="deleteRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">
 		DELETE
 		FROM `role_authority`
-		WHERE `role_uuid` = #{uuid}
-		<if test="roleAuthList != null and roleAuthList.size > 0">
-			AND `auth` IN
-			<foreach collection="roleAuthList" open="(" separator="," close=")" item="roleAuth">
-				#{roleAuth.auth}
-			</foreach>
-		</if>
+		<where>
+			<if test="roleUuid != null and roleUuid != ''">
+			AND `role_uuid` = #{roleUuid}
+			</if>
+			<if test="auth != null and auth != ''">
+			AND `auth` = #{auth}
+			</if>
+		</where>
+		
 	</delete>
 
 	<delete id="deleteMenuRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE FROM `menu_role` WHERE `role_uuid` = #{value}
-	</delete>
-
-	<delete id="deleteUserRoleByRoleUuid" parameterType="java.lang.String">
-		DELETE FROM `user_role` WHERE `role_uuid` = #{value}
 	</delete>
 
 	<delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
@@ -168,5 +166,13 @@
 
 	<delete id="deleteRoleAuthByAuth" parameterType="string">
 		DELETE FROM `role_authority` WHERE `auth` = #{auth}
+	</delete>
+	
+	<delete id="deleteRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
+		DELETE FROM `user_role` 
+		WHERE `role_uuid` = #{roleUuid}
+		<if test="userUuid != null and userUuid != ''">
+		AND `user_uuid` = #{userUuid}
+		</if>
 	</delete>
 </mapper>

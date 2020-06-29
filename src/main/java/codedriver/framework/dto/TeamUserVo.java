@@ -16,9 +16,19 @@ public class TeamUserVo {
 	public TeamUserVo() {
 	}
 
+	public TeamUserVo(String teamUuid) {
+		this.teamUuid = teamUuid;
+	}
+
 	public TeamUserVo(String teamUuid, String userUuid) {
 		this.teamUuid = teamUuid;
 		this.userUuid = userUuid;
+	}
+
+	public TeamUserVo(String teamUuid, String userUuid, String title) {
+		this.teamUuid = teamUuid;
+		this.userUuid = userUuid;
+		this.title = title;
 	}
 
 	public String getTeamUuid() {

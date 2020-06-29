@@ -172,9 +172,9 @@
 		DELETE FROM `role_authority` WHERE `auth` = #{auth}
 	</delete>
 	
-	<delete id="deleteRoleUser" parameterType="java.lang.String">
+	<delete id="deleteRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
 		DELETE FROM `user_role` 
-		WHERE `role_uuid` = #{value}
+		WHERE `role_uuid` = #{roleUuid}
 		<if test="userUuid != null and userUuid != ''">
 		AND `user_uuid` = #{userUuid}
 		</if>

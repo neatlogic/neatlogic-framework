@@ -68,6 +68,17 @@
 		WHERE a.`uuid` = #{value}
 	</select>
 
+	<select id="getLeaderUserUuidByTeamIds" resultType="java.lang.String" useCache="false">
+		SELECT
+		`user_uuid`
+		FROM `user_team_role`
+		WHERE `role` = 'leader'
+		AND team_uuid IN
+		<foreach collection="teamUuidIdList" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
 	<select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
 		SELECT
 		k.`uuid`,
@@ -351,16 +362,16 @@
 	</select>
 
 	<select id="getUserUuidListByteamUuidList" parameterType="java.util.List" resultType="java.lang.String">
-	SELECT 
-	a.`user_uuid` 
-	FROM user_team a 
+	SELECT
+	a.`user_uuid`
+	FROM user_team a
 	JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
-	WHERE a.`team_uuid` IN 
+	WHERE a.`team_uuid` IN
 	<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
 	#{teamUuid}
 	</foreach>
 	</select>
-	
+
 	<select id="getUserListByUserUuidList" parameterType="java.util.List" resultMap="userInfoMap" useCache="false">
 	SELECT
 	a.`uuid`,
@@ -382,7 +393,7 @@
 	LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
 	LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
 	LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
-	WHERE a.`uuid` IN 
+	WHERE a.`uuid` IN
 	<foreach collection="list" item="userUuid" open="(" close=")" separator=",">
 	#{userUuid}
 	</foreach>
@@ -397,7 +408,16 @@
 	#{userUuid}
 	</foreach>
 	</select>
-	
+
+    <select id="getUserDataByUserUuidAndType" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserDataVo" useCache="false">
+		SELECT
+		`user_uuid` as userUuid,
+		`data` as data,
+		`type` as type
+		FROM `user_data`
+		where `user_uuid` = #{userUuid} and `type` = #{type}
+	</select>
+
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,
@@ -473,6 +493,11 @@
 		VALUES (#{userUuid}, #{moduleId}, #{config})
 	</insert>
 
+	<insert id="insertUserData" parameterType="codedriver.framework.dto.UserDataVo">
+		INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
+		VALUES (#{userUuid}, #{data}, #{type})
+	</insert>
+
 	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
 		UPDATE `user`
 		SET
@@ -513,6 +538,12 @@
 		<if test="moduleId !=null and moduleId !=''">
 			and `module_id` = #{moduleId}
 		</if>
+	</update>
+
+	<update id="updateUserData" parameterType="codedriver.framework.dto.UserDataVo">
+		UPDATE `user_data`
+		SET `data` = #{data}
+		WHERE `user_uuid` = #{userUuid} and `type` = #{type}
 	</update>
 
 	<delete id="deleteUserPasswordByLimit">

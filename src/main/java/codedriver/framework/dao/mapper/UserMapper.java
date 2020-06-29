@@ -51,6 +51,8 @@ public interface UserMapper {
 
 	public List<String> checkUserUuidListIsExists(List<String> userUuidList);
 
+    public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
@@ -67,12 +69,16 @@ public interface UserMapper {
 
 	public int insertUserSession(String userUuid);
 
+	public int insertUserData(UserDataVo userDataVo);
+
 	public int updateUser(UserVo userVo);
 
 	public int updateUserActive(UserVo userVo);
 
 	public int updateUserSession(String userUuid);
-	
+
+	public int updateUserData(UserDataVo userDataVo);
+
 	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId, @Param("config")String config);
 
 	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid,@Param("idList") List<Long> idList);

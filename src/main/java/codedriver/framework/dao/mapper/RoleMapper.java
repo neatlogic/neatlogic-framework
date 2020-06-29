@@ -44,8 +44,6 @@ public interface RoleMapper {
 
 	public int deleteMenuRoleByRoleUuid(String roleUuid);
 
-//	public int deleteUserRoleByRoleUuid(String roleUuid);
-
 	public int deleteTeamRoleByRoleUuid(String roleUuid);
 
 	public int deleteRoleAuthByAuth(String auth);

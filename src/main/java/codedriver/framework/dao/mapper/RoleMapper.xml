@@ -160,10 +160,6 @@
 		DELETE FROM `menu_role` WHERE `role_uuid` = #{value}
 	</delete>
 
-	<!-- <delete id="deleteUserRoleByRoleUuid" parameterType="java.lang.String">
-		DELETE FROM `user_role` WHERE `role_uuid` = #{value}
-	</delete> -->
-
 	<delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
 		DELETE FROM `team_role` WHERE `role_uuid` = #{value}
 	</delete>

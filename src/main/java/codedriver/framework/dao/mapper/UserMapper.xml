@@ -559,21 +559,6 @@
 		DELETE FROM `user` WHERE `uuid` = #{value}
 	</delete>
 
-	<!-- <delete id="deleteUserAuthByUserUuid" parameterType="java.lang.String">
-		DELETE FROM `user_authority` WHERE `user_uuid` = #{userUuid}
-	</delete> -->
-
-	<!-- <delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
-		DELETE FROM `user_authority`
-		WHERE `user_uuid` = #{uuid}
-		<if test="userAuthList != null and userAuthList.size() > 0">
-			AND `auth` IN
-			<foreach collection="userAuthList" open="(" separator="," close=")" item="userAuth">
-				#{userAuth.auth}
-			</foreach>
-		</if>
-	</delete> -->
-
 	<delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
 		DELETE FROM `user_session` where `user_uuid` = #{value}
 	</delete>
@@ -585,10 +570,6 @@
 	<delete id="deleteUserTeamByUserUuid" parameterType="java.lang.String">
 		DELETE FROM `user_team` WHERE `user_uuid` = #{value}
 	</delete>
-
-	<!-- <delete id="deleteUserAuthByAuth" parameterType="string">
-		DELETE FROM `user_authority` WHERE `auth` = #{auth}
-	</delete> -->
 
 	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="string">
 		DELETE FROM `user_profile`

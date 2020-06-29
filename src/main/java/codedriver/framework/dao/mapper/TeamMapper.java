@@ -46,8 +46,6 @@ public interface TeamMapper {
 
 	public int deleteTeamTagByUuid(String uuid);
 
-//	public int deleteUserTeamByTeamUuid(String uuid);
-
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

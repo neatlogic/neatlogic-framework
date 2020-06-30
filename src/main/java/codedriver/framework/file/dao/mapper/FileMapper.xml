@@ -2,18 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.file.dao.mapper.FileMapper">
 
-	<select id="getFileByUuid" parameterType="java.lang.String" resultType="codedriver.framework.file.dto.FileVo">
+	<select id="getFileById" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
 		SELECT
-		`uuid`,
+		`id`,
 		`name`,
 		`size`,
 		`user_uuid` AS userUuid,
 		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
 		`type`,
-		content_type AS contentType
+		content_type AS contentType,
+		`path`
 		FROM
 		`file`
-		WHERE `uuid` = #{value}
+		WHERE `id` = #{value}
 	</select>
 
 	<select id="getFileTypeConfigByType" parameterType="java.lang.String" resultType="codedriver.framework.file.dto.FileTypeVo">
@@ -27,23 +28,25 @@
 
 	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
 		INSERT INTO `file` (
-		`uuid`,
+		`id`,
 		`name`,
 		`size`,
 		`user_uuid`,
 		`upload_time`,
 		`type`,
-		content_type
+		`content_type`,
+		`path`
 		)
 		VALUES
 		(
-		#{uuid},
+		#{id},
 		#{name},
 		#{size},
 		#{userUuid},
 		NOW(),
 		#{type},
-		#{contentType}
+		#{contentType},
+		#{path}
 		)
 	</insert>
 </mapper>

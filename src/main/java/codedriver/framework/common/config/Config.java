@@ -1,6 +1,7 @@
 package codedriver.framework.common.config;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -90,6 +91,9 @@ public class Config {
 	}
 
 	public static final String DATA_HOME() {
+		if (!DATA_HOME.endsWith(File.separator)) {
+			DATA_HOME += File.separator;
+		}
 		return DATA_HOME;
 	}
 
@@ -136,7 +140,7 @@ public class Config {
 			if (StringUtils.isNotBlank(configInfo)) {
 				prop.load(new ByteArrayInputStream(configInfo.getBytes()));
 			} else {
-				//如果从nacos中读不出配置，则使用本地配置文件配置
+				// 如果从nacos中读不出配置，则使用本地配置文件配置
 				prop.load(new InputStreamReader(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE), "UTF-8"));
 			}
 			DATA_HOME = prop.getProperty("data.home", "/app/data");

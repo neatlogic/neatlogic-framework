@@ -1,15 +1,14 @@
 package codedriver.framework.file.dto;
 
-import java.util.UUID;
-
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 public class FileVo {
-	@EntityField(name = "附件uuid", type = ApiParamType.STRING)
-	private String uuid;
+	@EntityField(name = "附件id", type = ApiParamType.LONG)
+	private Long id;
 	@EntityField(name = "附件保存路径", type = ApiParamType.STRING)
 	private String path;
 	@EntityField(name = "附件名称", type = ApiParamType.STRING)
@@ -27,15 +26,15 @@ public class FileVo {
 	@EntityField(name = "内容类型", type = ApiParamType.STRING)
 	private String contentType;
 
-	public String getUuid() {
-		if (StringUtils.isBlank(uuid)) {
-			uuid = UUID.randomUUID().toString().replace("-", "");
+	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
 		}
-		return uuid;
+		return id;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getPath() {

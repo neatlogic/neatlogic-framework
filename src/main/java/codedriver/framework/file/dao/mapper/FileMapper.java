@@ -4,7 +4,7 @@ import codedriver.framework.file.dto.FileTypeVo;
 import codedriver.framework.file.dto.FileVo;
 
 public interface FileMapper {
-	public FileVo getFileByUuid(String uuid);
+	public FileVo getFileById(Long id);
 
 	public FileTypeVo getFileTypeConfigByType(String name);
 

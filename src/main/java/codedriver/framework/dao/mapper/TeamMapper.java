@@ -46,8 +46,6 @@ public interface TeamMapper {
 
 	public int deleteTeamTagByUuid(String uuid);
 
-	public int deleteUserTeamByTeamUuid(String uuid);
-
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);
@@ -69,4 +67,6 @@ public interface TeamMapper {
 	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 
 	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
+
+	public int deleteTeamUser(TeamUserVo teamUserVo);
 }

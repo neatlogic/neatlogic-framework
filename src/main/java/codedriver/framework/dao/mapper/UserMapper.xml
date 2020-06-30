@@ -398,6 +398,16 @@
 	#{userUuid}
 	</foreach>
 	</select>
+	
+	<select id="checkUserUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String">
+	SELECT
+	DISTINCT `uuid`
+	FROM `user` 
+	WHERE `uuid` IN 
+	<foreach collection="list" item="userUuid" open="(" close=")" separator=",">
+	#{userUuid}
+	</foreach>
+	</select>
 
     <select id="getUserDataByUserUuidAndType" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserDataVo" useCache="false">
 		SELECT
@@ -549,21 +559,6 @@
 		DELETE FROM `user` WHERE `uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserAuthByUserUuid" parameterType="java.lang.String">
-		DELETE FROM `user_authority` WHERE `user_uuid` = #{userUuid}
-	</delete>
-
-	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserVo">
-		DELETE FROM `user_authority`
-		WHERE `user_uuid` = #{uuid}
-		<if test="userAuthList != null and userAuthList.size() > 0">
-			AND `auth` IN
-			<foreach collection="userAuthList" open="(" separator="," close=")" item="userAuth">
-				#{userAuth.auth}
-			</foreach>
-		</if>
-	</delete>
-
 	<delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
 		DELETE FROM `user_session` where `user_uuid` = #{value}
 	</delete>
@@ -576,17 +571,24 @@
 		DELETE FROM `user_team` WHERE `user_uuid` = #{value}
 	</delete>
 
-	<delete id="deleteUserAuthByAuth" parameterType="string">
-		DELETE FROM `user_authority` WHERE `auth` = #{auth}
-	</delete>
-
-	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="String">
+	<delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="string">
 		DELETE FROM `user_profile`
 		where `user_uuid` = #{userUuid}
 		<if test="moduleId !=null and moduleId !=''">
 			and `module_id` = #{moduleId}
 		</if>
 	</delete>
-
+	
+	<delete id="deleteUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
+		DELETE FROM `user_authority` 
+		<where>
+			<if test="auth != null and auth != ''">
+			AND `auth` = #{auth}
+			</if>
+			<if test="userUuid != null and userUuid != ''">
+			AND `user_uuid` = #{userUuid}
+			</if>
+		</where>
+	</delete>
 </mapper>
 

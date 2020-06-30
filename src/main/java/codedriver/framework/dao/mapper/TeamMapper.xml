@@ -301,7 +301,7 @@
 	</delete>
 	
 	<delete id="deleteTeamByLeftRightCode">
-	DELETE a, b, c, d
+	DELETE a, b, c
 	FROM `team` a
 	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
 	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`

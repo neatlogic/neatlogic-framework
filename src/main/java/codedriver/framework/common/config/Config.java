@@ -3,6 +3,7 @@ package codedriver.framework.common.config;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -132,7 +133,12 @@ public class Config {
 	private static void loadNacosProperties(String configInfo) {
 		try {
 			Properties prop = new Properties();
-			prop.load(new ByteArrayInputStream(configInfo.getBytes()));
+			if (StringUtils.isNotBlank(configInfo)) {
+				prop.load(new ByteArrayInputStream(configInfo.getBytes()));
+			} else {
+				//如果从nacos中读不出配置，则使用本地配置文件配置
+				prop.load(new InputStreamReader(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE), "UTF-8"));
+			}
 			DATA_HOME = prop.getProperty("data.home", "/app/data");
 			SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
 			SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));

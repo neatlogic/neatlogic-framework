@@ -121,7 +121,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
-			if (!hasTenant) {
+			if(StringUtils.isBlank(authorization)) {
+				response.setStatus(522);
+				redirectObj.put("Status", "FAILED");
+				redirectObj.put("Message", "没有找到认证信息，请登录");
+			}else if (!hasTenant) {
 				response.setStatus(521);
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");

@@ -137,10 +137,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			// 清除cookies
 			Cookie authCookie = new Cookie("codedriver_authorization", null);
 			authCookie.setMaxAge(0);
-			authCookie.setPath("/");
+			authCookie.setPath("/"+tenant);
 			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
 			tenantCookie.setMaxAge(0);
-			tenantCookie.setPath("/");
+			tenantCookie.setPath("/"+tenant);
 			response.addCookie(authCookie);
 			response.addCookie(tenantCookie);
 			response.setContentType(Config.RESPONSE_TYPE_JSON);

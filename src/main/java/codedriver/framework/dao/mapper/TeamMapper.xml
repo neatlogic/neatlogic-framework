@@ -218,6 +218,7 @@
 	FROM `user_team` a
 	JOIN `user` b ON b.`uuid`=a.`user_uuid`
 	WHERE a.`team_uuid` = #{value}
+	ORDER BY a.`id`
 	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

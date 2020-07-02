@@ -196,7 +196,12 @@ public class NotifyVo {
 			data.put(key, value);
 			return this;
 		}
-
+		
+		public Builder addAllData(JSONObject dataObj) {
+			data.putAll(dataObj);
+			return this;
+		}
+		
 		public NotifyVo build() {
 			return new NotifyVo(this);
 		}

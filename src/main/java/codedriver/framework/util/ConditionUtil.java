@@ -88,6 +88,12 @@ public class ConditionUtil {
 				}else {
 					return curentValueList.get(0).compareTo(targetValueList.get(0)) < 0 ? true : false;
 				}
+			case ISNULL:
+				if(CollectionUtils.isEmpty(curentValueList)) {
+					return true;
+				}else {
+					return false;
+				}
 			default : 
 				return false;
 		}

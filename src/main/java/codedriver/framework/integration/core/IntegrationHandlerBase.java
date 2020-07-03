@@ -43,6 +43,7 @@ import codedriver.framework.integration.dto.PatternVo;
 import codedriver.framework.param.validate.core.ParamValidatorBase;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.util.FreemarkerUtil;
+import codedriver.framework.util.JavascriptUtil;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 	static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
@@ -205,7 +206,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				// 内容不为空代表需要通过freemarker转换
 				if (StringUtils.isNotBlank(content)) {
 					try {
-						content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+						//content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+						content = JavascriptUtil.transform(integrationVo.getParamObj(), content);
 						resultVo.setTransformedParam(content);
 					} catch (Exception ex) {
 						logger.error(ex.getMessage(), ex);
@@ -254,9 +256,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				if (StringUtils.isNotBlank(content)) {
 					try {
 						if (resultVo.getRawResult().startsWith("{")) {
-							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONObject.parseObject(resultVo.getRawResult()), content));
+							resultVo.setTransformedResult(JavascriptUtil.transform(JSONObject.parseObject(resultVo.getRawResult()), content));
 						} else if (resultVo.getRawResult().startsWith("[")) {
-							resultVo.setTransformedResult(FreemarkerUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
+							resultVo.setTransformedResult(JavascriptUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
 						}
 					} catch (Exception ex) {
 						logger.error(ex.getMessage(), ex);

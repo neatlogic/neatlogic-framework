@@ -1,7 +1,15 @@
 package codedriver.framework.notify.dto;
-
+/**
+ * 
+* @Author:14378
+* @Time:2020年7月3日
+* @ClassName: NotifyReceiverVo 
+* @Description: 通知接收对象
+ */
 public class NotifyReceiverVo {
+	/** 对象类型，用户、组、角色 **/
 	private String type;
+	/** 对象uuid **/
 	private String uuid;
 	public NotifyReceiverVo() {
 	}

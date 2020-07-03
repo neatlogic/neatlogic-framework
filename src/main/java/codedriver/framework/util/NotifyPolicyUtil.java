@@ -45,26 +45,31 @@ public class NotifyPolicyUtil {
 	 */
 	public static void execute(JSONObject policyConfig, List<ParamMappingVo> paramMappingList, INotifyTriggerType notifyTriggerType, JSONObject templateParamData, JSONObject conditionParamData, Map<String, List<NotifyReceiverVo>> receiverMap) {
 		if (MapUtils.isNotEmpty(policyConfig)) {
+			/** 异常通知用户uuid列表 **/
 			List<String> adminUserUuidList = JSON.parseArray(policyConfig.getJSONArray("adminUserUuidList").toJSONString(), String.class);
+			/** 触发动作列表 **/
 			JSONArray triggerList = policyConfig.getJSONArray("triggerList");
 			for (int i = 0; i < triggerList.size(); i++) {
 				JSONObject triggerObj = triggerList.getJSONObject(i);
+				/** 找到要触发类型对应的信息**/
 				if (notifyTriggerType.getTrigger().equalsIgnoreCase(triggerObj.getString("trigger"))) {
+					/** 通知列表 **/
 					JSONArray notifyList = triggerObj.getJSONArray("notifyList");
 					if (CollectionUtils.isNotEmpty(notifyList)) {
 						Map<Long, NotifyTemplateVo> templateMap = new HashMap<>();
+						/** 模板列表 **/
 						List<NotifyTemplateVo> templateList = JSON.parseArray(policyConfig.getJSONArray("templateList").toJSONString(), NotifyTemplateVo.class);
 						for (NotifyTemplateVo notifyTemplateVo : templateList) {
 							templateMap.put(notifyTemplateVo.getId(), notifyTemplateVo);
 						}
 						for (int j = 0; j < notifyList.size(); j++) {
 							JSONObject notifyObj = notifyList.getJSONObject(j);
+							/** 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
 							JSONObject conditionConfig = notifyObj.getJSONObject("conditionConfig");
 							if (MapUtils.isNotEmpty(conditionConfig)) {
 								JSONArray conditionGroupList = conditionConfig.getJSONArray("conditionGroupList");
 								if (CollectionUtils.isNotEmpty(conditionGroupList)) {
-//									JSONObject processFieldData = ProcessTaskUtil.getProcessFieldData(processTaskVo, true);
-									// 参数映射
+									/** 参数映射 **/
 									if (CollectionUtils.isNotEmpty(paramMappingList)) {
 										for (ParamMappingVo paramMappingVo : paramMappingList) {
 											if ("constant".equals(paramMappingVo.getType())) {
@@ -87,8 +92,10 @@ public class NotifyPolicyUtil {
 									try {
 										ConditionParamContext.init(conditionParamData);
 										ConditionConfigVo conditionConfigVo = new ConditionConfigVo(conditionConfig);
+										/** 解析条件表达式，生成javascript脚本，如(true&&false)&&(false||true)||(false||true) **/
 										String script = conditionConfigVo.buildScript();
 										// System.out.println(script);
+										/** 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
 										if (!RunScriptUtil.runScript(script)) {
 											continue;
 										}
@@ -99,9 +106,11 @@ public class NotifyPolicyUtil {
 									}
 								}
 							}
+							/** 通知动作列表 **/
 							JSONArray actionList = notifyObj.getJSONArray("actionList");
 							for (int k = 0; k < actionList.size(); k++) {
 								JSONObject actionObj = actionList.getJSONObject(k);
+								/** 接收人列表**/
 								List<String> receiverList = JSON.parseArray(actionObj.getJSONArray("receiverList").toJSONString(), String.class);
 								if (CollectionUtils.isNotEmpty(receiverList)) {
 									String notifyHandler = actionObj.getString("notifyHandler");
@@ -110,9 +119,11 @@ public class NotifyPolicyUtil {
 										throw new NotifyHandlerNotFoundException(notifyHandler);
 									}
 									NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType);
+									/** 设置异常通知接收人 **/
 									if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
 										notifyBuilder.setExceptionNotifyUserUuidList(adminUserUuidList);
 									}
+									/** 设置通知模板 **/
 									Long templateId = actionObj.getLong("templateId");
 									if (templateId != null) {
 										NotifyTemplateVo notifyTemplateVo = templateMap.get(templateId);
@@ -122,9 +133,8 @@ public class NotifyPolicyUtil {
 										}
 									}
 									/** 注入流程作业信息 不够将来再补充 **/
-//									JSONObject processFieldData = ProcessTaskUtil.getProcessFieldData(processTaskVo, false);
 									notifyBuilder.addAllData(templateParamData);
-									// 参数映射
+									/** 参数映射 **/
 									if (CollectionUtils.isNotEmpty(paramMappingList)) {
 										for (ParamMappingVo paramMappingVo : paramMappingList) {
 											if ("constant".equals(paramMappingVo.getType())) {
@@ -144,6 +154,8 @@ public class NotifyPolicyUtil {
 										}
 									}
 									/** 注入结束 **/
+									
+									/** 设置正常接收人 **/
 									for (String receiver : receiverList) {
 										String[] split = receiver.split("#");
 										if (GroupSearch.USER.getValue().equals(split[0])) {
@@ -168,6 +180,7 @@ public class NotifyPolicyUtil {
 										}
 									}
 									NotifyVo notifyVo = notifyBuilder.build();
+									/** 发送通知 **/
 									handler.execute(notifyVo);
 								}
 							}

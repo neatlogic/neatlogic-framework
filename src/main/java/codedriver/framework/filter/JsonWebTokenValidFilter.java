@@ -121,7 +121,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} else {
 			JSONObject redirectObj = new JSONObject();
-			if (!hasTenant) {
+			if(StringUtils.isBlank(authorization)) {
+				response.setStatus(522);
+				redirectObj.put("Status", "FAILED");
+				redirectObj.put("Message", "没有找到认证信息，请登录");
+			}else if (!hasTenant) {
 				response.setStatus(521);
 				redirectObj.put("Status", "FAILED");
 				redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
@@ -137,10 +141,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 			// 清除cookies
 			Cookie authCookie = new Cookie("codedriver_authorization", null);
 			authCookie.setMaxAge(0);
-			authCookie.setPath("/");
+			authCookie.setPath("/"+tenant);
 			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
 			tenantCookie.setMaxAge(0);
-			tenantCookie.setPath("/");
+			tenantCookie.setPath("/"+tenant);
 			response.addCookie(authCookie);
 			response.addCookie(tenantCookie);
 			response.setContentType(Config.RESPONSE_TYPE_JSON);

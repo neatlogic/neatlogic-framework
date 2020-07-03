@@ -1,7 +1,13 @@
 package codedriver.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONObject;
-
+/**
+ * 
+* @Author:14378
+* @Time:2020年7月3日
+* @ClassName: SystemUser 
+* @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
+ */
 public enum SystemUser {
 	SYSTEM("system","system","system");
 	private String userId;

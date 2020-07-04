@@ -53,6 +53,10 @@ public interface UserMapper {
 
     public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
 
+	public List<String> getRoleUuidListByUserUuid(String userUuid);
+
+	public List<String> getTeamUuidListByUserUuid(String userUuid);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

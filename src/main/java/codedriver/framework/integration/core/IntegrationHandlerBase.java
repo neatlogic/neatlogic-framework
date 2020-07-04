@@ -42,7 +42,6 @@ import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
 import codedriver.framework.param.validate.core.ParamValidatorBase;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
-import codedriver.framework.util.FreemarkerUtil;
 import codedriver.framework.util.JavascriptUtil;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {

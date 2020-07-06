@@ -205,7 +205,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				// 内容不为空代表需要通过freemarker转换
 				if (StringUtils.isNotBlank(content)) {
 					try {
-						//content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
+						// content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
 						content = JavascriptUtil.transform(integrationVo.getParamObj(), content);
 						resultVo.setTransformedParam(content);
 					} catch (Exception ex) {
@@ -249,7 +249,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				integrationAuditVo.appendError(e.getMessage());
 				integrationAuditVo.setStatus("failed");
 			}
-
+			boolean hasTransferd = false;
 			if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
 				String content = outputConfig.getString("content");
 				if (StringUtils.isNotBlank(content)) {
@@ -259,6 +259,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 						} else if (resultVo.getRawResult().startsWith("[")) {
 							resultVo.setTransformedResult(JavascriptUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
 						}
+						hasTransferd = true;
 					} catch (Exception ex) {
 						logger.error(ex.getMessage(), ex);
 						resultVo.appendError(ex.getMessage());
@@ -266,6 +267,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 						integrationAuditVo.setStatus("failed");
 					}
 				}
+			}
+			if (!hasTransferd) {
+				resultVo.setTransformedResult(resultVo.getRawResult());
 			}
 
 			integrationAuditVo.setResult(resultVo.getRawResult());

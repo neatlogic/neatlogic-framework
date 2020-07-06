@@ -181,7 +181,11 @@ public class IntegrationAuditVo extends BasePageVo {
 
 	public void appendError(String error) {
 		if (StringUtils.isNotBlank(error)) {
-			this.error += "\n" + error;
+			if (StringUtils.isNotBlank(this.error)) {
+				this.error += "\n" + error;
+			} else {
+				this.error = error;
+			}
 		}
 	}
 

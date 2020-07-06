@@ -418,6 +418,14 @@
 		where `user_uuid` = #{userUuid} and `type` = #{type}
 	</select>
 
+	<select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
+	SELECT `role_uuid` FROM `user_role` WHERE `user_uuid` = #{value}
+	</select>
+
+	<select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
+	SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
+	</select>
+	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,

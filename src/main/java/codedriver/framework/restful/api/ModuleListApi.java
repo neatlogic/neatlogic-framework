@@ -20,12 +20,10 @@ import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
-import codedriver.framework.restful.annotation.IsActived;
 import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.annotation.Param;
 import codedriver.framework.restful.core.ApiComponentBase;
 
-@IsActived
 @Service
 public class ModuleListApi extends ApiComponentBase {
 	@Autowired

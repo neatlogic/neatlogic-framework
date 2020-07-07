@@ -21,6 +21,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 	public int needAudit() {
 		return 0;
 	}
+	
 
 	public final Object doService(ApiVo apiVo, JSONObject paramObj) throws Exception {
 		String error = "";

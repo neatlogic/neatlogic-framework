@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -22,7 +21,6 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.restful.annotation.IsActived;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -133,12 +131,13 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandler(component.getClassName());
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActived.class) != null) {
-						apiVo.setIsActive(1);
-					} else {
-						apiVo.setIsActive(0);
-					}
+//					Class<?> targetClass = AopUtils.getTargetClass(component);
+//					if (targetClass.getAnnotation(IsActived.class) != null) {
+//						apiVo.setIsActive(1);
+//					} else {
+//						apiVo.setIsActive(0);
+//					}
+					apiVo.setIsActive(1);
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
@@ -201,12 +200,13 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandler(component.getId());
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActived.class) != null) {
-						apiVo.setIsActive(1);
-					} else {
-						apiVo.setIsActive(0);
-					}
+//					Class<?> targetClass = AopUtils.getTargetClass(component);
+//					if (targetClass.getAnnotation(IsActived.class) != null) {
+//						apiVo.setIsActive(1);
+//					} else {
+//						apiVo.setIsActive(0);
+//					}
+					apiVo.setIsActive(1);
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
@@ -268,12 +268,13 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setHandler(component.getId());
 					apiVo.setHandlerName(component.getName());
 					apiVo.setName(component.getName());
-					Class<?> targetClass = AopUtils.getTargetClass(component);
-					if (targetClass.getAnnotation(IsActived.class) != null) {
-						apiVo.setIsActive(1);
-					} else {
-						apiVo.setIsActive(0);
-					}
+//					Class<?> targetClass = AopUtils.getTargetClass(component);
+//					if (targetClass.getAnnotation(IsActived.class) != null) {
+//						apiVo.setIsActive(1);
+//					} else {
+//						apiVo.setIsActive(0);
+//					}
+					apiVo.setIsActive(1);
 					apiVo.setNeedAudit(component.needAudit());
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());

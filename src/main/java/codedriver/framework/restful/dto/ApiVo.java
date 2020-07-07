@@ -46,6 +46,35 @@ public class ApiVo extends BasePageVo implements Serializable {
 		}
 	}
 
+	public enum ApiType {
+		SYSTEM("system", "系统接口"), CUSTOM("custom", "自定义接口");
+
+		private String name;
+		private String text;
+
+		private ApiType(String _name, String _text) {
+			this.name = _name;
+			this.text = _text;
+		}
+
+		public String getValue() {
+			return name;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public static String getText(String name) {
+			for (ApiType s : ApiType.values()) {
+				if (s.getValue().equals(name)) {
+					return s.getText();
+				}
+			}
+			return "";
+		}
+	}
+
 	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
 	@EntityField(name = "处理器", type = ApiParamType.STRING)
@@ -88,6 +117,10 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private Integer isDeletable = 1;
 	@EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
 	private Boolean isPrivate;
+	@EntityField(name = "接口类型(系统接口-system，自定义接口-custom)", type = ApiParamType.STRING)
+	private String apiType;
+	@EntityField(name = "功能ID(从token中截取第一个单词而来)", type = ApiParamType.STRING)
+	private String funcId;
 	@JSONField(serialize = false)
 	private transient JSONObject pathVariableObj;
 	@JSONField(serialize = false)
@@ -354,6 +387,22 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public void setIsPrivate(Boolean isPrivate) {
 		this.isPrivate = isPrivate;
+	}
+
+	public String getApiType() {
+		return apiType;
+	}
+
+	public void setApiType(String apiType) {
+		this.apiType = apiType;
+	}
+
+	public String getFuncId() {
+		return funcId;
+	}
+
+	public void setFuncId(String funcId) {
+		this.funcId = funcId;
 	}
 
 	@Override

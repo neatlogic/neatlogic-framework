@@ -13,6 +13,8 @@ public interface ApiMapper {
 
 	public List<String> getApiTokenList(ApiVo apiVo);
 
+	public List<ApiVo> getAllApi();
+
 	public List<ApiVo> getApiListByTokenList(List<String> tokenList);
 
 	public int getApiAuditCount(ApiAuditVo apiAuditVo);
@@ -20,6 +22,8 @@ public interface ApiMapper {
 	public List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
 
 	public List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
+
+	public String getApiAuditDetailByHash(String hash);
 
 	public int replaceApi(ApiVo apiVo);
 

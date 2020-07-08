@@ -225,8 +225,8 @@
 		SELECT max(rht) as `rht` FROM `team`
 	</select>
 
-	<select id="getTeamCount" resultType="int" useCache="false">
-		SELECT count(1) FROM `team`
+	<select id="getTeamCountOnLock" resultType="int" useCache="false">
+		SELECT count(1) FROM `team` FOR UPDATE
 	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

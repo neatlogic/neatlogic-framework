@@ -46,7 +46,7 @@ public interface TeamMapper {
 
 	public TeamVo getMaxRhtCode();
 
-	public int getTeamCount();
+	public int getTeamCountOnLock();
 
 	public int deleteTeamTagByUuid(String uuid);
 

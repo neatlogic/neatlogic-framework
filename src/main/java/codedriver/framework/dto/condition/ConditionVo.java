@@ -20,13 +20,13 @@ public class ConditionVo implements Serializable{
 	
 	private String uuid;
 	private String name;
-	private String displayName;
+//	private String displayName;
 	private String type;
 	private String handler;
-	private JSONObject config;
-	private Integer sort;
+//	private JSONObject config;
+//	private Integer sort;
 	private String expression;
-	private List<String> valueList;
+	private Object valueList;
 	
 	public ConditionVo() {
 		super();
@@ -44,10 +44,9 @@ public class ConditionVo implements Serializable{
 				values = values.replaceAll(GroupSearch.COMMON.getValuePlugin()+UserType.LOGIN_USER.getValue(), GroupSearch.USER.getValuePlugin()+UserContext.get().getUserUuid());
 			}
 			if(values.startsWith("[") && values.endsWith("]")) {
-				this.valueList = JSON.parseArray(values, String.class);
+				this.valueList = JSON.parseArray(jsonObj.getJSONArray("valueList").toJSONString(), String.class);
 			}else {
-				this.valueList = new ArrayList<>();
-				this.valueList.add(values);
+				this.valueList = values;
 			}
 		}				
 	}
@@ -68,13 +67,13 @@ public class ConditionVo implements Serializable{
 		this.name = name;
 	}
 
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
+//	public String getDisplayName() {
+//		return displayName;
+//	}
+//
+//	public void setDisplayName(String displayName) {
+//		this.displayName = displayName;
+//	}
 
 	public String getType() {
 		return type;
@@ -92,21 +91,21 @@ public class ConditionVo implements Serializable{
 		this.handler = handler;
 	}
 
-	public JSONObject getConfig() {
-		return config;
-	}
+//	public JSONObject getConfig() {
+//		return config;
+//	}
+//
+//	public void setConfig(JSONObject config) {
+//		this.config = config;
+//	}
 
-	public void setConfig(JSONObject config) {
-		this.config = config;
-	}
-
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
+//	public Integer getSort() {
+//		return sort;
+//	}
+//
+//	public void setSort(Integer sort) {
+//		this.sort = sort;
+//	}
 
 	public String getExpression() {
 		return expression;
@@ -116,11 +115,11 @@ public class ConditionVo implements Serializable{
 		this.expression = expression;
 	}
 
-	public List<String> getValueList() {
+	public Object getValueList() {
 		return valueList;
 	}
 
-	public void setValueList(List<String> valueList) {
+	public void setValueList(Object valueList) {
 		this.valueList = valueList;
 	}
 
@@ -141,10 +140,16 @@ public class ConditionVo implements Serializable{
 			}
 		}
 		List<String> targetValueList = new ArrayList<>();
-		for(String value : valueList) {
-			targetValueList.add(GroupSearch.removePrefix(value));
+		if(valueList instanceof String) {
+			targetValueList.add(GroupSearch.removePrefix((String)valueList));
+		}else if(valueList instanceof List){
+			List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
+			for(String value : values) {
+				targetValueList.add(GroupSearch.removePrefix(value));
+			}
 		}
-		return ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+		boolean result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+		return result;
 	}
 	
 }

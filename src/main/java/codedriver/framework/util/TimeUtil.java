@@ -57,7 +57,7 @@ public class TimeUtil {
         return format.format(new Date());
     }
     
-    public static Date getDateByHourMinute(String hourMinute) {
+    public static Date getDateByHourMinute(String hourMinute,Integer addDays) {
     	SimpleDateFormat  df = new SimpleDateFormat(TIME3_FORMAT);
     	SimpleDateFormat format = new SimpleDateFormat(TIME2_FORMAT);
     	try {
@@ -71,7 +71,7 @@ public class TimeUtil {
     	Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR); 
         int month = calendar.get(Calendar.MONTH)+1;   
-        int day = calendar.get(Calendar.DAY_OF_MONTH); 
+        int day = calendar.get(Calendar.DAY_OF_MONTH)+addDays; 
         try {
 			return format.parse(String.format("%d-%d-%d %s", year,month,day,hourMinute));
 		} catch (ParseException e) {
@@ -79,4 +79,44 @@ public class TimeUtil {
 		}
         return null;
     }
+    
+    /**
+	 * 比较执行时间窗口
+	 * @param startTime
+	 * @param endTime
+	 * @return 0:在时间窗口之内，1:大于时间窗口，-1:小于时间窗口
+	 */
+	public static int isInTime(String startTimeStr,String endTimeStr) {
+		if(StringUtils.isBlank(startTimeStr)&&StringUtils.isBlank(endTimeStr)) {//如果没有设置时间窗口
+			return 0;
+		}
+		Date nowTime =null;
+	    Date startTime = null;
+	    Date endTime = null;
+	    SimpleDateFormat  df = new SimpleDateFormat("H:mm");
+		try {
+			nowTime = df.parse(df.format(new Date()));
+			startTime =df.parse(startTimeStr);
+			endTime = df.parse(endTimeStr);
+		}catch(ParseException e) {
+			//时间格式不对，默认符合时间
+			return 0;
+		}
+		Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(startTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.after(begin) && date.before(end)) {
+            return 0;
+        }else if(date.after(end)){
+        	return 1;
+        }else{
+            return -1;
+        }
+	}
 }

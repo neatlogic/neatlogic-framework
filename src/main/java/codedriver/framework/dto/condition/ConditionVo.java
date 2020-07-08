@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -11,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.constvalue.UserType;
 import codedriver.framework.util.ConditionUtil;
@@ -124,31 +126,39 @@ public class ConditionVo implements Serializable{
 	}
 
 	public boolean predicate() {
-		Object paramValue = null;
-		List<String> curentValueList = new ArrayList<>();
+		boolean result = false;
 		ConditionParamContext context = ConditionParamContext.get();
 		if(context != null) {
+			List<String> curentValueList = new ArrayList<>();
 			JSONObject paramData = context.getParamData();
-			paramValue = paramData.get(this.name);
-		}
-		if(paramValue != null) {
-			String value = paramValue.toString();
-			if(value.startsWith("[") && value.endsWith("]")) {
-				curentValueList = JSON.parseArray(value, String.class);
-			}else {
-				curentValueList.add(value);
+			Object paramValue = paramData.get(this.name);
+			if(paramValue != null) {
+				String value = paramValue.toString();
+				if(value.startsWith("[") && value.endsWith("]")) {
+					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
+				}else {
+					curentValueList.add(value);
+				}
+			}
+			List<String> targetValueList = new ArrayList<>();
+			if(valueList instanceof String) {
+				targetValueList.add(GroupSearch.removePrefix((String)valueList));
+			}else if(valueList instanceof List){
+				List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
+				for(String value : values) {
+					targetValueList.add(GroupSearch.removePrefix(value));
+				}
+			}
+			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+			JSONObject paramNameData = context.getParamNameData();
+			JSONObject paramTextData = context.getParamTextData();
+			if(MapUtils.isNotEmpty(paramNameData) && MapUtils.isNotEmpty(paramTextData)) {
+				this.name = paramNameData.getString(this.name);
+				this.expression = Expression.getExpressionName(this.expression);
+				this.valueList = paramTextData.get(this.valueList);
 			}
 		}
-		List<String> targetValueList = new ArrayList<>();
-		if(valueList instanceof String) {
-			targetValueList.add(GroupSearch.removePrefix((String)valueList));
-		}else if(valueList instanceof List){
-			List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
-			for(String value : values) {
-				targetValueList.add(GroupSearch.removePrefix(value));
-			}
-		}
-		boolean result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+		
 		return result;
 	}
 	

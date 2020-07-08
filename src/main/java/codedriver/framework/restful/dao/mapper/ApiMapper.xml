@@ -130,12 +130,33 @@
 		GROUP BY `token`
 	</select>
 
-	<select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String">
+	<select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
 		SELECT
 		`content`
 		FROM
 		`api_audit_detail`
 		WHERE hash = #{value}
+	</select>
+
+	<select id="getApiAccessCountByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
+		SELECT
+		`token`,
+		`count`
+		FROM
+		`api_access_count`
+		WHERE token in
+		<foreach collection="list" item="token" separator="," open="(" close=")">
+			#{token}
+		</foreach>
+	</select>
+
+	<select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
+		SELECT
+		`token`,
+		`count`
+		FROM
+		`api_access_count`
+		WHERE token = #{token} FOR UPDATE
 	</select>
 
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
@@ -242,6 +263,12 @@
 		REPLACE INTO `api_audit_detail` (`hash`, `content`)
 		VALUES
 		(#{hash}, #{content})
+	</insert>
+
+	<insert id="replaceApiAccessCount" parameterType="codedriver.framework.restful.dto.ApiVo">
+		REPLACE INTO `api_access_count` (`token`, `count`)
+		VALUES
+		(#{token}, #{count})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

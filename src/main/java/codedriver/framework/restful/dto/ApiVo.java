@@ -121,6 +121,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String apiType;
 	@EntityField(name = "功能ID(从token中截取第一个单词而来)", type = ApiParamType.STRING)
 	private String funcId;
+	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
+	private Integer count;
 	@JSONField(serialize = false)
 	private transient JSONObject pathVariableObj;
 	@JSONField(serialize = false)
@@ -403,6 +405,14 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public void setFuncId(String funcId) {
 		this.funcId = funcId;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
 	}
 
 	@Override

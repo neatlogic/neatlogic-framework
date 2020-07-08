@@ -25,6 +25,10 @@ public interface ApiMapper {
 
 	public String getApiAuditDetailByHash(String hash);
 
+	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
+
+	public ApiVo getApiAccessCountLockByToken(String token);
+
 	public int replaceApi(ApiVo apiVo);
 
 	public int insertApiAudit(ApiAuditVo apiAudit);
@@ -34,6 +38,8 @@ public interface ApiMapper {
 	public int batchUpdate(ApiVo apiVo);
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
+
+	public int replaceApiAccessCount(ApiVo vo);
 
 	public int deleteApiByToken(String token);
 

@@ -68,7 +68,6 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 		paramMap.put("conn.testOnBorrow", this.getProperty("conn.testOnBorrow", "true"));
 		paramMap.put("conn.maxIdle", this.getProperty("conn.maxIdle", "16"));
 		paramMap.put("conn.initialSize", this.getProperty("conn.initialSize", "4"));
-		paramMap.put("hadoop.url", this.getProperty("hadoop.url", "hdfs://localhost:9000"));
 		propertySources.addLast(new MapPropertySource("localconfig", paramMap));
 	}
 

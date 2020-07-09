@@ -48,6 +48,7 @@ public class Config {
 	private static String USER_EXPIRETIME; // 会话超时时间
 	public static final String RC4KEY = "codedriver.key.20200101";
 	public static String MINIO_URL;
+	public static String MINIO_BUCKET;
 	public static String MINIO_ACCESSKEY;
 	public static String MINIO_SECRETKEY;
 
@@ -127,6 +128,10 @@ public class Config {
 	public static final String MINIO_SECRETKEY() {
 		return MINIO_SECRETKEY;
 	}
+	
+	public static final String MINIO_BUCKET() {
+		return MINIO_BUCKET;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -170,6 +175,7 @@ public class Config {
 			MINIO_URL = prop.getProperty("minio.url", "http://192.168.0.10:9001");
 			MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
 			MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
+			MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
 			ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
 			ES_CLUSTERS = new HashMap<>();
 

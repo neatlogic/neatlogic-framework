@@ -85,15 +85,7 @@ public class ApiDispatcher {
 		/**
 		 * 记录API访问次数
 		 */
-		ApiVo vo = apiMapper.getApiAccessCountLockByToken(token);
-		if(vo != null){
-			vo.setVisitTimes(vo.getVisitTimes() + 1);
-		}else{
-			vo = new ApiVo();
-			vo.setToken(token);
-			vo.setVisitTimes(1);
-		}
-		apiMapper.replaceApiAccessCount(vo);
+		apiService.saveApiAccessCount(token);
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());

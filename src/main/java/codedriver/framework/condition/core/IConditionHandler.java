@@ -68,7 +68,8 @@ public interface IConditionHandler {
 	* @Time:2020年7月9日
 	* @Description: 将条件组合中表达式右边值转换成对应的文本，条件步骤流转生成活动中需要展示对应文本,比如用户uuid转换成userName,下拉框的value转换成对应的text 
 	* @param value 值
+	* @param config 额外信息，如工单信息，表单信息
 	* @return Object 对应的文本
 	 */
-	public Object valueConversionText(Object value);
+	public Object valueConversionText(Object value, JSONObject config);
 }

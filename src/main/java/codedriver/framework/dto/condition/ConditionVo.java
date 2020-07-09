@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -15,6 +14,8 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.constvalue.UserType;
+import codedriver.framework.condition.core.ConditionHandlerFactory;
+import codedriver.framework.condition.core.IConditionHandler;
 import codedriver.framework.util.ConditionUtil;
 
 public class ConditionVo implements Serializable{
@@ -150,13 +151,33 @@ public class ConditionVo implements Serializable{
 				}
 			}
 			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
-			JSONObject paramNameData = context.getParamNameData();
-			JSONObject paramTextData = context.getParamTextData();
-			if(MapUtils.isNotEmpty(paramNameData) && MapUtils.isNotEmpty(paramTextData)) {
-				this.valueList = paramTextData.get(this.name);
-				this.name = paramNameData.getString(this.name);
-				this.expression = Expression.getExpressionName(this.expression);
+//			JSONObject paramNameData = context.getParamNameData();
+//			JSONObject paramTextData = context.getParamTextData();
+//			if(MapUtils.isNotEmpty(paramNameData) && MapUtils.isNotEmpty(paramTextData)) {
+//				this.valueList = paramTextData.get(this.name);
+//				this.name = paramNameData.getString(this.name);
+//				this.expression = Expression.getExpressionName(this.expression);
+//			}
+			if("common".equals(type)) {
+				IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler(name);
+				if(conditionHandler != null) {
+					valueList = conditionHandler.valueConversionText(valueList, null);
+					name = conditionHandler.getDisplayName();
+				}
+			}else if("form".equals(type)) {
+				IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
+				if(conditionHandler != null) {
+					String formConfig = context.getFormConfig();
+					if(StringUtils.isNotBlank(formConfig)) {
+						JSONObject configObj = new JSONObject();
+						configObj.put("attributeUuid", name);
+						configObj.put("formConfig", formConfig);
+						valueList = conditionHandler.valueConversionText(valueList, configObj);
+						name = configObj.getString("name");
+					}
+				}
 			}
+			this.expression = Expression.getExpressionName(this.expression);
 		}
 		
 		return result;

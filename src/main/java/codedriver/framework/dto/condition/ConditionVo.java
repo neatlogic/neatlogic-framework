@@ -29,7 +29,7 @@ public class ConditionVo implements Serializable{
 //	private Integer sort;
 	private String expression;
 	private Object valueList;
-	
+	private Boolean result;
 	public ConditionVo() {
 		super();
 	}
@@ -126,7 +126,7 @@ public class ConditionVo implements Serializable{
 	}
 
 	public boolean predicate() {
-		boolean result = false;
+		result = false;
 		ConditionParamContext context = ConditionParamContext.get();
 		if(context != null) {
 			List<String> curentValueList = new ArrayList<>();
@@ -153,12 +153,16 @@ public class ConditionVo implements Serializable{
 			JSONObject paramNameData = context.getParamNameData();
 			JSONObject paramTextData = context.getParamTextData();
 			if(MapUtils.isNotEmpty(paramNameData) && MapUtils.isNotEmpty(paramTextData)) {
+				this.valueList = paramTextData.get(this.name);
 				this.name = paramNameData.getString(this.name);
 				this.expression = Expression.getExpressionName(this.expression);
-				this.valueList = paramTextData.get(this.valueList);
 			}
 		}
 		
+		return result;
+	}
+
+	public Boolean getResult() {
 		return result;
 	}
 	

@@ -87,11 +87,11 @@ public class ApiDispatcher {
 		 */
 		ApiVo vo = apiMapper.getApiAccessCountLockByToken(token);
 		if(vo != null){
-			vo.setCount(vo.getCount() + 1);
+			vo.setVisitTimes(vo.getVisitTimes() + 1);
 		}else{
 			vo = new ApiVo();
 			vo.setToken(token);
-			vo.setCount(1);
+			vo.setVisitTimes(1);
 		}
 		apiMapper.replaceApiAccessCount(vo);
 

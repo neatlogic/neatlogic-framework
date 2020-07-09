@@ -141,7 +141,7 @@
 	<select id="getApiAccessCountByTokenList" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
 		SELECT
 		`token`,
-		`count`
+		`count` AS visitTimes
 		FROM
 		`api_access_count`
 		WHERE token in
@@ -153,7 +153,7 @@
 	<select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
 		SELECT
 		`token`,
-		`count`
+		`count` AS visitTimes
 		FROM
 		`api_access_count`
 		WHERE token = #{token} FOR UPDATE
@@ -268,7 +268,7 @@
 	<insert id="replaceApiAccessCount" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api_access_count` (`token`, `count`)
 		VALUES
-		(#{token}, #{count})
+		(#{token}, #{visitTimes})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

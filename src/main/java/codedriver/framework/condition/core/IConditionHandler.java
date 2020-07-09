@@ -62,4 +62,13 @@ public interface IConditionHandler {
 	 * @Date: 2020/2/11
 	 */
 	public ParamType getParamType();
+	
+	/**
+	 * 
+	* @Time:2020年7月9日
+	* @Description: 将条件组合中表达式右边值转换成对应的文本，条件步骤流转生成活动中需要展示对应文本,比如用户uuid转换成userName,下拉框的value转换成对应的text 
+	* @param value 值
+	* @return Object 对应的文本
+	 */
+	public Object valueConversionText(Object value);
 }

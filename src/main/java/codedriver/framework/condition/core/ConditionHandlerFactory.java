@@ -17,15 +17,13 @@ public class ConditionHandlerFactory extends ApplicationListenerBase {
 
 	private static Map<String, IConditionHandler> conditionHandlerMap = new HashMap<>();
 	
+	private static List<IConditionHandler> conditionHandlerList = new ArrayList<>();
+	
 	public static IConditionHandler getHandler(String name) {
 		return conditionHandlerMap.get(name);
 	}
 	
 	public static List<IConditionHandler> getConditionHandlerList(){
-		List<IConditionHandler> conditionHandlerList = new ArrayList<>();
-		for(Entry<String, IConditionHandler> entry : conditionHandlerMap.entrySet()) {
-			conditionHandlerList.add(entry.getValue());
-		}
 		return conditionHandlerList;
 	}
 	
@@ -34,7 +32,9 @@ public class ConditionHandlerFactory extends ApplicationListenerBase {
 		ApplicationContext context = event.getApplicationContext();
 		Map<String, IConditionHandler> myMap = context.getBeansOfType(IConditionHandler.class);
 		for(Entry<String, IConditionHandler> entry : myMap.entrySet()) {
-			conditionHandlerMap.put(entry.getValue().getName(), entry.getValue());
+			IConditionHandler conditionHandler = entry.getValue();
+			conditionHandlerMap.put(conditionHandler.getName(), conditionHandler);
+			conditionHandlerList.add(conditionHandler);
 		}
 	}
 

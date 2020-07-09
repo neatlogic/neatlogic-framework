@@ -47,6 +47,9 @@ public class Config {
 	private static String HOME_URL;
 	private static String USER_EXPIRETIME; // 会话超时时间
 	public static final String RC4KEY = "codedriver.key.20200101";
+	public static String MINIO_URL;
+	public static String MINIO_ACCESSKEY;
+	public static String MINIO_SECRETKEY;
 
 	static {
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -112,6 +115,18 @@ public class Config {
 	public static final int USER_EXPIRETIME() {
 		return Integer.valueOf(USER_EXPIRETIME);
 	}
+	
+	public static final String MINIO_URL() {
+		return MINIO_URL;
+	}
+	
+	public static final String MINIO_ACCESSKEY() {
+		return MINIO_ACCESSKEY;
+	}
+	
+	public static final String MINIO_SECRETKEY() {
+		return MINIO_SECRETKEY;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -152,6 +167,9 @@ public class Config {
 			DB_HOST = prop.getProperty("db.host", "localhost");
 			DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
 			DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
+			MINIO_URL = prop.getProperty("minio.url", "http://192.168.0.10:9001");
+			MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
+			MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
 			ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
 			ES_CLUSTERS = new HashMap<>();
 

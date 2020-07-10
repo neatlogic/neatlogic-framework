@@ -13,6 +13,8 @@ public interface ApiMapper {
 
 	public List<String> getApiTokenList(ApiVo apiVo);
 
+	public List<ApiVo> getAllApi();
+
 	public List<ApiVo> getApiListByTokenList(List<String> tokenList);
 
 	public int getApiAuditCount(ApiAuditVo apiAuditVo);
@@ -20,6 +22,12 @@ public interface ApiMapper {
 	public List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
 
 	public List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
+
+	public String getApiAuditDetailByHash(String hash);
+
+	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
+
+	public ApiVo getApiAccessCountLockByToken(String token);
 
 	public int replaceApi(ApiVo apiVo);
 
@@ -30,6 +38,8 @@ public interface ApiMapper {
 	public int batchUpdate(ApiVo apiVo);
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
+
+	public int replaceApiAccessCount(ApiVo vo);
 
 	public int deleteApiByToken(String token);
 

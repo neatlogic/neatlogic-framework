@@ -167,13 +167,14 @@
 	(SELECT `user_name` FROM `user` WHERE `uuid` = `fcu`) AS fcuName,
 	`lcd`,
 	`lcu`,
-	(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName
+	(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName,
+	IFNULL(lcd, fcd) AS actionTime
 	FROM `notify_policy`
 	WHERE `handler` = #{handler}
 	<if test="keyword != null and keyword != ''">
 		 AND `name` LIKE concat('%',#{keyword},'%') 
 	</if>
-	ORDER BY `id` DESC
+	ORDER BY actionTime DESC
 	<if test="needPage">
 	limit #{startNum}, #{pageSize}
 	</if>

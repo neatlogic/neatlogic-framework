@@ -3,7 +3,12 @@ package codedriver.framework.condition.core;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ParamType;
-
+/**
+ * 
+* @Time:2020年7月10日
+* @ClassName: IConditionHandler 
+* @Description: 条件处理器类
+ */
 public interface IConditionHandler {
 
 	/**

@@ -11,7 +11,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.common.RootComponent;
-
+/**
+ * 
+* @Time:2020年7月10日
+* @ClassName: ConditionHandlerFactory 
+* @Description: 条件处理器工厂类
+ */
 @RootComponent
 public class ConditionHandlerFactory extends ApplicationListenerBase {
 

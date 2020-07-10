@@ -151,33 +151,29 @@ public class ConditionVo implements Serializable{
 				}
 			}
 			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
-//			JSONObject paramNameData = context.getParamNameData();
-//			JSONObject paramTextData = context.getParamTextData();
-//			if(MapUtils.isNotEmpty(paramNameData) && MapUtils.isNotEmpty(paramTextData)) {
-//				this.valueList = paramTextData.get(this.name);
-//				this.name = paramNameData.getString(this.name);
-//				this.expression = Expression.getExpressionName(this.expression);
-//			}
-			if("common".equals(type)) {
-				IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler(name);
-				if(conditionHandler != null) {
-					valueList = conditionHandler.valueConversionText(valueList, null);
-					name = conditionHandler.getDisplayName();
-				}
-			}else if("form".equals(type)) {
-				IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
-				if(conditionHandler != null) {
-					String formConfig = context.getFormConfig();
-					if(StringUtils.isNotBlank(formConfig)) {
-						JSONObject configObj = new JSONObject();
-						configObj.put("attributeUuid", name);
-						configObj.put("formConfig", formConfig);
-						valueList = conditionHandler.valueConversionText(valueList, configObj);
-						name = configObj.getString("name");
+			/** 将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
+			if(context.isTranslate()) {
+				if("common".equals(type)) {
+					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler(name);
+					if(conditionHandler != null) {
+						valueList = conditionHandler.valueConversionText(valueList, null);
+						name = conditionHandler.getDisplayName();
+					}
+				}else if("form".equals(type)) {
+					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
+					if(conditionHandler != null) {
+						String formConfig = context.getFormConfig();
+						if(StringUtils.isNotBlank(formConfig)) {
+							JSONObject configObj = new JSONObject();
+							configObj.put("attributeUuid", name);
+							configObj.put("formConfig", formConfig);
+							valueList = conditionHandler.valueConversionText(valueList, configObj);
+							name = configObj.getString("name");
+						}
 					}
 				}
-			}
-			this.expression = Expression.getExpressionName(this.expression);
+				this.expression = Expression.getExpressionName(this.expression);
+			}			
 		}
 		
 		return result;

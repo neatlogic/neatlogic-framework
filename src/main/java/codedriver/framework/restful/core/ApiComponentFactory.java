@@ -98,6 +98,18 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 		return apiHandlerList;
 	}
 
+	public static Map<String, IApiComponent> getComponentMap() {
+		return componentMap;
+	}
+
+	public static Map<String, ApiHandlerVo> getApiHandlerMap() {
+		return apiHandlerMap;
+	}
+
+	public static Map<String, ApiVo> getApiMap() {
+		return apiMap;
+	}
+
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		ApplicationContext context = event.getApplicationContext();
@@ -142,6 +154,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
 					apiVo.setModuleId(context.getId());
+					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
 					apiVo.setIsDeletable(0);// 不能删除
 					apiVo.setIsPrivate(component.isPrivate());
 					if (token.indexOf("{") > -1) {

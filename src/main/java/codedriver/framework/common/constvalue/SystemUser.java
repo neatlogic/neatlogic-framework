@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser {
-	SYSTEM("system","system","system");
+	SYSTEM("system","system","系统");
 	private String userId;
 	private String userUuid;
 	private String userName;
@@ -39,4 +39,13 @@ public enum SystemUser {
 		config.put("userName", userName);
 		return config;
 	};
+	
+	public static String getUserName(String userUuid) {
+		for(SystemUser user : values()) {
+			if(user.getUserUuid().equals(userUuid)) {
+				return user.getUserName();
+			}
+		}
+		return "";
+	}
 }

@@ -18,9 +18,9 @@ public class ConditionGroupVo implements Serializable{
 	
 	private String uuid;
 	private List<ConditionVo> conditionList;
-	private Map<String, ConditionVo> conditionMap;
+	private transient Map<String, ConditionVo> conditionMap;
 	private List<ConditionRelVo> conditionRelList;
-	private List<String> channelUuidList;
+	private transient List<String> channelUuidList;
 	
 	public ConditionGroupVo() {
 		super();

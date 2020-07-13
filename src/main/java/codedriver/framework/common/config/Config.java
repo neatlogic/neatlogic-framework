@@ -34,6 +34,8 @@ public class Config {
 	public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 	public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
 	public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
+	public static final String RC4KEY = "codedriver.key.20200101";
+	
 	private static String JWT_SECRET = "techsure#codedriver$secret";
 	private static String CODEDRIVER_HOME;
 	private static Map<String, String> ES_CLUSTERS;
@@ -46,11 +48,11 @@ public class Config {
 	private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
 	private static String HOME_URL;
 	private static String USER_EXPIRETIME; // 会话超时时间
-	public static final String RC4KEY = "codedriver.key.20200101";
-	public static String MINIO_URL;
-	public static String MINIO_BUCKET;
-	public static String MINIO_ACCESSKEY;
-	public static String MINIO_SECRETKEY;
+	
+	private static String MINIO_URL;
+	private static String MINIO_BUCKET;
+	private static String MINIO_ACCESSKEY;
+	private static String MINIO_SECRETKEY;
 
 	static {
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");

@@ -77,9 +77,9 @@ public class LoginController {
 			UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
 			if (checkUserVo != null) {
 				// 保存 user 登录访问时间
-				if(userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {
+				if (userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {
 					userMapper.updateUserSession(checkUserVo.getUuid());
-				}else {
+				} else {
 					userMapper.insertUserSession(checkUserVo.getUuid());
 				}
 				JSONObject jwtHeadObj = new JSONObject();
@@ -111,7 +111,7 @@ public class LoginController {
 				String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
 
 				Cookie authCookie = new Cookie("codedriver_authorization", "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign);
-				authCookie.setPath("/"+tenant);
+				authCookie.setPath("/" + tenant);
 				String domainName = request.getServerName();
 				if (StringUtils.isNotBlank(domainName)) {
 					String[] ds = domainName.split("\\.");
@@ -121,7 +121,7 @@ public class LoginController {
 					}
 				}
 				Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
-				tenantCookie.setPath("/"+tenant);
+				tenantCookie.setPath("/" + tenant);
 				response.addCookie(authCookie);
 				response.addCookie(tenantCookie);
 				// 允许跨域携带cookie

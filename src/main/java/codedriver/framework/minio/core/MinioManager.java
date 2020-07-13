@@ -16,7 +16,7 @@ public class MinioManager implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 使用MinIO服务的URL，端口，Access key和Secret key创建一个MinioClient对象
-		this.minioClient =  new MinioClient(Config.MINIO_URL,Config.MINIO_ACCESSKEY, Config.MINIO_SECRETKEY);
+		this.minioClient =  new MinioClient(Config.MINIO_URL(),Config.MINIO_ACCESSKEY(), Config.MINIO_SECRETKEY());
 	}
 
 	/**

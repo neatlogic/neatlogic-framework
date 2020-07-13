@@ -47,10 +47,10 @@ public class Config {
 	private static String HOME_URL;
 	private static String USER_EXPIRETIME; // 会话超时时间
 	public static final String RC4KEY = "codedriver.key.20200101";
-	public static String MINIO_URL;
-	public static String MINIO_BUCKET;
-	public static String MINIO_ACCESSKEY;
-	public static String MINIO_SECRETKEY;
+	private static String MINIO_URL;
+	private static String MINIO_BUCKET;
+	private static String MINIO_ACCESSKEY;
+	private static String MINIO_SECRETKEY;
 
 	static {
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");

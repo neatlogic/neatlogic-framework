@@ -9,13 +9,6 @@
         <result property="level" column="level"/>
         <result property="lft" column="lft"/>
         <result property="rht" column="rht"/>
-        
-		<result property="userCount" column="userCount"/>
-        <result property="childCount" column="childCount"/>
-<!-- 		<collection property="tagList" ofType="codedriver.framework.dto.TagVo">
-			<id property="id" column="tagId"/>
-			<result property="name" column="tagName"/>
-		</collection> -->
 	</resultMap>
 
 	<select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap">
@@ -25,9 +18,7 @@
 	`lft`,
 	`rht`,
 	`parent_uuid` AS `parentUuid`,
-	`level`<!-- ,
-	(SELECT COUNT(1) FROM `user_team` e WHERE e.`team_uuid` = a.`uuid`)  AS `userCount`,
-   	(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) AS `childCount` -->
+	`level`
     FROM `team`
     WHERE `uuid` != '0'
     <if test="keyword != null and keyword != ''">
@@ -65,13 +56,9 @@
 		a.`lft`,
 		a.`rht`,
 		a.`parent_uuid` as `parentUuid`,
-		a.`level`<!-- ,
-		c.`id` as `tagId`,
-		c.`name` as `tagName` -->
+		a.`level`
 		FROM
 		`team` a
-<!-- 		LEFT JOIN `team_tag` b ON a.`uuid` = b.`team_uuid`
-		LEFT JOIN `tag` c ON b.`tag_id` = c.`id` -->
 		<where>
 			<if test="uuid !=null and uuid != ''">
 				AND a.`uuid` = #{uuid}
@@ -247,16 +234,6 @@
 		)
 	</insert>
 
-<!-- 	<insert id="insertTeamTag" parameterType="codedriver.framework.dto.TeamVo">
-		INSERT INTO `team_tag`(
-		`team_uuid`,
-		`tag_id`
-		) VALUES (
-			#{uuid},
-			#{tagId}
-		)
-	</insert> -->
-
 	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
 	UPDATE `team` SET 
 	<if test="level != null and level != ''">
@@ -292,10 +269,6 @@
 	WHERE `team_uuid` = #{teamUuid}
 	AND `user_uuid` = #{userUuid}
 	</update>
-	
-<!-- 	<delete id="deleteTeamTagByUuid" parameterType="java.lang.String">
-		DELETE FROM `team_tag` WHERE `team_uuid` = #{uuid}
-	</delete> -->
 	
 	<delete id="deleteTeamByLeftRightCode">
 	DELETE a, b

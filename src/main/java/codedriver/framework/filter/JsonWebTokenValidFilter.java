@@ -139,14 +139,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 				redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
 			}
 			// 清除cookies
-			Cookie authCookie = new Cookie("codedriver_authorization", null);
+			/*Cookie authCookie = new Cookie("codedriver_authorization", null);
 			authCookie.setMaxAge(0);
 			authCookie.setPath("/"+tenant);
 			Cookie tenantCookie = new Cookie("codedriver_tenant", null);
 			tenantCookie.setMaxAge(0);
 			tenantCookie.setPath("/"+tenant);
 			response.addCookie(authCookie);
-			response.addCookie(tenantCookie);
+			response.addCookie(tenantCookie);*/
 			response.setContentType(Config.RESPONSE_TYPE_JSON);
 			response.getWriter().print(redirectObj.toJSONString());
 		}

@@ -52,7 +52,7 @@ public interface TeamMapper {
 
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
-	public int deleteTeamByUuid(@Param("uuid") String uuid);
+//	public int deleteTeamByUuid(@Param("uuid") String uuid);
 
 	public  int insertTeam(TeamVo teamVo);
 

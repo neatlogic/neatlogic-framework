@@ -222,7 +222,7 @@
 	</select>
 
 	<select id="getMaxRhtCode" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT max(rht) as `rht` FROM `team`
+		SELECT max(rht) as `rht` FROM `team` FOR UPDATE
 	</select>
 
 	<select id="getTeamCountOnLock" resultType="int" useCache="false">
@@ -325,11 +325,11 @@
 	</if>
 	</delete>
 
-	<delete id="deleteTeamByUuid" parameterType="java.lang.String">
-	DELETE a, b, c
-	FROM `team` a
-	LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`
-	LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`
-	WHERE a.`uuid` = #{uuid}
-	</delete>
+	<!--<delete id="deleteTeamByUuid" parameterType="java.lang.String">-->
+	<!--DELETE a, b, c-->
+	<!--FROM `team` a-->
+	<!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`-->
+	<!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`-->
+	<!--WHERE a.`uuid` = #{uuid}-->
+	<!--</delete>-->
 </mapper>

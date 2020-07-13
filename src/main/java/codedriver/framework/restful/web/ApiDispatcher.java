@@ -2,13 +2,12 @@ package codedriver.framework.restful.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import codedriver.framework.restful.dao.mapper.ApiMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -45,6 +44,9 @@ public class ApiDispatcher {
 	@Autowired
 	private ApiService apiService;
 
+	@Autowired
+	private ApiMapper apiMapper;
+
 	private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
 
 	public ApiDispatcher() {
@@ -79,6 +81,11 @@ public class ApiDispatcher {
 		} else {
 			throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 		}
+
+		/**
+		 * 记录API访问次数
+		 */
+		apiService.saveApiAccessCount(token);
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());

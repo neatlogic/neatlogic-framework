@@ -45,11 +45,11 @@ public class ApiAuditVo extends BasePageVo {
 	@EntityField(name = "结果内容", type = ApiParamType.STRING)
 	private Object result;
 
-	@JSONField(serialize = false)
+	@EntityField(name = "参数内容hash", type = ApiParamType.STRING)
 	private String paramHash;
-	@JSONField(serialize = false)
+	@EntityField(name = "错误内容hash", type = ApiParamType.STRING)
 	private String errorHash;
-	@JSONField(serialize = false)
+	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
 	private String resultHash;
 	private transient String logPath;
 	private transient String tenant;

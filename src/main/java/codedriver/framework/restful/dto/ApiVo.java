@@ -1,17 +1,19 @@
 package codedriver.framework.restful.dto;
 
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.restful.core.ApiComponentFactory;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.restful.annotation.EntityField;
-import codedriver.framework.restful.core.ApiComponentFactory;
 
 public class ApiVo extends BasePageVo implements Serializable {
 
@@ -121,6 +123,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String apiType;
 	@EntityField(name = "功能ID(从token中截取第一个单词而来)", type = ApiParamType.STRING)
 	private String funcId;
+	@EntityField(name = "模块group", type = ApiParamType.STRING)
+	private String moduleGroup;
 //	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
 //	private Integer count;
 	@JSONField(serialize = false)
@@ -357,8 +361,17 @@ public class ApiVo extends BasePageVo implements Serializable {
 	}
 
 	public String getModuleId() {
+		if(StringUtils.isBlank(moduleId) && StringUtils.isNotBlank(handler)){
+			//根据handler从apiHandlerMap中取出ApiHandlerVo的moduleId
+			ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerMap().get(handler);
+			if(apiHandlerVo != null) {
+				moduleId = apiHandlerVo.getModuleId();
+			}
+		}
 		return moduleId;
 	}
+
+//	public String getModuleId(){return moduleId;}
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
@@ -407,12 +420,20 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.funcId = funcId;
 	}
 
-//	public Integer getCount() {
-//		return count;
-//	}
-//
-//	public void setCount(Integer count) {
-//		this.count = count;
+	public String getModuleGroup() {
+		if(StringUtils.isBlank(moduleGroup) && StringUtils.isNotBlank(moduleId)){
+			ModuleVo vo = ModuleUtil.getModuleById(moduleId);
+			if(vo != null){
+				moduleGroup = vo.getGroup();
+			}
+		}
+		return moduleGroup;
+	}
+
+//	public String getModuleGroup(){return moduleGroup;}
+
+//	public void setModuleGroup(String moduleGroup) {
+//		this.moduleGroup = moduleGroup;
 //	}
 
 	@Override

@@ -83,9 +83,9 @@ public class ApiDispatcher {
 		}
 
 		/**
-		 * 记录API访问次数
+		 * 记录API访问次数 TODO 延迟队列
 		 */
-		apiService.saveApiAccessCount(token);
+		//apiService.saveApiAccessCount(token);
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());

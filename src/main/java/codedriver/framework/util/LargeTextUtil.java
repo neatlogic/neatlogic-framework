@@ -20,8 +20,12 @@ import codedriver.framework.minio.core.MinioManager;
 public class LargeTextUtil {
 	private static Logger logger = LoggerFactory.getLogger(LargeTextUtil.class);
 
-	@Autowired
 	private static MinioManager minioManager;
+
+	@Autowired
+	public void setMinioManager(MinioManager _minioManager) {
+
+	}
 //
 //	private static FileSystem fileSystem;
 

@@ -102,6 +102,14 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 		return componentMap;
 	}
 
+	public static Map<String, IJsonStreamApiComponent> getStreamComponentMap(){
+		return streamComponentMap;
+	}
+
+	public static Map<String, IBinaryStreamApiComponent> getBinaryComponentMap(){
+		return binaryComponentMap;
+	}
+
 	public static Map<String, ApiHandlerVo> getApiHandlerMap() {
 		return apiHandlerMap;
 	}
@@ -154,8 +162,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.OBJECT.getValue());
 					apiVo.setModuleId(context.getId());
-					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
-					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
+//					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+//					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
 					apiVo.setIsDeletable(0);// 不能删除
 					apiVo.setIsPrivate(component.isPrivate());
 					if (token.indexOf("{") > -1) {
@@ -225,8 +233,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.STREAM.getValue());
 					apiVo.setModuleId(context.getId());
-					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
-					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
+//					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+//					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
 					apiVo.setIsDeletable(0);// 不能删除
 					apiVo.setIsPrivate(component.isPrivate());
 
@@ -296,8 +304,8 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
 					apiVo.setTimeout(0);// 0是default
 					apiVo.setType(ApiVo.Type.BINARY.getValue());
 					apiVo.setModuleId(context.getId());
-					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
-					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
+//					apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+//					apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());//系统扫描出来的就是系统接口
 					apiVo.setIsDeletable(0);// 不能删除
 					apiVo.setIsPrivate(component.isPrivate());
 

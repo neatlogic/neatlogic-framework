@@ -6,6 +6,9 @@ import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.ApiComponentFactory;
+import codedriver.framework.restful.core.IApiComponent;
+import codedriver.framework.restful.core.IBinaryStreamApiComponent;
+import codedriver.framework.restful.core.IJsonStreamApiComponent;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +24,9 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 3689437871016436622L;
 
 	private static final Map<String, ApiHandlerVo> apiHandlerMap = ApiComponentFactory.getApiHandlerMap();
+	private static final Map<String, IApiComponent> componentMap = ApiComponentFactory.getComponentMap();
+	private static final Map<String, IJsonStreamApiComponent> streamComponentMap = ApiComponentFactory.getStreamComponentMap();
+	private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = ApiComponentFactory.getBinaryComponentMap();
 
 	public enum Type {
 		OBJECT("object", "对象模式"), STREAM("stream", "json流模式"), BINARY("binary", "字节流模式");
@@ -363,8 +369,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.qps = qps;
 	}
 
-	public String getModuleId(String handler) {
-		if(StringUtils.isNotBlank(handler)){
+	public String getModuleId() {
+		if(StringUtils.isNotBlank(handler) && StringUtils.isBlank(moduleId)){
 			//根据handler从apiHandlerMap中取出ApiHandlerVo的moduleId
 			ApiHandlerVo apiHandlerVo = apiHandlerMap.get(handler);
 			if(apiHandlerVo != null) {
@@ -374,7 +380,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 		return moduleId;
 	}
 
-	public String getModuleId(){return moduleId;}
+//	public String getModuleId(){return moduleId;}
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
@@ -408,6 +414,16 @@ public class ApiVo extends BasePageVo implements Serializable {
 	}
 
 	public String getApiType() {
+		if(StringUtils.isNotBlank(handler) && StringUtils.isBlank(apiType)){
+			IApiComponent iApiComponent = componentMap.get(handler);
+			IJsonStreamApiComponent iJsonStreamApiComponent = streamComponentMap.get(handler);
+			IBinaryStreamApiComponent iBinaryStreamApiComponent = binaryComponentMap.get(handler);
+			if(iApiComponent != null || iJsonStreamApiComponent != null || iBinaryStreamApiComponent != null){
+				apiType = ApiVo.ApiType.SYSTEM.getValue();
+			}else{
+				apiType = ApiVo.ApiType.CUSTOM.getValue();
+			}
+		}
 		return apiType;
 	}
 
@@ -423,8 +439,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.funcId = funcId;
 	}
 
-	public String getModuleGroup(String moduleId) {
-		if(StringUtils.isNotBlank(moduleId)){
+	public String getModuleGroup() {
+		if(StringUtils.isNotBlank(moduleId) && StringUtils.isBlank(moduleGroup)){
 			ModuleVo vo = ModuleUtil.getModuleById(moduleId);
 			if(vo != null){
 				moduleGroup = vo.getGroup();
@@ -433,11 +449,11 @@ public class ApiVo extends BasePageVo implements Serializable {
 		return moduleGroup;
 	}
 
-	public String getModuleGroup(){return moduleGroup;}
+//	public String getModuleGroup(){return moduleGroup;}
 
-	public void setModuleGroup(String moduleGroup) {
-		this.moduleGroup = moduleGroup;
-	}
+//	public void setModuleGroup(String moduleGroup) {
+//		this.moduleGroup = moduleGroup;
+//	}
 
 	@Override
 	public int hashCode() {

@@ -6,14 +6,28 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class HtmlUtil {
 	public static String encodeHtml(String str) {
-		if (str != null && !"".equals(str)) {
+		if (StringUtils.isNotBlank(str)) {
 			str = str.replace("&", "&amp;");
 			str = str.replace("<", "&lt;");
 			str = str.replace(">", "&gt;");
 			str = str.replace("'", "&#39;");
 			str = str.replace("\"", "&quot;");
+			return str;
+		}
+		return "";
+	}
+
+	public static String decodeHtml(String str) {
+		if (StringUtils.isNotBlank(str)) {
+			str = str.replace("&quot;", "\"");
+			str = str.replace("&#39;", "'");
+			str = str.replace("&gt;", ">");
+			str = str.replace("&lt;", "<");
+			str = str.replace("&amp;", "&");
 			return str;
 		}
 		return "";

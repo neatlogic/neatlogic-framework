@@ -1,21 +1,26 @@
 package codedriver.framework.restful.dto;
 
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.restful.core.ApiComponentFactory;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.restful.annotation.EntityField;
-import codedriver.framework.restful.core.ApiComponentFactory;
+import java.util.Map;
 
 public class ApiVo extends BasePageVo implements Serializable {
 
 	private static final long serialVersionUID = 3689437871016436622L;
+
+	private static final Map<String, ApiHandlerVo> apiHandlerMap = ApiComponentFactory.getApiHandlerMap();
 
 	public enum Type {
 		OBJECT("object", "对象模式"), STREAM("stream", "json流模式"), BINARY("binary", "字节流模式");
@@ -121,6 +126,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String apiType;
 	@EntityField(name = "功能ID(从token中截取第一个单词而来)", type = ApiParamType.STRING)
 	private String funcId;
+	@EntityField(name = "模块group", type = ApiParamType.STRING)
+	private String moduleGroup;
 //	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
 //	private Integer count;
 	@JSONField(serialize = false)
@@ -356,9 +363,18 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.qps = qps;
 	}
 
-	public String getModuleId() {
+	public String getModuleId(String handler) {
+		if(StringUtils.isNotBlank(handler)){
+			//根据handler从apiHandlerMap中取出ApiHandlerVo的moduleId
+			ApiHandlerVo apiHandlerVo = apiHandlerMap.get(handler);
+			if(apiHandlerVo != null) {
+				moduleId = apiHandlerVo.getModuleId();
+			}
+		}
 		return moduleId;
 	}
+
+	public String getModuleId(){return moduleId;}
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
@@ -407,13 +423,21 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.funcId = funcId;
 	}
 
-//	public Integer getCount() {
-//		return count;
-//	}
-//
-//	public void setCount(Integer count) {
-//		this.count = count;
-//	}
+	public String getModuleGroup(String moduleId) {
+		if(StringUtils.isNotBlank(moduleId)){
+			ModuleVo vo = ModuleUtil.getModuleById(moduleId);
+			if(vo != null){
+				moduleGroup = vo.getGroup();
+			}
+		}
+		return moduleGroup;
+	}
+
+	public String getModuleGroup(){return moduleGroup;}
+
+	public void setModuleGroup(String moduleGroup) {
+		this.moduleGroup = moduleGroup;
+	}
 
 	@Override
 	public int hashCode() {

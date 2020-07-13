@@ -18,7 +18,7 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 5439300427812355573L;
 
 	private List<ConditionGroupVo> conditionGroupList;
-	private Map<String, ConditionGroupVo> conditionGroupMap;
+	private transient Map<String, ConditionGroupVo> conditionGroupMap;
 	private List<ConditionGroupRelVo> conditionGroupRelList;
 	public ConditionConfigVo() {
 	}

@@ -11,8 +11,11 @@ import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.constvalue.UserType;
+import codedriver.framework.condition.core.ConditionHandlerFactory;
+import codedriver.framework.condition.core.IConditionHandler;
 import codedriver.framework.util.ConditionUtil;
 
 public class ConditionVo implements Serializable{
@@ -20,14 +23,14 @@ public class ConditionVo implements Serializable{
 	
 	private String uuid;
 	private String name;
-	private String displayName;
+//	private String displayName;
 	private String type;
 	private String handler;
-	private JSONObject config;
-	private Integer sort;
+//	private JSONObject config;
+//	private Integer sort;
 	private String expression;
-	private List<String> valueList;
-	
+	private Object valueList;
+	private Boolean result;
 	public ConditionVo() {
 		super();
 	}
@@ -44,10 +47,9 @@ public class ConditionVo implements Serializable{
 				values = values.replaceAll(GroupSearch.COMMON.getValuePlugin()+UserType.LOGIN_USER.getValue(), GroupSearch.USER.getValuePlugin()+UserContext.get().getUserUuid());
 			}
 			if(values.startsWith("[") && values.endsWith("]")) {
-				this.valueList = JSON.parseArray(values, String.class);
+				this.valueList = jsonObj.getJSONArray("valueList");
 			}else {
-				this.valueList = new ArrayList<>();
-				this.valueList.add(values);
+				this.valueList = values;
 			}
 		}				
 	}
@@ -68,13 +70,13 @@ public class ConditionVo implements Serializable{
 		this.name = name;
 	}
 
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
+//	public String getDisplayName() {
+//		return displayName;
+//	}
+//
+//	public void setDisplayName(String displayName) {
+//		this.displayName = displayName;
+//	}
 
 	public String getType() {
 		return type;
@@ -92,21 +94,21 @@ public class ConditionVo implements Serializable{
 		this.handler = handler;
 	}
 
-	public JSONObject getConfig() {
-		return config;
-	}
+//	public JSONObject getConfig() {
+//		return config;
+//	}
+//
+//	public void setConfig(JSONObject config) {
+//		this.config = config;
+//	}
 
-	public void setConfig(JSONObject config) {
-		this.config = config;
-	}
-
-	public Integer getSort() {
-		return sort;
-	}
-
-	public void setSort(Integer sort) {
-		this.sort = sort;
-	}
+//	public Integer getSort() {
+//		return sort;
+//	}
+//
+//	public void setSort(Integer sort) {
+//		this.sort = sort;
+//	}
 
 	public String getExpression() {
 		return expression;
@@ -116,35 +118,69 @@ public class ConditionVo implements Serializable{
 		this.expression = expression;
 	}
 
-	public List<String> getValueList() {
+	public Object getValueList() {
 		return valueList;
 	}
 
-	public void setValueList(List<String> valueList) {
+	public void setValueList(Object valueList) {
 		this.valueList = valueList;
 	}
 
 	public boolean predicate() {
-		Object paramValue = null;
-		List<String> curentValueList = new ArrayList<>();
+		result = false;
 		ConditionParamContext context = ConditionParamContext.get();
 		if(context != null) {
+			List<String> curentValueList = new ArrayList<>();
 			JSONObject paramData = context.getParamData();
-			paramValue = paramData.get(this.name);
-		}
-		if(paramValue != null) {
-			String value = paramValue.toString();
-			if(value.startsWith("[") && value.endsWith("]")) {
-				curentValueList = JSON.parseArray(value, String.class);
-			}else {
-				curentValueList.add(value);
+			Object paramValue = paramData.get(this.name);
+			if(paramValue != null) {
+				String value = paramValue.toString();
+				if(value.startsWith("[") && value.endsWith("]")) {
+					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
+				}else {
+					curentValueList.add(value);
+				}
 			}
+			List<String> targetValueList = new ArrayList<>();
+			if(valueList instanceof String) {
+				targetValueList.add(GroupSearch.removePrefix((String)valueList));
+			}else if(valueList instanceof List){
+				List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
+				for(String value : values) {
+					targetValueList.add(GroupSearch.removePrefix(value));
+				}
+			}
+			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+			/** 将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
+			if(context.isTranslate()) {
+				if("common".equals(type)) {
+					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler(name);
+					if(conditionHandler != null) {
+						valueList = conditionHandler.valueConversionText(valueList, null);
+						name = conditionHandler.getDisplayName();
+					}
+				}else if("form".equals(type)) {
+					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
+					if(conditionHandler != null) {
+						String formConfig = context.getFormConfig();
+						if(StringUtils.isNotBlank(formConfig)) {
+							JSONObject configObj = new JSONObject();
+							configObj.put("attributeUuid", name);
+							configObj.put("formConfig", formConfig);
+							valueList = conditionHandler.valueConversionText(valueList, configObj);
+							name = configObj.getString("name");
+						}
+					}
+				}
+				this.expression = Expression.getExpressionName(this.expression);
+			}			
 		}
-		List<String> targetValueList = new ArrayList<>();
-		for(String value : valueList) {
-			targetValueList.add(GroupSearch.removePrefix(value));
-		}
-		return ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
+		
+		return result;
+	}
+
+	public Boolean getResult() {
+		return result;
 	}
 	
 }

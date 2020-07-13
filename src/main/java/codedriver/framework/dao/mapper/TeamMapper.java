@@ -44,7 +44,7 @@ public interface TeamMapper {
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 
-	public int deleteTeamTagByUuid(String uuid);
+//	public int deleteTeamTagByUuid(String uuid);
 
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
@@ -52,7 +52,7 @@ public interface TeamMapper {
 
 	public int insertTeamUser(TeamUserVo teamUserVo);
 
-	public int insertTeamTag(TeamVo teamVo);
+//	public int insertTeamTag(TeamVo teamVo);
 
 	public int updateTeamNameByUuid(TeamVo teamVo);
 

@@ -27,15 +27,15 @@ public class TeamVo extends BasePageVo {
 	@EntityField(name = "子节点数量", type = ApiParamType.INTEGER)
 	private Integer childCount;
 
-	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
-	private List<TagVo> tagList;
+//	@EntityField(name = "标签集合", type = ApiParamType.JSONARRAY)
+//	private List<TagVo> tagList;
 	
 	@EntityField(name = "左编码", type = ApiParamType.INTEGER)
 	private Integer lft;
 	@EntityField(name = "右编码", type = ApiParamType.INTEGER)
 	private Integer rht;
 	
-	private Long tagId;
+//	private Long tagId;
 
 	private int userCount;
 
@@ -118,21 +118,21 @@ public class TeamVo extends BasePageVo {
 		this.userCount = userCount;
 	}
 
-	public List<TagVo> getTagList() {
-		return tagList;
-	}
+//	public List<TagVo> getTagList() {
+//		return tagList;
+//	}
+//
+//	public void setTagList(List<TagVo> tagList) {
+//		this.tagList = tagList;
+//	}
 
-	public void setTagList(List<TagVo> tagList) {
-		this.tagList = tagList;
-	}
-
-	public Long getTagId() {
-		return tagId;
-	}
-
-	public void setTagId(Long tagId) {
-		this.tagId = tagId;
-	}
+//	public Long getTagId() {
+//		return tagId;
+//	}
+//
+//	public void setTagId(Long tagId) {
+//		this.tagId = tagId;
+//	}
 
 	public Integer getLft() {
 		return lft;

@@ -44,21 +44,15 @@ public interface TeamMapper {
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 
-	public TeamVo getMaxRhtCode();
+    public TeamVo getMaxRhtCode();
 
-	public int getTeamCountOnLock();
-
-	public int deleteTeamTagByUuid(String uuid);
+    public int getTeamCountOnLock();
 
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
-
-//	public int deleteTeamByUuid(@Param("uuid") String uuid);
 
 	public  int insertTeam(TeamVo teamVo);
 
 	public int insertTeamUser(TeamUserVo teamUserVo);
-
-	public int insertTeamTag(TeamVo teamVo);
 
 	public int updateTeamNameByUuid(TeamVo teamVo);
 

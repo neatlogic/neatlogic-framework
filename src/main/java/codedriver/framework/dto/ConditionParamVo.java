@@ -16,7 +16,7 @@ public class ConditionParamVo {
 	private String name;
 	private String label;
 	private String controller;
-	private Boolean isMultiple = false;
+	private Boolean isMultiple = false;//TODO linbq前端改好后要删除这个字段
 	private JSONObject config;
 	private String type;
 	private String paramType;

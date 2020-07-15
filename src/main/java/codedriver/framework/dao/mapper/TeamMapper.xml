@@ -204,8 +204,8 @@
 	ORDER BY a.`id`
 	</select>
 
-	<select id="getMaxRhtCode" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT max(rht) as `rht` FROM `team` FOR UPDATE
+	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
+		SELECT max(rht) FROM `team` FOR UPDATE
 	</select>
 
 	<select id="getTeamCountOnLock" resultType="int" useCache="false">

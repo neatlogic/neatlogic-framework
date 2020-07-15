@@ -44,7 +44,7 @@ public interface TeamMapper {
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 
-    public TeamVo getMaxRhtCode();
+    public Integer getMaxRhtCode();
 
     public int getTeamCountOnLock();
 

@@ -29,8 +29,8 @@ import codedriver.framework.transaction.util.TransactionUtil;
 public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	
 	private static  Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
-	/** 缓存访问次数阈值，同个租户访问1000次后写入数据库 **/
-	private final static int ACCESS_COUNT_THRESHOLD = 10;
+	/** 缓存访问次数阈值，同个租户访问次数达到阈值后写入数据库 **/
+	private final static int ACCESS_COUNT_THRESHOLD = 1000;
 	
 	private static ApiMapper apiMapper;
 

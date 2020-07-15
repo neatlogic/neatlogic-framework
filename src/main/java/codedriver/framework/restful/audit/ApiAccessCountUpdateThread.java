@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 
 	private static TransactionUtil transactionUtil;
 
-	private static Map<String, List<String>> tenantAccessTokenMap = new HashMap<>();
+	private static ConcurrentMap<String, List<String>> tenantAccessTokenMap = new ConcurrentHashMap<>();
 	
 	private String token;
 	
@@ -53,14 +55,19 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	protected void execute() {
 		if(StringUtils.isNotBlank(token)) {
 			String tenantUuid = TenantContext.get().getTenantUuid();
-			synchronized(ApiAccessCountUpdateThread.class) {
-				List<String> accessTokenList = tenantAccessTokenMap.get(tenantUuid);
-				if(accessTokenList == null) {
-					accessTokenList = new ArrayList<>(ACCESS_COUNT_THRESHOLD);
-					tenantAccessTokenMap.put(tenantUuid, accessTokenList);
+			List<String> accessTokenList = tenantAccessTokenMap.get(tenantUuid);
+			if(accessTokenList == null) {
+				synchronized(ApiAccessCountUpdateThread.class) {
+					accessTokenList = tenantAccessTokenMap.get(tenantUuid);
+					if(accessTokenList == null) {
+						accessTokenList = new ArrayList<>(ACCESS_COUNT_THRESHOLD);
+						tenantAccessTokenMap.put(tenantUuid, accessTokenList);
+					}
 				}
+			}
+			synchronized(accessTokenList) {
 				accessTokenList.add(token);
-				System.out.println(accessTokenList.size());
+//				System.out.println(accessTokenList.size());
 				if(accessTokenList.size() == ACCESS_COUNT_THRESHOLD) {
 					Map<String, Integer> tokenAccessCountMap = new HashMap<>();
 					for(String token : accessTokenList) {

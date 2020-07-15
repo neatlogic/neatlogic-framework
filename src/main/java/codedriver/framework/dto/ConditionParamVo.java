@@ -26,6 +26,8 @@ public class ConditionParamVo {
 	private int isEditable = 1;
 	private String freemarkerTemplate;
 	
+	private String handler;
+	
 	public Boolean getIsMultiple() {
 		return isMultiple;
 	}
@@ -118,5 +120,11 @@ public class ConditionParamVo {
 	}
 	public void setFreemarkerTemplate(String freemarkerTemplate) {
 		this.freemarkerTemplate = freemarkerTemplate;
+	}
+	public String getHandler() {
+		return handler;
+	}
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 }

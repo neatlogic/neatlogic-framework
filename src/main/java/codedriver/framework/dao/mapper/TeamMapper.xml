@@ -27,6 +27,9 @@
     <if test="parentUuid != null and parentUuid != ''">
         and `parent_uuid` = #{parentUuid}
     </if>
+    <if test="level != null and level != ''">
+    	and `level` = #{level}
+    </if>
     ORDER BY `lft`
     <if test="needPage == true">
         LIMIT #{startNum}, #{pageSize}

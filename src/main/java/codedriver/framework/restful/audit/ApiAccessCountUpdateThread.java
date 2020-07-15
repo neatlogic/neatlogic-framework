@@ -58,52 +58,60 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 
 	@Override
 	protected void execute() {
-		if(StringUtils.isNotBlank(token)) {
+		String oldThreadName = Thread.currentThread().getName();
+		try {
 			String tenantUuid = TenantContext.get().getTenantUuid();
-			/** 从缓存中获取当前租户访问记录**/
-			List<String> accessTokenList = tenantAccessTokenMap.get(tenantUuid);
-			if(accessTokenList == null) {
-				/** 首次访问初始化缓存 **/
-				synchronized(ApiAccessCountUpdateThread.class) {
-					accessTokenList = tenantAccessTokenMap.get(tenantUuid);
-					if(accessTokenList == null) {
-						accessTokenList = new ArrayList<>(ACCESS_COUNT_THRESHOLD);
-						tenantAccessTokenMap.put(tenantUuid, accessTokenList);
-					}
-				}
-			}
-			synchronized(accessTokenList) {
-				accessTokenList.add(token);
-				/** 累计达到缓存次数阈值时，写入数据库并清空缓存 **/
-				if(accessTokenList.size() == ACCESS_COUNT_THRESHOLD) {
-					/** 统计每个接口的访问次数 **/
-					Map<String, Integer> tokenAccessCountMap = new HashMap<>();
-					for(String token : accessTokenList) {
-						Integer count = tokenAccessCountMap.get(token);
-						if(count == null) {
-							tokenAccessCountMap.put(token, 1);
-						}else {
-							tokenAccessCountMap.put(token, count + 1);
+			Thread.currentThread().setName("API-ACCESS-COUNT-" + tenantUuid);
+			if(StringUtils.isNotBlank(token)) {
+				/** 从缓存中获取当前租户访问记录**/
+				List<String> accessTokenList = tenantAccessTokenMap.get(tenantUuid);
+				if(accessTokenList == null) {
+					/** 首次访问初始化缓存 **/
+					synchronized(ApiAccessCountUpdateThread.class) {
+						accessTokenList = tenantAccessTokenMap.get(tenantUuid);
+						if(accessTokenList == null) {
+							accessTokenList = new ArrayList<>(ACCESS_COUNT_THRESHOLD);
+							tenantAccessTokenMap.put(tenantUuid, accessTokenList);
 						}
 					}
-					for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-						String token = entry.getKey();
-						TransactionStatus transactionStatus = transactionUtil.openTx();
-						try {
-							if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-								apiMapper.insertApiAccessCount(token, entry.getValue());
+				}
+				synchronized(accessTokenList) {
+					accessTokenList.add(token);
+					/** 累计达到缓存次数阈值时，写入数据库并清空缓存 **/
+					if(accessTokenList.size() == ACCESS_COUNT_THRESHOLD) {
+						/** 统计每个接口的访问次数 **/
+						Map<String, Integer> tokenAccessCountMap = new HashMap<>();
+						for(String token : accessTokenList) {
+							Integer count = tokenAccessCountMap.get(token);
+							if(count == null) {
+								tokenAccessCountMap.put(token, 1);
 							}else {
-								apiMapper.increaseApiAccessCount(token, entry.getValue());
+								tokenAccessCountMap.put(token, count + 1);
 							}
-							transactionUtil.commitTx(transactionStatus);
-						} catch (Exception e) {
-							logger.error(e.getMessage(), e);
-							transactionUtil.rollbackTx(transactionStatus);
 						}
+						for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
+							String token = entry.getKey();
+							TransactionStatus transactionStatus = transactionUtil.openTx();
+							try {
+								if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+									apiMapper.insertApiAccessCount(token, entry.getValue());
+								}else {
+									apiMapper.increaseApiAccessCount(token, entry.getValue());
+								}
+								transactionUtil.commitTx(transactionStatus);
+							} catch (Exception e) {
+								logger.error(e.getMessage(), e);
+								transactionUtil.rollbackTx(transactionStatus);
+							}
+						}
+						accessTokenList.clear();
 					}
-					accessTokenList.clear();
-				}
-			}			
-		}		
+				}			
+			}
+		}catch(Exception e) {
+			logger.error(e.getMessage(), e);
+		}finally {
+			Thread.currentThread().setName(oldThreadName);
+		}			
 	}
 }

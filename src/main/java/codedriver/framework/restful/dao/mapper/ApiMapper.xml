@@ -183,7 +183,7 @@
 	</update>
 	
 	<update id="increaseApiAccessCount">
-	UPDATE `api_access_count` SET `count` = `count` + #{visitTimes} WHERE `token` = #{token}
+	UPDATE `api_access_count` SET `count` = `count` + #{count} WHERE `token` = #{token}
 	</update>
 
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
@@ -265,7 +265,7 @@
 	</insert>
 
 	<insert id="insertApiAccessCount">
-		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{visitTimes})
+		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

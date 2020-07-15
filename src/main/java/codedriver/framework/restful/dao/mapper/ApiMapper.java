@@ -39,7 +39,7 @@ public interface ApiMapper {
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-	public int insertApiAccessCount(@Param("token") String token, @Param("visitTimes") Integer visitTimes);
+	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 	
 	/**
 	 * 
@@ -49,7 +49,7 @@ public interface ApiMapper {
 	* @param visitTimes
 	* @return int
 	 */
-	public int increaseApiAccessCount(@Param("token") String token, @Param("visitTimes") Integer visitTimes);
+	public int increaseApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
 	public int deleteApiByToken(String token);
 

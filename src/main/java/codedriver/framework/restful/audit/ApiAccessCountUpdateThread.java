@@ -23,7 +23,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	
 	private static  Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
 	
-	private final static int ACCESS_COUNT_THRESHOLD = 10;
+	private final static int ACCESS_COUNT_THRESHOLD = 1000;
 	
 	private static ApiMapper apiMapper;
 
@@ -62,16 +62,16 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 				accessTokenList.add(token);
 				System.out.println(accessTokenList.size());
 				if(accessTokenList.size() == ACCESS_COUNT_THRESHOLD) {
-					Map<String, Integer> tokenVisitTimesMap = new HashMap<>();
+					Map<String, Integer> tokenAccessCountMap = new HashMap<>();
 					for(String token : accessTokenList) {
-						Integer count = tokenVisitTimesMap.get(token);
+						Integer count = tokenAccessCountMap.get(token);
 						if(count == null) {
-							tokenVisitTimesMap.put(token, 1);
+							tokenAccessCountMap.put(token, 1);
 						}else {
-							tokenVisitTimesMap.put(token, count + 1);
+							tokenAccessCountMap.put(token, count + 1);
 						}
 					}
-					for(Entry<String, Integer> entry : tokenVisitTimesMap.entrySet()) {
+					for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
 						String token = entry.getKey();
 						TransactionStatus transactionStatus = transactionUtil.openTx();
 						try {

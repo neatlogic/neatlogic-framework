@@ -206,6 +206,14 @@
 	WHERE a.`team_uuid` = #{value}
 	ORDER BY a.`id`
 	</select>
+
+	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
+		SELECT max(rht) FROM `team` FOR UPDATE
+	</select>
+
+	<select id="getTeamCountOnLock" resultType="int" useCache="false">
+		SELECT count(1) FROM `team` FOR UPDATE
+	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
@@ -287,4 +295,12 @@
 	AND `user_uuid` = #{userUuid}
 	</if>
 	</delete>
+
+	<!--<delete id="deleteTeamByUuid" parameterType="java.lang.String">-->
+	<!--DELETE a, b, c-->
+	<!--FROM `team` a-->
+	<!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`-->
+	<!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`-->
+	<!--WHERE a.`uuid` = #{uuid}-->
+	<!--</delete>-->
 </mapper>

@@ -89,6 +89,7 @@ public class ApiDispatcher {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
 					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
@@ -110,6 +111,7 @@ public class ApiDispatcher {
 			IJsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
 					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
@@ -131,6 +133,7 @@ public class ApiDispatcher {
 			IBinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
 					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);

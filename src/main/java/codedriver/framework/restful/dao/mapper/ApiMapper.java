@@ -38,7 +38,14 @@ public interface ApiMapper {
 	public int batchUpdate(ApiVo apiVo);
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
-
+	/**
+	 * 
+	* @Time:2020年7月15日
+	* @Description: 插入接口访问次数
+	* @param token
+	* @param count
+	* @return int
+	 */
 	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 	
 	/**

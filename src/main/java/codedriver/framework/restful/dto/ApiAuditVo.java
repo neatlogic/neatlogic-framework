@@ -51,6 +51,8 @@ public class ApiAuditVo extends BasePageVo {
 	private String errorHash;
 	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
 	private String resultHash;
+	@EntityField(name = "用户名", type = ApiParamType.STRING)
+	private String userName;
 	private transient String logPath;
 	private transient String tenant;
 
@@ -214,4 +216,11 @@ public class ApiAuditVo extends BasePageVo {
 		this.resultHash = resultHash;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 }

@@ -16,7 +16,7 @@ public class ConditionParamVo {
 	private String name;
 	private String label;
 	private String controller;
-	private Boolean isMultiple = false;
+	private Boolean isMultiple = false;//TODO linbq前端改好后要删除这个字段
 	private JSONObject config;
 	private String type;
 	private String paramType;
@@ -25,6 +25,8 @@ public class ConditionParamVo {
 	private List<ExpressionVo> expressionList = new ArrayList<>();
 	private int isEditable = 1;
 	private String freemarkerTemplate;
+	
+	private String handler;
 	
 	public Boolean getIsMultiple() {
 		return isMultiple;
@@ -118,5 +120,11 @@ public class ConditionParamVo {
 	}
 	public void setFreemarkerTemplate(String freemarkerTemplate) {
 		this.freemarkerTemplate = freemarkerTemplate;
+	}
+	public String getHandler() {
+		return handler;
+	}
+	public void setHandler(String handler) {
+		this.handler = handler;
 	}
 }

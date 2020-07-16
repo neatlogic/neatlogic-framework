@@ -20,18 +20,21 @@
 	`parent_uuid` AS `parentUuid`,
 	`level`
     FROM `team`
-    WHERE `uuid` != '0'
+    <where>
     <if test="keyword != null and keyword != ''">
         and `name` LIKE CONCAT('%', #{keyword}, '%')
     </if>
     <if test="parentUuid != null and parentUuid != ''">
         and `parent_uuid` = #{parentUuid}
     </if>
+    <if test="level != null and level != ''">
+    	and `level` = #{level}
+    </if>
+    </where>   
     ORDER BY `lft`
     <if test="needPage == true">
         LIMIT #{startNum}, #{pageSize}
     </if>
-       
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
@@ -203,6 +206,14 @@
 	WHERE a.`team_uuid` = #{value}
 	ORDER BY a.`id`
 	</select>
+
+	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
+		SELECT MAX(`rht`) FROM `team`
+	</select>
+
+	<select id="getTeamCountOnLock" resultType="int" useCache="false">
+		SELECT count(1) FROM `team` FOR UPDATE
+	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
@@ -284,4 +295,12 @@
 	AND `user_uuid` = #{userUuid}
 	</if>
 	</delete>
+
+	<!--<delete id="deleteTeamByUuid" parameterType="java.lang.String">-->
+	<!--DELETE a, b, c-->
+	<!--FROM `team` a-->
+	<!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid`-->
+	<!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid`-->
+	<!--WHERE a.`uuid` = #{uuid}-->
+	<!--</delete>-->
 </mapper>

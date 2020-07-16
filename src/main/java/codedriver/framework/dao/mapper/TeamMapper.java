@@ -44,6 +44,10 @@ public interface TeamMapper {
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 
+    public Integer getMaxRhtCode();
+
+    public int getTeamCountOnLock();
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

@@ -30,11 +30,11 @@
     <if test="level != null and level != ''">
     	and `level` = #{level}
     </if>
+    </where>   
     ORDER BY `lft`
     <if test="needPage == true">
         LIMIT #{startNum}, #{pageSize}
     </if>
-    </where>   
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">

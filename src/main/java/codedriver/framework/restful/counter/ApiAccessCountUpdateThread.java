@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 @Service
 public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	
-	//private static  Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
+	private static Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
 	
 	private static ApiMapper apiMapper;
 	
@@ -39,16 +41,20 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 
 	@Override
 	protected void execute() {
-		if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
-			for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-				String token = entry.getKey();			
-				if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-					apiMapper.insertApiAccessCount(token, entry.getValue());
-				}else {
-					apiMapper.increaseApiAccessCount(token, entry.getValue());
-				}		
+		try {
+			if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
+				for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
+					String token = entry.getKey();			
+					if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+						apiMapper.insertApiAccessCount(token, entry.getValue());
+					}else {
+						apiMapper.increaseApiAccessCount(token, entry.getValue());
+					}		
+				}
 			}
-		}			
+		}catch(Exception e) {
+			logger.error(e.getMessage(), e);
+		}					
 	}
 
 }

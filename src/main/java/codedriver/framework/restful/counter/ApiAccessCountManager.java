@@ -1,7 +1,5 @@
 package codedriver.framework.restful.counter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.DelayQueue;
@@ -27,22 +25,12 @@ public class ApiAccessCountManager {
 	@PostConstruct
 	public void init() {
 		delayQueue.add(delayedItem);		
-//		try {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-//			System.out.println("begin time: " + sdf.format(new Date()));
-//			DelayedItem take = delayQueue.take();
-//			System.out.println("name:" + take.getClass() + "-" + sdf.format(new Date()));
-//		} catch (InterruptedException e1) {
-//			e1.printStackTrace();
-//		}
 		Thread thread = new Thread("API-ACCESS-COUNTER") {
 			@Override
 			public void run() {
 				try {
-					System.out.println("++++++++++++++++++++++++++");
-					DelayedItem take = null;
-					while((take = delayQueue.take()) != null) {
-						System.out.println("-----------------------------------------------");
+					while(true) {
+						DelayedItem take = delayQueue.take();
 						delayedItem = new DelayedItem();
 						delayQueue.add(delayedItem);
 						for(Entry<String, Map<String, Integer>> entry : take.getTenantAccessTokenMap().entrySet()) {
@@ -50,7 +38,6 @@ public class ApiAccessCountManager {
 							CommonThreadPool.execute(new ApiAccessCountUpdateThread(entry.getValue()));
 						}
 					}
-					System.out.println("***************************");
 				}catch(Exception e) {
 					logger.error(e.getMessage(), e);
 				}				

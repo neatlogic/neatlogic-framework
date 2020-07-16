@@ -20,7 +20,7 @@
 	`parent_uuid` AS `parentUuid`,
 	`level`
     FROM `team`
-    WHERE `uuid` != '0'
+    <where>
     <if test="keyword != null and keyword != ''">
         and `name` LIKE CONCAT('%', #{keyword}, '%')
     </if>
@@ -34,7 +34,7 @@
     <if test="needPage == true">
         LIMIT #{startNum}, #{pageSize}
     </if>
-       
+    </where>   
 	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
@@ -208,7 +208,7 @@
 	</select>
 
 	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
-		SELECT max(rht) FROM `team` FOR UPDATE
+		SELECT MAX(`rht`) FROM `team`
 	</select>
 
 	<select id="getTeamCountOnLock" resultType="int" useCache="false">

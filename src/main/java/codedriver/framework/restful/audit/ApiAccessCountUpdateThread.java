@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,38 +76,42 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 						}
 					}
 				}
+				List<String> tokenList = new ArrayList<>();
 				synchronized(accessTokenList) {
 					accessTokenList.add(token);
 					/** 累计达到缓存次数阈值时，写入数据库并清空缓存 **/
 					if(accessTokenList.size() == ACCESS_COUNT_THRESHOLD) {
-						/** 统计每个接口的访问次数 **/
-						Map<String, Integer> tokenAccessCountMap = new HashMap<>();
-						for(String token : accessTokenList) {
-							Integer count = tokenAccessCountMap.get(token);
-							if(count == null) {
-								tokenAccessCountMap.put(token, 1);
-							}else {
-								tokenAccessCountMap.put(token, count + 1);
-							}
-						}
-						for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-							String token = entry.getKey();
-							TransactionStatus transactionStatus = transactionUtil.openTx();
-							try {
-								if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-									apiMapper.insertApiAccessCount(token, entry.getValue());
-								}else {
-									apiMapper.increaseApiAccessCount(token, entry.getValue());
-								}
-								transactionUtil.commitTx(transactionStatus);
-							} catch (Exception e) {
-								logger.error(e.getMessage(), e);
-								transactionUtil.rollbackTx(transactionStatus);
-							}
-						}
+						tokenList.addAll(accessTokenList);
 						accessTokenList.clear();
 					}
-				}			
+				}
+				if(CollectionUtils.isNotEmpty(tokenList)) {
+					/** 统计每个接口的访问次数 **/
+					Map<String, Integer> tokenAccessCountMap = new HashMap<>();
+					for(String token : tokenList) {
+						Integer count = tokenAccessCountMap.get(token);
+						if(count == null) {
+							tokenAccessCountMap.put(token, 1);
+						}else {
+							tokenAccessCountMap.put(token, count + 1);
+						}
+					}
+					for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
+						String token = entry.getKey();
+						TransactionStatus transactionStatus = transactionUtil.openTx();
+						try {
+							if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+								apiMapper.insertApiAccessCount(token, entry.getValue());
+							}else {
+								apiMapper.increaseApiAccessCount(token, entry.getValue());
+							}
+							transactionUtil.commitTx(transactionStatus);
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+							transactionUtil.rollbackTx(transactionStatus);
+						}
+					}
+				}
 			}
 		}catch(Exception e) {
 			logger.error(e.getMessage(), e);

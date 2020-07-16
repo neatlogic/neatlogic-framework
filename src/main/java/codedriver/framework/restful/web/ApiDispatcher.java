@@ -23,17 +23,16 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.exception.type.PermissionDeniedException;
-import codedriver.framework.restful.audit.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
+import codedriver.framework.restful.counter.ApiAccessCountManager;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -44,6 +43,9 @@ public class ApiDispatcher {
 
 	@Autowired
 	private ApiMapper apiMapper;
+	
+	@Autowired
+	private ApiAccessCountManager apiAccessCountManager;
 
 	private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
 
@@ -90,7 +92,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
+					apiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
 					Long endtime = System.currentTimeMillis();
@@ -112,7 +114,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
+					apiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
 					Long endtime = System.currentTimeMillis();
@@ -134,7 +136,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					CommonThreadPool.execute(new ApiAccessCountUpdateThread(token));
+					apiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
 					Long endtime = System.currentTimeMillis();

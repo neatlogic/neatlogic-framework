@@ -101,6 +101,7 @@
 		`id`,
 		`token`,
 		`user_uuid` AS userUuid,
+		(SELECT u.`user_name` from `user` u WHERE u.`uuid` = `api_audit`.`user_uuid`) AS userName,
 		`authtype`,
 		`server_id` AS serverId,
 		`ip`,

@@ -430,6 +430,10 @@ public class ApiVo extends BasePageVo implements Serializable {
 		return moduleGroup;
 	}
 
+	public void setModuleGroup(String moduleGroup){
+		this.moduleGroup = moduleGroup;
+	}
+
 //	public String getModuleGroup(){return moduleGroup;}
 
 //	public void setModuleGroup(String moduleGroup) {

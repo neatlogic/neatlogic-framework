@@ -27,7 +27,7 @@ public interface ApiMapper {
 
 	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	public String getApiAccessCountByToken(String token);
+	public int checkApiAccessCountIsExists(String token);
 
 	public int replaceApi(ApiVo apiVo);
 

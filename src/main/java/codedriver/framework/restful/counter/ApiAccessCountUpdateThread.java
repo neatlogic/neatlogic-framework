@@ -43,7 +43,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 			if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
 				for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
 					String token = entry.getKey();
-					if(apiMapper.getApiAccessCountByToken(token) == null) {
+					if(apiMapper.checkApiAccessCountIsExists(token) == 0) {
 						apiMapper.replaceApiAccessCount(token, entry.getValue());
 					}else {
 						apiMapper.increaseApiAccessCount(token, entry.getValue());

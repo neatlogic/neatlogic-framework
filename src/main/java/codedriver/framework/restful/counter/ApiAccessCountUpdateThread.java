@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,9 +42,28 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 		try {
 			if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
 				for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-					String token = entry.getKey();			
-					if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-						apiMapper.insertApiAccessCount(token, entry.getValue());
+//					String tenantUuid = TenantContext.get().getTenantUuid();
+//					Map<String, Integer> accessTokenCounterMap = Main.getTenantAccessTokenMap().get(tenantUuid);
+//					if(accessTokenCounterMap == null) {
+//						synchronized(ApiAccessCountUpdateThread.class){
+//							accessTokenCounterMap = Main.getTenantAccessTokenMap().get(tenantUuid);
+//							if(accessTokenCounterMap == null) {
+//								accessTokenCounterMap = new HashMap<>();
+//								Main.getTenantAccessTokenMap().put(tenantUuid, accessTokenCounterMap);
+//							}
+//						}
+//					}
+//					String token = entry.getKey();
+//					synchronized(accessTokenCounterMap){
+//						Integer counter = accessTokenCounterMap.get(token);
+//						if(counter == null) {
+//							counter = 0;
+//						}
+//						accessTokenCounterMap.put(token, counter + entry.getValue());
+//					}
+					String token = entry.getKey();
+					if(apiMapper.getApiAccessCountByToken(token) == null) {
+						apiMapper.replaceApiAccessCount(token, entry.getValue());
 					}else {
 						apiMapper.increaseApiAccessCount(token, entry.getValue());
 					}		

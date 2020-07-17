@@ -43,9 +43,6 @@ public class ApiDispatcher {
 
 	@Autowired
 	private ApiMapper apiMapper;
-	
-	@Autowired
-	private ApiAccessCountManager apiAccessCountManager;
 
 	private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
 
@@ -92,7 +89,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					apiAccessCountManager.putToken(token);
+					ApiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
 					Long endtime = System.currentTimeMillis();
@@ -114,7 +111,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					apiAccessCountManager.putToken(token);
+					ApiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
 					Long endtime = System.currentTimeMillis();
@@ -136,7 +133,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					apiAccessCountManager.putToken(token);
+					ApiAccessCountManager.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
 					Long endtime = System.currentTimeMillis();

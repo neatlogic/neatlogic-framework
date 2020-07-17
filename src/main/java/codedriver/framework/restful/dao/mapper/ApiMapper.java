@@ -27,7 +27,7 @@ public interface ApiMapper {
 
 	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	public String getApiAccessCountLockByToken(String token);
+	public String getApiAccessCountByToken(String token);
 
 	public int replaceApi(ApiVo apiVo);
 
@@ -46,7 +46,7 @@ public interface ApiMapper {
 	* @param count
 	* @return int
 	 */
-	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	public int replaceApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 	
 	/**
 	 * 

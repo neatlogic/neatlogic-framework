@@ -13,8 +13,8 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class DelayedItem implements Delayed {
 
-	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
-//	private long delayTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+//	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
+	private long delayTime = System.currentTimeMillis() + TimeUnit.MILLISECONDS.toMillis(1000);
 	
 	/** 缓存租户访问记录 **/
 	private ConcurrentMap<String, Map<String, Integer>> tenantAccessTokenMap = new ConcurrentHashMap<>();
@@ -25,12 +25,7 @@ public class DelayedItem implements Delayed {
 	@Override
 	public int compareTo(Delayed o) {
 		DelayedItem item = (DelayedItem) o;
-		long diff = this.delayTime - item.delayTime;
-		if(diff <= 0){
-			return -1;
-		} else{
-			return 1;
-		}
+		return Long.compare(this.delayTime, item.delayTime);
 	}
 
 	@Override
@@ -65,7 +60,4 @@ public class DelayedItem implements Delayed {
 		return tenantAccessTokenMap;
 	}
 
-	public long getDelayTime() {
-		return delayTime;
-	}
 }

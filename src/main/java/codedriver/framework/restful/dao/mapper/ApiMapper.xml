@@ -151,8 +151,8 @@
 		</foreach>
 	</select>
 
-	<select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
-		SELECT `token` FROM `api_access_count` WHERE token = #{token} FOR UPDATE
+	<select id="getApiAccessCountByToken" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT `token` FROM `api_access_count` WHERE token = #{token}
 	</select>
 
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
@@ -265,8 +265,8 @@
 		(#{hash}, #{content})
 	</insert>
 
-	<insert id="insertApiAccessCount">
-		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
+	<insert id="replaceApiAccessCount">
+		REPLACE INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

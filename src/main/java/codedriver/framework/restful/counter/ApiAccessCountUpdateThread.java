@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.service.ApiService;
 
 /**
  * 
@@ -23,11 +23,11 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	
 	private static Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
 	
-	private static ApiMapper apiMapper;
+	private static ApiService apiService;
 	
 	@Autowired
-	public void setApiMapper(ApiMapper _apiMapper) {
-		apiMapper = _apiMapper;
+	public void setApiService(ApiService _apiService) {
+		apiService = _apiService;
 	}
 	
 	private Map<String, Integer> tokenAccessCountMap;
@@ -42,12 +42,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 		try {
 			if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
 				for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-					String token = entry.getKey();
-					if(apiMapper.checkApiAccessCountIsExists(token) == 0) {
-						apiMapper.replaceApiAccessCount(token, entry.getValue());
-					}else {
-						apiMapper.increaseApiAccessCount(token, entry.getValue());
-					}		
+					apiService.udpateApiAccessCount(entry.getKey(), entry.getValue());	
 				}
 			}
 		}catch(Exception e) {

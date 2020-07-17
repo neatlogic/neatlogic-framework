@@ -17,4 +17,14 @@ public class ApiServiceImpl implements ApiService {
 	public ApiVo getApiByToken(String token) {
 		return apiMapper.getApiByToken(token);
 	}
+
+
+	@Override
+	public int udpateApiAccessCount(String token, int count) {
+		if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+			return apiMapper.replaceApiAccessCount(token, count);
+		}else {
+			return apiMapper.updateApiAccessCount(token, count);
+		}
+	}
 }

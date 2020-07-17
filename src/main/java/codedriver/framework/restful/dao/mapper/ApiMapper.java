@@ -27,7 +27,7 @@ public interface ApiMapper {
 
 	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	public int checkApiAccessCountIsExists(String token);
+	public String getApiAccessCountLockByToken(String token);
 
 	public int replaceApi(ApiVo apiVo);
 
@@ -56,7 +56,7 @@ public interface ApiMapper {
 	* @param visitTimes
 	* @return int
 	 */
-	public int increaseApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	public int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
 	public int deleteApiByToken(String token);
 

@@ -13,8 +13,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class DelayedItem implements Delayed {
 
-//	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
-	private long delayTime = System.currentTimeMillis() + TimeUnit.MILLISECONDS.toMillis(1000);
+	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
 	
 	/** 缓存租户访问记录 **/
 	private ConcurrentMap<String, Map<String, Integer>> tenantAccessTokenMap = new ConcurrentHashMap<>();

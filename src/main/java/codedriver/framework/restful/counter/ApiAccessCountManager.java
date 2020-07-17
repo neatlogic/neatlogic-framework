@@ -45,14 +45,12 @@ public class ApiAccessCountManager extends CodeDriverThread {
 	@Override
 	protected void execute() {
 		try {
-			while(true) {
-				DelayedItem take = delayQueue.take();
-				System.out.println("take:" + new Date().getTime());
-				delayedItem = null;
-				for(Entry<String, Map<String, Integer>> entry : take.getTenantAccessTokenMap().entrySet()) {
-					TenantContext.init(entry.getKey());
-					CommonThreadPool.execute(new ApiAccessCountUpdateThread(entry.getValue()));
-				}
+			DelayedItem take = delayQueue.take();
+			System.out.println("take:" + new Date().getTime());
+			delayedItem = null;
+			for(Entry<String, Map<String, Integer>> entry : take.getTenantAccessTokenMap().entrySet()) {
+				TenantContext.init(entry.getKey());
+				CommonThreadPool.execute(new ApiAccessCountUpdateThread(entry.getValue()));
 			}
 		}catch(Exception e) {
 			logger.error(e.getMessage(), e);

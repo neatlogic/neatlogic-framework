@@ -17,7 +17,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 * @Description: 统计次数延迟类
  */
 public class DelayedItem implements Delayed {
-
+	/** 延迟5分钟 **/
 	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
 	
 	/** 缓存租户访问记录 **/

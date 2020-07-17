@@ -42,25 +42,6 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 		try {
 			if(MapUtils.isNotEmpty(tokenAccessCountMap)) {
 				for(Entry<String, Integer> entry : tokenAccessCountMap.entrySet()) {
-//					String tenantUuid = TenantContext.get().getTenantUuid();
-//					Map<String, Integer> accessTokenCounterMap = Main.getTenantAccessTokenMap().get(tenantUuid);
-//					if(accessTokenCounterMap == null) {
-//						synchronized(ApiAccessCountUpdateThread.class){
-//							accessTokenCounterMap = Main.getTenantAccessTokenMap().get(tenantUuid);
-//							if(accessTokenCounterMap == null) {
-//								accessTokenCounterMap = new HashMap<>();
-//								Main.getTenantAccessTokenMap().put(tenantUuid, accessTokenCounterMap);
-//							}
-//						}
-//					}
-//					String token = entry.getKey();
-//					synchronized(accessTokenCounterMap){
-//						Integer counter = accessTokenCounterMap.get(token);
-//						if(counter == null) {
-//							counter = 0;
-//						}
-//						accessTokenCounterMap.put(token, counter + entry.getValue());
-//					}
 					String token = entry.getKey();
 					if(apiMapper.getApiAccessCountByToken(token) == null) {
 						apiMapper.replaceApiAccessCount(token, entry.getValue());

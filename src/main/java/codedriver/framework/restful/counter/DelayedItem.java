@@ -10,7 +10,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-
+/**
+ * 
+* @Time:2020年7月17日
+* @ClassName: DelayedItem 
+* @Description: 统计次数延迟类
+ */
 public class DelayedItem implements Delayed {
 
 	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
@@ -35,6 +40,7 @@ public class DelayedItem implements Delayed {
 	public void putToken(String token) {
 		if(StringUtils.isNotBlank(token)) {
 			String tenantUuid = TenantContext.get().getTenantUuid();
+			/** 从缓存中获取当前租户访问记录 **/
 			Map<String, Integer> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 			if(accessTokenCounterMap == null) {
 				synchronized(DelayedItem.class){
@@ -45,7 +51,9 @@ public class DelayedItem implements Delayed {
 					}
 				}
 			}
+			
 			synchronized(accessTokenCounterMap){
+				/** 从缓存中获取当前token访问次数 ，并累加1**/
 				Integer counter = accessTokenCounterMap.get(token);
 				if(counter == null) {
 					counter = 0;

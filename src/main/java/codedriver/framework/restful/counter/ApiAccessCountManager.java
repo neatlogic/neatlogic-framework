@@ -9,11 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
-
+/**
+ * 
+* @Time:2020年7月17日
+* @ClassName: ApiAccessCountManager 
+* @Description: 接口访问次数统计管理类
+ */
 public class ApiAccessCountManager {
 	
 	private static Logger logger = LoggerFactory.getLogger(ApiAccessCountManager.class);
-	
+	/** 统计延迟对象 **/
 	private volatile static DelayedItem delayedItem = new DelayedItem();
 	
 	static {		

@@ -48,6 +48,7 @@ public class DelayedItem implements Delayed {
 
 	public void putToken(String token) {
 		if(StringUtils.isNotBlank(token)) {
+			/** 写数据前加1**/
 			writingDataThreadNum.getAndIncrement();
 			String tenantUuid = TenantContext.get().getTenantUuid();
 			/** 从缓存中获取当前租户访问记录 **/
@@ -78,6 +79,7 @@ public class DelayedItem implements Delayed {
 			}else {
 				counter.getAndIncrement();
 			}
+			/** 写数据后减1**/
 			writingDataThreadNum.getAndDecrement();
 		}
 		if(invalid && writingDataThreadNum.get() == 0) {

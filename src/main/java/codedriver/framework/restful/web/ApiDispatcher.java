@@ -32,7 +32,7 @@ import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
-import codedriver.framework.restful.counter.ApiAccessCountManager;
+import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
@@ -89,7 +89,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					ApiAccessCountManager.putToken(token);
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
 					Long endtime = System.currentTimeMillis();
@@ -111,7 +111,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					ApiAccessCountManager.putToken(token);
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
 					Long endtime = System.currentTimeMillis();
@@ -133,7 +133,7 @@ public class ApiDispatcher {
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
-					ApiAccessCountManager.putToken(token);
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
 					Long endtime = System.currentTimeMillis();

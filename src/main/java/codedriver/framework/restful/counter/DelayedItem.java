@@ -25,7 +25,7 @@ public class DelayedItem implements Delayed {
 	private AtomicInteger writingDataThreadNum = new AtomicInteger();
 	/** 延迟对象是否失效，未放进延迟队列或已从延迟队列取出的延迟对象会被标记为true **/
 	private volatile boolean invalid = false;
-	
+	/** 等待延迟对象收集数据完毕锁 **/
 	private Object lock = new Object();
 	
 	public DelayedItem() {

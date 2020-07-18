@@ -26,6 +26,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	private static Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
 	/** 统计延迟对象，默认初始化一个失效的延迟对象 **/
 	private volatile static DelayedItem delayedItem = new DelayedItem(true);
+	/** 延迟队列 **/
 	private volatile static DelayQueue<DelayedItem> delayQueue = new DelayQueue<>();
 
 	private static ApiService apiService;
@@ -40,7 +41,9 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 	}
 	
 	public static void putToken(String token) {
+		/** 判断延迟对象是否失效 **/
 		if(delayedItem.isInvalid()) {
+			/** 初始化延迟对象时，必须加锁，否则会出现多个线程相互覆盖情况 **/
 			synchronized(ApiAccessCountUpdateThread.class) {
 				if(delayedItem.isInvalid()) {
 					delayedItem = new DelayedItem();

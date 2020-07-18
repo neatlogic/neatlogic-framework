@@ -265,8 +265,8 @@
 		(#{hash}, #{content})
 	</insert>
 
-	<insert id="replaceApiAccessCount">
-		REPLACE INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
+	<insert id="insertApiAccessCount">
+		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

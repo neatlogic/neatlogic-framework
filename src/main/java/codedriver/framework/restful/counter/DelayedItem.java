@@ -17,8 +17,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
  */
 public class DelayedItem implements Delayed {
 	/** 延迟5分钟 **/
-//	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
-	private long delayTime = System.currentTimeMillis() + TimeUnit.MILLISECONDS.toMillis(10);
+	private long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
 	
 	/** 缓存租户访问记录 **/
 	private ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> tenantAccessTokenMap = new ConcurrentHashMap<>();
@@ -54,7 +53,8 @@ public class DelayedItem implements Delayed {
 			/** 从缓存中获取当前租户访问记录 **/
 			ConcurrentMap<String, AtomicInteger> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 			if(accessTokenCounterMap == null) {
-				synchronized(DelayedItem.class){
+				/** 初始化某个租户访问记录缓存时，必须加锁，否则会出现多个线程相互覆盖情况 **/
+				synchronized(this){
 					accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 					if(accessTokenCounterMap == null) {
 						accessTokenCounterMap = new ConcurrentHashMap<>();
@@ -66,6 +66,7 @@ public class DelayedItem implements Delayed {
 			/** 从缓存中获取当前token访问次数 ，并累加1**/
 			AtomicInteger counter = accessTokenCounterMap.get(token);
 			if(counter == null) {
+				/** 初始化某个token访问次数时，必须加锁，否则会出现多个线程相互覆盖情况 **/
 				synchronized(accessTokenCounterMap){
 					counter = accessTokenCounterMap.get(token);
 					if(counter == null) {

@@ -46,7 +46,7 @@ public interface ApiMapper {
 	* @param count
 	* @return int
 	 */
-	public int replaceApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 	
 	/**
 	 * 

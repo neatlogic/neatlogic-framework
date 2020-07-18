@@ -22,7 +22,7 @@ public class ApiServiceImpl implements ApiService {
 	@Override
 	public int udpateApiAccessCount(String token, int count) {
 		if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-			return apiMapper.replaceApiAccessCount(token, count);
+			return apiMapper.insertApiAccessCount(token, count);
 		}else {
 			return apiMapper.updateApiAccessCount(token, count);
 		}

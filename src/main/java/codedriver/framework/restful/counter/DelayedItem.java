@@ -55,7 +55,7 @@ public class DelayedItem implements Delayed {
 			ConcurrentMap<String, AtomicInteger> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 			if(accessTokenCounterMap == null) {
 				/** 初始化某个租户访问记录缓存时，必须加锁，否则会出现多个线程相互覆盖情况 **/
-				synchronized(this){
+				synchronized(DelayedItem.class){
 					accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 					if(accessTokenCounterMap == null) {
 						accessTokenCounterMap = new ConcurrentHashMap<>();

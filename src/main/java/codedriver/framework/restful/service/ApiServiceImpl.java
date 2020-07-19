@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ApiServiceImpl implements ApiService {
@@ -19,17 +18,13 @@ public class ApiServiceImpl implements ApiService {
 		return apiMapper.getApiByToken(token);
 	}
 
+
 	@Override
-	@Transactional
-	public void saveApiAccessCount(String token) {
-		ApiVo vo = apiMapper.getApiAccessCountLockByToken(token);
-		if(vo != null){
-			vo.setVisitTimes(vo.getVisitTimes() + 1);
-		}else{
-			vo = new ApiVo();
-			vo.setToken(token);
-			vo.setVisitTimes(1);
+	public int saveApiAccessCount(String token, int count) {
+		if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+			return apiMapper.insertApiAccessCount(token, count);
+		}else {
+			return apiMapper.updateApiAccessCount(token, count);
 		}
-		apiMapper.replaceApiAccessCount(vo);
 	}
 }

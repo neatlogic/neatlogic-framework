@@ -42,4 +42,10 @@ public class CommonThreadPool {
 			logger.error(e.getMessage(), e);
 		}
 	}
+
+	public static int getWorkQueueSize() {
+		return workQueue.size();
+	}
+	
+	
 }

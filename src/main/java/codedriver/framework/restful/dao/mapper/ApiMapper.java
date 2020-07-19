@@ -27,7 +27,7 @@ public interface ApiMapper {
 
 	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	public ApiVo getApiAccessCountLockByToken(String token);
+	public String getApiAccessCountLockByToken(String token);
 
 	public int replaceApi(ApiVo apiVo);
 
@@ -38,8 +38,25 @@ public interface ApiMapper {
 	public int batchUpdate(ApiVo apiVo);
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
-
-	public int replaceApiAccessCount(ApiVo vo);
+	/**
+	 * 
+	* @Time:2020年7月15日
+	* @Description: 插入接口访问次数
+	* @param token
+	* @param count
+	* @return int
+	 */
+	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	
+	/**
+	 * 
+	* @Time:2020年7月15日
+	* @Description: 增加接口访问次数 
+	* @param token
+	* @param visitTimes
+	* @return int
+	 */
+	public int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
 	public int deleteApiByToken(String token);
 

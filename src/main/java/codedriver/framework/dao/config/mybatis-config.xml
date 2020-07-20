@@ -3,6 +3,10 @@
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+	<!--即使返回的字段数据为空，也要返回这个空字段-->
+	<settings>
+		<setting name="callSettersOnNulls" value="true"/>
+	</settings>
 	<typeAliases>
 		<typeAlias type="codedriver.framework.dao.typehandler.XssHandler" alias="XssHandler" />
 	</typeAliases>

@@ -204,7 +204,7 @@
 	<select id="searchApiAuditMapList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="java.util.LinkedHashMap" useCache="false">
 		select CONCAT(api_audit.id,'') as id,
 		`api_audit`.`token` as token,
-		`api_audit`.`user_uuid` as userUuid,
+-- 		`api_audit`.`user_uuid` as userUuid,
 		`api_audit`.`authtype` as authtype,
 		CONCAT(`api_audit`.`server_id`,'') as serverId,
 		`api_audit`.`ip` as ip,
@@ -212,13 +212,13 @@
 		DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
 		CONCAT(`api_audit`.`time_cost`,'') as timeCost,
 		`api_audit`.`status` as status,
-		`api_audit`.`param_hash` as paramHash,
-		`api_audit`.`result_hash` as resultHash,
-		`api_audit`.`error_hash` as errorHash,
-		`user`.`user_name` as userName
--- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
--- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
--- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+-- 		`api_audit`.`param_hash` as paramHash,
+-- 		`api_audit`.`result_hash` as resultHash,
+-- 		`api_audit`.`error_hash` as errorHash,
+		`user`.`user_name` as userName,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1

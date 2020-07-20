@@ -4,7 +4,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -253,5 +255,78 @@ public class ExcelUtil {
         }
         
     	return workbook;
+    }
+
+    /**
+     * 使用poi-3.8的SXSSFWorkbook来创建excel
+     * 3.8以前的版本，单元格字符数有限
+     * @param workbook
+     * @param headerList
+     * @param columnList
+     * @param dataMapList
+     * @return
+     * @throws Exception
+     */
+    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,String>> dataMapList) throws Exception {
+        // 生成一个表格
+        Sheet sheet = workbook.createSheet();
+        // 设置sheet名字
+        workbook.setSheetName(0,"sheet01");
+        // 设置标题行样式
+        CellStyle firstRowcellStyle = workbook.createCellStyle();
+        firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色
+        firstRowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
+        firstRowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        firstRowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        firstRowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        Font font = workbook.createFont();
+        font.setFontName("宋体");
+        font.setFontHeight((short) 220);
+        font.setBoldweight((short) 700);
+        firstRowcellStyle.setFont(font);
+        //设置正文行样式
+        CellStyle rowcellStyle = workbook.createCellStyle();
+        rowcellStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);// 设置背景色
+        rowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
+        rowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        rowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        rowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setFont(font);
+
+        //生成标题行
+        Row headerRow = sheet.createRow(0);
+        if(CollectionUtils.isNotEmpty(headerList)){
+            int i = 0;
+            for (String header : headerList) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellStyle(firstRowcellStyle);
+                HSSFRichTextString text = new HSSFRichTextString(header);
+                cell.setCellValue(text);
+                i++;
+            }
+        }
+        //生成数据行
+        if(CollectionUtils.isNotEmpty(columnList) && CollectionUtils.isNotEmpty(dataMapList)){
+            int lastRowNum = sheet.getLastRowNum();
+            for (Map<String, String> dataMap : dataMapList){
+                lastRowNum++;
+                Row row = sheet.createRow(lastRowNum);
+                int j = 0;
+                for (String column : columnList){
+                    Cell cell = row.createCell(j);
+                    cell.setCellStyle(rowcellStyle);
+                    HSSFRichTextString richString = new HSSFRichTextString(dataMap.get(column));
+                    cell.setCellValue(richString);
+                    j++;
+                }
+            }
+        }
+        return workbook;
     }
 }

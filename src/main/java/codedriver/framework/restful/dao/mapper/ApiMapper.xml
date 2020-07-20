@@ -151,13 +151,8 @@
 		</foreach>
 	</select>
 
-	<select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
-		SELECT
-		`token`,
-		`count` AS visitTimes
-		FROM
-		`api_access_count`
-		WHERE token = #{token} FOR UPDATE
+	<select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT `token` FROM `api_access_count` WHERE token = #{token} FOR UPDATE
 	</select>
 
 	<select id="searchApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
@@ -279,6 +274,10 @@
 		</foreach>
 
 	</update>
+	
+	<update id="updateApiAccessCount">
+	UPDATE `api_access_count` SET `count` = `count` + #{count} WHERE `token` = #{token}
+	</update>
 
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api`
@@ -358,10 +357,8 @@
 		(#{hash}, #{content})
 	</insert>
 
-	<insert id="replaceApiAccessCount" parameterType="codedriver.framework.restful.dto.ApiVo">
-		REPLACE INTO `api_access_count` (`token`, `count`)
-		VALUES
-		(#{token}, #{visitTimes})
+	<insert id="insertApiAccessCount">
+		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

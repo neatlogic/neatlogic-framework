@@ -32,17 +32,14 @@ import codedriver.framework.restful.core.ApiComponentFactory;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
+import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
-import codedriver.framework.restful.service.ApiService;
 
 @Controller
 @RequestMapping("/api/")
 public class ApiDispatcher {
 	Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
-
-	@Autowired
-	private ApiService apiService;
 
 	@Autowired
 	private ApiMapper apiMapper;
@@ -63,7 +60,7 @@ public class ApiDispatcher {
 		ApiVo interfaceVo = ApiComponentFactory.getApiByToken(token);
 
 		if (interfaceVo == null) {
-			interfaceVo = apiService.getApiByToken(token);
+			interfaceVo = apiMapper.getApiByToken(token);
 			if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
 				throw new ApiNotFoundException("token为“" + token + "”的接口不存在或已被禁用");
 			}
@@ -91,6 +88,8 @@ public class ApiDispatcher {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj);
 					Long endtime = System.currentTimeMillis();
@@ -111,6 +110,8 @@ public class ApiDispatcher {
 			IJsonStreamApiComponent restComponent = ApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
 					Long endtime = System.currentTimeMillis();
@@ -131,6 +132,8 @@ public class ApiDispatcher {
 			IBinaryStreamApiComponent restComponent = ApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
+					/** 统计接口访问次数 **/
+					ApiAccessCountUpdateThread.putToken(token);
 					Long starttime = System.currentTimeMillis();
 					Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
 					Long endtime = System.currentTimeMillis();

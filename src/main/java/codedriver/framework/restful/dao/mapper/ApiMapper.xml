@@ -183,10 +183,10 @@
 			</foreach>
 		</if>
 		<if test="startTime != null">
-			and `start_time` &gt; #{startTime}
+			and `start_time` &gt;= #{startTime}
 		</if>
 		<if test="endTime != null">
-			and `start_time` &lt; #{endTime}
+			and `start_time` &lt;= #{endTime}
 		</if>
 		<choose>
 			<when test="orderType == 'desc'">
@@ -216,6 +216,9 @@
 		`api_audit`.`result_hash` as resultHash,
 		`api_audit`.`error_hash` as errorHash,
 		`user`.`user_name` as userName
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
@@ -229,10 +232,10 @@
 			</foreach>
 		</if>
 		<if test="startTime != null">
-			and `start_time` &gt; #{startTime}
+			and `start_time` &gt;= #{startTime}
 		</if>
 		<if test="endTime != null">
-			and `start_time` &lt; #{endTime}
+			and `start_time` &lt;= #{endTime}
 		</if>
 		<choose>
 			<when test="orderType == 'desc'">

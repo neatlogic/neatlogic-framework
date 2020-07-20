@@ -219,6 +219,8 @@
 	SELECT COUNT(a.`uuid`) FROM (
 		SELECT `uuid` FROM `team`  WHERE `lft` IS NULL OR `rht` IS NULL
 		UNION
+		SELECT `uuid` FROM `team`  WHERE `lft` &lt; 2 OR `rht` &lt; 3
+		UNION
 		SELECT parent.`uuid` FROM `team` parent
 		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)
 		UNION

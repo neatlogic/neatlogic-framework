@@ -38,7 +38,9 @@ public interface TeamMapper {
 			@Param("title") String title
 	);
 
-	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+//	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+	
+	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
 	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
 

@@ -134,22 +134,32 @@ public class ConditionVo implements Serializable{
 			JSONObject paramData = context.getParamData();
 			Object paramValue = paramData.get(this.name);
 			if(paramValue != null) {
-				String value = paramValue.toString();
-				if(value.startsWith("[") && value.endsWith("]")) {
-					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
-				}else {
-					curentValueList.add(value);
+//				String value = paramValue.toString();
+//				if(value.startsWith("[") && value.endsWith("]")) {
+//					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
+//				}else {
+//					curentValueList.add(value);
+//				}
+				if(paramValue != null) {
+					if(paramValue instanceof String) {
+						curentValueList.add((String)paramValue);
+					}else if(paramValue instanceof List) {
+						curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
+					}
 				}
 			}
 			List<String> targetValueList = new ArrayList<>();
-			if(valueList instanceof String) {
-				targetValueList.add(GroupSearch.removePrefix((String)valueList));
-			}else if(valueList instanceof List){
-				List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
-				for(String value : values) {
-					targetValueList.add(GroupSearch.removePrefix(value));
+			if(valueList != null) {
+				if(valueList instanceof String) {
+					targetValueList.add(GroupSearch.removePrefix((String)valueList));
+				}else if(valueList instanceof List){
+					List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
+					for(String value : values) {
+						targetValueList.add(GroupSearch.removePrefix(value));
+					}
 				}
 			}
+			
 			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
 			/** 将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
 			if(context.isTranslate()) {

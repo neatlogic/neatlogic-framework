@@ -267,7 +267,7 @@ public class ExcelUtil {
      * @return
      * @throws Exception
      */
-    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,String>> dataMapList) throws Exception {
+    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList) throws Exception {
         // 生成一个表格
         Sheet sheet = workbook.createSheet();
         // 设置sheet名字
@@ -306,23 +306,23 @@ public class ExcelUtil {
             for (String header : headerList) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellStyle(firstRowcellStyle);
-                HSSFRichTextString text = new HSSFRichTextString(header);
-                cell.setCellValue(text);
+//                HSSFRichTextString text = new HSSFRichTextString(header);
+                cell.setCellValue(header);
                 i++;
             }
         }
         //生成数据行
         if(CollectionUtils.isNotEmpty(columnList) && CollectionUtils.isNotEmpty(dataMapList)){
             int lastRowNum = sheet.getLastRowNum();
-            for (Map<String, String> dataMap : dataMapList){
+            for (Map<String, Object> dataMap : dataMapList){
                 lastRowNum++;
                 Row row = sheet.createRow(lastRowNum);
                 int j = 0;
                 for (String column : columnList){
                     Cell cell = row.createCell(j);
                     cell.setCellStyle(rowcellStyle);
-                    HSSFRichTextString richString = new HSSFRichTextString(dataMap.get(column));
-                    cell.setCellValue(richString);
+//                    HSSFRichTextString richString = new HSSFRichTextString(dataMap.get(column) == null ? "" : dataMap.get(column).toString());
+                    cell.setCellValue(dataMap.get(column) == null ? null : dataMap.get(column).toString());
                     j++;
                 }
             }

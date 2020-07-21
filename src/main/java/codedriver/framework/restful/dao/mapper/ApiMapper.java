@@ -1,12 +1,10 @@
 package codedriver.framework.restful.dao.mapper;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
-
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ApiMapper {
 
@@ -32,7 +30,7 @@ public interface ApiMapper {
 
 	public List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
 
-	public List<Map<String, String>> searchApiAuditMapList(ApiAuditVo apiAuditVo);
+	public List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
 
 	public int replaceApi(ApiVo apiVo);
 

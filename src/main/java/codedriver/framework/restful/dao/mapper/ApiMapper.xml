@@ -201,7 +201,7 @@
 		</if>
 	</select>
 
-	<select id="searchApiAuditMapList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="java.util.LinkedHashMap" useCache="false">
+	<select id="searchApiAuditForExport" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
 		select CONCAT(api_audit.id,'') as id,
 		`api_audit`.`token` as token,
 -- 		`api_audit`.`user_uuid` as userUuid,

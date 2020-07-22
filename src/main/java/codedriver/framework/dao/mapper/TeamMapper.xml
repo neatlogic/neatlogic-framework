@@ -96,6 +96,7 @@
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="lft" column="lft"/>
 		<result property="rht" column="rht"/>
+		<result property="level" column="level"/>
         <result property="childCount" column="childCount"/>
 	</resultMap>
 	
@@ -106,6 +107,7 @@
 		a.`parent_uuid` AS parentUuid,
 		a.`lft`,
 		a.`rht`,
+		a.`level`,
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{value}
@@ -173,9 +175,13 @@
 	a.`parent_uuid` AS parentUuid,
 	a.`lft`,
 	a.`rht`,
+	a.`level`,
 	0 as `childCount`
 	FROM `team` a
 	WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+	<if test="level != null and level != ''">
+	AND a.`level` = #{level}
+	</if>
 	ORDER BY `lft` ASC
 	</select>
 	

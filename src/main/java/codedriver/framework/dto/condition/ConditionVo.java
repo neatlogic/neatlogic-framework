@@ -23,11 +23,8 @@ public class ConditionVo implements Serializable{
 	
 	private String uuid;
 	private String name;
-//	private String displayName;
 	private String type;
 	private String handler;
-//	private JSONObject config;
-//	private Integer sort;
 	private String expression;
 	private Object valueList;
 	private Boolean result;
@@ -70,14 +67,6 @@ public class ConditionVo implements Serializable{
 		this.name = name;
 	}
 
-//	public String getDisplayName() {
-//		return displayName;
-//	}
-//
-//	public void setDisplayName(String displayName) {
-//		this.displayName = displayName;
-//	}
-
 	public String getType() {
 		return type;
 	}
@@ -93,22 +82,6 @@ public class ConditionVo implements Serializable{
 	public void setHandler(String handler) {
 		this.handler = handler;
 	}
-
-//	public JSONObject getConfig() {
-//		return config;
-//	}
-//
-//	public void setConfig(JSONObject config) {
-//		this.config = config;
-//	}
-
-//	public Integer getSort() {
-//		return sort;
-//	}
-//
-//	public void setSort(Integer sort) {
-//		this.sort = sort;
-//	}
 
 	public String getExpression() {
 		return expression;
@@ -134,12 +107,6 @@ public class ConditionVo implements Serializable{
 			JSONObject paramData = context.getParamData();
 			Object paramValue = paramData.get(this.name);
 			if(paramValue != null) {
-//				String value = paramValue.toString();
-//				if(value.startsWith("[") && value.endsWith("]")) {
-//					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
-//				}else {
-//					curentValueList.add(value);
-//				}
 				if(paramValue != null) {
 					if(paramValue instanceof String) {
 						curentValueList.add((String)paramValue);

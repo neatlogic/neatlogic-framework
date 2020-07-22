@@ -18,13 +18,7 @@ public class ConditionUtil {
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
 				}			
-				if(curentValueList.size() == 0 && targetValueList.size() == 0) {
-					return curentValueList.get(0).contains(targetValueList.get(0));					
-				}else {
-					String currentValue = String.join("#", curentValueList);
-					String targetValue = String.join("#", targetValueList);
-					return currentValue.contains(targetValue);
-				}
+				return String.join("#", curentValueList).contains(String.join("#", targetValueList));
 			case NOTLIKE: 
 				if(CollectionUtils.isEmpty(targetValueList)) {
 					return false;
@@ -32,35 +26,17 @@ public class ConditionUtil {
 				if(CollectionUtils.isEmpty(curentValueList)) {
 					return true;
 				}
-				if(curentValueList.size() == 0 && targetValueList.size() == 0) {
-					return !curentValueList.get(0).contains(targetValueList.get(0));					
-				}else {
-					String currentValue = String.join("#", curentValueList);
-					String targetValue = String.join("#", targetValueList);
-					return !currentValue.contains(targetValue);
-				}
+				return !String.join("#", curentValueList).contains(String.join("#", targetValueList));
 			case EQUAL: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
 				}
-				if(curentValueList.size() == 0 && targetValueList.size() == 0) {
-					return curentValueList.get(0).equals(targetValueList.get(0));					
-				}else {
-					String currentValue = String.join("#", curentValueList);
-					String targetValue = String.join("#", targetValueList);
-					return currentValue.equals(targetValue);
-				}
+				return String.join("#", curentValueList).equals(String.join("#", targetValueList));
 			case UNEQUAL: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
 				}
-				if(curentValueList.size() == 0 && targetValueList.size() == 0) {
-					return !curentValueList.get(0).equals(targetValueList.get(0));					
-				}else {
-					String currentValue = String.join("#", curentValueList);
-					String targetValue = String.join("#", targetValueList);
-					return !currentValue.equals(targetValue);
-				}
+				return !String.join("#", curentValueList).equals(String.join("#", targetValueList));
 			case INCLUDE: 
 				return targetValueList.removeAll(curentValueList);
 			case EXCLUDE: 

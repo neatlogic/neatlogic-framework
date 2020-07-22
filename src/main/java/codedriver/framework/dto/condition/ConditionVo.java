@@ -107,14 +107,13 @@ public class ConditionVo implements Serializable{
 			JSONObject paramData = context.getParamData();
 			Object paramValue = paramData.get(this.name);
 			if(paramValue != null) {
-				if(paramValue != null) {
-					if(paramValue instanceof String) {
-						curentValueList.add((String)paramValue);
-					}else if(paramValue instanceof List) {
-						curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
-					}
+				if(paramValue instanceof String) {
+					curentValueList.add((String)paramValue);
+				}else if(paramValue instanceof List) {
+					curentValueList = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
 				}
 			}
+			
 			List<String> targetValueList = new ArrayList<>();
 			if(valueList != null) {
 				if(valueList instanceof String) {

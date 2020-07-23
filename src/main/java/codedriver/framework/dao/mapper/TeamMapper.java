@@ -37,8 +37,8 @@ public interface TeamMapper {
 			@Param("level") String level, 
 			@Param("title") String title
 	);
-
-	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+	
+	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
 	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
 
@@ -47,7 +47,18 @@ public interface TeamMapper {
     public Integer getMaxRhtCode();
 
     public int getTeamCountOnLock();
-
+    /**
+     * 
+    * @Time:2020年7月20日
+    * @Description: 判断左右编码是否全部正确，符合下列条件的才正确
+    * 1.左右编码不能为null
+    * 2.左编码不能小于2，右编码不能小于3
+    * 3.子节点的左编码大于父节点的左编码，子节点的右编码小于父节点的右编码
+    * 4.没有子节点的节点左编码比右编码小1
+    * @return int 返回左右编码不正确的个数
+     */
+    public int checkLeftRightCodeIsWrong();
+    
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

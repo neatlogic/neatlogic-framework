@@ -250,6 +250,13 @@
 		</if>
 	</select>
 
+	<select id="getDistinctTokenInApiAudit" resultType="java.lang.String" useCache="false">
+		SELECT
+		distinct `token`
+		FROM
+		`api_audit`
+	</select>
+
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
 		UPDATE `api`
 		SET

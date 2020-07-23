@@ -6,11 +6,13 @@ import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
-	
+
+	public int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("auth") String auth);
+
 	public int checkUserIsExists(String uuid);
 
 	public int checkUserIsInTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
-	
+
 	public UserVo getUserBaseInfoByUuid(String userUuid);
 
 	public UserVo getUserByUuid(String uuid);
@@ -22,7 +24,7 @@ public interface UserMapper {
 	public List<UserVo> searchRoleUserByAuth(String auth);
 
 	public List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
-	
+
 	public List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
 
 	public List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
@@ -42,7 +44,7 @@ public interface UserMapper {
 	public List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
 	public List<AuthVo> getUserCountByAuth();
-	
+
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
 	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
@@ -51,7 +53,7 @@ public interface UserMapper {
 
 	public List<String> checkUserUuidListIsExists(List<String> userUuidList);
 
-    public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid,@Param("type") String type);
+	public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 
 	public List<String> getRoleUuidListByUserUuid(String userUuid);
 
@@ -68,7 +70,7 @@ public interface UserMapper {
 	public int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
 	public int insertUserTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
-	
+
 	public int insertUserProfile(UserProfileVo userProfileVo);
 
 	public int insertUserSession(String userUuid);
@@ -83,9 +85,9 @@ public interface UserMapper {
 
 	public int updateUserData(UserDataVo userDataVo);
 
-	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId, @Param("config")String config);
+	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
 
-	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid,@Param("idList") List<Long> idList);
+	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
 	public int deleteUserByUuid(String uuid);
 
@@ -94,8 +96,8 @@ public interface UserMapper {
 	public int deleteUserSessionByUserUuid(String userUuid);
 
 	public int deleteUserTeamByUserUuid(String userUuid);
-	
-	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid")String userUuid, @Param("moduleId")String moduleId);
+
+	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
 	public int deleteUserAuth(UserAuthVo userAuthVo);
 }

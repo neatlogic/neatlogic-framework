@@ -9,11 +9,11 @@ import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.RoleUserVo;
 import codedriver.framework.dto.RoleVo;
 
-
 public interface RoleMapper {
+	public List<String> getRoleUuidListByAuth(String auth);
 
 	public int checkRoleIsExists(String uuid);
-	
+
 	public List<RoleVo> searchRole(RoleVo roleVo);
 
 	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
@@ -49,6 +49,5 @@ public interface RoleMapper {
 	public int deleteRoleAuthByAuth(String auth);
 
 	public int deleteRoleUser(RoleUserVo roleUserVo);
-
 
 }

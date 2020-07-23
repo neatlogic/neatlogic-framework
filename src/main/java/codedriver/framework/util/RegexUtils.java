@@ -1,12 +1,11 @@
 package codedriver.framework.util;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class RegexUtils {
     private static Logger logger = LoggerFactory.getLogger(RegexUtils.class);

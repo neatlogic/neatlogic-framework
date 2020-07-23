@@ -3,7 +3,7 @@ package codedriver.framework.common.constvalue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

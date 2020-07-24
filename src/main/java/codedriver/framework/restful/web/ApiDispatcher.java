@@ -320,8 +320,8 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/binary/**", method = RequestMethod.POST)
-	public void displatcherForPostBinary(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	@RequestMapping(value = "/binary/**", method = RequestMethod.POST, consumes = "application/json")
+	public void displatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
@@ -335,6 +335,35 @@ public class ApiDispatcher {
 		} else {
 			paramObj = new JSONObject();
 		}
+
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(520);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(520);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
+		if (!response.isCommitted()) {
+			response.setContentType(Config.RESPONSE_TYPE_JSON);
+			response.getWriter().print(returnObj.toJSONString());
+		}
+	}
+
+	@RequestMapping(value = "/binary/**", method = RequestMethod.POST, consumes = "multipart/form-data")
+	public void displatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+		JSONObject paramObj = new JSONObject();
 
 		Enumeration<String> paraNames = request.getParameterNames();
 		while (paraNames.hasMoreElements()) {

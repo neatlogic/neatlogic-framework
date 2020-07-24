@@ -77,6 +77,35 @@ public class ApiVo extends BasePageVo implements Serializable {
 		}
 	}
 
+	public enum TreeMenuType {
+		SYSTEM("system", "系统接口目录"), CUSTOM("custom", "自定义接口目录"), AUDIT("audit", "操作审计目录");
+
+		private String name;
+		private String text;
+
+		private TreeMenuType(String _name, String _text) {
+			this.name = _name;
+			this.text = _text;
+		}
+
+		public String getValue() {
+			return name;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public static String getText(String name) {
+			for (TreeMenuType s : TreeMenuType.values()) {
+				if (s.getValue().equals(name)) {
+					return s.getText();
+				}
+			}
+			return "";
+		}
+	}
+
 	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
 	@EntityField(name = "处理器", type = ApiParamType.STRING)

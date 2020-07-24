@@ -26,7 +26,6 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 
 	@Override
 	public void setEnvironment(Environment environment) {
-		// TODO Auto-generated method stub
 		this.environment = (ConfigurableEnvironment) environment;
 	}
 

@@ -82,7 +82,7 @@ public class ApiDispatcher {
 		/**
 		 * 记录API访问次数 TODO 延迟队列
 		 */
-		//apiService.saveApiAccessCount(token);
+		// apiService.saveApiAccessCount(token);
 
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = ApiComponentFactory.getInstance(interfaceVo.getHandler());
@@ -280,12 +280,62 @@ public class ApiDispatcher {
 		}
 	}
 
-	@RequestMapping(value = "/binary/**")
+	@RequestMapping(value = "/binary/**", method = RequestMethod.GET)
 	public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
 		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
 		JSONObject paramObj = new JSONObject();
+
+		Enumeration<String> paraNames = request.getParameterNames();
+		while (paraNames.hasMoreElements()) {
+			String p = paraNames.nextElement();
+			String[] vs = request.getParameterValues(p);
+			if (vs.length > 1) {
+				paramObj.put(p, vs);
+			} else {
+				paramObj.put(p, request.getParameter(p));
+			}
+		}
+		JSONObject returnObj = new JSONObject();
+		try {
+			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+		} catch (ApiRuntimeException ex) {
+			response.setStatus(520);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (PermissionDeniedException ex) {
+			response.setStatus(523);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			response.setStatus(520);
+			returnObj.put("Status", "ERROR");
+			returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+		}
+		if (!response.isCommitted()) {
+			response.setContentType(Config.RESPONSE_TYPE_JSON);
+			response.getWriter().print(returnObj.toJSONString());
+		}
+	}
+
+	@RequestMapping(value = "/binary/**", method = RequestMethod.POST)
+	public void displatcherForPostBinary(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+
+		JSONObject paramObj = null;
+		if (StringUtils.isNotBlank(jsonStr)) {
+			try {
+				paramObj = JSONObject.parseObject(jsonStr);
+			} catch (Exception e) {
+				throw new ApiRuntimeException("请求参数需要符合JSON格式");
+			}
+		} else {
+			paramObj = new JSONObject();
+		}
+
 		Enumeration<String> paraNames = request.getParameterNames();
 		while (paraNames.hasMoreElements()) {
 			String p = paraNames.nextElement();

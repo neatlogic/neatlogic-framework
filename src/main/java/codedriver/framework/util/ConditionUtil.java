@@ -2,7 +2,7 @@ package codedriver.framework.util;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import codedriver.framework.common.constvalue.Expression;
 
@@ -17,8 +17,8 @@ public class ConditionUtil {
 			case LIKE: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
-				}
-				return curentValueList.get(0).contains(targetValueList.get(0));
+				}			
+				return String.join("#", curentValueList).contains(String.join("#", targetValueList));
 			case NOTLIKE: 
 				if(CollectionUtils.isEmpty(targetValueList)) {
 					return false;
@@ -26,17 +26,17 @@ public class ConditionUtil {
 				if(CollectionUtils.isEmpty(curentValueList)) {
 					return true;
 				}
-				return !curentValueList.get(0).contains(targetValueList.get(0));
+				return !String.join("#", curentValueList).contains(String.join("#", targetValueList));
 			case EQUAL: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
 				}
-				return curentValueList.get(0).equals(targetValueList.get(0));
+				return String.join("#", curentValueList).equals(String.join("#", targetValueList));
 			case UNEQUAL: 
 				if(CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
 					return false;
 				}
-				return !curentValueList.get(0).equals(targetValueList.get(0));
+				return !String.join("#", curentValueList).equals(String.join("#", targetValueList));
 			case INCLUDE: 
 				return targetValueList.removeAll(curentValueList);
 			case EXCLUDE: 

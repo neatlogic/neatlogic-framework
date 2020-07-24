@@ -96,6 +96,7 @@
 		<result property="parentUuid" column="parentUuid"/>
 		<result property="lft" column="lft"/>
 		<result property="rht" column="rht"/>
+		<result property="level" column="level"/>
         <result property="childCount" column="childCount"/>
 	</resultMap>
 	
@@ -106,6 +107,7 @@
 		a.`parent_uuid` AS parentUuid,
 		a.`lft`,
 		a.`rht`,
+		a.`level`,
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{value}
@@ -173,9 +175,13 @@
 	a.`parent_uuid` AS parentUuid,
 	a.`lft`,
 	a.`rht`,
+	a.`level`,
 	0 as `childCount`
 	FROM `team` a
 	WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+	<if test="level != null and level != ''">
+	AND a.`level` = #{level}
+	</if>
 	ORDER BY `lft` ASC
 	</select>
 	
@@ -213,6 +219,21 @@
 
 	<select id="getTeamCountOnLock" resultType="int" useCache="false">
 		SELECT count(1) FROM `team` FOR UPDATE
+	</select>
+	
+	<select id="checkLeftRightCodeIsWrong" resultType="int">
+	SELECT COUNT(a.`uuid`) FROM (
+		SELECT `uuid` FROM `team`  WHERE `lft` IS NULL OR `rht` IS NULL
+		UNION
+		SELECT `uuid` FROM `team`  WHERE `lft` &lt; 2 OR `rht` &lt; 3
+		UNION
+		SELECT parent.`uuid` FROM `team` parent
+		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)
+		UNION
+		SELECT parent.`uuid` FROM `team` parent
+		LEFT JOIN `team` child ON child.`parent_uuid` = parent.`uuid` 
+		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1
+	) a
 	</select>
 	
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

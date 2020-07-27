@@ -94,6 +94,7 @@
 		`timeout`,
 		`need_audit` AS needAudit
 		FROM `api`
+		order by `create_time` desc
 	</select>
 
 	<select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">

@@ -30,6 +30,8 @@ public interface ApiMapper {
 
 	public List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
 
+	public int searchApiAuditListCount(ApiAuditVo apiAuditVo);
+
 	public List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
 
 	public List<String> getDistinctTokenInApiAudit();

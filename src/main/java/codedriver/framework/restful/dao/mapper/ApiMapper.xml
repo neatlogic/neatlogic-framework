@@ -202,6 +202,37 @@
 		</if>
 	</select>
 
+	<select id="searchApiAuditListCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int" useCache="false">
+		select
+		COUNT(1)
+		from `api_audit` LEFT JOIN `user`
+		on `api_audit`.`user_uuid` = `user`.`uuid`
+		where 1=1
+		<if test="userUuid != null">
+			and `api_audit`.`user_uuid` = #{userUuid}
+		</if>
+		<if test="tokenList != null and tokenList.size() > 0">
+			AND `api_audit`.`token` IN
+			<foreach collection="tokenList" item="token" open="(" separator="," close=")">
+				#{token}
+			</foreach>
+		</if>
+		<if test="startTime != null">
+			and `start_time` &gt;= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and `start_time` &lt;= #{endTime}
+		</if>
+		<choose>
+			<when test="orderType == 'desc'">
+				order by `start_time` desc
+			</when>
+			<otherwise>
+				order by `start_time`
+			</otherwise>
+		</choose>
+	</select>
+
 	<select id="searchApiAuditForExport" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
 		select CONCAT(api_audit.id,'') as id,
 		`api_audit`.`token` as token,

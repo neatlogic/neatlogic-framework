@@ -155,6 +155,108 @@
 		SELECT `token` FROM `api_access_count` WHERE token = #{token} FOR UPDATE
 	</select>
 
+	<select id="searchApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
+		select api_audit.id as id,
+		`api_audit`.`token` as token,
+		`api_audit`.`user_uuid` as userUuid,
+		`api_audit`.`authtype` as authtype,
+		`api_audit`.`server_id` as serverId,
+		`api_audit`.`ip` as ip,
+		`api_audit`.`start_time` as startTime,
+		`api_audit`.`end_time` as endTime,
+		`api_audit`.`time_cost` as timeCost,
+		`api_audit`.`status` as status,
+		`api_audit`.`param_hash` as paramHash,
+		`api_audit`.`result_hash` as resultHash,
+		`api_audit`.`error_hash` as errorHash,
+		`user`.`user_name` as userName
+		from `api_audit` LEFT JOIN `user`
+		on `api_audit`.`user_uuid` = `user`.`uuid`
+		where 1=1
+		<if test="userUuid != null">
+			and `api_audit`.`user_uuid` = #{userUuid}
+		</if>
+		<if test="tokenList != null and tokenList.size() > 0">
+			AND `api_audit`.`token` IN
+			<foreach collection="tokenList" item="token" open="(" separator="," close=")">
+				#{token}
+			</foreach>
+		</if>
+		<if test="startTime != null">
+			and `start_time` &gt;= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and `start_time` &lt;= #{endTime}
+		</if>
+		<choose>
+			<when test="orderType == 'desc'">
+				order by `start_time` desc
+			</when>
+			<otherwise>
+				order by `start_time`
+			</otherwise>
+		</choose>
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchApiAuditForExport" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
+		select CONCAT(api_audit.id,'') as id,
+		`api_audit`.`token` as token,
+-- 		`api_audit`.`user_uuid` as userUuid,
+		`api_audit`.`authtype` as authtype,
+		CONCAT(`api_audit`.`server_id`,'') as serverId,
+		`api_audit`.`ip` as ip,
+		DATE_FORMAT(`api_audit`.`start_time`,'%Y-%m-%d %H:%i:%s') as startTime,
+		DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
+		CONCAT(`api_audit`.`time_cost`,'') as timeCost,
+		`api_audit`.`status` as status,
+-- 		`api_audit`.`param_hash` as paramHash,
+-- 		`api_audit`.`result_hash` as resultHash,
+-- 		`api_audit`.`error_hash` as errorHash,
+		`user`.`user_name` as userName,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+		from `api_audit` LEFT JOIN `user`
+		on `api_audit`.`user_uuid` = `user`.`uuid`
+		where 1=1
+		<if test="userUuid != null">
+			and `api_audit`.`user_uuid` = #{userUuid}
+		</if>
+		<if test="tokenList != null and tokenList.size() > 0">
+			AND `api_audit`.`token` IN
+			<foreach collection="tokenList" item="token" open="(" separator="," close=")">
+				#{token}
+			</foreach>
+		</if>
+		<if test="startTime != null">
+			and `start_time` &gt;= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and `start_time` &lt;= #{endTime}
+		</if>
+		<choose>
+			<when test="orderType == 'desc'">
+				order by `start_time` desc
+			</when>
+			<otherwise>
+				order by `start_time`
+			</otherwise>
+		</choose>
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getDistinctTokenInApiAudit" resultType="java.lang.String" useCache="false">
+		SELECT
+		distinct `token`
+		FROM
+		`api_audit`
+	</select>
+
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
 		UPDATE `api`
 		SET

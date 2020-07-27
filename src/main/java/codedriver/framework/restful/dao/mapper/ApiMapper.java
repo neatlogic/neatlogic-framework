@@ -1,11 +1,10 @@
 package codedriver.framework.restful.dao.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ApiMapper {
 
@@ -28,6 +27,12 @@ public interface ApiMapper {
 	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
 	public String getApiAccessCountLockByToken(String token);
+
+	public List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
+
+	public List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
+
+	public List<String> getDistinctTokenInApiAudit();
 
 	public int replaceApi(ApiVo apiVo);
 

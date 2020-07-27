@@ -4,7 +4,8 @@ public enum OperationTypeEnum {
     CREATE("create","增加"),
     DELETE("delete","删除"),
     UPDATE("update","更新"),
-    SEARCH("search","查询");
+    SEARCH("search","查询"),
+    OPERATE("operate","操作");
     private String name;
     private String text;
 

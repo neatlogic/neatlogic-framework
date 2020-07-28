@@ -267,7 +267,7 @@ public class ExcelUtil {
      * @return
      * @throws Exception
      */
-    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList) throws Exception {
+    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList,Integer columnWidth) throws Exception {
         // 生成一个表格
         Sheet sheet = workbook.createSheet();
         // 设置sheet名字
@@ -305,7 +305,9 @@ public class ExcelUtil {
             int i = 0;
             for (String header : headerList) {
                 //设置列宽
-                sheet.setColumnWidth(i,(int)((30 + 0.72) * 256));
+                if(columnWidth != null && columnWidth > 0){
+                    sheet.setColumnWidth(i,columnWidth.intValue() * 256);
+                }
                 Cell cell = headerRow.createCell(i);
                 cell.setCellStyle(firstRowcellStyle);
 //                HSSFRichTextString text = new HSSFRichTextString(header);

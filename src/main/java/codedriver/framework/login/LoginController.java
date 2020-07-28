@@ -1,6 +1,8 @@
 package codedriver.framework.login;
 
 import java.util.Base64;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,6 +32,8 @@ import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
+import codedriver.framework.login.core.ILoginAuth;
+import codedriver.framework.login.core.LoginAuthFactory;
 import codedriver.framework.service.TenantService;
 
 @Controller
@@ -49,8 +53,7 @@ public class LoginController {
 		JSONObject jsonObj = JSONObject.parseObject(json);
 		TenantContext tenantContext = TenantContext.init();
 		try {
-			String userId = jsonObj.getString("userid");
-			String password = jsonObj.getString("password");
+			
 			if (StringUtils.isBlank(tenant)) {
 				tenant = request.getHeader("Tenant");
 			}
@@ -68,13 +71,16 @@ public class LoginController {
 				// 还原回租户库
 				tenantContext.setUseDefaultDatasource(false);
 			}
-
-			UserVo userVo = new UserVo();
-			userVo.setUserId(userId);
-			userVo.setPassword(password);
-			userVo.setTenant(tenant);
-
-			UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+			//验证并获取用户
+			UserVo  checkUserVo = null;
+			Map<String,ILoginAuth> loginAuthMap =  LoginAuthFactory.getLoginAuthMap();
+			for(Entry<String, ILoginAuth> loginAuthEntry : loginAuthMap.entrySet()) {
+				ILoginAuth loginAuth = loginAuthEntry.getValue();
+				checkUserVo =  loginAuth.auth(request, jsonObj);
+				if(checkUserVo != null && StringUtils.isNotBlank(checkUserVo.getUuid())) {
+					break;
+				}
+			}
 			if (checkUserVo != null) {
 				// 保存 user 登录访问时间
 				if (userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {

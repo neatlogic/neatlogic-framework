@@ -466,10 +466,9 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public String getModuleGroupName() {
 		if(StringUtils.isBlank(moduleGroupName) && StringUtils.isNotBlank(moduleGroup)){
-			Object group = ModuleUtil.getModuleGroupMap().get(moduleGroup);
+			ModuleGroupVo group = ModuleUtil.getModuleGroupMap().get(moduleGroup);
 			if(group != null){
-				ModuleGroupVo groupVo = (ModuleGroupVo)group;
-				String groupName = groupVo.getGroupName();
+				String groupName = group.getGroupName();
 				if(StringUtils.isNotBlank(groupName)){
 					moduleGroupName = groupName;
 				}

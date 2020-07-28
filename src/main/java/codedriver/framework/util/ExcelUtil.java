@@ -304,6 +304,8 @@ public class ExcelUtil {
         if(CollectionUtils.isNotEmpty(headerList)){
             int i = 0;
             for (String header : headerList) {
+                //设置列宽
+                sheet.setColumnWidth(i,(int)((30 + 0.72) * 256));
                 Cell cell = headerRow.createCell(i);
                 cell.setCellStyle(firstRowcellStyle);
 //                HSSFRichTextString text = new HSSFRichTextString(header);

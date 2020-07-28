@@ -3,6 +3,7 @@ package codedriver.framework.restful.dto;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.ApiComponentFactory;
@@ -154,8 +155,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String funcId;
 	@EntityField(name = "模块group", type = ApiParamType.STRING)
 	private String moduleGroup;
-//	@EntityField(name = "访问次数", type = ApiParamType.INTEGER)
-//	private Integer count;
+	@EntityField(name = "模块group名称", type = ApiParamType.STRING)
+	private String moduleGroupName;
 	@JSONField(serialize = false)
 	private transient JSONObject pathVariableObj;
 	@JSONField(serialize = false)
@@ -461,6 +462,19 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	public void setModuleGroup(String moduleGroup){
 		this.moduleGroup = moduleGroup;
+	}
+
+	public String getModuleGroupName() {
+		if(StringUtils.isBlank(moduleGroupName) && StringUtils.isNotBlank(moduleGroup)){
+			ModuleGroupVo group = ModuleUtil.getModuleGroupMap().get(moduleGroup);
+			if(group != null){
+				String groupName = group.getGroupName();
+				if(StringUtils.isNotBlank(groupName)){
+					moduleGroupName = groupName;
+				}
+			}
+		}
+		return moduleGroupName;
 	}
 
 //	public String getModuleGroup(){return moduleGroup;}

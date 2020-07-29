@@ -1,40 +1,26 @@
 package codedriver.framework.common.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
+import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import codedriver.framework.file.core.FileStorageMediumFactory;
 import codedriver.framework.file.core.IFileStorageMediumHandler;
 import codedriver.framework.file.dto.FileVo;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtil {
 	private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
@@ -161,12 +147,6 @@ public class FileUtil {
 		return desFile.getAbsolutePath();
 	}
 
-	public static void saveData(String storageMedium, String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMedium);
-		handler.saveData(tenantUuid,multipartFile,fileVo);
-	}
-
-	
 	/*private static String createNewFile(String filePath) {
 		File file = new File(filePath);
 		if ((!file.isFile()) || (!file.exists())) {
@@ -630,6 +610,22 @@ public class FileUtil {
 		}
 
 		return readData;
+	}
+
+	/**
+	 * 根据storageMedium获取存储介质Handler，从而上传到对应的存储介质中
+	 * @param storageMedium
+	 * @param tenantUuid
+	 * @param multipartFile
+	 * @param fileVo
+	 * @throws Exception
+	 */
+	public static void saveData(String storageMedium, String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMedium);
+		if(handler == null){
+			throw new FileStorageMediumHandlerNotFoundException(storageMedium);
+		}
+		handler.saveData(tenantUuid,multipartFile,fileVo);
 	}
 
 //	public static void main(String[] args) throws Exception {

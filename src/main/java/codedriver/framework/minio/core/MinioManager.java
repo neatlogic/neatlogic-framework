@@ -16,11 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RootComponent
 public class MinioManager implements InitializingBean, IFileStorageMediumHandler {
 
+	public static final String NAME = "MINIO";
+
 	private MinioClient minioClient;
 
 	@Override
 	public String getName() {
-		return "MINIO";
+		return NAME;
 	}
 
 	@Override
@@ -31,9 +33,9 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 
 	/**
 	 * 
-	 * @param bucketName  存储桶名
-	 * @param in          输入文件流
-	 * @param contentType 内容类型
+	 * @param tenantUuid
+	 * @param multipartFile
+	 * @param fileVo
 	 * @return
 	 */
 	public String saveData(String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
@@ -44,9 +46,10 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 			minioClient.makeBucket(Config.MINIO_BUCKET());
 		}
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
-		String finalPath = "/"+tenantUuid + "/upload/" + fileVo.getType() + "/" + format.format(new Date()) + "/" + fileVo.getId();
+		String finalPath = "/" + tenantUuid + "/upload/" + fileVo.getType() + "/" + format.format(new Date()) + "/" + fileVo.getId();
 		// 使用putObject上传一个文件到存储桶中
 		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, multipartFile.getInputStream(), multipartFile.getContentType());
+		fileVo.setPath("minio:" + finalPath);
 		return minioClient.getObjectUrl(Config.MINIO_BUCKET(), finalPath);
 	}
 

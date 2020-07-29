@@ -12,12 +12,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RootComponent
-public class localFileSystemFactory implements IFileStorageMediumHandler {
+public class LocalFileSystemHandler implements IFileStorageMediumHandler {
+
+	public static final String NAME = "LOCAL_FILE_SYSTEM";
 
 
 	@Override
 	public String getName() {
-		return "LOCAL_FILE_SYSTEM";
+		return NAME;
 	}
 
 

@@ -3,7 +3,6 @@ package codedriver.framework.minio.core;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.file.core.IFileStorageMediumHandler;
-import codedriver.framework.file.dto.FileVo;
 import io.minio.MinioClient;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -33,12 +32,11 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	 * 
 	 * @param tenantUuid
 	 * @param inputStream
-	 * @param fileVo
 	 * @param contentType
 	 * @return
 	 */
 	@Override
-	public String saveData(String tenantUuid, InputStream inputStream, FileVo fileVo,String contentType) throws Exception {
+	public String saveData(String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
 		// 检查存储桶是否已经存在
 		boolean bucketExists = minioClient.bucketExists(Config.MINIO_BUCKET());
 		if (!bucketExists) {
@@ -46,11 +44,11 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 			minioClient.makeBucket(Config.MINIO_BUCKET());
 		}
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
-		String finalPath = "/" + tenantUuid + "/upload/" + fileVo.getType() + "/" + format.format(new Date()) + "/" + fileVo.getId();
+		String finalPath = "/" + tenantUuid + "/upload/" + fileType + "/" + format.format(new Date()) + "/" + fileId;
 		// 使用putObject上传一个文件到存储桶中
 		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, inputStream, contentType);
-		fileVo.setPath("minio:" + finalPath);
-		return minioClient.getObjectUrl(Config.MINIO_BUCKET(), finalPath);
+//		fileVo.setPath("minio:" + finalPath);
+		return MinioManager.NAME.toLowerCase() + ":" + finalPath;
 	}
 
 	/**

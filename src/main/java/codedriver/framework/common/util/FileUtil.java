@@ -3,7 +3,6 @@ package codedriver.framework.common.util;
 import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import codedriver.framework.file.core.FileStorageMediumFactory;
 import codedriver.framework.file.core.IFileStorageMediumHandler;
-import codedriver.framework.file.dto.FileVo;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
@@ -616,27 +615,27 @@ public class FileUtil {
 	 * @param storageMediumHandler
 	 * @param tenantUuid
 	 * @param inputStream
-	 * @param fileVo
 	 * @throws Exception
 	 */
-	public static void saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, FileVo fileVo,String contentType) throws Exception {
+	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
 		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
 		if(handler == null){
 			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
 		}
-		handler.saveData(tenantUuid,inputStream,fileVo,contentType);
+		String filePath = handler.saveData(tenantUuid,inputStream,fileId,contentType,fileType);
+		return filePath;
 	}
 
-	public static InputStream getData(FileVo fileVo) throws Exception {
-		if(fileVo == null || StringUtils.isBlank(fileVo.getPath()) || !fileVo.getPath().contains(":")){
+	public static InputStream getData(String filePath) throws Exception {
+		if(StringUtils.isBlank(filePath) || !filePath.contains(":")){
 			return null;
 		}
-		String prefix = fileVo.getPath().split(":")[0];
+		String prefix = filePath.split(":")[0];
 		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
 		if(handler == null){
 			throw new FileStorageMediumHandlerNotFoundException(prefix);
 		}
-		InputStream inputStream = handler.getData(fileVo.getPath());
+		InputStream inputStream = handler.getData(filePath);
 		return inputStream;
 	}
 

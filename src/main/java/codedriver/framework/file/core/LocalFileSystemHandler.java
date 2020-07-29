@@ -2,7 +2,6 @@ package codedriver.framework.file.core;
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.file.dto.FileVo;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -24,9 +23,9 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 	}
 
 	@Override
-	public String saveData(String tenantUuid, InputStream inputStream, FileVo fileVo,String contentType) throws Exception {
+	public String saveData(String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy" + File.separator + "MM" + File.separator + "dd");
-		String filePath = tenantUuid + File.separator + format.format(new Date()) + File.separator + fileVo.getId();
+		String filePath = tenantUuid + File.separator + fileType + File.separator + format.format(new Date()) + File.separator + fileId;
 		String finalPath = Config.DATA_HOME() + filePath;
 		File file = new File(finalPath);
 		if (!file.getParentFile().exists()) {
@@ -36,8 +35,8 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 		IOUtils.copyLarge(inputStream, fos);
 		fos.flush();
 		fos.close();
-		fileVo.setPath("file:" + filePath);
-		return fileVo.getPath();
+//		fileVo.setPath("file:" + filePath);
+		return LocalFileSystemHandler.NAME.toLowerCase() + ":" + filePath;
 	}
 
 	@Override

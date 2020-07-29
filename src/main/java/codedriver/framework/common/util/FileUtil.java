@@ -1,5 +1,6 @@
 package codedriver.framework.common.util;
 
+import codedriver.framework.exception.file.FilePathIllegalException;
 import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import codedriver.framework.file.core.FileStorageMediumFactory;
 import codedriver.framework.file.core.IFileStorageMediumHandler;
@@ -628,7 +629,7 @@ public class FileUtil {
 
 	public static InputStream getData(String filePath) throws Exception {
 		if(StringUtils.isBlank(filePath) || !filePath.contains(":")){
-			return null;
+			throw new FilePathIllegalException(filePath);
 		}
 		String prefix = filePath.split(":")[0];
 		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());

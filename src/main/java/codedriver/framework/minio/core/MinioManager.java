@@ -1,17 +1,15 @@
 package codedriver.framework.minio.core;
 
+import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.config.Config;
+import codedriver.framework.file.core.IFileStorageMediumHandler;
+import codedriver.framework.file.dto.FileVo;
+import io.minio.MinioClient;
+import org.springframework.beans.factory.InitializingBean;
+
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import codedriver.framework.file.core.IFileStorageMediumHandler;
-import codedriver.framework.file.dto.FileVo;
-import org.springframework.beans.factory.InitializingBean;
-
-import codedriver.framework.common.RootComponent;
-import codedriver.framework.common.config.Config;
-import io.minio.MinioClient;
-import org.springframework.web.multipart.MultipartFile;
 
 @RootComponent
 public class MinioManager implements InitializingBean, IFileStorageMediumHandler {
@@ -34,11 +32,13 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	/**
 	 * 
 	 * @param tenantUuid
-	 * @param multipartFile
+	 * @param inputStream
 	 * @param fileVo
+	 * @param contentType
 	 * @return
 	 */
-	public String saveData(String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
+	@Override
+	public String saveData(String tenantUuid, InputStream inputStream, FileVo fileVo,String contentType) throws Exception {
 		// 检查存储桶是否已经存在
 		boolean bucketExists = minioClient.bucketExists(Config.MINIO_BUCKET());
 		if (!bucketExists) {
@@ -48,7 +48,7 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
 		String finalPath = "/" + tenantUuid + "/upload/" + fileVo.getType() + "/" + format.format(new Date()) + "/" + fileVo.getId();
 		// 使用putObject上传一个文件到存储桶中
-		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, multipartFile.getInputStream(), multipartFile.getContentType());
+		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, inputStream, contentType);
 		fileVo.setPath("minio:" + finalPath);
 		return minioClient.getObjectUrl(Config.MINIO_BUCKET(), finalPath);
 	}
@@ -66,14 +66,14 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 
 	/**
 	 * 获取
-	 * 
-	 * @param bucketName 存储桶名
-	 * @param objectName 输入文件流
+	 *
+	 * @param path
 	 * @return
 	 * @throws Exception
 	 */
-	public InputStream getObject(String bucketName, String objectName) throws Exception {
-		InputStream in = minioClient.getObject(bucketName, objectName);
+	@Override
+	public InputStream getData(String path) throws Exception {
+		InputStream in = minioClient.getObject(Config.MINIO_BUCKET(), path.replaceAll("minio:", ""));
 		return in;
 	}
 

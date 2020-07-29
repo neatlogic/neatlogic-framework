@@ -13,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -613,19 +612,32 @@ public class FileUtil {
 	}
 
 	/**
-	 * 根据storageMedium获取存储介质Handler，从而上传到对应的存储介质中
-	 * @param storageMedium
+	 * 根据storageMediumHandler获取存储介质Handler，从而上传到对应的存储介质中
+	 * @param storageMediumHandler
 	 * @param tenantUuid
-	 * @param multipartFile
+	 * @param inputStream
 	 * @param fileVo
 	 * @throws Exception
 	 */
-	public static void saveData(String storageMedium, String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMedium);
+	public static void saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, FileVo fileVo,String contentType) throws Exception {
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
 		if(handler == null){
-			throw new FileStorageMediumHandlerNotFoundException(storageMedium);
+			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
 		}
-		handler.saveData(tenantUuid,multipartFile,fileVo);
+		handler.saveData(tenantUuid,inputStream,fileVo,contentType);
+	}
+
+	public static InputStream getData(FileVo fileVo) throws Exception {
+		if(fileVo == null || StringUtils.isBlank(fileVo.getPath()) || !fileVo.getPath().contains(":")){
+			return null;
+		}
+		String prefix = fileVo.getPath().split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if(handler == null){
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		InputStream inputStream = handler.getData(fileVo.getPath());
+		return inputStream;
 	}
 
 //	public static void main(String[] args) throws Exception {

@@ -1,11 +1,6 @@
 package codedriver.framework.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-
+import codedriver.framework.minio.core.MinioManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import codedriver.framework.common.config.Config;
-import codedriver.framework.minio.core.MinioManager;
+import java.io.*;
 
 @Component
 public class LargeTextUtil {
@@ -80,7 +74,7 @@ public class LargeTextUtil {
 		InputStream stream = null;
 		if (StringUtils.isNotBlank(filePath) && length > 0) {
 			try {
-				stream = minioManager.getObject(Config.MINIO_BUCKET(), filePath);
+				stream = minioManager.getData(filePath);
 				reader = new InputStreamReader(stream, "utf-8");
 				int index = 0;
 				char[] buffer = new char[length];
@@ -116,7 +110,7 @@ public class LargeTextUtil {
 		if (StringUtils.isNotBlank(filePath)) {
 			InputStream stream = null;
 			try {
-				stream = minioManager.getObject(Config.MINIO_BUCKET(), filePath);
+				stream = minioManager.getData(filePath);
 				IOUtils.copy(stream, out);
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
@@ -137,7 +131,7 @@ public class LargeTextUtil {
 			String result = "";
 			InputStream stream = null;
 			try {
-				stream = minioManager.getObject(Config.MINIO_BUCKET(), filePath);
+				stream = minioManager.getData(filePath);
 				result = IOUtils.toString(stream, "utf-8");
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);

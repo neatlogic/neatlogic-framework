@@ -1,35 +1,25 @@
 package codedriver.framework.common.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import codedriver.framework.exception.file.FilePathIllegalException;
+import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
+import codedriver.framework.file.core.FileStorageMediumFactory;
+import codedriver.framework.file.core.IFileStorageMediumHandler;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtil {
 	private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
@@ -156,7 +146,6 @@ public class FileUtil {
 		return desFile.getAbsolutePath();
 	}
 
-	
 	/*private static String createNewFile(String filePath) {
 		File file = new File(filePath);
 		if ((!file.isFile()) || (!file.exists())) {
@@ -620,6 +609,35 @@ public class FileUtil {
 		}
 
 		return readData;
+	}
+
+	/**
+	 * 根据storageMediumHandler获取存储介质Handler，从而上传到对应的存储介质中
+	 * @param storageMediumHandler
+	 * @param tenantUuid
+	 * @param inputStream
+	 * @throws Exception
+	 */
+	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
+		if(handler == null){
+			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
+		}
+		String filePath = handler.saveData(tenantUuid,inputStream,fileId,contentType,fileType);
+		return filePath;
+	}
+
+	public static InputStream getData(String filePath) throws Exception {
+		if(StringUtils.isBlank(filePath) || !filePath.contains(":")){
+			throw new FilePathIllegalException(filePath);
+		}
+		String prefix = filePath.split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if(handler == null){
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		InputStream inputStream = handler.getData(filePath);
+		return inputStream;
 	}
 
 //	public static void main(String[] args) throws Exception {

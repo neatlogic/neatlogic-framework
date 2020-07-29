@@ -17,9 +17,13 @@ import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.file.core.FileStorageMediumFactory;
+import codedriver.framework.file.core.IFileStorageMediumHandler;
+import codedriver.framework.file.dto.FileVo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,6 +34,7 @@ import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtil {
 	private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
@@ -154,6 +159,11 @@ public class FileUtil {
 			}
 		}
 		return desFile.getAbsolutePath();
+	}
+
+	public static void saveData(String storageMedium, String tenantUuid, MultipartFile multipartFile, FileVo fileVo) throws Exception {
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMedium);
+		handler.saveData(tenantUuid,multipartFile,fileVo);
 	}
 
 	

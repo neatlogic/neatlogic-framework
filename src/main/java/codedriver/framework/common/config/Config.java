@@ -53,6 +53,8 @@ public class Config {
 	private static String MINIO_BUCKET;
 	private static String MINIO_ACCESSKEY;
 	private static String MINIO_SECRETKEY;
+	
+	private static String MOBILE_TEST_USER;//移动端测试用户
 
 	static {
 		CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -134,6 +136,10 @@ public class Config {
 	public static final String MINIO_BUCKET() {
 		return MINIO_BUCKET;
 	}
+	
+	public static final String MOBILE_TEST_USER() {
+		return MOBILE_TEST_USER;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -178,6 +184,7 @@ public class Config {
 			MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
 			MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
 			MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
+			MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
 			ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
 			ES_CLUSTERS = new HashMap<>();
 

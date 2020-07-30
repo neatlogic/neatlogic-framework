@@ -49,5 +49,10 @@
 		#{path}
 		)
 	</insert>
+
+	<delete id="deleteFile" parameterType="java.lang.Long">
+		DELETE FROM `file`
+		WHERE `id` = #{fileId}
+	</delete>
 </mapper>
 

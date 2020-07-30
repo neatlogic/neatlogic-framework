@@ -2,8 +2,10 @@ package codedriver.framework.minio.core;
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.file.FilePathIllegalException;
 import codedriver.framework.file.core.IFileStorageMediumHandler;
 import io.minio.MinioClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.InputStream;
@@ -54,12 +56,16 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	/**
 	 * 删除
 	 * 
-	 * @param bucketName 存储桶名
-	 * @param ObjectName 输入文件流
 	 * @throws Exception
 	 */
-	public void removeObject(String bucketName, String objectName) throws Exception {
-		minioClient.removeObject(bucketName, objectName);
+	public void deleteData(String filePath) throws Exception {
+		if(StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")){
+			String path = filePath.replaceAll(NAME.toLowerCase() + ":","");
+			minioClient.removeObject(Config.MINIO_BUCKET(), path);
+		}else{
+			throw new FilePathIllegalException(filePath);
+		}
+
 	}
 
 	/**
@@ -71,7 +77,7 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	 */
 	@Override
 	public InputStream getData(String path) throws Exception {
-		InputStream in = minioClient.getObject(Config.MINIO_BUCKET(), path.replaceAll("minio:", ""));
+		InputStream in = minioClient.getObject(Config.MINIO_BUCKET(), path.replaceAll(NAME.toLowerCase() + ":", ""));
 		return in;
 	}
 

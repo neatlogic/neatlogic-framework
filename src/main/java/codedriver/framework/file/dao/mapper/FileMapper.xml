@@ -26,6 +26,23 @@
 		WHERE name = #{value}
 	</select>
 
+	<select id="getFileListByIdList" parameterType="java.util.List" resultType="codedriver.framework.file.dto.FileVo">
+		SELECT
+		`id`,
+		`name`,
+		`size`,
+		`user_uuid` AS userUuid,
+		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
+		`type`,
+		content_type AS contentType,
+		`path`
+		FROM `file`
+		WHERE `id` IN
+		<foreach collection="list" item ="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</select>
+
 	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
 		INSERT INTO `file` (
 		`id`,

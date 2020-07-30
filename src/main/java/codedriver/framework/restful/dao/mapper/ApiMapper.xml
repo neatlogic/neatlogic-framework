@@ -374,7 +374,8 @@
 		`status`,
 		`param_hash`,
 		`result_hash`,
-		`error_hash`
+		`error_hash`,
+		`audit_detail_hash`
 		)
 		VALUES
 		(#{id},
@@ -389,7 +390,15 @@
 		#{status},
 		#{paramHash},
 		#{resultHash},
-		#{errorHash}
+		#{errorHash},
+		<choose>
+			<when test="auditDetailHash == null">
+				null
+			</when>
+			<otherwise>
+				#{auditDetailHash}
+			</otherwise>
+		</choose>
 		)
 	</insert>
 
@@ -397,6 +406,12 @@
 		REPLACE INTO `api_audit_detail` (`hash`, `content`)
 		VALUES
 		(#{hash}, #{content})
+	</insert>
+
+	<insert id="insertApiAuditDetail">
+		REPLACE INTO `api_audit_detail` (`hash`, `detail_file_id`)
+		VALUES
+		(#{hash}, #{detailFileId})
 	</insert>
 
 	<insert id="insertApiAccessCount">

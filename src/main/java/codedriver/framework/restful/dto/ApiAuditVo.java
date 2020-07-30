@@ -61,6 +61,10 @@ public class ApiAuditVo extends BasePageVo {
 	private String errorHash;
 	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
 	private String resultHash;
+	@EntityField(name = "调用详细记录hash", type = ApiParamType.STRING)
+	private String auditDetailHash;
+	@EntityField(name = "调用详细记录文件ID", type = ApiParamType.LONG)
+	private Long detailFileId;
 
 	@EntityField(name = "API所属模块", type = ApiParamType.STRING)
 	@ExcelField(name = "API所属模块")
@@ -245,6 +249,31 @@ public class ApiAuditVo extends BasePageVo {
 
 	public void setResultHash(String resultHash) {
 		this.resultHash = resultHash;
+	}
+
+	/**
+	 * 只要有一个有值，那么就生成调用详细记录hash
+	 * @return
+	 */
+	public String getAuditDetailHash() {
+		if(StringUtils.isBlank(auditDetailHash)){
+			if (result != null || StringUtils.isNotBlank(param) || StringUtils.isNotBlank(error)) {
+				auditDetailHash = DigestUtils.md5DigestAsHex(JSON.toJSONString(id + token + startTime.getTime()).getBytes());
+			}
+		}
+		return auditDetailHash;
+	}
+
+	public void setAuditDetailHash(String auditDetailHash) {
+		this.auditDetailHash = auditDetailHash;
+	}
+
+	public Long getDetailFileId() {
+		return detailFileId;
+	}
+
+	public void setDetailFileId(Long detailFileId) {
+		this.detailFileId = detailFileId;
 	}
 
 	public String getModuleGroup() {

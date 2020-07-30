@@ -45,6 +45,8 @@ public interface ApiMapper {
 	public int batchUpdate(ApiVo apiVo);
 
 	public int replaceApiAuditDetail(@Param("hash") String hash, @Param("content") String content);
+
+	public int insertApiAuditDetail(@Param("hash") String hash, @Param("detailFileId") Long detailFileId);
 	/**
 	 * 
 	* @Time:2020年7月15日

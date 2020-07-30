@@ -9,8 +9,10 @@ public interface FileMapper {
 	public FileVo getFileById(Long id);
 
 	public FileTypeVo getFileTypeConfigByType(String name);
-	
+
 	public List<FileVo> getFileListByIdList(List<Long> idList);
 
 	public int insertFile(FileVo fileVo);
+
+	public void deleteFile(Long fileId);
 }

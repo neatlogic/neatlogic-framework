@@ -37,12 +37,12 @@
 		content_type AS contentType,
 		`path`
 		FROM `file`
-		WHERE `id` IN 
+		WHERE `id` IN
 		<foreach collection="list" item ="id" open="(" close=")" separator=",">
 		#{id}
 		</foreach>
 	</select>
-	
+
 	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
 		INSERT INTO `file` (
 		`id`,
@@ -66,5 +66,10 @@
 		#{path}
 		)
 	</insert>
+
+	<delete id="deleteFile" parameterType="java.lang.Long">
+		DELETE FROM `file`
+		WHERE `id` = #{fileId}
+	</delete>
 </mapper>
 

@@ -2,6 +2,8 @@ package codedriver.framework.restful.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.annotation.ExcelField;
 import codedriver.framework.util.SnowflakeUtil;
@@ -63,8 +65,10 @@ public class ApiAuditVo extends BasePageVo {
 	private String resultHash;
 
 	@EntityField(name = "API所属模块", type = ApiParamType.STRING)
-	@ExcelField(name = "API所属模块")
 	private String moduleGroup;
+	@EntityField(name = "模块group名称", type = ApiParamType.STRING)
+	@ExcelField(name = "API所属模块")
+	private String moduleGroupName;
 	@EntityField(name = "API所属功能", type = ApiParamType.STRING)
 	private String funcId;
 	@EntityField(name = "操作类型", type = ApiParamType.STRING)
@@ -253,6 +257,19 @@ public class ApiAuditVo extends BasePageVo {
 
 	public void setModuleGroup(String moduleGroup) {
 		this.moduleGroup = moduleGroup;
+	}
+
+	public String getModuleGroupName() {
+		if(StringUtils.isBlank(moduleGroupName) && StringUtils.isNotBlank(moduleGroup)){
+			ModuleGroupVo group = ModuleUtil.getModuleGroupMap().get(moduleGroup);
+			if(group != null){
+				String groupName = group.getGroupName();
+				if(StringUtils.isNotBlank(groupName)){
+					moduleGroupName = groupName;
+				}
+			}
+		}
+		return moduleGroupName;
 	}
 
 	public String getFuncId() {

@@ -174,7 +174,7 @@
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
-		<if test="userUuid != null">
+		<if test="userUuid != null and userUuid != ''">
 			and `api_audit`.`user_uuid` = #{userUuid}
 		</if>
 		<if test="tokenList != null and tokenList.size() > 0">
@@ -190,7 +190,7 @@
 			and `start_time` &lt;= #{endTime}
 		</if>
 		<choose>
-			<when test="orderType == 'desc'">
+			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc
 			</when>
 			<otherwise>
@@ -208,7 +208,7 @@
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
-		<if test="userUuid != null">
+		<if test="userUuid != null and userUuid != ''">
 			and `api_audit`.`user_uuid` = #{userUuid}
 		</if>
 		<if test="tokenList != null and tokenList.size() > 0">
@@ -224,7 +224,7 @@
 			and `start_time` &lt;= #{endTime}
 		</if>
 		<choose>
-			<when test="orderType == 'desc'">
+			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc
 			</when>
 			<otherwise>
@@ -254,7 +254,7 @@
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
-		<if test="userUuid != null">
+		<if test="userUuid != null and userUuid != ''">
 			and `api_audit`.`user_uuid` = #{userUuid}
 		</if>
 		<if test="tokenList != null and tokenList.size() > 0">
@@ -270,7 +270,7 @@
 			and `start_time` &lt;= #{endTime}
 		</if>
 		<choose>
-			<when test="orderType == 'desc'">
+			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc
 			</when>
 			<otherwise>

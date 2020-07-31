@@ -6,6 +6,7 @@ import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.dao.mapper.FileMapper;
 import codedriver.framework.file.dto.FileVo;
+import codedriver.framework.minio.core.MinioManager;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import com.alibaba.fastjson.JSONObject;
@@ -83,15 +84,20 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 				String filePath = null;
 				try {
 					// TODO fileType待定，存储介质待定
-					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"apiAudit","ITSM");
+					filePath = FileUtil.saveData(MinioManager.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
 				} catch (Exception e) {
+					try {
+						filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 					e.printStackTrace();
 				}
 				fileVo.setPath(filePath);
 				fileVo.setSize(new Long(auditDetail.toJSONString().getBytes().length));
-				fileVo.setContentType("apiAudit");
+				fileVo.setContentType("text/plain");
 				// TODO fileType待定
-				fileVo.setType("ITSM");
+				fileVo.setType("API_AUDIT");
 				fileMapper.insertFile(fileVo);
 
 				apiAuditVo.setDetailFileId(fileVo.getId());

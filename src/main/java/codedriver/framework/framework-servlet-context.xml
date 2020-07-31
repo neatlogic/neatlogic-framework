@@ -15,7 +15,7 @@
 		http://codedriver.techsure.com/schema/codedriver
 		http://codedriver.techsure.com/schema/codedriver.xsd">
 
-	<codedriver:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99" groupDescription="基础模块，提供各种基础功能" />
+	<codedriver:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99" groupDescription="挖掘更多强大的配置功能" />
 
 	<context:component-scan base-package="codedriver.framework" />
 

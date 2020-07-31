@@ -112,7 +112,8 @@
 		`status`,
 		`param_hash` as paramHash,
 		`result_hash` as resultHash,
-		`error_hash` as errorHash
+		`error_hash` as errorHash,
+		(SELECT aad.`detail_file_id` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`audit_detail_hash`) AS detailFileId
 		FROM
 		`api_audit`
 		WHERE `token` = #{token}
@@ -170,7 +171,8 @@
 		`api_audit`.`param_hash` as paramHash,
 		`api_audit`.`result_hash` as resultHash,
 		`api_audit`.`error_hash` as errorHash,
-		`user`.`user_name` as userName
+		`user`.`user_name` as userName,
+		(SELECT aad.`detail_file_id` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`audit_detail_hash`) AS detailFileId
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
@@ -248,9 +250,10 @@
 -- 		`api_audit`.`result_hash` as resultHash,
 -- 		`api_audit`.`error_hash` as errorHash,
 		`user`.`user_name` as userName,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+		(SELECT aad.`detail_file_id` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`audit_detail_hash`) AS detailFileId
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
@@ -400,12 +403,6 @@
 			</otherwise>
 		</choose>
 		)
-	</insert>
-
-	<insert id="replaceApiAuditDetail">
-		REPLACE INTO `api_audit_detail` (`hash`, `content`)
-		VALUES
-		(#{hash}, #{content})
 	</insert>
 
 	<insert id="insertApiAuditDetail">

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 
 @Service
 public class ApiAuditSaveThread extends CodeDriverThread {
@@ -51,6 +52,10 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 	@Override
 	protected void execute() {
 		if (apiAuditVo != null) {
+			/**
+			 * 先在api_audit表中插入一条记录
+			 * 如果参数/结果/异常三者中任一一个有值，那么就生成文件记录
+			 */
 			apiMapper.insertApiAudit(apiAuditVo);
 //			if (StringUtils.isNotBlank(apiAuditVo.getErrorHash())) {
 //				apiMapper.replaceApiAuditDetail(apiAuditVo.getErrorHash(), apiAuditVo.getError());
@@ -68,8 +73,9 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 				 * 将fileId赋值给apiAuditVo的detailFileId字段，插入api_audit_detail表
  				 */
 				String tenantUuid = TenantContext.get().getTenantUuid();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 				FileVo fileVo = new FileVo();
-				fileVo.setName(fileVo.getId().toString());
+				fileVo.setName("API_AUDIT-" + sdf.format(apiAuditVo.getStartTime()));
 				fileVo.setUserUuid(apiAuditVo.getUserUuid());
 				/**
 				 * 组装文件内容JSON
@@ -83,15 +89,15 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 				InputStream inputStream = IOUtils.toInputStream(auditDetail.toJSONString(), Charset.forName("UTF-8"));
 				String filePath = null;
 				try {
-					// TODO fileType待定，存储介质待定
+					// TODO fileType待定
 					filePath = FileUtil.saveData(MinioManager.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
 				} catch (Exception e) {
+					logger.error(e.getMessage(),e);
 					try {
 						filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						logger.error(e1.getMessage(),e1);
 					}
-					e.printStackTrace();
 				}
 				fileVo.setPath(filePath);
 				fileVo.setSize(new Long(auditDetail.toJSONString().getBytes().length));
@@ -102,14 +108,6 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 
 				apiAuditVo.setDetailFileId(fileVo.getId());
 				apiMapper.insertApiAuditDetail(apiAuditVo.getAuditDetailHash(),apiAuditVo.getDetailFileId());
-				try {
-					InputStream data = FileUtil.getData(filePath);
-					String s = IOUtils.toString(data,Charset.forName("UTF-8"));
-					System.out.println(s);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
 			}
 		}
 	}

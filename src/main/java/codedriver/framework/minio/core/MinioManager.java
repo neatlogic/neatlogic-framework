@@ -38,7 +38,7 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	 * @return
 	 */
 	@Override
-	public String saveData(String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
+	public String saveData(String tenantUuid, InputStream inputStream, Long fileId, String contentType, String fileType) throws Exception {
 		// 检查存储桶是否已经存在
 		boolean bucketExists = minioClient.bucketExists(Config.MINIO_BUCKET());
 		if (!bucketExists) {
@@ -59,10 +59,10 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	 * @throws Exception
 	 */
 	public void deleteData(String filePath) throws Exception {
-		if(StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")){
-			String path = filePath.replaceAll(NAME.toLowerCase() + ":","");
+		if (StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")) {
+			String path = filePath.replaceAll(NAME.toLowerCase() + ":", "");
 			minioClient.removeObject(Config.MINIO_BUCKET(), path);
-		}else{
+		} else {
 			throw new FilePathIllegalException(filePath);
 		}
 

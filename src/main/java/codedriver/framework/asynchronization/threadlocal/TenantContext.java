@@ -84,7 +84,10 @@ public class TenantContext implements Serializable {
 			this.activeModuleGroupList = new ArrayList<>();
 			if (tenantModuleGroupList != null) {
 				for (String group : tenantModuleGroupList) {
-					this.activeModuleGroupList.add(ModuleUtil.getModuleGroup(group));
+					ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
+					if (groupVo != null) {
+						this.activeModuleGroupList.add(groupVo);
+					}
 				}
 			}
 
@@ -120,7 +123,7 @@ public class TenantContext implements Serializable {
 	public List<ModuleVo> getActiveModuleList() {
 		return activeModuleList;
 	}
-	
+
 	public List<ModuleGroupVo> getActiveModuleGroupList() {
 		return activeModuleGroupList;
 	}

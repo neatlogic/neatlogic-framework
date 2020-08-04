@@ -6,10 +6,8 @@ import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.dao.mapper.FileMapper;
 import codedriver.framework.file.dto.FileVo;
-import codedriver.framework.minio.core.MinioManager;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 @Service
@@ -53,62 +51,77 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 	protected void execute() {
 		if (apiAuditVo != null) {
 			/**
-			 * 先在api_audit表中插入一条记录
-			 * 如果参数/结果/异常三者中任一一个有值，那么就生成文件记录
+			 * 创建FileVo对象，生成文件流，调用FileUtil.saveData存储文件并得到filePath
+			 * 将filePath装入FileVo对象，插入file表
+			 * 将filePath和各自内容的坐标、偏移量赋给apiAuditVo，插入api_audit表
+ 			 */
+			String tenantUuid = TenantContext.get().getTenantUuid();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+			FileVo fileVo = new FileVo();
+			fileVo.setName("API_AUDIT-" + sdf.format(apiAuditVo.getStartTime()));
+			fileVo.setUserUuid(apiAuditVo.getUserUuid());
+			/**
+			 * 组装文件内容JSON并且计算文件中每一块内容的开始坐标和偏移量
+			 * 例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
+			 * 偏移量为apiAuditVo.getParam()的字节数(注意一定要用UTF-8格式，否则计算出来的偏移量不对)
 			 */
-			apiMapper.insertApiAudit(apiAuditVo);
-//			if (StringUtils.isNotBlank(apiAuditVo.getErrorHash())) {
-//				apiMapper.replaceApiAuditDetail(apiAuditVo.getErrorHash(), apiAuditVo.getError());
-//			}
-//			if (StringUtils.isNotBlank(apiAuditVo.getResultHash())) {
-//				apiMapper.replaceApiAuditDetail(apiAuditVo.getResultHash(), JSON.toJSONString(apiAuditVo.getResult()));
-//			}
-//			if (StringUtils.isNotBlank(apiAuditVo.getParamHash())) {
-//				apiMapper.replaceApiAuditDetail(apiAuditVo.getParamHash(), apiAuditVo.getParam());
-//			}
-			if(StringUtils.isNotBlank(apiAuditVo.getAuditDetailHash())){
-				/**
-				 * 创建FileVo对象，生成文件流，调用FileUtil.saveData存储文件并得到filePath
-				 * 将filePath装入FileVo对象，插入file表
-				 * 将fileId赋值给apiAuditVo的detailFileId字段，插入api_audit_detail表
- 				 */
-				String tenantUuid = TenantContext.get().getTenantUuid();
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-				FileVo fileVo = new FileVo();
-				fileVo.setName("API_AUDIT-" + sdf.format(apiAuditVo.getStartTime()));
-				fileVo.setUserUuid(apiAuditVo.getUserUuid());
-				/**
-				 * 组装文件内容JSON
-				 */
-				JSONObject auditDetail = new JSONObject();
-				auditDetail.put("auditDetailHash",apiAuditVo.getAuditDetailHash());
-				auditDetail.put("param",apiAuditVo.getParam());
-				auditDetail.put("result",apiAuditVo.getResult());
-				auditDetail.put("error",apiAuditVo.getError());
-//				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(auditDetail.toJSONString().getBytes());
-				InputStream inputStream = IOUtils.toInputStream(auditDetail.toJSONString(), Charset.forName("UTF-8"));
-				String filePath = null;
-				try {
-					// TODO fileType待定
-					filePath = FileUtil.saveData(MinioManager.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
-				} catch (Exception e) {
-					logger.error(e.getMessage(),e);
-					try {
-						filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
-					} catch (Exception e1) {
-						logger.error(e1.getMessage(),e1);
-					}
-				}
-				fileVo.setPath(filePath);
-				fileVo.setSize(new Long(auditDetail.toJSONString().getBytes().length));
-				fileVo.setContentType("text/plain");
-				// TODO fileType待定
-				fileVo.setType("API_AUDIT");
-				fileMapper.insertFile(fileVo);
-
-				apiAuditVo.setDetailFileId(fileVo.getId());
-				apiMapper.insertApiAuditDetail(apiAuditVo.getAuditDetailHash(),apiAuditVo.getDetailFileId());
+			StringBuffer sb = new StringBuffer();
+			sb.append("param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			sb.append("\n");
+			if(StringUtils.isNotBlank(apiAuditVo.getParam())){
+				int offset = apiAuditVo.getParam().getBytes(StandardCharsets.UTF_8).length;
+				apiAuditVo.setParamFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+				sb.append(apiAuditVo.getParam());
+				sb.append("\n");
 			}
+			sb.append("param<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+			sb.append("\n");
+			sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			sb.append("\n");
+			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+				int offset = apiAuditVo.getResult().toString().getBytes(StandardCharsets.UTF_8).length;
+				apiAuditVo.setResultFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+				sb.append(apiAuditVo.getResult());
+				sb.append("\n");
+			}
+			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+			sb.append("\n");
+			sb.append("error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			sb.append("\n");
+			if(StringUtils.isNotBlank(apiAuditVo.getError())){
+				int offset = apiAuditVo.getError().getBytes(StandardCharsets.UTF_8).length;
+				apiAuditVo.setErrorFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+				sb.append(apiAuditVo.getError());
+				sb.append("\n");
+			}
+			sb.append("error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
+			String filePath = null;
+			try {
+				// TODO fileType待定
+				filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
+			} catch (Exception e) {
+				logger.error(e.getMessage(),e);
+			}
+			fileVo.setPath(filePath);
+			fileVo.setSize(new Long(sb.toString().getBytes(StandardCharsets.UTF_8).length));
+			fileVo.setContentType("text/plain");
+			// TODO fileType待定
+			fileVo.setType("API_AUDIT");
+			fileMapper.insertFile(fileVo);
+
+			/** 记录文件路径和偏移量，插入api_audit表 */
+			if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){
+				apiAuditVo.setParamFilePath(filePath + apiAuditVo.getParamFilePath());
+			}
+			if(StringUtils.isNotBlank(apiAuditVo.getResultFilePath())){
+				apiAuditVo.setResultFilePath(filePath + apiAuditVo.getResultFilePath());
+			}
+			if(StringUtils.isNotBlank(apiAuditVo.getErrorFilePath())){
+				apiAuditVo.setErrorFilePath(filePath + apiAuditVo.getErrorFilePath());
+			}
+			apiMapper.insertApiAudit(apiAuditVo);
+
 		}
 	}
 

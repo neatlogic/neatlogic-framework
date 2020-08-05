@@ -145,6 +145,26 @@
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
 		ORDER BY k.`id` DESC
 	</select>
+	
+	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
+		SELECT
+		CONCAT("user#",a.uuid) AS  `value`,
+		a.`user_name` AS `text`
+		FROM
+		`user` a
+		<where>
+			a.`is_active` = 1
+			<if test="keyword !=null and keyword != ''">
+				AND (a.user_id LIKE CONCAT('%', #{keyword}, '%')
+				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+		</where>
+		ORDER BY a.`id` DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+		
+	</select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">
 		SELECT

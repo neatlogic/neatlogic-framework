@@ -53,7 +53,7 @@ public class UserVo extends BasePageVo {
 	
 	@EntityField(name = "用户角色uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> roleUuidList = new ArrayList<>();
-	private List<String> roleNameList = new ArrayList<>();
+	//private List<String> roleNameList = new ArrayList<>();
 	
 	@EntityField(name = "用户角色信息列表", type = ApiParamType.JSONARRAY)
 	private List<RoleVo> roleList = new ArrayList<>();
@@ -298,14 +298,14 @@ public class UserVo extends BasePageVo {
 		this.userInfoObj = userInfoObj;
 	}
 
-	public List<String> getRoleDescriptionList() {
+	/*public List<String> getRoleDescriptionList() {
 		if(CollectionUtils.isEmpty(roleNameList) && CollectionUtils.isNotEmpty(roleList)) {
 			for(RoleVo role : roleList) {
-				roleNameList.add(role.getName());
+				roleNameList.add(role.getDescription());
 			}
 		}
 		return roleNameList;
-	}
+	}*/
 
 	public List<String> getRoleUuidList() {
 		if(CollectionUtils.isEmpty(roleUuidList) && CollectionUtils.isNotEmpty(roleList)) {

@@ -2,6 +2,7 @@ package codedriver.framework.restful.audit;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.dao.mapper.FileMapper;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -76,16 +78,16 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			}
 			sb.append("param<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			sb.append("\n");
-			sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-			sb.append("\n");
-			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
-				int offset = apiAuditVo.getResult().toString().getBytes(StandardCharsets.UTF_8).length;
-				apiAuditVo.setResultFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
-				sb.append(apiAuditVo.getResult());
-				sb.append("\n");
-			}
-			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-			sb.append("\n");
+//			sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//			sb.append("\n");
+//			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+//				int offset = apiAuditVo.getResult().toString().getBytes(StandardCharsets.UTF_8).length;
+//				apiAuditVo.setResultFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+//				sb.append(apiAuditVo.getResult());
+//				sb.append("\n");
+//			}
+//			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+//			sb.append("\n");
 			sb.append("error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 			sb.append("\n");
 			if(StringUtils.isNotBlank(apiAuditVo.getError())){
@@ -95,6 +97,17 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 				sb.append("\n");
 			}
 			sb.append("error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			sb.append("\n");
+			sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+			sb.append("\n");
+
+			long lengthWithoutResult = sb.toString().getBytes(StandardCharsets.UTF_8).length;
+
+			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+				sb.append(apiAuditVo.getResult());
+				sb.append("\n");
+			}
+			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
 			String filePath = null;
 			try {
@@ -110,12 +123,19 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			fileVo.setType("API_AUDIT");
 			fileMapper.insertFile(fileVo);
 
+			System.out.println("获取长度前：" + System.currentTimeMillis());
+			File file = new File(Config.DATA_HOME() + filePath.substring(5));
+			long length = file.length();
+			System.out.println("获取长度后：" + System.currentTimeMillis());
+			long resultOffset = length - lengthWithoutResult - "result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".getBytes(StandardCharsets.UTF_8).length -1;
+			String resultOffsetStr = "?startIndex=" + lengthWithoutResult + "&offset=" + resultOffset;
+
 			/** 记录文件路径和偏移量，插入api_audit表 */
 			if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){
 				apiAuditVo.setParamFilePath(filePath + apiAuditVo.getParamFilePath());
 			}
-			if(StringUtils.isNotBlank(apiAuditVo.getResultFilePath())){
-				apiAuditVo.setResultFilePath(filePath + apiAuditVo.getResultFilePath());
+			if(StringUtils.isNotBlank(resultOffsetStr)){
+				apiAuditVo.setResultFilePath(filePath + resultOffsetStr);
 			}
 			if(StringUtils.isNotBlank(apiAuditVo.getErrorFilePath())){
 				apiAuditVo.setErrorFilePath(filePath + apiAuditVo.getErrorFilePath());

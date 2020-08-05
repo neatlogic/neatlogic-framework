@@ -620,6 +620,18 @@ public class FileUtil {
 		handler.deleteData(filePath);
 	}
 
+	public static long getDataLength(String filePath){
+		if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+			throw new FilePathIllegalException(filePath);
+		}
+		String prefix = filePath.split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if (handler == null) {
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		return handler.getDataLength(filePath);
+	}
+
 //	public static void main(String[] args) throws Exception {
 //		//并发嵌套测试，（写与读） 10 threads
 //		new Thread(

@@ -16,6 +16,9 @@ import java.util.List;
 
 public class ApiAuditVo extends BasePageVo {
 
+	/** 查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看 */
+	public final static long maxFileSize = 1024 * 1024;
+
 	public final static String SUCCEED = "succeed";
 	public final static String FAILED = "failed";
 

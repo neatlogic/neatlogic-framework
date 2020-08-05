@@ -62,4 +62,14 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 			throw new FilePathIllegalException(filePath);
 		}
 	}
+
+	@Override
+	public long getDataLength(String filePath){
+		long length = 0;
+		File file = new File(Config.DATA_HOME() + filePath.substring(5));
+		if (file.exists() && file.isFile()) {
+			length = file.length();
+		}
+		return length;
+	}
 }

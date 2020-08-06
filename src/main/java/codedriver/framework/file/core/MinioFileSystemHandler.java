@@ -1,24 +1,18 @@
-package codedriver.framework.minio.core;
+package codedriver.framework.file.core;
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.file.FilePathIllegalException;
-import codedriver.framework.file.core.IFileStorageMediumHandler;
 import io.minio.MinioClient;
-import io.minio.errors.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RootComponent
-public class MinioManager implements InitializingBean, IFileStorageMediumHandler {
+public class MinioFileSystemHandler implements InitializingBean, IFileStorageMediumHandler {
 
 	public static final String NAME = "MINIO";
 
@@ -55,7 +49,7 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 		// 使用putObject上传一个文件到存储桶中
 		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, inputStream, contentType);
 //		fileVo.setPath("minio:" + finalPath);
-		return MinioManager.NAME.toLowerCase() + ":" + finalPath;
+		return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
 	}
 
 	/**
@@ -87,29 +81,9 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 	}
 
 	@Override
-	public long getDataLength(String filePath) {
+	public long getDataLength(String filePath) throws Exception {
 		long length = 0;
-		try {
-			length = minioClient.statObject(Config.MINIO_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
-		} catch (InvalidBucketNameException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (InsufficientDataException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (NoResponseException e) {
-			e.printStackTrace();
-		} catch (XmlPullParserException e) {
-			e.printStackTrace();
-		} catch (ErrorResponseException e) {
-			e.printStackTrace();
-		} catch (InternalException e) {
-			e.printStackTrace();
-		}
+		length = minioClient.statObject(Config.MINIO_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
 		return length;
 	}
 }

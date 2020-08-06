@@ -620,7 +620,7 @@ public class FileUtil {
 		handler.deleteData(filePath);
 	}
 
-	public static long getDataLength(String filePath){
+	public static long getDataLength(String filePath) throws Exception {
 		if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
 			throw new FilePathIllegalException(filePath);
 		}

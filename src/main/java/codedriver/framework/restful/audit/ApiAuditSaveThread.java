@@ -6,7 +6,7 @@ import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.dao.mapper.FileMapper;
 import codedriver.framework.file.dto.FileVo;
-import codedriver.framework.minio.core.MinioManager;
+import codedriver.framework.file.core.MinioFileSystemHandler;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import org.apache.commons.io.IOUtils;
@@ -106,7 +106,7 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
 			String filePath = null;
 			try {
-				filePath = FileUtil.saveData(MinioManager.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
+				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
 				try {
@@ -118,28 +118,36 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			}
 
 			if(StringUtils.isNotBlank(filePath)){
-				long length = FileUtil.getDataLength(filePath);
-				fileVo.setPath(filePath);
-				fileVo.setSize(length);
-				fileVo.setContentType("text/plain");
-				fileVo.setType("API_AUDIT");
-				fileMapper.insertFile(fileVo);
+				long length = 0;
+				try {
+					length = FileUtil.getDataLength(filePath);
+				} catch (Exception e) {
+					logger.error("获取数据长度失败：" + filePath);
+					e.printStackTrace();
+				}
+				if(length != 0){
+					fileVo.setPath(filePath);
+					fileVo.setSize(length);
+					fileVo.setContentType("text/plain");
+					fileVo.setType("API_AUDIT");
+					fileMapper.insertFile(fileVo);
 
-				/** 记录文件路径和偏移量，插入api_audit表 */
-				if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){
-					apiAuditVo.setParamFilePath(filePath + apiAuditVo.getParamFilePath());
-				}
-				if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
-					/**
-					 * 计算result在文件中的起始位置和偏移量
-					 * 偏移量 = 文件总长度 - 截止到result开始定界符的长度 - result结束定界符的长度
-					 */
-					long resultOffset = length - lengthWithoutResult - "result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".getBytes(StandardCharsets.UTF_8).length -1;
-					String resultOffsetStr = "?startIndex=" + lengthWithoutResult + "&offset=" + resultOffset;
-					apiAuditVo.setResultFilePath(filePath + resultOffsetStr);
-				}
-				if(StringUtils.isNotBlank(apiAuditVo.getErrorFilePath())){
-					apiAuditVo.setErrorFilePath(filePath + apiAuditVo.getErrorFilePath());
+					/** 记录文件路径和偏移量，插入api_audit表 */
+					if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){
+						apiAuditVo.setParamFilePath(filePath + apiAuditVo.getParamFilePath());
+					}
+					if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+						/**
+						 * 计算result在文件中的起始位置和偏移量
+						 * 偏移量 = 文件总长度 - 截止到result开始定界符的长度 - result结束定界符的长度
+						 */
+						long resultOffset = length - lengthWithoutResult - "result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".getBytes(StandardCharsets.UTF_8).length -1;
+						String resultOffsetStr = "?startIndex=" + lengthWithoutResult + "&offset=" + resultOffset;
+						apiAuditVo.setResultFilePath(filePath + resultOffsetStr);
+					}
+					if(StringUtils.isNotBlank(apiAuditVo.getErrorFilePath())){
+						apiAuditVo.setErrorFilePath(filePath + apiAuditVo.getErrorFilePath());
+					}
 				}
 			}
 			apiMapper.insertApiAudit(apiAuditVo);

@@ -12,5 +12,5 @@ public interface IFileStorageMediumHandler {
 
 	public void deleteData(String filePath) throws Exception;
 
-	public long getDataLength(String filePath);
+	public long getDataLength(String filePath) throws Exception;
 }

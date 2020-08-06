@@ -24,6 +24,7 @@ public class TenantContext implements Serializable {
 	private List<ModuleVo> activeModuleList;
 	private List<ModuleGroupVo> activeModuleGroupList;
 	private Map<String, ModuleVo> activeModuleMap;
+	private Boolean isOlap = false;
 
 	private static ModuleMapper moduleMapper;
 
@@ -73,6 +74,18 @@ public class TenantContext implements Serializable {
 	private TenantContext setTenantUuid(String tenantUuid) {
 		this.tenantUuid = tenantUuid;
 		return this;
+	}
+
+	public void enableOlap() {
+		this.isOlap = true;
+	}
+
+	public void disableOlap() {
+		this.isOlap = false;
+	}
+
+	public Boolean isOlap() {
+		return this.isOlap;
 	}
 
 	public TenantContext switchTenant(String tenantUuid) {

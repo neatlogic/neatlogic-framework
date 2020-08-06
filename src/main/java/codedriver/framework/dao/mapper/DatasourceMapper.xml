@@ -8,7 +8,9 @@
 		`url`,
 		`username`,
 		`password` AS passwordCipher,
-		`driver`
+		`driver`,
+		`host`,
+		`port`
 		FROM
 		`datasource` a
 		JOIN `tenant` b
@@ -23,7 +25,9 @@
 		`url`,
 		`username`,
 		`password`,
-		`driver`
+		`driver`,
+		`host`,
+		`port`
 		)
 		VALUES
 		(
@@ -32,12 +36,16 @@
 		#{url},
 		#{username},
 		#{passwordCipher},
-		#{driver}
+		#{driver},
+		#{host},
+		#{port}
 		)
 	</insert>
 
 	<insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
 		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
 		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_olap`;
+		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_olap`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
 	</insert>
 </mapper>

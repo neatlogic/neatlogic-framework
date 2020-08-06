@@ -10,6 +10,8 @@ import codedriver.framework.common.util.RC4Util;
 public class DatasourceVo {
 	private Long tenantId;
 	private String tenantUuid;
+	private String host;
+	private Integer port;
 	private String url;
 	private String username;
 	private String passwordPlain;
@@ -39,7 +41,7 @@ public class DatasourceVo {
 	}
 
 	public static void main(String[] argv) {
-		System.out.println(RC4Util.encrypt(Config.RC4KEY, "123456"));
+		System.out.println(RC4Util.decrypt(Config.RC4KEY, "6907164243c1"));
 	}
 
 	public String getTenantUuid() {
@@ -52,7 +54,7 @@ public class DatasourceVo {
 
 	public String getUrl() {
 		if (StringUtils.isBlank(url)) {
-			url = "jdbc:mysql://" + Config.DB_HOST() + ":" + Config.DB_PORT() + "/codedriver_" + this.tenantUuid + "?characterEncoding=UTF-8&jdbcCompliantTruncation=false&allowMultiQueries=true";
+			url = "jdbc:mysql://{host}:{port}/{dbname}?characterEncoding=UTF-8&jdbcCompliantTruncation=false&allowMultiQueries=true";
 		}
 		return url;
 	}
@@ -116,6 +118,28 @@ public class DatasourceVo {
 
 	public void setTenantId(Long tenantId) {
 		this.tenantId = tenantId;
+	}
+
+	public String getHost() {
+		if (StringUtils.isBlank(host)) {
+			host = Config.DB_HOST();
+		}
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public Integer getPort() {
+		if (port == null) {
+			port = Config.DB_PORT();
+		}
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
 	}
 
 }

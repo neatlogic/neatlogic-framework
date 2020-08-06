@@ -45,12 +45,29 @@ public class DatasourceInitializer {
 
 		for (DatasourceVo datasourceVo : datasourceList) {
 			if (!datasourceMap.containsKey(datasourceVo.getTenantUuid())) {
+				// 创建OLTP库
 				CodeDriverBasicDataSource tenantDatasource = new CodeDriverBasicDataSource();
-				tenantDatasource.setUrl(datasourceVo.getUrl());
+				String url = datasourceVo.getUrl();
+				url = url.replace("{host}", datasourceVo.getHost());
+				url = url.replace("{port}", datasourceVo.getPort().toString());
+				url = url.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid());
+				tenantDatasource.setUrl(url);
 				tenantDatasource.setDriverClassName(datasourceVo.getDriver());
 				tenantDatasource.setUsername(datasourceVo.getUsername());
 				tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
 				datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
+				// 创建OLAP库
+				CodeDriverBasicDataSource tenantDatasourceOlap = new CodeDriverBasicDataSource();
+				String urlOlap = datasourceVo.getUrl();
+				urlOlap = urlOlap.replace("{host}", datasourceVo.getHost());
+				urlOlap = urlOlap.replace("{port}", datasourceVo.getPort().toString());
+				urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_olap");
+				tenantDatasourceOlap.setUrl(urlOlap);
+				tenantDatasourceOlap.setDriverClassName(datasourceVo.getDriver());
+				tenantDatasourceOlap.setUsername(datasourceVo.getUsername());
+				tenantDatasourceOlap.setPassword(datasourceVo.getPasswordPlain());
+				datasourceMap.put(datasourceVo.getTenantUuid() + "_OLAP", tenantDatasourceOlap);
+
 				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}
 		}

@@ -189,6 +189,9 @@
 		<if test="endTime != null">
 			and `start_time` &lt;= #{endTime}
 		</if>
+		<if test="ip != null and ip != ''">
+			and `ip` LIKE CONCAT('%', #{ip}, '%')
+		</if>
 		<choose>
 			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc
@@ -222,6 +225,9 @@
 		</if>
 		<if test="endTime != null">
 			and `start_time` &lt;= #{endTime}
+		</if>
+		<if test="ip != null and ip != ''">
+			and `ip` LIKE CONCAT('%', #{ip}, '%')
 		</if>
 		<choose>
 			<when test="orderType == 'desc' or orderType == ''">
@@ -268,6 +274,9 @@
 		</if>
 		<if test="endTime != null">
 			and `start_time` &lt;= #{endTime}
+		</if>
+		<if test="ip != null and ip != ''">
+			and `ip` LIKE CONCAT('%', #{ip}, '%')
 		</if>
 		<choose>
 			<when test="orderType == 'desc' or orderType == ''">

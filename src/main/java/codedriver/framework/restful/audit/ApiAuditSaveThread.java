@@ -8,6 +8,7 @@ import codedriver.framework.file.core.MinioFileSystemHandler;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,7 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.Vector;
 
 @Service
 public class ApiAuditSaveThread extends CodeDriverThread {
@@ -82,19 +86,43 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			/**
 			 * 由于result可能比较大，故最后写入result，以方便计算偏移量
 			 */
-			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
-				sb.append(apiAuditVo.getResult());
-				sb.append("\n");
+//			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+//				sb.append(apiAuditVo.getResult());
+//				sb.append("\n");
+//			}
+//			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+//			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
+
+			/**
+			 * 用一个单独的流存result，避免append到StringBuilder后增加内存负担
+			 * 然后利用SequenceInputStream合并两个流
+			 */
+			InputStream resultInputStream = null;
+			String resultStr = null;
+			if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(resultStr = JSON.toJSON(apiAuditVo.getResult()).toString())){
+				resultInputStream = IOUtils.toInputStream(resultStr, StandardCharsets.UTF_8);
+			}else{
+				sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			}
-			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
+			SequenceInputStream sis = null;
+			if(resultInputStream != null){
+				Vector<InputStream> ins = new Vector<>();
+				ins.add(inputStream);
+				ins.add(resultInputStream);
+				ins.add(IOUtils.toInputStream("\nresult<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",StandardCharsets.UTF_8));
+				Enumeration<InputStream> elements = ins.elements();
+				sis = new SequenceInputStream(elements);
+			}
+			InputStream in = sis == null ? inputStream : sis;
+
 			String filePath = null;
 			try {
-				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME,tenantUuid,inputStream, SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
+				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME,tenantUuid,in, SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
 				try {
-					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
+					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,in,SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
 				} catch (Exception e1) {
 					logger.error(e1.getMessage(),e1);
 					e1.printStackTrace();
@@ -102,6 +130,9 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			}finally {
 				try {
 					inputStream.close();
+					if(sis != null){
+						sis.close();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -121,7 +152,7 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 					if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){
 						apiAuditVo.setParamFilePath(filePath + apiAuditVo.getParamFilePath());
 					}
-					if(apiAuditVo.getResult() != null && StringUtils.isNotBlank(apiAuditVo.getResult().toString())){
+					if(StringUtils.isNotBlank(resultStr)){
 						/**
 						 * 计算result在文件中的起始位置和偏移量
 						 * 偏移量 = 文件总长度 - 截止到result开始定界符的长度 - result结束定界符的长度

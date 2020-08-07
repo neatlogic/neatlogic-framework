@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -97,6 +98,12 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 				} catch (Exception e1) {
 					logger.error(e1.getMessage(),e1);
 					e1.printStackTrace();
+				}
+			}finally {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 

@@ -10,6 +10,7 @@ import org.springframework.util.DigestUtils;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -21,6 +22,7 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 
 public class UserVo extends BasePageVo {
 	private transient String keyword;
+	private transient List<String> valueList;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "用户id", type = ApiParamType.STRING)
@@ -351,6 +353,19 @@ public class UserVo extends BasePageVo {
 		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
+	}
+
+	public List<String> getValueList() {
+		if(CollectionUtils.isNotEmpty(valueList)) {
+			for(int i =0; i<valueList.size();i++) {
+				valueList.set(i,valueList.get(i).replaceAll(GroupSearch.USER.getValuePlugin(),""));
+			}
+		}
+		return valueList;
+	}
+
+	public void setValueList(List<String> valueList) {
+		this.valueList = valueList;
 	}
 
 }

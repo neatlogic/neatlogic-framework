@@ -4,11 +4,10 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.file.core.LocalFileSystemHandler;
-import codedriver.framework.file.dao.mapper.FileMapper;
-import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.file.core.MinioFileSystemHandler;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
+import codedriver.framework.util.SnowflakeUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,20 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 
 @Service
 public class ApiAuditSaveThread extends CodeDriverThread {
 	Logger logger = LoggerFactory.getLogger(ApiAuditSaveThread.class);
 
 	private static ApiMapper apiMapper;
-
-	private static FileMapper fileMapper;
-
-	@Autowired
-	public void setFileMapper(FileMapper _fileMapper) {
-		fileMapper = _fileMapper;
-	}
 
 	@Autowired
 	public void setApiMapper(ApiMapper _apiMapper) {
@@ -51,16 +42,8 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 	@Override
 	protected void execute() {
 		if (apiAuditVo != null) {
-			/**
-			 * 创建FileVo对象，生成文件流，调用FileUtil.saveData存储文件并得到filePath
-			 * 将filePath装入FileVo对象，插入file表
-			 * 将filePath和各自内容的坐标、偏移量赋给apiAuditVo，插入api_audit表
- 			 */
+
 			String tenantUuid = TenantContext.get().getTenantUuid();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
-			FileVo fileVo = new FileVo();
-			fileVo.setName("API_AUDIT-" + sdf.format(apiAuditVo.getStartTime()));
-			fileVo.setUserUuid(apiAuditVo.getUserUuid());
 			/**
 			 * 组装文件内容JSON并且计算文件中每一块内容的开始坐标和偏移量
 			 * 例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
@@ -106,11 +89,11 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
 			String filePath = null;
 			try {
-				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
+				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME,tenantUuid,inputStream, SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
 				try {
-					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,fileVo.getId(),"text/plain","API_AUDIT");
+					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,tenantUuid,inputStream,SnowflakeUtil.uniqueLong(),"text/plain","api_audit");
 				} catch (Exception e1) {
 					logger.error(e1.getMessage(),e1);
 					e1.printStackTrace();
@@ -126,11 +109,6 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 					e.printStackTrace();
 				}
 				if(length != 0){
-					fileVo.setPath(filePath);
-					fileVo.setSize(length);
-					fileVo.setContentType("text/plain");
-					fileVo.setType("API_AUDIT");
-					fileMapper.insertFile(fileVo);
 
 					/** 记录文件路径和偏移量，插入api_audit表 */
 					if(StringUtils.isNotBlank(apiAuditVo.getParamFilePath())){

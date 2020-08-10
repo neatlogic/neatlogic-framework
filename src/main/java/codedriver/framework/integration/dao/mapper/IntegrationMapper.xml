@@ -99,6 +99,36 @@
 		</if>
 	</select>
 
+	<select id="searchIntegrationForSelect" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`uuid` as `value`,
+		`name` as `text`
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
+			</if>
+			<if test="valueList != null and valueList.size() >0">
+				AND uuid in
+				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
+					#{uuid}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY fcd DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
 	<select id="searchIntegrationCount" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="int">
 		SELECT
 		COUNT(1)

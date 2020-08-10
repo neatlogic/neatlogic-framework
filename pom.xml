@@ -14,6 +14,14 @@
 				<includes>
 					<include>**/*.xml</include>
 					<include>META-INF/**</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.ttc</include>
+					<include>**/*.ttf</include>
 				</includes>
 			</resource>
 		</resources>

@@ -158,9 +158,17 @@
 				AND (a.user_id LIKE CONCAT('%', #{keyword}, '%')
 				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
 			</if>
+			<if test="valueList != null and valueList.size() > 0">
+				AND a.uuid in 
+				<foreach collection="valueList" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			</if>
 		</where>
-		ORDER BY a.`id` DESC
-		<if test="needPage == true">
+		<if test="valueList == null or valueList.size() == 0">
+			ORDER BY a.`id` DESC
+		</if>
+		<if test="needPage == true and (valueList == null or valueList.size() == 0)">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 		

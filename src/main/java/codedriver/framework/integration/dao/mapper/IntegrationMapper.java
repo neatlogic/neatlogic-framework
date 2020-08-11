@@ -2,6 +2,7 @@ package codedriver.framework.integration.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.integration.dto.IntegrationAuditVo;
@@ -18,6 +19,8 @@ public interface IntegrationMapper {
 	public IntegrationVo getIntegrationByUuid(String uuid);
 
 	public List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);
+
+	public List<ValueTextVo> searchIntegrationForSelect(IntegrationVo integrationVo);
 
 	public int searchIntegrationCount(IntegrationVo integrationVo);
 

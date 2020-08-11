@@ -2,6 +2,7 @@ package codedriver.framework.notify.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.dto.NotifyPolicyInvokerVo;
 import codedriver.framework.notify.dto.NotifyPolicyVo;
 
@@ -30,6 +31,8 @@ public interface NotifyMapper {
 	public int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo);
 
 	public List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo);
+
+	public List<ValueTextVo> getNotifyPolicyListForSelect(NotifyPolicyVo notifyPolicyVo);
 
 	public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
 

@@ -180,6 +180,20 @@
 	</if>
 	</select>
 
+	<select id="getNotifyPolicyListForSelect" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`id` as `value`,
+		`name` as `text`
+		FROM `notify_policy`
+		WHERE `handler` = #{handler}
+		<if test="keyword != null and keyword != ''">
+			AND `name` LIKE concat('%',#{keyword},'%')
+		</if>
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
 	<select id="getNotifyPolicyCount" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">
 	SELECT 
 	COUNT(`id`)

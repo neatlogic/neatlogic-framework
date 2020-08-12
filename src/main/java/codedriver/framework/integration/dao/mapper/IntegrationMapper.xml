@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
-	<select id="getIntegrationAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String">
-		SELECT
-		`content`
-		FROM
-		`integration_audit_detail`
-		WHERE hash = #{value}
-	</select>
-
 	<sql id="searchIntegrationAuditCondition">
 		<where>
 			<if test="integrationUuid != null and integrationUuid != ''">
@@ -28,9 +20,9 @@
 		`start_time` AS startTime,
 		`end_time` AS endTime,
 		`status`,
-		`param_hash` AS paramHash,
-		`result_hash` AS resultHash,
-		`error_hash` AS errorHash,
+		`param_file_path` AS paramFilePath,
+		`result_file_path` AS resultFilePath,
+		`error_file_path` AS errorFilePath,
 		(UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
 		FROM
 		`integration_audit`
@@ -220,9 +212,12 @@
 		`start_time`,
 		`end_time`,
 		`status`,
-		`param_hash`,
-		`result_hash`,
-		`error_hash`
+		`param_file_path`,
+		`result_file_path`,
+		`error_file_path`
+-- 		`param_hash`,
+-- 		`result_hash`,
+-- 		`error_hash`
 		)
 		VALUES
 		(
@@ -234,17 +229,10 @@
 		#{startTime},
 		#{endTime},
 		#{status},
-		#{paramHash},
-		#{resultHash},
-		#{errorHash}
+		#{paramFilePath},
+		#{resultFilePath},
+		#{errorFilePath}
 		)
-	</insert>
-
-	<insert id="replaceIntegrationAuditDetail">
-		REPLACE INTO `integration_audit_detail` (`hash`, `content`)
-		VALUES
-		(#{hash},
-		#{content})
 	</insert>
 
 	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">

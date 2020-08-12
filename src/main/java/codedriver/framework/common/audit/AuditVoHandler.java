@@ -8,7 +8,7 @@ public interface AuditVoHandler {
 
 	public Object getResult();
 
-	public void setResult(String result);
+	public void setResult(Object result);
 
 	public String getError();
 

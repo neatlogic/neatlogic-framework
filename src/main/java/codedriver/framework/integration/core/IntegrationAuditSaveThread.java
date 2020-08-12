@@ -30,7 +30,7 @@ public class IntegrationAuditSaveThread extends CodeDriverThread {
 	@Override
 	protected void execute() {
 		if (integrationAuditVo != null) {
-			AuditUtil.saveAuditContent(integrationAuditVo,"integration_audit");
+			AuditUtil.saveAuditDetail(integrationAuditVo,"integration_audit");
 			integrationMapper.insertIntegrationAudit(integrationAuditVo);
 		}
 	}

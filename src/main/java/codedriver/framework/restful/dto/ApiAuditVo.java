@@ -1,5 +1,6 @@
 package codedriver.framework.restful.dto;
 
+import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
@@ -14,10 +15,7 @@ import org.springframework.util.DigestUtils;
 import java.util.Date;
 import java.util.List;
 
-public class ApiAuditVo extends BasePageVo {
-
-	/** 查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看 */
-	public final static long maxFileSize = 1024 * 1024;
+public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
 	public final static String SUCCEED = "succeed";
 	public final static String FAILED = "failed";

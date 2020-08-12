@@ -132,7 +132,7 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 		return result;
 	}
 
-	public void setResult(String result) {
+	public void setResult(Object result) {
 		this.result = result;
 	}
 

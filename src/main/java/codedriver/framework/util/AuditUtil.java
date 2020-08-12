@@ -6,7 +6,6 @@ import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.exception.file.FilePathIllegalException;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.core.MinioFileSystemHandler;
-import codedriver.framework.restful.dto.ApiAuditVo;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +29,7 @@ public class AuditUtil {
 
 	private static Logger logger = LoggerFactory.getLogger(AuditUtil.class);
 
-	public static void saveAuditContent(AuditVoHandler vo,String fileType){
+	public static void saveAuditDetail(AuditVoHandler vo,String fileType){
 		/**
 		 * 组装文件内容JSON并且计算文件中每一块内容的开始坐标和偏移量
 		 * 例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
@@ -159,8 +158,8 @@ public class AuditUtil {
 				 * 如果偏移量大于最大字节数限制，那么就只截取最大字节数长度的数据
 				 */
 				int buffSize = 0;
-				if(offset > ApiAuditVo.maxFileSize){
-					buffSize = (int)ApiAuditVo.maxFileSize;
+				if(offset > maxFileSize){
+					buffSize = (int)maxFileSize;
 				}else{
 					buffSize = offset.intValue();
 				}
@@ -204,7 +203,7 @@ public class AuditUtil {
 			if(in != null){
 				in.skip(startIndex);
 
-				String fileNameEncode = "API_AUDIT.log";
+				String fileNameEncode = "AUDIT_DETAIL.log";
 				Boolean flag = request.getHeader("User-Agent").indexOf("Gecko") > 0;
 				if (request.getHeader("User-Agent").toLowerCase().indexOf("msie") > 0 || flag) {
 					fileNameEncode = URLEncoder.encode(fileNameEncode, "UTF-8");// IE浏览器
@@ -215,7 +214,7 @@ public class AuditUtil {
 				response.setHeader("Content-Disposition", "attachment;fileName=\"" + fileNameEncode + "\"");
 				OutputStream os = response.getOutputStream();
 
-				byte[] buff = new byte[(int) ApiAuditVo.maxFileSize];
+				byte[] buff = new byte[(int)maxFileSize];
 				int len = 0;
 				long endPoint = 0;
 				while((len = in.read(buff)) != -1){

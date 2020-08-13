@@ -33,6 +33,9 @@ public class TimeUtil {
     private static final String yyMMdd = "yyMMdd";
     private static final String yyyyMMddHHmmss = "yyyyMMddHHmmss";
     
+	private final static SimpleDateFormat SDF_HH_MM = new SimpleDateFormat("HH:mm");
+
+	private final static SimpleDateFormat SDF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");
 
     public static String timeTransfer(int timeRange, String timeUnit){
         SimpleDateFormat format = new SimpleDateFormat(TIME_FORMAT);
@@ -97,40 +100,44 @@ public class TimeUtil {
 	 * 比较执行时间窗口
 	 * @param startTime
 	 * @param endTime
-	 * @return 0:在时间窗口之内，1:大于时间窗口，-1:小于时间窗口
+	 * @return 0:在时间窗口之内，1:大于时间窗口(须加一天)，-1:小于时间窗口
 	 */
-	public static int isInTime(String startTimeStr,String endTimeStr) {
-		if(StringUtils.isBlank(startTimeStr)&&StringUtils.isBlank(endTimeStr)) {//如果没有设置时间窗口
+	public static int isInTimeWindow(String startTimeStr, String endTimeStr) {
+		String currentTime = SDF_HH_MM.format(new Date());
+		if(StringUtils.isNotBlank(startTimeStr) && StringUtils.isNotBlank(endTimeStr)) {
+			if(startTimeStr.compareTo(endTimeStr) <= 0) {//开始时间小于结束时间(在一天之内)
+				if(currentTime.compareTo(startTimeStr) < 0) {
+					/** 当前时间小于开始时间 **/
+					return -1;
+				}else if(currentTime.compareTo(startTimeStr) >= 0 && currentTime.compareTo(endTimeStr) <= 0) {
+					/** 当前时间大于开始时间，小于结束时间**/
+					return 0;
+				}else {
+					/** 当前时间大于结束时间 **/
+					return 1;
+				}
+			}else {//开始时间大于结束时间(跨天)
+				if(currentTime.compareTo(startTimeStr) >= 0 || currentTime.compareTo(endTimeStr) <= 0) {
+					return 0;
+				}else {
+					return -1;
+				}
+			}
+		}else if(StringUtils.isNotBlank(startTimeStr)){//只有开始时间
+			if(currentTime.compareTo(startTimeStr) < 0) {
+				return -1;
+			}else {
+				return 0;
+			}
+		}else if(StringUtils.isNotBlank(endTimeStr)) {//只有结束时间
+			if(currentTime.compareTo(endTimeStr) > 0) {
+				return 1;
+			}else {
+				return 0;
+			}
+		}else {
 			return 0;
 		}
-		Date nowTime =null;
-	    Date startTime = null;
-	    Date endTime = null;
-	    SimpleDateFormat  df = new SimpleDateFormat("H:mm");
-		try {
-			nowTime = df.parse(df.format(new Date()));
-			startTime =df.parse(startTimeStr);
-			endTime = df.parse(endTimeStr);
-		}catch(ParseException e) {
-			//时间格式不对，默认符合时间
-			return 0;
-		}
-		Calendar date = Calendar.getInstance();
-        date.setTime(nowTime);
-
-        Calendar begin = Calendar.getInstance();
-        begin.setTime(startTime);
-
-        Calendar end = Calendar.getInstance();
-        end.setTime(endTime);
-
-        if (date.after(begin) && date.before(end)) {
-            return 0;
-        }else if(date.after(end)){
-        	return 1;
-        }else{
-            return -1;
-        }
 	}
 
     public static String addDateByWorkDay(Date date,int day) {
@@ -196,7 +203,6 @@ public class TimeUtil {
      * 获取本月第一天, e.g.: 2019-01-01 00:00:00
      */
     public static Date firstDayOfMonth(Date now) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(FMT_yyyy_MM_dd);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(convertStringToDate(convertDateToString(now, FMT_yyyy_MM_dd), FMT_yyyy_MM_dd));
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -675,5 +681,22 @@ public class TimeUtil {
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+    
+    /**
+     * 
+    * @Time:2020年8月13日
+    * @Description: 判断当前日期是否在指定目标日期之后
+    * @param targetDate
+    * @return boolean
+     */
+    public static boolean afterTargetDate(String targetDate) {
+    	try {
+			Date date = SDF_YYYY_MM_DD.parse(targetDate);
+			return new Date().after(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	return false;
     }
 }

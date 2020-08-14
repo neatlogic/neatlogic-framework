@@ -14,6 +14,12 @@ public interface EventTypeMapper {
 
 	public Integer getMaxRhtCode();
 
+	public int searchEventTypeCount(EventTypeVo eventTypeVo);
+
+	public List<EventTypeVo> searchEventType(EventTypeVo eventTypeVo);
+
+	public List<EventTypeVo> getEventTypeSolutionCountAndChildCountListByIdList(List<Long> eventTypeIdList);
+
 	public int checkEventTypeIsExists(Long id);
 
 	public int updateEventTypeNameById(EventTypeVo eventTypeVo);

@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.EventTypeMapper">
 
+	<resultMap id="eventTypeMap" type="codedriver.framework.dto.event.EventTypeVo">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="parentId" column="parentId"/>
+		<result property="lft" column="lft"/>
+		<result property="rht" column="rht"/>
+	</resultMap>
+
 	<resultMap id="childrenEventTypeMap" type="codedriver.framework.dto.event.EventTypeVo">
 		<id property="id" column="id"/>
 		<result property="name" column="name"/>
@@ -21,6 +29,58 @@
 
 	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
 		SELECT MAX(`rht`) FROM `event_type`
+	</select>
+
+	<select id="searchEventTypeCount" parameterType="codedriver.framework.dto.event.EventTypeVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`event_type`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="parentId != null and parentId != ''">
+			and parent_id = #{parentId}
+		</if>
+	</select>
+
+	<select id="searchEventType" parameterType="codedriver.framework.dto.event.EventTypeVo" resultMap="eventTypeMap">
+		SELECT
+		`id`,
+		`name`,
+		`lft`,
+		`rht`,
+		`parent_id` AS `parentId`
+		FROM `event_type`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				and `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="parentId != null and parentId != ''">
+				and `parent_id` = #{parentId}
+			</if>
+		</where>
+		ORDER BY `lft`
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getEventTypeSolutionCountAndChildCountListByIdList" parameterType="java.util.List" resultType="codedriver.framework.dto.event.EventTypeVo">
+		SELECT
+		a.`id`,
+		COUNT(DISTINCT b.`solution_id`) AS solutionCount,
+		COUNT(DISTINCT c.`id`) AS childCount
+		FROM `event_type` a
+		LEFT JOIN `event_type_solution` b ON b.`event_type_id` = a.`id`
+		LEFT JOIN `event_type` c ON c.`parent_id` = a.`id`
+		WHERE a.`id` IN
+		<foreach collection="list" item="eventTypeId" open="(" close=")" separator=",">
+			#{eventTypeId}
+		</foreach>
+		GROUP BY a.`id`
 	</select>
 
 	<select id="checkLeftRightCodeIsWrong" resultType="int">

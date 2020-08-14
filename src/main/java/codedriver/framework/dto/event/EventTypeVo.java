@@ -33,6 +33,8 @@ public class EventTypeVo extends BasePageVo {
 
 	private List<EventTypeVo> children = new ArrayList<>();
 
+	private int solutionCount;
+
 	private transient List<AuthorityVo> authorityVoList;
 
 	private transient EventTypeVo parent;
@@ -142,5 +144,13 @@ public class EventTypeVo extends BasePageVo {
 
 	public void setAuthorityVoList(List<AuthorityVo> authorityVoList) {
 		this.authorityVoList = authorityVoList;
+	}
+
+	public int getSolutionCount() {
+		return solutionCount;
+	}
+
+	public void setSolutionCount(int solutionCount) {
+		this.solutionCount = solutionCount;
 	}
 }

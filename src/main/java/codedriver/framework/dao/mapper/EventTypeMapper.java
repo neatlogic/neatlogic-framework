@@ -10,7 +10,7 @@ public interface EventTypeMapper {
 
 	public List<EventTypeVo> getEventTypeByParentId(Long parentId);
 
-	public int updateEventTypeLeftRightCode(@Param("id") Long id, @Param("lft") int lft, @Param("rht") int rht);
+	public int updateEventTypeLeftRightCode(@Param("id") Long id, @Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public Integer getMaxRhtCode();
 
@@ -30,11 +30,17 @@ public interface EventTypeMapper {
 
 	public int checkLeftRightCodeIsWrong();
 
-	public int checkEventTypeIsExistsByLeftRightCode(@Param("id") Long id, @Param("lft") int lft, @Param("rht") int rht);
+	public int checkEventTypeIsExistsByLeftRightCode(@Param("id") Long id, @Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public EventTypeVo getEventTypeById(Long id);
 
 	public EventTypeVo getEventTypeByParentIdAndStartNum(@Param("parentId") Long parentId, @Param("startNum") int startNum);
+
+	public EventTypeVo getTopEventTypeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+	public List<AuthorityVo> getAuthorityByEventTypeId(@Param("eventTypId") Long eventTypId);
+
+	public List<AuthorityVo> checkAuthorityIsExists(@Param("lft") Integer lft, @Param("rht") Integer rht,@Param("authorityVo") AuthorityVo authority);
 
 	public int updateEventTypeParentIdById(EventTypeVo eventTypeVo);
 
@@ -49,5 +55,7 @@ public interface EventTypeMapper {
 	public int insertEventTypeAuthority(@Param("authorityVo") AuthorityVo authority, @Param("eventTypeId") Long eventTypeId);
 
 	public int deleteEventTypeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+	public int deleteAuthorityByEventTypeId(@Param("eventTypeId") Long eventTypeId,@Param("type") String type,@Param("uuid") String uuid);
 
 }

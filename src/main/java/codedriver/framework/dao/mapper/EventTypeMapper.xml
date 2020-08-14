@@ -154,6 +154,38 @@
 		limit #{startNum}, 1
 	</select>
 
+	<select id="getTopEventTypeByLeftRightCode" resultType="codedriver.framework.dto.event.EventTypeVo">
+		SELECT
+		a.`id`,
+		a.`name`,
+		a.`parent_id` AS parentId,
+		a.`lft`,
+		a.`rht`
+		FROM `event_type` a
+		WHERE a.`lft` &lt; #{lft} and a.`rht` &gt; #{rht}
+	</select>
+
+	<select id="getAuthorityByEventTypeId" resultType="codedriver.framework.dto.AuthorityVo" useCache="false">
+		select
+		`event_type_id`,
+		`type`,
+		`uuid`
+		from event_type_authority
+		where `event_type_id` = #{eventTypId}
+	</select>
+
+	<select id="checkAuthorityIsExists" resultType="codedriver.framework.dto.AuthorityVo" useCache="false">
+		select
+		b.`event_type_id`,
+		b.`type`,
+		b.`uuid`
+		FROM `event_type` a
+		LEFT JOIN `event_type_authority` b on a.`id` = b.`event_type_id`
+		WHERE a.`lft` &gt; #{lft} AND a.`rht` &lt; #{rht}
+		AND `type` = #{authorityVo.type}
+		AND `uuid` = #{authorityVo.uuid}
+	</select>
+
 	<update id="updateEventTypeNameById" parameterType="codedriver.framework.dto.event.EventTypeVo">
 		UPDATE `event_type` SET
 		`name` = #{name}
@@ -215,6 +247,14 @@
 		FROM `event_type` a
 		LEFT JOIN `event_type_authority` b on a.`id` = b.`event_type_id`
 		WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
+	</delete>
+
+	<delete id="deleteAuthorityByEventTypeId">
+		DELETE
+		FROM `event_type_authority`
+		WHERE `event_type_id` = #{eventTypeId}
+		and `type` = #{type}
+		and `uuid` = #{uuid}
 	</delete>
 
 

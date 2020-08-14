@@ -137,10 +137,35 @@
 		ORDER BY `lft` ASC
 	</select>
 
+	<select id="checkEventTypeIsExistsByLeftRightCode" resultType="int">
+	SELECT COUNT(1) FROM `event_type` WHERE `id` = #{id} AND `lft` &gt; #{lft} AND `rht` &lt; #{rht}
+	</select>
+
+	<select id="getEventTypeByParentIdAndStartNum" resultType="codedriver.framework.dto.event.EventTypeVo">
+	SELECT
+		a.`id`,
+		a.`name`,
+		a.`parent_id` AS parentId,
+		a.`lft`,
+		a.`rht`
+		FROM `event_type` a
+		WHERE a.`parent_id` = #{parentId}
+		ORDER BY a.`lft` ASC
+		limit #{startNum}, 1
+	</select>
+
 	<update id="updateEventTypeNameById" parameterType="codedriver.framework.dto.event.EventTypeVo">
 		UPDATE `event_type` SET
 		`name` = #{name}
 		WHERE `id` = #{id}
+	</update>
+
+	<update id="updateEventTypeParentIdById" parameterType="codedriver.framework.dto.event.EventTypeVo">
+		UPDATE `event_type` SET `parent_id` = #{parentId} WHERE `id` = #{id}
+	</update>
+
+	<update id="batchUpdateEventTypeLeftRightCodeByLeftRightCode">
+		UPDATE `event_type` SET `lft` = `lft` + #{step}, `rht` = `rht` + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
 	</update>
 
 	<update id="updateEventTypeLeftRightCode">

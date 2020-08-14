@@ -30,7 +30,15 @@ public interface EventTypeMapper {
 
 	public int checkLeftRightCodeIsWrong();
 
+	public int checkEventTypeIsExistsByLeftRightCode(@Param("id") Long id, @Param("lft") int lft, @Param("rht") int rht);
+
 	public EventTypeVo getEventTypeById(Long id);
+
+	public EventTypeVo getEventTypeByParentIdAndStartNum(@Param("parentId") Long parentId, @Param("startNum") int startNum);
+
+	public int updateEventTypeParentIdById(EventTypeVo eventTypeVo);
+
+	public int batchUpdateEventTypeLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
 	public int batchUpdateEventTypeLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
 

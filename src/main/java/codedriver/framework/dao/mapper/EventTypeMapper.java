@@ -18,6 +18,8 @@ public interface EventTypeMapper {
 
 	public List<EventTypeVo> searchEventType(EventTypeVo eventTypeVo);
 
+	public List<EventTypeVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
 	public List<EventTypeVo> getEventTypeSolutionCountAndChildCountListByIdList(List<Long> eventTypeIdList);
 
 	public int checkEventTypeIsExists(Long id);

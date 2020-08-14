@@ -13,8 +13,8 @@ import java.util.List;
 
 public class EventTypeVo extends BasePageVo {
 
-	public static final Long ROOT_PARENTUUID = -1L;
-	public static final Long ROOT_UUID = 0L;
+	public static final Long ROOT_PARENTID = -1L;
+	public static final Long ROOT_ID = 0L;
 
 	@EntityField(name = "事件类型ID", type = ApiParamType.LONG)
 	private Long id;

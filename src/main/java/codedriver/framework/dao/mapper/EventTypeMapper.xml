@@ -68,6 +68,19 @@
 		</if>
 	</select>
 
+	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenEventTypeMap">
+		SELECT
+		a.`id`,
+		a.`name`,
+		a.`parent_id` AS parentId,
+		a.`lft`,
+		a.`rht`,
+		0 as `childCount`
+		FROM `event_type` a
+		WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+		ORDER BY `lft` ASC
+	</select>
+
 	<select id="getEventTypeSolutionCountAndChildCountListByIdList" parameterType="java.util.List" resultType="codedriver.framework.dto.event.EventTypeVo">
 		SELECT
 		a.`id`,

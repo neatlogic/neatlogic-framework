@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.EventTypeMapper">
+
+	<resultMap id="childrenEventTypeMap" type="codedriver.framework.dto.event.EventTypeVo">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="parentId" column="parentId"/>
+		<result property="lft" column="lft"/>
+		<result property="rht" column="rht"/>
+		<result property="childCount" column="childCount"/>
+	</resultMap>
+
+	<select id="checkEventTypeIsExists" parameterType="java.lang.Long" resultType="int">
+		SELECT COUNT(`id`) FROM `event_type` WHERE `id` = #{id}
+	</select>
+
+	<select id="getEventTypeCountOnLock" resultType="int" useCache="false">
+		SELECT count(1) FROM `event_type` FOR UPDATE
+	</select>
+
+	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
+		SELECT MAX(`rht`) FROM `event_type`
+	</select>
+
+	<select id="checkLeftRightCodeIsWrong" resultType="int">
+	SELECT COUNT(a.`id`) FROM (
+		SELECT `id` FROM `event_type`  WHERE `lft` IS NULL OR `rht` IS NULL
+		UNION
+		SELECT `id` FROM `event_type`  WHERE `lft` &lt; 2 OR `rht` &lt; 3
+		UNION
+		SELECT parent.`id` FROM `event_type` parent
+		JOIN `event_type` child ON child.`parent_id`=parent.`id` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)
+		UNION
+		SELECT parent.`id` FROM `event_type` parent
+		LEFT JOIN `event_type` child ON child.`parent_id` = parent.`id`
+		WHERE child.id IS NULL AND parent.`rht` - parent.`lft` != 1
+	) a
+	</select>
+
+	<select id="getEventTypeById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.event.EventTypeVo">
+		SELECT
+		a.`id`,
+		a.`name`,
+		(SELECT COUNT(1) FROM `event_type` WHERE `parent_id` = a.`id`) as `childCount`,
+		a.`parent_id` as `parentId`,
+		a.`lft`,
+		a.`rht`
+		FROM
+		`event_type` a
+		WHERE `id` = #{id}
+	</select>
+
+	<select id="getEventTypeByParentId" parameterType="java.lang.Long" resultMap="childrenEventTypeMap">
+		SELECT
+		a.`id`,
+		a.`name`,
+		a.`parent_id` AS parentId,
+		a.`lft`,
+		a.`rht`,
+		(SELECT COUNT(1) FROM `event_type` WHERE `parent_id` = a.`id`) as `childCount`
+		FROM `event_type` a
+		WHERE a.`parent_id` = #{value}
+		ORDER BY `lft` ASC
+	</select>
+
+	<update id="updateEventTypeNameById" parameterType="codedriver.framework.dto.event.EventTypeVo">
+		UPDATE `event_type` SET
+		`name` = #{name}
+		WHERE `id` = #{id}
+	</update>
+
+	<update id="updateEventTypeLeftRightCode">
+	UPDATE `event_type` SET `lft` = #{lft}, `rht` = #{rht} WHERE `id` = #{id}
+	</update>
+
+	<update id="batchUpdateEventTypeLeftCode">
+		UPDATE `event_type` set `lft` = `lft` + #{step} WHERE `lft` &gt;= #{minCode}
+	</update>
+
+	<update id="batchUpdateEventTypeRightCode">
+		UPDATE `event_type` set `rht` = `rht` + #{step} WHERE `rht` &gt;= #{minCode}
+	</update>
+
+	<insert id="insertEventType" parameterType="codedriver.framework.dto.event.EventTypeVo">
+		INSERT INTO `event_type` (
+		`id`,
+		`name`,
+		`parent_id`,
+		`lft`,
+		`rht`
+		) VALUES (
+		#{id},
+		#{name},
+		#{parentId},
+		#{lft},
+		#{rht}
+		)
+	</insert>
+
+	<insert id="insertEventTypeAuthority">
+		INSERT INTO `event_type_authority` (
+		`event_type_id`,
+		`type`,
+		`uuid`
+		)
+		VALUES
+		(
+		#{eventTypeId},
+		#{authorityVo.type},
+		#{authorityVo.uuid}
+		)
+	</insert>
+
+
+</mapper>

@@ -185,5 +185,12 @@
 		)
 	</insert>
 
+	<delete id="deleteEventTypeByLeftRightCode">
+		DELETE a,b
+		FROM `event_type` a
+		LEFT JOIN `event_type_authority` b on a.`id` = b.`event_type_id`
+		WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}
+	</delete>
+
 
 </mapper>

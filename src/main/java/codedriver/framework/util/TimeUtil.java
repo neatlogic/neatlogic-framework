@@ -13,7 +13,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.time.DateUtils.isSameDay;
 import static org.apache.commons.lang3.time.DateUtils.toCalendar;
@@ -26,17 +28,26 @@ import static org.apache.commons.lang3.time.DateUtils.toCalendar;
 public class TimeUtil {
 
     public static final String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String TIME2_FORMAT = "yyyy-MM-dd HH:mm";
     public static final String TIME3_FORMAT = "HH:mm";
     public static final String FMT_yyyy_MM_dd = "yyyy-MM-dd";
     private static final String yyyyMMdd = "yyyyMMdd";
     private static final String yyMMdd = "yyMMdd";
     private static final String yyyyMMddHHmmss = "yyyyMMddHHmmss";
     
-	private final static SimpleDateFormat SDF_HH_MM = new SimpleDateFormat("HH:mm");
+    public static final String HH_MM = "HH:mm";
+    public static final String YYYY_MM_DD = "yyyy-MM-dd";
+    public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
 
-	private final static SimpleDateFormat SDF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");
-
+	private static Map<String, SimpleDateFormat> simpleDateFormatMap = new HashMap<>();
+	
+	public static SimpleDateFormat getSimpleDateFormatByFormat(String format) {
+	    SimpleDateFormat simpleDateFormat = simpleDateFormatMap.get(format);
+	    if(simpleDateFormat == null) {
+	        simpleDateFormat = new SimpleDateFormat(format);
+	        simpleDateFormatMap.put(format, simpleDateFormat);
+	    }
+	    return simpleDateFormat;
+	}
     public static String timeTransfer(int timeRange, String timeUnit){
         SimpleDateFormat format = new SimpleDateFormat(TIME_FORMAT);
         Calendar calendar = Calendar.getInstance();
@@ -69,13 +80,13 @@ public class TimeUtil {
     }
 
     public static String timeNow(){
-        SimpleDateFormat format = new SimpleDateFormat(TIME2_FORMAT);
+        SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM);
         return format.format(new Date());
     }
     
     public static Date getDateByHourMinute(String hourMinute,Integer addDays) {
     	SimpleDateFormat  df = new SimpleDateFormat(TIME3_FORMAT);
-    	SimpleDateFormat format = new SimpleDateFormat(TIME2_FORMAT);
+    	SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM);
     	try {
 			if(StringUtils.isNotBlank(hourMinute)) {
 				df.parse(hourMinute);
@@ -103,7 +114,7 @@ public class TimeUtil {
 	 * @return 0:在时间窗口之内，1:大于时间窗口(须加一天)，-1:小于时间窗口
 	 */
 	public static int isInTimeWindow(String startTimeStr, String endTimeStr) {
-		String currentTime = SDF_HH_MM.format(new Date());
+		String currentTime = getSimpleDateFormatByFormat(HH_MM).format(new Date());
 		if(StringUtils.isNotBlank(startTimeStr) && StringUtils.isNotBlank(endTimeStr)) {
 			if(startTimeStr.compareTo(endTimeStr) <= 0) {//开始时间小于结束时间(在一天之内)
 				if(currentTime.compareTo(startTimeStr) < 0) {
@@ -690,9 +701,9 @@ public class TimeUtil {
     * @param targetDate
     * @return boolean
      */
-    public static boolean afterTargetDate(String targetDate) {
+    public static boolean afterTargetDate(String targetDate, String format) {
     	try {
-			Date date = SDF_YYYY_MM_DD.parse(targetDate);
+			Date date = getSimpleDateFormatByFormat(format).parse(targetDate);
 			return new Date().after(date);
 		} catch (ParseException e) {
 			e.printStackTrace();

@@ -154,7 +154,7 @@
 		limit #{startNum}, 1
 	</select>
 
-	<select id="getAllParentEventTypeByLeftRightCode" resultType="codedriver.framework.dto.event.EventTypeVo">
+	<select id="getChildrenByLeftRightCode" resultType="codedriver.framework.dto.event.EventTypeVo">
 		SELECT
 		a.`id`,
 		a.`name`,
@@ -162,7 +162,7 @@
 		a.`lft`,
 		a.`rht`
 		FROM `event_type` a
-		WHERE a.`lft` &lt; #{lft} and a.`rht` &gt; #{rht}
+		WHERE a.`lft` &gt; #{lft} and a.`rht` &lt; #{rht}
 	</select>
 
 	<select id="getAuthorityByEventTypeId" resultType="codedriver.framework.dto.AuthorityVo" useCache="false">

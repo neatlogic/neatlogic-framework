@@ -253,8 +253,6 @@
 		DELETE
 		FROM `event_type_authority`
 		WHERE `event_type_id` = #{eventTypeId}
-		and `type` = #{type}
-		and `uuid` = #{uuid}
 	</delete>
 
 

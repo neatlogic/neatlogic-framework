@@ -56,6 +56,6 @@ public interface EventTypeMapper {
 
 	public int deleteEventTypeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
-	public int deleteAuthorityByEventTypeId(@Param("eventTypeId") Long eventTypeId,@Param("type") String type,@Param("uuid") String uuid);
+	public int deleteAuthorityByEventTypeId(@Param("eventTypeId") Long eventTypeId);
 
 }

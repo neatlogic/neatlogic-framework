@@ -154,7 +154,7 @@
 		limit #{startNum}, 1
 	</select>
 
-	<select id="getTopEventTypeByLeftRightCode" resultType="codedriver.framework.dto.event.EventTypeVo">
+	<select id="getAllParentEventTypeByLeftRightCode" resultType="codedriver.framework.dto.event.EventTypeVo">
 		SELECT
 		a.`id`,
 		a.`name`,

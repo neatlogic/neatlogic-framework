@@ -1,6 +1,6 @@
 package codedriver.framework.util;
 
-import codedriver.framework.minio.core.MinioManager;
+import codedriver.framework.file.core.MinioFileSystemHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,10 +14,10 @@ import java.io.*;
 public class LargeTextUtil {
 	private static Logger logger = LoggerFactory.getLogger(LargeTextUtil.class);
 
-	private static MinioManager minioManager;
+	private static MinioFileSystemHandler minioFileSystemHandler;
 
 	@Autowired
-	public void setMinioManager(MinioManager _minioManager) {
+	public void setMinioManager(MinioFileSystemHandler _minioFileSystemHandler) {
 
 	}
 //
@@ -74,7 +74,7 @@ public class LargeTextUtil {
 		InputStream stream = null;
 		if (StringUtils.isNotBlank(filePath) && length > 0) {
 			try {
-				stream = minioManager.getData(filePath);
+				stream = minioFileSystemHandler.getData(filePath);
 				reader = new InputStreamReader(stream, "utf-8");
 				int index = 0;
 				char[] buffer = new char[length];
@@ -110,7 +110,7 @@ public class LargeTextUtil {
 		if (StringUtils.isNotBlank(filePath)) {
 			InputStream stream = null;
 			try {
-				stream = minioManager.getData(filePath);
+				stream = minioFileSystemHandler.getData(filePath);
 				IOUtils.copy(stream, out);
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
@@ -131,7 +131,7 @@ public class LargeTextUtil {
 			String result = "";
 			InputStream stream = null;
 			try {
-				stream = minioManager.getData(filePath);
+				stream = minioFileSystemHandler.getData(filePath);
 				result = IOUtils.toString(stream, "utf-8");
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);

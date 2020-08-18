@@ -10,7 +10,6 @@ import codedriver.framework.integration.dto.IntegrationInvokeVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 
 public interface IntegrationMapper {
-	public String getIntegrationAuditDetailByHash(String hash);
 
 	public List<IntegrationAuditVo> searchIntegrationAudit(IntegrationAuditVo integrationAuditVo);
 
@@ -36,5 +35,4 @@ public interface IntegrationMapper {
 
 	public int insertIntegrationAudit(IntegrationAuditVo integrationAuditVo);
 
-	public int replaceIntegrationAuditDetail(@Param("hash") String hash, @Param("content") String content);
 }

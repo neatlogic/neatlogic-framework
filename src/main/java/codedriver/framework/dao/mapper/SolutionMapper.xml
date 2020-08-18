@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.SolutionMapper">
+
+	<select id="searchSolution" parameterType="codedriver.framework.dto.solution.SolutionVo">
+		SELECT
+		`id`,
+		`name`,
+		`is_active` as isActive,
+		`content`,
+		`fcu`,
+		`lcu`,
+		`fcd`,
+		`lcd`
+		FROM `solution`
+	</select>
+
+	<select id="checkSolutionExistsById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.solution.SolutionVo">
+		SELECT
+		`id`,
+		`name`
+		FROM `solution`
+		where `id` = #{id}
+	</select>
+
+	<select id="checkSolutionExistsByName" parameterType="java.lang.String" resultType="codedriver.framework.dto.solution.SolutionVo">
+		SELECT
+		`id`,
+		`name`
+		FROM `solution`
+		where `name` = #{name}
+	</select>
+
+
+	<update id="updateSolutionById" parameterType="codedriver.framework.dto.solution.SolutionVo">
+		UPDATE `solution` set
+		`name` = #{name},
+		`is_active` = #{isActive},
+		`content` = #{content},
+		`lcu` = #{lcu},
+		`lcd` = #{lcd}
+		WHERE `id` = #{id}
+	</update>
+
+	<insert id="insertSolution" parameterType="codedriver.framework.dto.solution.SolutionVo">
+		INSERT INTO `solution` (
+		`id`,
+		`name`,
+		`is_active`,
+		`content`,
+		`fcu`,
+		`lcu`,
+		`fcd`,
+		`lcd`
+		) VALUES (
+		#{id},
+		#{name},
+		#{isActive},
+		#{content},
+		#{fcu},
+		#{lcu},
+		#{fcd},
+		#{lcd}
+		)
+	</insert>
+
+	<insert id="insertEventTypeSolution">
+		INSERT INTO `event_type_solution` (
+		`event_type_id`,
+		`solution_id`
+		) VALUES (
+		#{eventTypeId},
+		#{solutionId}
+		)
+	</insert>
+
+	<delete id="deleteEventTypeSolution">
+		DELETE
+		FROM `event_type_solution`
+		WHERE `solution_id` = #{solutionId}
+	</delete>
+
+</mapper>

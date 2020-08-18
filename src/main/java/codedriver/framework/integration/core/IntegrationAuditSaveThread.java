@@ -1,18 +1,14 @@
 package codedriver.framework.integration.core;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.integration.dao.mapper.IntegrationMapper;
 import codedriver.framework.integration.dto.IntegrationAuditVo;
+import codedriver.framework.util.AuditUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class IntegrationAuditSaveThread extends CodeDriverThread {
-	Logger logger = LoggerFactory.getLogger(IntegrationAuditSaveThread.class);
 
 	private static IntegrationMapper integrationMapper;
 
@@ -34,16 +30,8 @@ public class IntegrationAuditSaveThread extends CodeDriverThread {
 	@Override
 	protected void execute() {
 		if (integrationAuditVo != null) {
+			AuditUtil.saveAuditDetail(integrationAuditVo,"integration_audit");
 			integrationMapper.insertIntegrationAudit(integrationAuditVo);
-			if (StringUtils.isNotBlank(integrationAuditVo.getErrorHash())) {
-				integrationMapper.replaceIntegrationAuditDetail(integrationAuditVo.getErrorHash(), integrationAuditVo.getError());
-			}
-			if (StringUtils.isNotBlank(integrationAuditVo.getResultHash())) {
-				integrationMapper.replaceIntegrationAuditDetail(integrationAuditVo.getResultHash(), integrationAuditVo.getResult());
-			}
-			if (StringUtils.isNotBlank(integrationAuditVo.getParamHash())) {
-				integrationMapper.replaceIntegrationAuditDetail(integrationAuditVo.getParamHash(), integrationAuditVo.getParam());
-			}
 		}
 	}
 

@@ -1,9 +1,8 @@
-package codedriver.framework.minio.core;
+package codedriver.framework.file.core;
 
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.file.FilePathIllegalException;
-import codedriver.framework.file.core.IFileStorageMediumHandler;
 import io.minio.MinioClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RootComponent
-public class MinioManager implements InitializingBean, IFileStorageMediumHandler {
+public class MinioFileSystemHandler implements InitializingBean, IFileStorageMediumHandler {
 
 	public static final String NAME = "MINIO";
 
@@ -50,7 +49,7 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 		// 使用putObject上传一个文件到存储桶中
 		minioClient.putObject(Config.MINIO_BUCKET(), finalPath, inputStream, contentType);
 //		fileVo.setPath("minio:" + finalPath);
-		return MinioManager.NAME.toLowerCase() + ":" + finalPath;
+		return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
 	}
 
 	/**
@@ -81,4 +80,10 @@ public class MinioManager implements InitializingBean, IFileStorageMediumHandler
 		return in;
 	}
 
+	@Override
+	public long getDataLength(String filePath) throws Exception {
+		long length = 0;
+		length = minioClient.statObject(Config.MINIO_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
+		return length;
+	}
 }

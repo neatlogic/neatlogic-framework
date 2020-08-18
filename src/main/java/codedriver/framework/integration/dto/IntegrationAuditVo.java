@@ -1,19 +1,17 @@
 package codedriver.framework.integration.dto;
 
-import java.util.Date;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.DigestUtils;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
+import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
 
-public class IntegrationAuditVo extends BasePageVo {
+import java.util.Date;
+
+public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "id", type = ApiParamType.LONG)
 	private Long id;
 	@EntityField(name = "集成配置uuid", type = ApiParamType.STRING)
@@ -34,18 +32,18 @@ public class IntegrationAuditVo extends BasePageVo {
 	private Long timeCost;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
-	@EntityField(name = "参数内容hash", type = ApiParamType.STRING)
-	private String paramHash;
-	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
-	private String resultHash;
-	@EntityField(name = "错误内容hash", type = ApiParamType.STRING)
-	private String errorHash;
 	@EntityField(name = "请求参数", type = ApiParamType.STRING)
 	private String param;
 	@EntityField(name = "返回结果", type = ApiParamType.STRING)
-	private String result;
+	private Object result;
 	@EntityField(name = "异常", type = ApiParamType.STRING)
 	private String error;
+	@EntityField(name = "参数内容文件路径", type = ApiParamType.STRING)
+	private String paramFilePath;
+	@EntityField(name = "结果内容文件路径", type = ApiParamType.STRING)
+	private String resultFilePath;
+	@EntityField(name = "错误内容文件路径", type = ApiParamType.STRING)
+	private String errorFilePath;
 
 	public Long getId() {
 		if (id == null) {
@@ -122,39 +120,6 @@ public class IntegrationAuditVo extends BasePageVo {
 		this.status = status;
 	}
 
-	public String getParamHash() {
-		if (StringUtils.isBlank(paramHash) && StringUtils.isNotBlank(param)) {
-			paramHash = DigestUtils.md5DigestAsHex(param.getBytes());
-		}
-		return paramHash;
-	}
-
-	public void setParamHash(String paramHash) {
-		this.paramHash = paramHash;
-	}
-
-	public String getResultHash() {
-		if (StringUtils.isBlank(resultHash) && StringUtils.isNotBlank(result)) {
-			resultHash = DigestUtils.md5DigestAsHex(result.getBytes());
-		}
-		return resultHash;
-	}
-
-	public void setResultHash(String resultHash) {
-		this.resultHash = resultHash;
-	}
-
-	public String getErrorHash() {
-		if (StringUtils.isBlank(errorHash) && StringUtils.isNotBlank(error)) {
-			errorHash = DigestUtils.md5DigestAsHex(error.getBytes());
-		}
-		return errorHash;
-	}
-
-	public void setErrorHash(String errorHash) {
-		this.errorHash = errorHash;
-	}
-
 	public String getParam() {
 		return param;
 	}
@@ -163,11 +128,11 @@ public class IntegrationAuditVo extends BasePageVo {
 		this.param = param;
 	}
 
-	public String getResult() {
+	public Object getResult() {
 		return result;
 	}
 
-	public void setResult(String result) {
+	public void setResult(Object result) {
 		this.result = result;
 	}
 
@@ -205,4 +170,27 @@ public class IntegrationAuditVo extends BasePageVo {
 		this.userName = userName;
 	}
 
+	public String getParamFilePath() {
+		return paramFilePath;
+	}
+
+	public void setParamFilePath(String paramFilePath) {
+		this.paramFilePath = paramFilePath;
+	}
+
+	public String getResultFilePath() {
+		return resultFilePath;
+	}
+
+	public void setResultFilePath(String resultFilePath) {
+		this.resultFilePath = resultFilePath;
+	}
+
+	public String getErrorFilePath() {
+		return errorFilePath;
+	}
+
+	public void setErrorFilePath(String errorFilePath) {
+		this.errorFilePath = errorFilePath;
+	}
 }

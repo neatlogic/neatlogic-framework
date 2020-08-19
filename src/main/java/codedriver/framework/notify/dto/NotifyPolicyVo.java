@@ -6,9 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import codedriver.framework.common.constvalue.ActionType;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
-import codedriver.framework.notify.constvalue.NotifyPolicyActionType;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
@@ -89,9 +89,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	public String getAction() {
 		if(action == null) {
 			if(getLcd() != null) {
-				action = NotifyPolicyActionType.UPDATE.getValue();
+				action = ActionType.UPDATE.getValue();
 			}else if(getFcd() != null) {
-				action = NotifyPolicyActionType.CREATE.getValue();
+				action = ActionType.CREATE.getValue();
 			}
 		}
 		return action;
@@ -102,9 +102,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	public String getActionName() {
 		if(actionName == null) {
 			if(getLcd() != null) {
-				actionName = NotifyPolicyActionType.UPDATE.getText();
+				actionName = ActionType.UPDATE.getText();
 			}else if(getFcd() != null) {
-				actionName = NotifyPolicyActionType.CREATE.getText();
+				actionName = ActionType.CREATE.getText();
 			}
 		}
 		return actionName;

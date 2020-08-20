@@ -110,9 +110,12 @@
 		`end_time` AS endTime,
 		`time_cost` AS timeCost,
 		`status`,
-		`param_hash` as paramHash,
-		`result_hash` as resultHash,
-		`error_hash` as errorHash
+		`param_file_path` AS paramFilePath,
+		`result_file_path` AS resultFilePath,
+		`error_file_path` AS errorFilePath
+-- 		`param_hash` as paramHash,
+-- 		`result_hash` as resultHash,
+-- 		`error_hash` as errorHash,
 		FROM
 		`api_audit`
 		WHERE `token` = #{token}
@@ -167,9 +170,9 @@
 		`api_audit`.`end_time` as endTime,
 		`api_audit`.`time_cost` as timeCost,
 		`api_audit`.`status` as status,
-		`api_audit`.`param_hash` as paramHash,
-		`api_audit`.`result_hash` as resultHash,
-		`api_audit`.`error_hash` as errorHash,
+		`api_audit`.`param_file_path` as paramFilePath,
+		`api_audit`.`result_file_path` as resultFilePath,
+		`api_audit`.`error_file_path` as errorFilePath,
 		`user`.`user_name` as userName
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
@@ -250,13 +253,13 @@
 		DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
 		CONCAT(`api_audit`.`time_cost`,'') as timeCost,
 		`api_audit`.`status` as status,
--- 		`api_audit`.`param_hash` as paramHash,
--- 		`api_audit`.`result_hash` as resultHash,
--- 		`api_audit`.`error_hash` as errorHash,
-		`user`.`user_name` as userName,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
-		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+		`api_audit`.`param_file_path` as paramFilePath,
+		`api_audit`.`result_file_path` as resultFilePath,
+		`api_audit`.`error_file_path` as errorFilePath,
+		`user`.`user_name` as userName
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+-- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
 		where 1=1
@@ -381,9 +384,9 @@
 		`end_time`,
 		`time_cost`,
 		`status`,
-		`param_hash`,
-		`result_hash`,
-		`error_hash`
+		`param_file_path`,
+		`result_file_path`,
+		`error_file_path`
 		)
 		VALUES
 		(#{id},
@@ -396,16 +399,10 @@
 		#{endTime},
 		#{timeCost},
 		#{status},
-		#{paramHash},
-		#{resultHash},
-		#{errorHash}
+		#{paramFilePath},
+		#{resultFilePath},
+		#{errorFilePath}
 		)
-	</insert>
-
-	<insert id="replaceApiAuditDetail">
-		REPLACE INTO `api_audit_detail` (`hash`, `content`)
-		VALUES
-		(#{hash}, #{content})
 	</insert>
 
 	<insert id="insertApiAccessCount">

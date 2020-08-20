@@ -1,5 +1,6 @@
 package codedriver.framework.restful.dto;
 
+import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
@@ -14,7 +15,7 @@ import org.springframework.util.DigestUtils;
 import java.util.Date;
 import java.util.List;
 
-public class ApiAuditVo extends BasePageVo {
+public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
 	public final static String SUCCEED = "succeed";
 	public final static String FAILED = "failed";
@@ -63,6 +64,13 @@ public class ApiAuditVo extends BasePageVo {
 	private String errorHash;
 	@EntityField(name = "结果内容hash", type = ApiParamType.STRING)
 	private String resultHash;
+
+	@EntityField(name = "参数内容文件位置", type = ApiParamType.STRING)
+	private String paramFilePath;
+	@EntityField(name = "结果内容文件位置", type = ApiParamType.STRING)
+	private String resultFilePath;
+	@EntityField(name = "错误内容文件位置", type = ApiParamType.STRING)
+	private String errorFilePath;
 
 	@EntityField(name = "API所属模块", type = ApiParamType.STRING)
 	private String moduleGroup;
@@ -334,5 +342,29 @@ public class ApiAuditVo extends BasePageVo {
 
 	public void setTimeUnit(String timeUnit) {
 		this.timeUnit = timeUnit;
+	}
+
+	public String getParamFilePath() {
+		return paramFilePath;
+	}
+
+	public void setParamFilePath(String paramFilePath) {
+		this.paramFilePath = paramFilePath;
+	}
+
+	public String getResultFilePath() {
+		return resultFilePath;
+	}
+
+	public void setResultFilePath(String resultFilePath) {
+		this.resultFilePath = resultFilePath;
+	}
+
+	public String getErrorFilePath() {
+		return errorFilePath;
+	}
+
+	public void setErrorFilePath(String errorFilePath) {
+		this.errorFilePath = errorFilePath;
 	}
 }

@@ -3,7 +3,15 @@ package codedriver.framework.dao.mapper;
 import codedriver.framework.dto.solution.SolutionVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface SolutionMapper {
+
+	public List<SolutionVo> searchSolution(SolutionVo solutionVo);
+
+	public SolutionVo getSolutionById(@Param("id") Long id);
+
+	public int searchSolutionCount(SolutionVo solutionVo);
 
 	public SolutionVo checkSolutionExistsById(@Param("id") Long id);
 

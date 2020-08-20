@@ -2,17 +2,73 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.SolutionMapper">
 
-	<select id="searchSolution" parameterType="codedriver.framework.dto.solution.SolutionVo">
+	<resultMap id="solutionMap" type="codedriver.framework.dto.solution.SolutionVo">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="isActive" column="is_active" />
+		<result property="content" column="content" />
+		<result property="fcu" column="fcu" />
+		<result property="lcu" column="lcu" />
+		<result property="fcd" column="fcd" />
+		<result property="lcd" column="lcd" />
+		<collection property="eventTypeList" ofType="codedriver.framework.dto.event.EventTypeVo">
+			<id property="id" column="eventTypeId" />
+			<result property="name" column="eventTypeName" />
+		</collection>
+	</resultMap>
+
+	<select id="searchSolution" parameterType="codedriver.framework.dto.solution.SolutionVo" resultType="codedriver.framework.dto.solution.SolutionVo">
 		SELECT
 		`id`,
 		`name`,
 		`is_active` as isActive,
 		`content`,
 		`fcu`,
+		(select user_name from user where uuid = `fcu`) as fcuName,
 		`lcu`,
+		(select user_name from user where uuid = `lcu`) as lcuName,
 		`fcd`,
 		`lcd`
 		FROM `solution`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getSolutionById" parameterType="codedriver.framework.dto.solution.SolutionVo" resultMap="solutionMap">
+		SELECT
+		s.`id`,
+		s.`name`,
+		s.`is_active` as isActive,
+		s.`content`,
+		s.`fcu`,
+		s.`lcu`,
+		s.`fcd`,
+		s.`lcd`,
+		et.`id` as eventTypeId,
+		et.`name` as eventTypeName
+		FROM `solution` s
+		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
+		left join `event_type` et on ets.`event_type_id` = et.`id`
+		WHERE
+		s.`id` = #{id}
+	</select>
+
+	<select id="searchSolutionCount" parameterType="codedriver.framework.dto.solution.SolutionVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`solution`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT('%', #{keyword}, '%')
+		</if>
 	</select>
 
 	<select id="checkSolutionExistsById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.solution.SolutionVo">

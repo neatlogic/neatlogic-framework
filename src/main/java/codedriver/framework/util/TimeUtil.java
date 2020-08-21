@@ -1,7 +1,7 @@
 package codedriver.framework.util;
 
-import codedriver.framework.exception.type.ParamIrregularException;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.time.DateUtils.isSameDay;
+import static org.apache.commons.lang3.time.DateUtils.toCalendar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.time.DateUtils.isSameDay;
-import static org.apache.commons.lang3.time.DateUtils.toCalendar;
+import org.apache.commons.lang3.StringUtils;
+
+import codedriver.framework.exception.type.ParamIrregularException;
 
 /**
  * @program: codedriver
@@ -27,8 +28,7 @@ import static org.apache.commons.lang3.time.DateUtils.toCalendar;
  **/
 public class TimeUtil {
 
-    public static final String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String TIME3_FORMAT = "HH:mm";
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String FMT_yyyy_MM_dd = "yyyy-MM-dd";
     private static final String yyyyMMdd = "yyyyMMdd";
     private static final String yyMMdd = "yyMMdd";
@@ -49,7 +49,7 @@ public class TimeUtil {
 	    return simpleDateFormat;
 	}
     public static String timeTransfer(int timeRange, String timeUnit){
-        SimpleDateFormat format = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         switch (timeUnit){
@@ -85,7 +85,7 @@ public class TimeUtil {
     }
     
     public static Date getDateByHourMinute(String hourMinute,Integer addDays) {
-    	SimpleDateFormat  df = new SimpleDateFormat(TIME3_FORMAT);
+    	SimpleDateFormat  df = new SimpleDateFormat(HH_MM);
     	SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM);
     	try {
 			if(StringUtils.isNotBlank(hourMinute)) {
@@ -438,6 +438,7 @@ public class TimeUtil {
      * @return
      * @throws ParseException
      */
+    @SuppressWarnings("unused")
     public static List<Date> calBetweenDaysDate(String startDay,String endDay) throws ParseException{
         List<Date> result = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat(FMT_yyyy_MM_dd);
@@ -460,6 +461,7 @@ public class TimeUtil {
      * @param date
      * @return
      */
+    @SuppressWarnings("unused")
     public static List<String> calFirstDay2Date(Date date) throws ParseException{
         List<String> result = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat(FMT_yyyy_MM_dd);
@@ -483,6 +485,7 @@ public class TimeUtil {
      * @param date
      * @return
      */
+    @SuppressWarnings("unused")
     public static List<String> calMonday2Date(Date date) {
         List<String> result = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat(FMT_yyyy_MM_dd);
@@ -652,6 +655,7 @@ public class TimeUtil {
      * @param format
      * @return
      */
+    @SuppressWarnings("unused")
     public static boolean checkTimeParam(String startTime, String endTime, String format) {
         if (StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
             return  false;

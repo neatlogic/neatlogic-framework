@@ -136,4 +136,11 @@
 		WHERE `solution_id` = #{solutionId}
 	</delete>
 
+	<delete id="deleteSolution">
+		DELETE s,ets
+		FROM `solution` s left join `event_type_solution` ets
+		on s.`id` = ets.`solution_id`
+		WHERE s.`id` = #{id}
+	</delete>
+
 </mapper>

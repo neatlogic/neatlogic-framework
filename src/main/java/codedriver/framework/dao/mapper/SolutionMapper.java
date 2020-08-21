@@ -24,4 +24,6 @@ public interface SolutionMapper {
 	public int insertEventTypeSolution(@Param("eventTypeId") Long eventTypeId,@Param("solutionId") Long solutionId);
 
 	public int deleteEventTypeSolution(@Param("solutionId") Long solutionId);
+
+	public int deleteSolution(@Param("id") Long solutionId);
 }

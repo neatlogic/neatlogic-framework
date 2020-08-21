@@ -506,78 +506,107 @@ public class ApiVo extends BasePageVo implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ApiVo other = (ApiVo) obj;
 		if (authtype == null) {
-			if (other.authtype != null)
+			if (other.authtype != null) {
 				return false;
-		} else if (!authtype.equals(other.authtype))
+			}
+		} else if (!authtype.equals(other.authtype)) {
 			return false;
+		}
 		if (config == null) {
-			if (other.config != null)
+			if (other.config != null) {
 				return false;
-		} else if (!config.equals(other.config))
+			}
+		} else if (!config.equals(other.config)) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (expire == null) {
-			if (other.expire != null)
+			if (other.expire != null) {
 				return false;
-		} else if (!expire.equals(other.expire))
+			}
+		} else if (!expire.equals(other.expire)) {
 			return false;
+		}
 		if (handler == null) {
-			if (other.handler != null)
+			if (other.handler != null) {
 				return false;
-		} else if (!handler.equals(other.handler))
+			}
+		} else if (!handler.equals(other.handler)) {
 			return false;
+		}
 		if (isActive == null) {
-			if (other.isActive != null)
+			if (other.isActive != null) {
 				return false;
-		} else if (!isActive.equals(other.isActive))
+			}
+		} else if (!isActive.equals(other.isActive)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (needAudit == null) {
-			if (other.needAudit != null)
+			if (other.needAudit != null) {
 				return false;
-		} else if (!needAudit.equals(other.needAudit))
+			}
+		} else if (!needAudit.equals(other.needAudit)) {
 			return false;
+		}
 		if (password == null) {
-			if (other.password != null)
+			if (other.password != null) {
 				return false;
-		} else if (!password.equals(other.password))
+			}
+		} else if (!password.equals(other.password)) {
 			return false;
+		}
 		if (qps == null) {
-			if (other.qps != null)
+			if (other.qps != null) {
 				return false;
-		} else if (!qps.equals(other.qps))
+			}
+		} else if (!qps.equals(other.qps)) {
 			return false;
+		}
 		if (timeout == null) {
-			if (other.timeout != null)
+			if (other.timeout != null) {
 				return false;
-		} else if (!timeout.equals(other.timeout))
+			}
+		} else if (!timeout.equals(other.timeout)) {
 			return false;
+		}
 		if (token == null) {
-			if (other.token != null)
+			if (other.token != null) {
 				return false;
-		} else if (!token.equals(other.token))
+			}
+		} else if (!token.equals(other.token)) {
 			return false;
+		}
 		if (username == null) {
-			if (other.username != null)
+			if (other.username != null) {
 				return false;
-		} else if (!username.equals(other.username))
+			}
+		} else if (!username.equals(other.username)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -597,29 +626,4 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.pathVariableList = pathVariableList;
 	}
 
-//	@Override
-//	public boolean equals(Object other) {
-//		if (this == other)
-//			return true;
-//		if (other == null)
-//			return false;
-//		if (!(other instanceof ApiVo))
-//			return false;
-//
-//		final ApiVo api = (ApiVo) other;
-//		try {
-//			if (getToken().equals(api.getToken())) {
-//				return true;
-//			}
-//		} catch (Exception ex) {
-//			return false;
-//		}
-//		return false;
-//	}
-//
-//	@Override
-//	public int hashCode() {
-//		int result = getToken().hashCode() * 117;
-//		return result;
-//	}
 }

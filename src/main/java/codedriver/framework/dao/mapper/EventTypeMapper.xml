@@ -41,7 +41,7 @@
 		<if test="keyword != null and keyword != ''">
 			and name LIKE CONCAT('%', #{keyword}, '%')
 		</if>
-		<if test="parentId != null and parentId != ''">
+		<if test="parentId != null">
 			and parent_id = #{parentId}
 		</if>
 	</select>
@@ -54,14 +54,13 @@
 		`rht`,
 		`parent_id` AS `parentId`
 		FROM `event_type`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				and `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-			<if test="parentId != null and parentId != ''">
-				and `parent_id` = #{parentId}
-			</if>
-		</where>
+		where 1=1
+		<if test="keyword != null and keyword != ''">
+			and `name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="parentId != null">
+			and `parent_id` = #{parentId}
+		</if>
 		ORDER BY `lft`
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
@@ -184,6 +183,26 @@
 		WHERE a.`lft` &gt; #{lft} AND a.`rht` &lt; #{rht}
 		AND `type` = #{authorityVo.type}
 		AND `uuid` = #{authorityVo.uuid}
+	</select>
+
+	<select id="getSolutionCountByEventTypeId" resultType="int" useCache="false">
+		select
+		count(s.`id`)
+		from `solution` s
+		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
+		where ets.`event_type_id` = #{eventTypId}
+	</select>
+
+	<select id="getSolutionList" parameterType="codedriver.framework.dto.event.EventTypeVo" resultType="codedriver.framework.dto.solution.SolutionVo" useCache="false">
+		select
+		s.`id`,
+		s.`name`
+		from `solution` s
+		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
+		where ets.`event_type_id` = #{id}
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
 	</select>
 
 	<update id="updateEventTypeNameById" parameterType="codedriver.framework.dto.event.EventTypeVo">

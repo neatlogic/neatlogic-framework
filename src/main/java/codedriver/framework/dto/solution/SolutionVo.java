@@ -6,7 +6,6 @@ import codedriver.framework.dto.event.EventTypeVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class SolutionVo extends BasePageVo {
 	@EntityField(name = "更新人用户名", type = ApiParamType.STRING)
 	private String lcuName;
 	@EntityField(name = "关联的事件类型", type = ApiParamType.JSONARRAY)
-	private List<EventTypeVo> eventTypeList = new ArrayList<>();
+	private List<EventTypeVo> eventTypeList;
 
 	public SolutionVo() {}
 

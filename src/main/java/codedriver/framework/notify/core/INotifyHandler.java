@@ -27,7 +27,6 @@ public interface INotifyHandler {
 	 * 
 	 * @Author: chenqiwei
 	 * @Time:Feb 12, 2020
-	 * @Description: TODO
 	 * @param @return
 	 * @return String
 	 */

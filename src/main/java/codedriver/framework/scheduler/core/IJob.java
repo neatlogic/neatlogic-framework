@@ -30,7 +30,6 @@ public interface IJob extends Job {
 	/**
 	 * @Author: chenqiwei
 	 * @Time:Feb 8, 2020
-	 * @Description: TODO
 	 * @param @return
 	 * @return IJob
 	 */

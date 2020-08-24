@@ -2,7 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import codedriver.framework.dto.AuthorityVo;
 import codedriver.framework.dto.event.EventTypeVo;
-import codedriver.framework.dto.solution.SolutionVo;
+import codedriver.framework.dto.event.EventSolutionVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface EventTypeMapper {
 
 	public List<AuthorityVo> checkAuthorityIsExists(@Param("lft") Integer lft, @Param("rht") Integer rht,@Param("authorityVo") AuthorityVo authority);
 
-	public List<SolutionVo> getSolutionList(EventTypeVo eventTypeVo);
+	public List<EventSolutionVo> getSolutionList(EventTypeVo eventTypeVo);
 
 	public int getSolutionCountByEventTypeId(@Param("eventTypId") Long eventTypId);
 

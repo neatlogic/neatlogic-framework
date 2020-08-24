@@ -1,15 +1,14 @@
-package codedriver.framework.dto.solution;
+package codedriver.framework.dto.event;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.dto.event.EventTypeVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
 import java.util.Date;
 import java.util.List;
 
-public class SolutionVo extends BasePageVo {
+public class EventSolutionVo extends BasePageVo {
 
 	@EntityField(name = "解决方案ID", type = ApiParamType.LONG)
 	private Long id;
@@ -35,7 +34,7 @@ public class SolutionVo extends BasePageVo {
 	@EntityField(name = "关联的事件类型", type = ApiParamType.JSONARRAY)
 	private List<EventTypeVo> eventTypeList;
 
-	public SolutionVo() {}
+	public EventSolutionVo() {}
 
 	public Long getId() {
 		if(id == null){

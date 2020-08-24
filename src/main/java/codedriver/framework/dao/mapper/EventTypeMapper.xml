@@ -188,16 +188,16 @@
 	<select id="getSolutionCountByEventTypeId" resultType="int" useCache="false">
 		select
 		count(s.`id`)
-		from `solution` s
+		from `event_solution` s
 		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
 		where ets.`event_type_id` = #{eventTypId}
 	</select>
 
-	<select id="getSolutionList" parameterType="codedriver.framework.dto.event.EventTypeVo" resultType="codedriver.framework.dto.solution.SolutionVo" useCache="false">
+	<select id="getSolutionList" parameterType="codedriver.framework.dto.event.EventTypeVo" resultType="codedriver.framework.dto.event.EventSolutionVo" useCache="false">
 		select
 		s.`id`,
 		s.`name`
-		from `solution` s
+		from `event_solution` s
 		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
 		where ets.`event_type_id` = #{id}
 		<if test="needPage == true">

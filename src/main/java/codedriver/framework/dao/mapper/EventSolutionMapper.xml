@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="codedriver.framework.dao.mapper.SolutionMapper">
+<mapper namespace="codedriver.framework.dao.mapper.EventSolutionMapper">
 
-	<resultMap id="solutionMap" type="codedriver.framework.dto.solution.SolutionVo">
+	<resultMap id="solutionMap" type="codedriver.framework.dto.event.EventSolutionVo">
 		<id property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="isActive" column="is_active" />
@@ -17,7 +17,7 @@
 		</collection>
 	</resultMap>
 
-	<select id="searchSolution" parameterType="codedriver.framework.dto.solution.SolutionVo" resultType="codedriver.framework.dto.solution.SolutionVo">
+	<select id="searchSolution" parameterType="codedriver.framework.dto.event.EventSolutionVo" resultType="codedriver.framework.dto.event.EventSolutionVo">
 		SELECT
 		`id`,
 		`name`,
@@ -29,7 +29,7 @@
 		(select user_name from user where uuid = `lcu`) as lcuName,
 		`fcd`,
 		`lcd`
-		FROM `solution`
+		FROM `event_solution`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
@@ -40,7 +40,7 @@
 		</if>
 	</select>
 
-	<select id="getSolutionById" parameterType="codedriver.framework.dto.solution.SolutionVo" resultMap="solutionMap">
+	<select id="getSolutionById" parameterType="codedriver.framework.dto.event.EventSolutionVo" resultMap="solutionMap">
 		SELECT
 		s.`id`,
 		s.`name`,
@@ -52,18 +52,18 @@
 		s.`lcd`,
 		et.`id` as eventTypeId,
 		et.`name` as eventTypeName
-		FROM `solution` s
+		FROM `event_solution` s
 		left join `event_type_solution` ets on s.`id` = ets.`solution_id`
 		left join `event_type` et on ets.`event_type_id` = et.`id`
 		WHERE
 		s.`id` = #{id}
 	</select>
 
-	<select id="searchSolutionCount" parameterType="codedriver.framework.dto.solution.SolutionVo" resultType="int">
+	<select id="searchSolutionCount" parameterType="codedriver.framework.dto.event.EventSolutionVo" resultType="int">
 		SELECT
 		COUNT(1)
 		FROM
-		`solution`
+		`event_solution`
 		WHERE
 		1=1
 		<if test="keyword != null and keyword != ''">
@@ -71,25 +71,25 @@
 		</if>
 	</select>
 
-	<select id="checkSolutionExistsById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.solution.SolutionVo">
+	<select id="checkSolutionExistsById" parameterType="java.lang.Long" resultType="codedriver.framework.dto.event.EventSolutionVo">
 		SELECT
 		`id`,
 		`name`
-		FROM `solution`
+		FROM `event_solution`
 		where `id` = #{id}
 	</select>
 
-	<select id="checkSolutionExistsByName" parameterType="java.lang.String" resultType="codedriver.framework.dto.solution.SolutionVo">
+	<select id="checkSolutionExistsByName" parameterType="java.lang.String" resultType="codedriver.framework.dto.event.EventSolutionVo">
 		SELECT
 		`id`,
 		`name`
-		FROM `solution`
+		FROM `event_solution`
 		where `name` = #{name}
 	</select>
 
 
-	<update id="updateSolutionById" parameterType="codedriver.framework.dto.solution.SolutionVo">
-		UPDATE `solution` set
+	<update id="updateSolutionById" parameterType="codedriver.framework.dto.event.EventSolutionVo">
+		UPDATE `event_solution` set
 		`name` = #{name},
 		`is_active` = #{isActive},
 		`content` = #{content},
@@ -98,8 +98,8 @@
 		WHERE `id` = #{id}
 	</update>
 
-	<insert id="insertSolution" parameterType="codedriver.framework.dto.solution.SolutionVo">
-		INSERT INTO `solution` (
+	<insert id="insertSolution" parameterType="codedriver.framework.dto.event.EventSolutionVo">
+		INSERT INTO `event_solution` (
 		`id`,
 		`name`,
 		`is_active`,
@@ -138,7 +138,7 @@
 
 	<delete id="deleteSolution">
 		DELETE s,ets
-		FROM `solution` s left join `event_type_solution` ets
+		FROM `event_solution` s left join `event_type_solution` ets
 		on s.`id` = ets.`solution_id`
 		WHERE s.`id` = #{id}
 	</delete>

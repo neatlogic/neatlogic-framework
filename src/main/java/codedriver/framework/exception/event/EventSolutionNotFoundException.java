@@ -1,12 +1,12 @@
-package codedriver.framework.exception.solution;
+package codedriver.framework.exception.event;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class SolutionNotFoundException extends ApiRuntimeException {
+public class EventSolutionNotFoundException extends ApiRuntimeException {
 
 	private static final long serialVersionUID = -3755737935060105949L;
 
-	public SolutionNotFoundException(Long id) {
+	public EventSolutionNotFoundException(Long id) {
 		super("解决方案：" + id + "不存在");
 	}
 

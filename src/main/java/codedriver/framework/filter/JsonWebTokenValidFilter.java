@@ -69,13 +69,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         boolean isUnExpired = false;
         boolean hasTenant = false;
         String tenant = null, authorization = null, timezone = "+8:00";
-        String authorizationFromCookie = null;
+        //String authorizationFromCookie = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("codedriver_timezone".equals(cookie.getName())) {
                     timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
                 } else if ("codedriver_authorization".equals(cookie.getName())) {
-                    authorizationFromCookie = cookie.getValue();
+                    //authorizationFromCookie = cookie.getValue();
+                    authorization = cookie.getValue();
                 }
             }
         }
@@ -89,7 +90,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
 
         if (StringUtils.isNotBlank(authorization)) {
-            authorization = authorizationFromCookie;
+            //authorization = authorizationFromCookie;
             // 解压cookie内容
             if (authorization.startsWith("GZIP_")) {
                 authorization = authorization.substring(5);

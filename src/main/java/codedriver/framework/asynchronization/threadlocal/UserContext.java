@@ -7,8 +7,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import codedriver.framework.exception.user.NoUserException;
 
 public class UserContext implements Serializable {
 	private static final long serialVersionUID = -578199115176786224L;
@@ -18,15 +22,38 @@ public class UserContext implements Serializable {
 	private String tenant;
 	private String userName;
 	private String userId;
-	private List<String> roleNameList;
+	private String userUuid;
+	private String timezone = "+8:00";
+	private String token;
+	private List<String> roleUuidList = new ArrayList<>();
+	
+	public static UserContext init(UserContext _userContext) {
+		UserContext context = new UserContext();
+		if (_userContext != null) {
+			context.setUserId(_userContext.getUserId());
+			context.setUserUuid(_userContext.getUserUuid());
+			context.setUserName(_userContext.getUserName());
+			context.setTenant(_userContext.getTenant());
+			context.setTimezone(_userContext.getTimezone());
+			context.setToken(_userContext.getToken());
+			// context.setRequest(_userContext.getRequest());
+			// context.setResponse(_userContext.getResponse());
+			context.setRoleUuidList(_userContext.getRoleUuidList());
+		}
+		instance.set(context);
+		return context;
+	}
 
-	public static UserContext init(JSONObject jsonObj, HttpServletRequest request, HttpServletResponse response) {
+	public static UserContext init(JSONObject jsonObj,String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
 		UserContext context = new UserContext();
 		context.setUserId(jsonObj.getString("userid"));
+		context.setUserUuid(jsonObj.getString("useruuid"));
 		context.setUserName(jsonObj.getString("username"));
 		context.setTenant(jsonObj.getString("tenant"));
 		context.setRequest(request);
+		context.setToken(token);
 		context.setResponse(response);
+		context.setTimezone(timezone);
 		JSONArray roleList = jsonObj.getJSONArray("rolelist");
 		if (roleList != null && roleList.size() > 0) {
 			for (int i = 0; i < roleList.size(); i++) {
@@ -38,12 +65,17 @@ public class UserContext implements Serializable {
 	}
 
 	public void addRole(String role) {
-		if (roleNameList == null) {
-			roleNameList = new ArrayList<>();
+		if (!roleUuidList.contains(role)) {
+			roleUuidList.add(role);
 		}
-		if (!roleNameList.contains(role)) {
-			roleNameList.add(role);
-		}
+	}
+
+	public String getTimezone() {
+		return timezone;
+	}
+
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
 	}
 
 	private UserContext() {
@@ -70,16 +102,38 @@ public class UserContext implements Serializable {
 		return userId;
 	}
 
+	public String getUserId(boolean need) {
+		if (StringUtils.isBlank(userId)) {
+			throw new NoUserException();
+		}
+		return userId;
+	}
+
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 
-	public List<String> getRoleNameList() {
-		return roleNameList;
+	public String getUserUuid() {
+		return userUuid;
+	}
+	
+	public String getUserUuid(boolean need) {
+		if (StringUtils.isBlank(userUuid)) {
+			throw new NoUserException();
+		}
+		return userUuid;
 	}
 
-	public void setRoleNameList(List<String> roleNameList) {
-		this.roleNameList = roleNameList;
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
+	}
+
+	public List<String> getRoleUuidList() {
+		return roleUuidList;
+	}
+
+	public void setRoleUuidList(List<String> roleUuidList) {
+		this.roleUuidList = roleUuidList;
 	}
 
 	public String getTenant() {
@@ -104,5 +158,13 @@ public class UserContext implements Serializable {
 
 	public void setResponse(HttpServletResponse response) {
 		this.response = response;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

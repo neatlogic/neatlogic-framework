@@ -1,0 +1,121 @@
+package codedriver.framework.reminder.dao.mapper;
+
+import codedriver.framework.reminder.dto.GlobalReminderMessageVo;
+import codedriver.framework.reminder.dto.ReminderMessageSearchVo;
+import codedriver.framework.reminder.dto.param.ReminderHistoryParamVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * @program: balantflow
+ * @description: 实时动态消息Mapper
+ * @create: 2019-09-11 15:40
+ **/
+public interface GlobalReminderMessageMapper {
+
+    /** 
+    * @Description: 获取当天的所有用户相关消息
+    * @Param: [searchVo] 
+    * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.GlobalReminderMessageVo>  
+    */ 
+    List<GlobalReminderMessageVo> getShowReminderMessageListByIdListAndUserUuid(ReminderMessageSearchVo searchVo);
+
+    /**
+    * @Description: 获取指定实时动态历史消息
+    * @Param: [paramVo]
+    * @return: java.util.List<codedriver.framework.reminder.dto.GlobalReminderMessageVo>
+    */
+    List<GlobalReminderMessageVo> getReminderHistoryMessageList(ReminderHistoryParamVo paramVo);
+
+    /**
+    * @Description:  获取指定实时动态历史消息数目
+    * @Param: [paramVo]
+    * @return: int
+    */
+    int getReminderHistoryMessageCount(ReminderHistoryParamVo paramVo);
+
+    /** 
+    * @Description: 定时获取最新消息 
+    * @Param: [userUuid] 
+    * @return: java.util.List<com.techsure.balantflow.dto.globalreminder.GlobalReminderMessageVo>  
+    */ 
+    List<GlobalReminderMessageVo> getScheduleMessageList(String userUuid);
+
+    /** 
+    * @Description: 获取当天消息数量
+    * @Param: [searchVo] 
+    * @return: int  
+    */ 
+    int getReminderMessageCountByDay(ReminderMessageSearchVo searchVo);
+
+    /** 
+    * @Description: 获取消息数量
+    * @Param: [userUuid] 
+    * @return: int  
+    */ 
+    int getReminderMessageCount(String userUuid);
+
+    /** 
+    * @Description: 插入新消息 
+    * @Param: [messageVo] 
+    * @return: int  
+    */ 
+    int insertReminderMessage(GlobalReminderMessageVo messageVo);
+
+    /** 
+    * @Description: 插入消息内容 
+    * @Param: [messageVo] 
+    * @return: int  
+    */ 
+    int insertReminderMessageContent(GlobalReminderMessageVo messageVo);
+
+    /** 
+    * @Description: 关联消息接收人 
+    * @Param: [messageId, userUuid] 
+    * @return: int  
+    */ 
+    int insertReminderMessageUser(@Param("messageId") Long messageId, @Param("userUuid") String userUuid);
+
+    /** 
+    * @Description: 更新新消息是否为旧消息
+    * @Param: [userMessageId, userUuid] 
+    * @return: void  
+    */ 
+    void updateUserMessageNewStatus(@Param("userMessageId") Long userMessageId, @Param("userUuid") String userUuid);
+
+    /** 
+    * @Description: 更新单个消息有效性
+    * @Param: [messageId, userUuid] 
+    * @return: void  
+    */ 
+    void updateMessageActiveById(@Param("messageId") Long messageId, @Param("userUuid") String userUuid);
+
+    /** 
+    * @Description: 更新所有消息有效性 
+    * @Param: [userUuid] 
+    * @return: void  
+    */ 
+    void updateAllMessageActive(String userUuid);
+
+    /** 
+    * @Description: 跟新当天新消息有效性 
+    * @Param: [searchVo] 
+    * @return: void  
+    */ 
+    void updateDayMessageActive(ReminderMessageSearchVo searchVo);
+
+    /** 
+    * @Description: 跟新消息弹窗性 
+    * @Param: [userUuid, messageId] 
+    * @return: void  
+    */ 
+    void updateMessageKeepStatus(@Param("userUuid") String userUuid, @Param("messageId") Long messageId);
+
+    /** 
+    * @Description: 跟新用户插件的所有消息有效性
+    * @Param: [userUuid, reminderId] 
+    * @return: int  
+    */
+    int updateMessageActiveByReminderId(@Param("userUuid") String userUuid, @Param("handler") String handler);
+}

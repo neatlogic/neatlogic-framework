@@ -4,9 +4,9 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<typeAliases>
-		<typeAlias type="codedriver.framework.dao.typehandler.XssHandler" alias="XssHandler" />
+		<typeAlias type="codedriver.framework.dao.plugin.XssHandler" alias="XssHandler" />
 	</typeAliases>
-	<typeHandlers>
-		<typeHandler jdbcType="VARCHAR" javaType="String" handler="codedriver.framework.dao.typehandler.XssHandler" />
-	</typeHandlers>
+	<plugins>
+		<plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor" />
+	</plugins>
 </configuration>

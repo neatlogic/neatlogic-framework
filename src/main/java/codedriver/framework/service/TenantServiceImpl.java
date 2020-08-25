@@ -12,7 +12,6 @@ public class TenantServiceImpl implements TenantService {
 	@Autowired
 	private TenantMapper tenantMapper;
 
-
 	@Override
 	public TenantVo getTenantByUuid(String tenantUuid) {
 		return tenantMapper.getTenantByUuid(tenantUuid);

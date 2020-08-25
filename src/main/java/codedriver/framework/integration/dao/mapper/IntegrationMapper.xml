@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
+	<sql id="searchIntegrationAuditCondition">
+		<where>
+			<if test="integrationUuid != null and integrationUuid != ''">
+				AND integration_uuid = #{integrationUuid}
+			</if>
+		</where>
+	</sql>
+
+	<select id="searchIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="codedriver.framework.integration.dto.IntegrationAuditVo">
+		SELECT
+		`id`,
+		`integration_uuid` AS integrationUuid,
+		`user_uuid` AS userUuid,
+		(SELECT user_name FROM user WHERE uuid = user_uuid) AS userName,
+		`request_from` AS requestFrom,
+		`server_id` AS serverId,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`status`,
+		`param_file_path` AS paramFilePath,
+		`result_file_path` AS resultFilePath,
+		`error_file_path` AS errorFilePath,
+		(UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
+		FROM
+		`integration_audit`
+		<include refid="searchIntegrationAuditCondition" />
+		ORDER BY id DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`integration_audit`
+		<include refid="searchIntegrationAuditCondition" />
+	</select>
+
+	<select id="getIntegrationByUuid" parameterType="java.lang.String" resultType="codedriver.framework.integration.dto.IntegrationVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		is_active AS isActive,
+		`config`
+		FROM
+		`integration`
+		WHERE
+		uuid = #{value}
+	</select>
+
+	<select id="searchIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.integration.dto.IntegrationVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		is_active AS isActive,
+		`config`
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
+			</if>
+			<if test="valueList != null and valueList.size() >0">
+				AND uuid in
+				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
+					#{uuid}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY fcd DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchIntegrationForSelect" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`uuid` as `value`,
+		`name` as `text`
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
+			</if>
+			<if test="valueList != null and valueList.size() >0">
+				AND uuid in
+				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
+					#{uuid}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY fcd DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchIntegrationCount" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`integration`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (name LIKE concat('%', #{keyword}, '%')
+				OR url LIKE concat('%', #{keyword}, '%'))
+			</if>
+			<if test="handler != null and handler != ''">
+				AND handler = #{handler}
+			</if>
+			<if test="isActive != null">
+				AND is_active = #{isActive}
+			</if>
+		</where>
+	</select>
+
+	<update id="updateIntegrationActive" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		UPDATE
+		`integration`
+		SET
+		is_active = #{isActive}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		UPDATE
+		`integration`
+		SET
+		`name` = #{name},
+		`url` = #{url},
+		`handler` = #{handler},
+		`method` = #{method},
+		`config` = #{configStr},
+		`lcd` = NOW(),
+		`lcu` = #{lcu}
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<insert id="replaceIntegrationInvoke" parameterType="codedriver.framework.integration.dto.IntegrationInvokeVo">
+		REPLACE INTO `integration_invoke` (
+		`integration_uuid`,
+		`invoke_config`,
+		`invoke_hash`
+		)
+		VALUES
+		(
+		#{integrationUuid},
+		#{invokeConfigStr},
+		#{invokeHash}
+		)
+	</insert>
+
+	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
+		INSERT INTO `integration` (
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		`config`,
+		`is_active`,
+		`fcd`,
+		`fcu`
+		)
+		VALUES
+		(
+		#{uuid},
+		#{name},
+		#{url},
+		#{handler},
+		#{method},
+		#{configStr},
+		#{isActive},
+		NOW(),
+		#{fcu}
+		)
+	</insert>
+
+	<insert id="insertIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo">
+		INSERT INTO `integration_audit` (
+		`id`,
+		`integration_uuid`,
+		`user_uuid`,
+		`request_from`,
+		`server_id`,
+		`start_time`,
+		`end_time`,
+		`status`,
+		`param_file_path`,
+		`result_file_path`,
+		`error_file_path`
+-- 		`param_hash`,
+-- 		`result_hash`,
+-- 		`error_hash`
+		)
+		VALUES
+		(
+		#{id},
+		#{integrationUuid},
+		#{userUuid},
+		#{requestFrom},
+		#{serverId},
+		#{startTime},
+		#{endTime},
+		#{status},
+		#{paramFilePath},
+		#{resultFilePath},
+		#{errorFilePath}
+		)
+	</insert>
+
+	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">
+		DELETE
+		FROM
+		`integration`
+		WHERE `uuid` = #{value}
+	</delete>
+</mapper>

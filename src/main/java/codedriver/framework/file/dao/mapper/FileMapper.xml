@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.file.dao.mapper.FileMapper">
+
+	<select id="getFileById" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
+		SELECT
+		`id`,
+		`name`,
+		`size`,
+		`user_uuid` AS userUuid,
+		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
+		`type`,
+		content_type AS contentType,
+		`path`
+		FROM
+		`file`
+		WHERE `id` = #{value}
+	</select>
+
+	<select id="getFileTypeConfigByType" parameterType="java.lang.String" resultType="codedriver.framework.file.dto.FileTypeVo">
+		SELECT
+		`name`,
+		`config`
+		FROM
+		`filetype_config`
+		WHERE name = #{value}
+	</select>
+
+	<select id="getFileListByIdList" parameterType="java.util.List" resultType="codedriver.framework.file.dto.FileVo">
+		SELECT
+		`id`,
+		`name`,
+		`size`,
+		`user_uuid` AS userUuid,
+		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
+		`type`,
+		content_type AS contentType,
+		`path`
+		FROM `file`
+		WHERE `id` IN
+		<foreach collection="list" item ="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</select>
+
+	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
+		INSERT INTO `file` (
+		`id`,
+		`name`,
+		`size`,
+		`user_uuid`,
+		`upload_time`,
+		`type`,
+		`content_type`,
+		`path`
+		)
+		VALUES
+		(
+		#{id},
+		#{name},
+		#{size},
+		#{userUuid},
+		NOW(),
+		#{type},
+		#{contentType},
+		#{path}
+		)
+	</insert>
+
+	<delete id="deleteFile" parameterType="java.lang.Long">
+		DELETE FROM `file`
+		WHERE `id` = #{fileId}
+	</delete>
+</mapper>
+

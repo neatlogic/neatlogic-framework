@@ -6,56 +6,92 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 
-import com.alibaba.druid.pool.DruidDataSource;
-
-import codedriver.framework.common.CodeDriverDataSource;
-import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.CodeDriverBasicDataSource;
+import codedriver.framework.common.CodeDriverRoutingDataSource;
+import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
 
-@RootComponent
-@Order(1)
+/**
+ * 
+ * @Author:chenqiwei
+ * @Time:Jun 11, 2020
+ * @ClassName: DatasourceInitializer
+ * @Description: 此类在root-context.xml中初始化
+ */
 public class DatasourceInitializer {
 	@Autowired
 	private DatasourceMapper datasourceMapper;
 
 	@Autowired
-	private CodeDriverDataSource datasouce;
+	private CodeDriverRoutingDataSource datasource;
+
+	private static CodeDriverRoutingDataSource instance;
 
 	@Resource(name = "dataSourceMaster")
-	private DruidDataSource masterDatasource;
+	private CodeDriverBasicDataSource masterDatasource;
 
 	private static Map<Object, Object> datasourceMap = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
-		// TenantContext context = TenantContext.init("master");
-		List<DatasourceVo> datasourceList = datasourceMapper.getAllDatasource();
+		List<DatasourceVo> datasourceList = datasourceMapper.getAllActiveTenantDatasource();
 		if (!datasourceMap.containsKey("master")) {
 			datasourceMap.put("master", masterDatasource);
 		}
 
 		for (DatasourceVo datasourceVo : datasourceList) {
 			if (!datasourceMap.containsKey(datasourceVo.getTenantUuid())) {
-				DruidDataSource tenantDatasource = new DruidDataSource();
-				tenantDatasource.setUrl(datasourceVo.getUrl());
+				// 创建OLTP库
+				CodeDriverBasicDataSource tenantDatasource = new CodeDriverBasicDataSource();
+				String url = datasourceVo.getUrl();
+				url = url.replace("{host}", datasourceVo.getHost());
+				url = url.replace("{port}", datasourceVo.getPort().toString());
+				url = url.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid());
+				tenantDatasource.setUrl(url);
 				tenantDatasource.setDriverClassName(datasourceVo.getDriver());
 				tenantDatasource.setUsername(datasourceVo.getUsername());
-				tenantDatasource.setPassword(datasourceVo.getPassword());
+				tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
 				datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
+				// 创建OLAP库
+				CodeDriverBasicDataSource tenantDatasourceOlap = new CodeDriverBasicDataSource();
+				String urlOlap = datasourceVo.getUrl();
+				urlOlap = urlOlap.replace("{host}", datasourceVo.getHost());
+				urlOlap = urlOlap.replace("{port}", datasourceVo.getPort().toString());
+				urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_olap");
+				tenantDatasourceOlap.setUrl(urlOlap);
+				tenantDatasourceOlap.setDriverClassName(datasourceVo.getDriver());
+				tenantDatasourceOlap.setUsername(datasourceVo.getUsername());
+				tenantDatasourceOlap.setPassword(datasourceVo.getPasswordPlain());
+				datasourceMap.put(datasourceVo.getTenantUuid() + "_OLAP", tenantDatasourceOlap);
+
+				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}
+		}
+		if (instance == null && datasource != null) {
+			instance = datasource;
 		}
 		if (!datasourceMap.isEmpty()) {
-			datasouce.setTargetDataSources(datasourceMap);
+			datasource.setTargetDataSources(datasourceMap);
 			if (datasourceMap.containsKey("master")) {
-				datasouce.setDefaultTargetDataSource(datasourceMap.get("master"));
+				datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
 			}
-			datasouce.afterPropertiesSet();
+			datasource.afterPropertiesSet();
 		}
 	}
+
+	public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource) {
+		if (!datasourceMap.containsKey(tenantUuid)) {
+			datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
+			instance.setTargetDataSources(datasourceMap);
+			if (datasourceMap.containsKey("master")) {
+				instance.setDefaultTargetDataSource(datasourceMap.get("master"));
+			}
+			instance.afterPropertiesSet();
+		}
+	}
+
 }

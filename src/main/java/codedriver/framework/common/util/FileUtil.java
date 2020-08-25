@@ -1,35 +1,25 @@
 package codedriver.framework.common.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import codedriver.framework.exception.file.FilePathIllegalException;
+import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
+import codedriver.framework.file.core.FileStorageMediumFactory;
+import codedriver.framework.file.core.IFileStorageMediumHandler;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtil {
 	private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
@@ -156,6 +146,37 @@ public class FileUtil {
 		return desFile.getAbsolutePath();
 	}
 
+	/*
+	 * private static String createNewFile(String filePath) { File file = new
+	 * File(filePath); if ((!file.isFile()) || (!file.exists())) { try { File
+	 * dirFile = file.getParentFile(); if ((!dirFile.exists()) ||
+	 * (!dirFile.isDirectory())) { dirFile.mkdirs(); }
+	 * 
+	 * boolean fileIsExists = file.createNewFile(); if(fileIsExists) { return
+	 * file.getAbsolutePath(); } return null; } catch (IOException e) {
+	 * logger.error("create task file error : " + e.getMessage() + filePath, e); } }
+	 * return file.getAbsolutePath(); }
+	 */
+
+	/*
+	 * private static boolean copy(File oldFile, File newFile) { try(
+	 * FileInputStream fis = new FileInputStream(oldFile); InputStreamReader fir =
+	 * new InputStreamReader(fis, "UTF-8"); OutputStream fos = new
+	 * FileOutputStream(newFile, true); OutputStreamWriter fow = new
+	 * OutputStreamWriter(fos, "UTF-8");){ char[] cbuf = new char[1024];
+	 * while(fir.read(cbuf) != -1) { fow.write(cbuf); fow.flush(); } } catch
+	 * (FileNotFoundException e) { logger.error(e.getMessage(), e); return false; }
+	 * catch (IOException e) { logger.error(e.getMessage(), e); return false; }
+	 * return true; }
+	 */
+
+	/*
+	 * private static void writeContent(String content, File file, boolean isAppend)
+	 * { try ( OutputStream fos = new FileOutputStream(file, isAppend);
+	 * OutputStreamWriter fow = new OutputStreamWriter(fos, "UTF-8"); ) {
+	 * fow.write(content); fow.flush(); } catch (IOException e) {
+	 * logger.error("write task file error : " + e.getMessage(), e); } }
+	 */
 	public static List<String> readContentToList(String filePath, String fileName) {
 		FileReader fr = null;
 		BufferedReader filebr = null;
@@ -314,12 +335,9 @@ public class FileUtil {
 	 * @Author: chenqiwei
 	 * @Time:Apr 1, 2019
 	 * @Description: TODO
-	 * @param @param
-	 *            filePath
-	 * @param @param
-	 *            start
-	 * @param @param
-	 *            length
+	 * @param @param  filePath
+	 * @param @param  start
+	 * @param @param  length
 	 * @param @return
 	 * @return String
 	 */
@@ -379,12 +397,9 @@ public class FileUtil {
 	/**
 	 * @Description: 向压缩文件(zip)内写入内容
 	 * @Author:fandong
-	 * @param zipFilePath
-	 *            压缩包路径 like c:\ZipTest\test4.zip
-	 * @param subPath
-	 *            压缩包内路径 like 11/22/33/aa.txt
-	 * @param fis
-	 *            inputstream ,please close fis when write complete
+	 * @param zipFilePath 压缩包路径 like c:\ZipTest\test4.zip
+	 * @param subPath     压缩包内路径 like 11/22/33/aa.txt
+	 * @param fis         inputstream ,please close fis when write complete
 	 * @return: void
 	 * @Date 16:03 2019/4/16
 	 */
@@ -446,10 +461,8 @@ public class FileUtil {
 	 * @Description: 向压缩文件(zip)内写入多条内容
 	 * @Author:fandong
 	 * @param zipFilePath
-	 * @param subPathList
-	 *            path list
-	 * @param dataList
-	 *            string list
+	 * @param subPathList path list
+	 * @param dataList    string list
 	 * @return: void
 	 * @throws Exception
 	 * @Date 19:07 2019/4/17
@@ -525,10 +538,8 @@ public class FileUtil {
 	/**
 	 * @Description:从压缩文件中读取内容，不解压文件
 	 * @Author:fandong
-	 * @param zipFilePath
-	 *            like c:\ZipTest\test4.zip
-	 * @param subPath
-	 *            like 11/22/33/aa.txt
+	 * @param zipFilePath like c:\ZipTest\test4.zip
+	 * @param subPath     like 11/22/33/aa.txt
 	 * @return: java.lang.String 读取出来的内容
 	 * @Date 16:07 2019/4/16
 	 */
@@ -538,36 +549,87 @@ public class FileUtil {
 		if (!lockFile.getParentFile().exists()) {
 			lockFile.getParentFile().mkdirs();
 		}
-		try (RandomAccessFile randomAccessFile = new RandomAccessFile(lockFile, "rw");
-			 FileChannel channel = randomAccessFile.getChannel()) {
+		try (RandomAccessFile randomAccessFile = new RandomAccessFile(lockFile, "rw"); FileChannel channel = randomAccessFile.getChannel()) {
 
 			FileLock fileLock = channel.lock();
 			if (fileLock != null && fileLock.isValid()) {
 				File file = new File(zipFilePath);
 				if (!file.exists()) {
-					readData =  "出错，找不到压缩文件";
+					readData = "出错，找不到压缩文件";
 				}
 				ZipFile zipFile = new ZipFile(zipFilePath);
 				FileHeader fileHeader = zipFile.getFileHeader(subPath);
-				if(fileHeader != null){
+				if (fileHeader != null) {
 					ZipInputStream is = zipFile.getInputStream(fileHeader);
 					StringWriter writer = new StringWriter();
 					IOUtils.copy(is, writer, StandardCharsets.UTF_8.name());
 					is.close();
-					readData =  writer.toString();
-				}else{
+					readData = writer.toString();
+				} else {
 					readData = "出错：压缩文件内未发现该日志文件";
 				}
 			}
 
-
-
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			readData =  "出错，压缩文件内容读取失败";
+			readData = "出错，压缩文件内容读取失败";
 		}
 
 		return readData;
+	}
+
+	/**
+	 * 根据storageMediumHandler获取存储介质Handler，从而上传到对应的存储介质中
+	 * 
+	 * @param storageMediumHandler
+	 * @param tenantUuid
+	 * @param inputStream
+	 * @throws Exception
+	 */
+	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, Long fileId, String contentType, String fileType) throws Exception {
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
+		if (handler == null) {
+			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
+		}
+		String filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+		return filePath;
+	}
+
+	public static InputStream getData(String filePath) throws Exception {
+		if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+			throw new FilePathIllegalException(filePath);
+		}
+		String prefix = filePath.split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if (handler == null) {
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		InputStream inputStream = handler.getData(filePath);
+		return inputStream;
+	}
+
+	public static void deleteData(String filePath) throws Exception {
+		if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+			throw new FilePathIllegalException(filePath);
+		}
+		String prefix = filePath.split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if (handler == null) {
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		handler.deleteData(filePath);
+	}
+
+	public static long getDataLength(String filePath) throws Exception {
+		if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+			throw new FilePathIllegalException(filePath);
+		}
+		String prefix = filePath.split(":")[0];
+		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		if (handler == null) {
+			throw new FileStorageMediumHandlerNotFoundException(prefix);
+		}
+		return handler.getDataLength(filePath);
 	}
 
 //	public static void main(String[] args) throws Exception {

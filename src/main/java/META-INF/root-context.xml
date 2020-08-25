@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="false" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans
-						http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://www.springframework.org/schema/context
-						http://www.springframework.org/schema/context/spring-context.xsd">
+<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:nacos="http://nacos.io/schema/nacos" xsi:schemaLocation="http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://nacos.io/schema/nacos
+		http://nacos.io/schema/nacos.xsd">
 
-	<bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="locations">
-			<list>
-				<value>classpath:config.properties</value>
-			</list>
-		</property>
-	</bean>
+	<!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
+	<!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
+	<!-- 本地配置加载器,nacos不可用时加载配置数据 -->
+	<bean class="codedriver.framework.common.config.LocalConfig"></bean>
+	<nacos:annotation-driven></nacos:annotation-driven>
+	<!--指定nacos配置地址 -->
+	<nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}" />
+	<!--指定dataId,group-id, 不自动刷新 -->
+	<nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="false" />
 
-	<bean id="dataSourceMaster" class="com.alibaba.druid.pool.DruidDataSource">
+	<!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
+	<!-- org.apache.commons.dbcp2.BasicDataSource -->
+	<bean id="dataSourceMaster" class="codedriver.framework.common.CodeDriverBasicDataSource">
 		<property name="driverClassName">
 			<value>${db.driverClassName}</value>
 		</property>
@@ -41,11 +47,16 @@
 		</property>
 	</bean>
 
-	<context:component-scan base-package="codedriver.framework" use-default-filters="false">
+	<!-- 配置需要在rootComponent前加载 -->
+	<context:component-scan base-package="codedriver" use-default-filters="false">
+		<context:include-filter type="annotation" expression="codedriver.framework.common.RootConfiguration" />
+	</context:component-scan>
+
+	<context:component-scan base-package="codedriver" use-default-filters="false">
 		<context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent" />
 	</context:component-scan>
 
-	<bean id="dataSource" class="codedriver.framework.common.CodeDriverDataSource">
+	<bean id="dataSource" class="codedriver.framework.common.CodeDriverRoutingDataSource">
 		<property name="targetDataSources">
 			<map key-type="java.lang.String">
 				<entry key="master" value-ref="dataSourceMaster" />
@@ -79,7 +90,7 @@
 
 	<!-- scan for mappers and let them be autowired -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="codedriver.framework.**.dao.mapper" />
+		<property name="basePackage" value="codedriver.framework.**.mapper" />
 	</bean>
 	<!-- 创建SqlSessionFactory，同时指定数据源 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -87,12 +98,21 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapperLocations">
 			<list>
-				<value>classpath*:codedriver/framework/**/dao/mapper/*.xml</value>
+				<value>classpath*:codedriver/framework/**/mapper/*.xml</value>
 			</list>
 		</property>
 	</bean>
 
+	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false" />
+
+	<bean id="DatasourceInitializer" class="codedriver.framework.startup.DatasourceInitializer"></bean>
+
+	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
 
 
+	<!-- <hdp:configuration id="hadoopConfiguration">
+		fs.defaultFS=${hadoop.url}
+	</hdp:configuration>
+	<hdp:file-system id="fileSystem" configuration-ref="hadoopConfiguration" user="root"></hdp:file-system> -->
 </beans>

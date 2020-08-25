@@ -2,14 +2,50 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.DatasourceMapper">
 
-	<select id="getAllDatasource" resultType="codedriver.framework.dto.DatasourceVo">
+	<select id="getAllActiveTenantDatasource" resultType="codedriver.framework.dto.DatasourceVo">
 		SELECT
-		`tenant_uuid` as tenantUuid,
+		`tenant_uuid` AS tenantUuid,
+		`url`,
+		`username`,
+		`password` AS passwordCipher,
+		`driver`,
+		`host`,
+		`port`
+		FROM
+		`datasource` a
+		JOIN `tenant` b
+		ON a.tenant_uuid = b.uuid
+		AND b.is_active = 1
+	</select>
+
+	<insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+		INSERT INTO `datasource` (
+		`tenant_id`,
+		`tenant_uuid`,
 		`url`,
 		`username`,
 		`password`,
-		`driver`
-		FROM
-		`datasource`
-	</select>
+		`driver`,
+		`host`,
+		`port`
+		)
+		VALUES
+		(
+		#{tenantId},
+		#{tenantUuid},
+		#{url},
+		#{username},
+		#{passwordCipher},
+		#{driver},
+		#{host},
+		#{port}
+		)
+	</insert>
+
+	<insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
+		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_olap`;
+		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_olap`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+	</insert>
 </mapper>

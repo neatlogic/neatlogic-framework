@@ -5,6 +5,6 @@
 	<diskStore path="java.io.tmpdir/ehcache" />
 
 	<!-- 默认缓存 -->
-	<defaultCache maxEntriesLocalHeap="10000" eternal="false" overflowToDisk="true" timeToIdleSeconds="100" timeToLiveSeconds="120" diskPersistent="false" maxEntriesLocalDisk="10000000" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+	<defaultCache maxEntriesLocalHeap="10000" eternal="false" overflowToDisk="true" timeToIdleSeconds="90" timeToLiveSeconds="180" diskPersistent="false" maxEntriesLocalDisk="10000000" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
 	</defaultCache>
 </ehcache>

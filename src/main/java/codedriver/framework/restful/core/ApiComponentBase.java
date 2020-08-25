@@ -1,134 +1,93 @@
 package codedriver.framework.restful.core;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ClassUtils;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.common.util.IpUtil;
-import codedriver.framework.restful.annotation.Description;
-import codedriver.framework.restful.annotation.Example;
-import codedriver.framework.restful.annotation.Input;
-import codedriver.framework.restful.annotation.Output;
-import codedriver.framework.restful.annotation.Param;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class ApiComponentBase implements ApiComponent, MyApiComponent {
-	private static final Logger logger = LoggerFactory.getLogger(ApiComponentBase.class.getName());
+public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements IApiComponent, MyApiComponent {
 
 	@Autowired
-	private ApiMapper restMapper;
+	private ApiMapper apiMapper;
 
-	public final Object doService(ApiVo interfaceVo, JSONObject jsonObj) throws Exception {
+	public int needAudit() {
+		return 0;
+	}
+	
+
+	public final Object doService(ApiVo apiVo, JSONObject paramObj) throws Exception {
 		String error = "";
 		Object result = null;
-		boolean status = false;
 		long startTime = System.currentTimeMillis();
-		String requestIp = IpUtil.getIpAddr(UserContext.get().getRequest());
-
 		try {
 			try {
 				Object proxy = AopContext.currentProxy();
-				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
-				result = method.invoke(proxy, jsonObj);
+				Class<?> targetClass = AopUtils.getTargetClass(proxy);
+				validApi(targetClass, paramObj, JSONObject.class);
+				boolean canRun = false;
+				if (apiVo.getIsActive().equals(0)) {
+					Method method = proxy.getClass().getMethod("myDoTest", JSONObject.class);
+					result = method.invoke(proxy, paramObj);
+					if (result == null) {
+						canRun = true;
+					}
+				} else {
+					canRun = true;
+				}
+				if (canRun) {
+					Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
+					result = method.invoke(proxy, paramObj);
+				}
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
-				result = myDoService(jsonObj);
+				validApi(this.getClass(), paramObj, JSONObject.class);
+				boolean canRun = false;
+				if (apiVo.getIsActive().equals(0)) {
+					result = myDoTest(paramObj);
+					if (result == null) {
+						canRun = true;
+					}
+				} else {
+					canRun = true;
+				}
+				if (canRun) {
+					result = myDoService(paramObj);
+				}
 			} catch (Exception ex) {
-				throw ex;
+				if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
+					throw new ApiRuntimeException(ex.getCause().getMessage());
+				} else {
+					throw ex;
+				}
 			}
-			status = true;
 		} catch (Exception e) {
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
 			throw e;
 		} finally {
-			if (interfaceVo.getNeedAudit() != null && interfaceVo.getNeedAudit().equals(1)) {
-
+			long endTime = System.currentTimeMillis();
+			ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
+			// 如果没有配置，则使用默认配置
+			if (apiConfigVo == null) {
+				apiConfigVo = apiVo;
 			}
+			if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+				saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+			}
+
 		}
 		return result;
 	}
 
 	@Override
-	public final String getId() {
-		return ClassUtils.getUserClass(this.getClass()).getName();
-	}
-
-	@Override
 	public final JSONObject help() {
-		JSONObject jsonObj = new JSONObject();
-		JSONArray inputList = new JSONArray();
-		JSONArray outputList = new JSONArray();
-		try {
-			Method method = this.getClass().getDeclaredMethod("myDoService", JSONObject.class);
-			if (method != null && method.isAnnotationPresent(Input.class) || method.isAnnotationPresent(Output.class) || method.isAnnotationPresent(Description.class)) {
-				for (Annotation anno : method.getDeclaredAnnotations()) {
-					if (anno.annotationType().equals(Input.class)) {
-						Input input = (Input) anno;
-						Param[] params = input.value();
-						if (params != null && params.length > 0) {
-							for (Param p : params) {
-								JSONObject paramObj = new JSONObject();
-								paramObj.put("参数", p.name());
-								paramObj.put("类型", p.type());
-								paramObj.put("是否必填", p.isRequired());
-								paramObj.put("说明", p.desc());
-								inputList.add(paramObj);
-							}
-						}
-					} else if (anno.annotationType().equals(Output.class)) {
-						Output output = (Output) anno;
-						Param[] params = output.value();
-						if (params != null && params.length > 0) {
-							for (Param p : params) {
-								JSONObject paramObj = new JSONObject();
-								paramObj.put("参数", p.name());
-								paramObj.put("类型", p.type());
-								paramObj.put("说明", p.desc());
-								outputList.add(paramObj);
-							}
-						}
-					} else if (anno.annotationType().equals(Description.class)) {
-						Description description = (Description) anno;
-						jsonObj.put("接口说明", description.desc());
-					} else if (anno.annotationType().equals(Example.class)) {
-						Example example = (Example) anno;
-						String content = example.example();
-						if (StringUtils.isNotBlank(content)) {
-							try {
-								content = JSONObject.parseObject(content).toString();
-							} catch (Exception ex) {
-								try {
-									content = JSONArray.parseArray(content).toString();
-								} catch (Exception ex2) {
-
-								}
-							}
-							jsonObj.put("范例", content);
-						}
-					}
-				}
-			}
-		} catch (NoSuchMethodException | SecurityException e) {
-			logger.error(e.getMessage());
-		}
-		if (!inputList.isEmpty()) {
-			jsonObj.put("输入参数", inputList);
-		}
-		if (!outputList.isEmpty()) {
-			jsonObj.put("输出参数", outputList);
-		}
-		return jsonObj;
+		return getApiComponentHelp(JSONObject.class);
 	}
 
 }

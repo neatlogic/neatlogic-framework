@@ -18,4 +18,13 @@ public class ApiServiceImpl implements ApiService {
 		return apiMapper.getApiByToken(token);
 	}
 
+
+	@Override
+	public int saveApiAccessCount(String token, int count) {
+		if(apiMapper.getApiAccessCountLockByToken(token) == null) {
+			return apiMapper.insertApiAccessCount(token, count);
+		}else {
+			return apiMapper.updateApiAccessCount(token, count);
+		}
+	}
 }

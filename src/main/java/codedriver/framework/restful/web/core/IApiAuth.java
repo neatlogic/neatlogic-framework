@@ -3,13 +3,15 @@ package codedriver.framework.restful.web.core;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import com.alibaba.fastjson.JSONObject;
+
+import codedriver.framework.restful.dto.ApiVo;
 
 public interface IApiAuth {
 
     public String getType();
 
-    public int auth(String authorization, String timezone, HttpServletRequest request, HttpServletResponse response)
-        throws IOException;
+    public int auth(ApiVo interfaceVo, JSONObject jsonParam, HttpServletRequest request) throws IOException;
 
 }

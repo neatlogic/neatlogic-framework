@@ -3,9 +3,10 @@ package codedriver.framework.restful.web.core;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
@@ -19,15 +20,11 @@ public abstract class ApiAuthBase implements IApiAuth {
     }
 
     @Override
-    public int auth(String authorization, String timezone, HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-        ApiVo apiVo = new ApiVo();
-        apiVo.setAuthorization(authorization);
-        apiVo.setTimezone(timezone);
-        return myAuth(apiVo, null, request, response);
+    public int auth(ApiVo interfaceVo, JSONObject jsonParam, HttpServletRequest request) throws IOException {
+        
+        return myAuth(interfaceVo,jsonParam,request);
     }
 
-    public abstract int myAuth(ApiVo apiVo, String paramJson, HttpServletRequest request, HttpServletResponse response)
-        throws IOException;
+    public abstract int myAuth(ApiVo interfaceVo, JSONObject jsonParam, HttpServletRequest request) throws IOException;
 
 }

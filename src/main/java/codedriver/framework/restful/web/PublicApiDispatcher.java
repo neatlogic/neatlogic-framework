@@ -106,10 +106,13 @@ public class PublicApiDispatcher {
 		}
 
 		 //认证
-//		String authorization = request.getHeader("Authorization");
-//		IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
-//		apiAuth.auth(interfaceVo,paramObj);
-		
+		IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
+		if(apiAuth != null) {
+    		int result = apiAuth.auth(interfaceVo,paramObj,request);
+    		if(result != 1) {
+    		    throw new RuntimeException(errorMap.get(result));
+    		}
+		}
 		
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());

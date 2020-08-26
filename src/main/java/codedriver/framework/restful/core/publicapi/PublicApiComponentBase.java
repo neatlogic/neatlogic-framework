@@ -1,9 +1,8 @@
 package codedriver.framework.restful.core.publicapi;
 
-import codedriver.framework.restful.core.privateapi.IPrivateApiComponent;
-import codedriver.framework.restful.core.privateapi.PrivateApiComponentBase;
+import codedriver.framework.restful.core.ApiComponentBase;
 
-public abstract class PublicApiComponentBase extends PrivateApiComponentBase implements IPrivateApiComponent {
+public abstract class PublicApiComponentBase extends ApiComponentBase implements IPublicApiComponent {
 
 	public int needAudit() {
 		return 0;

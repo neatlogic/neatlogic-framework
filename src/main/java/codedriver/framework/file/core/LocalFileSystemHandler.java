@@ -38,13 +38,13 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 		fos.flush();
 		fos.close();
 //		fileVo.setPath("file:" + filePath);
-		return LocalFileSystemHandler.NAME.toLowerCase() + ":" + filePath;
+		return LocalFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
 	}
 
 	@Override
 	public InputStream getData(String path) throws Exception {
 		InputStream in = null;
-		File file = new File(Config.DATA_HOME() + path.substring(5));
+		File file = new File(path.substring(5));
 		if (file.exists() && file.isFile()) {
 			in = new FileInputStream(file);
 		}

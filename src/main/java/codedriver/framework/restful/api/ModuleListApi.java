@@ -20,11 +20,11 @@ import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.reminder.core.OperationTypeEnum;
 import codedriver.framework.restful.annotation.*;
-import codedriver.framework.restful.core.ApiComponentBase;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentBase;
 
 @Service
 @OperationType(type = OperationTypeEnum.SEARCH)
-public class ModuleListApi extends ApiComponentBase {
+public class ModuleListApi extends PrivateApiComponentBase {
 	@Autowired
 	UserMapper userMapper;
 

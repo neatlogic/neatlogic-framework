@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONReader;
 import codedriver.framework.restful.dto.ApiVo;
 
 public interface IJsonStreamApiComponent {
-	public String getToken();
 
 	public String getId();
 
@@ -18,8 +17,6 @@ public interface IJsonStreamApiComponent {
 	public default boolean isRaw() {
 		return false;
 	}
-
-	public boolean isPrivate();
 
 	public int needAudit();
 

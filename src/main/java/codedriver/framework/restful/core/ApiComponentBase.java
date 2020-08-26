@@ -13,7 +13,7 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements IApiComponent, MyApiComponent {
+public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
 
 	@Autowired
 	private ApiMapper apiMapper;

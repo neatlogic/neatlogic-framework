@@ -12,11 +12,11 @@ import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.restful.annotation.Description;
 import codedriver.framework.restful.annotation.Input;
 import codedriver.framework.restful.annotation.Output;
-import codedriver.framework.restful.core.ApiComponentBase;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentBase;
 
 @Service
 @OperationType(type = OperationTypeEnum.DELETE)
-public class LogoutApi extends ApiComponentBase {
+public class LogoutApi extends PrivateApiComponentBase {
 	@Autowired
 	UserMapper userMapper;
 

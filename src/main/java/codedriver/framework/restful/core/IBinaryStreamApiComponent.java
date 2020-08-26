@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.restful.dto.ApiVo;
 
 public interface IBinaryStreamApiComponent {
-	public String getToken();
 
 	public String getId();
 
@@ -20,10 +19,6 @@ public interface IBinaryStreamApiComponent {
 	}
 
 	public String getConfig();
-
-	public default boolean isPrivate() {
-		return true;
-	}
 
 	public int needAudit();
 

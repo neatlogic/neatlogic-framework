@@ -58,7 +58,7 @@ public class ApiValidateAndHelpBase {
 		audit.setEndTime(new Date(endTime));
 		audit.setTimeCost(endTime - startTime);
 		UserContext userContext = UserContext.get();
-		audit.setUserUuid(userContext.getUserUuid(true));
+		audit.setUserUuid(userContext.getUserUuid());
 		HttpServletRequest request = userContext.getRequest();
 		String requestIp = IpUtil.getIpAddr(request);
 		audit.setIp(requestIp);

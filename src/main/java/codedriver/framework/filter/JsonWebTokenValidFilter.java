@@ -88,7 +88,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             authorization = request.getHeader("Authorization");
         }
 
-        if (StringUtils.isBlank(authorization)&&StringUtils.isNotBlank(authorizationFromCookie)) {
+        if (StringUtils.isBlank(authorization) && StringUtils.isNotBlank(authorizationFromCookie)) {
             authorization = authorizationFromCookie;
             // 解压cookie内容
             if (authorization.startsWith("GZIP_")) {

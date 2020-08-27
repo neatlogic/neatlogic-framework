@@ -124,7 +124,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	}
 	
 	public enum AuthenticateType {
-	    NOAUTH("noauth", "无需认证"), BASIC("basicauth", "Basic认证");
+	    NOAUTH("-", "无需认证"), BASIC("basic", "Basic认证");
 
 	    private String type;
 	    private String text;

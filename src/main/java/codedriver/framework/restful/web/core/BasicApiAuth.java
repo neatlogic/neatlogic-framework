@@ -1,6 +1,7 @@
 package codedriver.framework.restful.web.core;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,6 +45,18 @@ public class BasicApiAuth extends ApiAuthBase {
             return 401;//用户验证失败
         }
         return 1;
+    }
+    
+    public static void main(String[] arfs) throws UnsupportedEncodingException {
+       System.out.println(Base64.encodeBase64String("test:123456".getBytes())); 
+       byte[] bytes = Base64.decodeBase64("dGVzdDoxMjM0NTY=");
+       String authorization = new String(bytes, "UTF-8");
+       String[] as = authorization.split(":");
+       if (as.length == 2) {
+           String username = as[0];
+           String password = as[1];
+           System.out.println(username+":"+password);
+       } 
     }
 
 }

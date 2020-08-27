@@ -2,6 +2,8 @@ package codedriver.framework.restful.web.core;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,6 +59,17 @@ public class BasicApiAuth extends ApiAuthBase {
            String password = as[1];
            System.out.println(username+":"+password);
        } 
+    }
+
+    @Override
+    public JSONObject help() {
+        JSONObject helpJson = new JSONObject();
+        helpJson.put("title", "Basic认证");
+        List<String> detailList = new ArrayList<String>();
+        helpJson.put("detailList", detailList);
+        detailList.add("request header需要包含键值对Authorization:Basic xxx");
+        detailList.add("（xxx是 '用户名:密码' 的base64编码）。");
+        return helpJson;
     }
 
 }

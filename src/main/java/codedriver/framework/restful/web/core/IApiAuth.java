@@ -13,5 +13,8 @@ public interface IApiAuth {
     public String getType();
 
     public int auth(ApiVo interfaceVo, JSONObject jsonParam, HttpServletRequest request) throws IOException;
+    
+    
+    public JSONObject help();
 
 }

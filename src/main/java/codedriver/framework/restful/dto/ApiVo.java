@@ -22,7 +22,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 3689437871016436622L;
 
 	public enum Type {
-		OBJECT("object", "对象模式","api/rest/"), STREAM("stream", "json流模式","api/stream/"), BINARY("binary", "字节流模式","api/binary/");
+		OBJECT("object", "对象模式","rest/"), STREAM("stream", "json流模式","stream/"), BINARY("binary", "字节流模式","binary/");
 
 		private String name;
 		private String text;
@@ -157,6 +157,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String token;
 	@EntityField(name = "地址", type = ApiParamType.STRING)
     private String url;
+	@EntityField(name = "帮助地址", type = ApiParamType.STRING)
+    private String helpUrl;
 	@EntityField(name = "使用期限", type = ApiParamType.LONG)
 	private Date expire;
 	@EntityField(name = "描述", type = ApiParamType.STRING)
@@ -688,13 +690,23 @@ public class ApiVo extends BasePageVo implements Serializable {
     }
 
     public String getUrl() {
-        if(StringUtils.isBlank(url)&&StringUtils.isNoneBlank(type)&&StringUtils.isNoneBlank(token)&&isPrivate != null) {
-            this.url = Type.getUrlPre(type) + token;
+        if(StringUtils.isBlank(url)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
+            this.url = "api/"+Type.getUrlPre(type) + token;
             if(!isPrivate) {
-                this.url = "public/"+token;
+                this.url = "public/"+url;
             }
         }
         return url;
+    }
+    
+    public String getHelpUrl() {
+        if(StringUtils.isBlank(helpUrl)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
+            String url = "api/help/"+Type.getUrlPre(type) + token;
+            if(!isPrivate) {
+                helpUrl = "public/"+url;
+            }
+        }
+        return helpUrl;
     }
 
     public void setUrl(String url) {

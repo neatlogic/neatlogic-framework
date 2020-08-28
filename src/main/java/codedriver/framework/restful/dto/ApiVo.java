@@ -691,7 +691,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     public String getUrl() {
         if(StringUtils.isBlank(url)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
-            this.url = "api/"+Type.getUrlPre(type) + token;
+            url = "api/"+Type.getUrlPre(type) + token;
             if(!isPrivate) {
                 this.url = "public/"+url;
             }
@@ -701,10 +701,9 @@ public class ApiVo extends BasePageVo implements Serializable {
     
     public String getHelpUrl() {
         if(StringUtils.isBlank(helpUrl)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
-            String url = "api/help/"+Type.getUrlPre(type) + token;
-            helpUrl = url;
+            helpUrl = "api/help/"+Type.getUrlPre(type) + token;
             if(!isPrivate) {
-                helpUrl = "public/"+url;
+                helpUrl = "public/"+helpUrl;
             }
             
         }

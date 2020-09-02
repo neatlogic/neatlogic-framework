@@ -2,6 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.dto.AuthVo;
@@ -15,6 +16,8 @@ public interface RoleMapper {
 	public int checkRoleIsExists(String uuid);
 
 	public List<RoleVo> searchRole(RoleVo roleVo);
+
+	public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
 	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
 

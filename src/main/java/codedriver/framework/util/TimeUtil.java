@@ -177,8 +177,14 @@ public class TimeUtil {
     }
 
     public static Date convertStringToDate(String dataStr, String format) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        return sdf.parse(dataStr);
+        Date date = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            date = sdf.parse(dataStr);
+        }catch(Exception ex) {
+            return null;
+        }
+        return date;
     }
 
     public static Date formatDate(Date date, String format) throws ParseException {

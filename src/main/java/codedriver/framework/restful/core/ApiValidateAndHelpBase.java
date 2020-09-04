@@ -58,7 +58,7 @@ public class ApiValidateAndHelpBase {
 		audit.setEndTime(new Date(endTime));
 		audit.setTimeCost(endTime - startTime);
 		UserContext userContext = UserContext.get();
-		audit.setUserUuid(userContext.getUserUuid(true));
+		audit.setUserUuid(userContext.getUserUuid());
 		HttpServletRequest request = userContext.getRequest();
 		String requestIp = IpUtil.getIpAddr(request);
 		audit.setIp(requestIp);
@@ -185,6 +185,9 @@ public class ApiValidateAndHelpBase {
 					Param[] params = input.value();
 					if (params != null && params.length > 0) {
 						for (Param p : params) {
+						    if (p.type().equals(ApiParamType.NOAUTH)) {
+						        continue;
+						    }
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
 								escapeXss(paramObj, p.name());

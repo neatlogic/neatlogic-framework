@@ -15,7 +15,7 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements IJsonStreamApiComponent, MyJsonStreamApiComponent {
+public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements MyJsonStreamApiComponent {
 	// private static Logger logger =
 	// LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
 

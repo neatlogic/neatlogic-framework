@@ -21,7 +21,7 @@
 		SELECT COUNT(`uuid`) FROM `user` WHERE `uuid` = #{value}
 	</select>
 
-	<select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+	<select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="true">
 		SELECT
 		a.`uuid`,
 		a.`user_id` as userId,

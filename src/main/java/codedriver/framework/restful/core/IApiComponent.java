@@ -7,14 +7,6 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.restful.dto.ApiVo;
 
 public interface IApiComponent {
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Jun 19, 2020
-	 * @Description: 接口唯一标识，也是访问URI
-	 * @param @return
-	 * @return String
-	 */
-	public String getToken();
 
 	/**
 	 * @Author: chenqiwei
@@ -55,17 +47,6 @@ public interface IApiComponent {
 	 * @return String
 	 */
 	public String getConfig();
-
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Jun 19, 2020
-	 * @Description: 私有接口不允许用户配置新的访问实例
-	 * @param @return
-	 * @return boolean
-	 */
-	public default boolean isPrivate() {
-		return true;
-	}
 
 	/**
 	 * @Author: chenqiwei

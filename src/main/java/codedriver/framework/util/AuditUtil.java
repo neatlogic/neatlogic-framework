@@ -91,7 +91,7 @@ public class AuditUtil {
 		try {
 			filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),sis, SnowflakeUtil.uniqueLong(),"text/plain",fileType);
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
+			//logger.error(e.getMessage(),e);
 			try {
 				filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),sis,SnowflakeUtil.uniqueLong(),"text/plain",fileType);
 			} catch (Exception e1) {

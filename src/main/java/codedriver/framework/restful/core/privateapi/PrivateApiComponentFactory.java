@@ -1,4 +1,4 @@
-package codedriver.framework.restful.core;
+package codedriver.framework.restful.core.privateapi;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,12 +21,15 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.restful.core.IApiComponent;
+import codedriver.framework.restful.core.IBinaryStreamApiComponent;
+import codedriver.framework.restful.core.IJsonStreamApiComponent;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 @RootComponent
-public class ApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
-    static Logger logger = LoggerFactory.getLogger(ApiComponentFactory.class);
+public class PrivateApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
+    static Logger logger = LoggerFactory.getLogger(PrivateApiComponentFactory.class);
 
     private static Map<String, IApiComponent> componentMap = new HashMap<>();
     private static List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
@@ -124,21 +127,22 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
         return apiMap;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext context = event.getApplicationContext();
-        Map<String, IApiComponent> myMap = context.getBeansOfType(IApiComponent.class);
-        Map<String, IJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IJsonStreamApiComponent.class);
-        Map<String, IBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IBinaryStreamApiComponent.class);
-        for (Map.Entry<String, IApiComponent> entry : myMap.entrySet()) {
-            IApiComponent component = entry.getValue();
+        Map<String, IPrivateApiComponent> myMap = context.getBeansOfType(IPrivateApiComponent.class);
+        Map<String, IPrivateJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPrivateJsonStreamApiComponent.class);
+        Map<String, IPrivateBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPrivateBinaryStreamApiComponent.class);
+        for (Map.Entry<String, IPrivateApiComponent> entry : myMap.entrySet()) {
+            IPrivateApiComponent component = entry.getValue();
             if (component.getClassName() != null) {
                 componentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getClassName());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(component.isPrivate());
+                restComponentVo.setPrivate(true);
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
@@ -171,7 +175,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
                     // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(component.isPrivate());
+                    apiVo.setIsPrivate(true);
                     if (token.indexOf("{") > -1) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -201,15 +205,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
             }
         }
 
-        for (Map.Entry<String, IJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
-            IJsonStreamApiComponent component = entry.getValue();
+        for (Map.Entry<String, IPrivateJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
+            IPrivateJsonStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
                 streamComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(component.isPrivate());
+                restComponentVo.setPrivate(true);
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiVo.Type.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
@@ -242,7 +246,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
                     // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(component.isPrivate());
+                    apiVo.setIsPrivate(true);
 
                     if (token.indexOf("{") > -1) {
                         Matcher m = p.matcher(token);
@@ -272,15 +276,15 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
             }
         }
 
-        for (Map.Entry<String, IBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
-            IBinaryStreamApiComponent component = entry.getValue();
+        for (Map.Entry<String, IPrivateBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
+            IPrivateBinaryStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
                 binaryComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(component.isPrivate());
+                restComponentVo.setPrivate(true);
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiVo.Type.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
@@ -313,7 +317,7 @@ public class ApiComponentFactory implements ApplicationListener<ContextRefreshed
                     // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(component.isPrivate());
+                    apiVo.setIsPrivate(true);
 
                     if (token.indexOf("{") > -1) {
                         Matcher m = p.matcher(token);

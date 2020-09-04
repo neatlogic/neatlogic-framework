@@ -17,7 +17,7 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 
-public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBase implements IBinaryStreamApiComponent, MyBinaryStreamApiComponent {
+public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBase implements MyBinaryStreamApiComponent {
 	// private static Logger logger =
 	// LoggerFactory.getLogger(BinaryStreamApiComponentBase.class);
 

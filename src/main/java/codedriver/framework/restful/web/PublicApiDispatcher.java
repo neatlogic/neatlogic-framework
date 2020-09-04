@@ -2,12 +2,15 @@ package codedriver.framework.restful.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.net.URLDecoder;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import codedriver.framework.restful.dao.mapper.ApiMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -23,30 +26,37 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.integration.AuthenticateException;
+import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.exception.type.PermissionDeniedException;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
-import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
+import codedriver.framework.restful.core.publicapi.PublicApiComponentFactory;
 import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
+import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.web.core.ApiAuthFactory;
+import codedriver.framework.restful.web.core.IApiAuth;
 
 @Controller
-@RequestMapping("/api/")
-public class ApiDispatcher {
-	Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
+@RequestMapping("/public/api/")
+public class PublicApiDispatcher {
+	Logger logger = LoggerFactory.getLogger(PublicApiDispatcher.class);
 
 	@Autowired
 	private ApiMapper apiMapper;
 
 	private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
 
-	public ApiDispatcher() {
+	public PublicApiDispatcher() {
 		errorMap.put(408, "请求已超时");
 		errorMap.put(400, "由于包含语法错误，当前请求无法被服务器理解");
 		errorMap.put(412, "头信息不符合要求");
@@ -54,23 +64,40 @@ public class ApiDispatcher {
 		errorMap.put(401, "用户验证失败");
 		errorMap.put(403, "禁止访问");
 		errorMap.put(470, "访问频率过高，请稍后访问");
+		errorMap.put(521, "访问频率过高，请稍后访问");
 	}
 
 	private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
-		ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
-
-		if (interfaceVo == null) {
-			interfaceVo = apiMapper.getApiByToken(token);
-			if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
-				throw new ApiNotFoundException("token为“" + token + "”的接口不存在或已被禁用");
-			}
-		} else if (interfaceVo.getPathVariableObj() != null) {
-			// 融合路径参数
-			paramObj.putAll(interfaceVo.getPathVariableObj());
+	   
+	    //初始化时区
+	    Cookie[] cookies = request.getCookies();
+        String timezone = "+8:00";
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("codedriver_timezone".equals(cookie.getName())) {
+                    timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
+                } 
+            }
+        }
+        //自定义接口 访问人初始化
+        UserContext.init(new JSONObject(),token, timezone,  request,  response);
+        
+        //初始化租户
+        String tenant = request.getHeader("Tenant");
+	    if(StringUtils.isBlank(tenant)) {
+	        throw new TenantNotFoundException(tenant);
+	    }
+	    TenantContext.init();
+        TenantContext.get().switchTenant(tenant);
+        
+        //
+	    ApiVo interfaceVo = apiMapper.getApiByToken(token);
+		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1) || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
+			throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
 		}
 
 		// 判断是否master模块接口，如果是不允许访问
-		ApiHandlerVo apiHandlerVo = PrivateApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler());
+		ApiHandlerVo apiHandlerVo = PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler());
 		if (apiHandlerVo != null) {
 			if (apiHandlerVo.getModuleId().equals("master")) {
 				throw new PermissionDeniedException();
@@ -79,13 +106,17 @@ public class ApiDispatcher {
 			throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 		}
 
-		/**
-		 * 记录API访问次数 TODO 延迟队列
-		 */
-		// apiService.saveApiAccessCount(token);
-
+		 //认证
+		IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
+		if(apiAuth != null) {
+    		int result = apiAuth.auth(interfaceVo,paramObj,request);
+    		if(result != 1) {
+    		    throw new AuthenticateException(errorMap.get(result));
+    		}
+		}
+		
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
-			IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
+			IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
@@ -107,7 +138,7 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.STREAM)) {
-			IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
+			IJsonStreamApiComponent restComponent = PublicApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
@@ -129,7 +160,7 @@ public class ApiDispatcher {
 				throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 			}
 		} else if (apiType.equals(ApiVo.Type.BINARY)) {
-			IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
+			IBinaryStreamApiComponent restComponent = PublicApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
 			if (restComponent != null) {
 				if (action.equals("doservice")) {
 					/** 统计接口访问次数 **/
@@ -172,7 +203,11 @@ public class ApiDispatcher {
 		JSONObject returnObj = new JSONObject();
 		try {
 			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
@@ -221,7 +256,11 @@ public class ApiDispatcher {
 			}
 
 			doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
@@ -260,7 +299,16 @@ public class ApiDispatcher {
 		JSONObject returnObj = new JSONObject();
 		try {
 			doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (TenantNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(521);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
@@ -268,7 +316,7 @@ public class ApiDispatcher {
 			response.setStatus(523);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
-		} catch (Exception ex) {
+		}  catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
@@ -300,7 +348,11 @@ public class ApiDispatcher {
 		JSONObject returnObj = new JSONObject();
 		try {
 			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
@@ -339,7 +391,11 @@ public class ApiDispatcher {
 		JSONObject returnObj = new JSONObject();
 		try {
 			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());
@@ -378,7 +434,11 @@ public class ApiDispatcher {
 		JSONObject returnObj = new JSONObject();
 		try {
 			doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-		} catch (ApiRuntimeException ex) {
+		} catch (AuthenticateException  ex) {
+            response.setStatus(525);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
 			response.setStatus(520);
 			returnObj.put("Status", "ERROR");
 			returnObj.put("Message", ex.getMessage());

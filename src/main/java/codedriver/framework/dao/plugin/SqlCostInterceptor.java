@@ -56,8 +56,11 @@ public class SqlCostInterceptor implements Interceptor {
 			}
 			Iterator<String> it = sqlSet.iterator();
 			while (it.hasNext()) {
-				if (id.endsWith(it.next())) {
+			    String t = it.next();
+				if (id.endsWith(t)) {
 					return true;
+				}else if(t.equals("*")){
+				    return true;
 				}
 			}
 			return false;
@@ -73,7 +76,7 @@ public class SqlCostInterceptor implements Interceptor {
 		long starttime = 0;
 		try {
 			if (!SqlIdMap.isEmpty()) {
-				Object target = invocation.getTarget();
+				//Object target = invocation.getTarget();
 				MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
 				String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
 				if (SqlIdMap.isExists(sqlId)) {

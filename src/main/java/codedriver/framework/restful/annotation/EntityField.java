@@ -13,8 +13,10 @@ import codedriver.framework.common.constvalue.ApiParamType;
 @Documented
 public @interface EntityField {
 
-	String name() default "";
+    String name() default "";
 
-	ApiParamType type() default ApiParamType.STRING;
+    ApiParamType type() default ApiParamType.STRING;
+
+    Class<?> member() default NotDefined.class;// 值成员
 
 }

@@ -2,6 +2,7 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.TeamUserVo;
 import codedriver.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
@@ -16,6 +17,8 @@ public interface TeamMapper {
 	public List<TeamVo> getTeamByParentUuid(String parentUuid);
 
 	public List<TeamVo> searchTeam(TeamVo teamVo);
+
+	public List<ValueTextVo> searchTeamForSelect(TeamVo teamVo);
 
 	public int searchTeamCount(TeamVo teamVo);
 

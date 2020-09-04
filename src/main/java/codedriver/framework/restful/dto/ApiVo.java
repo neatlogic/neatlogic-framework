@@ -6,7 +6,8 @@ import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
-import codedriver.framework.restful.core.ApiComponentFactory;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
+
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +22,16 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 3689437871016436622L;
 
 	public enum Type {
-		OBJECT("object", "对象模式"), STREAM("stream", "json流模式"), BINARY("binary", "字节流模式");
+		OBJECT("object", "对象模式","rest/"), STREAM("stream", "json流模式","stream/"), BINARY("binary", "字节流模式","binary/");
 
 		private String name;
 		private String text;
+		private String urlPre;
 
-		private Type(String _name, String _text) {
+		private Type(String _name, String _text,String _urlPre) {
 			this.name = _name;
 			this.text = _text;
+			this.urlPre = _urlPre;
 		}
 
 		public String getValue() {
@@ -38,8 +41,12 @@ public class ApiVo extends BasePageVo implements Serializable {
 		public String getText() {
 			return text;
 		}
+		
+		public String getUrlPre() {
+            return urlPre;
+        }
 
-		public static String getText(String name) {
+        public static String getText(String name) {
 			for (Type s : Type.values()) {
 				if (s.getValue().equals(name)) {
 					return s.getText();
@@ -47,6 +54,15 @@ public class ApiVo extends BasePageVo implements Serializable {
 			}
 			return "";
 		}
+        
+        public static String getUrlPre(String name) {
+            for (Type s : Type.values()) {
+                if (s.getValue().equals(name)) {
+                    return s.getUrlPre();
+                }
+            }
+            return "";
+        }
 	}
 
 	public enum ApiType {
@@ -106,6 +122,26 @@ public class ApiVo extends BasePageVo implements Serializable {
 			return "";
 		}
 	}
+	
+	public enum AuthenticateType {
+	    NOAUTH("-", "无需认证"), BASIC("basic", "Basic认证");
+
+	    private String type;
+	    private String text;
+
+	    private AuthenticateType(String _type, String _text) {
+	        this.type = _type;
+	        this.text = _text;
+	    }
+
+	    public String getValue() {
+	        return this.type;
+	    }
+
+	    public String getText() {
+	        return this.text;
+	    }
+	}
 
 	@EntityField(name = "名称", type = ApiParamType.STRING)
 	private String name;
@@ -117,8 +153,12 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String config;
 	@EntityField(name = "状态", type = ApiParamType.INTEGER)
 	private Integer isActive;
-	@EntityField(name = "地址", type = ApiParamType.STRING)
+	@EntityField(name = "token", type = ApiParamType.STRING)
 	private String token;
+	@EntityField(name = "地址", type = ApiParamType.STRING)
+    private String url;
+	@EntityField(name = "帮助地址", type = ApiParamType.STRING)
+    private String helpUrl;
 	@EntityField(name = "使用期限", type = ApiParamType.LONG)
 	private Date expire;
 	@EntityField(name = "描述", type = ApiParamType.STRING)
@@ -143,6 +183,8 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private String typeText;
 	@EntityField(name = "是否需要保存记录", type = ApiParamType.INTEGER)
 	private Integer needAudit = 0;
+	@EntityField(name = "接口数据类型，stream,rest,binary", type = ApiParamType.STRING)
+    private String dataType;
 	@EntityField(name = "访问频率", type = ApiParamType.INTEGER)
 	private Integer qps = 0;
 	@EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
@@ -167,6 +209,11 @@ public class ApiVo extends BasePageVo implements Serializable {
 	private transient List<String> tokenList;
 //	private Long totalDataSize = 0l;
 //	private String totalDataSizeText;
+	@JSONField(serialize = false)
+	private String authorization;
+	
+	@JSONField(serialize = false)
+    private String timezone;
 
 	public void addPathVariable(String para) {
 		if (pathVariableList == null) {
@@ -213,7 +260,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 		if (handler == null) {
 			return null;
 		}
-		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		ApiHandlerVo apiHandlerVo = PrivateApiComponentFactory.getApiHandlerByHandler(handler);
 		if (apiHandlerVo == null) {
 			return null;
 		}
@@ -264,7 +311,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 		if (handler == null) {
 			return null;
 		}
-		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		ApiHandlerVo apiHandlerVo = PrivateApiComponentFactory.getApiHandlerByHandler(handler);
 		if (apiHandlerVo == null) {
 			return null;
 		}
@@ -393,7 +440,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	public String getModuleId() {
 		if(StringUtils.isBlank(moduleId) && StringUtils.isNotBlank(handler)){
 			//根据handler从apiHandlerMap中取出ApiHandlerVo的moduleId
-			ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerMap().get(handler);
+			ApiHandlerVo apiHandlerVo = PrivateApiComponentFactory.getApiHandlerMap().get(handler);
 			if(apiHandlerVo != null) {
 				moduleId = apiHandlerVo.getModuleId();
 			}
@@ -422,7 +469,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 		if (handler == null) {
 			return null;
 		}
-		ApiHandlerVo apiHandlerVo = ApiComponentFactory.getApiHandlerByHandler(handler);
+		ApiHandlerVo apiHandlerVo = PrivateApiComponentFactory.getApiHandlerByHandler(handler);
 		if (apiHandlerVo == null) {
 			return null;
 		}
@@ -626,4 +673,46 @@ public class ApiVo extends BasePageVo implements Serializable {
 		this.pathVariableList = pathVariableList;
 	}
 
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public String getUrl() {
+        if(StringUtils.isBlank(url)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
+            url = "api/"+Type.getUrlPre(type) + token;
+            if(!isPrivate) {
+                this.url = "public/"+url;
+            }
+        }
+        return url;
+    }
+    
+    public String getHelpUrl() {
+        if(StringUtils.isBlank(helpUrl)&&StringUtils.isNotBlank(type)&&StringUtils.isNotBlank(token)&&isPrivate != null) {
+            helpUrl = "api/help/"+Type.getUrlPre(type) + token;
+            if(!isPrivate) {
+                helpUrl = "public/"+helpUrl;
+            }
+            
+        }
+        return helpUrl;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+	
 }

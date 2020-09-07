@@ -94,6 +94,12 @@ public class ConditionUtil {
 				}else {
 					return false;
 				}
+			case ISNOTNULL:
+				if(CollectionUtils.isNotEmpty(curentValueList)) {
+					return true;
+				}else {
+					return false;
+				}
 			default : 
 				return false;
 		}

@@ -10,8 +10,8 @@ public enum Expression {
 	BETWEEN("between","属于"," %s between '%s' and '%s' "),
 	GREATERTHAN("greater-than", "晚于", " %s > %s ) "),
 	LESSTHAN("less-than", "早于", " %s < %s ) "),
-	ISNULL("is-null", "为空", " not %s = '' "),
-	ISNOTNULL("is-not-null", "不为空", " %s = '' ");
+	ISNULL("is-null", "为空", " %s = '' "),
+	ISNOTNULL("is-not-null", "不为空", " not %s = '' ");
 	private String expression;
 	private String expressionName;
 	private String expressionEs;

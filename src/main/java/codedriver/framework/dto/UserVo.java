@@ -1,5 +1,6 @@
 package codedriver.framework.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,10 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-public class UserVo extends BasePageVo {
-	private transient String keyword;
+public class UserVo extends BasePageVo implements Serializable{
+
+    private static final long serialVersionUID = 3670529362145832083L;
+    private transient String keyword;
 	private transient List<String> valueList;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String uuid;

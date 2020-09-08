@@ -1,25 +1,27 @@
 package codedriver.framework.common.constvalue;
 
 public enum Expression {
-	LIKE("like", "包含", " %s contains %s "),
-	NOTLIKE("notlike", "不包含", " not %s contains %s "),
-	EQUAL("equal", "等于", " %s = %s "),
-	UNEQUAL("unequal", "不等于", " not %s = %s "),
-	INCLUDE("include", "包含", " %s contains any ( %s ) "),
-	EXCLUDE("exclude", "不包含", " not %s contains any ( %s ) "),
-	BETWEEN("between","属于"," %s between '%s' and '%s' "),
-	GREATERTHAN("greater-than", "晚于", " %s > %s ) "),
-	LESSTHAN("less-than", "早于", " %s < %s ) "),
-	ISNULL("is-null", "为空", " %s = '' "),
-	ISNOTNULL("is-not-null", "不为空", " not %s = '' ");
+	LIKE("like", "包含", " %s contains %s ",1),
+	NOTLIKE("notlike", "不包含", " not %s contains %s ",1),
+	EQUAL("equal", "等于", " %s = %s ",1),
+	UNEQUAL("unequal", "不等于", " not %s = %s ",1),
+	INCLUDE("include", "包含", " %s contains any ( %s ) ",1),
+	EXCLUDE("exclude", "不包含", " not %s contains any ( %s ) ",1),
+	BETWEEN("between","属于"," %s between '%s' and '%s' ",1),
+	GREATERTHAN("greater-than", "晚于", " %s > %s ) ",1),
+	LESSTHAN("less-than", "早于", " %s < %s ) ",1),
+	ISNULL("is-null", "为空", " %s = '' ",0),
+	ISNOTNULL("is-not-null", "不为空", " not %s = '' ",0);
 	private String expression;
 	private String expressionName;
 	private String expressionEs;
+	private Integer isShowConditionValue;
 	
-	private Expression(String _expression, String _expressionName, String _expressionEs) {
+	private Expression(String _expression, String _expressionName, String _expressionEs,Integer _isShowConditionValue) {
 		this.expression = _expression;
 		this.expressionName = _expressionName;
 		this.expressionEs = _expressionEs;
+		this.isShowConditionValue = _isShowConditionValue;
 	}
 	
 	public String getExpression() {
@@ -32,6 +34,10 @@ public enum Expression {
 	
 	public String getExpressionEs() {
 		return expressionEs;
+	}
+
+	public Integer getIsShowConditionValue() {
+		return isShowConditionValue;
 	}
 
 	

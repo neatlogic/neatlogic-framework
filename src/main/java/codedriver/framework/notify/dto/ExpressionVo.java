@@ -10,6 +10,7 @@ public class ExpressionVo implements Serializable {
 	private String expression;
 	private String expressionName;
 	private String expressionEs;
+	private Integer isShowConditionValue;
 	
 	public ExpressionVo() {
 	}
@@ -18,6 +19,7 @@ public class ExpressionVo implements Serializable {
 		this.expression = expression.getExpression();
 		this.expressionName = expression.getExpressionName();
 		this.expressionEs = expression.getExpressionEs();
+		this.isShowConditionValue = expression.getIsShowConditionValue();
 	}
 
 	public ExpressionVo(String expression, String expressionName) {
@@ -44,5 +46,12 @@ public class ExpressionVo implements Serializable {
 	public void setExpressionEs(String expressionEs) {
 		this.expressionEs = expressionEs;
 	}
-	
+
+	public Integer getIsShowConditionValue() {
+		return isShowConditionValue;
+	}
+
+	public void setIsShowConditionValue(Integer isShowConditionValue) {
+		this.isShowConditionValue = isShowConditionValue;
+	}
 }

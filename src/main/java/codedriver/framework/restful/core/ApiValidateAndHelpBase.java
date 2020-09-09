@@ -185,6 +185,9 @@ public class ApiValidateAndHelpBase {
 					Param[] params = input.value();
 					if (params != null && params.length > 0) {
 						for (Param p : params) {
+						    if (p.type().equals(ApiParamType.NOAUTH)) {
+						        continue;
+						    }
 							// xss过滤
 							if (p.xss() && paramObj.containsKey(p.name())) {
 								escapeXss(paramObj, p.name());

@@ -66,7 +66,7 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 	@Override
 	public long getDataLength(String filePath){
 		long length = 0;
-		File file = new File(Config.DATA_HOME() + filePath.substring(5));
+		File file = new File(filePath.substring(5));
 		if (file.exists() && file.isFile()) {
 			length = file.length();
 		}

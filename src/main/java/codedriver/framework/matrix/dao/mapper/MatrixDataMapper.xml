@@ -92,43 +92,73 @@
 	from (
 		SELECT
 		<foreach collection="columnList" item="column" separator=",">
-			`${column}`
+			a.`${column}`
 		</foreach>
-		FROM `matrix_${matrixUuid}`
+		FROM `matrix_${matrixUuid}` a
+		<choose>
+			<when test="attrType == 'user'">
+				JOIN `user` b ON b.`uuid` = a.`${attributeUuid}`
+			</when>
+			<when test="attrType == 'team'">
+				JOIN `team` c ON c.`uuid` = a.`${attributeUuid}`
+			</when>
+			<when test="attrType == 'role'">
+				JOIN `role` d ON d.`name` = a.`${attributeUuid}`
+			</when>
+		</choose>
 		<where>
-		<foreach collection="columnList" item="column" separator="AND">
-		`${column}` IS NOT NULL
-		</foreach>
-		<if test="uuidList != null and uuidList.size() > 0">
-		AND `uuid` IN
-		<foreach collection="uuidList" item="uuid" open="(" close=")" separator=",">
-		#{uuid}
-		</foreach>
-		</if>
-		<if test="sourceColumnList != null and sourceColumnList.size() > 0">
-			<foreach collection="sourceColumnList" item="sourceColumn">
-				<choose>
-					<when test="sourceColumn.expression == 'equal'">
-					AND `${sourceColumn.column}` = #{sourceColumn.value}
-					</when>
-					<when test="sourceColumn.expression == 'unequal'">
-					AND `${sourceColumn.column}` != #{sourceColumn.value}
-					</when>
-					<when test="sourceColumn.expression == 'like'">
-					AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
-					</when>
-					<when test="sourceColumn.expression == 'greater-than'">
-					AND `${sourceColumn.column}` &gt; #{sourceColumn.value}
-					</when>
-					<when test="sourceColumn.expression == 'less-than'">
-					AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
-					</when>
-					<otherwise>
-					AND `${sourceColumn.column}` = #{sourceColumn.value}
-					</otherwise>
-				</choose>
+			<foreach collection="columnList" item="column" separator="AND">
+				a.`${column}` IS NOT NULL
 			</foreach>
-		</if>
+			<choose>
+				<when test="attrType == 'input' or attrType == 'select' or attrType == 'date'">
+					<if test="keyword != null and keyword != ''">
+					 	and `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
+					</if>
+				</when>
+				<when test="attrType == 'user'">
+					and b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="attrType == 'team'">
+					and c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="attrType == 'role'">
+					and d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+			</choose>
+			<if test="sourceColumnList != null and sourceColumnList.size() > 0">
+				<foreach collection="sourceColumnList" item="sourceColumn">
+					<choose>
+						<when test="sourceColumn.expression == 'equal'">
+							AND a.`${sourceColumn.column}` = #{sourceColumn.value}
+						</when>
+						<when test="sourceColumn.expression == 'unequal'">
+							AND a.`${sourceColumn.column}` != #{sourceColumn.value}
+						</when>
+						<when test="sourceColumn.expression == 'like'">
+							AND a.`${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
+						</when>
+						<when test="sourceColumn.expression == 'greater-than'">
+							AND a.`${sourceColumn.column}` &gt; #{sourceColumn.value}
+						</when>
+						<when test="sourceColumn.expression == 'less-than'">
+							AND a.`${sourceColumn.column}` &lt; #{sourceColumn.value}
+						</when>
+						<otherwise>
+							AND a.`${sourceColumn.column}` = #{sourceColumn.value}
+						</otherwise>
+					</choose>
+				</foreach>
+			</if>
+			<if test="filterList != null and filterList.size() > 0">
+				and
+				<foreach collection="filterList" item="filter" separator=" and ">
+					${filter.key} in
+					<foreach collection="filter.value" item="value"  open="(" separator="," close=")">
+						${value}
+					</foreach>
+				</foreach>
+			</if>
 		</where>
 		ORDER BY `id` DESC
 	) a
@@ -189,70 +219,6 @@
 	  `${targetColumn}`
 	FROM `matrix_${matrixUuid}` 
 	WHERE `${sourceColumnVo.column}` = #{sourceColumnVo.value}
-	</select>
-	
-	<select id="getUuidListByAttributeValueListForSelectType" resultType="java.lang.String">
-	SELECT 
-	  `uuid` 
-	FROM `matrix_${matrixUuid}` 
-	WHERE `${attributeUuid}` IN 
-	<foreach collection="attributeValueList" item="attributeValue" open="(" close=")" separator=",">
-	#{attributeValue}
-	</foreach>
-	LIMIT #{pageSize}
-	</select>
-
-	<select id="getUuidListByKeywordForUserType" resultType="java.lang.String">
-	SELECT 
-	  a.`uuid` 
-	FROM `matrix_${matrixUuid}` a
-	JOIN `user` b ON b.`uuid` = a.`${attributeUuid}`
-	<if test="keyword != null and keyword != ''">
-	WHERE b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
-	</if>
-	LIMIT #{pageSize}
-	</select>
-
-	<select id="getUuidListByKeywordForTeamType" resultType="java.lang.String">
-	SELECT 
-	  a.`uuid` 
-	FROM `matrix_${matrixUuid}` a
-	JOIN `team` b ON b.`uuid` = a.`${attributeUuid}`
-	<if test="keyword != null and keyword != ''">
-	WHERE b.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR b.`name` LIKE CONCAT('%', #{keyword}, '%')
-	</if>
-	LIMIT #{pageSize}
-	</select>
-
-	<select id="getUuidListByKeywordForRoleType" resultType="java.lang.String">
-	SELECT 
-	  a.`uuid` 
-	FROM `matrix_${matrixUuid}` a
-	JOIN `role` b ON b.`name` = a.`${attributeUuid}`
-	<if test="keyword != null and keyword != ''">
-	WHERE b.`name` LIKE CONCAT('%', #{keyword}, '%') OR b.`description` LIKE CONCAT('%', #{keyword}, '%')
-	</if>
-	LIMIT #{pageSize}
-	</select>
-	
-	<select id="getUuidListByKeywordForDateType" resultType="java.lang.String">
-	SELECT 
-	  `uuid` 
-	FROM `matrix_${matrixUuid}` 
-	<if test="keyword != null and keyword != ''">
-	WHERE `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
-	</if>
-	LIMIT #{pageSize}
-	</select>
-
-	<select id="getUuidListByKeywordForInputType" resultType="java.lang.String">
-	SELECT 
-	  `uuid` 
-	FROM `matrix_${matrixUuid}` 
-	<if test="keyword != null and keyword != ''">
-	WHERE `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
-	</if>
-	LIMIT #{pageSize}
 	</select>
 	
 	<select id="getDynamicRowDataByUuid" parameterType="codedriver.framework.matrix.dto.MatrixDataVo" resultType="java.util.LinkedHashMap">

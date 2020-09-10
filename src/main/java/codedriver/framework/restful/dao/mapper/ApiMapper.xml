@@ -301,6 +301,14 @@
 		`api_audit`
 	</select>
 
+	<select id="getAuditFileByHash" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT
+		`file_path`
+		FROM
+		`audit_file`
+		where `hash` = #{value}
+	</select>
+
 	<update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
 		UPDATE `api`
 		SET
@@ -407,6 +415,10 @@
 
 	<insert id="insertApiAccessCount">
 		INSERT INTO `api_access_count` (`token`, `count`) VALUES (#{token}, #{count})
+	</insert>
+
+	<insert id="insertAuditFile">
+		INSERT INTO `audit_file` (`hash`, `file_path`) VALUES (#{hash}, #{filePath})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

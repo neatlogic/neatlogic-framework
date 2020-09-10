@@ -4,6 +4,8 @@ import codedriver.framework.common.dto.BasePageVo;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+
 /**
  * @program: codedriver
  * @description:
@@ -16,6 +18,10 @@ public class MatrixDataVo extends BasePageVo {
     private List<MatrixColumnVo> sourceColumnList;
     private List<String> uuidList;
     private String uuid;
+    private String attrType;
+    private List<String> attributeValueList;
+    private String attributeUuid;
+    private JSONArray filterList;
 //    private String targetColumn;
 //
 //    public String getTargetColumn() {
@@ -73,4 +79,36 @@ public class MatrixDataVo extends BasePageVo {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+
+    public String getAttrType() {
+        return attrType;
+    }
+
+    public void setAttrType(String attrType) {
+        this.attrType = attrType;
+    }
+
+    public List<String> getAttributeValueList() {
+        return attributeValueList;
+    }
+
+    public void setAttributeValueList(List<String> attributeValueList) {
+        this.attributeValueList = attributeValueList;
+    }
+
+    public String getAttributeUuid() {
+        return attributeUuid;
+    }
+
+    public void setAttributeUuid(String attributeUuid) {
+        this.attributeUuid = attributeUuid;
+    }
+
+    public JSONArray getFilterList() {
+        return filterList;
+    }
+
+    public void setFilterList(JSONArray filterList) {
+        this.filterList = filterList;
+    }
 }

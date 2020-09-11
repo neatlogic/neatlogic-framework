@@ -39,7 +39,7 @@ public class AuditUtil {
 
 	private static Logger logger = LoggerFactory.getLogger(AuditUtil.class);
 
-	public synchronized static void saveAuditDetail(AuditVoHandler vo,String fileType){
+	public static void saveAuditDetail(AuditVoHandler vo,String fileType){
 		/**
 		 * 组装文件内容JSON并且计算文件中每一块内容的开始坐标和偏移量
 		 * 例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
@@ -81,44 +81,39 @@ public class AuditUtil {
 		sb.append("error<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		String fileHash = DigestUtils.md5DigestAsHex(sb.toString().getBytes());
 		String filePath = null;
-		synchronized(AuditUtil.class){
-			filePath = apiMapper.getAuditFileByHash(fileHash);
-			/** 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
-			if(StringUtils.isBlank(filePath)){
-				InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
+		filePath = apiMapper.getAuditFileByHash(fileHash);
+		/** 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
+		if(StringUtils.isBlank(filePath)){
+			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
+			try {
+				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),inputStream,fileHash,"text/plain",fileType);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage(),e);
 				try {
-					filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),inputStream, SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.error(e.getMessage(),e);
+					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),inputStream,fileHash,"text/plain",fileType);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					logger.error(e1.getMessage(),e1);
+				}
+			}finally {
+				if(StringUtils.isNotBlank(filePath)){
+					apiMapper.insertAuditFile(fileHash,filePath);
+				}
+				if(inputStream != null){
 					try {
-						filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),inputStream,SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-						if(StringUtils.isNotBlank(filePath)){
-							apiMapper.insertAuditFile(fileHash,filePath);
-						}
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						logger.error(e1.getMessage(),e1);
-					}
-				}finally {
-					if(inputStream != null){
-						try {
-							inputStream.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						inputStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
 			}
-			if(StringUtils.isNotBlank(filePath)){
-				vo.setParamFilePath(StringUtils.isNotBlank(paramFilePath) == true ? filePath + paramFilePath : null);
-				vo.setResultFilePath(StringUtils.isNotBlank(resultFilePath) == true ? filePath + resultFilePath : null);
-				vo.setErrorFilePath(StringUtils.isNotBlank(errorFilePath) == true ? filePath + errorFilePath : null);
-			}
 		}
-
-
-
+		if(StringUtils.isNotBlank(filePath)){
+			vo.setParamFilePath(StringUtils.isNotBlank(paramFilePath) == true ? (filePath + paramFilePath) : null);
+			vo.setResultFilePath(StringUtils.isNotBlank(resultFilePath) == true ? (filePath + resultFilePath) : null);
+			vo.setErrorFilePath(StringUtils.isNotBlank(errorFilePath) == true ? (filePath + errorFilePath) : null);
+		}
 	}
 
 	public static String getAuditDetail(String filePath){

@@ -418,7 +418,7 @@
 	</insert>
 
 	<insert id="insertAuditFile">
-		INSERT INTO `audit_file` (`hash`, `path`) VALUES (#{hash}, #{filePath})
+		INSERT ignore INTO `audit_file` (`hash`, `path`) VALUES (#{hash}, #{filePath})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

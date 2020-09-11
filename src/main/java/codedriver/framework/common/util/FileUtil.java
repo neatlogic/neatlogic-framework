@@ -586,7 +586,7 @@ public class FileUtil {
 	 * @param inputStream
 	 * @throws Exception
 	 */
-	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, Long fileId, String contentType, String fileType) throws Exception {
+	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
 		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
 		if (handler == null) {
 			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);

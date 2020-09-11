@@ -303,7 +303,7 @@
 
 	<select id="getAuditFileByHash" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
 		SELECT
-		`file_path`
+		`path`
 		FROM
 		`audit_file`
 		where `hash` = #{value}
@@ -418,7 +418,7 @@
 	</insert>
 
 	<insert id="insertAuditFile">
-		INSERT INTO `audit_file` (`hash`, `file_path`) VALUES (#{hash}, #{filePath})
+		INSERT INTO `audit_file` (`hash`, `path`) VALUES (#{hash}, #{filePath})
 	</insert>
 
 	<delete id="deleteApiByToken" parameterType="java.lang.String">

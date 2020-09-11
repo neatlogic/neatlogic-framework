@@ -80,38 +80,44 @@ public class AuditUtil {
 		}
 		sb.append("error<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		String fileHash = DigestUtils.md5DigestAsHex(sb.toString().getBytes());
-		//TODO 做同步
-		String filePath = apiMapper.getAuditFileByHash(fileHash);
-		/** 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
-		if(StringUtils.isBlank(filePath)){
-			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
-			try {
-				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),inputStream, SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-			} catch (Exception e) {
-				e.printStackTrace();
+		String filePath = null;
+		synchronized(AuditUtil.class){
+			filePath = apiMapper.getAuditFileByHash(fileHash);
+			/** 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
+			if(StringUtils.isBlank(filePath)){
+				InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
 				try {
-					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),inputStream,SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-					if(StringUtils.isNotBlank(filePath)){
-						apiMapper.insertAuditFile(fileHash,filePath);
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}finally {
-				if(inputStream != null){
+					filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),inputStream, SnowflakeUtil.uniqueLong(),"text/plain",fileType);
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error(e.getMessage(),e);
 					try {
-						inputStream.close();
-					} catch (IOException e) {
-						e.printStackTrace();
+						filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),inputStream,SnowflakeUtil.uniqueLong(),"text/plain",fileType);
+						if(StringUtils.isNotBlank(filePath)){
+							apiMapper.insertAuditFile(fileHash,filePath);
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						logger.error(e1.getMessage(),e1);
+					}
+				}finally {
+					if(inputStream != null){
+						try {
+							inputStream.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
+			if(StringUtils.isNotBlank(filePath)){
+				vo.setParamFilePath(StringUtils.isNotBlank(paramFilePath) == true ? filePath + paramFilePath : null);
+				vo.setResultFilePath(StringUtils.isNotBlank(resultFilePath) == true ? filePath + resultFilePath : null);
+				vo.setErrorFilePath(StringUtils.isNotBlank(errorFilePath) == true ? filePath + errorFilePath : null);
+			}
 		}
-		if(StringUtils.isNotBlank(filePath)){
-			vo.setParamFilePath(StringUtils.isNotBlank(paramFilePath) == true ? filePath + paramFilePath : null);
-			vo.setResultFilePath(StringUtils.isNotBlank(resultFilePath) == true ? filePath + resultFilePath : null);
-			vo.setErrorFilePath(StringUtils.isNotBlank(errorFilePath) == true ? filePath + errorFilePath : null);
-		}
+
+
 
 	}
 

@@ -106,7 +106,7 @@ public class PublicApiDispatcher {
         String user = request.getHeader("User");
         UserVo userVo = userMapper.getUserByUuid(user);
         JSONObject userJson = new JSONObject();
-        if(user != null) {
+        if(userVo != null) {
             userJson.put("useruuid", userVo.getUuid());
             userJson.put("userid", userVo.getUserId());
             userJson.put("username", userVo.getUserName());
@@ -126,8 +126,8 @@ public class PublicApiDispatcher {
 	    ApiVo interfaceVo = apiMapper.getApiByToken(token);
 		String uri = request.getRequestURI();
 		/** 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
-		if ((!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
-				|| (interfaceVo == null || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate())) {
+		if (interfaceVo == null||(!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
+				|| PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
 			throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
 		}
 

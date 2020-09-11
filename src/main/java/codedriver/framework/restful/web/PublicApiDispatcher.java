@@ -92,7 +92,10 @@ public class PublicApiDispatcher {
         
         //
 	    ApiVo interfaceVo = apiMapper.getApiByToken(token);
-		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1) || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
+		String uri = request.getRequestURI();
+		/** 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
+		if ((!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
+				|| (interfaceVo == null || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate())) {
 			throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
 		}
 
@@ -106,15 +109,17 @@ public class PublicApiDispatcher {
 			throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 		}
 
-		 //认证
-		IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
-		if(apiAuth != null) {
-    		int result = apiAuth.auth(interfaceVo,paramObj,request);
-    		if(result != 1) {
-    		    throw new AuthenticateException(errorMap.get(result));
-    		}
+		/**认证，如果是查看帮助接口，则不需要认证*/
+		if(!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/"))){
+			IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
+			if(apiAuth != null) {
+				int result = apiAuth.auth(interfaceVo,paramObj,request);
+				if(result != 1) {
+					throw new AuthenticateException(errorMap.get(result));
+				}
+			}
 		}
-		
+
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {

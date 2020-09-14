@@ -720,4 +720,24 @@ public class TimeUtil {
 		}
     	return false;
     }
+    /**
+     * 
+    * @Time:2020年9月14日
+    * @Description: 将毫秒转换换为最大单位显示文案
+    * @param milliseconds
+    * @return String
+     */
+    public static String millisecondsTranferMaxTimeUnit(long milliseconds) {
+        if(milliseconds >= 24 * 60 * 60 * 1000) {
+            return (milliseconds / (24 * 60 * 60 * 1000)) + " 天";
+        }else if(milliseconds >= (60 * 60 * 1000)) {
+            return (milliseconds / (60 * 60 * 1000)) + " 小时";
+        }else if(milliseconds >= 60 * 1000) {
+            return (milliseconds / (60 * 1000)) + " 分钟";
+        }else if(milliseconds >= 1000) {
+            return (milliseconds / 1000) + " 秒";
+        }else {
+            return milliseconds + " 毫秒";
+        }
+    }
 }

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -41,7 +43,7 @@ public class JobVo extends BasePageVo {
 	@EntityField(name = "结束时间",
 			type = ApiParamType.LONG)
 	private Date endTime;
-
+	@JSONField(serialize=false)
 	private transient String keyword;
 
 	private JobStatusVo jobStatus;

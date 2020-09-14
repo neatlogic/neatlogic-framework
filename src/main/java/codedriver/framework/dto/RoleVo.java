@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -15,6 +17,7 @@ public class RoleVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = -8007028390813552667L;
 
 	public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
+	@JSONField(serialize=false)
 	private transient String keyword;
 	@EntityField(name = "角色uuis",
 			type = ApiParamType.STRING)

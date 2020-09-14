@@ -10,6 +10,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.dto.BasePageVo;
 
@@ -18,6 +19,7 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
 	private static final long serialVersionUID = 5439300427812355573L;
 
 	private List<ConditionGroupVo> conditionGroupList;
+	@JSONField(serialize=false)
 	private transient Map<String, ConditionGroupVo> conditionGroupMap;
 	private List<ConditionGroupRelVo> conditionGroupRelList;
 	public ConditionConfigVo() {

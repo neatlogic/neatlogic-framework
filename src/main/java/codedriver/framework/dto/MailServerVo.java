@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -41,7 +43,7 @@ public class MailServerVo extends BasePageVo {
 	
 	@EntityField(name = "邮箱地址", type = ApiParamType.EMAIL)
     private String fromAddress;
-
+	@JSONField(serialize=false)
     private transient String keyword;
     
     public String getUuid() {

@@ -9,6 +9,8 @@ import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.annotation.ExcelField;
 import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
@@ -95,8 +97,9 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 	private Integer timeRange;
 	@EntityField(name = "时间跨度单位(day|month)", type = ApiParamType.STRING)
 	private String timeUnit;
-
+	@JSONField(serialize=false)
 	private transient String logPath;
+	@JSONField(serialize=false)
 	private transient String tenant;
 
 	public ApiAuditVo() {

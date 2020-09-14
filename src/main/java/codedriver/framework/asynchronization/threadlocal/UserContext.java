@@ -11,13 +11,17 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.exception.user.NoUserException;
 
 public class UserContext implements Serializable {
 	private static final long serialVersionUID = -578199115176786224L;
+	@JSONField(serialize=false)
 	private transient static ThreadLocal<UserContext> instance = new ThreadLocal<UserContext>();
+	@JSONField(serialize=false)
 	private transient HttpServletRequest request;
+	@JSONField(serialize=false)
 	private transient HttpServletResponse response;
 	private String tenant;
 	private String userName;

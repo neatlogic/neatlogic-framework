@@ -125,6 +125,21 @@
 	SELECT COUNT(1) FROM `process_matrix` WHERE `name` = #{name} AND `uuid` != #{uuid}
 	</select>
 	
+	<select id="getMatrixFormComponentByMatrixUuid" parameterType="java.lang.String" resultType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+	select 
+	a.`matrix_uuid` AS matrixUuid,
+	a.`form_version_uuid` AS formVersionUuid,
+	a.`form_attribute_label` AS formAttributeLabel,
+	a.`form_attribute_uuid` AS formAttributeUuid,
+	b.`version`,
+	c.`uuid` AS formUuid,
+	c.`name` AS formName
+	FROM `process_matrix_form_component` a
+	LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+	LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
+	WHERE a.`matrix_uuid` = #{matrixUuid}
+	</select>
+	
 	<update id="updateMatrixNameAndLcu" parameterType="codedriver.framework.matrix.dto.MatrixVo">
 		UPDATE `process_matrix` SET
 		 `name` = #{name},

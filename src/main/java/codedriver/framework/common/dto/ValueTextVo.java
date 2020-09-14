@@ -6,7 +6,7 @@ import codedriver.framework.restful.annotation.EntityField;
 public class ValueTextVo {
 	
 	@EntityField(name = "value", type = ApiParamType.STRING)
-	private String value;
+	private Object value;
 	@EntityField(name = "text", type = ApiParamType.STRING)
 	private String text;
 
@@ -18,11 +18,11 @@ public class ValueTextVo {
 		this.text = text;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 

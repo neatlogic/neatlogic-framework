@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -23,12 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.AuthenticateException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
@@ -53,6 +57,9 @@ public class PublicApiDispatcher {
 
 	@Autowired
 	private ApiMapper apiMapper;
+	
+	@Autowired
+	UserMapper userMapper;
 
 	private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
 
@@ -79,8 +86,13 @@ public class PublicApiDispatcher {
                 } 
             }
         }
-        //自定义接口 访问人初始化
-        UserContext.init(new JSONObject(),token, timezone,  request,  response);
+        
+        //authorization
+        String authorization = null;
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getHeader("Authorization");
+        }
+        
         
         //初始化租户
         String tenant = request.getHeader("Tenant");
@@ -90,9 +102,32 @@ public class PublicApiDispatcher {
 	    TenantContext.init();
         TenantContext.get().switchTenant(tenant);
         
-        //
+        //自定义接口 访问人初始化
+        String user = request.getHeader("User");
+        UserVo userVo = userMapper.getUserByUuid(user);
+        JSONObject userJson = new JSONObject();
+        if(userVo != null) {
+            userJson.put("useruuid", userVo.getUuid());
+            userJson.put("userid", userVo.getUserId());
+            userJson.put("username", userVo.getUserName());
+            userJson.put("tenant", TenantContext.get().getTenantUuid());
+            if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
+                JSONArray roleList = new JSONArray();
+                for (String role : userVo.getRoleUuidList()) {
+                    roleList.add(role);
+                }
+                userJson.put("rolelist", roleList);
+            }
+        }
+        UserContext.init(userJson, authorization, timezone, request, response);
+       
+        
+        
 	    ApiVo interfaceVo = apiMapper.getApiByToken(token);
-		if (interfaceVo == null || !interfaceVo.getIsActive().equals(1) || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
+		String uri = request.getRequestURI();
+		/** 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
+		if (interfaceVo == null||(!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
+				|| PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
 			throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
 		}
 
@@ -106,15 +141,17 @@ public class PublicApiDispatcher {
 			throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
 		}
 
-		 //认证
-		IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
-		if(apiAuth != null) {
-    		int result = apiAuth.auth(interfaceVo,paramObj,request);
-    		if(result != 1) {
-    		    throw new AuthenticateException(errorMap.get(result));
-    		}
+		/**认证，如果是查看帮助接口，则不需要认证*/
+		if(!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/"))){
+			IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
+			if(apiAuth != null) {
+				int result = apiAuth.auth(interfaceVo,paramObj,request);
+				if(result != 1) {
+					throw new AuthenticateException(errorMap.get(result));
+				}
+			}
 		}
-		
+
 		if (apiType.equals(ApiVo.Type.OBJECT)) {
 			IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());
 			if (restComponent != null) {

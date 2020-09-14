@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.matrix.dao.mapper.MatrixMapper">
+	<resultMap id="matrixMap" type="codedriver.framework.matrix.dto.MatrixVo">
+		<id property="uuid" column="uuid"/>
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="type" column="type"/>
+		<result property="fcu" column="fcu"/>
+		<result property="fcd" column="fcd"/>
+		<result property="lcu" column="lcu"/>
+		<result property="lcuName" column="lcuName"/>
+		<result property="lcd" column="lcd"/>
+	</resultMap>
+
+	<insert id="insertMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" >
+		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+			select LAST_INSERT_ID() as id
+		</selectKey>
+		INSERT INTO `process_matrix` (
+		`uuid`,
+		`name`,
+		`type`,
+		`fcu`,
+		`fcd`,
+		`lcu`,
+		`lcd`
+		) VALUES (
+		#{uuid},
+		#{name},
+		#{type},
+		#{fcu},
+		NOW(),
+		#{lcu},
+		NOW()
+		)
+	</insert>
+
+	<select id="searchMatrixCount" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="int">
+		SELECT
+			COUNT(`uuid`)
+		FROM `process_matrix`
+		<where>
+			<if test="type != null and type != ''">
+				AND `type` = #{type}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+	</select>
+
+	<select id="getMatrixByUuid" parameterType="String" resultType="codedriver.framework.matrix.dto.MatrixVo">
+		SELECT
+		`id`,
+		`uuid`,
+		`name`,
+		`type`,
+		`fcu`,
+		`fcd`,
+		`lcu`,
+		`lcd`
+		FROM `process_matrix`
+		WHERE `uuid` = #{uuid}
+	</select>
+
+	<select id="getMatrixByUuidForSelect" parameterType="String" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`uuid` as `value`,
+		`name` as `text`
+		FROM `process_matrix`
+		WHERE `uuid` = #{uuid}
+	</select>
+
+	<select id="searchMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultMap="matrixMap">
+			SELECT 
+			a.`id`,
+			a.`uuid`,
+			a.`name`,
+			a.`type`,
+			a.`fcu`,
+			a.`fcd`,
+			a.`lcu`,
+			(SELECT u.`user_name` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuName,
+			a.`lcd`
+			FROM `process_matrix` a
+			<where>
+				<if test="type != null and type != ''">
+					AND a.`type` = #{type}
+				</if>
+				<if test="keyword != null and keyword != ''">
+					AND a.`name` LIKE CONCAT('%', #{keyword}, '%')
+				</if>
+			</where>
+			ORDER BY a.`id` desc
+			<if test="needPage == true">
+				LIMIT #{startNum}, #{pageSize}
+			</if>
+	</select>
+
+	<select id="searchMatrixForSelect" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`uuid` as `value`,
+		`name` as `text`
+		FROM `process_matrix`
+		<where>
+			<if test="type != null and type != ''">
+				AND `type` = #{type}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+		ORDER BY `id` DESC
+	</select>
+	
+	<select id="checkMatrixIsExists" parameterType="java.lang.String" resultType="int">
+	SELECT COUNT(`uuid`) FROM `process_matrix` WHERE `uuid` = #{uuid}
+	</select>
+	
+	<select id="checkMatrixNameIsRepeat" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="int">
+	SELECT COUNT(1) FROM `process_matrix` WHERE `name` = #{name} AND `uuid` != #{uuid}
+	</select>
+	
+	<update id="updateMatrixNameAndLcu" parameterType="codedriver.framework.matrix.dto.MatrixVo">
+		UPDATE `process_matrix` SET
+		 `name` = #{name},
+		 `lcu` = #{lcu},
+		 `lcd` = NOW()
+		 WHERE `uuid` = #{uuid}
+	</update>
+
+	<delete id="deleteMatrixByUuid" parameterType="string">
+		DELETE FROM `process_matrix` WHERE `uuid` = #{uuid}
+	</delete>
+</mapper>

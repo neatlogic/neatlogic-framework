@@ -6,7 +6,7 @@ public interface IFileStorageMediumHandler {
 
 	public String getName();
 
-	public String saveData(String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception;
+	public String saveData(String tenantUuid, InputStream inputStream, String fileId,String contentType,String fileType) throws Exception;
 
 	public InputStream getData(String path) throws Exception;
 

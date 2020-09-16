@@ -6,7 +6,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,11 +19,11 @@ import java.util.Map;
  **/
 public class ExcelUtil {
 
-    /** 
-    * @Description: excel 导出 
-    * @Param: [headerList, columnList, columnSelectValueList, dataMapList, os] 
-    * @return: void  
-    */ 
+    /**
+    * @Description: excel 导出
+    * @Param: [headerList, columnList, columnSelectValueList, dataMapList, os]
+    * @return: void
+    */
     public static void exportExcel(List<String> headerList, List<String> columnList, List<List<String>> columnSelectValueList, List<Map<String, String>> dataMapList, OutputStream os)
     {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -66,10 +65,10 @@ public class ExcelUtil {
         font2.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
         // 把字体应用到当前的样式
         style2.setFont(font2);
-        
+
         HSSFFont font3 = workbook.createFont();
         font3.setColor(HSSFColor.BLUE.index);
-        
+
 //        // 声明一个画图的顶级管理器
 //        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
 //        // 定义注释的大小和位置,详见文档
@@ -106,7 +105,7 @@ public class ExcelUtil {
                 i++;
             }
         }
-        
+
 
         if (CollectionUtils.isNotEmpty(dataMapList) && CollectionUtils.isNotEmpty(columnList)){
             int index = 0;
@@ -140,24 +139,24 @@ public class ExcelUtil {
         }
     }
 
-    /** 
-    * @Description: 表头导出 
-    * @Param: [headerList, columnSelectValueList, os] 
-    * @return: void  
-    */ 
+    /**
+    * @Description: 表头导出
+    * @Param: [headerList, columnSelectValueList, os]
+    * @return: void
+    */
     public static void exportExcelHeaders(List<String> headerList, List<List<String>> columnSelectValueList, OutputStream os){
         exportExcel(headerList, null, columnSelectValueList, null, os);
     }
 
-    /** 
-    * @Description: 不包含下拉框默认值导出 
-    * @Param: [headerList, columnList, dataMapList, os] 
-    * @return: void  
-    */ 
+    /**
+    * @Description: 不包含下拉框默认值导出
+    * @Param: [headerList, columnList, dataMapList, os]
+    * @return: void
+    */
     public static void exportExcel(List<String> headerList, List<String> columnList, List<Map<String, String>> dataMapList, OutputStream os){
         exportExcel(headerList, columnList, null, dataMapList, os);
     }
-    
+
     public static HSSFWorkbook createExcel(HSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<List<String>> columnSelectValueList, List<Map<String, String>> dataMapList) {
     	HSSFSheet sheet = null;
     	if(workbook == null) {
@@ -185,7 +184,7 @@ public class ExcelUtil {
             font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
             // 把字体应用到当前的样式
             style.setFont(font);
-            
+
 
             // 产生表格标题行
             HSSFRow row = sheet.createRow(0);
@@ -218,7 +217,7 @@ public class ExcelUtil {
     		//sheet = workbook.getSheetAt(0);
     		sheet = workbook.getSheet("sheet01");
     	}
-    	
+
         if (CollectionUtils.isNotEmpty(dataMapList) && CollectionUtils.isNotEmpty(columnList)){
         	// 生成并设置另一个样式
         	HSSFCellStyle style2 = workbook.createCellStyle();
@@ -237,7 +236,7 @@ public class ExcelUtil {
             style2.setFont(font2);
         	HSSFFont font3 = workbook.createFont();
             font3.setColor(HSSFColor.BLUE.index);
-            
+
         	int lastRowNum = sheet.getLastRowNum();
             for (Map<String, String> dataMap : dataMapList){
             	lastRowNum++;
@@ -253,12 +252,12 @@ public class ExcelUtil {
                 }
             }
         }
-        
+
     	return workbook;
     }
 
     /**
-     * 使用poi-3.8的SXSSFWorkbook来创建excel
+     * 此方法可传入poi-3.8的SXSSFWorkbook来创建excel
      * 3.8以前的版本，单元格字符数有限
      * @param workbook
      * @param headerList
@@ -267,11 +266,11 @@ public class ExcelUtil {
      * @return
      * @throws Exception
      */
-    public static SXSSFWorkbook exportData(SXSSFWorkbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList,Integer columnWidth) throws Exception {
+    public static Workbook exportData(Workbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList,Integer columnWidth,int num) throws Exception {
         // 生成一个表格
         Sheet sheet = workbook.createSheet();
         // 设置sheet名字
-        workbook.setSheetName(0,"sheet01");
+        workbook.setSheetName(num,"sheet-" + num);
         // 设置标题行样式
         CellStyle firstRowcellStyle = workbook.createCellStyle();
         firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色

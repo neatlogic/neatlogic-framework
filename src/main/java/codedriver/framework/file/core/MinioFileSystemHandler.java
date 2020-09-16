@@ -37,7 +37,7 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageMed
 	 * @return
 	 */
 	@Override
-	public String saveData(String tenantUuid, InputStream inputStream, Long fileId, String contentType, String fileType) throws Exception {
+	public String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
 		// 检查存储桶是否已经存在
 		boolean bucketExists = minioClient.bucketExists(Config.MINIO_BUCKET());
 		if (!bucketExists) {

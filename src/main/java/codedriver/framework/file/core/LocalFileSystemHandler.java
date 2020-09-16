@@ -25,7 +25,7 @@ public class LocalFileSystemHandler implements IFileStorageMediumHandler {
 	}
 
 	@Override
-	public String saveData(String tenantUuid, InputStream inputStream, Long fileId,String contentType,String fileType) throws Exception {
+	public String saveData(String tenantUuid, InputStream inputStream, String fileId,String contentType,String fileType) throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy" + File.separator + "MM" + File.separator + "dd");
 		String filePath = tenantUuid + File.separator + fileType + File.separator + format.format(new Date()) + File.separator + fileId;
 		String finalPath = Config.DATA_HOME() + filePath;

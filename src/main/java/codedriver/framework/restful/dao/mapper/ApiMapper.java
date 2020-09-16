@@ -36,6 +36,8 @@ public interface ApiMapper {
 
 	public List<String> getDistinctTokenInApiAudit();
 
+	public String getAuditFileByHash(String hash);
+
 	public int replaceApi(ApiVo apiVo);
 
 	public int insertApiAudit(ApiAuditVo apiAudit);
@@ -53,7 +55,9 @@ public interface ApiMapper {
 	* @return int
 	 */
 	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
-	
+
+	public int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
+
 	/**
 	 * 
 	* @Time:2020年7月15日

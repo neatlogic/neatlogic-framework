@@ -10,6 +10,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.exception.type.ParamIrregularException;
 
@@ -18,8 +19,10 @@ public class ConditionGroupVo implements Serializable{
 	
 	private String uuid;
 	private List<ConditionVo> conditionList;
+	@JSONField(serialize=false)
 	private transient Map<String, ConditionVo> conditionMap;
 	private List<ConditionRelVo> conditionRelList;
+	@JSONField(serialize=false)
 	private transient List<String> channelUuidList;
 	
 	public ConditionGroupVo() {

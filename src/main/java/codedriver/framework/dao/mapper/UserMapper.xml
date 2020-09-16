@@ -4,11 +4,15 @@
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
 
 	<select id="checkUserAuthorityIsExists" resultType="int" useCache="true">
+		SELECT COUNT(1) FROM (
 		SELECT
-		COUNT(1)
+		1
 		FROM
 		`user_authority`
-		WHERE user_uuid = #{userUuid} AND auth = #{auth}
+		WHERE user_uuid = #{userUuid} AND auth IN
+		<foreach collection="authList" item="item" open="(" separator="," close=")">#{item}</foreach>
+		LIMIT 1
+		) auth
 	</select>
 
 	<select id="checkUserIsInTeam" resultType="int" useCache="false">
@@ -145,10 +149,10 @@
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
 		ORDER BY k.`id` DESC
 	</select>
-	
+
 	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
 		SELECT
-		CONCAT("user#",a.uuid) AS  `value`,
+		CONCAT("user#",a.uuid) AS `value`,
 		a.`user_name` AS `text`
 		FROM
 		`user` a
@@ -159,7 +163,7 @@
 				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
 			</if>
 			<if test="valueList != null and valueList.size() > 0">
-				AND a.uuid in 
+				AND a.uuid in
 				<foreach collection="valueList" item="item" separator="," open="(" close=")">
 					#{item}
 				</foreach>
@@ -171,7 +175,7 @@
 		<if test="needPage == true and (valueList == null or valueList.size() == 0)">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
-		
+
 	</select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">

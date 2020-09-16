@@ -10,7 +10,7 @@ public enum MatrixAttributeType {
 	SELECT("select","下拉框", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
 	DATE("date","日期", Arrays.asList(Expression.EQUAL, Expression.LESSTHAN,Expression.GREATERTHAN), Expression.EQUAL),
 	USER("user","用户", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-	TEAM("team","用户组", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
+	TEAM("team","分组", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
 	ROLE("role","角色", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE);
 	
 	private String value;

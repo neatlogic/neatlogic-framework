@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.GroupSearch;
@@ -24,7 +25,9 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 public class UserVo extends BasePageVo implements Serializable{
 
     private static final long serialVersionUID = 3670529362145832083L;
+    @JSONField(serialize=false)
     private transient String keyword;
+    @JSONField(serialize=false)
 	private transient List<String> valueList;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String uuid;

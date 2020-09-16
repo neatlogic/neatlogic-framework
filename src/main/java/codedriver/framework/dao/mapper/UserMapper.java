@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
 
-	public int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("auth") String auth);
+	public int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("authList") List<String> authList);
 
 	public int checkUserIsExists(String uuid);
 

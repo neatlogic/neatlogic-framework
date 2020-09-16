@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -14,8 +16,9 @@ public class TeamVo extends BasePageVo {
 	
 	public static final String ROOT_PARENTUUID = "-1";
 	public static final String ROOT_UUID = "0";
-	
+	@JSONField(serialize=false)
 	private transient String keyword;
+	@JSONField(serialize=false)
 	private transient Boolean isAutoGenerateUuid = true;
 	
 	@EntityField(name = "分组uuid", type = ApiParamType.STRING)
@@ -128,7 +131,7 @@ public class TeamVo extends BasePageVo {
 	public void setRht(Integer rht) {
 		this.rht = rht;
 	}
-	
+	@JSONField(serialize=false)
 	private transient TeamVo parent;
 	
 	private List<TeamVo> children = new ArrayList<>();

@@ -47,6 +47,7 @@
 		<result property="phone" column="phone" />
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
+		<result property="userInfo" column="userInfo" />
 		<collection property="roleList" ofType="codedriver.framework.dto.RoleVo">
 			<id property="uuid" column="roleUuid" />
 			<result property="name" column="roleName" />
@@ -68,6 +69,7 @@
 		e.`password`,
 		a.`pinyin`,
 		a.`is_active` AS isActive,
+		a.`user_info` AS userInfo,
 		b.`role_uuid` AS roleUuid,
 		r.`name` AS roleName,
 		r.`description`,
@@ -102,6 +104,7 @@
 		k.`phone`,
 		k.`pinyin`,
 		k.`is_active` as `isActive`,
+		k.`user_info` as `userInfo`,
 		h.`role_uuid` as `roleUuid`,
 		r.`name` as `roleName`,
 		r.`description`,
@@ -594,6 +597,12 @@
 		UPDATE `user_data`
 		SET `data` = #{data}
 		WHERE `user_uuid` = #{userUuid} and `type` = #{type}
+	</update>
+
+	<update id="updateUserInfo" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE `user`
+		SET `user_info` = #{userInfo}
+		WHERE `uuid` = #{uuid}
 	</update>
 
 	<delete id="deleteUserPasswordByLimit">

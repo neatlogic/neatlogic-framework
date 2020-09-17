@@ -88,6 +88,8 @@ public interface UserMapper {
 
 	public int updateUserData(UserDataVo userDataVo);
 
+	public int updateUserInfo(UserVo userVo);
+
 	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
 
 	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);

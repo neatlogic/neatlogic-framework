@@ -6,8 +6,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -343,7 +341,7 @@ public class ExcelUtil {
     public static Map<String, Object> getExcelData(MultipartFile file) throws Exception {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
-            XSSFWorkbook wb = new XSSFWorkbook(file.getInputStream());
+            Workbook wb = new XSSFWorkbook(file.getInputStream());
 
             List<String> headerList = new ArrayList<String>();
             List<Map<String, String>> contentList = new ArrayList<Map<String, String>>();
@@ -352,11 +350,11 @@ public class ExcelUtil {
             resultMap.put("content", contentList);
 
             for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-                XSSFSheet hssfSheet = wb.getSheetAt(i);
+                Sheet hssfSheet = wb.getSheetAt(i);
                 if (hssfSheet == null) {
                     continue;
                 } else {
-                    XSSFRow headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
+                    Row headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
                     List<Integer> cellIndex = new ArrayList<Integer>();
                     for (Iterator<Cell> cellIterator = (Iterator<Cell>) headRow.cellIterator(); cellIterator.hasNext();) {
                         Cell cell = cellIterator.next();
@@ -371,7 +369,7 @@ public class ExcelUtil {
                     }
 
                     for (int r = hssfSheet.getFirstRowNum() + 1; r <= hssfSheet.getLastRowNum(); r++) {
-                        XSSFRow hssfRow = hssfSheet.getRow(r);
+                        Row hssfRow = hssfSheet.getRow(r);
                         if (hssfRow != null) {
                             contentMap = new HashMap<String, String>(cellIndex.size() + 1, 1);
                             for (int ci = 0; ci < cellIndex.size(); ci++) {

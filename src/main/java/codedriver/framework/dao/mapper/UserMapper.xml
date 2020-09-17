@@ -39,6 +39,20 @@
 		WHERE a.`uuid` = #{value}
 	</select>
 
+	<select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="true">
+		SELECT
+		a.`uuid`,
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		a.`user_info` as userInfo
+		FROM `user` a
+		WHERE a.`user_id` = #{value}
+	</select>
+
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
 		<id property="uuid" column="uuid" />
 		<result property="userId" column="userId" />

@@ -7,6 +7,7 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -78,7 +79,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 				apiConfigVo = apiVo;
 			}
 			if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
-				saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+				saveAudit(apiVo, paramObj, JSON.toJSONString(result), error, startTime, endTime);
 			}
 
 		}

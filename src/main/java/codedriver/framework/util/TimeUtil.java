@@ -13,9 +13,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,16 +36,6 @@ public class TimeUtil {
     public static final String YYYY_MM_DD = "yyyy-MM-dd";
     public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
 
-	private static Map<String, SimpleDateFormat> simpleDateFormatMap = new HashMap<>();
-	
-	public static SimpleDateFormat getSimpleDateFormatByFormat(String format) {
-	    SimpleDateFormat simpleDateFormat = simpleDateFormatMap.get(format);
-	    if(simpleDateFormat == null) {
-	        simpleDateFormat = new SimpleDateFormat(format);
-	        simpleDateFormatMap.put(format, simpleDateFormat);
-	    }
-	    return simpleDateFormat;
-	}
     public static String timeTransfer(int timeRange, String timeUnit){
         SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
         Calendar calendar = Calendar.getInstance();
@@ -114,7 +102,8 @@ public class TimeUtil {
 	 * @return 0:在时间窗口之内，1:大于时间窗口(须加一天)，-1:小于时间窗口
 	 */
 	public static int isInTimeWindow(String startTimeStr, String endTimeStr) {
-		String currentTime = getSimpleDateFormatByFormat(HH_MM).format(new Date());
+	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(HH_MM);
+		String currentTime = simpleDateFormat.format(new Date());
 		if(StringUtils.isNotBlank(startTimeStr) && StringUtils.isNotBlank(endTimeStr)) {
 			if(startTimeStr.compareTo(endTimeStr) <= 0) {//开始时间小于结束时间(在一天之内)
 				if(currentTime.compareTo(startTimeStr) < 0) {
@@ -703,23 +692,7 @@ public class TimeUtil {
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
     }
-    
-    /**
-     * 
-    * @Time:2020年8月13日
-    * @Description: 判断当前日期是否在指定目标日期之后
-    * @param targetDate
-    * @return boolean
-     */
-    public static boolean afterTargetDate(String targetDate, String format) {
-    	try {
-			Date date = getSimpleDateFormatByFormat(format).parse(targetDate);
-			return new Date().after(date);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-    	return false;
-    }
+
     /**
      * 
     * @Time:2020年9月14日

@@ -599,6 +599,12 @@
 		WHERE `user_uuid` = #{userUuid} and `type` = #{type}
 	</update>
 
+	<update id="updateUserInfo" parameterType="codedriver.framework.dto.UserVo">
+		UPDATE `user`
+		SET `user_info` = #{userInfo}
+		WHERE `uuid` = #{uuid}
+	</update>
+
 	<delete id="deleteUserPasswordByLimit">
 		DELETE FROM `user_password`
 		WHERE `user_uuid` = #{userUuid}

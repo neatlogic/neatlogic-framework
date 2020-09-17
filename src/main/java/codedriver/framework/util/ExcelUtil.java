@@ -6,11 +6,16 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: codedriver
@@ -18,6 +23,8 @@ import java.util.Map;
  * @create: 2020-03-31 17:00
  **/
 public class ExcelUtil {
+
+    static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);
 
     /**
     * @Description: excel 导出
@@ -332,4 +339,91 @@ public class ExcelUtil {
         }
         return workbook;
     }
+
+    public static Map<String, Object> getExcelData(MultipartFile file) throws Exception {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        try {
+            XSSFWorkbook wb = new XSSFWorkbook(file.getInputStream());
+
+            List<String> headerList = new ArrayList<String>();
+            List<Map<String, String>> contentList = new ArrayList<Map<String, String>>();
+            Map<String, String> contentMap = null;
+            resultMap.put("header", headerList);
+            resultMap.put("content", contentList);
+
+            for (int i = 0; i < wb.getNumberOfSheets(); i++) {
+                XSSFSheet hssfSheet = wb.getSheetAt(i);
+                if (hssfSheet == null) {
+                    continue;
+                } else {
+                    XSSFRow headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
+                    List<Integer> cellIndex = new ArrayList<Integer>();
+                    for (Iterator<Cell> cellIterator = (Iterator<Cell>) headRow.cellIterator(); cellIterator.hasNext();) {
+                        Cell cell = cellIterator.next();
+                        if (cell != null) {
+                            String content = getCellContent(cell);
+                            if (content.contains("[(")) {
+                                content = content.substring(0, content.indexOf("[("));
+                            }
+                            headerList.add(content);
+                            cellIndex.add(cell.getColumnIndex());
+                        }
+                    }
+
+                    for (int r = hssfSheet.getFirstRowNum() + 1; r <= hssfSheet.getLastRowNum(); r++) {
+                        XSSFRow hssfRow = hssfSheet.getRow(r);
+                        if (hssfRow != null) {
+                            contentMap = new HashMap<String, String>(cellIndex.size() + 1, 1);
+                            for (int ci = 0; ci < cellIndex.size(); ci++) {
+                                Cell cell = hssfRow.getCell(cellIndex.get(ci));
+                                if (cell != null) {
+                                    String content = getCellContent(cell);
+                                    contentMap.put(headerList.get(ci), content);
+                                }
+                            }
+                            contentList.add(contentMap);
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        finally {
+            try {
+                file.getInputStream().close();
+            } catch (IOException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        }
+        return resultMap;
+    }
+
+    private static String getCellContent(Cell cell) {
+        String cellContent = "";
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_NUMERIC:
+                cellContent = (int) cell.getNumericCellValue() + "";
+                break;
+            case Cell.CELL_TYPE_STRING:
+                cellContent = cell.getStringCellValue() + "";
+                break;
+            case Cell.CELL_TYPE_BOOLEAN:
+                cellContent = cell.getBooleanCellValue() + "";
+                break;
+            case Cell.CELL_TYPE_BLANK:
+                cellContent = "blank";
+                break;
+            case Cell.CELL_TYPE_FORMULA:
+                cellContent = cell.getCellFormula() + "";
+                break;
+            case Cell.CELL_TYPE_ERROR:
+                cellContent = "error";
+                break;
+        }
+        return cellContent;
+    }
+
+
 }

@@ -11,46 +11,46 @@ import codedriver.framework.dto.RoleUserVo;
 import codedriver.framework.dto.RoleVo;
 
 public interface RoleMapper {
-	public List<String> getRoleUuidListByAuth(String auth);
+    public List<String> getRoleUuidListByAuth(@Param("authList") List<String> authList);
 
-	public int checkRoleIsExists(String uuid);
+    public int checkRoleIsExists(String uuid);
 
-	public List<RoleVo> searchRole(RoleVo roleVo);
+    public List<RoleVo> searchRole(RoleVo roleVo);
 
-	public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
+    public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
-	public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
+    public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
 
-	public int searchRoleCount(RoleVo roleVo);
+    public int searchRoleCount(RoleVo roleVo);
 
-	public int searchRoleUserCountByRoleUuid(String roleUuid);
+    public int searchRoleUserCountByRoleUuid(String roleUuid);
 
-	public RoleVo getRoleByUuid(String uuid);
+    public RoleVo getRoleByUuid(String uuid);
 
-	public List<RoleVo> getRoleByUuidList(List<String> uuidList);
+    public List<RoleVo> getRoleByUuidList(List<String> uuidList);
 
-	public List<AuthVo> getRoleCountByAuth();
+    public List<AuthVo> getRoleCountByAuth();
 
-	public int insertRoleAuth(RoleAuthVo roleAuthVo);
+    public int insertRoleAuth(RoleAuthVo roleAuthVo);
 
-	public int insertRole(RoleVo roleVo);
+    public int insertRole(RoleVo roleVo);
 
-	public int insertRoleUser(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
+    public int insertRoleUser(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
-	public int updateRole(RoleVo roleVo);
+    public int updateRole(RoleVo roleVo);
 
-	public int deleteRoleAuthByRoleUuid(String roleUuid);
+    public int deleteRoleAuthByRoleUuid(String roleUuid);
 
-	public int deleteRoleAuth(RoleAuthVo roleAuthVo);
+    public int deleteRoleAuth(RoleAuthVo roleAuthVo);
 
-	public int deleteRoleByUuid(String uuid);
+    public int deleteRoleByUuid(String uuid);
 
-	public int deleteMenuRoleByRoleUuid(String roleUuid);
+    public int deleteMenuRoleByRoleUuid(String roleUuid);
 
-	public int deleteTeamRoleByRoleUuid(String roleUuid);
+    public int deleteTeamRoleByRoleUuid(String roleUuid);
 
-	public int deleteRoleAuthByAuth(String auth);
+    public int deleteRoleAuthByAuth(String auth);
 
-	public int deleteRoleUser(RoleUserVo roleUserVo);
+    public int deleteRoleUser(RoleUserVo roleUserVo);
 
 }

@@ -1,5 +1,7 @@
 package codedriver.framework.scheduler.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
@@ -24,7 +26,7 @@ public class JobClassVo extends BasePageVo {
 	@EntityField(name = "定时作业组件所属模块名称",
 			type = ApiParamType.STRING)
 	private String moduleName;
-	
+	@JSONField(serialize=false)
 	private transient String keyword;
 
 	public JobClassVo() {

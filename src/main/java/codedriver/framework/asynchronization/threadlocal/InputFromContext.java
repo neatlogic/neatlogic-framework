@@ -2,8 +2,11 @@ package codedriver.framework.asynchronization.threadlocal;
 
 import java.io.Serializable;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class InputFromContext implements Serializable {
     private static final long serialVersionUID = -5732345436786224L;
+    @JSONField(serialize=false)
     private transient static ThreadLocal<InputFromContext> instance = new ThreadLocal<InputFromContext>();
     private String inputFrom;
 

@@ -6,23 +6,33 @@ import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.exception.file.FilePathIllegalException;
 import codedriver.framework.file.core.LocalFileSystemHandler;
 import codedriver.framework.file.core.MinioFileSystemHandler;
+import codedriver.framework.restful.dao.mapper.ApiMapper;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.SequenceInputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Vector;
 
+@Component
 public class AuditUtil {
+
+	private static ApiMapper apiMapper;
+
+	@Autowired
+	public void setApiMapper(ApiMapper _apiMapper) {
+		apiMapper = _apiMapper;
+	}
 
 	/** 查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看 */
 	public final static long maxFileSize = 1024 * 1024;
@@ -35,105 +45,74 @@ public class AuditUtil {
 		 * 例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
 		 * 偏移量为apiAuditVo.getParam()的字节数(注意一定要用UTF-8格式，否则计算出来的偏移量不对)
 		 */
+		String paramFilePath = null;
+		String resultFilePath = null;
+		String errorFilePath = null;
 		StringBuilder sb = new StringBuilder();
 		sb.append("param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		sb.append("\n");
-		if(StringUtils.isNotBlank(vo.getParam())){
+		if(StringUtils.isNotBlank(vo.getParam()) && !vo.getParam().equals("{}") && !vo.getParam().equals("[]")){
 			int offset = vo.getParam().getBytes(StandardCharsets.UTF_8).length;
-			vo.setParamFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+			paramFilePath = "?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset;
 			sb.append(vo.getParam());
 			sb.append("\n");
 		}
 		sb.append("param<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		sb.append("\n");
+		sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		sb.append("\n");
+		String resultStr = null;
+		if(vo.getResult() != null && StringUtils.isNotBlank(resultStr = JSON.toJSON(vo.getResult()).toString())){
+			int offset = resultStr.getBytes(StandardCharsets.UTF_8).length;
+			resultFilePath = "?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset;
+			sb.append(resultStr);
+			sb.append("\n");
+		}
+		sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		sb.append("\n");
 		sb.append("error>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		sb.append("\n");
 		if(StringUtils.isNotBlank(vo.getError())){
 			int offset = vo.getError().getBytes(StandardCharsets.UTF_8).length;
-			vo.setErrorFilePath("?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset);
+			errorFilePath = "?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset;
 			sb.append(vo.getError());
 			sb.append("\n");
 		}
 		sb.append("error<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-		sb.append("\n");
-		sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-		sb.append("\n");
-
-		/**
-		 * 先记录下截止到error结束，result定界符开始时的文件长度
-		 */
-		long lengthWithoutResult = sb.toString().getBytes(StandardCharsets.UTF_8).length;
-
-		/**
-		 * 用一个单独的流存result，避免append到StringBuilder后增加内存负担
-		 * 然后利用SequenceInputStream合并两个流
-		 */
-		InputStream resultInputStream = null;
-		String resultStr = null;
-		if(vo.getResult() != null && StringUtils.isNotBlank(resultStr = JSON.toJSON(vo.getResult()).toString())){
-			resultInputStream = IOUtils.toInputStream(resultStr, StandardCharsets.UTF_8);
-		}else{
-			sb.append("result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-		}
-
-		SequenceInputStream sis = null;
-		Vector<InputStream> ins = new Vector<>();
-		if(resultInputStream != null){
-			ins.add(IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8));
-			ins.add(resultInputStream);
-			ins.add(IOUtils.toInputStream("\nresult<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",StandardCharsets.UTF_8));
-		}else{
-			ins.add(IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8));
-		}
-		sis = new SequenceInputStream(ins.elements());
-
+		String fileHash = DigestUtils.md5DigestAsHex(sb.toString().getBytes());
 		String filePath = null;
-		try {
-			filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),sis, SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-		} catch (Exception e) {
-			//logger.error(e.getMessage(),e);
+		filePath = apiMapper.getAuditFileByHash(fileHash);
+		/** 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
+		if(StringUtils.isBlank(filePath)){
+			InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
 			try {
-				filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),sis,SnowflakeUtil.uniqueLong(),"text/plain",fileType);
-			} catch (Exception e1) {
-				logger.error(e1.getMessage(),e1);
-				e1.printStackTrace();
-			}
-		}finally {
-			try {
-				if(sis != null){
-					sis.close();
-				}
-			} catch (IOException e) {
+				filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(),inputStream,fileHash,"text/plain",fileType);
+			} catch (Exception e) {
 				e.printStackTrace();
+				logger.error(e.getMessage(),e);
+				try {
+					filePath = FileUtil.saveData(LocalFileSystemHandler.NAME,TenantContext.get().getTenantUuid(),inputStream,fileHash,"text/plain",fileType);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					logger.error(e1.getMessage(),e1);
+				}
+			}finally {
+				if(StringUtils.isNotBlank(filePath)){
+					apiMapper.insertAuditFile(fileHash,filePath);
+				}
+				if(inputStream != null){
+					try {
+						inputStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		if(StringUtils.isNotBlank(filePath)){
-			long length = 0;
-			try {
-				length = FileUtil.getDataLength(filePath);
-			} catch (Exception e) {
-				logger.error("获取数据长度失败：" + filePath);
-				e.printStackTrace();
-			}
-			if(length != 0){
-
-				/** 记录文件路径和偏移量*/
-				if(StringUtils.isNotBlank(vo.getParamFilePath())){
-					vo.setParamFilePath(filePath + vo.getParamFilePath());
-				}
-				if(StringUtils.isNotBlank(resultStr)){
-					/**
-					 * 计算result在文件中的起始位置和偏移量
-					 * 偏移量 = 文件总长度 - 截止到result开始定界符的长度 - result结束定界符的长度
-					 */
-					long resultOffset = length - lengthWithoutResult - "result<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<".getBytes(StandardCharsets.UTF_8).length -1;
-					String resultOffsetStr = "?startIndex=" + lengthWithoutResult + "&offset=" + resultOffset;
-					vo.setResultFilePath(filePath + resultOffsetStr);
-				}
-				if(StringUtils.isNotBlank(vo.getErrorFilePath())){
-					vo.setErrorFilePath(filePath + vo.getErrorFilePath());
-				}
-			}
+			vo.setParamFilePath(StringUtils.isNotBlank(paramFilePath) == true ? (filePath + paramFilePath) : null);
+			vo.setResultFilePath(StringUtils.isNotBlank(resultFilePath) == true ? (filePath + resultFilePath) : null);
+			vo.setErrorFilePath(StringUtils.isNotBlank(errorFilePath) == true ? (filePath + errorFilePath) : null);
 		}
 	}
 

@@ -377,6 +377,8 @@ public class ExcelUtil {
                                 if (cell != null) {
                                     String content = getCellContent(cell);
                                     contentMap.put(headerList.get(ci), content);
+                                }else{
+                                    contentMap.put(headerList.get(ci), null);
                                 }
                             }
                             contentList.add(contentMap);

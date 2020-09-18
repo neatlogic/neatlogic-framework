@@ -1,6 +1,8 @@
 package codedriver.framework.util;
 
+import codedriver.framework.exception.file.FileUploadException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -338,14 +340,24 @@ public class ExcelUtil {
         return workbook;
     }
 
+    /**
+     * 读取excel内容，转换成Map对象，包含两对entry：
+     * header->标题列集合
+     * content->内容行Map集合(Map格式：标题->单元格内容)
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public static Map<String, Object> getExcelData(MultipartFile file) throws Exception {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             Workbook wb = new XSSFWorkbook(file.getInputStream());
+            if(wb == null){
+                throw new FileUploadException("Excel文件损坏");
+            }
 
             List<String> headerList = new ArrayList<String>();
             List<Map<String, String>> contentList = new ArrayList<Map<String, String>>();
-            Map<String, String> contentMap = null;
             resultMap.put("header", headerList);
             resultMap.put("content", contentList);
 
@@ -355,23 +367,28 @@ public class ExcelUtil {
                     continue;
                 } else {
                     Row headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
-                    List<Integer> cellIndex = new ArrayList<Integer>();
-                    for (Iterator<Cell> cellIterator = (Iterator<Cell>) headRow.cellIterator(); cellIterator.hasNext();) {
+                    if(headRow == null){
+                        throw new FileUploadException("Excel首行内容为空");
+                    }
+                    List<Integer> cellIndex = new ArrayList<>();
+                    Iterator<Cell> cellIterator = headRow.cellIterator();
+                    while(cellIterator.hasNext()){
                         Cell cell = cellIterator.next();
                         if (cell != null) {
                             String content = getCellContent(cell);
-                            if (content.contains("[(")) {
-                                content = content.substring(0, content.indexOf("[("));
+                            if(StringUtils.isNotBlank(content)){
+                                headerList.add(content);
+                                cellIndex.add(cell.getColumnIndex());
                             }
-                            headerList.add(content);
-                            cellIndex.add(cell.getColumnIndex());
                         }
                     }
-
+                    if(CollectionUtils.isEmpty(headerList) && CollectionUtils.isEmpty(cellIndex)){
+                        throw new FileUploadException("Excel首行内容为空");
+                    }
                     for (int r = hssfSheet.getFirstRowNum() + 1; r <= hssfSheet.getLastRowNum(); r++) {
                         Row hssfRow = hssfSheet.getRow(r);
                         if (hssfRow != null) {
-                            contentMap = new HashMap<String, String>(cellIndex.size() + 1, 1);
+                            Map<String, String> contentMap = new HashMap<>(cellIndex.size() + 1);
                             for (int ci = 0; ci < cellIndex.size(); ci++) {
                                 Cell cell = hssfRow.getCell(cellIndex.get(ci));
                                 if (cell != null) {

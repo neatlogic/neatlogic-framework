@@ -2,11 +2,11 @@ package codedriver.framework.exception.user;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class UserAgentIllegalException extends ApiRuntimeException {
+public class AgentIsUserSelfException extends ApiRuntimeException {
 
 	private static final long serialVersionUID = 8784255855238341892L;
 
-	public UserAgentIllegalException(String msg) {
-		super(msg);
+	public AgentIsUserSelfException() {
+		super("请不要授权给自己");
 	}
 }

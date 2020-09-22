@@ -1,6 +1,6 @@
 package codedriver.framework.util;
 
-import codedriver.framework.exception.file.FileUploadException;
+import codedriver.framework.exception.file.EmptyExcelException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
@@ -353,7 +353,7 @@ public class ExcelUtil {
         try {
             Workbook wb = new XSSFWorkbook(file.getInputStream());
             if(wb == null){
-                throw new FileUploadException("Excel文件损坏");
+                throw new EmptyExcelException();
             }
 
             List<String> headerList = new ArrayList<String>();
@@ -368,7 +368,7 @@ public class ExcelUtil {
                 } else {
                     Row headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
                     if(headRow == null){
-                        throw new FileUploadException("Excel首行内容为空");
+                        throw new EmptyExcelException();
                     }
                     List<Integer> cellIndex = new ArrayList<>();
                     Iterator<Cell> cellIterator = headRow.cellIterator();
@@ -383,7 +383,7 @@ public class ExcelUtil {
                         }
                     }
                     if(CollectionUtils.isEmpty(headerList) && CollectionUtils.isEmpty(cellIndex)){
-                        throw new FileUploadException("Excel首行内容为空");
+                        throw new EmptyExcelException();
                     }
                     for (int r = hssfSheet.getFirstRowNum() + 1; r <= hssfSheet.getLastRowNum(); r++) {
                         Row hssfRow = hssfSheet.getRow(r);

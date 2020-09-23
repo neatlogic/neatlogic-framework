@@ -455,7 +455,7 @@ public class ExcelUtil {
         return resultMap;
     }
 
-    private static String getCellContent(Cell cell) {
+    public static String getCellContent(Cell cell) {
         String cellContent = "";
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC:
@@ -480,7 +480,7 @@ public class ExcelUtil {
         return cellContent;
     }
 
-    private static Map<String,CellStyle> getRowCellStyle(Workbook workbook){
+    public static Map<String,CellStyle> getRowCellStyle(Workbook workbook){
         // 设置标题行样式
         CellStyle firstRowcellStyle = workbook.createCellStyle();
         firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色

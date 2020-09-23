@@ -50,6 +50,8 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String position;
 	@EntityField(name = "其他属性", type = ApiParamType.STRING)
 	private String userInfo;
+	@EntityField(name = "头像", type = ApiParamType.STRING)
+	private String avatar;
 	private String teamUuid;
 	private String auth;
 	private String authGroup;
@@ -300,6 +302,14 @@ public class UserVo extends BasePageVo implements Serializable{
 			userInfoObj = JSONObject.parseObject(userInfo);
 		}
 		return userInfoObj;
+	}
+
+	public String getAvatar() {
+		if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
+			JSONObject jsonObject = JSONObject.parseObject(userInfo);
+			avatar = jsonObject.getString("avatar");
+		}
+		return avatar;
 	}
 
 	public void setUserInfoObj(JSONObject userInfoObj) {

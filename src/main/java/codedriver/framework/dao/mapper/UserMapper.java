@@ -16,6 +16,8 @@ public interface UserMapper {
 
 	public UserVo getUserBaseInfoByUuid(String userUuid);
 
+	public UserVo getUserByUserId(String userId);
+
 	public UserVo getUserByUuid(String uuid);
 
 	public List<UserVo> searchUser(UserVo userVo);

@@ -1,6 +1,7 @@
 package codedriver.framework.util;
 
 import codedriver.framework.exception.file.EmptyExcelException;
+import codedriver.framework.exception.file.ExcelLostChannelUuidException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
@@ -278,69 +279,93 @@ public class ExcelUtil {
         Sheet sheet = workbook.createSheet();
         // 设置sheet名字
         workbook.setSheetName(num,"sheet-" + num);
-        // 设置标题行样式
-        CellStyle firstRowcellStyle = workbook.createCellStyle();
-        firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色
-        firstRowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
-        firstRowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        firstRowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        firstRowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-        Font font = workbook.createFont();
-        font.setFontName("宋体");
-        font.setFontHeight((short) 220);
-        font.setBoldweight((short) 700);
-        firstRowcellStyle.setFont(font);
-        //设置正文行样式
-        CellStyle rowcellStyle = workbook.createCellStyle();
-        rowcellStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);// 设置背景色
-        rowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
-        rowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        rowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        rowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setFont(font);
+        Map<String, CellStyle> cellStyle = getRowCellStyle(workbook);
+        CellStyle firstRowcellStyle = cellStyle.get("firstRowcellStyle");
+        CellStyle rowcellStyle = cellStyle.get("rowcellStyle");
 
+        //生成标题行与正文行
+        createRows(headerList, columnList, dataMapList, columnWidth, sheet, firstRowcellStyle, rowcellStyle, 0);
+        return workbook;
+    }
+
+
+    /**
+     * 导出工单上报模版方法
+     * @param workbook
+     * @param headerList
+     * @param columnList
+     * @param dataMapList
+     * @param channelData
+     * @param columnWidth
+     * @return
+     * @throws Exception
+     */
+    public static Workbook exportProcessTaskTemplate(Workbook workbook, List<String> headerList, List<String> columnList, List<Map<String,Object>> dataMapList,List<String> channelData,Integer columnWidth) throws Exception {
+        // 生成一个表格
+        Sheet sheet = workbook.createSheet();
+        // 设置sheet名字
+        workbook.setSheetName(0,"sheet");
+        Map<String, CellStyle> cellStyle = getRowCellStyle(workbook);
+        CellStyle firstRowcellStyle = cellStyle.get("firstRowcellStyle");
+        CellStyle rowcellStyle = cellStyle.get("rowcellStyle");
+
+        /** 生成服务信息行 */
+        Row channelRow = sheet.createRow(0);
+        for(int i = 0;i < channelData.size();i++){
+            Cell cell = channelRow.createCell(i);
+            cell.setCellValue(channelData.get(i));
+        }
+
+        createRows(headerList, columnList, dataMapList, columnWidth, sheet, firstRowcellStyle, rowcellStyle, 1);
+        return workbook;
+    }
+
+    /**
+     * 生成标题行与正文行
+     * @param headerList
+     * @param columnList
+     * @param dataMapList
+     * @param columnWidth
+     * @param sheet
+     * @param firstRowcellStyle
+     * @param rowcellStyle
+     * @param headRowNum 标题行开始行数
+     */
+    private static void createRows(List<String> headerList, List<String> columnList, List<Map<String, Object>> dataMapList, Integer columnWidth, Sheet sheet, CellStyle firstRowcellStyle, CellStyle rowcellStyle, int headRowNum) {
         //生成标题行
-        Row headerRow = sheet.createRow(0);
-        if(CollectionUtils.isNotEmpty(headerList)){
+        Row headerRow = sheet.createRow(headRowNum);
+        if (CollectionUtils.isNotEmpty(headerList)) {
             int i = 0;
             for (String header : headerList) {
                 //设置列宽
-                if(columnWidth != null && columnWidth > 0){
-                    sheet.setColumnWidth(i,columnWidth.intValue() * 256);
+                if (columnWidth != null && columnWidth > 0) {
+                    sheet.setColumnWidth(i, columnWidth.intValue() * 256);
                 }
                 Cell cell = headerRow.createCell(i);
                 cell.setCellStyle(firstRowcellStyle);
-//                HSSFRichTextString text = new HSSFRichTextString(header);
                 cell.setCellValue(header);
                 i++;
             }
         }
         //生成数据行
-        if(CollectionUtils.isNotEmpty(columnList) && CollectionUtils.isNotEmpty(dataMapList)){
+        if (CollectionUtils.isNotEmpty(columnList) && CollectionUtils.isNotEmpty(dataMapList)) {
             int lastRowNum = sheet.getLastRowNum();
-            for (Map<String, Object> dataMap : dataMapList){
+            for (Map<String, Object> dataMap : dataMapList) {
                 lastRowNum++;
                 Row row = sheet.createRow(lastRowNum);
                 int j = 0;
-                for (String column : columnList){
+                for (String column : columnList) {
                     Cell cell = row.createCell(j);
                     cell.setCellStyle(rowcellStyle);
-//                    HSSFRichTextString richString = new HSSFRichTextString(dataMap.get(column) == null ? "" : dataMap.get(column).toString());
                     cell.setCellValue(dataMap.get(column) == null ? null : dataMap.get(column).toString());
                     j++;
                 }
             }
         }
-        return workbook;
     }
 
     /**
+     * ***此方法为批量导入工单接口专用***
      * 读取excel内容，转换成Map对象，包含两对entry：
      * header->标题列集合
      * content->内容行Map集合(Map格式：标题->单元格内容)
@@ -348,7 +373,7 @@ public class ExcelUtil {
      * @return
      * @throws Exception
      */
-    public static Map<String, Object> getExcelData(MultipartFile file) throws Exception {
+    public static Map<String, Object> getTaskDataFromFirstSheet(MultipartFile file) throws Exception {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             Workbook wb = new XSSFWorkbook(file.getInputStream());
@@ -358,50 +383,63 @@ public class ExcelUtil {
 
             List<String> headerList = new ArrayList<String>();
             List<Map<String, String>> contentList = new ArrayList<Map<String, String>>();
+            List<String> channelData = new ArrayList<>();
             resultMap.put("header", headerList);
             resultMap.put("content", contentList);
+            resultMap.put("channelData",channelData);
 
-            for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-                Sheet hssfSheet = wb.getSheetAt(i);
-                if (hssfSheet == null) {
-                    continue;
-                } else {
-                    Row headRow = hssfSheet.getRow(hssfSheet.getFirstRowNum());
-                    if(headRow == null){
-                        throw new EmptyExcelException();
+            Sheet sheet = wb.getSheetAt(0);
+            if (sheet == null) {
+                throw new EmptyExcelException();
+            }
+            Row channelRow = sheet.getRow(0);
+            if(channelRow == null){
+                throw new ExcelLostChannelUuidException();
+            }
+            //读取服务信息
+            for(int i = 0;i < channelRow.getPhysicalNumberOfCells();i++){
+                Cell cell = channelRow.getCell(i);
+                if (cell != null) {
+                    String content = getCellContent(cell);
+                    if(StringUtils.isNotBlank(content)){
+                        channelData.add(content);
                     }
-                    List<Integer> cellIndex = new ArrayList<>();
-                    Iterator<Cell> cellIterator = headRow.cellIterator();
-                    while(cellIterator.hasNext()){
-                        Cell cell = cellIterator.next();
+                }
+            }
+
+            Row headRow = sheet.getRow(1);
+            if(headRow == null){
+                throw new EmptyExcelException();
+            }
+            List<Integer> cellIndex = new ArrayList<>();
+            Iterator<Cell> cellIterator = headRow.cellIterator();
+            while(cellIterator.hasNext()){
+                Cell cell = cellIterator.next();
+                if (cell != null) {
+                    String content = getCellContent(cell);
+                    if(StringUtils.isNotBlank(content)){
+                        headerList.add(content);
+                        cellIndex.add(cell.getColumnIndex());
+                    }
+                }
+            }
+            if(CollectionUtils.isEmpty(headerList) && CollectionUtils.isEmpty(cellIndex)){
+                throw new EmptyExcelException();
+            }
+            for (int r = 2; r <= sheet.getLastRowNum(); r++) {
+                Row row = sheet.getRow(r);
+                if (row != null) {
+                    Map<String, String> contentMap = new HashMap<>(cellIndex.size() + 1);
+                    for (int ci = 0; ci < cellIndex.size(); ci++) {
+                        Cell cell = row.getCell(cellIndex.get(ci));
                         if (cell != null) {
                             String content = getCellContent(cell);
-                            if(StringUtils.isNotBlank(content)){
-                                headerList.add(content);
-                                cellIndex.add(cell.getColumnIndex());
-                            }
+                            contentMap.put(headerList.get(ci), content);
+                        }else{
+                            contentMap.put(headerList.get(ci), null);
                         }
                     }
-                    if(CollectionUtils.isEmpty(headerList) && CollectionUtils.isEmpty(cellIndex)){
-                        throw new EmptyExcelException();
-                    }
-                    for (int r = hssfSheet.getFirstRowNum() + 1; r <= hssfSheet.getLastRowNum(); r++) {
-                        Row hssfRow = hssfSheet.getRow(r);
-                        if (hssfRow != null) {
-                            Map<String, String> contentMap = new HashMap<>(cellIndex.size() + 1);
-                            for (int ci = 0; ci < cellIndex.size(); ci++) {
-                                Cell cell = hssfRow.getCell(cellIndex.get(ci));
-                                if (cell != null) {
-                                    String content = getCellContent(cell);
-                                    contentMap.put(headerList.get(ci), content);
-                                }else{
-                                    contentMap.put(headerList.get(ci), null);
-                                }
-                            }
-                            contentList.add(contentMap);
-                        }
-                    }
-                    break;
+                    contentList.add(contentMap);
                 }
             }
         } catch (IOException e) {
@@ -440,6 +478,39 @@ public class ExcelUtil {
                 break;
         }
         return cellContent;
+    }
+
+    private static Map<String,CellStyle> getRowCellStyle(Workbook workbook){
+        // 设置标题行样式
+        CellStyle firstRowcellStyle = workbook.createCellStyle();
+        firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色
+        firstRowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
+        firstRowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        firstRowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        firstRowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        Font font = workbook.createFont();
+        font.setFontName("宋体");
+        font.setFontHeight((short) 220);
+        font.setBoldweight((short) 700);
+        firstRowcellStyle.setFont(font);
+        //设置正文行样式
+        CellStyle rowcellStyle = workbook.createCellStyle();
+        rowcellStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);// 设置背景色
+        rowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
+        rowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        rowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        rowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setFont(font);
+        Map<String,CellStyle> cellStyleMap = new HashMap<>(2);
+        cellStyleMap.put("firstRowcellStyle",firstRowcellStyle);
+        cellStyleMap.put("rowcellStyle",rowcellStyle);
+        return cellStyleMap;
     }
 
 

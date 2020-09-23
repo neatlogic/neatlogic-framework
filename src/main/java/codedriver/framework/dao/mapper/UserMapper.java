@@ -64,6 +64,10 @@ public interface UserMapper {
 
 	public List<String> getTeamUuidListByUserUuid(String userUuid);
 
+	public int checkAgentExists(String agentUuid);
+
+	public UserVo getUserAgent(String userUuid);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
@@ -81,6 +85,8 @@ public interface UserMapper {
 	public int insertUserSession(String userUuid);
 
 	public int insertUserData(UserDataVo userDataVo);
+
+	public int insertUserAgent(UserAgentVo userAgentVo);
 
 	public int updateUser(UserVo userVo);
 
@@ -107,4 +113,6 @@ public interface UserMapper {
 	public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
 	public int deleteUserAuth(UserAuthVo userAuthVo);
+
+	public void deleteUserAgent(String userUuid);
 }

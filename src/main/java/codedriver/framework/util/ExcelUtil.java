@@ -331,7 +331,7 @@ public class ExcelUtil {
      * @param rowcellStyle
      * @param headRowNum 标题行开始行数
      */
-    private static void createRows(List<String> headerList, List<String> columnList, List<Map<String, Object>> dataMapList, Integer columnWidth, Sheet sheet, CellStyle firstRowcellStyle, CellStyle rowcellStyle, int headRowNum) {
+    public static void createRows(List<String> headerList, List<String> columnList, List<Map<String, Object>> dataMapList, Integer columnWidth, Sheet sheet, CellStyle firstRowcellStyle, CellStyle rowcellStyle, int headRowNum) {
         //生成标题行
         Row headerRow = sheet.createRow(headRowNum);
         if (CollectionUtils.isNotEmpty(headerList)) {

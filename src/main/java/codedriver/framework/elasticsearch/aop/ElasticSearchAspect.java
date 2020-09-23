@@ -97,7 +97,7 @@ public class ElasticSearchAspect {
 					JSONObject paramJson = eshandler.getConfig(paramList);
 					ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler,JSONObject.toJSONString(paramJson));
 					elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
-					eshandler.doService(paramJson);
+					eshandler.save(paramJson);
 					elasticSearchMapper.deleteElasticSearchAuditById(elasticSeachAduitVo.getId());
 				}catch(Exception ex) {
 					logger.error(ex.getMessage(),ex);

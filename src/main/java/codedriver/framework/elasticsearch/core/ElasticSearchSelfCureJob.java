@@ -25,7 +25,7 @@ public class ElasticSearchSelfCureJob extends PublicJobBase {
 		for(ElasticSearchAuditVo audit :auditList) {
 			JSONObject paramObj = JSONObject.parseObject(audit.getConfig());
 			paramObj.put("tenantUuid", jobObject.getTenantUuid());
-			ElasticSearchFactory.getHandler(audit.getHandler()).doService(paramObj);
+			ElasticSearchFactory.getHandler(audit.getHandler()).save(paramObj,jobObject.getTenantUuid());
 			elasticSearchMapper.deleteElasticSearchAuditById(audit.getId());
 		}
 		

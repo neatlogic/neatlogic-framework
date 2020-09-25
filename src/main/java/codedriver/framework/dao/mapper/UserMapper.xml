@@ -39,6 +39,20 @@
 		WHERE a.`uuid` = #{value}
 	</select>
 
+	<select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="true">
+		SELECT
+		a.`uuid`,
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		a.`user_info` as userInfo
+		FROM `user` a
+		WHERE a.`user_id` = #{value}
+	</select>
+
 	<resultMap id="userInfoMap" type="codedriver.framework.dto.UserVo">
 		<id property="uuid" column="uuid" />
 		<result property="userId" column="userId" />
@@ -471,6 +485,33 @@
 		SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
 	</select>
 
+	<select id="checkAgentExists" parameterType="java.lang.String" resultType="int" useCache="false">
+		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} or `agent_uuid` = #{value} limit 1) a
+	</select>
+
+	<select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+		select
+		b.`uuid`,
+		b.`user_id` as `userId`,
+		b.`user_name` as `userName`,
+		b.`email`,
+		b.`phone`,
+		b.`pinyin`,
+		b.`is_active` as `isActive`,
+		b.`user_info` as `userInfo`,
+		d.`uuid` as `roleUuid`,
+		d.`name` as `roleName`,
+		f.`uuid` as `teamUuid`,
+		f.`name` as `teamName`
+		from `user_agent` a
+		left join `user` b on a.`agent_uuid` = b.`uuid`
+		left join `user_role` c on b.`uuid` = c.`user_uuid`
+		left join `role` d on c.`role_uuid` = d.`uuid`
+		left join `user_team` e on e.`user_uuid` = b.`uuid`
+		left join `team` f on f.`uuid` = e.`team_uuid`
+		where a.`user_uuid` = #{value}
+	</select>
+
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,
@@ -549,6 +590,11 @@
 	<insert id="insertUserData" parameterType="codedriver.framework.dto.UserDataVo">
 		INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
 		VALUES (#{userUuid}, #{data}, #{type})
+	</insert>
+
+	<insert id="insertUserAgent" parameterType="codedriver.framework.dto.UserAgentVo">
+		INSERT INTO `user_agent` (`user_uuid`, `agent_uuid`, `func`)
+		VALUES (#{userUuid}, #{agentUuid}, #{func})
 	</insert>
 
 	<update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
@@ -648,6 +694,10 @@
 				AND `user_uuid` = #{userUuid}
 			</if>
 		</where>
+	</delete>
+
+	<delete id="deleteUserAgent" parameterType="java.lang.String">
+		DELETE FROM `user_agent` WHERE `user_uuid` = #{value}
 	</delete>
 </mapper>
 

@@ -1,8 +1,7 @@
 package codedriver.framework.elasticsearch.core;
 
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
+import com.techsure.multiattrsearch.QueryResultSet;
 import com.techsure.multiattrsearch.query.QueryResult;
 
 public interface IElasticSearchHandler {
@@ -12,13 +11,7 @@ public interface IElasticSearchHandler {
 	 * @return
 	 */
 	public String getDocument();
-	
-	/**
-	 * name
-	 * @return
-	 */
-	public String getDocumentName();
-	
+		
 	/**
      * id
      * @return
@@ -52,13 +45,38 @@ public interface IElasticSearchHandler {
 	* @Description: 查询  
 	* @Param 
 	* @return
-	 */
-	public QueryResult search(String sql);
+	* @demo
+	* List<MultiAttrsObject> resultData = result.getData();
+	* if (!resultData.isEmpty()) {
+        for (MultiAttrsObject el : resultData) {
+            el.getId();//documentId
+            el.getJSON("键");//根据对应的key，获取value
+        }
+      }            
+	*/
+	public <T> QueryResult search(T t);
+	
+	
+	public<T> String mySql(T t);
 	
 	/**
-	 * 执行动作
+	 * 
+	* @Author 89770
+	* @Time 2020年9月24日  
+	* @Description: 分批（流式）查询
+	* @Param 
+	* @return
+	* @demo
+	* if (resultSet.hasMoreResults()) {
+        QueryResult result = resultSet.fetchResult();
+        if (!result.getData().isEmpty()) {
+            for (MultiAttrsObject el : result.getData()) {
+                el.getId();//documentId
+                el.getJSON("键");//根据对应的key，获取value
+            }
+        }
+      }
 	 */
-	public JSONObject getConfig(List<Object> paramList);
-
-   
+	public <T> QueryResultSet iterateSearch(T t);
+	  
 }

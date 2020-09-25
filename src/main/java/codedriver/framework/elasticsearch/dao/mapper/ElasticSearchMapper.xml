@@ -4,28 +4,38 @@
 
 	<select id="getElasticSearchAudit" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo" resultType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
 		SELECT 
-			`id`,
-		  `handler`,
-		  `config`,
-		  `update_time` 
+		  a.`handler`,
+		  b.`param`,
+		  a.`update_time` 
 		FROM
-		  `elasticsearch_audit` 
+		  `elasticsearch_audit` a
+		  LEFT JOIN `elasticsearch_param` b ON a.`param_hash` = b.`hash` 
 	</select>
 
 	<insert id="insertElasticSearchAudit" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
-	 	<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-            SELECT LAST_INSERT_ID() as id
-        </selectKey>
-		INSERT INTO `elasticsearch_audit` (`handler`,`config`) 
+		INSERT ignore INTO `elasticsearch_audit` (`handler`,`param_hash`) 
 		VALUES
-		  (#{handler}, #{config}) ;
+		  (#{handler}, #{paramHash}) ;
 	</insert>
 	
-	<delete id="deleteElasticSearchAuditById" parameterType="java.lang.Long">
+	<insert id="insertElasticSearchParam" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
+		INSERT ignore INTO `elasticsearch_param` (`hash`,`param`) 
+		VALUES
+		  (#{paramHash}, #{param}) ;
+	</insert>
+	
+	<delete id="deleteElasticSearchAudit" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
 		DELETE 
 		FROM
 		  `elasticsearch_audit` 
-		WHERE `id` = #{id} ;
+		WHERE `handler` = #{handler} and  `param_hash` = #{paramHash};
+	</delete>
+	
+	<delete id="deleteElasticSearchParam" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
+		DELETE 
+		FROM
+		  `elasticsearch_param` 
+		WHERE `hash` = #{paramHash};
 	</delete>
 	
 </mapper>

@@ -62,6 +62,7 @@ public class AuditUtil {
 		sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		sb.append("\n");
 		String resultStr = null;
+		System.out.println(vo.getResult());
 		if(vo.getResult() != null && StringUtils.isNotBlank(resultStr = JSON.toJSON(vo.getResult()).toString())){
 			int offset = resultStr.getBytes(StandardCharsets.UTF_8).length;
 			resultFilePath = "?startIndex=" + sb.toString().getBytes(StandardCharsets.UTF_8).length + "&offset=" + offset;

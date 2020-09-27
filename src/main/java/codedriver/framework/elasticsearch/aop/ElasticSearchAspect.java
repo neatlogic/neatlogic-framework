@@ -47,11 +47,11 @@ public class ElasticSearchAspect {
 		elasticSearchMapper = _elasticSearchMapper;
     }
 	
-	@After("@annotation(elasticSearch)")
-	public void ActionCheck(JoinPoint point, ESSearch elasticSearch) {
+	@After("@annotation(eSSearch)")
+	public void ActionCheck(JoinPoint point, ESSearch eSSearch) {
 		List<Object> argList = Arrays.asList(point.getArgs());
-		argList = argList.stream().filter(object->object.getClass() == elasticSearch.paramType()).collect(Collectors.toList());
-		if (CollectionUtils.isNotEmpty(argList) && StringUtils.isNotBlank(elasticSearch.type()) && ElasticSearchFactory.getHandler(elasticSearch.type()) != null) {
+		argList = argList.stream().filter(object->object.getClass() == eSSearch.paramType()).collect(Collectors.toList());
+		if (CollectionUtils.isNotEmpty(argList) && StringUtils.isNotBlank(eSSearch.type()) && ElasticSearchFactory.getHandler(eSSearch.type()) != null) {
 		    //拼接参数
 		    JSONObject result = new JSONObject();
 		    List<String> pkList = new ArrayList<String>();
@@ -65,6 +65,7 @@ public class ElasticSearchAspect {
                 try {
                     String fieldName = field.getName();
                     Object valueObj = obj.getClass().getMethod("get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1)).invoke(obj);
+                    //System.out.println(eSSearch.paramType()+"         "+valueObj);
                     if(valueObj == null) {
                         continue;
                     }
@@ -72,18 +73,21 @@ public class ElasticSearchAspect {
                     String key = keyAnnota.id();
                     if(ESKeyType.PKEY.getValue().equals(keyAnnota.type().getValue())) {
                         pkList.add(value);
-                        
+                        result.put(key, value);
                     }else if(StringUtils.isNotBlank(key)){
                         key = fieldName;
                     }
-                    result.put(key, value);
+                    result.put("&=&"+ESKeyType.PKEY.getValue(), value);
                 } catch (IllegalArgumentException | IllegalAccessException|InvocationTargetException | NoSuchMethodException | SecurityException e) {
                     logger.error(e.getMessage(),e);
                 }
             }
+            if(pkList.size()>1) {
+                return; //TODO 暂时不支持多个primary key
+            }
             //
 			if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-				CachedThreadPool.execute(new ElasticSearchHandler(elasticSearch.type(), result));
+				CachedThreadPool.execute(new ElasticSearchHandler(eSSearch.type(), result));
 			} else {
 				Map<String, JSONObject> argMap = ARGS_MAP.get();
 				if (argMap == null) {
@@ -96,7 +100,7 @@ public class ElasticSearchAspect {
 							Iterator<String> keys = argMap.keySet().iterator();
 							while (keys.hasNext()) {
 								String key = keys.next();
-								CachedThreadPool.execute(new ElasticSearchHandler(elasticSearch.type(), argMap.get(key)));
+								CachedThreadPool.execute(new ElasticSearchHandler(eSSearch.type(), argMap.get(key)));
 							}
 						}
 

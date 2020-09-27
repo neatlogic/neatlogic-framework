@@ -17,6 +17,8 @@ import com.techsure.multiattrsearch.query.QueryResult;
 import com.techsure.multiattrsearch.util.ESQueryUtil;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.elasticsearch.constvalue.ESKeyType;
+import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotFoundException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
 public abstract class EsHandlerBase implements IElasticSearchHandler {
@@ -51,39 +53,42 @@ public abstract class EsHandlerBase implements IElasticSearchHandler {
 
     @Override
     public void delete(String documentId) {
-        ElasticSearchPoolManager.getObjectPool(this.getDocument()).delete(this.getDocumentId());
+        getObjectPool(null,null).delete(this.getDocumentId());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void save(JSONObject paramObj, String tenantUuid) {
-        MultiAttrsObjectPool pool = getObjectPool(this.getDocument(), tenantUuid);
-        MultiAttrsObjectPatch patch = pool.save(this.getDocumentId());
-        if (paramObj == null) {
-            delete(this.getDocumentId());
-        } else {
-            JSONObject param = mySave(paramObj);
-            Set<Entry<String, Object>> entrySet = param.entrySet();
-            for (Entry<String, Object> entry : entrySet) {
-                Object value = entry.getValue();
-                if (value instanceof JSONObject) {
-                    patch.set(entry.getKey(), JSONObject.parseObject(value.toString()));
-                } else if (value instanceof JSONArray) {
-                    patch.set(entry.getKey(), JSONArray.parseObject(value.toString()));
-                } else if (value instanceof String) {
-                    patch.set(entry.getKey(), value.toString());
-                } else if (value instanceof List) {
-                    patch.setStrings(entry.getKey(), (List)value);
-                } else if (value instanceof Double) {
-                    patch.set(entry.getKey(), Double.valueOf(value.toString()));
-                } else if (value instanceof Integer) {
-                    patch.set(entry.getKey(), Integer.valueOf(value.toString()));
-                } else if (value instanceof Boolean) {
-                    patch.set(entry.getKey(), Boolean.valueOf(value.toString()));
-                }
-            }
-            patch.commit();
+        String documentId = paramObj.getString("&=&"+ESKeyType.PKEY.getValue());
+        if(StringUtils.isBlank(documentId)) {
+            throw new ElatsticSearchDocumentIdNotFoundException();
         }
+        MultiAttrsObjectPool pool = getObjectPool(this.getDocument(), tenantUuid);
+        MultiAttrsObjectPatch patch = pool.save(documentId);
+        JSONObject param = mySave(paramObj);
+        if(param.isEmpty()) {
+            return;
+        }
+        Set<Entry<String, Object>> entrySet = param.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            Object value = entry.getValue();
+            if (value instanceof JSONObject) {
+                patch.set(entry.getKey(), JSONObject.parseObject(value.toString()));
+            } else if (value instanceof JSONArray) {
+                patch.set(entry.getKey(), JSONArray.parseArray(value.toString()));
+            } else if (value instanceof String) {
+                patch.set(entry.getKey(), value.toString());
+            } else if (value instanceof List) {
+                patch.setStrings(entry.getKey(), (List)value);
+            } else if (value instanceof Double) {
+                patch.set(entry.getKey(), Double.valueOf(value.toString()));
+            } else if (value instanceof Integer) {
+                patch.set(entry.getKey(), Integer.valueOf(value.toString()));
+            } else if (value instanceof Boolean) {
+                patch.set(entry.getKey(), Boolean.valueOf(value.toString()));
+            }
+        }
+        patch.commit();
     }
 
     @Override

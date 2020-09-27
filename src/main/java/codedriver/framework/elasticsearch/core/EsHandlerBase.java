@@ -88,8 +88,7 @@ public abstract class EsHandlerBase implements IElasticSearchHandler {
 
     @Override
     public void save(JSONObject paramObj) {
-        String tenantUuid = null;
-        tenantUuid = paramObj.getString("tenantUuid");
+        String tenantUuid = TenantContext.get().getTenantUuid();
         if (tenantUuid != null && TenantContext.get() != null) {
             tenantUuid = TenantContext.get().getTenantUuid();
         }

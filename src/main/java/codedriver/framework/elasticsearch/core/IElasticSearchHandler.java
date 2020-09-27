@@ -56,8 +56,15 @@ public interface IElasticSearchHandler {
 	*/
 	public <T> QueryResult search(T t);
 	
-	
-	public<T> String mySql(T t);
+	/**
+	 * 
+	* @Author 89770
+	* @Time 2020年9月27日  
+	* @Description: 构建要执行的sql
+	* @Param 
+	* @return
+	 */
+	public<T> String myBuildSql(T t);
 	
 	/**
 	 * 

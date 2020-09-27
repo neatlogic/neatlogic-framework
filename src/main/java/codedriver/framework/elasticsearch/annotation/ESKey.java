@@ -6,12 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.restful.annotation.NotDefined;
+import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ElasticSearch {
-	String type() default "";
-	Class<?> paramType() default NotDefined.class;
+public @interface ESKey {
+    ESKeyType type() ;
+    
+    String id() default "";
 }

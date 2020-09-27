@@ -18,6 +18,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -26,8 +27,8 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.elasticsearch.annotation.ElasticSearch;
-import codedriver.framework.elasticsearch.annotation.ElasticSearchKey;
+import codedriver.framework.elasticsearch.annotation.ESKey;
+import codedriver.framework.elasticsearch.annotation.ESSearch;
 import codedriver.framework.elasticsearch.core.ElasticSearchFactory;
 import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
 import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
@@ -46,7 +47,7 @@ public class ElasticSearchAspect {
     }
 	
 	@After("@annotation(elasticSearch)")
-	public void ActionCheck(JoinPoint point, ElasticSearch elasticSearch) {
+	public void ActionCheck(JoinPoint point, ESSearch elasticSearch) {
 		List<Object> argList = Arrays.asList(point.getArgs());
 		argList = argList.stream().filter(object->object.getClass() == elasticSearch.paramType()).collect(Collectors.toList());
 		if (CollectionUtils.isNotEmpty(argList) && StringUtils.isNotBlank(elasticSearch.type()) && ElasticSearchFactory.getHandler(elasticSearch.type()) != null) {
@@ -56,7 +57,7 @@ public class ElasticSearchAspect {
             Object obj = argList.get(0);
             Field[] fields = obj.getClass().getDeclaredFields();
             for(Field field : fields) {
-                ElasticSearchKey keyAnnota = field.getAnnotation(ElasticSearchKey.class);
+                ESKey keyAnnota = field.getAnnotation(ESKey.class);
                 if(keyAnnota == null) {
                     continue;
                 }
@@ -110,7 +111,7 @@ public class ElasticSearchAspect {
 		}
 	}
 	
-	private static class ElasticSearchHandler extends CodeDriverThread {
+	private class ElasticSearchHandler extends CodeDriverThread {
 		private String handler;
 		private JSONObject paramJson;
 
@@ -127,14 +128,19 @@ public class ElasticSearchAspect {
 				try {
 				    String param = JSONObject.toJSONString(paramJson);
 					ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler,param);
-					elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
-					elasticSearchMapper.insertElasticSearchParam(elasticSeachAduitVo);
+					insertAudit(elasticSeachAduitVo);
 					eshandler.save(paramJson);
 					elasticSearchMapper.deleteElasticSearchAudit(elasticSeachAduitVo);
 				}catch(Exception ex) {
 					logger.error(ex.getMessage(),ex);
 				}
 			}
+		}
+		
+		@Transactional
+		private void insertAudit(ElasticSearchAuditVo elasticSeachAduitVo) {
+		    elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
+            elasticSearchMapper.insertElasticSearchParam(elasticSeachAduitVo);
 		}
 
 	}

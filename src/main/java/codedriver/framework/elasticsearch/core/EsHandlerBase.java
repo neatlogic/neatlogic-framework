@@ -39,13 +39,13 @@ public abstract class EsHandlerBase implements IElasticSearchHandler {
 
     @Override
     public<T> QueryResult search(T t) {
-        return ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), mySql(t));
+        return ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), myBuildSql(t));
     }
     
     @Override
     public<T> QueryResultSet iterateSearch(T t) {
         QueryParser parser = ElasticSearchPoolManager.getObjectPool(this.getDocument()).createQueryParser();
-        MultiAttrsQuery query = parser.parse(mySql(t));
+        MultiAttrsQuery query = parser.parse(myBuildSql(t));
         return query.iterate();
     }
 

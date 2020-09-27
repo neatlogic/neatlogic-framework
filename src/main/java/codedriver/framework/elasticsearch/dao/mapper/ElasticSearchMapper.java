@@ -9,6 +9,10 @@ public interface ElasticSearchMapper {
 	
 	public Integer insertElasticSearchAudit(ElasticSearchAuditVo elasticSearchAuditVo);
 	
-	public Integer deleteElasticSearchAuditById(Long id);
+	public Integer insertElasticSearchParam(ElasticSearchAuditVo elasticSearchAuditVo);
+	
+	public Integer deleteElasticSearchAudit(ElasticSearchAuditVo elasticSearchAuditVo);
+	
+	public Integer deleteElasticSearchParam(ElasticSearchAuditVo elasticSearchAuditVo);
 
 }

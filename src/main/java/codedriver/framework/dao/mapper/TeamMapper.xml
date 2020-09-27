@@ -228,7 +228,8 @@
 		a.`user_uuid` AS userUuid,
 		a.`title`,
 		b.`user_id` AS userId,
-		b.`user_name` AS userName
+		b.`user_name` AS userName,
+		(SELECT `user_info` from `user` WHERE `uuid` = a.`user_uuid`) as userInfo
 		FROM `user_team` a
 		JOIN `user` b ON b.`uuid`=a.`user_uuid`
 		WHERE a.`team_uuid` = #{value}

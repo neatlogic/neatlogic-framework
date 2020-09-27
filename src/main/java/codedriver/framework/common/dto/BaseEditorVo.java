@@ -20,10 +20,14 @@ public class BaseEditorVo extends BasePageVo {
 	private String lcuName;
 	@EntityField(name = "修改日期", type = ApiParamType.STRING)
 	private Date lcd;
+	@EntityField(name = "创建者额外属性", type = ApiParamType.STRING)
+	private String fcuInfo;
+	@EntityField(name = "创建者头像", type = ApiParamType.STRING)
+	private String fcuAvatar;
 	@EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
-	private String userInfo;
+	private String lcuInfo;
 	@EntityField(name = "修改者头像", type = ApiParamType.STRING)
-	private String avatar;
+	private String lcuAvatar;
 
 	public BaseEditorVo() {
 	}
@@ -76,19 +80,36 @@ public class BaseEditorVo extends BasePageVo {
 		this.lcd = lcd;
 	}
 
-	public String getUserInfo() {
-		return userInfo;
+	public String getFcuInfo() {
+		return fcuInfo;
 	}
 
-	public void setUserInfo(String userInfo) {
-		this.userInfo = userInfo;
+	public void setFcuInfo(String fcuInfo) {
+		this.fcuInfo = fcuInfo;
 	}
 
-	public String getAvatar() {
-		if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
-			JSONObject jsonObject = JSONObject.parseObject(userInfo);
-			avatar = jsonObject.getString("avatar");
+	public String getFcuAvatar() {
+		if (StringUtils.isBlank(fcuAvatar) && StringUtils.isNotBlank(fcuInfo)) {
+			JSONObject jsonObject = JSONObject.parseObject(fcuInfo);
+			fcuAvatar = jsonObject.getString("avatar");
 		}
-		return avatar;
+		return fcuAvatar;
 	}
+
+	public String getLcuInfo() {
+		return lcuInfo;
+	}
+
+	public void setLcuInfo(String lcuInfo) {
+		this.lcuInfo = lcuInfo;
+	}
+
+	public String getLcuAvatar() {
+		if (StringUtils.isBlank(lcuAvatar) && StringUtils.isNotBlank(lcuInfo)) {
+			JSONObject jsonObject = JSONObject.parseObject(lcuInfo);
+			lcuAvatar = jsonObject.getString("avatar");
+		}
+		return lcuAvatar;
+	}
+
 }

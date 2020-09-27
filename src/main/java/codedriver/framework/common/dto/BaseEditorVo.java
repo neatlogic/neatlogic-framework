@@ -4,6 +4,8 @@ import java.util.Date;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 public class BaseEditorVo extends BasePageVo {
 	@EntityField(name = "创建者", type = ApiParamType.STRING)
@@ -18,6 +20,10 @@ public class BaseEditorVo extends BasePageVo {
 	private String lcuName;
 	@EntityField(name = "修改日期", type = ApiParamType.STRING)
 	private Date lcd;
+	@EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
+	private String userInfo;
+	@EntityField(name = "修改者头像", type = ApiParamType.STRING)
+	private String avatar;
 
 	public BaseEditorVo() {
 	}
@@ -70,4 +76,19 @@ public class BaseEditorVo extends BasePageVo {
 		this.lcd = lcd;
 	}
 
+	public String getUserInfo() {
+		return userInfo;
+	}
+
+	public void setUserInfo(String userInfo) {
+		this.userInfo = userInfo;
+	}
+
+	public String getAvatar() {
+		if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
+			JSONObject jsonObject = JSONObject.parseObject(userInfo);
+			avatar = jsonObject.getString("avatar");
+		}
+		return avatar;
+	}
 }

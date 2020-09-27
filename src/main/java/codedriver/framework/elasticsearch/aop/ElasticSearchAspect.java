@@ -29,6 +29,7 @@ import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.elasticsearch.annotation.ESKey;
 import codedriver.framework.elasticsearch.annotation.ESSearch;
+import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.elasticsearch.core.ElasticSearchFactory;
 import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
 import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
@@ -69,7 +70,7 @@ public class ElasticSearchAspect {
                     }
                     String value = valueObj.toString();
                     String key = keyAnnota.id();
-                    if("pk".equals(keyAnnota.type())) {
+                    if(ESKeyType.PKEY.getValue().equals(keyAnnota.type().getValue())) {
                         pkList.add(value);
                         
                     }else if(StringUtils.isNotBlank(key)){

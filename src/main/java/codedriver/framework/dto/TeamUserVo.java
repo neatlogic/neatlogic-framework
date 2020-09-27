@@ -1,5 +1,6 @@
 package codedriver.framework.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.TeamUserTitle;
@@ -11,6 +12,8 @@ public class TeamUserVo {
 	private String userUuid;
 	private String userName;
 	private String userId;
+	private String userInfo;
+	private String userAvatar;
 	private String title;
 	private String titleText;
 	public TeamUserVo() {
@@ -87,5 +90,21 @@ public class TeamUserVo {
 	public void setTitleText(String titleText) {
 		this.titleText = titleText;
 	}
-	
+
+	public String getUserInfo() {
+		return userInfo;
+	}
+
+	public void setUserInfo(String userInfo) {
+		this.userInfo = userInfo;
+	}
+
+	public String getUserAvatar() {
+		if (StringUtils.isBlank(userAvatar) && StringUtils.isNotBlank(userInfo)) {
+			JSONObject jsonObject = JSONObject.parseObject(userInfo);
+			userAvatar = jsonObject.getString("avatar");
+		}
+		return userAvatar;
+	}
+
 }

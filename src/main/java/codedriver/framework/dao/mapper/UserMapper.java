@@ -68,7 +68,7 @@ public interface UserMapper {
 
 	public UserVo getUserAgent(String userUuid);
 
-    public String getUserUuidByAgentUuidAndFunc(@Param("userUuid") String userUuid, @Param("func") String func);
+    public String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

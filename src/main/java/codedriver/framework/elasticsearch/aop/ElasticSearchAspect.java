@@ -128,7 +128,7 @@ public class ElasticSearchAspect {
 		@Override
 		protected void execute() {
 			Thread.currentThread().setName("ELASTICSEARCH-HANDLER-" + handler);
-			IElasticSearchHandler eshandler = ElasticSearchFactory.getHandler(handler);
+			IElasticSearchHandler<?, ?> eshandler = ElasticSearchFactory.getHandler(handler);
 			if (eshandler != null) {
 				try {
 				    String param = JSONObject.toJSONString(paramJson);

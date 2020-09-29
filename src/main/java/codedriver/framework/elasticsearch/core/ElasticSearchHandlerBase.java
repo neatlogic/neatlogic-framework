@@ -25,16 +25,13 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     protected MultiAttrsObjectPool objectPool;
 
-    protected MultiAttrsObjectPool getObjectPool(String poolName, String tenant) {
+    protected MultiAttrsObjectPool getObjectPool(String tenant) {
         if (objectPool == null) {
-            objectPool = ElasticSearchPoolManager.getObjectPool(poolName);
+            objectPool = ElasticSearchPoolManager.getObjectPool(this.getDocument());
         }
         if (objectPool != null) {
-            if (StringUtils.isNotBlank(tenant)) {
-                objectPool.checkout(tenant);
-            } else {
-                objectPool.checkout(TenantContext.get().getTenantUuid());
-            }
+            objectPool.checkout(tenant);
+           
         }
         return objectPool;
     }
@@ -51,13 +48,13 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     @Override
     public R search(T t) {
-        QueryResult result = ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), buildSql(t));
+        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
         return makeupQueryResult(result);
     }
     
     @Override
     public int searchCount(T t) {
-        QueryResult result = ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), buildSql(t));
+        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
         return result.getTotal();
     }
 
@@ -65,14 +62,14 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     @Override
     public QueryResultSet iterateSearch(T t) {
-        QueryParser parser = ElasticSearchPoolManager.getObjectPool(this.getDocument()).createQueryParser();
+        QueryParser parser = getObjectPool(TenantContext.get().getTenantUuid()).createQueryParser();
         MultiAttrsQuery query = parser.parse(buildSql(t));
         return query.iterate();
     }
 
     @Override
     public void delete(String documentId) {
-        getObjectPool(null, null).delete(this.getDocumentId());
+        getObjectPool(TenantContext.get().getTenantUuid()).delete(documentId);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -82,7 +79,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
         if (StringUtils.isBlank(documentId)) {
             throw new ElatsticSearchDocumentIdNotFoundException();
         }
-        MultiAttrsObjectPool pool = getObjectPool(this.getDocument(), tenantUuid);
+        MultiAttrsObjectPool pool = getObjectPool(tenantUuid);
         MultiAttrsObjectPatch patch = pool.save(documentId);
         JSONObject param = mySave(paramObj);
         if (param.isEmpty()) {

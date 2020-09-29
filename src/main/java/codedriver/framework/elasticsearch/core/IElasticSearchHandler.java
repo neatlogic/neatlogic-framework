@@ -1,7 +1,5 @@
 package codedriver.framework.elasticsearch.core;
 
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
 import com.techsure.multiattrsearch.QueryResultSet;
 
@@ -12,13 +10,6 @@ public interface IElasticSearchHandler<T, R> {
      * @return
      */
     public String getDocument();
-
-    /**
-     * id
-     * 
-     * @return
-     */
-    public String getDocumentId();
 
     /**
      * 保存、修改

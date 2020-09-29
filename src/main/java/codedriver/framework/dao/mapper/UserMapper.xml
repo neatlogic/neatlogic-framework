@@ -534,7 +534,8 @@
 		`phone`,
 		`pinyin`,
 		`is_active`,
-		`user_info`
+		`user_info`,
+		`vip_level`
 		)
 		VALUES
 		(
@@ -545,7 +546,8 @@
 		#{phone},
 		#{pinyin},
 		#{isActive},
-		#{userInfo}
+		#{userInfo},
+		#{vipLevel}
 		)
 	</insert>
 
@@ -608,7 +610,8 @@
 		<if test="isActive != null">
 			`is_active` = #{isActive},
 		</if>
-		`user_info` = #{userInfo}
+		`user_info` = #{userInfo},
+		`vip_level` = #{vipLevel}
 		WHERE `uuid` = #{uuid}
 	</update>
 

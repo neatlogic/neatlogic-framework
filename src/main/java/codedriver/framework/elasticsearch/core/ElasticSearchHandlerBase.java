@@ -21,7 +21,7 @@ import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotFoundException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
-public abstract class EsHandlerBase implements IElasticSearchHandler {
+public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHandler<T, R> {
 
     protected MultiAttrsObjectPool objectPool;
 
@@ -39,34 +39,53 @@ public abstract class EsHandlerBase implements IElasticSearchHandler {
         return objectPool;
     }
 
+    /**
+     * 
+     * @Author 89770
+     * @Time 2020年9月27日
+     * @Description: 构建要执行的sql
+     * @Param
+     * @return
+     */
+    protected abstract String buildSql(T target);
+
     @Override
-    public<T> QueryResult search(T t) {
-        return ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), myBuildSql(t));
+    public R search(T t) {
+        QueryResult result = ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), buildSql(t));
+        return makeupQueryResult(result);
     }
     
     @Override
-    public<T> QueryResultSet iterateSearch(T t) {
+    public int searchCount(T t) {
+        QueryResult result = ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), buildSql(t));
+        return result.getTotal();
+    }
+
+    protected abstract R makeupQueryResult(QueryResult result);
+
+    @Override
+    public QueryResultSet iterateSearch(T t) {
         QueryParser parser = ElasticSearchPoolManager.getObjectPool(this.getDocument()).createQueryParser();
-        MultiAttrsQuery query = parser.parse(myBuildSql(t));
+        MultiAttrsQuery query = parser.parse(buildSql(t));
         return query.iterate();
     }
 
     @Override
     public void delete(String documentId) {
-        getObjectPool(null,null).delete(this.getDocumentId());
+        getObjectPool(null, null).delete(this.getDocumentId());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void save(JSONObject paramObj, String tenantUuid) {
-        String documentId = paramObj.getString("&=&"+ESKeyType.PKEY.getValue());
-        if(StringUtils.isBlank(documentId)) {
+        String documentId = paramObj.getString("&=&" + ESKeyType.PKEY.getValue());
+        if (StringUtils.isBlank(documentId)) {
             throw new ElatsticSearchDocumentIdNotFoundException();
         }
         MultiAttrsObjectPool pool = getObjectPool(this.getDocument(), tenantUuid);
         MultiAttrsObjectPatch patch = pool.save(documentId);
         JSONObject param = mySave(paramObj);
-        if(param.isEmpty()) {
+        if (param.isEmpty()) {
             return;
         }
         Set<Entry<String, Object>> entrySet = param.entrySet();

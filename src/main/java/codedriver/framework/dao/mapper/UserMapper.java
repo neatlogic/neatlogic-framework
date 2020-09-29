@@ -68,6 +68,8 @@ public interface UserMapper {
 
 	public UserVo getUserAgent(String userUuid);
 
+    public String getUserUuidByAgentUuidAndFunc(@Param("userUuid") String userUuid, @Param("func") String func);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
@@ -114,5 +116,5 @@ public interface UserMapper {
 
 	public int deleteUserAuth(UserAuthVo userAuthVo);
 
-	public void deleteUserAgent(String userUuid);
+	public int deleteUserAgent(String userUuid);
 }

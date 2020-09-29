@@ -53,7 +53,7 @@ public class UserVo extends BasePageVo implements Serializable{
 	@EntityField(name = "头像", type = ApiParamType.STRING)
 	private String avatar;
 	@EntityField(name = "VIP级别(0,1,2,3,4,5)", type = ApiParamType.ENUM)
-	private String vipLevel;
+	private Integer vipLevel;
 	private String teamUuid;
 	private String auth;
 	private String authGroup;
@@ -318,11 +318,11 @@ public class UserVo extends BasePageVo implements Serializable{
 		this.userInfoObj = userInfoObj;
 	}
 
-	public String getVipLevel() {
+	public Integer getVipLevel() {
 		return vipLevel;
 	}
 
-	public void setVipLevel(String vipLevel) {
+	public void setVipLevel(Integer vipLevel) {
 		this.vipLevel = vipLevel;
 	}
 

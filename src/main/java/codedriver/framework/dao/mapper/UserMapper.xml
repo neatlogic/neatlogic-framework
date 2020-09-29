@@ -62,6 +62,7 @@
 		<result property="pinyin" column="pinyin" />
 		<result property="isActive" column="isActive" />
 		<result property="userInfo" column="userInfo" />
+		<result property="vipLevel" column="vipLevel" />
 		<collection property="roleList" ofType="codedriver.framework.dto.RoleVo">
 			<id property="uuid" column="roleUuid" />
 			<result property="name" column="roleName" />
@@ -84,6 +85,7 @@
 		a.`pinyin`,
 		a.`is_active` AS isActive,
 		a.`user_info` AS userInfo,
+		a.`vip_level` AS vipLevel,
 		b.`role_uuid` AS roleUuid,
 		r.`name` AS roleName,
 		r.`description`,
@@ -119,6 +121,7 @@
 		k.`pinyin`,
 		k.`is_active` as `isActive`,
 		k.`user_info` as `userInfo`,
+		k.`vip_level` as `vipLevel`,
 		h.`role_uuid` as `roleUuid`,
 		r.`name` as `roleName`,
 		r.`description`,

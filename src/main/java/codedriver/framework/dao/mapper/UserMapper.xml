@@ -512,6 +512,10 @@
 		where a.`user_uuid` = #{value}
 	</select>
 
+	<select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String">
+	SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{agentUuid} AND `func` = #{func}
+	</select>
+	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,

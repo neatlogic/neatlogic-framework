@@ -24,7 +24,7 @@ public class ElasticSearchFactory extends ApplicationListenerBase {
 		for (Map.Entry<String, IElasticSearchHandler> entry : myMap.entrySet()) {
 			try {
 				IElasticSearchHandler handler = entry.getValue();
-				handlerMap.put(handler.getHandler(), handler);
+				handlerMap.put(handler.getDocument(), handler);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

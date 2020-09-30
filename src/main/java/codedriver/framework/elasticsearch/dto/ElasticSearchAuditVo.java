@@ -2,28 +2,25 @@ package codedriver.framework.elasticsearch.dto;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
 public class ElasticSearchAuditVo {
 
-	private Long id;
 	private String handler;
-	private String config;
+	private String param;
+	private String paramHash;
 	private Date udpateTime;
 	
 	public ElasticSearchAuditVo() {
 
 	}
 
-	public ElasticSearchAuditVo(String handler, String config) {
+	public ElasticSearchAuditVo(String handler,String param) {
 		this.handler = handler;
-		this.config = config;
+		this.param = param;
 	}
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+
 	
 	public String getHandler() {
 		return handler;
@@ -31,11 +28,11 @@ public class ElasticSearchAuditVo {
 	public void setHandler(String handler) {
 		this.handler = handler;
 	}
-	public String getConfig() {
-		return config;
+	public String getParam() {
+		return param;
 	}
-	public void setConfig(String config) {
-		this.config = config;
+	public void setParam(String param) {
+		this.param = param;
 	}
 	public Date getUdpateTime() {
 		return udpateTime;
@@ -43,6 +40,17 @@ public class ElasticSearchAuditVo {
 	public void setUdpateTime(Date udpateTime) {
 		this.udpateTime = udpateTime;
 	}
+
+    public String getParamHash() {
+        if(StringUtils.isBlank(paramHash)) {
+            paramHash = DigestUtils.md5DigestAsHex(param.getBytes());
+        }
+        return paramHash;
+    }
+
+    public void setParamHash(String paramHash) {
+        this.paramHash = paramHash;
+    }
 	
 	
 }

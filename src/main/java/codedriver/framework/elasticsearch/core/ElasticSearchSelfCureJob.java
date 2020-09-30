@@ -23,10 +23,10 @@ public class ElasticSearchSelfCureJob extends PublicJobBase {
 	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
 		List<ElasticSearchAuditVo> auditList =  elasticSearchMapper.getElasticSearchAudit();
 		for(ElasticSearchAuditVo audit :auditList) {
-			JSONObject paramObj = JSONObject.parseObject(audit.getConfig());
+			JSONObject paramObj = JSONObject.parseObject(audit.getParam());
 			paramObj.put("tenantUuid", jobObject.getTenantUuid());
-			ElasticSearchFactory.getHandler(audit.getHandler()).doService(paramObj);
-			elasticSearchMapper.deleteElasticSearchAuditById(audit.getId());
+			ElasticSearchFactory.getHandler(audit.getHandler()).save(paramObj,jobObject.getTenantUuid());
+			elasticSearchMapper.deleteElasticSearchAudit(audit);
 		}
 		
 	}

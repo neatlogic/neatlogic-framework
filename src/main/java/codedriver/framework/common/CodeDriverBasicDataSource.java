@@ -13,40 +13,40 @@ import org.slf4j.LoggerFactory;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 
 public class CodeDriverBasicDataSource extends BasicDataSource {
-	private Logger logger = LoggerFactory.getLogger(CodeDriverBasicDataSource.class);
+    private Logger logger = LoggerFactory.getLogger(CodeDriverBasicDataSource.class);
 
-	@Override
-	public Connection getConnection() throws SQLException {
-		Connection conn = super.getConnection();
-		Statement statement = null;
-		if (UserContext.get() != null) {
-			String timezone = UserContext.get().getTimezone();
-			if (StringUtils.isNotBlank(timezone)) {
-				try {
-					statement = conn.createStatement();
-					statement.execute("SET time_zone = \'" + timezone + "\'");
-				} catch (Exception ex) {
-					logger.error(ex.getMessage(), ex);
-				} finally {
-					try {
-						if (statement != null) {
-							statement.close();
-						}
-					} catch (SQLException e) {
-					}
-				}
-			}
-		}
-		return conn;
-	}
+    @Override
+    public Connection getConnection() throws SQLException {
+        Connection conn = super.getConnection();
+        Statement statement = null;
+        if (UserContext.get() != null) {
+        	String timezone = UserContext.get().getTimezone();
+        	if (StringUtils.isNotBlank(timezone)) {
+        		try {
+        			statement = conn.createStatement();
+        			statement.execute("SET time_zone = \'" + timezone + "\'");
+        		} catch (Exception ex) {
+        			logger.error(ex.getMessage(), ex);
+        		} finally {
+        			try {
+        				if (statement != null) {
+        					statement.close();
+        				}
+        			} catch (SQLException e) {
+        			}
+        		}
+        	}
+        }
+        return conn;
+    }
 
-	@Override
-	public void setPassword(String password) {
-		String prefix = "{ENCRYPTED}";
-		if (password.startsWith(prefix)) {
-			password = password.substring(prefix.length());
-			password = RC4Util.decrypt(password);
-		}
-		super.setPassword(password);
-	}
+    @Override
+    public void setPassword(String password) {
+        String prefix = "{ENCRYPTED}";
+        if (password.startsWith(prefix)) {
+            password = password.substring(prefix.length());
+            password = RC4Util.decrypt(password);
+        }
+        super.setPassword(password);
+    }
 }

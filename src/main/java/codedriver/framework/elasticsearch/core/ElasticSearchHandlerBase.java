@@ -21,52 +21,68 @@ import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotFoundException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
-public abstract class EsHandlerBase implements IElasticSearchHandler {
+public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHandler<T, R> {
 
     protected MultiAttrsObjectPool objectPool;
 
-    protected MultiAttrsObjectPool getObjectPool(String poolName, String tenant) {
+    protected MultiAttrsObjectPool getObjectPool(String tenant) {
         if (objectPool == null) {
-            objectPool = ElasticSearchPoolManager.getObjectPool(poolName);
+            objectPool = ElasticSearchPoolManager.getObjectPool(this.getDocument());
         }
         if (objectPool != null) {
-            if (StringUtils.isNotBlank(tenant)) {
-                objectPool.checkout(tenant);
-            } else {
-                objectPool.checkout(TenantContext.get().getTenantUuid());
-            }
+            objectPool.checkout(tenant);
+           
         }
         return objectPool;
     }
 
+    /**
+     * 
+     * @Author 89770
+     * @Time 2020年9月27日
+     * @Description: 构建要执行的sql
+     * @Param
+     * @return
+     */
+    protected abstract String buildSql(T target);
+
     @Override
-    public<T> QueryResult search(T t) {
-        return ESQueryUtil.query(ElasticSearchPoolManager.getObjectPool(this.getDocument()), myBuildSql(t));
+    public R search(T t) {
+        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
+        return makeupQueryResult(result);
     }
     
     @Override
-    public<T> QueryResultSet iterateSearch(T t) {
-        QueryParser parser = ElasticSearchPoolManager.getObjectPool(this.getDocument()).createQueryParser();
-        MultiAttrsQuery query = parser.parse(myBuildSql(t));
+    public int searchCount(T t) {
+        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
+        return result.getTotal();
+    }
+
+    protected abstract R makeupQueryResult(QueryResult result);
+
+    @Override
+    public QueryResultSet iterateSearch(T t) {
+        QueryParser parser = getObjectPool(TenantContext.get().getTenantUuid()).createQueryParser();
+        MultiAttrsQuery query = parser.parse(buildSql(t));
         return query.iterate();
     }
 
     @Override
     public void delete(String documentId) {
-        getObjectPool(null,null).delete(this.getDocumentId());
+        getObjectPool(TenantContext.get().getTenantUuid()).delete(documentId);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void save(JSONObject paramObj, String tenantUuid) {
-        String documentId = paramObj.getString("&=&"+ESKeyType.PKEY.getValue());
-        if(StringUtils.isBlank(documentId)) {
+        String documentId = paramObj.getString("&=&" + ESKeyType.PKEY.getValue());
+        if (StringUtils.isBlank(documentId)) {
             throw new ElatsticSearchDocumentIdNotFoundException();
         }
-        MultiAttrsObjectPool pool = getObjectPool(this.getDocument(), tenantUuid);
+        MultiAttrsObjectPool pool = getObjectPool(tenantUuid);
         MultiAttrsObjectPatch patch = pool.save(documentId);
         JSONObject param = mySave(paramObj);
-        if(param.isEmpty()) {
+        if (param.isEmpty()) {
             return;
         }
         Set<Entry<String, Object>> entrySet = param.entrySet();

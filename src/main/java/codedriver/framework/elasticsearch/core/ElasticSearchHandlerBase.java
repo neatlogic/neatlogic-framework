@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.techsure.multiattrsearch.MultiAttrsObjectPatch;
@@ -17,7 +15,6 @@ import com.techsure.multiattrsearch.query.QueryResult;
 import com.techsure.multiattrsearch.util.ESQueryUtil;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotFoundException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
@@ -31,7 +28,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
         }
         if (objectPool != null) {
             objectPool.checkout(tenant);
-           
+
         }
         return objectPool;
     }
@@ -51,7 +48,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
         QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
         return makeupQueryResult(result);
     }
-    
+
     @Override
     public int searchCount(T t) {
         QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
@@ -74,14 +71,13 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public void save(JSONObject paramObj, String tenantUuid) {
-        String documentId = paramObj.getString("&=&" + ESKeyType.PKEY.getValue());
-        if (StringUtils.isBlank(documentId)) {
+    public void save(Long documentId, String tenantUuid) {
+        if (documentId == null) {
             throw new ElatsticSearchDocumentIdNotFoundException();
         }
         MultiAttrsObjectPool pool = getObjectPool(tenantUuid);
-        MultiAttrsObjectPatch patch = pool.save(documentId);
-        JSONObject param = mySave(paramObj);
+        MultiAttrsObjectPatch patch = pool.save(documentId.toString());
+        JSONObject param = mySave(documentId);
         if (param.isEmpty()) {
             return;
         }
@@ -108,7 +104,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
     }
 
     @Override
-    public void save(JSONObject paramObj) {
+    public void save(Long documentId) {
         String tenantUuid = TenantContext.get().getTenantUuid();
         if (tenantUuid != null && TenantContext.get() != null) {
             tenantUuid = TenantContext.get().getTenantUuid();
@@ -116,10 +112,8 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
         if (tenantUuid == null) {
             throw new TenantNotFoundException(tenantUuid);
         }
-        save(paramObj, tenantUuid);
+        save(documentId, tenantUuid);
     }
 
-    public JSONObject mySave(JSONObject paramObj) {
-        return paramObj;
-    }
+    public abstract JSONObject mySave(Long documentId);
 }

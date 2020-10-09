@@ -1,33 +1,31 @@
 package codedriver.framework.elasticsearch.aop;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.elasticsearch.annotation.ESKey;
+import codedriver.framework.elasticsearch.annotation.ESParam;
 import codedriver.framework.elasticsearch.annotation.ESSearch;
 import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.elasticsearch.core.ElasticSearchFactory;
@@ -37,116 +35,182 @@ import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
 
 @Aspect
 @RootComponent
+/**
+ * @Author:chenqiwei
+ * @Time:2020年9月30日
+ * @ClassName: ElasticSearchAspect
+ * @Description: 处理带ESSearch注解的函数
+ */
 public class ElasticSearchAspect {
-	private static final ThreadLocal<Map<String, JSONObject>> ARGS_MAP = new ThreadLocal<>();
-	private static Logger logger = LoggerFactory.getLogger(ElasticSearchAspect.class);
-	private static ElasticSearchMapper elasticSearchMapper;
-	
-	@Autowired
-    private  void setReminderMapper(ElasticSearchMapper _elasticSearchMapper) {
-		elasticSearchMapper = _elasticSearchMapper;
+    private static final ThreadLocal<Map<Long, String>> DOCUMENT_MAP = new ThreadLocal<>();
+    private static Logger logger = LoggerFactory.getLogger(ElasticSearchAspect.class);
+    private static ElasticSearchMapper elasticSearchMapper;
+
+    @Autowired
+    private void setReminderMapper(ElasticSearchMapper _elasticSearchMapper) {
+        elasticSearchMapper = _elasticSearchMapper;
     }
-	
-	@After("@annotation(eSSearch)")
-	public void ActionCheck(JoinPoint point, ESSearch eSSearch) {
-		List<Object> argList = Arrays.asList(point.getArgs());
-		argList = argList.stream().filter(object->object.getClass() == eSSearch.paramType()).collect(Collectors.toList());
-		if (CollectionUtils.isNotEmpty(argList) && StringUtils.isNotBlank(eSSearch.type()) && ElasticSearchFactory.getHandler(eSSearch.type()) != null) {
-		    //拼接参数
-		    JSONObject result = new JSONObject();
-		    List<String> pkList = new ArrayList<String>();
-            Object obj = argList.get(0);
-            Field[] fields = obj.getClass().getDeclaredFields();
-            for(Field field : fields) {
-                ESKey keyAnnota = field.getAnnotation(ESKey.class);
-                if(keyAnnota == null) {
-                    continue;
+
+    @After("@annotation(eSSearch)")
+    public void ActionCheck(JoinPoint point, ESSearch eSSearch) {
+        Object[] params = point.getArgs();
+        if (params == null || params.length == 0) {
+            return;
+        }
+        // 待处理参数列表
+        List<Target> targetList = new ArrayList<>();
+        // 获取方法，此处可将signature强转为MethodSignature
+        MethodSignature signature = (MethodSignature)point.getSignature();
+        Method method = signature.getMethod();
+        Annotation[][] annotations = method.getParameterAnnotations();
+        for (int i = 0; i < annotations.length; i++) {
+            Object param = params[i];
+            Annotation[] paramAnn = annotations[i];
+            // 参数为空或没有注解，直接检查下一个参数
+            if (param == null || paramAnn == null || paramAnn.length == 0) {
+                continue;
+            }
+            for (Annotation annotation : paramAnn) {
+                // 判断当前注解是否为ESParam，是则加入待处理参数列表
+                if (annotation instanceof ESParam) {
+                    targetList.add(new Target(((ESParam)annotation).value(), param));
+                    break;
                 }
-                try {
-                    String fieldName = field.getName();
-                    Object valueObj = obj.getClass().getMethod("get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1)).invoke(obj);
-                    //System.out.println(eSSearch.paramType()+"         "+valueObj);
-                    if(valueObj == null) {
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(targetList)) {
+            Map<Long, String> documentMap = new HashMap<>();
+            for (Target target : targetList) {
+                // 如果参数本身就是Long类型，则直接使用参数值作为documentId
+                if (target.getParam() instanceof Long) {
+                    Long documentId = (Long)target.getParam();
+                    if (documentId == null) {
                         continue;
                     }
-                    String value = valueObj.toString();
-                    String key = keyAnnota.id();
-                    if(ESKeyType.PKEY.getValue().equals(keyAnnota.type().getValue())) {
-                        pkList.add(value);
-                        result.put(key, value);
-                    }else if(StringUtils.isNotBlank(key)){
-                        key = fieldName;
+                    documentMap.put(documentId, target.getHandler());
+                } else {
+                    Field[] fields = target.getParam().getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        Long documentId = null;
+                        ESKey keyAnnota = field.getAnnotation(ESKey.class);
+                        // 需要找到带有annotation并且annotation类型是主键并且值类型是java.lang.Long的属性
+                        if (keyAnnota == null || !keyAnnota.type().equals(ESKeyType.PKEY)
+                            || !field.getType().equals(Long.class)) {
+                            continue;
+                        }
+                        try {
+                            field.setAccessible(true);
+                            documentId = (Long)field.get(target.getParam());
+                            field.setAccessible(false);
+                            if (documentId == null) {
+                                continue;
+                            }
+                            documentMap.put(documentId, target.getHandler());
+                        } catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+                            logger.error(e.getMessage(), e);
+                        }
                     }
-                    result.put("&=&"+ESKeyType.PKEY.getValue(), value);
-                } catch (IllegalArgumentException | IllegalAccessException|InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    logger.error(e.getMessage(),e);
                 }
             }
-            if(pkList.size()>1) {
-                return; //TODO 暂时不支持多个primary key
+
+            if (MapUtils.isNotEmpty(documentMap)) {
+                if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+                    // 没有事务的情况下，跑完一个sql会马上处理document
+                    Iterator<Long> itKey = documentMap.keySet().iterator();
+                    while (itKey.hasNext()) {
+                        Long docId = itKey.next();
+                        String handler = documentMap.get(docId);
+                        CachedThreadPool.execute(new ElasticSearchHandler(handler, docId));
+                    }
+                } else {
+                    // 有事务的情况下，需要记录有所有documentId以及对应的handler，等事务提交后一起处理
+                    // 没有事务的情况下，跑完一个sql会马上处理document
+                    Iterator<Long> itKey = documentMap.keySet().iterator();
+                    while (itKey.hasNext()) {
+                        Long docId = itKey.next();
+                        String handler = documentMap.get(docId);
+
+                        Map<Long, String> documentTypeMap = DOCUMENT_MAP.get();
+                        if (documentTypeMap == null) {// 第一次进入发现threadlocal为空，初始化threadlocal容器，并且给事务管理器注册回调事件
+                            documentTypeMap = new HashMap<>();
+                            DOCUMENT_MAP.set(documentTypeMap);
+
+                            TransactionSynchronizationManager
+                                .registerSynchronization(new TransactionSynchronizationAdapter() {
+                                    @Override
+                                    public void afterCommit() {
+                                        Map<Long, String> docMap = DOCUMENT_MAP.get();
+                                        Iterator<Long> keys = docMap.keySet().iterator();
+                                        while (keys.hasNext()) {
+                                            Long d = keys.next();
+                                            String h = docMap.get(d);
+                                            CachedThreadPool.execute(new ElasticSearchHandler(h, d));
+                                        }
+                                    }
+
+                                    @Override
+                                    public void afterCompletion(int status) {
+                                        DOCUMENT_MAP.remove();
+                                    }
+                                });
+                        }
+                        documentTypeMap.put(docId, handler);
+                    }
+                }
             }
-            //
-			if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-				CachedThreadPool.execute(new ElasticSearchHandler(eSSearch.type(), result));
-			} else {
-				Map<String, JSONObject> argMap = ARGS_MAP.get();
-				if (argMap == null) {
-					argMap = new HashMap<>();
-					ARGS_MAP.set(argMap);
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-						@Override
-						public void afterCommit() {
-							Map<String, JSONObject> argMap = ARGS_MAP.get();
-							Iterator<String> keys = argMap.keySet().iterator();
-							while (keys.hasNext()) {
-								String key = keys.next();
-								CachedThreadPool.execute(new ElasticSearchHandler(eSSearch.type(), argMap.get(key)));
-							}
-						}
+        }
+    }
 
-						@Override
-						public void afterCompletion(int status) {
-							ARGS_MAP.remove();
-						}
-					});
-				}
-			    String pks = String.join("_", pkList);
-                argMap.put(pks, result);
-			}
-		}
-	}
-	
-	private class ElasticSearchHandler extends CodeDriverThread {
-		private String handler;
-		private JSONObject paramJson;
+    // 处理对象
+    private class Target {
+        private String handler;
+        private Object param;
 
-		public ElasticSearchHandler(String _handler, JSONObject _paramJson) {
-			handler = _handler;
-			paramJson = _paramJson;
-		}
+        public Target(String _handler, Object _param) {
+            handler = _handler;
+            param = _param;
+        }
 
-		@Override
-		protected void execute() {
-			Thread.currentThread().setName("ELASTICSEARCH-HANDLER-" + handler);
-			IElasticSearchHandler<?, ?> eshandler = ElasticSearchFactory.getHandler(handler);
-			if (eshandler != null) {
-				try {
-				    String param = JSONObject.toJSONString(paramJson);
-					ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler,param);
-					insertAudit(elasticSeachAduitVo);
-					eshandler.save(paramJson);
-					elasticSearchMapper.deleteElasticSearchAudit(elasticSeachAduitVo);
-				}catch(Exception ex) {
-					logger.error(ex.getMessage(),ex);
-				}
-			}
-		}
-		
-		@Transactional
-		private void insertAudit(ElasticSearchAuditVo elasticSeachAduitVo) {
-		    elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
-            elasticSearchMapper.insertElasticSearchParam(elasticSeachAduitVo);
-		}
+        public String getHandler() {
+            return handler;
+        }
 
-	}
+        public Object getParam() {
+            return param;
+        }
+    }
+
+    private class ElasticSearchHandler extends CodeDriverThread {
+        private String handler;
+        private Long documentId;
+
+        public ElasticSearchHandler(String _handler, Long _documentId) {
+            handler = _handler;
+            documentId = _documentId;
+        }
+
+        @Override
+        protected void execute() {
+            String oldName = Thread.currentThread().getName();
+            Thread.currentThread().setName("ELASTICSEARCH-DOCUMENT-SAVER-" + documentId);
+            IElasticSearchHandler<?, ?> eshandler = ElasticSearchFactory.getHandler(handler);
+            if (eshandler != null) {
+                try {
+                    ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler, documentId);
+                    insertAudit(elasticSeachAduitVo);
+                    eshandler.save(documentId);
+                    elasticSearchMapper.deleteElasticSearchAuditByDocumentId(documentId);
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
+            }
+            Thread.currentThread().setName(oldName);
+        }
+
+        private void insertAudit(ElasticSearchAuditVo elasticSeachAduitVo) {
+            elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
+        }
+
+    }
 }

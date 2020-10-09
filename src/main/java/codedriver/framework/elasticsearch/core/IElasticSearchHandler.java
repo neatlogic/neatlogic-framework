@@ -1,6 +1,5 @@
 package codedriver.framework.elasticsearch.core;
 
-import com.alibaba.fastjson.JSONObject;
 import com.techsure.multiattrsearch.QueryResultSet;
 
 public interface IElasticSearchHandler<T, R> {
@@ -14,12 +13,12 @@ public interface IElasticSearchHandler<T, R> {
     /**
      * 保存、修改
      */
-    public void save(JSONObject paramObj, String tenant);
+    public void save(Long documentId, String tenantUuid);
 
     /**
      * 保存、修改
      */
-    public void save(JSONObject paramObj);
+    public void save(Long documentId);
 
     /**
      * 
@@ -42,15 +41,16 @@ public interface IElasticSearchHandler<T, R> {
      *       : resultData) { el.getId();//documentId el.getJSON("键");//根据对应的key，获取value } }
      */
     public R search(T target);
-    
+
     /**
      * 
-    * @Author: chenqiwei
-    * @Time:2020年9月29日
-    * @Description: 返回查询结果数量 
-    * @param @param target
-    * @param @return 
-    * @return int
+     * @Author: chenqiwei
+     * @Time:2020年9月29日
+     * @Description: 返回查询结果数量
+     * @param @param
+     *            target
+     * @param @return
+     * @return int
      */
     public int searchCount(T target);
 

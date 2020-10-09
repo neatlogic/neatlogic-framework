@@ -6,13 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import codedriver.framework.elasticsearch.constvalue.ESKeyType;
-
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ESKey {
-    ESKeyType type();
-
-    String name();
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface ESParam {
+    // IElasticSearchHandler处理器名称
+    String value();
 }

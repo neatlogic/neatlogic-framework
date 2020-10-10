@@ -28,7 +28,7 @@ import codedriver.framework.elasticsearch.annotation.ESKey;
 import codedriver.framework.elasticsearch.annotation.ESParam;
 import codedriver.framework.elasticsearch.annotation.ESSearch;
 import codedriver.framework.elasticsearch.constvalue.ESKeyType;
-import codedriver.framework.elasticsearch.core.ElasticSearchFactory;
+import codedriver.framework.elasticsearch.core.ElasticSearchHandlerFactory;
 import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
 import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
 import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
@@ -59,7 +59,7 @@ public class ElasticSearchAspect {
         }
         // 待处理参数列表
         List<Target> targetList = new ArrayList<>();
-        // 获取方法，此处可将signature强转为MethodSignature
+        
         MethodSignature signature = (MethodSignature)point.getSignature();
         Method method = signature.getMethod();
         Annotation[][] annotations = method.getParameterAnnotations();
@@ -125,7 +125,6 @@ public class ElasticSearchAspect {
                     }
                 } else {
                     // 有事务的情况下，需要记录有所有documentId以及对应的handler，等事务提交后一起处理
-                    // 没有事务的情况下，跑完一个sql会马上处理document
                     Iterator<Long> itKey = documentMap.keySet().iterator();
                     while (itKey.hasNext()) {
                         Long docId = itKey.next();
@@ -194,7 +193,7 @@ public class ElasticSearchAspect {
         protected void execute() {
             String oldName = Thread.currentThread().getName();
             Thread.currentThread().setName("ELASTICSEARCH-DOCUMENT-SAVER-" + documentId);
-            IElasticSearchHandler<?, ?> eshandler = ElasticSearchFactory.getHandler(handler);
+            IElasticSearchHandler<?, ?> eshandler = ElasticSearchHandlerFactory.getHandler(handler);
             if (eshandler != null) {
                 try {
                     ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler, documentId);

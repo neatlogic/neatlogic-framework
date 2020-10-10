@@ -21,7 +21,7 @@ public class ElasticSearchSelfCureJob extends PublicJobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
         List<ElasticSearchAuditVo> auditList = elasticSearchMapper.getElasticSearchAudit();
         for (ElasticSearchAuditVo audit : auditList) {
-            ElasticSearchFactory.getHandler(audit.getHandler()).save(audit.getDocumentId());
+            ElasticSearchHandlerFactory.getHandler(audit.getHandler()).save(audit.getDocumentId());
             elasticSearchMapper.deleteElasticSearchAuditByDocumentId(audit.getDocumentId());
         }
 

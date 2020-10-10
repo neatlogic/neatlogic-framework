@@ -46,7 +46,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
     @Override
     public R search(T t) {
         QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
-        return makeupQueryResult(result);
+        return makeupQueryResult(t, result);
     }
 
     @Override
@@ -55,7 +55,7 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
         return result.getTotal();
     }
 
-    protected abstract R makeupQueryResult(QueryResult result);
+    protected abstract R makeupQueryResult(T t, QueryResult result);
 
     @Override
     public QueryResultSet iterateSearch(T t) {
@@ -98,6 +98,8 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
                 patch.set(entry.getKey(), Integer.valueOf(value.toString()));
             } else if (value instanceof Boolean) {
                 patch.set(entry.getKey(), Boolean.valueOf(value.toString()));
+            } else if (value instanceof Long) {
+                patch.set(entry.getKey(), Long.valueOf(value.toString()));
             }
         }
         patch.commit();

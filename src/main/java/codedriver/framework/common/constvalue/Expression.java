@@ -5,11 +5,11 @@ public enum Expression {
 	NOTLIKE("notlike", "不包含", " not %s contains %s ",1),
 	EQUAL("equal", "等于", " %s = %s ",1),
 	UNEQUAL("unequal", "不等于", " not %s = %s ",1),
-	INCLUDE("include", "包含", " %s contains any ( %s ) ",1),
-	EXCLUDE("exclude", "不包含", " not %s contains any ( %s ) ",1),
+	INCLUDE("include", "包括", " %s contains any ( %s ) ",1),
+	EXCLUDE("exclude", "不包括", " not %s contains any ( %s ) ",1),
 	BETWEEN("between","属于"," %s between '%s' and '%s' ",1),
-	GREATERTHAN("greater-than", "晚于", " %s > %s ) ",1),
-	LESSTHAN("less-than", "早于", " %s < %s ) ",1),
+	GREATERTHAN("greater-than", "晚于", " %s > %s ",1),
+	LESSTHAN("less-than", "早于", " %s < %s ",1),
 	ISNULL("is-null", "为空", " %s = '' ",0),
 	ISNOTNULL("is-not-null", "不为空", " not %s = '' ",0);
 	private String expression;

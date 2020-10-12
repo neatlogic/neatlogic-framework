@@ -10,7 +10,7 @@ import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.common.RootComponent;
 
 @RootComponent
-public class ElasticSearchFactory extends ApplicationListenerBase {
+public class ElasticSearchHandlerFactory extends ApplicationListenerBase {
 	private static Map<String, IElasticSearchHandler> handlerMap = new HashMap<String, IElasticSearchHandler>();
 
 	public static IElasticSearchHandler getHandler(String handler) {

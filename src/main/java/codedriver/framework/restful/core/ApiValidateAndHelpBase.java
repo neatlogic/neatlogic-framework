@@ -309,7 +309,7 @@ public class ApiValidateAndHelpBase {
 								paramObj.put("isRequired", p.isRequired());
 								String description = p.desc();
 								if (StringUtils.isNotBlank(p.rule())) {
-									description = description + "，规则：" + p.rule();
+									description = description + "，合法输入：" + p.rule();
 								}
 								paramObj.put("description", description);
 								inputList.add(paramObj);

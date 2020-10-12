@@ -68,7 +68,7 @@ public class TimeUtil {
     }
 
     public static String timeNow(){
-        SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM);
+        SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
         return format.format(new Date());
     }
     

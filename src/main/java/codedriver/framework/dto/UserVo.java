@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.auth.label.VIP_VIEW;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
@@ -319,6 +321,10 @@ public class UserVo extends BasePageVo implements Serializable{
 	}
 
 	public Integer getVipLevel() {
+		/** 判断是否有权限查看VIP等级 */
+		if(vipLevel != null && !AuthActionChecker.check(VIP_VIEW.class.getSimpleName())){
+			vipLevel = null;
+		}
 		return vipLevel;
 	}
 

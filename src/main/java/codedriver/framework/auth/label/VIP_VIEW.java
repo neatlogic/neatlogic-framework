@@ -2,11 +2,11 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
-public class VIP_MODIFY extends AuthBase {
+public class VIP_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "VIP管理权限";
+		return "VIP查看权限";
 	}
 
 	@Override

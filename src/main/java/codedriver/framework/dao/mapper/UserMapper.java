@@ -67,6 +67,8 @@ public interface UserMapper {
 	public int checkAgentExists(String agentUuid);
 
 	public UserVo getUserAgent(String userUuid);
+	
+	public List<UserVo> getUserVip();
 
     public String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
 

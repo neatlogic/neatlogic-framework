@@ -10,10 +10,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
-import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.common.constvalue.UserType;
 import codedriver.framework.condition.core.ConditionHandlerFactory;
 import codedriver.framework.condition.core.IConditionHandler;
 import codedriver.framework.util.ConditionUtil;
@@ -40,9 +38,6 @@ public class ConditionVo implements Serializable{
 		this.expression = jsonObj.getString("expression");
 		String values = jsonObj.getString("valueList");
 		if(StringUtils.isNotBlank(values)) {
-			if(values.contains(GroupSearch.COMMON.getValuePlugin() + UserType.LOGIN_USER.getValue())) {
-				values = values.replaceAll(GroupSearch.COMMON.getValuePlugin()+UserType.LOGIN_USER.getValue(), GroupSearch.USER.getValuePlugin()+UserContext.get().getUserUuid());
-			}
 			if(values.startsWith("[") && values.endsWith("]")) {
 				this.valueList = JSON.parseArray(values);
 			}else {

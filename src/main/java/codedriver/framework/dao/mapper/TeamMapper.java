@@ -61,7 +61,7 @@ public interface TeamMapper {
     * @return int 返回左右编码不正确的个数
      */
     public int checkLeftRightCodeIsWrong();
-    
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

@@ -72,6 +72,10 @@ public interface UserMapper {
 
     public String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
 
+	public List<String> getUserUuidListByTeamUuid(String teamUuid);
+
+	public List<String> getUserUuidListByRoleUuid(String teamUuid);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

@@ -533,6 +533,18 @@
 	<select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String">
 	SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{agentUuid} AND `func` = #{func}
 	</select>
+
+	<select id="getUserUuidListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT `user_uuid` FROM `user_team` WHERE `team_uuid` = #{value}
+	</select>
+
+	<select id="getUserUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT
+		`user_uuid`
+		FROM
+		`user_role`
+		WHERE `role_uuid` = #{value}
+	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(

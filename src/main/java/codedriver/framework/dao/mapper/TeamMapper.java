@@ -61,6 +61,8 @@ public interface TeamMapper {
     * @return int 返回左右编码不正确的个数
      */
     public int checkLeftRightCodeIsWrong();
+
+    public List<String> getUserUuidListByTeamUuid(String teamUuid);
     
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 

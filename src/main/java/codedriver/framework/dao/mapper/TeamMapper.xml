@@ -259,6 +259,10 @@
 		) a
 	</select>
 
+	<select id="getUserUuidListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT `user_uuid` FROM `user_team` WHERE `team_uuid` = #{value}
+	</select>
+
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
 		`uuid`,

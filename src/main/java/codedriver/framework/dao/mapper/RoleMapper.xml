@@ -128,6 +128,14 @@
 		GROUP BY `auth`, `auth_group`
 	</select>
 
+	<select id="getUserUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT
+		`user_uuid`
+		FROM
+		`user_role`
+		WHERE `role_uuid` = #{value}
+	</select>
+
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)
 		VALUES (#{uuid}, #{name}, #{description})

@@ -99,6 +99,21 @@
 		LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
 		WHERE a.`uuid` = #{value}
 	</select>
+	
+	<select id="getUserVip" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		a.`uuid`,
+		a.`user_id` AS userId,
+		a.`user_name` AS userName,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` AS isActive,
+		a.`user_info` AS userInfo,
+		a.`vip_level` AS vipLevel
+		FROM `user` a 
+		WHERE a.`vip_level` !=  0
+	</select>
 
 	<select id="getLeaderUserUuidByTeamIds" resultType="java.lang.String" useCache="false">
 		SELECT
@@ -517,6 +532,18 @@
 
 	<select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String">
 	SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{agentUuid} AND `func` = #{func}
+	</select>
+
+	<select id="getUserUuidListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT `user_uuid` FROM `user_team` WHERE `team_uuid` = #{value}
+	</select>
+
+	<select id="getUserUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+		SELECT
+		`user_uuid`
+		FROM
+		`user_role`
+		WHERE `role_uuid` = #{value}
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

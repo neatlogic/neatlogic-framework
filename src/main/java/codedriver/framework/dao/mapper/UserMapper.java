@@ -52,7 +52,11 @@ public interface UserMapper {
 
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
-	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
+	public List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
+
+	public List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
+
+	public List<String> getUserNameListByUuidList(List<String> uuidList);
 
 	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 

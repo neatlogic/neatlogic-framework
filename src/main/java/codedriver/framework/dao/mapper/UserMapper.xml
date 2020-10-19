@@ -662,12 +662,16 @@
 		`user_name` = #{userName},
 		`email` = #{email},
 		`phone` = #{phone},
-		`pinyin` = #{pinyin},
 		<if test="isActive != null">
 			`is_active` = #{isActive},
 		</if>
-		`user_info` = #{userInfo},
-		`vip_level` = #{vipLevel}
+		<if test="userInfo != null and userInfo != ''">
+			`user_info` = #{userInfo},
+		</if>
+		<if test="vipLevel != null">
+			`vip_level` = #{vipLevel},
+		</if>
+		`pinyin` = #{pinyin}
 		WHERE `uuid` = #{uuid}
 	</update>
 

@@ -439,7 +439,7 @@
 		</if>
 	</select>
 
-	<select id="getUserUuidListByteamUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+	<select id="getUserUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
 		SELECT
 		a.`user_uuid`
 		FROM user_team a
@@ -447,6 +447,27 @@
 		WHERE a.`team_uuid` IN
 		<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
 			#{teamUuid}
+		</foreach>
+	</select>
+
+	<select id="getUserUuidListByRoleUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+		SELECT
+		a.`user_uuid`
+		FROM user_role a
+		JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+		WHERE a.`role_uuid` IN
+		<foreach collection="list" item="roleUuid" open="(" close=")" separator=",">
+			#{roleUuid}
+		</foreach>
+	</select>
+
+	<select id="getUserNameListByUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+		SELECT
+		a.`user_name`
+		FROM `user` a
+		WHERE a.`uuid` IN
+		<foreach collection="list" item="uuid" open="(" close=")" separator=",">
+			#{uuid}
 		</foreach>
 	</select>
 

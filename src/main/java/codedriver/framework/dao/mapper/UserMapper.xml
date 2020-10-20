@@ -404,7 +404,9 @@
 		`user_name` AS userName,
 		`email`,
 		`phone`,
-		`is_active` AS isActive
+		`is_active` AS isActive,
+		`user_info` AS userInfo,
+		`vip_level` AS vipLevel
 		FROM `user`
 		Where `uuid` in
 		<foreach collection="list" item="item" separator="," open="(" close=")">

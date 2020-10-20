@@ -14,6 +14,7 @@ public class TeamUserVo {
 	private String userId;
 	private String userInfo;
 	private String userAvatar;
+	private Integer userVipLevel;
 	private String title;
 	private String titleText;
 	public TeamUserVo() {
@@ -107,4 +108,11 @@ public class TeamUserVo {
 		return userAvatar;
 	}
 
+	public Integer getUserVipLevel() {
+		return userVipLevel;
+	}
+
+	public void setUserVipLevel(Integer userVipLevel) {
+		this.userVipLevel = userVipLevel;
+	}
 }

@@ -223,7 +223,8 @@
 		a.`phone`,
 		a.`pinyin`,
 		a.`is_active` as `isActive`,
-		a.`user_info` as `userInfo`
+		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
@@ -240,6 +241,7 @@
 		a.`pinyin`,
 		a.`is_active` as `isActive`,
 		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`,
 		b.`role_uuid` as `roleUuid`
 		FROM `user` a
 		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
@@ -303,6 +305,10 @@
 			OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 
+		<if test="vipLevel != null">
+			and a.`vip_level` = #{vipLevel}
+		</if>
+
 		<if test="teamUuid != null and teamUuid != ''">
 			AND b.`team_uuid` = #{teamUuid}
 		</if>
@@ -363,6 +369,7 @@
 		<result property="password" column="password" />
 		<result property="isActive" column="isActive" />
 		<result property="userInfo" column="userInfo" />
+		<result property="vipLevel" column="vipLevel" />
 		<collection property="roleUuidList" ofType="java.lang.String">
 			<result column="roleUuid" />
 		</collection>
@@ -397,7 +404,9 @@
 		`user_name` AS userName,
 		`email`,
 		`phone`,
-		`is_active` AS isActive
+		`is_active` AS isActive,
+		`user_info` AS userInfo,
+		`vip_level` AS vipLevel
 		FROM `user`
 		Where `uuid` in
 		<foreach collection="list" item="item" separator="," open="(" close=")">
@@ -539,6 +548,7 @@
 		b.`pinyin`,
 		b.`is_active` as `isActive`,
 		b.`user_info` as `userInfo`,
+		b.`vip_level` as `vipLevel`,
 		d.`uuid` as `roleUuid`,
 		d.`name` as `roleName`,
 		f.`uuid` as `teamUuid`,

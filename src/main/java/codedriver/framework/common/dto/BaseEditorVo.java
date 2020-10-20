@@ -24,10 +24,14 @@ public class BaseEditorVo extends BasePageVo {
 	private String fcuInfo;
 	@EntityField(name = "创建者头像", type = ApiParamType.STRING)
 	private String fcuAvatar;
+	@EntityField(name = "创建者VIP等级", type = ApiParamType.INTEGER)
+	private Integer fcuVipLevel;
 	@EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
 	private String lcuInfo;
 	@EntityField(name = "修改者头像", type = ApiParamType.STRING)
 	private String lcuAvatar;
+	@EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
+	private Integer lcuVipLevel;
 
 	public BaseEditorVo() {
 	}
@@ -112,4 +116,19 @@ public class BaseEditorVo extends BasePageVo {
 		return lcuAvatar;
 	}
 
+	public Integer getFcuVipLevel() {
+		return fcuVipLevel;
+	}
+
+	public void setFcuVipLevel(Integer fcuVipLevel) {
+		this.fcuVipLevel = fcuVipLevel;
+	}
+
+	public Integer getLcuVipLevel() {
+		return lcuVipLevel;
+	}
+
+	public void setLcuVipLevel(Integer lcuVipLevel) {
+		this.lcuVipLevel = lcuVipLevel;
+	}
 }

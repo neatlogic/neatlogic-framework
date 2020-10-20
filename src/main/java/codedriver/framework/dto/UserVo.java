@@ -321,10 +321,6 @@ public class UserVo extends BasePageVo implements Serializable{
 	}
 
 	public Integer getVipLevel() {
-		/** 判断是否有权限查看VIP等级 */
-		if(vipLevel != null && !AuthActionChecker.check(VIP_VIEW.class.getSimpleName())){
-			vipLevel = null;
-		}
 		return vipLevel;
 	}
 

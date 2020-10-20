@@ -28,6 +28,8 @@ public class BaseEditorVo extends BasePageVo {
 	private String lcuInfo;
 	@EntityField(name = "修改者头像", type = ApiParamType.STRING)
 	private String lcuAvatar;
+	@EntityField(name = "修改者VIP等级", type = ApiParamType.STRING)
+	private String lcuVipLevel;
 
 	public BaseEditorVo() {
 	}
@@ -112,4 +114,11 @@ public class BaseEditorVo extends BasePageVo {
 		return lcuAvatar;
 	}
 
+	public String getLcuVipLevel() {
+		return lcuVipLevel;
+	}
+
+	public void setLcuVipLevel(String lcuVipLevel) {
+		this.lcuVipLevel = lcuVipLevel;
+	}
 }

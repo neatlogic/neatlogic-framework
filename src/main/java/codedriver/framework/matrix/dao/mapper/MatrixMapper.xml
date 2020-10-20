@@ -11,6 +11,7 @@
 		<result property="lcu" column="lcu"/>
 		<result property="lcuName" column="lcuName"/>
 		<result property="lcuInfo" column="lcuInfo"/>
+		<result property="lcuVipLevel" column="lcuVipLevel"/>
 		<result property="lcd" column="lcd"/>
 	</resultMap>
 
@@ -84,6 +85,7 @@
 			a.`lcu`,
 			(SELECT u.`user_name` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuName,
 			(SELECT u.`user_info` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuInfo,
+			(SELECT u.`vip_level` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuVipLevel,
 			a.`lcd`
 			FROM `process_matrix` a
 			<where>

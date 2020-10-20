@@ -223,7 +223,8 @@
 		a.`phone`,
 		a.`pinyin`,
 		a.`is_active` as `isActive`,
-		a.`user_info` as `userInfo`
+		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
@@ -240,6 +241,7 @@
 		a.`pinyin`,
 		a.`is_active` as `isActive`,
 		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`,
 		b.`role_uuid` as `roleUuid`
 		FROM `user` a
 		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
@@ -367,6 +369,7 @@
 		<result property="password" column="password" />
 		<result property="isActive" column="isActive" />
 		<result property="userInfo" column="userInfo" />
+		<result property="vipLevel" column="vipLevel" />
 		<collection property="roleUuidList" ofType="java.lang.String">
 			<result column="roleUuid" />
 		</collection>
@@ -543,6 +546,7 @@
 		b.`pinyin`,
 		b.`is_active` as `isActive`,
 		b.`user_info` as `userInfo`,
+		b.`vip_level` as `vipLevel`,
 		d.`uuid` as `roleUuid`,
 		d.`name` as `roleName`,
 		f.`uuid` as `teamUuid`,

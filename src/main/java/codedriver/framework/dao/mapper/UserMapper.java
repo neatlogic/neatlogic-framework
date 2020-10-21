@@ -68,7 +68,12 @@ public interface UserMapper {
 
 	public List<String> getTeamUuidListByUserUuid(String userUuid);
 
-	public int checkAgentExists(String agentUuid);
+	public int checkUserExistsInUserAgent(String agentUuid);
+
+	public int checkAgentExistsInUserAgent(String agentUuid);
+
+	/** 检查是否存在循环代理，即A已经是B的代理人，则不允许A设置代理人为B */
+	public int checkExistsAgentLoop(@Param("agentUuid") String agentUuid,@Param("userUuid") String userUuid);
 
 	public UserVo getUserAgent(String userUuid);
 	

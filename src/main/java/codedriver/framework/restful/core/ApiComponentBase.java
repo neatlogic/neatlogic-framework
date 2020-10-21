@@ -78,7 +78,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 				apiConfigVo = apiVo;
 			}
 			if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
-				saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+				saveAudit(apiVo, paramObj, result.toString(), error, startTime, endTime);
 			}
 
 		}

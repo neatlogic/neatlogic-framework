@@ -534,8 +534,16 @@
 		SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
 	</select>
 
-	<select id="checkAgentExists" parameterType="java.lang.String" resultType="int" useCache="false">
-		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} or `agent_uuid` = #{value} limit 1) a
+	<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
+	</select>
+
+	<select id="checkAgentExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{value} limit 1) a
+	</select>
+
+	<select id="checkExistsAgentLoop" parameterType="java.lang.String" resultType="int" useCache="false">
+		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{agentUuid} and `agent_uuid` = #{userUuid} limit 1) a
 	</select>
 
 	<select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">

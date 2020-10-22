@@ -25,6 +25,8 @@ public class FileVo {
 	private String ext;
 	@EntityField(name = "内容类型", type = ApiParamType.STRING)
 	private String contentType;
+	@EntityField(name = "下载url", type = ApiParamType.STRING)
+    private String url;
 
 	public Long getId() {
 		if (id == null) {
@@ -103,5 +105,13 @@ public class FileVo {
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
 }

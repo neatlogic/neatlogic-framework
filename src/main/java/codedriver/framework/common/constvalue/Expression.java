@@ -11,6 +11,7 @@ public enum Expression {
 	GREATERTHAN("greater-than", "晚于", " %s > %s ",1),
 	LESSTHAN("less-than", "早于", " %s < %s ",1),
 	ISNULL("is-null", "为空", " %s = '' ",0),
+	MATCH("match","包含(分词)"," %s match '%s'",0),
 	ISNOTNULL("is-not-null", "不为空", " not %s = '' ",0);
 	private String expression;
 	private String expressionName;

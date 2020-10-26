@@ -41,6 +41,12 @@ public interface TeamMapper {
 			@Param("title") String title
 	);
 	
+	public List<String> getTeamUserUuidListByLftRhtTitle(
+	    @Param("lft") Integer lft, 
+	    @Param("rht") Integer rht, 
+	    @Param("title") String title
+	    );
+	
 	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
 	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);

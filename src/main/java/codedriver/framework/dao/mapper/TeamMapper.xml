@@ -189,6 +189,13 @@
 		JOIN `user` c ON c.`uuid`=b.`user_uuid` AND c.`is_active`=1
 		WHERE a.`level` = #{level} AND a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
 	</select>
+	
+	<select id="getTeamUserUuidListByLftRhtTitle" resultType="java.lang.String" useCache="false">
+		SELECT b.`user_uuid` FROM `team` a
+		JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title`=#{title}
+		JOIN `user` c ON c.`uuid`=b.`user_uuid` AND c.`is_active`=1
+		WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+	</select>
 
 	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap" useCache="false">
 		SELECT

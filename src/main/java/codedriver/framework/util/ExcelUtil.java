@@ -1,22 +1,44 @@
 package codedriver.framework.util;
 
-import codedriver.framework.exception.file.EmptyExcelException;
-import codedriver.framework.exception.file.ExcelLostChannelUuidException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.usermodel.DVConstraint;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
+import codedriver.framework.exception.file.EmptyExcelException;
+import codedriver.framework.exception.file.ExcelLostChannelUuidException;
 
 /**
  * @program: codedriver
@@ -34,6 +56,7 @@ public class ExcelUtil {
     */
     public static void exportExcel(List<String> headerList, List<String> columnList, List<List<String>> columnSelectValueList, List<Map<String, String>> dataMapList, OutputStream os)
     {
+        @SuppressWarnings("resource")
         HSSFWorkbook workbook = new HSSFWorkbook();
         workbook.createSheet("sheet01");
 
@@ -44,38 +67,38 @@ public class ExcelUtil {
         // 生成一个样式
         HSSFCellStyle style = workbook.createCellStyle();
         // 设置这些样式
-        style.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
-        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        style.setFillForegroundColor(HSSFColorPredefined.SKY_BLUE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
         // 生成一个字体
         HSSFFont font = workbook.createFont();
-        font.setColor(HSSFColor.VIOLET.index);
+        font.setColor(HSSFColorPredefined.VIOLET.getIndex());
         font.setFontHeightInPoints((short) 12);
-        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+         font.setBold(true);
         // 把字体应用到当前的样式
         style.setFont(font);
         // 生成并设置另一个样式
         HSSFCellStyle style2 = workbook.createCellStyle();
-        style2.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
-        style2.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        style2.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        style2.setBorderTop(HSSFCellStyle.BORDER_THIN);
-        style2.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        style2.setFillForegroundColor(HSSFColorPredefined.LIGHT_YELLOW.getIndex());
+        style2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style2.setBorderBottom(BorderStyle.THIN);
+        style2.setBorderLeft(BorderStyle.THIN);
+        style2.setBorderRight(BorderStyle.THIN);
+        style2.setBorderTop(BorderStyle.THIN);
+        style2.setAlignment(HorizontalAlignment.CENTER);
+        style2.setVerticalAlignment(VerticalAlignment.CENTER);
         // 生成另一个字体
         HSSFFont font2 = workbook.createFont();
-        font2.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
+        font2.setBold(true);
         // 把字体应用到当前的样式
         style2.setFont(font2);
 
         HSSFFont font3 = workbook.createFont();
-        font3.setColor(HSSFColor.BLUE.index);
+        font3.setColor(HSSFColorPredefined.BLUE.getIndex());
 
 //        // 声明一个画图的顶级管理器
 //        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
@@ -178,18 +201,18 @@ public class ExcelUtil {
             // 生成一个样式
             HSSFCellStyle style = workbook.createCellStyle();
             // 设置这些样式
-            style.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
-            style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-            style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-            style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-            style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-            style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-            style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+            style.setFillForegroundColor(HSSFColorPredefined.SKY_BLUE.getIndex());
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBorderLeft(BorderStyle.THIN);
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderTop(BorderStyle.THIN);
+            style.setAlignment(HorizontalAlignment.CENTER);
             // 生成一个字体
             HSSFFont font = workbook.createFont();
-            font.setColor(HSSFColor.VIOLET.index);
+            font.setColor(HSSFColorPredefined.VIOLET.getIndex());
             font.setFontHeightInPoints((short) 12);
-            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+            font.setBold(true);
             // 把字体应用到当前的样式
             style.setFont(font);
 
@@ -229,21 +252,21 @@ public class ExcelUtil {
         if (CollectionUtils.isNotEmpty(dataMapList) && CollectionUtils.isNotEmpty(columnList)){
         	// 生成并设置另一个样式
         	HSSFCellStyle style2 = workbook.createCellStyle();
-            style2.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);
-            style2.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-            style2.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-            style2.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-            style2.setBorderRight(HSSFCellStyle.BORDER_THIN);
-            style2.setBorderTop(HSSFCellStyle.BORDER_THIN);
-            style2.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-            style2.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+            style2.setFillForegroundColor(HSSFColorPredefined.LIGHT_YELLOW.getIndex());
+            style2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style2.setBorderBottom(BorderStyle.THIN);
+            style2.setBorderLeft(BorderStyle.THIN);
+            style2.setBorderRight(BorderStyle.THIN);
+            style2.setBorderTop(BorderStyle.THIN);
+            style2.setAlignment(HorizontalAlignment.CENTER);
+            style2.setVerticalAlignment(VerticalAlignment.CENTER);
             // 生成另一个字体
             HSSFFont font2 = workbook.createFont();
-            font2.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
+            font2.setBold(true);
             // 把字体应用到当前的样式
             style2.setFont(font2);
         	HSSFFont font3 = workbook.createFont();
-            font3.setColor(HSSFColor.BLUE.index);
+            font3.setColor(HSSFColorPredefined.BLUE.getIndex());
 
         	int lastRowNum = sheet.getLastRowNum();
             for (Map<String, String> dataMap : dataMapList){
@@ -377,10 +400,6 @@ public class ExcelUtil {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
             Workbook wb = new XSSFWorkbook(file.getInputStream());
-            if(wb == null){
-                throw new EmptyExcelException();
-            }
-
             List<String> headerList = new ArrayList<String>();
             List<Map<String, String>> contentList = new ArrayList<Map<String, String>>();
             List<String> channelData = new ArrayList<>();
@@ -458,23 +477,25 @@ public class ExcelUtil {
     public static String getCellContent(Cell cell) {
         String cellContent = "";
         switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_NUMERIC:
+            case NUMERIC:
                 cellContent = (int) cell.getNumericCellValue() + "";
                 break;
-            case Cell.CELL_TYPE_STRING:
+            case STRING:
                 cellContent = cell.getStringCellValue() + "";
                 break;
-            case Cell.CELL_TYPE_BOOLEAN:
+            case BOOLEAN:
                 cellContent = cell.getBooleanCellValue() + "";
                 break;
-            case Cell.CELL_TYPE_BLANK:
+            case BLANK:
                 cellContent = "blank";
                 break;
-            case Cell.CELL_TYPE_FORMULA:
+            case FORMULA:
                 cellContent = cell.getCellFormula() + "";
                 break;
-            case Cell.CELL_TYPE_ERROR:
+            case ERROR:
                 cellContent = "error";
+                break;
+            default:
                 break;
         }
         return cellContent;
@@ -483,29 +504,29 @@ public class ExcelUtil {
     public static Map<String,CellStyle> getRowCellStyle(Workbook workbook){
         // 设置标题行样式
         CellStyle firstRowcellStyle = workbook.createCellStyle();
-        firstRowcellStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);// 设置背景色
-        firstRowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
-        firstRowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        firstRowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        firstRowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        firstRowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        firstRowcellStyle.setFillForegroundColor(HSSFColorPredefined.SKY_BLUE.getIndex());// 设置背景色
+        firstRowcellStyle.setVerticalAlignment(VerticalAlignment.TOP);// 上下居中
+        firstRowcellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        firstRowcellStyle.setAlignment(HorizontalAlignment.CENTER);
+        firstRowcellStyle.setBorderBottom(BorderStyle.THIN);
+        firstRowcellStyle.setBorderLeft(BorderStyle.THIN);
+        firstRowcellStyle.setBorderRight(BorderStyle.THIN);
+        firstRowcellStyle.setBorderTop(BorderStyle.THIN);
         Font font = workbook.createFont();
         font.setFontName("宋体");
         font.setFontHeight((short) 220);
-        font.setBoldweight((short) 700);
+        font.setBold(true);
         firstRowcellStyle.setFont(font);
         //设置正文行样式
         CellStyle rowcellStyle = workbook.createCellStyle();
-        rowcellStyle.setFillForegroundColor(HSSFColor.LIGHT_YELLOW.index);// 设置背景色
-        rowcellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_TOP);// 上下居中
-        rowcellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        rowcellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-        rowcellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        rowcellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+        rowcellStyle.setFillForegroundColor(HSSFColorPredefined.LIGHT_YELLOW.getIndex());// 设置背景色
+        rowcellStyle.setVerticalAlignment(VerticalAlignment.TOP);// 上下居中
+        rowcellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        rowcellStyle.setAlignment(HorizontalAlignment.CENTER);
+        rowcellStyle.setBorderBottom(BorderStyle.THIN);
+        rowcellStyle.setBorderLeft(BorderStyle.THIN);
+        rowcellStyle.setBorderRight(BorderStyle.THIN);
+        rowcellStyle.setBorderTop(BorderStyle.THIN);
         rowcellStyle.setFont(font);
         Map<String,CellStyle> cellStyleMap = new HashMap<>(2);
         cellStyleMap.put("firstRowcellStyle",firstRowcellStyle);

@@ -52,7 +52,11 @@ public interface UserMapper {
 
 	public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
-	public List<String> getUserUuidListByteamUuidList(List<String> teamUuidList);
+	public List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
+
+	public List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
+
+	public List<String> getUserNameListByUuidList(List<String> uuidList);
 
 	public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 
@@ -64,11 +68,22 @@ public interface UserMapper {
 
 	public List<String> getTeamUuidListByUserUuid(String userUuid);
 
-	public int checkAgentExists(String agentUuid);
+	public int checkUserExistsInUserAgent(String userUuid);
+
+	public int checkAgentExistsInUserAgent(String agentUuid);
+
+	/** 检查是否存在循环代理，即A已经是B的代理人，则不允许A设置代理人为B */
+	public int checkExistsAgentLoop(@Param("agentUuid") String agentUuid,@Param("userUuid") String userUuid);
 
 	public UserVo getUserAgent(String userUuid);
+	
+	public List<UserVo> getUserVip();
 
     public String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
+
+	public List<String> getUserUuidListByTeamUuid(String teamUuid);
+
+	public List<String> getUserUuidListByRoleUuid(String teamUuid);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

@@ -8,6 +8,8 @@ public interface TagMapper {
 
     public List<TagVo> searchTag(TagVo tagVo);
 
+    public List<TagVo> getTagListByIdList(List<Long> IdList);
+    
     public int insertTag(TagVo tagVo);
 
     public int deleteTagById(Long id);

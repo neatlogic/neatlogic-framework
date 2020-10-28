@@ -41,6 +41,12 @@ public interface TeamMapper {
 			@Param("title") String title
 	);
 	
+	public List<String> getTeamUserUuidListByLftRhtTitle(
+	    @Param("lft") Integer lft, 
+	    @Param("rht") Integer rht, 
+	    @Param("title") String title
+	    );
+	
 	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
 	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
@@ -61,7 +67,7 @@ public interface TeamMapper {
     * @return int 返回左右编码不正确的个数
      */
     public int checkLeftRightCodeIsWrong();
-    
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

@@ -17,7 +17,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -30,8 +29,6 @@ import codedriver.framework.elasticsearch.annotation.ESSearch;
 import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 import codedriver.framework.elasticsearch.core.ElasticSearchHandlerFactory;
 import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
-import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
-import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
 
 @Aspect
 @RootComponent
@@ -44,12 +41,6 @@ import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
 public class ElasticSearchAspect {
     private static final ThreadLocal<Map<Long, String>> DOCUMENT_MAP = new ThreadLocal<>();
     private static Logger logger = LoggerFactory.getLogger(ElasticSearchAspect.class);
-    private static ElasticSearchMapper elasticSearchMapper;
-
-    @Autowired
-    private void setReminderMapper(ElasticSearchMapper _elasticSearchMapper) {
-        elasticSearchMapper = _elasticSearchMapper;
-    }
 
     @After("@annotation(eSSearch)")
     public void ActionCheck(JoinPoint point, ESSearch eSSearch) {
@@ -195,20 +186,9 @@ public class ElasticSearchAspect {
             Thread.currentThread().setName("ELASTICSEARCH-DOCUMENT-SAVER-" + documentId);
             IElasticSearchHandler<?, ?> eshandler = ElasticSearchHandlerFactory.getHandler(handler);
             if (eshandler != null) {
-                try {
-                    ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(handler, documentId);
-                    insertAudit(elasticSeachAduitVo);
-                    eshandler.save(documentId);
-                    elasticSearchMapper.deleteElasticSearchAuditByDocumentId(documentId);
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
+                eshandler.save(documentId);
             }
             Thread.currentThread().setName(oldName);
-        }
-
-        private void insertAudit(ElasticSearchAuditVo elasticSeachAduitVo) {
-            elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
         }
 
     }

@@ -4,6 +4,7 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<plugins>
+		<plugin interceptor="codedriver.framework.dao.plugin.BusinessGroupInterceptor" />
 		<plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor" />
 	</plugins>
 </configuration>

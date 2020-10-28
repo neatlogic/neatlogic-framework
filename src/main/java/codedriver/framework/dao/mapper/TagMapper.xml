@@ -16,7 +16,18 @@
 			</if>
 		</where>
 	</select>
-
+	
+	<select id="getTagListByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.dto.TagVo">
+	SELECT
+		`id`,
+		`name`
+	FROM `tag`
+	WHERE `id` IN 
+	<foreach collection="list" item="id" open="(" separator="," close=")">
+	#{id}
+	</foreach>
+	</select>
+	
 	<insert id="insertTag" parameterType="codedriver.framework.dto.TagVo">
 		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
 			select LAST_INSERT_ID() as id

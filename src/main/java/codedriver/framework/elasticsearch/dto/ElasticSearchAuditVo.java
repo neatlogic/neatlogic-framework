@@ -6,6 +6,7 @@ public class ElasticSearchAuditVo {
     private Long documentId;
     private String handler;
     private Date udpateTime;
+    private String errorMsg;
 
     public ElasticSearchAuditVo() {
 
@@ -38,6 +39,14 @@ public class ElasticSearchAuditVo {
 
     public void setDocumentId(Long documentId) {
         this.documentId = documentId;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 
 }

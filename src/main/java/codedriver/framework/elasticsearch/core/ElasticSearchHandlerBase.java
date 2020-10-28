@@ -1,7 +1,13 @@
 package codedriver.framework.elasticsearch.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Set;
 
 import com.alibaba.fastjson.JSONArray;
@@ -15,10 +21,19 @@ import com.techsure.multiattrsearch.query.QueryResult;
 import com.techsure.multiattrsearch.util.ESQueryUtil;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
+import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
 import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotFoundException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
 public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHandler<T, R> {
+    
+    private static ElasticSearchMapper elasticSearchMapper;
+
+    @Autowired
+    private void setReminderMapper(ElasticSearchMapper _elasticSearchMapper) {
+        elasticSearchMapper = _elasticSearchMapper;
+    }
 
     protected MultiAttrsObjectPool objectPool;
 
@@ -107,14 +122,25 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     @Override
     public void save(Long documentId) {
-        String tenantUuid = TenantContext.get().getTenantUuid();
-        if (tenantUuid != null && TenantContext.get() != null) {
-            tenantUuid = TenantContext.get().getTenantUuid();
+        ElasticSearchAuditVo elasticSeachAduitVo = new ElasticSearchAuditVo(this.getDocument(), documentId);
+        try {
+            elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
+            String tenantUuid = TenantContext.get().getTenantUuid();
+            if (tenantUuid != null && TenantContext.get() != null) {
+                tenantUuid = TenantContext.get().getTenantUuid();
+            }
+            if (tenantUuid == null) {
+                throw new TenantNotFoundException(tenantUuid);
+            }
+            save(documentId, tenantUuid);
+            elasticSearchMapper.deleteElasticSearchAuditByDocumentId(documentId);
+        }catch(Exception ex) {
+            final Writer result = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter(result);
+            ex.fillInStackTrace().printStackTrace(printWriter);
+            elasticSeachAduitVo.setErrorMsg(result.toString());
+            elasticSearchMapper.insertElasticSearchAudit(elasticSeachAduitVo);
         }
-        if (tenantUuid == null) {
-            throw new TenantNotFoundException(tenantUuid);
-        }
-        save(documentId, tenantUuid);
     }
 
     public abstract JSONObject mySave(Long documentId);

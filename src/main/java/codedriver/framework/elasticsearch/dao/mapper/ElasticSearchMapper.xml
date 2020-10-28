@@ -12,9 +12,9 @@
 	</select>
 
 	<insert id="insertElasticSearchAudit" parameterType="codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo">
-		INSERT ignore INTO `elasticsearch_audit` (`handler`,`document_id`,`update_time`)
+		REPLACE INTO `elasticsearch_audit` (`handler`,`document_id`,`update_time`,`error_msg`)
 		VALUES
-		(#{handler}, #{documentId}, NOW(3))
+		(#{handler}, #{documentId}, NOW(3),#{errorMsg})
 	</insert>
 
 

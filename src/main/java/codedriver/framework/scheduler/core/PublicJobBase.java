@@ -7,6 +7,14 @@ import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
 
+/**
+ * 1、所有外部作业必须继承此父类
+ * 2、外部作业默认不审计
+ * 3、外部作业的相关配置（cron、是否审计、计划开始时间等）从 `schedule_job` 获取； 
+ * 4、`schedule_job` 表仅供 自定义外部作业使用(结合”定时作业“页面修改)
+ * 5、job_name 是外部作业的uuid，即`schedule_job`的对应`uuid`字段
+ * 6、job_group 只能是 “租户-PUBLICJOB“ 不允许自定义
+ */
 public abstract class PublicJobBase extends JobBase implements IPublicJob {
 
 	public Boolean checkCronIsExpired(JobObject jobObject) {
@@ -46,7 +54,12 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 	}
 
 	@Override
-	public String getGroupName() {
+	public final String getGroupName() {
 		return TenantContext.get().getTenantUuid() + "-PUBLICJOB";
+	}
+	
+	@Override
+	public final Boolean isAudit() {
+	    return false;//外部作业默认不启用，如需启用，需到页面配置
 	}
 }

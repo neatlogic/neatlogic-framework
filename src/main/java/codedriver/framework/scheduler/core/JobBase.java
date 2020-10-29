@@ -36,8 +36,16 @@ import codedriver.framework.scheduler.exception.ScheduleParamNotExistsException;
 import codedriver.framework.transaction.util.TransactionUtil;
 
 /**
- * 定时任务处理模块基类，所新增的定时任务类必须继承此类，新Job类必须实现接口内的2个方法。
+ * 1、定时任务处理模块基类，所新增的定时任务类必须继承此类。
+ *    即内部作业直接继承此类，外部作业继承"PublicJobBase"类。
+ *    外部作业使用声明请移步"PublicJobBase"类。
+ * 2、内部作业默认审计
+ * 3、内部作业的相关配置（job_name,job_group,cron、是否审计、计划开始时间等）在内部作业loadJob自己定义 
+ * 4、`schedule_job_audit` 和  `schedule_job_audit_detail` 用于所有作业审计记录
+ * 5、`schedule_job_lock` 用于所有作业在服务器之间做负载均衡
+ * 6、`schedule_job_status` 用于记录所有作业的执行状态（上一次|下次激活时间、执行次数等），执行job前后会更新
  */
+
 public abstract class JobBase implements IJob {
 
 	private Logger logger = LoggerFactory.getLogger(JobBase.class);
@@ -131,9 +139,18 @@ public abstract class JobBase implements IJob {
 			return;
 		}
 		try {
-			JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobName);
+		    Boolean isAudit = false;
+		    //判断外部作业是否需要审计
+		    if(jobHandler instanceof PublicJobBase) {
+		        JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobName);
+		        if(jobVo != null && jobVo.getNeedAudit().equals(1)) {
+		            isAudit = true;
+		        }
+		    }else {
+		        isAudit = jobHandler.isAudit();
+		    }
 			// 如果作业存在并且设置为需要审计
-			if (jobVo != null && jobVo.getNeedAudit().equals(1)) {
+			if (isAudit) {
 				JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
 				schedulerMapper.insertJobAudit(auditVo);
 				jobDetail.getJobDataMap().put("jobAuditVo", auditVo);

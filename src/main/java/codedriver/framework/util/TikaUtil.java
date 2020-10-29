@@ -1,7 +1,7 @@
 package codedriver.framework.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -20,7 +20,7 @@ public class TikaUtil {
      * @Param 
      * @return
       */
-    public JSONObject getFileContentByAutoParser(FileInputStream inputstream,Boolean isRemoveSymbol) throws IOException, TikaException, SAXException {
+    public static JSONObject getFileContentByAutoParser(InputStream inputstream,Boolean isRemoveSymbol) throws IOException, TikaException, SAXException {
           JSONObject fileJson = new JSONObject();
           BodyContentHandler handler = new BodyContentHandler();
           Metadata metadata = new Metadata();

@@ -82,4 +82,15 @@ public interface IJob extends Job {
 	 * @return void
 	 */
 	public void initJob(String tenantUuid);
+	
+	/**
+	* @Author 89770
+	* @Time 2020年10月29日  
+	* @Description: 是否启用审计，默认启用
+	* @Param 
+	* @return
+	 */
+	public default Boolean isAudit() {
+	    return true;
+	}
 }

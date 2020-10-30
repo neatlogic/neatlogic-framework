@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -70,7 +71,7 @@ public class ApiValidateAndHelpBase {
 			audit.setError(error);
 		}
 		if (result != null) {
-			audit.setResult(result);
+			audit.setResult(JSON.toJSONString(result));
 		}
 		CommonThreadPool.execute(new ApiAuditSaveThread(audit));
 	}
@@ -122,8 +123,12 @@ public class ApiValidateAndHelpBase {
 	}
 
 	public static void main(String[] argcv) {
-		String a = "<Script>alert</Script>asdasd\neval(\"abc\")df";
-		System.out.println(escapeXss(a));
+//		String a = "<Script>alert</Script>asdasd\neval(\"abc\")df";
+//		System.out.println(escapeXss(a));
+//	    String a = JSON.toJSONString(null);
+//	    System.out.println(a);
+//	    a = JSON.toJSONString(new ApiVo());
+//	    System.out.println(a);	    
 	}
 
 	private static void escapeXss(JSONObject j) {

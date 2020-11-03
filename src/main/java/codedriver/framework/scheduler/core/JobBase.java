@@ -160,7 +160,7 @@ public abstract class JobBase implements IJob {
 				} catch (Exception ex) {
 					auditVo.setStatus(JobAuditVo.FAILED);
 					auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
-					logger.error(ex.getMessage(), ex);
+					//logger.error(ex.getMessage(), ex); //已记录到数据库，无需日志
 				} finally {
 					if (StringUtils.isNotBlank(auditVo.getContentHash())) {
 						schedulerMapper.replaceJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());

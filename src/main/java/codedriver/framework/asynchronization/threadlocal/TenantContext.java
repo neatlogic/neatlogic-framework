@@ -95,6 +95,7 @@ public class TenantContext implements Serializable {
 			this.setUseDefaultDatasource(true);
 			List<String> tenantModuleGroupList = new ArrayList<String>(); //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
 			tenantModuleGroupList.addAll(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
+			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
 			this.activeModuleGroupList = new ArrayList<>();
 			if (tenantModuleGroupList != null) {
 				for (String group : tenantModuleGroupList) {
@@ -107,7 +108,6 @@ public class TenantContext implements Serializable {
 
 			// 还原回租户库
 			this.setUseDefaultDatasource(false);
-			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
 			activeModuleMap = new HashMap<>();
 			if (activeModuleList != null && activeModuleList.size() > 0) {
 				for (ModuleVo module : activeModuleList) {

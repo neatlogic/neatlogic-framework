@@ -21,6 +21,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
@@ -185,7 +186,10 @@ public abstract class JobBase implements IJob {
 			}
 
 			oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);
-		} catch (Exception ex) {
+		} catch (ApiRuntimeException  ex) {
+		    //能识别的exception,不打error日志
+		    logger.debug(ex.getMessage(), ex);
+		}catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		} finally {
 			// 恢复作业锁状态为等待中

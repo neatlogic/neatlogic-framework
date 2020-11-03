@@ -124,7 +124,7 @@ public abstract class JobBase implements IJob {
 		Date currentFireTime = context.getFireTime();// 本次执行激活时间
 		JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
 		// 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
-		if (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
+		if (beforeJobStatusVo == null ||(beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime))) {
 			return;
 		}
 

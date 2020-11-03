@@ -93,8 +93,8 @@ public class TenantContext implements Serializable {
 			this.tenantUuid = tenantUuid;
 			// 使用master库
 			this.setUseDefaultDatasource(true);
-			List<String> tenantModuleGroupList = new ArrayList<String>(); //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
-			tenantModuleGroupList.addAll(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
+			//List<String> tenantModuleGroupList = new ArrayList<String>(); //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
+			List<String> tenantModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
 			this.activeModuleGroupList = new ArrayList<>();
 			if (tenantModuleGroupList != null) {
 				for (String group : tenantModuleGroupList) {

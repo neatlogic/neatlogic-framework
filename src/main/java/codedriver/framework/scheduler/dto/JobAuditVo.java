@@ -5,8 +5,6 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -29,8 +27,7 @@ public class JobAuditVo extends BasePageVo {
 	private Date endTime;
 	@EntityField(name = "日志内容", type = ApiParamType.STRING)
 	private String content;
-	@JSONField(serialize = false)
-	private transient String contentHash;
+	private String contentHash;
 	@EntityField(name = "执行状态(succeed：成功；failed:失败；running：进行中)", type = ApiParamType.STRING)
 	private String status = RUNNING;
 	@EntityField(name = "服务器id", type = ApiParamType.INTEGER)

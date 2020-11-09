@@ -81,7 +81,13 @@ public class ElasticSearchAspect {
                     }
                     documentMap.put(documentId, target.getHandler());
                 } else {
-                    Field[] fields = target.getParam().getClass().getDeclaredFields();
+                    Object param = target.getParam();
+                    //兼容参数是List类型，仅会获取集合里其中一个元素的documentId
+                    if(param instanceof List) {
+                        List<?> paramList = ((List<?>)param);
+                        param = paramList.size()>0?paramList.get(0):param;
+                    }
+                    Field[] fields = param.getClass().getDeclaredFields();
                     for (Field field : fields) {
                         Long documentId = null;
                         ESKey keyAnnota = field.getAnnotation(ESKey.class);
@@ -92,7 +98,7 @@ public class ElasticSearchAspect {
                         }
                         try {
                             field.setAccessible(true);
-                            documentId = (Long)field.get(target.getParam());
+                            documentId = (Long)field.get(param);
                             field.setAccessible(false);
                             if (documentId == null) {
                                 continue;

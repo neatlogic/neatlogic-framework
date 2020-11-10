@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ParamType;
-//import codedriver.framework.notify.dto.ExpressionVo;
 
 public class ConditionParamVo {
 	private String name;

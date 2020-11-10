@@ -1,7 +1,10 @@
 package codedriver.framework.condition.core;
 
+import java.util.List;
+
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.ParamType;
 /**
  * 
@@ -77,4 +80,18 @@ public interface IConditionHandler {
 	* @return Object 对应的文本
 	 */
 	public Object valueConversionText(Object value, JSONObject config);
+	
+	public default Expression getExpression() {
+	    if(getParamType() != null) {
+	        return getParamType().getDefaultExpression();
+	    }
+	    return null;
+	}
+	
+	public default List<Expression> getExpressionList() {
+	    if(getParamType() != null) {
+	        return getParamType().getExpressionList();
+	    }
+        return null;
+	}
 }

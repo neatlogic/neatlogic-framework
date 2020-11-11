@@ -9,6 +9,7 @@ public enum FormHandlerType {
 	CHECKBOX("checkbox"),
 	DATE("date"), 
 	TIME("time"),
+	TIMESELECT("timeselect"),
 	USERSELECT("userselect"),
 	TEAMSELECT("teamselect"),
 	CASCADELIST("cascadelist");

@@ -109,6 +109,8 @@ public class ConditionVo implements Serializable{
 					for(String value : values) {
 						curentValueList.add(GroupSearch.removePrefix(value));
 					}
+				}else {
+				    curentValueList.add(GroupSearch.removePrefix(paramValue.toString()));
 				}
 			}
 			
@@ -121,7 +123,9 @@ public class ConditionVo implements Serializable{
 					for(String value : values) {
 						targetValueList.add(GroupSearch.removePrefix(value));
 					}
-				}
+				}else {
+				    targetValueList.add(GroupSearch.removePrefix(valueList.toString()));
+                }
 			}
 			
 			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);

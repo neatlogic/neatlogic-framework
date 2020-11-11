@@ -21,6 +21,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.scheduler.annotation.Input;
 import codedriver.framework.scheduler.annotation.Param;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
@@ -123,7 +124,7 @@ public abstract class JobBase implements IJob {
 		Date currentFireTime = context.getFireTime();// 本次执行激活时间
 		JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
 		// 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
-		if (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
+		if (beforeJobStatusVo == null ||(beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime))) {
 			return;
 		}
 
@@ -160,7 +161,7 @@ public abstract class JobBase implements IJob {
 				} catch (Exception ex) {
 					auditVo.setStatus(JobAuditVo.FAILED);
 					auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
-					logger.error(ex.getMessage(), ex);
+					//logger.error(ex.getMessage(), ex); //已记录到数据库，无需日志
 				} finally {
 					if (StringUtils.isNotBlank(auditVo.getContentHash())) {
 						schedulerMapper.replaceJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());
@@ -185,7 +186,10 @@ public abstract class JobBase implements IJob {
 			}
 
 			oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);
-		} catch (Exception ex) {
+		} catch (ApiRuntimeException  ex) {
+		    //能识别的exception,不打error日志
+		    logger.debug(ex.getMessage(), ex);
+		}catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		} finally {
 			// 恢复作业锁状态为等待中

@@ -6,6 +6,8 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -27,7 +29,7 @@ import codedriver.framework.exception.elasticsearch.ElatsticSearchDocumentIdNotF
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 
 public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHandler<T, R> {
-    
+    static Logger logger = LoggerFactory.getLogger(ElasticSearchHandlerBase.class);
     private static ElasticSearchMapper elasticSearchMapper;
 
     @Autowired
@@ -60,14 +62,25 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
 
     @Override
     public R search(T t) {
-        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
-        return makeupQueryResult(t, result);
+        try {
+            QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
+            return makeupQueryResult(t, result);
+        }catch(Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            return null;
+        }
+       
     }
 
     @Override
     public int searchCount(T t) {
-        QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
-        return result.getTotal();
+        try {
+            QueryResult result = ESQueryUtil.query(getObjectPool(TenantContext.get().getTenantUuid()), buildSql(t));
+            return result.getTotal();
+        }catch(Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            return 0;
+        }
     }
 
     protected abstract R makeupQueryResult(T t, QueryResult result);

@@ -31,6 +31,8 @@ public interface RoleMapper {
 
     public List<AuthVo> getRoleCountByAuth();
 
+    public List<String> getRoleUuidByName(String name);
+
     public int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     public int insertRole(RoleVo roleVo);

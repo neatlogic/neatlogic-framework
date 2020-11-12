@@ -68,6 +68,8 @@ public interface TeamMapper {
      */
     public int checkLeftRightCodeIsWrong();
 
+    public List<String> getTeamUuidByName(String name);
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

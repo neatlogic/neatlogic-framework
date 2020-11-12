@@ -710,7 +710,7 @@ public class TimeUtil {
         }else if(milliseconds >= 1000) {
             return (milliseconds / 1000) + " 秒";
         }else {
-            return milliseconds + " 毫秒";
+            return null;
         }
     }
 }

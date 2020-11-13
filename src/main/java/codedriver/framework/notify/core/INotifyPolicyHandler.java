@@ -19,6 +19,8 @@ public interface INotifyPolicyHandler {
 	
 	public List<ConditionParamVo> getSystemParamList();
 	
+	public List<ConditionParamVo> getSystemConditionOptionList();
+	
 	public JSONObject getAuthorityConfig();
 	
 	public default String getClassName() {

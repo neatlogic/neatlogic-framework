@@ -15,7 +15,7 @@ public class ConditionParamVo {
 	private String name;
 	private String label;
 	private String controller;
-	private Boolean isMultiple = false;//TODO linbq前端改好后要删除这个字段
+//	private Boolean isMultiple = false;//TODO linbq前端改好后要删除这个字段
 	private JSONObject config;
 	private String type;
 	private String paramType;
@@ -27,12 +27,12 @@ public class ConditionParamVo {
 	
 	private String handler;
 	
-	public Boolean getIsMultiple() {
-		return isMultiple;
-	}
-	public void setIsMultiple(Boolean isMultiple) {
-		this.isMultiple = isMultiple;
-	}
+//	public Boolean getIsMultiple() {
+//		return isMultiple;
+//	}
+//	public void setIsMultiple(Boolean isMultiple) {
+//		this.isMultiple = isMultiple;
+//	}
 	public JSONObject getConfig() {
 		return config;
 	}

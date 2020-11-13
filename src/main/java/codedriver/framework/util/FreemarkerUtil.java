@@ -1,5 +1,6 @@
 package codedriver.framework.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.util.FreemarkerTransformException;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
@@ -22,6 +25,11 @@ public class FreemarkerUtil {
 		String resultStr = "";
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
+		String homeUrl = Config.HOME_URL();
+        if(!homeUrl.endsWith(File.separator)) {
+            homeUrl += File.separator;
+        }
+        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
 		try {
 			if (content != null) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
@@ -48,6 +56,11 @@ public class FreemarkerUtil {
 		// String resultStr = "";
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
+		String homeUrl = Config.HOME_URL();
+		if(!homeUrl.endsWith(File.separator)) {
+		    homeUrl += File.separator;
+		}
+		dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
 		try {
 			if (content != null && !content.equals("")) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);

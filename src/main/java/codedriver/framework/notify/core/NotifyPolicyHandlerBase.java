@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
@@ -35,21 +37,23 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	@Override
 	public List<ConditionParamVo> getSystemParamList() {
 	    List<ConditionParamVo> resultList = new ArrayList<>();
-	    ConditionParamVo param = new ConditionParamVo();
-        param.setName("homeUrl");
-        param.setLabel("域名");
-        param.setController("input");
+	    if(StringUtils.isNotBlank(Config.HOME_URL())) {
+	        ConditionParamVo param = new ConditionParamVo();
+	        param.setName("homeUrl");
+	        param.setLabel("域名");
+	        param.setController("input");
 
-        param.setType("common");
-        param.setParamType(ParamType.STRING.getName());
-        param.setParamTypeName(ParamType.STRING.getText());
-        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
-        for(Expression expression : ParamType.STRING.getExpressionList()) {
-            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
-        }        
-        param.setIsEditable(0);
-        param.setFreemarkerTemplate("<a href=\"${homeUrl}\"></a>");
-	    resultList.add(param);
+	        param.setType("common");
+	        param.setParamType(ParamType.STRING.getName());
+	        param.setParamTypeName(ParamType.STRING.getText());
+	        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
+	        for(Expression expression : ParamType.STRING.getExpressionList()) {
+	            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
+	        }        
+	        param.setIsEditable(0);
+	        param.setFreemarkerTemplate("<a href=\"${homeUrl}\"></a>");
+	        resultList.add(param);
+	    }	    
 	    List<ConditionParamVo> mySystemParamList = mySystemParamList();
 	    if(CollectionUtils.isNotEmpty(mySystemParamList)) {
 	        resultList .addAll(mySystemParamList);

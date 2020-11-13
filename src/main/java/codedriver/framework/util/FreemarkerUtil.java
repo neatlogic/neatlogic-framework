@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +27,13 @@ public class FreemarkerUtil {
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
 		String homeUrl = Config.HOME_URL();
-        if(!homeUrl.endsWith(File.separator)) {
-            homeUrl += File.separator;
-        }
-        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
+		if(StringUtils.isNotBlank(homeUrl)) {
+		    if(!homeUrl.endsWith(File.separator)) {
+	            homeUrl += File.separator;
+	        }
+	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
+		}
+        
 		try {
 			if (content != null) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
@@ -57,10 +61,12 @@ public class FreemarkerUtil {
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
 		String homeUrl = Config.HOME_URL();
-		if(!homeUrl.endsWith(File.separator)) {
-		    homeUrl += File.separator;
+		if(StringUtils.isNotBlank(homeUrl)) {
+	        if(!homeUrl.endsWith(File.separator)) {
+	            homeUrl += File.separator;
+	        }
+	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
 		}
-		dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
 		try {
 			if (content != null && !content.equals("")) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);

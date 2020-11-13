@@ -114,12 +114,16 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 					sb.append(notifyVo.getError());
 					sb.append("</body></html>");
 					se.addPart(sb.toString(), "text/html;charset=utf-8");
+					boolean isSend = false;
 					for (UserVo user : notifyVo.getExceptionNotifyUserList()) {
 						if (StringUtils.isNotBlank(user.getEmail())) {
+						    isSend = true;
 							se.addTo(user.getEmail());
 						}
 					}
-					se.send();
+					if(isSend) {
+	                    se.send();					    
+					}
 				} else {
 					throw new EmailServerNotFoundException();
 				}

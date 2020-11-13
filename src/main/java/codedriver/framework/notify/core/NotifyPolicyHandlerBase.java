@@ -48,7 +48,7 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
             param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
         }        
         param.setIsEditable(0);
-        param.setFreemarkerTemplate("<a href='${homeUrl}'></a>");
+        param.setFreemarkerTemplate("<a href=\"${homeUrl}\"></a>");
 	    resultList.add(param);
 	    List<ConditionParamVo> mySystemParamList = mySystemParamList();
 	    if(CollectionUtils.isNotEmpty(mySystemParamList)) {

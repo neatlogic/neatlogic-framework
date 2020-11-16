@@ -537,14 +537,18 @@
 		SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
 	</select>
 
-	<select id="getUserUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
+	<select id="getUserByUserIdList" resultType="codedriver.framework.dto.UserVo">
 		SELECT
-		CONCAT('user#', `uuid`) as `value`,
-		`user_name` as `text`
+		`uuid`,
+		`user_name` as `userName`,
+		`user_id` as `userId`
 		FROM `user`
-		WHERE `user_id` in
-		<foreach collection="list" item="text" separator="," open="(" close=")">
-			#{text}
+		WHERE
+		`is_active` = 1
+		and
+		`user_id` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
 		</foreach>
 	</select>
 

@@ -3,6 +3,7 @@ package codedriver.framework.matrix.dao.mapper;
 import java.util.List;
 import java.util.Map;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import org.apache.ibatis.annotations.Param;
 
 import codedriver.framework.matrix.dto.MatrixColumnVo;
@@ -30,6 +31,8 @@ public interface MatrixDataMapper {
 	public int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
 	
 	public List<String> getDynamicTableCellData(@Param("matrixUuid") String matrixUuid, @Param("sourceColumnVo") MatrixColumnVo sourceColumnVo, @Param("targetColumn") String targetColumn);
+
+	public List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values);
 
 	public List<Map<String, String>> getDynamicTableDataByColumnList2(MatrixDataVo dataVo);
 

@@ -79,6 +79,8 @@ public interface TeamMapper {
 	public int updateTeamNameByUuid(TeamVo teamVo);
 
 	public int updateTeamParentUuidByUuid(TeamVo teamVo);
+	
+	public int updateTeamParentUuidAndNameByUuid(TeamVo teamVo);
 
 	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 

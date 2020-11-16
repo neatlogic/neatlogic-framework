@@ -188,6 +188,24 @@
 		WHERE
 		id = #{value}
 	</select>
+	
+	<select id="getJobAuditByUuid" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
+		SELECT
+		`id`,
+		`job_uuid` AS jobUuid,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`content_hash` AS contentHash,
+		b.`content`,
+		`status`,
+		`server_id` AS serverId
+		FROM
+		`schedule_job_audit` a
+		LEFT JOIN 
+		`schedule_job_audit_detail` b ON a.content_hash = b.hash
+		WHERE
+		job_uuid = #{value}
+	</select>
 
 
 	<select id="getJobLockByJobNameGroup" resultType="codedriver.framework.scheduler.dto.JobLockVo">

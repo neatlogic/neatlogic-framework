@@ -537,6 +537,21 @@
 		SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
 	</select>
 
+	<select id="getUserByUserIdList" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		`uuid`,
+		`user_name` as `userName`,
+		`user_id` as `userId`
+		FROM `user`
+		WHERE
+		`is_active` = 1
+		and
+		`user_id` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+
 	<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
 		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
 	</select>

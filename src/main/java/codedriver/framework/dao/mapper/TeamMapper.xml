@@ -254,16 +254,16 @@
 
 	<select id="checkLeftRightCodeIsWrong" resultType="int" useCache="false">
 		SELECT COUNT(a.`uuid`) FROM (
-		SELECT `uuid` FROM `team` WHERE `lft` IS NULL OR `rht` IS NULL
+		(SELECT `uuid` FROM `team` WHERE `lft` IS NULL OR `rht` IS NULL limit 1)
 		UNION
-		SELECT `uuid` FROM `team` WHERE `lft` &lt; 2 OR `rht` &lt; 3
+		(SELECT `uuid` FROM `team` WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1)
 		UNION
-		SELECT parent.`uuid` FROM `team` parent
-		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)
+		(SELECT parent.`uuid` FROM `team` parent
+		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`) limit 1)
 		UNION
-		SELECT parent.`uuid` FROM `team` parent
+		(SELECT parent.`uuid` FROM `team` parent
 		LEFT JOIN `team` child ON child.`parent_uuid` = parent.`uuid`
-		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1
+		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1 limit 1)
 		) a
 	</select>
 

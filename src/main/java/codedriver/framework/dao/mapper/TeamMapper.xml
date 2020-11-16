@@ -317,6 +317,10 @@
 		UPDATE `team` SET `parent_uuid` = #{parentUuid} WHERE `uuid` = #{uuid}
 	</update>
 
+	<update id="updateTeamParentUuidAndNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
+		UPDATE `team` SET `parent_uuid` = #{parentUuid},`name` = #{name}  WHERE `uuid` = #{uuid}
+	</update>
+
 	<update id="updateTeamLeftRightCode">
 		UPDATE `team` SET `lft` = #{lft}, `rht` = #{rht} WHERE `uuid` = #{uuid}
 	</update>

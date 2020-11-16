@@ -161,7 +161,7 @@
 				</foreach>
 			</if>
 		</where>
-		ORDER BY `id` DESC
+		ORDER BY a.`id` DESC
 	) a
 	<if test="needPage == true">
 		LIMIT #{startNum}, #{pageSize}

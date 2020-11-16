@@ -33,6 +33,8 @@ public interface RoleMapper {
 
     public List<String> getRoleUuidByName(String name);
 
+    public List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
+
     public int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     public int insertRole(RoleVo roleVo);

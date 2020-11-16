@@ -274,6 +274,17 @@
 		where `name` = #{value}
 	</select>
 
+	<select id="getTeamUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		CONCAT('team#', `uuid`) as `value`,
+		`name` as `text`
+		FROM `team`
+		WHERE `name` in
+		<foreach collection="list" item="text" separator="," open="(" close=")">
+			#{text}
+		</foreach>
+	</select>
+
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
 		`uuid`,

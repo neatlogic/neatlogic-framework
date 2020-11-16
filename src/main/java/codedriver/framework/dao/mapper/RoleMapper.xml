@@ -135,6 +135,17 @@
 		where `name` = #{value}
 	</select>
 
+	<select id="getRoleUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		CONCAT('role#', `uuid`) as `value`,
+		`name` as `text`
+		FROM `role`
+		WHERE `name` in
+		<foreach collection="list" item="text" separator="," open="(" close=")">
+			#{text}
+		</foreach>
+	</select>
+
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)
 		VALUES (#{uuid}, #{name}, #{description})

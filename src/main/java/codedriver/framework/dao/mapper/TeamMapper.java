@@ -55,7 +55,7 @@ public interface TeamMapper {
 
     public Integer getMaxRhtCode();
 
-    public int getTeamCountOnLock();
+    public int getTeamCount();
     /**
      * 
     * @Time:2020年7月20日

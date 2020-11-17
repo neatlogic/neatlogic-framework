@@ -295,38 +295,50 @@
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int" useCache="false">
 		SELECT
-		count(DISTINCT (a.`uuid`))
+		<if test="(teamUuid != null and teamUuid != '') or (authGroup != null and authGroup != '') or (auth != null and auth != '') or (roleUuid != null and roleUuid != '')">
+			count(DISTINCT (a.`uuid`))
+		</if>
+		<if test="(teamUuid == null or teamUuid == '') and (authGroup == null or authGroup == '') and (auth == null or auth == '') and (roleUuid == null or roleUuid == '')">
+			count(a.`uuid`)
+		</if>
 		FROM `user` a
-		LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
-		LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
-		LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
-		WHERE
-		1=1
-		<if test="keyword !=null and keyword != ''">
-			AND
-			(a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
-			OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
-		</if>
-
-		<if test="vipLevel != null">
-			and a.`vip_level` = #{vipLevel}
-		</if>
-
 		<if test="teamUuid != null and teamUuid != ''">
-			AND b.`team_uuid` = #{teamUuid}
+		LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
 		</if>
-
-		<if test="authGroup != null and authGroup != ''">
-			AND c.`auth_group` = #{authGroup}
+		
+		<if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
+		LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
 		</if>
-
-		<if test="auth != null and auth != ''">
-			AND c.`auth` = #{auth}
-		</if>
-
+		
 		<if test="roleUuid != null and roleUuid != ''">
-			AND d.`role_uuid` = #{roleUuid}
+		LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
 		</if>
+		<where>
+			<if test="keyword !=null and keyword != ''">
+				(a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+				OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+	
+			<if test="vipLevel != null">
+				and a.`vip_level` = #{vipLevel}
+			</if>
+	
+			<if test="teamUuid != null and teamUuid != ''">
+				AND b.`team_uuid` = #{teamUuid}
+			</if>
+	
+			<if test="authGroup != null and authGroup != ''">
+				AND c.`auth_group` = #{authGroup}
+			</if>
+	
+			<if test="auth != null and auth != ''">
+				AND c.`auth` = #{auth}
+			</if>
+	
+			<if test="roleUuid != null and roleUuid != ''">
+				AND d.`role_uuid` = #{roleUuid}
+			</if>
+		</where>
 	</select>
 
 	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">

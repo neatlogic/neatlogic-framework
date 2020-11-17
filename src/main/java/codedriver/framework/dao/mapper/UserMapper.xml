@@ -156,7 +156,7 @@
 		WHERE 1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
-			(a.user_id LIKE CONCAT('%', #{keyword}, '%')
+			(a.user_id LIKE CONCAT(#{keyword}, '%')
 			OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
 		<if test="vipLevel != null">
@@ -198,7 +198,7 @@
 		<where>
 			a.`is_active` = 1
 			<if test="keyword !=null and keyword != ''">
-				AND (a.user_id LIKE CONCAT('%', #{keyword}, '%')
+				AND (a.user_id LIKE CONCAT(#{keyword}, '%')
 				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
 			</if>
 			<if test="valueList != null and valueList.size() > 0">
@@ -315,7 +315,7 @@
 		</if>
 		<where>
 			<if test="keyword !=null and keyword != ''">
-				(a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+				(a.`user_id` LIKE CONCAT(#{keyword}, '%')
 				OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
 			</if>
 	

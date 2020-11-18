@@ -137,6 +137,14 @@ public class NotifyPolicyUtil {
 									/** 参数映射 **/
 									if (CollectionUtils.isNotEmpty(paramMappingList)) {
 										for (ParamMappingVo paramMappingVo : paramMappingList) {
+										    /** 临时增加逻辑 默认参数不能自定义值 **/
+                                            if (templateParamData.containsKey(paramMappingVo.getName())) {
+                                                continue;
+                                            }
+                                            if (templateParamData.containsKey(paramMappingVo.getValue())) {
+                                                continue;
+                                            }
+                                            /** end **/
 											if ("constant".equals(paramMappingVo.getType())) {
 												notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());
 											} else if (Objects.equals(paramMappingVo.getName(), paramMappingVo.getValue())) {
@@ -186,6 +194,7 @@ public class NotifyPolicyUtil {
 							}
 						}
 					}
+					break;
 				}
 			}
 		}			

@@ -71,6 +71,8 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 			}
 		}
 		if(StringUtils.isNotBlank(notifyVo.getError())) {
+		    System.out.println(notifyVo.getError());
+		    logger.error(notifyVo.getError());
 			sendEmail(notifyVo);
 		}else {
 			if (CollectionUtils.isNotEmpty(notifyVo.getToUserList())) {

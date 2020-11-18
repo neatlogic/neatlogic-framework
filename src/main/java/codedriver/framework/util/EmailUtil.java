@@ -69,7 +69,7 @@ public class EmailUtil {
             /** 设置邮件正文 */
             if(StringUtils.isNotBlank(content)){
                 MimeBodyPart text = new MimeBodyPart();
-                text.setContent(content, "text/html;charset=UTF-8");
+                text.setContent(content, "text/plain;charset=UTF-8");
                 multipart.addBodyPart(text);
             }
             /** 设置附件 */

@@ -616,6 +616,10 @@
 		WHERE `role_uuid` = #{value}
 	</select>
 	
+	<select id="checkUserIdIsIsRepeat" parameterType="codedriver.framework.dto.UserVo" resultType="int">
+	SELECT COUNT(`user_id`) FROM `user` WHERE `user_id` = #{userId} AND `uuid` != #{uuid}
+	</select>
+	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
 		INSERT INTO `user_authority`(
 		`user_uuid`,

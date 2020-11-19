@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import codedriver.framework.auth.core.AuthActionChecker;
-import codedriver.framework.auth.label.VIP_VIEW;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
@@ -75,6 +73,11 @@ public class UserVo extends BasePageVo implements Serializable{
 	private List<TeamVo> teamList = new ArrayList<>();
 	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
 	private List<UserAuthVo> userAuthList = new ArrayList<>();
+	@JSONField(serialize=false)
+	private Boolean isHasAuthorization = true;
+	@JSONField(serialize=false)
+	private String authorization;
+	
 
 	public UserVo() {
 
@@ -396,4 +399,21 @@ public class UserVo extends BasePageVo implements Serializable{
 		this.valueList = valueList;
 	}
 
+    public Boolean getIsHasAuthorization() {
+        return isHasAuthorization;
+    }
+
+    public void setIsHasAuthorization(Boolean isHasAuthorization) {
+        this.isHasAuthorization = isHasAuthorization;
+    }
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
+    }
+
+    
 }

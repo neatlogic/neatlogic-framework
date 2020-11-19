@@ -1,17 +1,9 @@
 package codedriver.framework.filter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -19,10 +11,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -32,6 +26,9 @@ import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.cache.UserSessionCache;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserSessionVo;
+import codedriver.framework.dto.UserVo;
+import codedriver.framework.filter.core.ILoginAuth;
+import codedriver.framework.filter.core.LoginAuthFactory;
 
 /**
  * @Author:chenqiwei
@@ -63,129 +60,101 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-
         Cookie[] cookies = request.getCookies();
+        String timezone = "+8:00";
         boolean isAuth = false;
         boolean isUnExpired = false;
         boolean hasTenant = false;
-        String tenant = null, authorization = null, timezone = "+8:00";
-        String authorizationFromCookie = null;
+        UserVo userVo = null;
+        JSONObject redirectObj = null;
+        ILoginAuth loginAuth = null;
+        //获取时区
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("codedriver_timezone".equals(cookie.getName())) {
                     timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
-                } else if ("codedriver_authorization".equals(cookie.getName())) {
-                    authorizationFromCookie = cookie.getValue();
                 }
             }
         }
-
-        if (StringUtils.isBlank(tenant)) {
-            tenant = request.getHeader("Tenant");
-        }
-
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getHeader("Authorization");
-        }
-
-        if (StringUtils.isBlank(authorization) && StringUtils.isNotBlank(authorizationFromCookie)) {
-            authorization = authorizationFromCookie;
-            // 解压cookie内容
-            if (authorization.startsWith("GZIP_")) {
-                authorization = authorization.substring(5);
-                try {
-                    byte[] compressDatas = Base64.getDecoder().decode(authorization);
-                    ByteArrayInputStream bis = new ByteArrayInputStream(compressDatas);
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    GZIPInputStream gzipInputStream = new GZIPInputStream(bis);
-                    byte[] buffer = new byte[2048];
-                    int n;
-                    while ((n = gzipInputStream.read(buffer)) >= 0) {
-                        bos.write(buffer, 0, n);
-                    }
-                    bis.close();
-                    gzipInputStream.close();
-                    authorization = new String(bos.toByteArray());
-                    bos.close();
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }
-        }
-
-        if (StringUtils.isNotBlank(authorization) && StringUtils.isNotBlank(tenant)) {
+        
+        //判断租户
+        try {
+            String tenant =  request.getHeader("Tenant");
             if (TenantUtil.hasTenant(tenant)) {
                 hasTenant = true;
-
-                if (authorization.startsWith("Bearer") && authorization.length() > 7) {
-                    String jwt = authorization.substring(7);
-                    String[] jwtParts = jwt.split("\\.");
-                    if (jwtParts.length == 3) {
-                        SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
-                        Mac mac;
-                        try {
-                            mac = Mac.getInstance("HmacSHA1");
-                            mac.init(signingKey);
-                            byte[] rawHmac = mac.doFinal((jwtParts[0] + "." + jwtParts[1]).getBytes());
-                            String result = Base64.getUrlEncoder().encodeToString(rawHmac);
-                            if (result.equals(jwtParts[2])) {
-                                isAuth = true;
+                //认证获取用户,先认证codedriver jwt，如果不存在,则认证其它认证（目前仅支持单一认证）。如果都不合法，则返回跳转url给前端跳转到对应登录页
+                loginAuth = LoginAuthFactory.getLoginAuth("codedriver");
+               
+                userVo = loginAuth.auth(request,response);
+                if(userVo == null && StringUtils.isNotBlank(Config.LOGIN_AUTH()) && !Config.LOGIN_AUTH().equals("codedriver")) {
+                    loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH());
+                    userVo = loginAuth.auth(request,response);
+                }
+                
+                if(userVo != null ) {
+                    if(StringUtils.isNotBlank(userVo.getUuid())){
+                        JSONObject jwtBodyObj = new JSONObject();
+                        jwtBodyObj.put("useruuid", userVo.getUuid());
+                        jwtBodyObj.put("userid", userVo.getUserId());
+                        jwtBodyObj.put("username", userVo.getUserName());
+                        jwtBodyObj.put("tenant", tenant);
+                        if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
+                            JSONArray roleList = new JSONArray();
+                            for (String role : userVo.getRoleUuidList()) {
+                                roleList.add(role);
                             }
-                        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-                            e.printStackTrace();
+                            jwtBodyObj.put("rolelist", roleList);
                         }
-                        if (isAuth) {
-                            String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), "utf-8");
-                            JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-                            UserContext.init(jwtBodyObj, authorization, timezone, request, response);
-                            TenantContext.init();
-                            TenantContext.get().switchTenant(tenant);
-                            isUnExpired = userExpirationValid();
-                        }
-
+                        UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
+                        TenantContext.init();
+                        TenantContext.get().switchTenant(tenant);
+                        isUnExpired = userExpirationValid();
+                        isAuth = true;
                     }
                 }
             }
-        }
-        if (hasTenant && isAuth && isUnExpired) {
-            filterChain.doFilter(request, response);
-        } else {
-            JSONObject redirectObj = new JSONObject();
-            if (StringUtils.isBlank(authorization)) {
-                response.setStatus(522);
-                redirectObj.put("Status", "FAILED");
-                redirectObj.put("Message", "没有找到认证信息，请登录");
-            } else if (!hasTenant) {
-                response.setStatus(521);
-                redirectObj.put("Status", "FAILED");
-                redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
-            } else if (!isAuth) {
-                response.setStatus(522);
-                redirectObj.put("Status", "FAILED");
-                redirectObj.put("Message", "没有找到登录信息，请登录");
-            } else if (!isUnExpired) {
-                response.setStatus(522);
-                redirectObj.put("Status", "FAILED");
-                redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
+            
+            if (hasTenant && isAuth && isUnExpired) {
+                filterChain.doFilter(request, response);
+            } else {
+                redirectObj = new JSONObject();
+                 if (!hasTenant) {
+                    response.setStatus(521);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
+                } else if (!userVo.getIsHasAuthorization()) {
+                    response.setStatus(522);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "没有找到认证信息，请登录");
+                    redirectObj.put("directUrl", loginAuth.directUrl());
+                } else if (!isAuth) {
+                    response.setStatus(522);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "没有找到登录信息，请登录");
+                    redirectObj.put("directUrl", loginAuth.directUrl());
+                } else if (!isUnExpired) {
+                    response.setStatus(522);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
+                    redirectObj.put("directUrl", loginAuth.directUrl());
+                }
+                response.setContentType(Config.RESPONSE_TYPE_JSON);
+                response.getWriter().print(redirectObj.toJSONString());
             }
-            // 清除cookies
-            /*Cookie authCookie = new Cookie("codedriver_authorization", null);
-            authCookie.setMaxAge(0);
-            authCookie.setPath("/"+tenant);
-            Cookie tenantCookie = new Cookie("codedriver_tenant", null);
-            tenantCookie.setMaxAge(0);
-            tenantCookie.setPath("/"+tenant);
-            response.addCookie(authCookie);
-            response.addCookie(tenantCookie);*/
+            // 清除所有threadlocal
+            if (TenantContext.get() != null) {
+                TenantContext.get().release();
+            }
+            if (UserContext.get() != null) {
+                UserContext.get().release();
+            }
+        }catch(Exception  ex) {
+            logger.error("认证失败", ex);
+            response.setStatus(500);
+            redirectObj.put("Status", "FAILED");
+            redirectObj.put("Message", "认证失败，具体异常请查看日志");
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
-        }
-        // 清除所有threadlocal
-        if (TenantContext.get() != null) {
-            TenantContext.get().release();
-        }
-        if (UserContext.get() != null) {
-            UserContext.get().release();
         }
     }
 
@@ -210,5 +179,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
         return false;
     }
+    
 
 }

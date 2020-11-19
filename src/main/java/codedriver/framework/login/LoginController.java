@@ -1,18 +1,9 @@
 package codedriver.framework.login;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.zip.GZIPOutputStream;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,20 +13,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
-import codedriver.framework.login.core.ILoginAuth;
-import codedriver.framework.login.core.LoginAuthFactory;
+import codedriver.framework.service.LoginService;
 import codedriver.framework.service.TenantService;
 
 @Controller
@@ -43,6 +33,9 @@ import codedriver.framework.service.TenantService;
 public class LoginController {
     Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+    @Autowired
+    private LoginService loginService;
+    
     @Autowired
     private UserMapper userMapper;
 
@@ -56,7 +49,8 @@ public class LoginController {
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
         try {
-
+            String userId = jsonObj.getString("userid");
+            String password = jsonObj.getString("password");
             if (StringUtils.isBlank(tenant)) {
                 tenant = request.getHeader("Tenant");
             }
@@ -75,60 +69,22 @@ public class LoginController {
                 tenantContext.setUseDefaultDatasource(false);
             }
             // 验证并获取用户
-            UserVo checkUserVo = null;
-            Map<String, ILoginAuth> loginAuthMap = LoginAuthFactory.getLoginAuthMap();
-            for (Entry<String, ILoginAuth> loginAuthEntry : loginAuthMap.entrySet()) {
-                ILoginAuth loginAuth = loginAuthEntry.getValue();
-                checkUserVo = loginAuth.auth(request, jsonObj);
-                if (checkUserVo != null && StringUtils.isNotBlank(checkUserVo.getUuid())) {
-                    break;
-                }
-            }
+            UserVo userVo = new UserVo();
+            userVo.setUserId(userId);
+            userVo.setPassword(password);
+            userVo.setTenant(tenant);
+
+            UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
             if (checkUserVo != null) {
+                checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
                 if (userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {
                     userMapper.updateUserSession(checkUserVo.getUuid());
                 } else {
                     userMapper.insertUserSession(checkUserVo.getUuid());
                 }
-                JSONObject jwtHeadObj = new JSONObject();
-                jwtHeadObj.put("alg", "HS256");
-                jwtHeadObj.put("typ", "JWT");
-
-                JSONObject jwtBodyObj = new JSONObject();
-                jwtBodyObj.put("useruuid", checkUserVo.getUuid());
-                jwtBodyObj.put("userid", checkUserVo.getUserId());
-                jwtBodyObj.put("username", checkUserVo.getUserName());
-                jwtBodyObj.put("tenant", tenant);
-                if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
-                    JSONArray roleList = new JSONArray();
-                    for (String role : checkUserVo.getRoleUuidList()) {
-                        roleList.add(role);
-                    }
-                    jwtBodyObj.put("rolelist", roleList);
-                }
-
-                String jwthead = Base64.getUrlEncoder().encodeToString(jwtHeadObj.toJSONString().getBytes());
-                String jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
-
-                SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
-                Mac mac;
-
-                mac = Mac.getInstance("HmacSHA1");
-                mac.init(signingKey);
-                byte[] rawHmac = mac.doFinal((jwthead + "." + jwtbody).getBytes());
-                String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
-
-                // 压缩cookie内容
-                String c = "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign;
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bos);
-                gzipOutputStream.write(c.getBytes());
-                gzipOutputStream.close();
-                String cc = Base64.getEncoder().encodeToString(bos.toByteArray());
-                bos.close();
-
-                Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" + cc);
+                JwtVo jwtVo = loginService.buildJwt(checkUserVo);
+                Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" +  jwtVo.getCc());
                 authCookie.setPath("/" + tenant);
                 String domainName = request.getServerName();
                 if (StringUtils.isNotBlank(domainName)) {
@@ -146,7 +102,7 @@ public class LoginController {
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
                 returnObj.put("Status", "OK");
-                returnObj.put("JwtToken", jwthead + "." + jwtbody + "." + jwtsign);
+                returnObj.put("JwtToken", jwtVo.getJwthead() + "." +  jwtVo.getJwtbody() + "." +  jwtVo.getJwtsign());
                 response.getWriter().print(returnObj);
             } else {
                 throw new UserAuthFailedException();

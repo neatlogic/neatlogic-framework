@@ -1,4 +1,4 @@
-package codedriver.framework.login.core;
+package codedriver.framework.filter.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class LoginAuthFactory extends ApplicationListenerBase{
 	}
 	
 	public static final ILoginAuth getLoginAuth(String type) {
-		return loginAuthMap.get(type);
+		return loginAuthMap.get(type.toUpperCase());
 	}
 
 	@Override
@@ -26,8 +26,8 @@ public class LoginAuthFactory extends ApplicationListenerBase{
 		ApplicationContext context = event.getApplicationContext();
 		Map<String, ILoginAuth> myMap = context.getBeansOfType(ILoginAuth.class);
 		for (Map.Entry<String, ILoginAuth> entry : myMap.entrySet()) {
-			ILoginAuth loginAuth = entry.getValue();
-			loginAuthMap.put(loginAuth.getType().toUpperCase(), loginAuth);
+		    ILoginAuth authAuth = entry.getValue();
+			loginAuthMap.put(authAuth.getType().toUpperCase(), authAuth);
 		}
 		
 	}

@@ -87,6 +87,8 @@ public interface UserMapper {
 
 	public List<String> getUserUuidListByRoleUuid(String teamUuid);
 
+    public int checkUserIdIsIsRepeat(UserVo userVo);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

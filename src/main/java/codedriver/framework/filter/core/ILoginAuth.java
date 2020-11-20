@@ -28,7 +28,7 @@ public interface ILoginAuth {
     /**
     * @Author 89770
     * @Time 2020年11月19日  
-    * @Description: 跳转url 
+    * @Description: 跳转url ，如果为null，则跳自带的登录页
     * @Param 
     * @return
      */

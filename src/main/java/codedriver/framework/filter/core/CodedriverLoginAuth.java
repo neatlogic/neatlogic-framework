@@ -105,7 +105,7 @@ public class CodedriverLoginAuth extends LoginAuthBase{
 
     @Override
     public String directUrl() {
-        return "/login.html";
+        return null;
     }
 
 }

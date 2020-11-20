@@ -231,7 +231,7 @@
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
-		ORDER BY a.`id` DESC
+		ORDER BY b.`id`
 	</select>
 
 	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
@@ -250,7 +250,7 @@
 		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
 		LEFT JOIN `role_authority` c ON b.`role_uuid` = c.`role_uuid`
 		WHERE c.`auth` = #{auth}
-		ORDER BY a.`id` DESC
+		ORDER BY c.`id`
 	</select>
 
 	<select id="searchUserAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">

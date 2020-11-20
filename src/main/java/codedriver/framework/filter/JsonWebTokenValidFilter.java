@@ -141,20 +141,21 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
                 response.getWriter().print(redirectObj.toJSONString());
             }
-            // 清除所有threadlocal
-            if (TenantContext.get() != null) {
-                TenantContext.get().release();
-            }
-            if (UserContext.get() != null) {
-                UserContext.get().release();
-            }
         }catch(Exception  ex) {
             logger.error("认证失败", ex);
-            response.setStatus(500);
+            response.setStatus(522);
             redirectObj.put("Status", "FAILED");
             redirectObj.put("Message", "认证失败，具体异常请查看日志");
+            redirectObj.put("directUrl", loginAuth.directUrl());
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
+        }
+        // 清除所有threadlocal
+        if (TenantContext.get() != null) {
+            TenantContext.get().release();
+        }
+        if (UserContext.get() != null) {
+            UserContext.get().release();
         }
     }
 

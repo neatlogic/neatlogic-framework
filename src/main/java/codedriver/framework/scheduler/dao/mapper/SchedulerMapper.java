@@ -45,6 +45,8 @@ public interface SchedulerMapper {
 
 	public int updateJobStatus(JobStatusVo jobStatus);
 
+	public int updateJobNextFireTime(JobStatusVo jobStatus);
+
 	public int updateJobAudit(JobAuditVo scheduleJobAudit);
 
 	public int updateJobLock(JobLockVo jobLock);

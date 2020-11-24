@@ -2,7 +2,6 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,7 +21,7 @@ public interface UserMapper {
 
 	public List<UserVo> searchUser(UserVo userVo);
 	
-	public List<ValueTextVo> searchUserForSelect(UserVo userVo);
+	public List<UserVo> searchUserForSelect(UserVo userVo);
 
 	public List<UserVo> searchUserByAuth(String auth);
 

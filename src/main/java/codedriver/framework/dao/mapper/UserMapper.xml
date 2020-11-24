@@ -189,32 +189,36 @@
 		ORDER BY k.`id` DESC
 	</select>
 
-	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
+	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
-		CONCAT("user#",a.uuid) AS `value`,
-		a.`user_name` AS `text`
-		FROM
-		`user` a
-		<where>
-			a.`is_active` = 1
-			<if test="keyword !=null and keyword != ''">
-				AND (a.user_id LIKE CONCAT(#{keyword}, '%')
-				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
-			</if>
-			<if test="valueList != null and valueList.size() > 0">
-				AND a.uuid in
-				<foreach collection="valueList" item="item" separator="," open="(" close=")">
-					#{item}
-				</foreach>
-			</if>
-		</where>
+		  `id`,
+		  `uuid`,
+		  `user_id` AS userId,
+		  `user_name` AS userName,
+		  `email`,
+		  `phone`,
+		  `pinyin`,
+		  `is_active` AS isActive,
+		  `user_info` AS userInfo,
+		  `vip_level` AS vipLevel
+		FROM `user`
+		where `is_active` = 1
+		<if test="keyword !=null and keyword != ''">
+			AND (`user_id` LIKE CONCAT(#{keyword}, '%')
+			OR `user_name` LIKE CONCAT('%', #{keyword}, '%'))
+		</if>
+		<if test="valueList != null and valueList.size() > 0">
+			AND uuid IN
+			<foreach collection="valueList" item="item" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
 		<if test="valueList == null or valueList.size() == 0">
-			ORDER BY a.`id` DESC
+			ORDER BY `id` DESC
 		</if>
 		<if test="needPage == true and (valueList == null or valueList.size() == 0)">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
-
 	</select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">

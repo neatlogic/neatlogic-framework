@@ -88,6 +88,8 @@ public interface UserMapper {
 
     public int checkUserIdIsIsRepeat(UserVo userVo);
 
+    public List<UserVo> getUserListByUuidList(List<String> uuidList);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

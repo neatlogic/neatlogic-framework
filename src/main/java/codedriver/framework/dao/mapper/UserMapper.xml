@@ -245,7 +245,7 @@
 		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
 		LEFT JOIN `role_authority` c ON b.`role_uuid` = c.`role_uuid`
 		WHERE c.`auth` = #{auth}
-		ORDER BY c.`id`
+		ORDER BY a.`id` DESC
 	</select>
 
 	<select id="searchUserAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.UserAuthVo" useCache="false">

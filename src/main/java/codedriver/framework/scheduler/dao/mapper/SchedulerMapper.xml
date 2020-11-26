@@ -274,6 +274,14 @@
 		job_group = #{jobGroup}
 	</update>
 
+	<update id="updateJobNextFireTime" parameterType="codedriver.framework.scheduler.dto.JobStatusVo">
+		UPDATE schedule_job_status
+		SET
+		next_fire_time = #{nextFireTime}
+		WHERE
+		job_name = #{jobName}
+	</update>
+
 	<update id="updateJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
 		UPDATE schedule_job_audit
 		SET

@@ -2,7 +2,6 @@ package codedriver.framework.dao.mapper;
 
 import java.util.List;
 
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,7 +21,7 @@ public interface UserMapper {
 
 	public List<UserVo> searchUser(UserVo userVo);
 	
-	public List<ValueTextVo> searchUserForSelect(UserVo userVo);
+	public List<UserVo> searchUserForSelect(UserVo userVo);
 
 	public List<UserVo> searchUserByAuth(String auth);
 
@@ -88,6 +87,8 @@ public interface UserMapper {
 	public List<String> getUserUuidListByRoleUuid(String teamUuid);
 
     public int checkUserIdIsIsRepeat(UserVo userVo);
+
+    public List<UserVo> getUserListByUuidList(List<String> uuidList);
 
 	public int insertUserAuth(UserAuthVo userAuthVo);
 

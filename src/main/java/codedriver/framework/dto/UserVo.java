@@ -12,7 +12,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -27,8 +26,8 @@ public class UserVo extends BasePageVo implements Serializable{
     private static final long serialVersionUID = 3670529362145832083L;
     @JSONField(serialize=false)
     private transient String keyword;
-    @JSONField(serialize=false)
-	private transient List<String> valueList;
+//    @JSONField(serialize=false)
+//	private transient List<String> valueList;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "用户id", type = ApiParamType.STRING)
@@ -386,18 +385,18 @@ public class UserVo extends BasePageVo implements Serializable{
 		return true;
 	}
 
-	public List<String> getValueList() {
-		if(CollectionUtils.isNotEmpty(valueList)) {
-			for(int i =0; i<valueList.size();i++) {
-				valueList.set(i,valueList.get(i).replaceAll(GroupSearch.USER.getValuePlugin(),""));
-			}
-		}
-		return valueList;
-	}
-
-	public void setValueList(List<String> valueList) {
-		this.valueList = valueList;
-	}
+//	public List<String> getValueList() {
+//		if(CollectionUtils.isNotEmpty(valueList)) {
+//			for(int i =0; i<valueList.size();i++) {
+//				valueList.set(i,valueList.get(i).replaceAll(GroupSearch.USER.getValuePlugin(),""));
+//			}
+//		}
+//		return valueList;
+//	}
+//
+//	public void setValueList(List<String> valueList) {
+//		this.valueList = valueList;
+//	}
 
     public Boolean getIsHasAuthorization() {
         return isHasAuthorization;

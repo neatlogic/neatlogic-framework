@@ -90,6 +90,8 @@ public interface UserMapper {
 
     public List<UserVo> getUserListByUuidList(List<String> uuidList);
 
+	public List<UserVo> getUserListByRoleUuid(String roleUuid);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);

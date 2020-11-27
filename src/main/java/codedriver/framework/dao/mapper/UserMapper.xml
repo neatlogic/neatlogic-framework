@@ -245,7 +245,7 @@
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
-		ORDER BY a.`id` DESC
+		ORDER BY b.`id`
 	</select>
 
 	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
@@ -652,6 +652,32 @@
 	<foreach collection="list" item="item" separator="," open="(" close=")">
 		#{item}
 	</foreach>
+	</select>
+
+	<select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as `isActive`,
+		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`,
+		b.`role_uuid` as `roleUuid`,
+		e.`name` as `roleName`,
+		e.`description`,
+		d.`uuid` as `teamUuid`,
+		d.`name` as `teamName`
+		from
+		`user` a
+		LEFT JOIN `user_role` b on b.`user_uuid` = a.`uuid`
+		LEFT JOIN `user_team` c on c.`user_uuid` = a.`uuid`
+		LEFT JOIN `team` d on c.`team_uuid` = d.`uuid`
+		LEFT JOIN `role` e on b.`role_uuid` = e.`uuid`
+		WHERE e.`uuid` = #{value}
+		ORDER BY b.`id`
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

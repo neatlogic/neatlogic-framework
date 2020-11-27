@@ -145,7 +145,7 @@
 		j.`name` as `teamName`
 		FROM (
 		SELECT
-		DISTINCT (a.`uuid`) AS `uuid`
+		DISTINCT (a.`uuid`) AS `uuid`,a.user_id,a.user_name
 		FROM
 		`user` a
 		LEFT JOIN user_role b ON a.uuid = b.user_uuid
@@ -157,7 +157,7 @@
 		<if test="keyword !=null and keyword != ''">
 			AND
 			(a.user_id LIKE CONCAT(#{keyword}, '%')
-			OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
+			OR a.user_name LIKE CONCAT(#{keyword}, '%'))
 		</if>
 		<if test="vipLevel != null">
 			and a.`vip_level` = #{vipLevel}
@@ -177,6 +177,15 @@
 		<if test="roleUuid != null and roleUuid != ''">
 			AND b.`role_uuid` = #{roleUuid}
 		</if>
+		<if test="keyword !=null and keyword != ''">
+			ORDER BY(
+				CASE 
+				WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
+				WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR  a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			)
+		</if>
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
@@ -186,7 +195,17 @@
 		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
 		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
-		ORDER BY k.`id` DESC
+		ORDER BY
+		<if test="keyword !=null and keyword != ''">
+			(
+				CASE 
+				WHEN k.`user_id` = #{keyword} OR k.`user_name` = #{keyword} THEN 1
+				WHEN k.`user_id` LIKE CONCAT(#{keyword},'%') OR  k.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			),
+		</if>
+		 k.`id` DESC
 	</select>
 
 	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.dto.UserVo" useCache="false">

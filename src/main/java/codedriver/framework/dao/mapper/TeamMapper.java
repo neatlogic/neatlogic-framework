@@ -55,7 +55,7 @@ public interface TeamMapper {
 
     public Integer getMaxRhtCode();
 
-    public int getTeamCountOnLock();
+    public int getTeamCount();
     /**
      * 
     * @Time:2020年7月20日
@@ -68,6 +68,10 @@ public interface TeamMapper {
      */
     public int checkLeftRightCodeIsWrong();
 
+    public List<String> getTeamUuidByName(String name);
+
+    public List<ValueTextVo> getTeamUuidAndNameMapList(List<String> list);
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);
@@ -77,6 +81,8 @@ public interface TeamMapper {
 	public int updateTeamNameByUuid(TeamVo teamVo);
 
 	public int updateTeamParentUuidByUuid(TeamVo teamVo);
+	
+	public int updateTeamParentUuidAndNameByUuid(TeamVo teamVo);
 
 	public int updateTeamLeftRightCode(@Param("uuid") String uuid, @Param("lft") int lft, @Param("rht") int rht);
 

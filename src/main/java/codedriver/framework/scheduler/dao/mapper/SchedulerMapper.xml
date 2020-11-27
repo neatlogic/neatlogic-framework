@@ -188,6 +188,24 @@
 		WHERE
 		id = #{value}
 	</select>
+	
+	<select id="getJobAuditByUuid" parameterType="java.lang.String" resultType="codedriver.framework.scheduler.dto.JobAuditVo">
+		SELECT
+		`id`,
+		`job_uuid` AS jobUuid,
+		`start_time` AS startTime,
+		`end_time` AS endTime,
+		`content_hash` AS contentHash,
+		b.`content`,
+		`status`,
+		`server_id` AS serverId
+		FROM
+		`schedule_job_audit` a
+		LEFT JOIN 
+		`schedule_job_audit_detail` b ON a.content_hash = b.hash
+		WHERE
+		job_uuid = #{value}
+	</select>
 
 
 	<select id="getJobLockByJobNameGroup" resultType="codedriver.framework.scheduler.dto.JobLockVo">
@@ -254,6 +272,14 @@
 		job_name = #{jobName}
 		AND
 		job_group = #{jobGroup}
+	</update>
+
+	<update id="updateJobNextFireTime" parameterType="codedriver.framework.scheduler.dto.JobStatusVo">
+		UPDATE schedule_job_status
+		SET
+		next_fire_time = #{nextFireTime}
+		WHERE
+		job_name = #{jobName}
 	</update>
 
 	<update id="updateJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">

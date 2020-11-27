@@ -29,6 +29,8 @@ public interface SchedulerMapper {
 	public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
 
 	public JobAuditVo getJobAuditById(Long auditId);
+	
+	public List<JobAuditVo> getJobAuditByUuid(String uuid);
 
 	public JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
@@ -42,6 +44,8 @@ public interface SchedulerMapper {
 	public int resetJobLockByServerId(Integer serverId);
 
 	public int updateJobStatus(JobStatusVo jobStatus);
+
+	public int updateJobNextFireTime(JobStatusVo jobStatus);
 
 	public int updateJobAudit(JobAuditVo scheduleJobAudit);
 

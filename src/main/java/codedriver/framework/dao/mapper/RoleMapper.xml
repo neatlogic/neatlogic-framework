@@ -128,6 +128,39 @@
 		GROUP BY `auth`, `auth_group`
 	</select>
 
+	<select id="getRoleUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
+		select
+		`uuid`
+		from `role`
+		where `name` = #{value}
+	</select>
+
+	<select id="getRoleUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		CONCAT('role#', `uuid`) as `value`,
+		`name` as `text`
+		FROM `role`
+		WHERE `name` in
+		<foreach collection="list" item="text" separator="," open="(" close=")">
+			#{text}
+		</foreach>
+	</select>
+
+	<select id="getRoleListByAuthName" parameterType="java.lang.String" resultMap="roleMap" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`name`,
+		a.`description`,
+		COUNT(DISTINCT (b.`user_uuid`)) as userCount
+		FROM `role` a
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`role_uuid`
+		LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
+		WHERE
+		c.`auth` = #{auth}
+		GROUP BY a.`uuid`
+		ORDER BY c.`id`
+	</select>
+
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)
 		VALUES (#{uuid}, #{name}, #{description})

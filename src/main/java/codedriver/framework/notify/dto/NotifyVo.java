@@ -31,8 +31,6 @@ public class NotifyVo {
 	private StringBuilder errorBuilder;
 	
 	private NotifyVo(Builder builder) {
-//		this.templateTitle = builder.templateTitle;
-//		this.templateContent = builder.templateContent;
 		this.triggerType = builder.triggerType;
 		this.data = builder.data;
 		this.toUserUuidList = builder.toUserUuidList;
@@ -62,22 +60,10 @@ public class NotifyVo {
 	}
 
 	public String getTitle() {
-//		if (StringUtils.isBlank(title) && StringUtils.isNotBlank(this.getTemplateTitle())) {
-//			try {
-//				title = FreemarkerUtil.transform(this.getData(), this.getTemplateTitle());
-//			} catch (Exception e) {
-//			}
-//		}
 		return title;
 	}
 
 	public String getContent() {
-//		if (StringUtils.isBlank(content) && StringUtils.isNotBlank(this.getTemplateContent())) {
-//			try {
-//				content = FreemarkerUtil.transform(this.getData(), this.getTemplateContent());
-//			} catch (Exception e) {
-//			}
-//		}
 		return content;
 	}
 

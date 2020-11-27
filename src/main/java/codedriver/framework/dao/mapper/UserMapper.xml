@@ -145,7 +145,7 @@
 		j.`name` as `teamName`
 		FROM (
 		SELECT
-		DISTINCT (a.`uuid`) AS `uuid`
+		DISTINCT (a.`uuid`) AS `uuid`,a.user_id,a.user_name
 		FROM
 		`user` a
 		LEFT JOIN user_role b ON a.uuid = b.user_uuid
@@ -156,8 +156,8 @@
 		WHERE 1=1
 		<if test="keyword !=null and keyword != ''">
 			AND
-			(a.user_id LIKE CONCAT('%', #{keyword}, '%')
-			OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
+			(a.user_id LIKE CONCAT(#{keyword}, '%')
+			OR a.user_name LIKE CONCAT(#{keyword}, '%'))
 		</if>
 		<if test="vipLevel != null">
 			and a.`vip_level` = #{vipLevel}
@@ -177,6 +177,15 @@
 		<if test="roleUuid != null and roleUuid != ''">
 			AND b.`role_uuid` = #{roleUuid}
 		</if>
+		<if test="keyword !=null and keyword != ''">
+			ORDER BY(
+				CASE 
+				WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
+				WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR  a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			)
+		</if>
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
@@ -186,35 +195,40 @@
 		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
 		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
-		ORDER BY k.`id` DESC
+		ORDER BY
+		<if test="keyword !=null and keyword != ''">
+			(
+				CASE 
+				WHEN k.`user_id` = #{keyword} OR k.`user_name` = #{keyword} THEN 1
+				WHEN k.`user_id` LIKE CONCAT(#{keyword},'%') OR  k.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			),
+		</if>
+		 k.`id` DESC
 	</select>
 
-	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
+	<select id="searchUserForSelect" parameterType="codedriver.framework.dto.UserVo" resultType="codedriver.framework.dto.UserVo" useCache="false">
 		SELECT
-		CONCAT("user#",a.uuid) AS `value`,
-		a.`user_name` AS `text`
-		FROM
-		`user` a
-		<where>
-			a.`is_active` = 1
-			<if test="keyword !=null and keyword != ''">
-				AND (a.user_id LIKE CONCAT('%', #{keyword}, '%')
-				OR a.user_name LIKE CONCAT('%', #{keyword}, '%'))
-			</if>
-			<if test="valueList != null and valueList.size() > 0">
-				AND a.uuid in
-				<foreach collection="valueList" item="item" separator="," open="(" close=")">
-					#{item}
-				</foreach>
-			</if>
-		</where>
-		<if test="valueList == null or valueList.size() == 0">
-			ORDER BY a.`id` DESC
+		  `id`,
+		  `uuid`,
+		  `user_id` AS userId,
+		  `user_name` AS userName,
+		  `email`,
+		  `phone`,
+		  `pinyin`,
+		  `is_active` AS isActive,
+		  `user_info` AS userInfo,
+		  `vip_level` AS vipLevel
+		FROM `user`
+		where `is_active` = 1
+		<if test="keyword !=null and keyword != ''">
+			AND (`user_id` LIKE CONCAT(#{keyword}, '%')
+			OR `user_name` LIKE CONCAT('%', #{keyword}, '%'))
 		</if>
-		<if test="needPage == true and (valueList == null or valueList.size() == 0)">
+		<if test="needPage">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
-
 	</select>
 
 	<select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">
@@ -231,7 +245,7 @@
 		FROM `user` a
 		LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
 		WHERE b.`auth` = #{auth}
-		ORDER BY a.`id` DESC
+		ORDER BY b.`id`
 	</select>
 
 	<select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
@@ -295,38 +309,50 @@
 
 	<select id="searchUserCount" parameterType="codedriver.framework.dto.UserVo" resultType="int" useCache="false">
 		SELECT
-		count(DISTINCT (a.`uuid`))
+		<if test="(teamUuid != null and teamUuid != '') or (authGroup != null and authGroup != '') or (auth != null and auth != '') or (roleUuid != null and roleUuid != '')">
+			count(DISTINCT (a.`uuid`))
+		</if>
+		<if test="(teamUuid == null or teamUuid == '') and (authGroup == null or authGroup == '') and (auth == null or auth == '') and (roleUuid == null or roleUuid == '')">
+			count(a.`uuid`)
+		</if>
 		FROM `user` a
-		LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
-		LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
-		LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
-		WHERE
-		1=1
-		<if test="keyword !=null and keyword != ''">
-			AND
-			(a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
-			OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
-		</if>
-
-		<if test="vipLevel != null">
-			and a.`vip_level` = #{vipLevel}
-		</if>
-
 		<if test="teamUuid != null and teamUuid != ''">
-			AND b.`team_uuid` = #{teamUuid}
+		LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
 		</if>
-
-		<if test="authGroup != null and authGroup != ''">
-			AND c.`auth_group` = #{authGroup}
+		
+		<if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
+		LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
 		</if>
-
-		<if test="auth != null and auth != ''">
-			AND c.`auth` = #{auth}
-		</if>
-
+		
 		<if test="roleUuid != null and roleUuid != ''">
-			AND d.`role_uuid` = #{roleUuid}
+		LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
 		</if>
+		<where>
+			<if test="keyword !=null and keyword != ''">
+				(a.`user_id` LIKE CONCAT(#{keyword}, '%')
+				OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+	
+			<if test="vipLevel != null">
+				and a.`vip_level` = #{vipLevel}
+			</if>
+	
+			<if test="teamUuid != null and teamUuid != ''">
+				AND b.`team_uuid` = #{teamUuid}
+			</if>
+	
+			<if test="authGroup != null and authGroup != ''">
+				AND c.`auth_group` = #{authGroup}
+			</if>
+	
+			<if test="auth != null and auth != ''">
+				AND c.`auth` = #{auth}
+			</if>
+	
+			<if test="roleUuid != null and roleUuid != ''">
+				AND d.`role_uuid` = #{roleUuid}
+			</if>
+		</where>
 	</select>
 
 	<select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">
@@ -537,6 +563,21 @@
 		SELECT `team_uuid` FROM `user_team` WHERE `user_uuid` = #{value}
 	</select>
 
+	<select id="getUserByUserIdList" resultType="codedriver.framework.dto.UserVo">
+		SELECT
+		`uuid`,
+		`user_name` as `userName`,
+		`user_id` as `userId`
+		FROM `user`
+		WHERE
+		`is_active` = 1
+		and
+		`user_id` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+
 	<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
 		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
 	</select>
@@ -587,6 +628,56 @@
 		FROM
 		`user_role`
 		WHERE `role_uuid` = #{value}
+	</select>
+	
+	<select id="checkUserIdIsIsRepeat" parameterType="codedriver.framework.dto.UserVo" resultType="int">
+	SELECT COUNT(`user_id`) FROM `user` WHERE `user_id` = #{userId} AND `uuid` != #{uuid}
+	</select>
+	
+	<select id="getUserListByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	SELECT
+	  `id`,
+	  `uuid`,
+	  `user_id` AS userId,
+	  `user_name` AS userName,
+	  `email`,
+	  `phone`,
+	  `pinyin`,
+	  `is_active` AS isActive,
+	  `user_info` AS userInfo,
+	  `vip_level` AS vipLevel
+	FROM `user`
+	WHERE `is_active` = 1
+	AND `uuid` IN
+	<foreach collection="list" item="item" separator="," open="(" close=")">
+		#{item}
+	</foreach>
+	</select>
+
+	<select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`user_id` as `userId`,
+		a.`user_name` as `userName`,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as `isActive`,
+		a.`user_info` as `userInfo`,
+		a.`vip_level` as `vipLevel`,
+		b.`role_uuid` as `roleUuid`,
+		e.`name` as `roleName`,
+		e.`description`,
+		d.`uuid` as `teamUuid`,
+		d.`name` as `teamName`
+		from
+		`user` a
+		LEFT JOIN `user_role` b on b.`user_uuid` = a.`uuid`
+		LEFT JOIN `user_team` c on c.`user_uuid` = a.`uuid`
+		LEFT JOIN `team` d on c.`team_uuid` = d.`uuid`
+		LEFT JOIN `role` e on b.`role_uuid` = e.`uuid`
+		WHERE e.`uuid` = #{value}
+		ORDER BY b.`id`
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

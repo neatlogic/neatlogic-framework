@@ -7,35 +7,41 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 
 public abstract class CodeDriverThread implements Runnable {
 
-	protected UserContext userContext;
-	protected TenantContext tenantContext;
-	private String threadName;
+    protected UserContext userContext;
+    protected TenantContext tenantContext;
+    private String threadName;
 
-	public CodeDriverThread() {
-		userContext = UserContext.get();
-		tenantContext = TenantContext.get();
-	}
+    public CodeDriverThread() {
+        userContext = UserContext.get();
+        tenantContext = TenantContext.get();
+    }
 
-	@Override
-	public final void run() {
-		TenantContext.init(tenantContext);
-		UserContext.init(userContext);
-		String oldThreadName = Thread.currentThread().getName();
-		if (StringUtils.isNotBlank(threadName)) {
-			Thread.currentThread().setName(threadName);
-		}
-		execute();
-		Thread.currentThread().setName(oldThreadName);
-	}
+    public CodeDriverThread(String _threadName) {
+        userContext = UserContext.get();
+        tenantContext = TenantContext.get();
+        this.threadName = _threadName;
+    }
 
-	protected abstract void execute();
+    @Override
+    public final void run() {
+        TenantContext.init(tenantContext);
+        UserContext.init(userContext);
+        String oldThreadName = Thread.currentThread().getName();
+        if (StringUtils.isNotBlank(threadName)) {
+            Thread.currentThread().setName(threadName);
+        }
+        execute();
+        Thread.currentThread().setName(oldThreadName);
+    }
 
-	public String getThreadName() {
-		return threadName;
-	}
+    protected abstract void execute();
 
-	public void setThreadName(String threadName) {
-		this.threadName = threadName;
-	}
+    public String getThreadName() {
+        return threadName;
+    }
+
+    public void setThreadName(String threadName) {
+        this.threadName = threadName;
+    }
 
 }

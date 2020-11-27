@@ -161,7 +161,7 @@
 				</foreach>
 			</if>
 		</where>
-		ORDER BY `id` DESC
+		ORDER BY a.`id` DESC
 	) a
 	<if test="needPage == true">
 		LIMIT #{startNum}, #{pageSize}
@@ -220,6 +220,17 @@
 	  `${targetColumn}`
 	FROM `matrix_${matrixUuid}` 
 	WHERE `${sourceColumnVo.column}` = #{sourceColumnVo.value}
+	</select>
+
+	<select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
+		SELECT
+		`${targetColumn}` as `value`,
+		`${sourceColumn}` as `text`
+		FROM `matrix_${matrixUuid}`
+		WHERE `${sourceColumn}` in
+		<foreach collection="list" item="text" separator="," open="(" close=")">
+			#{text}
+		</foreach>
 	</select>
 	
 	<select id="getDynamicRowDataByUuid" parameterType="codedriver.framework.matrix.dto.MatrixDataVo" resultType="java.util.LinkedHashMap">

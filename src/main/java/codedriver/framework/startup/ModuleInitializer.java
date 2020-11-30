@@ -1,7 +1,6 @@
 package codedriver.framework.startup;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -21,20 +20,18 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import codedriver.framework.asynchronization.thread.ModuleInitApplicationListener;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 public class ModuleInitializer implements WebApplicationInitializer {
 	static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
-	/** 用于等待所有模块加载完成，再初始化定时作业 **/
-	private static CountDownLatch latch = null;
 	@Override
 	public void onStartup(ServletContext context) throws ServletException {
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		String moduleId = null;
 		try {
 			Resource[] resources = resolver.getResources("classpath*:codedriver/**/*-servlet-context.xml");
-			latch = new CountDownLatch(resources.length + 1);
 			for (Resource resource : resources) {
 				String path = resource.getURL().getPath();
 				path = path.substring(path.indexOf("!") + 1);
@@ -65,7 +62,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					if (StringUtils.isNotBlank(urlMapping)) {
 						sr.addMapping(urlMapping);
 					}
-
+					/** 模块加载开始，计数器加一 **/
+					ModuleInitApplicationListener.getModuleinitphaser().register();
 					if (moduleId.equalsIgnoreCase("framework")) {
 						sr.addMapping("/");
 						sr.setLoadOnStartup(1);
@@ -85,7 +83,9 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					ModuleUtil.addModule(moduleVo);
 				}
 			}
+			System.out.println("getRegisteredParties():" + ModuleInitApplicationListener.getModuleinitphaser().getRegisteredParties());
 		} catch (IOException | DocumentException ex) {
+            ModuleInitApplicationListener.getModuleinitphaser().arrive();
 			if (moduleId != null) {
 				logger.error("初始化模块：" + moduleId + "失败", ex);
 			} else {
@@ -94,7 +94,4 @@ public class ModuleInitializer implements WebApplicationInitializer {
 		}
 
 	}
-    public static CountDownLatch getLatch() {
-        return latch;
-    }
 }

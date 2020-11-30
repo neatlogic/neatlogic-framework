@@ -36,7 +36,6 @@ import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobStatusVo;
-import codedriver.framework.startup.ModuleInitializer;
 
 @RootComponent
 public class SchedulerManager extends ApplicationListenerBase {
@@ -194,7 +193,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-	    ModuleInitializer.getLatch().countDown();
 		ApplicationContext context = event.getApplicationContext();
 		Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
 		List<IJob> tmpJobHandlerList = new ArrayList<>();
@@ -232,7 +230,6 @@ public class SchedulerManager extends ApplicationListenerBase {
 		protected void execute() {
 			String oldThreadName = Thread.currentThread().getName();
 			try {
-			    ModuleInitializer.getLatch().await();
 				Thread.currentThread().setName("SCHEDULE-JOB-LOADER-" + tenantUuid);
 				// 切换租户数据源
 				TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);

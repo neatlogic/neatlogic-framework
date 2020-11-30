@@ -26,6 +26,7 @@ import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 public class ModuleInitializer implements WebApplicationInitializer {
 	static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
+	
 	@Override
 	public void onStartup(ServletContext context) throws ServletException {
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -62,6 +63,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					if (StringUtils.isNotBlank(urlMapping)) {
 						sr.addMapping(urlMapping);
 					}
+					
 					/** 模块加载开始，计数器加一 **/
 					ModuleInitApplicationListener.getModuleinitphaser().register();
 					if (moduleId.equalsIgnoreCase("framework")) {
@@ -83,7 +85,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					ModuleUtil.addModule(moduleVo);
 				}
 			}
-			System.out.println("getRegisteredParties():" + ModuleInitApplicationListener.getModuleinitphaser().getRegisteredParties());
 		} catch (IOException | DocumentException ex) {
             ModuleInitApplicationListener.getModuleinitphaser().arrive();
 			if (moduleId != null) {

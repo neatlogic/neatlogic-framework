@@ -1,6 +1,7 @@
 package codedriver.framework.startup;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -25,13 +26,15 @@ import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 public class ModuleInitializer implements WebApplicationInitializer {
 	static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
-
+	/** 用于等待所有模块加载完成，再初始化定时作业 **/
+	private static CountDownLatch latch = null;
 	@Override
 	public void onStartup(ServletContext context) throws ServletException {
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		String moduleId = null;
 		try {
 			Resource[] resources = resolver.getResources("classpath*:codedriver/**/*-servlet-context.xml");
+			latch = new CountDownLatch(resources.length + 1);
 			for (Resource resource : resources) {
 				String path = resource.getURL().getPath();
 				path = path.substring(path.indexOf("!") + 1);
@@ -91,4 +94,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 		}
 
 	}
+    public static CountDownLatch getLatch() {
+        return latch;
+    }
 }

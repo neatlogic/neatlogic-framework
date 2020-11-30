@@ -233,20 +233,23 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
 			// 处理返回值
 			try {
-				InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "utf-8");
-				StringWriter writer = new StringWriter();
-				IOUtils.copy(reader, writer);
 				int code = connection.getResponseCode();
 				resultVo.setStatusCode(code);
-				if (String.valueOf(code).startsWith("2")) {
+				/** 请求失败时，getInputStream方法会根据状态码抛出不同的异常，比如404时抛出FileNotFoundException
+				 * 故只有请求成功时才能使用getInputStream，否则应该使用getErrorStream
+				 */
+				if(String.valueOf(code).startsWith("2")){
+					InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "utf-8");
+					StringWriter writer = new StringWriter();
+					IOUtils.copy(reader, writer);
 					resultVo.appendResult(writer.toString());
-				} else {
-					resultVo.appendError(writer.toString());
+				}else{
+					throw new RuntimeException("HTTP code : " + code);
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				resultVo.appendError(e.getMessage());
-				integrationAuditVo.appendError(e.getMessage());
+				resultVo.appendError("Connection failed\n" + e.getMessage());
+				integrationAuditVo.appendError("Connection failed\n" + e.getMessage());
 				integrationAuditVo.setStatus("failed");
 			}
 			boolean hasTransferd = false;

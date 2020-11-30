@@ -147,18 +147,16 @@
 	</select>
 
 	<select id="getRoleListByAuthName" parameterType="java.lang.String" resultMap="roleMap" useCache="false">
-		SELECT
+		select
 		a.`uuid`,
 		a.`name`,
-		a.`description`,
-		COUNT(DISTINCT (b.`user_uuid`)) as userCount
-		FROM `role` a
-		LEFT JOIN `user_role` b ON a.`uuid` = b.`role_uuid`
-		LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
-		WHERE
-		c.`auth` = #{auth}
-		GROUP BY a.`uuid`
-		ORDER BY c.`id`
+		a.`description`
+		from
+		`role` a
+		join `role_authority` b
+		on a.`uuid` = b.`role_uuid`
+		where b.`auth` = #{value}
+		ORDER BY b.`id`
 	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">

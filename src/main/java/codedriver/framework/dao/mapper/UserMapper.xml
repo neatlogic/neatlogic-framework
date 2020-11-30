@@ -224,7 +224,15 @@
 		where `is_active` = 1
 		<if test="keyword !=null and keyword != ''">
 			AND (`user_id` LIKE CONCAT(#{keyword}, '%')
-			OR `user_name` LIKE CONCAT('%', #{keyword}, '%'))
+			OR `user_name` LIKE CONCAT(#{keyword}, '%'))
+			ORDER BY
+			(
+				CASE 
+				WHEN `user_id` = #{keyword} OR `user_name` = #{keyword} THEN 1
+				WHEN `user_id` LIKE CONCAT(#{keyword},'%') OR  `user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			)
 		</if>
 		<if test="needPage">
 			LIMIT #{startNum}, #{pageSize}

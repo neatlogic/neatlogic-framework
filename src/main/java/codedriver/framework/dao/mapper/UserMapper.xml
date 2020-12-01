@@ -680,20 +680,19 @@
 		j.`name` as `teamName`
 		FROM (
 		SELECT
-		DISTINCT (a.`uuid`) AS `uuid`,a.user_id,a.user_name
+		DISTINCT (a.`uuid`) AS `uuid`,b.`id`
 		FROM
 		`user` a
-		LEFT JOIN user_role b ON a.uuid = b.user_uuid
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
 		WHERE
 		b.`role_uuid` = #{value}
-		ORDER BY
-		b.`id`
 		) g
 		JOIN `user` k ON g.`uuid` = k.`uuid`
 		LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
 		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
 		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+		order by g.`id`
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

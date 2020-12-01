@@ -698,6 +698,7 @@
 		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
 		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
 		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+		order by g.id
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

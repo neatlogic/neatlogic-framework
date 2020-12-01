@@ -656,28 +656,40 @@
 
 	<select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
 		SELECT
-		a.`uuid`,
-		a.`user_id` as `userId`,
-		a.`user_name` as `userName`,
-		a.`email`,
-		a.`phone`,
-		a.`pinyin`,
-		a.`is_active` as `isActive`,
-		a.`user_info` as `userInfo`,
-		a.`vip_level` as `vipLevel`,
-		b.`role_uuid` as `roleUuid`,
-		e.`name` as `roleName`,
-		e.`description`,
-		d.`uuid` as `teamUuid`,
-		d.`name` as `teamName`
-		from
+		k.`uuid`,
+		k.`user_id` as `userId`,
+		k.`user_name` as `userName`,
+		k.`email`,
+		k.`phone`,
+		k.`pinyin`,
+		k.`is_active` as `isActive`,
+		k.`user_info` as `userInfo`,
+		k.`vip_level` as `vipLevel`,
+		h.`role_uuid` as `roleUuid`,
+		r.`name` as `roleName`,
+		r.`description`,
+		j.`uuid` as `teamUuid`,
+		j.`name` as `teamName`
+		FROM (
+		SELECT
+		DISTINCT (a.`uuid`) AS `uuid`,a.user_id,a.user_name,b.id
+		FROM
 		`user` a
-		LEFT JOIN `user_role` b on b.`user_uuid` = a.`uuid`
-		LEFT JOIN `user_team` c on c.`user_uuid` = a.`uuid`
-		LEFT JOIN `team` d on c.`team_uuid` = d.`uuid`
-		LEFT JOIN `role` e on b.`role_uuid` = e.`uuid`
-		WHERE e.`uuid` = #{value}
-		ORDER BY b.`id`
+		LEFT JOIN user_role b ON a.uuid = b.user_uuid
+		LEFT JOIN user_team c ON a.uuid = c.user_uuid
+		LEFT JOIN team d ON c.team_uuid = d.uuid
+		LEFT JOIN `user_authority` f ON a.`uuid` = f.`user_uuid`
+		LEFT JOIN `role_authority` l ON b.`role_uuid` = l.`role_uuid`
+		WHERE
+		b.`role_uuid` = #{value}
+		ORDER BY
+		b.`id`
+		) g
+		JOIN `user` k ON g.`uuid` = k.`uuid`
+		LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

@@ -18,77 +18,77 @@ import codedriver.framework.common.dto.BasePageVo;
 
 public class ConditionConfigVo extends BasePageVo implements Serializable {
 
-	private static final long serialVersionUID = 5439300427812355573L;
+    private static final long serialVersionUID = 5439300427812355573L;
 
-	private List<ConditionGroupVo> conditionGroupList;
-	@JSONField(serialize=false)
-	private transient Map<String, ConditionGroupVo> conditionGroupMap;
-	private List<ConditionGroupRelVo> conditionGroupRelList;
-	public ConditionConfigVo() {
-	}
+    private List<ConditionGroupVo> conditionGroupList;
+    @JSONField(serialize = false)
+    private transient Map<String, ConditionGroupVo> conditionGroupMap;
+    private List<ConditionGroupRelVo> conditionGroupRelList;
 
-	public ConditionConfigVo(JSONObject jsonObj) {
-		JSONArray conditionGroupArray = jsonObj.getJSONArray("conditionGroupList");
-		if (CollectionUtils.isNotEmpty(conditionGroupArray)) {
-			
-			conditionGroupList = new ArrayList<ConditionGroupVo>();
-			conditionGroupMap = new HashMap<String, ConditionGroupVo>();
-			for (int i = 0; i < conditionGroupArray.size(); i++) {
-				JSONObject conditionGroupJson = conditionGroupArray.getJSONObject(i);
-				ConditionGroupVo conditionGroupVo = new ConditionGroupVo(conditionGroupJson);
-				conditionGroupList.add(conditionGroupVo);
-				conditionGroupMap.put(conditionGroupVo.getUuid(), conditionGroupVo);
-			}
-			JSONArray conditionGroupRelArray = jsonObj.getJSONArray("conditionGroupRelList");
-			if (CollectionUtils.isNotEmpty(conditionGroupRelArray)) {
-				conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();
-				for (int i = 0; i < conditionGroupRelArray.size(); i++) {
-					JSONObject conditionRelGroup = conditionGroupRelArray.getJSONObject(i);
-					conditionGroupRelList.add(new ConditionGroupRelVo(conditionRelGroup));
-				}
-			}
-		}
-	}
+    public ConditionConfigVo() {}
 
-	public List<ConditionGroupVo> getConditionGroupList() {
-		return conditionGroupList;
-	}
+    public ConditionConfigVo(JSONObject jsonObj) {
+        JSONArray conditionGroupArray = jsonObj.getJSONArray("conditionGroupList");
+        if (CollectionUtils.isNotEmpty(conditionGroupArray)) {
 
-	public void setConditionGroupList(List<ConditionGroupVo> conditionGroupList) {
-		this.conditionGroupList = conditionGroupList;
-	}
+            conditionGroupList = new ArrayList<ConditionGroupVo>();
+            conditionGroupMap = new HashMap<String, ConditionGroupVo>();
+            for (int i = 0; i < conditionGroupArray.size(); i++) {
+                JSONObject conditionGroupJson = conditionGroupArray.getJSONObject(i);
+                ConditionGroupVo conditionGroupVo = new ConditionGroupVo(conditionGroupJson);
+                conditionGroupList.add(conditionGroupVo);
+                conditionGroupMap.put(conditionGroupVo.getUuid(), conditionGroupVo);
+            }
+            JSONArray conditionGroupRelArray = jsonObj.getJSONArray("conditionGroupRelList");
+            if (CollectionUtils.isNotEmpty(conditionGroupRelArray)) {
+                conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();
+                for (int i = 0; i < conditionGroupRelArray.size(); i++) {
+                    JSONObject conditionRelGroup = conditionGroupRelArray.getJSONObject(i);
+                    conditionGroupRelList.add(new ConditionGroupRelVo(conditionRelGroup));
+                }
+            }
+        }
+    }
 
-	public Map<String, ConditionGroupVo> getConditionGroupMap() {
-	    if(MapUtils.isEmpty(conditionGroupMap) && CollectionUtils.isNotEmpty(conditionGroupList)) {
-	        conditionGroupMap = conditionGroupList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
-	    }
-		return conditionGroupMap;
-	}
+    public List<ConditionGroupVo> getConditionGroupList() {
+        return conditionGroupList;
+    }
 
-	public List<ConditionGroupRelVo> getConditionGroupRelList() {
-		return conditionGroupRelList;
-	}
+    public void setConditionGroupList(List<ConditionGroupVo> conditionGroupList) {
+        this.conditionGroupList = conditionGroupList;
+    }
 
-	public void setConditionGroupRelList(List<ConditionGroupRelVo> conditionGroupRelList) {
-		this.conditionGroupRelList = conditionGroupRelList;
-	}
+    public Map<String, ConditionGroupVo> getConditionGroupMap() {
+        if (MapUtils.isEmpty(conditionGroupMap) && CollectionUtils.isNotEmpty(conditionGroupList)) {
+            conditionGroupMap = conditionGroupList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        }
+        return conditionGroupMap;
+    }
 
-	public String buildScript() {
-		if (CollectionUtils.isNotEmpty(conditionGroupRelList)) {
-			StringBuilder script = new StringBuilder();
-			script.append("(");
-			String toUuid = null;
-			for (ConditionGroupRelVo conditionGroupRelVo : conditionGroupRelList) {
-				script.append(getConditionGroupMap().get(conditionGroupRelVo.getFrom()).buildScript());
-				script.append("and".equals(conditionGroupRelVo.getJoinType()) ? " && " : " || ");
-				toUuid = conditionGroupRelVo.getTo();
-			}
-			script.append(getConditionGroupMap().get(toUuid).buildScript());
-			script.append(")");
-			return script.toString();
-		} else {
-			ConditionGroupVo conditionGroupVo = conditionGroupList.get(0);
-			return conditionGroupVo.buildScript();
-		}
-	}
+    public List<ConditionGroupRelVo> getConditionGroupRelList() {
+        return conditionGroupRelList;
+    }
+
+    public void setConditionGroupRelList(List<ConditionGroupRelVo> conditionGroupRelList) {
+        this.conditionGroupRelList = conditionGroupRelList;
+    }
+
+    public String buildScript() {
+        if (CollectionUtils.isNotEmpty(conditionGroupRelList)) {
+            StringBuilder script = new StringBuilder();
+            script.append("(");
+            String toUuid = null;
+            for (ConditionGroupRelVo conditionGroupRelVo : conditionGroupRelList) {
+                script.append(getConditionGroupMap().get(conditionGroupRelVo.getFrom()).buildScript());
+                script.append("and".equals(conditionGroupRelVo.getJoinType()) ? " && " : " || ");
+                toUuid = conditionGroupRelVo.getTo();
+            }
+            script.append(getConditionGroupMap().get(toUuid).buildScript());
+            script.append(")");
+            return script.toString();
+        } else {
+            ConditionGroupVo conditionGroupVo = conditionGroupList.get(0);
+            return conditionGroupVo.buildScript();
+        }
+    }
 }

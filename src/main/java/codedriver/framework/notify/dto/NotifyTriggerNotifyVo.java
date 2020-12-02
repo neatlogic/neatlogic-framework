@@ -1,5 +1,6 @@
 package codedriver.framework.notify.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import codedriver.framework.dto.condition.ConditionConfigVo;
@@ -7,7 +8,7 @@ import codedriver.framework.dto.condition.ConditionConfigVo;
 public class NotifyTriggerNotifyVo {
 
     private Long id;
-    private List<NotifyActionVo> actionList;
+    private List<NotifyActionVo> actionList = new ArrayList<>();
     private ConditionConfigVo conditionConfig;
     public Long getId() {
         return id;

@@ -3,7 +3,8 @@ package codedriver.framework.notify.dto;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import com.alibaba.fastjson.JSONObject;
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import codedriver.framework.common.constvalue.ActionType;
@@ -29,7 +30,7 @@ public class NotifyPolicyVo extends BaseEditorVo {
 	@EntityField(name = "引用数量", type = ApiParamType.INTEGER)
 	private int invokerCount;
 	@EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
-	private JSONObject config;
+	private NotifyPolicyConfigVo config;
 	@EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
 	private String handler;
 	
@@ -121,21 +122,21 @@ public class NotifyPolicyVo extends BaseEditorVo {
 		this.invokerCount = invokerCount;
 	}
 
-	public JSONObject getConfig() {
+	public NotifyPolicyConfigVo getConfig() {
 		return config;
 	}
 	public void setConfig(String config) {
 		try {
-			this.config = JSONObject.parseObject(config);
+			this.config = JSON.parseObject(config, NotifyPolicyConfigVo.class);
 		}catch(Exception ex) {
 			
 		}
 	}
-	
+
 	@JSONField(serialize = false)
 	public String getConfigStr() {
 		if (config != null) {
-			return config.toJSONString();
+			return JSON.toJSONString(config);
 		}
 		return null;
 	}

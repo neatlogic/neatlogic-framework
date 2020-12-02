@@ -1,5 +1,6 @@
 package codedriver.framework.notify.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import codedriver.framework.dto.ConditionParamVo;
@@ -7,12 +8,12 @@ import codedriver.framework.dto.UserVo;
 
 public class NotifyPolicyConfigVo {
 
-    private List<String> adminUserUuidList;
-    private List<NotifyTriggerVo> triggerList;
-    private List<UserVo> userList;
-    private List<ConditionParamVo> paramList;
-    private List<NotifyTemplateVo> templateList;
-    private List<ConditionParamVo> conditionOptionList;
+    private List<String> adminUserUuidList = new ArrayList<>();
+    private List<NotifyTriggerVo> triggerList = new ArrayList<>();
+    private List<UserVo> userList = new ArrayList<>();
+    private List<ConditionParamVo> paramList = new ArrayList<>();
+    private List<NotifyTemplateVo> templateList = new ArrayList<>();
+    private List<ConditionParamVo> conditionOptionList = new ArrayList<>();
     public List<String> getAdminUserUuidList() {
         return adminUserUuidList;
     }

@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -90,17 +92,24 @@ public class ConditionGroupVo implements Serializable{
 		this.channelUuidList = channelUuidList;
 	}
 
-	public String buildScript() {	
+	public Map<String, ConditionVo> getConditionMap() {
+	    if(MapUtils.isEmpty(conditionMap) && CollectionUtils.isNotEmpty(conditionList)) {
+            conditionMap = conditionList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        }
+        return conditionMap;
+    }
+
+    public String buildScript() {	
 		if(!CollectionUtils.isEmpty(conditionRelList)) {
 			StringBuilder script = new StringBuilder();
 			script.append("(");
 			String toUuid = null;
 			for(ConditionRelVo conditionRelVo : conditionRelList) {
-				script.append(conditionMap.get(conditionRelVo.getFrom()).predicate());
+				script.append(getConditionMap().get(conditionRelVo.getFrom()).predicate());
 				script.append("and".equals(conditionRelVo.getJoinType()) ? " && " : " || ");
 				toUuid = conditionRelVo.getTo();
 			}
-			script.append(conditionMap.get(toUuid).predicate());
+			script.append(getConditionMap().get(toUuid).predicate());
 			script.append(")");
 			return script.toString();
 		}else {

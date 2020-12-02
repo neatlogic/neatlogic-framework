@@ -3,6 +3,7 @@ package codedriver.framework.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -15,7 +16,6 @@ public class ConditionParamVo {
 	private String name;
 	private String label;
 	private String controller;
-//	private Boolean isMultiple = false;//TODO linbq前端改好后要删除这个字段
 	private JSONObject config;
 	private String type;
 	private String paramType;
@@ -23,17 +23,31 @@ public class ConditionParamVo {
 	private String defaultExpression;
 	private List<ExpressionVo> expressionList = new ArrayList<>();
 	private int isEditable = 1;
-	private String freemarkerTemplate;
-	
+	private String freemarkerTemplate;	
 	private String handler;
 	
-//	public Boolean getIsMultiple() {
-//		return isMultiple;
-//	}
-//	public void setIsMultiple(Boolean isMultiple) {
-//		this.isMultiple = isMultiple;
-//	}
-	public JSONObject getConfig() {
+	public ConditionParamVo() {}
+	
+	public ConditionParamVo(ConditionParamVo conditionParamVo) {
+        this.name = conditionParamVo.name;
+        this.label = conditionParamVo.label;
+        this.controller = conditionParamVo.controller;
+        this.setConfig(conditionParamVo.getConfigStr());
+        this.type = conditionParamVo.type;
+        this.paramType = conditionParamVo.paramType;
+        this.paramTypeName = conditionParamVo.paramTypeName;
+        this.defaultExpression = conditionParamVo.defaultExpression;
+        this.isEditable = conditionParamVo.isEditable;
+        this.freemarkerTemplate = conditionParamVo.freemarkerTemplate;
+        this.handler = conditionParamVo.handler;
+
+        if(CollectionUtils.isNotEmpty(conditionParamVo.expressionList)) {
+            for(ExpressionVo expressionVo : conditionParamVo.expressionList) {
+                this.expressionList.add(new ExpressionVo(expressionVo));
+            }
+        }
+    }
+    public JSONObject getConfig() {
 		return config;
 	}
 	public void setConfig(String config) {

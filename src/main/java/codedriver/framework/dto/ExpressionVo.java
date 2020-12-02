@@ -20,7 +20,13 @@ public class ExpressionVo implements Serializable {
 		this.expressionEs = processExpression.getExpressionEs();
         this.isShowConditionValue = processExpression.getIsShowConditionValue();
 	}
-	public ExpressionVo(String expression, String expressionName) {
+	public ExpressionVo(ExpressionVo expressionVo) {
+        this.expression = expressionVo.expression;
+        this.expressionName = expressionVo.expressionName;
+        this.expressionEs = expressionVo.expressionEs;
+        this.isShowConditionValue = expressionVo.isShowConditionValue;
+    }
+    public ExpressionVo(String expression, String expressionName) {
 	    this.expression = expression;
         this.expressionName = expressionName;
     }

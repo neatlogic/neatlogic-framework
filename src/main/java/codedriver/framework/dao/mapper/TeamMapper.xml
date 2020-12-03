@@ -36,6 +36,17 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 	</select>
+	
+	<select id="searchTeamByUserUuidAndLevel" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`name`,
+		a.`lft`,
+		a.`rht`,
+		a.`parent_uuid` AS `parentUuid`,
+		a.`level`
+		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid} AND a.`level` = #{level}
+	</select>
 
 	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
 		SELECT
@@ -134,6 +145,21 @@
 		FROM `team` a
 		WHERE a.`parent_uuid` = #{value}
 		ORDER BY `lft` ASC
+	</select>
+	
+	<select id="getAllSonTeamByParentTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`name`,
+		a.`parent_uuid` AS parentUuid,
+		a.`lft`,
+		a.`rht`,
+		a.`level`,
+		FROM `team` a
+		WHERE
+		<foreach collection="list" item="team" separator=") or (" open="(" close=")">
+			a.`lft` > #{team.lft} and a.`rht` &lt; #{team.rgt}
+		</foreach>
 	</select>
 
 	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int" useCache="false">

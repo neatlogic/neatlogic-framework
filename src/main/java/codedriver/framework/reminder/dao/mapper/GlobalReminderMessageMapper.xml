@@ -250,7 +250,7 @@
         `param`
         ) VALUES (
         #{title},
-        NOW(),
+        NOW(3),
         #{fromUser},
         #{handler},
         #{param}

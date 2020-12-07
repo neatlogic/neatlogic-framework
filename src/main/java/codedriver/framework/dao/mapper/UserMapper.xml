@@ -746,7 +746,7 @@
 		#{uuid},
 		#{userId},
 		#{password},
-		NOW(),
+		NOW(3),
 		1
 		)
 	</insert>
@@ -764,7 +764,7 @@
 	<insert id="insertUserSession" parameterType="java.lang.String">
 		INSERT INTO `user_session` (`user_uuid`, `visit_time`)
 		VALUES
-		(#{userUuid}, now()) ;
+		(#{userUuid}, now(3)) ;
 	</insert>
 
 	<insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
@@ -817,7 +817,7 @@
 	</update>
 
 	<update id="updateUserSession" parameterType="java.lang.String">
-		UPDATE `user_session` set `visit_time` = now() WHERE `user_uuid` = #{userUuid}
+		UPDATE `user_session` set `visit_time` = now(3) WHERE `user_uuid` = #{userUuid}
 	</update>
 
 	<update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">

@@ -203,7 +203,7 @@
 		(
 		#{tenantId},
 		#{moduleId},
-		NOW()
+		NOW(3)
 		)
 	</insert>
 
@@ -243,7 +243,7 @@
 		`tenant_module`
 		SET
 		`version` = #{version},
-		`lcd` = NOW()
+		`lcd` = NOW(3)
 		WHERE
 		`tenant_id` = #{tenantId}
 		AND `module_id` = #{moduleId}

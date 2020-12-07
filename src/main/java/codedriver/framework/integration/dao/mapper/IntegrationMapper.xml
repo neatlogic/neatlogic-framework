@@ -157,7 +157,7 @@
 		`handler` = #{handler},
 		`method` = #{method},
 		`config` = #{configStr},
-		`lcd` = NOW(),
+		`lcd` = NOW(3),
 		`lcu` = #{lcu}
 		WHERE `uuid` = #{uuid}
 	</update>
@@ -197,7 +197,7 @@
 		#{method},
 		#{configStr},
 		#{isActive},
-		NOW(),
+		NOW(3),
 		#{fcu}
 		)
 	</insert>

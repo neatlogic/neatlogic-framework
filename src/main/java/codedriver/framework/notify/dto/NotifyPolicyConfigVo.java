@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import codedriver.framework.dto.ConditionParamVo;
-import codedriver.framework.dto.UserVo;
 
 public class NotifyPolicyConfigVo {
 
     private List<String> adminUserUuidList = new ArrayList<>();
     private List<NotifyTriggerVo> triggerList = new ArrayList<>();
-    private List<UserVo> userList = new ArrayList<>();
+    private List<String> userList = new ArrayList<>();
     private List<ConditionParamVo> paramList = new ArrayList<>();
     private List<NotifyTemplateVo> templateList = new ArrayList<>();
     private List<ConditionParamVo> conditionOptionList = new ArrayList<>();
@@ -31,11 +30,11 @@ public class NotifyPolicyConfigVo {
         this.triggerList = triggerList;
     }
 
-    public List<UserVo> getUserList() {
+    public List<String> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<UserVo> userList) {
+    public void setUserList(List<String> userList) {
         this.userList = userList;
     }
 

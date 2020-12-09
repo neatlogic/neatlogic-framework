@@ -2,6 +2,7 @@ package codedriver.framework.notify.core;
 
 import java.util.List;
 
+import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.springframework.util.ClassUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -13,7 +14,7 @@ public interface INotifyPolicyHandler {
 	
 	public String getName();
 	
-	public List<ValueTextVo> getNotifyTriggerList();
+	public List<NotifyTriggerVo> getNotifyTriggerList();
 	
 	public List<ValueTextVo> getParamTypeList();
 	

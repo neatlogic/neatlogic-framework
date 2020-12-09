@@ -13,6 +13,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import codedriver.framework.common.constvalue.ParamType;
 
 public class ConditionParamVo {
+    private String uuid;
     private String name;
     private String label;
     private String controller;
@@ -118,6 +119,14 @@ public class ConditionParamVo {
 
     public void setConfig(JSONObject config) {
         this.config = config;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

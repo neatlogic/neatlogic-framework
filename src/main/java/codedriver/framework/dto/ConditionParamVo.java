@@ -26,6 +26,8 @@ public class ConditionParamVo {
     private int isEditable = 1;
     private String freemarkerTemplate;
     private String handler;
+    /** 不作为数据库与显示字段，仅为排序使用 */
+    private Long lcd = 0L;
 
     public ConditionParamVo() {}
 
@@ -174,5 +176,13 @@ public class ConditionParamVo {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public Long getLcd() {
+        return lcd;
+    }
+
+    public void setLcd(Long lcd) {
+        this.lcd = lcd;
     }
 }

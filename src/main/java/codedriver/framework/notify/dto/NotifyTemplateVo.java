@@ -31,6 +31,8 @@ public class NotifyTemplateVo extends BasePageVo {
 	private String action;
 	@EntityField(name = "操作类型名，创建|修改", type = ApiParamType.STRING)
 	private String actionName;
+	/** 不作为数据库与显示字段，仅为排序使用 */
+	private Long lcd = 0L;
 
 	public NotifyTemplateVo() {
 	}
@@ -111,5 +113,13 @@ public class NotifyTemplateVo extends BasePageVo {
 
 	public void setActionName(String actionName) {
 		this.actionName = actionName;
+	}
+
+	public Long getLcd() {
+		return lcd;
+	}
+
+	public void setLcd(Long lcd) {
+		this.lcd = lcd;
 	}
 }

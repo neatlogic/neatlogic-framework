@@ -13,6 +13,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import codedriver.framework.common.constvalue.ParamType;
 
 public class ConditionParamVo {
+    private String uuid;
     private String name;
     private String label;
     private String controller;
@@ -25,6 +26,9 @@ public class ConditionParamVo {
     private int isEditable = 1;
     private String freemarkerTemplate;
     private String handler;
+    /** 不作为数据库与显示字段，仅为排序使用 */
+    @JSONField(serialize = false)
+    private Long lcd = 0L;
 
     public ConditionParamVo() {}
 
@@ -120,6 +124,14 @@ public class ConditionParamVo {
         this.config = config;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getName() {
         return name;
     }
@@ -165,5 +177,13 @@ public class ConditionParamVo {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public Long getLcd() {
+        return lcd;
+    }
+
+    public void setLcd(Long lcd) {
+        this.lcd = lcd;
     }
 }

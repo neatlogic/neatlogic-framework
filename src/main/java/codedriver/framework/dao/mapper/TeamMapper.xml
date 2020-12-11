@@ -154,11 +154,11 @@
 		a.`parent_uuid` AS parentUuid,
 		a.`lft`,
 		a.`rht`,
-		a.`level`,
+		a.`level`
 		FROM `team` a
 		WHERE
 		<foreach collection="list" item="team" separator=") or (" open="(" close=")">
-			a.`lft` > #{team.lft} and a.`rht` &lt; #{team.rgt}
+			a.`lft` >= #{team.lft} and a.`rht` &lt;= #{team.rht}
 		</foreach>
 	</select>
 

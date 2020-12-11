@@ -5,7 +5,7 @@ import codedriver.framework.restful.annotation.EntityField;
 
 import java.util.Map;
 
-public class UserTypeVo implements Cloneable{
+public class UserTypeVo{
 
 	@EntityField(name = "模块id", type = ApiParamType.STRING)
 	private String moduleId;

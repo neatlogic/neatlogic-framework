@@ -27,6 +27,7 @@ public class ConditionParamVo {
     private String freemarkerTemplate;
     private String handler;
     /** 不作为数据库与显示字段，仅为排序使用 */
+    @JSONField(serialize = false)
     private Long lcd = 0L;
 
     public ConditionParamVo() {}

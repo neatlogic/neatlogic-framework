@@ -7,13 +7,15 @@ public class NotifyTriggerVo {
 
     private String trigger;
     private String triggerName;
+    private String description;
     private List<NotifyTriggerNotifyVo> notifyList = new ArrayList<>();
 
     public NotifyTriggerVo() {}
 
-    public NotifyTriggerVo(String trigger, String triggerName) {
+    public NotifyTriggerVo(String trigger, String triggerName,String description) {
         this.trigger = trigger;
         this.triggerName = triggerName;
+        this.description = description;
     }
 
     public String getTrigger() {
@@ -30,6 +32,14 @@ public class NotifyTriggerVo {
 
     public void setTriggerName(String triggerName) {
         this.triggerName = triggerName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<NotifyTriggerNotifyVo> getNotifyList() {

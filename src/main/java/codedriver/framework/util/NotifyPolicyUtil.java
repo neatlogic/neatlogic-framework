@@ -144,9 +144,6 @@ public class NotifyPolicyUtil {
                                         if (templateParamData.containsKey(paramMappingVo.getName())) {
                                             continue;
                                         }
-                                        if (templateParamData.containsKey(paramMappingVo.getValue())) {
-                                            continue;
-                                        }
                                         /** end **/
                                         if ("constant".equals(paramMappingVo.getType())) {
                                             notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());

@@ -33,6 +33,12 @@ public class ExpressionVo implements Serializable {
         this.expressionName = expressionName;
     }
 
+    public ExpressionVo(String expression, String expressionName, Integer isShowConditionValue) {
+        this.expression = expression;
+        this.expressionName = expressionName;
+        this.isShowConditionValue = isShowConditionValue;
+    }
+
     public String getExpression() {
         return expression;
     }

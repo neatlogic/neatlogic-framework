@@ -16,11 +16,13 @@ public interface TeamMapper {
 
 	public List<TeamVo> getTeamByParentUuid(String parentUuid);
 	
+    public List<TeamVo> getDepartmentTeamUuidByTeamList(@Param("list")List<TeamVo> teamList);
+	
 	public List<TeamVo> getAllSonTeamByParentTeamList(@Param("list")List<TeamVo> list);
 
 	public List<TeamVo> searchTeam(TeamVo teamVo);
 	
-	public List<TeamVo> searchTeamByUserUuidAndLevel(@Param("userUuid") String userUuid,@Param("level") String level);
+	public List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid,@Param("list") List<String> level);
 
 	public List<ValueTextVo> searchTeamForSelect(TeamVo teamVo);
 
@@ -99,4 +101,5 @@ public interface TeamMapper {
 	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
 	public int deleteTeamUser(TeamUserVo teamUserVo);
+
 }

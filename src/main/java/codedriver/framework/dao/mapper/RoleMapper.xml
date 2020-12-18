@@ -158,6 +158,17 @@
 		where b.`auth` = #{value}
 		ORDER BY b.`id`
 	</select>
+	
+	<select id="getRoleUuidListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String">
+		select 
+		`role_uuid`	
+		from
+		`user_role`
+		where `user_uuid` in
+		<foreach collection="list" item="userUuid" separator="," open="(" close=")">
+			#{userUuid}
+		</foreach>
+	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)

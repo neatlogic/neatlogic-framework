@@ -18,6 +18,8 @@ public interface RoleMapper {
     public List<RoleVo> searchRole(RoleVo roleVo);
 
     public List<RoleVo> getRoleListByAuthName(String auth);
+    
+    public List<String> getRoleUuidListByUserUuidList(@Param("list")List<String> userUuidList);
 
     public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 

@@ -1,8 +1,10 @@
 package codedriver.framework.auth.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
@@ -53,5 +55,21 @@ public class AuthActionChecker {
             return false;
         }
     }
-
+    
+    public static Boolean checkByUserUuid(String userUuid, String... action) {
+        if (action == null || action.length == 0) {
+            return false;
+        }
+        List<String> actionList = Arrays.asList(action);
+        List<String> actionRoleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
+        if(CollectionUtils.isNotEmpty(actionRoleUuidList)) {
+            List<String> roleUuidList = userMapper.getRoleUuidListByUserUuid(userUuid);
+            for (String roleUuid : actionRoleUuidList) {
+                if(roleUuidList.contains(roleUuid)) {
+                    return true;
+                }
+            }
+        }
+        return userMapper.checkUserAuthorityIsExists(userUuid, actionList) > 0;
+    }
 }

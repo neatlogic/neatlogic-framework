@@ -1,5 +1,7 @@
 package codedriver.framework.restful.api;
 
+import codedriver.framework.auth.core.AuthAction;
+import codedriver.framework.auth.label.NO_AUTH;
 import codedriver.framework.reminder.core.OperationTypeEnum;
 import codedriver.framework.restful.annotation.OperationType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,8 @@ import codedriver.framework.restful.annotation.Output;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentBase;
 
 @Service
-@OperationType(type = OperationTypeEnum.DELETE)
+@AuthAction(action = NO_AUTH.class)
+@OperationType(type = OperationTypeEnum.OPERATE)
 public class LogoutApi extends PrivateApiComponentBase {
 	@Autowired
 	UserMapper userMapper;

@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AuthAction {
-	String name() default "";
+	Class<?> action() ;
 }
 

@@ -169,8 +169,8 @@ public class ApiValidateAndHelpBase {
 		Boolean isAuth = false;
 		if (apiClass != null) {
 			AuthAction action = apiClass.getAnnotation(AuthAction.class);
-			if (null != action && StringUtils.isNotBlank(action.name())) {
-				String actionName = action.name();
+			if (null != action && StringUtils.isNotBlank(action.getClass().getSimpleName())) {
+				String actionName = action.getClass().getSimpleName();
 				// 判断用户角色是否拥有接口权限
 				if (AuthActionChecker.check(actionName)) {
 					isAuth = true;

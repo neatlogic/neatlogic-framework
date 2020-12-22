@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,7 +21,10 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
+import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.reminder.core.OperationTypeEnum;
+import codedriver.framework.restful.annotation.OperationType;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
@@ -279,6 +283,7 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
         for (Map.Entry<String, IPrivateBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
             IPrivateBinaryStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
+                checkAnnotation(component);
                 binaryComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
@@ -346,5 +351,27 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                 }
             }
         }
+    }
+    
+    /**
+    * @Time 2020年12月22日  
+    * @Description: 补充注解提示，防止越权
+    * @Param 
+    * @return
+     */
+    public void checkAnnotation(Object component) {
+        Class<?> clazz = AopUtils.getTargetClass(component);
+        OperationType operationType = clazz.getAnnotation(OperationType.class);
+        if(operationType == null) {
+            logger.error(clazz.getName() + "接口没有OperationType注解");
+        }else {
+            OperationTypeEnum operationTypeEnum = operationType.type();
+            if(operationTypeEnum == OperationTypeEnum.DELETE || operationTypeEnum == OperationTypeEnum.CREATE || operationTypeEnum == OperationTypeEnum.UPDATE) {
+                AuthAction authAction = clazz.getAnnotation(AuthAction.class);
+                if(authAction == null) {
+                    logger.error(clazz.getName() + "接口没有AuthAction注解");
+                }
+            }
+        }      
     }
 }

@@ -4,15 +4,17 @@ public class NotifyTriggerTemplateVo {
 
     private String trigger;
     private String title;
+    private String description;
     private String content;
     private String handler;
 
     public NotifyTriggerTemplateVo() {}
 
-    public NotifyTriggerTemplateVo(String trigger, String title, String content, String handler) {
+    public NotifyTriggerTemplateVo(String trigger, String description,String title, String content, String handler) {
         this.trigger = trigger;
         this.title = title;
         this.content = content;
+        this.description = description;
         this.handler = handler;
     }
 
@@ -38,6 +40,14 @@ public class NotifyTriggerTemplateVo {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getHandler() {

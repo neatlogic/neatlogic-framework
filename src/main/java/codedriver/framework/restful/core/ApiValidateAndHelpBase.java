@@ -1,5 +1,27 @@
 package codedriver.framework.restful.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.auth.core.AuthAction;
+import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.util.IpUtil;
+import codedriver.framework.exception.type.*;
+import codedriver.framework.param.validate.core.ParamValidatorFactory;
+import codedriver.framework.restful.annotation.*;
+import codedriver.framework.restful.audit.ApiAuditSaveThread;
+import codedriver.framework.restful.dto.ApiAuditVo;
+import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,41 +31,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
-import codedriver.framework.auth.core.AuthAction;
-import codedriver.framework.auth.core.AuthActionChecker;
-import codedriver.framework.common.config.Config;
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.util.IpUtil;
-import codedriver.framework.exception.type.ParamIrregularException;
-import codedriver.framework.exception.type.ParamNotExistsException;
-import codedriver.framework.exception.type.ParamValueTooLongException;
-import codedriver.framework.exception.type.ParamValueTooShortException;
-import codedriver.framework.exception.type.PermissionDeniedException;
-import codedriver.framework.param.validate.core.ParamValidatorFactory;
-import codedriver.framework.restful.annotation.Description;
-import codedriver.framework.restful.annotation.EntityField;
-import codedriver.framework.restful.annotation.Example;
-import codedriver.framework.restful.annotation.Input;
-import codedriver.framework.restful.annotation.NotDefined;
-import codedriver.framework.restful.annotation.Output;
-import codedriver.framework.restful.annotation.Param;
-import codedriver.framework.restful.audit.ApiAuditSaveThread;
-import codedriver.framework.restful.dto.ApiAuditVo;
-import codedriver.framework.restful.dto.ApiVo;
 
 public class ApiValidateAndHelpBase {
 	private static Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
@@ -169,8 +156,8 @@ public class ApiValidateAndHelpBase {
 		Boolean isAuth = false;
 		if (apiClass != null) {
 			AuthAction action = apiClass.getAnnotation(AuthAction.class);
-			if (null != action && StringUtils.isNotBlank(action.getClass().getSimpleName())) {
-				String actionName = action.getClass().getSimpleName();
+			if (null != action && StringUtils.isNotBlank(action.action().getSimpleName())) {
+				String actionName = action.action().getSimpleName();
 				// 判断用户角色是否拥有接口权限
 				if (AuthActionChecker.check(actionName)) {
 					isAuth = true;

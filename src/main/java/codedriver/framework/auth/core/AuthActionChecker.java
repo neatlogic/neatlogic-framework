@@ -1,16 +1,16 @@
 package codedriver.framework.auth.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.auth.label.NO_AUTH;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RootComponent
 public class AuthActionChecker {
@@ -36,6 +36,10 @@ public class AuthActionChecker {
         List<String> actionList = new ArrayList<>();
         for (String a : action) {
             actionList.add(a);
+        }
+        //无需鉴权
+        if(actionList.contains(NO_AUTH.class.getSimpleName())){
+            return true;
         }
         if (userContext != null) {
             List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);

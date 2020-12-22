@@ -366,7 +366,7 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
             logger.error(clazz.getName() + "接口没有OperationType注解");
         }else {
             OperationTypeEnum operationTypeEnum = operationType.type();
-            if(operationTypeEnum == OperationTypeEnum.DELETE || operationTypeEnum == OperationTypeEnum.CREATE || operationTypeEnum == OperationTypeEnum.UPDATE) {
+            if(operationTypeEnum == OperationTypeEnum.DELETE || operationTypeEnum == OperationTypeEnum.CREATE || operationTypeEnum == OperationTypeEnum.UPDATE|| operationTypeEnum == OperationTypeEnum.OPERATE) {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);
                 if(authAction == null) {
                     logger.error(clazz.getName() + "接口没有AuthAction注解");

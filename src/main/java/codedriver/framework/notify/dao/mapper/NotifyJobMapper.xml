@@ -15,7 +15,40 @@
 		`cron`,
 		`is_active` as isActive
 		FROM `notify_job`
-		WHERE `id` = #{id}
+		WHERE `id` = #{value}
+	</select>
+
+	<resultMap id="NotifyJobMap" type="codedriver.framework.notify.dto.job.NotifyJobVo">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="handler" column="handler" />
+		<result property="notifyHandler" column="notifyHandler" />
+		<result property="config" column="config" />
+		<result property="cron" column="cron" />
+		<result property="isActive" column="isActive" />
+		<collection property="receiverList" ofType="codedriver.framework.notify.dto.job.NotifyJobReceiverVo">
+			<result property="receiver" column="receiver" />
+			<result property="type" column="type" />
+			<result property="receiveType" column="receiveType" />
+		</collection>
+	</resultMap>
+
+	<select id="getJobDetailById" parameterType="java.lang.Long" resultMap="NotifyJobMap">
+		SELECT
+		a.`id`,
+		a.`name`,
+		a.`handler`,
+		a.`notify_handler` as notifyHandler,
+		a.`config`,
+		a.`cron`,
+		a.`is_active` as isActive,
+		b.`receiver`,
+		b.`type`,
+		b.`receive_type` as receiveType
+		FROM `notify_job` a
+		left join `notify_job_receiver` b
+		on a.`id` = b.`notify_job_id`
+		WHERE `id` = #{value}
 	</select>
 
     <insert id="insertJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo">

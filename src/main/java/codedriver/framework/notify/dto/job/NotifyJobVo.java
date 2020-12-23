@@ -2,9 +2,14 @@ package codedriver.framework.notify.dto.job;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
+import codedriver.framework.notify.constvalue.NotifyRecipientType;
+import codedriver.framework.notify.core.INotifyHandler;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +37,10 @@ public class NotifyJobVo extends BaseEditorVo {
 	private List<String> toList;
 	@EntityField(name = "抄送人列表", type = ApiParamType.JSONARRAY)
 	private List<String> ccList;
+
+	@JSONField(serialize = false)
+	@EntityField(name = "接收者列表", type = ApiParamType.JSONARRAY)
+	private List<NotifyJobReceiverVo> receiverList;
 
 	@EntityField(name = "下次发送时间")
 	private Date nextFireTime;
@@ -114,6 +123,15 @@ public class NotifyJobVo extends BaseEditorVo {
 	}
 
 	public List<String> getToList() {
+		if(CollectionUtils.isEmpty(toList) && CollectionUtils.isNotEmpty(receiverList)){
+			toList = new ArrayList<>();
+			for(NotifyJobReceiverVo vo : receiverList){
+				NotifyRecipientType type = NotifyRecipientType.getNotifyRecipientType(vo.getType());
+				if(type != null && INotifyHandler.RecipientType.TO.getValue().equals(vo.getReceiveType())){
+					toList.add(type.getValuePlugin() + vo.getReceiver());
+				}
+			}
+		}
 		return toList;
 	}
 
@@ -122,11 +140,28 @@ public class NotifyJobVo extends BaseEditorVo {
 	}
 
 	public List<String> getCcList() {
+		if(CollectionUtils.isEmpty(ccList) && CollectionUtils.isNotEmpty(receiverList)){
+			ccList = new ArrayList<>();
+			for(NotifyJobReceiverVo vo : receiverList){
+				NotifyRecipientType type = NotifyRecipientType.getNotifyRecipientType(vo.getType());
+				if(type != null && INotifyHandler.RecipientType.CC.getValue().equals(vo.getReceiveType())){
+					ccList.add(type.getValuePlugin() + vo.getReceiver());
+				}
+			}
+		}
 		return ccList;
 	}
 
 	public void setCcList(List<String> ccList) {
 		this.ccList = ccList;
+	}
+
+	public List<NotifyJobReceiverVo> getReceiverList() {
+		return receiverList;
+	}
+
+	public void setReceiverList(List<NotifyJobReceiverVo> receiverList) {
+		this.receiverList = receiverList;
 	}
 
 	public Date getNextFireTime() {

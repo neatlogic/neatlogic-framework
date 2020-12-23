@@ -11,6 +11,8 @@ public interface NotifyJobMapper {
 
     public NotifyJobVo getJobBaseInfoById(Long id);
 
+    public NotifyJobVo getJobDetailById(Long id);
+
     public int updateJob(NotifyJobVo vo);
 
     public int updateJobStatus(NotifyJobVo vo);

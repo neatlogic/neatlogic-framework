@@ -28,6 +28,13 @@ public class AuthActionChecker {
         userMapper = _userMapper;
     }
 
+    /**
+     * create by: 89770
+     * description: TODO
+     * create time: 2020/12/23 10:57
+     * 
+     * @return 
+     */
     public static Boolean check(String... action) {
         if (action == null || action.length == 0) {
             return false;

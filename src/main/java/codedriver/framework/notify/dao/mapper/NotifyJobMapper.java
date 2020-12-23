@@ -13,6 +13,8 @@ public interface NotifyJobMapper {
 
     public int updateJob(NotifyJobVo vo);
 
+    public int updateJobStatus(NotifyJobVo vo);
+
     public int insertJob(NotifyJobVo vo);
 
     public int batchInsertReceiver(List<NotifyJobReceiverVo> list);

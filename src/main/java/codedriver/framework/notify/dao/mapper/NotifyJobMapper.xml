@@ -80,6 +80,16 @@
 		`id` = #{id}
 	</update>
 
+	<update id="updateJobStatus" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo">
+		UPDATE `notify_job`
+		SET
+		`is_active` = #{isActive},
+		`lcu` = #{lcu},
+		`lcd` = now(3)
+		WHERE
+		`id` = #{id}
+	</update>
+
 	<delete id="deleteJobById" parameterType="java.lang.Long">
 		delete
 		from

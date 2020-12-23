@@ -17,6 +17,8 @@ public interface NotifyJobMapper {
 
     public int batchInsertReceiver(List<NotifyJobReceiverVo> list);
 
+    public int deleteJobById(Long id);
+
     public int deleteReceiverByJobId(Long jobId);
 
 }

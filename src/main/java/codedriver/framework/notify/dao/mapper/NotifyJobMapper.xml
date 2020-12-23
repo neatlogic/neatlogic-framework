@@ -80,6 +80,13 @@
 		`id` = #{id}
 	</update>
 
+	<delete id="deleteJobById" parameterType="java.lang.Long">
+		delete
+		from
+		`notify_job`
+		where `id` = #{value}
+	</delete>
+
 	<delete id="deleteReceiverByJobId" parameterType="java.lang.Long">
 		delete
 		from

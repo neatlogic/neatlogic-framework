@@ -2,6 +2,7 @@ package codedriver.framework.notify.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.ConditionParamVo;
+import codedriver.framework.notify.dto.NotifyVo;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.util.ClassUtils;
 
@@ -65,6 +66,12 @@ public interface INotifyContentHandler {
 	 * @return
 	 */
 	public List<ValueTextVo> getDataColumnList();
+
+	/**
+	 * 组装待发送数据
+	 * @param id notify_job主键
+	 */
+	public List<NotifyVo> getNotifyData(Long id);
 
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();

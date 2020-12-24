@@ -11,7 +11,6 @@
 		`name`,
 		`handler`,
 		`notify_handler` as notifyHandler,
-		`config`,
 		`cron`,
 		`is_active` as isActive
 		FROM `notify_job`
@@ -56,11 +55,11 @@
 		COUNT(1)
 		FROM
 		`notify_job`
-		WHERE
-		1=1
+		<where>
 		<if test="keyword != null and keyword != ''">
 			and `name` LIKE CONCAT('%', #{keyword}, '%')
 		</if>
+		</where>
 	</select>
 
 	<select id="searchJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo" resultType="codedriver.framework.notify.dto.job.NotifyJobVo">
@@ -72,10 +71,11 @@
 		a.`is_active` as isActive,
 		(select `next_fire_time` from `schedule_job_status` where `job_name` = CONCAT(a.`id`,'')) as nextFireTime
 		from `notify_job` a
-		where 1=1
+		<where>
 		<if test="keyword != null and keyword != ''">
 			and a.`name` LIKE CONCAT('%', #{keyword}, '%')
 		</if>
+		</where>
 		order by a.`lcd` desc
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}

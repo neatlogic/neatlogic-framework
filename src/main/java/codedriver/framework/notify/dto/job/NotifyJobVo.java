@@ -33,6 +33,9 @@ public class NotifyJobVo extends BaseEditorVo {
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
 	private Integer isActive;
 
+	@EntityField(name = "通知方式插件名称", type = ApiParamType.STRING)
+	private String notifyHandlerName;
+
 	@EntityField(name = "收件人列表", type = ApiParamType.JSONARRAY)
 	private List<String> toList;
 	@EntityField(name = "抄送人列表", type = ApiParamType.JSONARRAY)
@@ -104,6 +107,14 @@ public class NotifyJobVo extends BaseEditorVo {
 
 	public void setNotifyHandler(String notifyHandler) {
 		this.notifyHandler = notifyHandler;
+	}
+
+	public String getNotifyHandlerName() {
+		return notifyHandlerName;
+	}
+
+	public void setNotifyHandlerName(String notifyHandlerName) {
+		this.notifyHandlerName = notifyHandlerName;
 	}
 
 	public String getConfig() {

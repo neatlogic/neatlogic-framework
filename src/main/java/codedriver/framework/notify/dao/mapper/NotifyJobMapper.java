@@ -13,6 +13,10 @@ public interface NotifyJobMapper {
 
     public NotifyJobVo getJobDetailById(Long id);
 
+    public int searchJobCount(NotifyJobVo vo);
+
+    public List<NotifyJobVo> searchJob(NotifyJobVo vo);
+
     public int updateJob(NotifyJobVo vo);
 
     public int updateJobStatus(NotifyJobVo vo);

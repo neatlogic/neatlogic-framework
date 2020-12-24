@@ -51,6 +51,37 @@
 		WHERE `id` = #{value}
 	</select>
 
+	<select id="searchJobCount" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM
+		`notify_job`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			and `name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
+
+	<select id="searchJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo" resultType="codedriver.framework.notify.dto.job.NotifyJobVo">
+		select
+		a.`id`,
+		a.`name`,
+		a.`notify_handler` as notifyHandler,
+		a.`cron`,
+		a.`is_active` as isActive,
+		(select `next_fire_time` from `schedule_job_status` where `job_name` = CONCAT(a.`id`,'')) as nextFireTime
+		from `notify_job` a
+		where 1=1
+		<if test="keyword != null and keyword != ''">
+			and a.`name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		order by a.`lcd` desc
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
     <insert id="insertJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo">
 		INSERT INTO `notify_job`
 		(

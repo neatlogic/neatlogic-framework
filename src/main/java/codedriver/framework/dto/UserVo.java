@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
@@ -73,8 +74,18 @@ public class UserVo extends BasePageVo implements Serializable{
 	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
 	private List<UserAuthVo> userAuthList = new ArrayList<>();
 
+	/**
+	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
+	 */
+	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+	private final String initType = GroupSearch.USER.getValue();
+
 	public UserVo() {
 
+	}
+
+	public UserVo(String uuid){
+		this.uuid = uuid;
 	}
 
 	public List<UserAuthVo> getUserAuthList() {
@@ -341,6 +352,10 @@ public class UserVo extends BasePageVo implements Serializable{
 			}
 		}
 		return roleUuidList;
+	}
+
+	public String getInitType() {
+		return initType;
 	}
 
 	public void setRoleUuidList(List<String> roleUuidList) {

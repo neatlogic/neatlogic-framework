@@ -3,6 +3,7 @@ package codedriver.framework.common.dto;
 import java.util.Date;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,11 @@ public class BaseEditorVo extends BasePageVo {
 	private String lcuAvatar;
 	@EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
 	private Integer lcuVipLevel;
+
+	@EntityField(name = "创建者VO")
+	private UserVo fcuVo;
+	@EntityField(name = "修改者VO")
+	private UserVo lcuVo;
 
 	public BaseEditorVo() {
 	}
@@ -130,5 +136,21 @@ public class BaseEditorVo extends BasePageVo {
 
 	public void setLcuVipLevel(Integer lcuVipLevel) {
 		this.lcuVipLevel = lcuVipLevel;
+	}
+
+	public UserVo getFcuVo() {
+		return fcuVo;
+	}
+
+	public void setFcuVo(UserVo fcuVo) {
+		this.fcuVo = fcuVo;
+	}
+
+	public UserVo getLcuVo() {
+		return lcuVo;
+	}
+
+	public void setLcuVo(UserVo lcuVo) {
+		this.lcuVo = lcuVo;
 	}
 }

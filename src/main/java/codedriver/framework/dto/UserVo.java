@@ -79,6 +79,11 @@ public class UserVo extends BasePageVo implements Serializable{
 	 */
 	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
 	private final String initType = GroupSearch.USER.getValue();
+	/***
+	 * 此字段专供前端使用，用于渲染用户插件
+	 */
+	@EntityField(name = "用户名(与userName取值相同)", type = ApiParamType.STRING)
+	private String name;
 
 	public UserVo() {
 
@@ -356,6 +361,11 @@ public class UserVo extends BasePageVo implements Serializable{
 
 	public String getInitType() {
 		return initType;
+	}
+
+	public String getName() {
+		name = userName;
+		return name;
 	}
 
 	public void setRoleUuidList(List<String> roleUuidList) {

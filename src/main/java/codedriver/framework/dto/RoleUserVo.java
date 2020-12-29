@@ -2,6 +2,7 @@ package codedriver.framework.dto;
 
 public class RoleUserVo {
 
+	private Long id;
 	private String roleUuid;
 	private String userUuid;
 	public RoleUserVo() {
@@ -13,6 +14,15 @@ public class RoleUserVo {
 		this.roleUuid = roleUuid;
 		this.userUuid = userUuid;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getRoleUuid() {
 		return roleUuid;
 	}

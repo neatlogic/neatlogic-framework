@@ -20,6 +20,7 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import codedriver.framework.asynchronization.thread.ModuleInitApplicationListener;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
@@ -63,6 +64,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
 						sr.addMapping(urlMapping);
 					}
 
+					/** 模块加载开始，计数器加一 **/
+					ModuleInitApplicationListener.getModuleinitphaser().register();
 					if (moduleId.equalsIgnoreCase("framework")) {
 						sr.addMapping("/");
 						sr.setLoadOnStartup(1);
@@ -83,6 +86,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 				}
 			}
 		} catch (IOException | DocumentException ex) {
+            ModuleInitApplicationListener.getModuleinitphaser().arrive();
 			if (moduleId != null) {
 				logger.error("初始化模块：" + moduleId + "失败", ex);
 			} else {

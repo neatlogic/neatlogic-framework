@@ -1,7 +1,5 @@
 package codedriver.framework.elasticsearch.core;
 
-import com.techsure.multiattrsearch.QueryResultSet;
-
 public interface IElasticSearchHandler<T, R> {
 
     /**
@@ -65,6 +63,6 @@ public interface IElasticSearchHandler<T, R> {
      *       (!result.getData().isEmpty()) { for (MultiAttrsObject el : result.getData()) { el.getId();//documentId
      *       el.getJSON("键");//根据对应的key，获取value } } }
      */
-    public QueryResultSet iterateSearch(T target);
+    public R iterateSearch(T target);
 
 }

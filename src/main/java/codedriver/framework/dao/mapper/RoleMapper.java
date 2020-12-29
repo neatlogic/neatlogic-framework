@@ -18,6 +18,8 @@ public interface RoleMapper {
     public List<RoleVo> searchRole(RoleVo roleVo);
 
     public List<RoleVo> getRoleListByAuthName(String auth);
+    
+    public List<String> getRoleUuidListByUserUuidList(@Param("list")List<String> userUuidList);
 
     public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
@@ -41,7 +43,7 @@ public interface RoleMapper {
 
     public int insertRole(RoleVo roleVo);
 
-    public int insertRoleUser(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
+    public int insertRoleUser(RoleUserVo vo);
 
     public int updateRole(RoleVo roleVo);
 

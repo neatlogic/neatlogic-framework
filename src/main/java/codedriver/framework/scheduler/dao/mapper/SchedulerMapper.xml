@@ -285,7 +285,7 @@
 	<update id="updateJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
 		UPDATE schedule_job_audit
 		SET
-		end_time = now(),
+		end_time = now(3),
 		status = #{status},
 		content_hash = #{contentHash}
 		WHERE id = #{id}
@@ -329,7 +329,7 @@
 		#{cron},
 		#{isActive},
 		#{needAudit},
-		NOW()
+		NOW(3)
 		)
 	</insert>
 
@@ -355,7 +355,7 @@
 
 	<insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
 		INSERT INTO schedule_job_audit (id, job_uuid,start_time,status,server_id)
-		VALUES (#{id},#{jobUuid},now(),#{status},#{serverId})
+		VALUES (#{id},#{jobUuid},now(3),#{status},#{serverId})
 	</insert>
 
 	<insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">

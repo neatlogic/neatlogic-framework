@@ -224,7 +224,15 @@
 		where `is_active` = 1
 		<if test="keyword !=null and keyword != ''">
 			AND (`user_id` LIKE CONCAT(#{keyword}, '%')
-			OR `user_name` LIKE CONCAT('%', #{keyword}, '%'))
+			OR `user_name` LIKE CONCAT(#{keyword}, '%'))
+			ORDER BY
+			(
+				CASE 
+				WHEN `user_id` = #{keyword} OR `user_name` = #{keyword} THEN 1
+				WHEN `user_id` LIKE CONCAT(#{keyword},'%') OR  `user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+				ELSE 4
+				END
+			)
 		</if>
 		<if test="needPage">
 			LIMIT #{startNum}, #{pageSize}
@@ -555,7 +563,7 @@
 		where `user_uuid` = #{userUuid} and `type` = #{type}
 	</select>
 
-	<select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+	<select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="true">
 		SELECT `role_uuid` FROM `user_role` WHERE `user_uuid` = #{value}
 	</select>
 
@@ -656,28 +664,35 @@
 
 	<select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
 		SELECT
-		a.`uuid`,
-		a.`user_id` as `userId`,
-		a.`user_name` as `userName`,
-		a.`email`,
-		a.`phone`,
-		a.`pinyin`,
-		a.`is_active` as `isActive`,
-		a.`user_info` as `userInfo`,
-		a.`vip_level` as `vipLevel`,
-		b.`role_uuid` as `roleUuid`,
-		e.`name` as `roleName`,
-		e.`description`,
-		d.`uuid` as `teamUuid`,
-		d.`name` as `teamName`
-		from
+		k.`uuid`,
+		k.`user_id` as `userId`,
+		k.`user_name` as `userName`,
+		k.`email`,
+		k.`phone`,
+		k.`pinyin`,
+		k.`is_active` as `isActive`,
+		k.`user_info` as `userInfo`,
+		k.`vip_level` as `vipLevel`,
+		h.`role_uuid` as `roleUuid`,
+		r.`name` as `roleName`,
+		r.`description`,
+		j.`uuid` as `teamUuid`,
+		j.`name` as `teamName`
+		FROM (
+		SELECT
+		DISTINCT (a.`uuid`) AS `uuid`,b.`id`
+		FROM
 		`user` a
-		LEFT JOIN `user_role` b on b.`user_uuid` = a.`uuid`
-		LEFT JOIN `user_team` c on c.`user_uuid` = a.`uuid`
-		LEFT JOIN `team` d on c.`team_uuid` = d.`uuid`
-		LEFT JOIN `role` e on b.`role_uuid` = e.`uuid`
-		WHERE e.`uuid` = #{value}
-		ORDER BY b.`id`
+		LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+		WHERE
+		b.`role_uuid` = #{value}
+		) g
+		JOIN `user` k ON g.`uuid` = k.`uuid`
+		LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+		LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+		LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+		LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+		order by g.`id`
 	</select>
 	
 	<insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
@@ -731,7 +746,7 @@
 		#{uuid},
 		#{userId},
 		#{password},
-		NOW(),
+		NOW(3),
 		1
 		)
 	</insert>
@@ -749,7 +764,7 @@
 	<insert id="insertUserSession" parameterType="java.lang.String">
 		INSERT INTO `user_session` (`user_uuid`, `visit_time`)
 		VALUES
-		(#{userUuid}, now()) ;
+		(#{userUuid}, now(3)) ;
 	</insert>
 
 	<insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
@@ -802,7 +817,7 @@
 	</update>
 
 	<update id="updateUserSession" parameterType="java.lang.String">
-		UPDATE `user_session` set `visit_time` = now() WHERE `user_uuid` = #{userUuid}
+		UPDATE `user_session` set `visit_time` = now(3) WHERE `user_uuid` = #{userUuid}
 	</update>
 
 	<update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">

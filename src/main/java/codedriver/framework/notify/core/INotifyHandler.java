@@ -5,6 +5,33 @@ import org.springframework.util.ClassUtils;
 import codedriver.framework.notify.dto.NotifyVo;
 
 public interface INotifyHandler {
+
+	public enum RecipientType{
+		TO("to","接收人"),
+		CC("cc","抄送人");
+		private String value;
+		private String text;
+		private RecipientType(String value, String text) {
+			this.value = value;
+			this.text = text;
+		}
+		public String getValue() {
+			return value;
+		}
+		public String getText() {
+			return text;
+		}
+
+		public static RecipientType getType(String _value) {
+			for(RecipientType e : values()) {
+				if(e.value.equals(_value)) {
+					return e;
+				}
+			}
+			return null;
+		}
+	}
+
 	/**
 	 * @Description: 处理通知
 	 * @Param: [informVo]

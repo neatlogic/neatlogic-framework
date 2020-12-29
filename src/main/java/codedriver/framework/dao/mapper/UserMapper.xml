@@ -35,7 +35,8 @@
 		a.`pinyin`,
 		a.`is_active` as isActive,
 		a.`user_info` as userInfo,
-		a.`vip_level` as vipLevel
+		a.`vip_level` as vipLevel,
+		a.`is_delete` as isDelete
 		FROM `user` a
 		WHERE a.`uuid` = #{value}
 	</select>
@@ -153,7 +154,7 @@
 		LEFT JOIN team d ON c.team_uuid = d.uuid
 		LEFT JOIN `user_authority` f ON a.`uuid` = f.`user_uuid`
 		LEFT JOIN `role_authority` l ON b.`role_uuid` = l.`role_uuid`
-		WHERE 1=1
+		WHERE a.`is_delete` = 0
 		<if test="keyword !=null and keyword != ''">
 			AND
 			(a.user_id LIKE CONCAT(#{keyword}, '%')
@@ -839,6 +840,10 @@
 		UPDATE `user`
 		SET `user_info` = #{userInfo}
 		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateUserToDeleteByUuid" parameterType="java.lang.String">
+		UPDATE `user` SET `is_active` = 0, `is_delete` = 1 WHERE `uuid` = #{value}
 	</update>
 
 	<delete id="deleteUserPasswordByLimit">

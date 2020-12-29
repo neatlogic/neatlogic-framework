@@ -57,7 +57,8 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String auth;
 	private String authGroup;
 	private JSONObject userInfoObj;
-	
+	@EntityField(name = "是否已删除", type = ApiParamType.INTEGER)
+	private Integer isDelete;
 	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> teamUuidList = new ArrayList<>();
 	private List<String> teamNameList = new ArrayList<>();
@@ -259,6 +260,14 @@ public class UserVo extends BasePageVo implements Serializable{
 
 	public void setIsActive(Integer isActive) {
 		this.isActive = isActive;
+	}
+
+	public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
 	}
 
 	public List<String> getTeamUuidList() {

@@ -586,6 +586,22 @@
 		</foreach>
 	</select>
 
+	<select id="getUserListByTeamUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+		SELECT
+		a.`team_uuid` AS teamUuid,
+		a.`user_uuid` AS uuid,
+		a.`title`,
+		b.`user_id` AS userId,
+		b.`user_name` AS userName,
+		b.`user_info` AS userInfo,
+		b.`vip_level` AS vipLevel,
+		b.`pinyin` AS pinyin
+		FROM `user_team` a
+		JOIN `user` b ON b.`uuid`=a.`user_uuid`
+		WHERE a.`team_uuid` = #{value}
+		ORDER BY a.`id`
+	</select>
+
 	<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
 		select count(a.`user_uuid`) from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
 	</select>

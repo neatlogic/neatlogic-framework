@@ -58,6 +58,8 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String auth;
 	private String authGroup;
 	private JSONObject userInfoObj;
+	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
+	private String title;
 	
 	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> teamUuidList = new ArrayList<>();
@@ -319,6 +321,14 @@ public class UserVo extends BasePageVo implements Serializable{
 			userInfoObj = JSONObject.parseObject(userInfo);
 		}
 		return userInfoObj;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getAvatar() {

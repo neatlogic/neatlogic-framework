@@ -58,9 +58,10 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String auth;
 	private String authGroup;
 	private JSONObject userInfoObj;
+
 	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
 	private String title;
-	
+
 	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> teamUuidList = new ArrayList<>();
 	private List<String> teamNameList = new ArrayList<>();

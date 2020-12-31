@@ -857,6 +857,10 @@
 		WHERE `uuid` = #{uuid}
 	</update>
 
+	<update id="updateUserToDeleteByUuid" parameterType="java.lang.String">
+		UPDATE `user` SET `is_active` = 0 WHERE `uuid` = #{value}
+	</update>
+
 	<delete id="deleteUserPasswordByLimit">
 		DELETE FROM `user_password`
 		WHERE `user_uuid` = #{userUuid}

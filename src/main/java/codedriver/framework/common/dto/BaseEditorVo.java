@@ -2,6 +2,7 @@ package codedriver.framework.common.dto;
 
 import java.util.Date;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -43,6 +44,9 @@ public class BaseEditorVo extends BasePageVo {
 	}
 
 	public String getFcu() {
+		if (StringUtils.isBlank(fcu)) {
+			fcu = UserContext.get().getUserUuid();
+		}
 		return fcu;
 	}
 
@@ -67,6 +71,9 @@ public class BaseEditorVo extends BasePageVo {
 	}
 
 	public String getLcu() {
+		if (StringUtils.isBlank(lcu)) {
+			lcu = UserContext.get().getUserUuid();
+		}
 		return lcu;
 	}
 

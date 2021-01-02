@@ -8,92 +8,89 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class BasePageVo {
-	@JSONField(serialize = false)
-	private transient Boolean needPage = true;
-	@JSONField(serialize = false)
-	@EntityField(name = "每页条数", type = ApiParamType.INTEGER)
-	private transient Integer pageSize = 20;
-	@JSONField(serialize = false)
-	@EntityField(name = "当前页数", type = ApiParamType.INTEGER)
-	private transient Integer currentPage = 1;
-	@JSONField(serialize = false)
-	@EntityField(name = "页数", type = ApiParamType.INTEGER)
-	private transient Integer pageCount = 0;
-	@JSONField(serialize = false)
-	private transient Integer startNum;
-	@JSONField(serialize = false)
-	private transient String keyword;
-	@EntityField(name = "总条数", type = ApiParamType.INTEGER)
-	private transient Integer rowNum = 0;
+    @JSONField(serialize = false)
+    private transient Boolean needPage = true;
+    @JSONField(serialize = false)
+    @EntityField(name = "每页条数", type = ApiParamType.INTEGER)
+    private transient Integer pageSize = 20;
+    @JSONField(serialize = false)
+    @EntityField(name = "当前页数", type = ApiParamType.INTEGER)
+    private transient Integer currentPage = 1;
+    @JSONField(serialize = false)
+    @EntityField(name = "页数", type = ApiParamType.INTEGER)
+    private transient Integer pageCount = 0;
+    @JSONField(serialize = false)
+    private transient Integer startNum;
+    @JSONField(serialize = false)
+    private transient String keyword;
+    @EntityField(name = "总条数", type = ApiParamType.INTEGER)
+    private transient Integer rowNum = 0;
 
-	public BasePageVo() {
-	}
+    public BasePageVo() {
+    }
 
-	public Integer getRowNum() {
-		return rowNum;
-	}
+    public Integer getRowNum() {
+        return rowNum;
+    }
 
-	public void setRowNum(Integer rowNum) {
-		this.rowNum = rowNum;
-	}
+    public void setRowNum(Integer rowNum) {
+        this.rowNum = rowNum;
+    }
 
-	public Boolean getNeedPage() {
-		return needPage;
-	}
+    public Boolean getNeedPage() {
+        return needPage;
+    }
 
-	public void setNeedPage(Boolean needPage) {
-		this.needPage = needPage;
-	}
+    public void setNeedPage(Boolean needPage) {
+        this.needPage = needPage;
+    }
 
-	public Integer getPageSize() {
-		return pageSize;
-	}
+    public Integer getPageSize() {
+        return pageSize;
+    }
 
-	public void setPageSize(Integer pageSize) {
-		if (pageSize != null) {
-			this.pageSize = pageSize;
-		}
+    public void setPageSize(Integer pageSize) {
+        if (pageSize != null) {
+            this.pageSize = pageSize;
+        }
 
-	}
+    }
 
-	public Integer getCurrentPage() {
-		return currentPage;
-	}
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
 
-	public void setCurrentPage(Integer currentPage) {
-		if (currentPage == null) {
-			this.currentPage = 1;
-		} else {
-			this.currentPage = currentPage;
-		}
-	}
+    public void setCurrentPage(Integer currentPage) {
+        if (currentPage == null) {
+            this.currentPage = 1;
+        } else {
+            this.currentPage = currentPage;
+        }
+    }
 
-	public Integer getStartNum() {
-		if (startNum == null) {
-			startNum = Math.max((currentPage - 1) * pageSize, 0);
-		}
-		return startNum;
-	}
+    public Integer getStartNum() {
+        return Math.max((getCurrentPage() - 1) * getPageSize(), 0);
+    }
 
-	public void setStartNum(Integer startNum) {
-		this.startNum = startNum;
-	}
+    public void setStartNum(Integer startNum) {
+        this.startNum = startNum;
+    }
 
-	public Integer getPageCount() {
-		return pageCount;
-	}
+    public Integer getPageCount() {
+        return pageCount;
+    }
 
-	public void setPageCount(Integer pageCount) {
-		this.pageCount = pageCount;
-	}
+    public void setPageCount(Integer pageCount) {
+        this.pageCount = pageCount;
+    }
 
-	public String getKeyword() {
-		return keyword;
-	}
+    public String getKeyword() {
+        return keyword;
+    }
 
-	public void setKeyword(String keyword) {
-		if (StringUtils.isNotBlank(keyword)) {
-			this.keyword = keyword.trim();
-		}
-	}
+    public void setKeyword(String keyword) {
+        if (StringUtils.isNotBlank(keyword)) {
+            this.keyword = keyword.trim();
+        }
+    }
 }

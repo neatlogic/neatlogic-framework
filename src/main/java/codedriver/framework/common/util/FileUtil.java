@@ -3,7 +3,7 @@ package codedriver.framework.common.util;
 import codedriver.framework.exception.file.FilePathIllegalException;
 import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import codedriver.framework.file.core.FileStorageMediumFactory;
-import codedriver.framework.file.core.IFileStorageMediumHandler;
+import codedriver.framework.file.core.IFileStorageHandler;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.io.ZipInputStream;
 import net.lingala.zip4j.model.FileHeader;
@@ -587,12 +587,11 @@ public class FileUtil {
 	 * @throws Exception
 	 */
 	public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
+		IFileStorageHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
 		if (handler == null) {
 			throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
 		}
-		String filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
-		return filePath;
+		return handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
 	}
 
 	public static InputStream getData(String filePath) throws Exception {
@@ -600,7 +599,7 @@ public class FileUtil {
 			throw new FilePathIllegalException(filePath);
 		}
 		String prefix = filePath.split(":")[0];
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
 		if (handler == null) {
 			throw new FileStorageMediumHandlerNotFoundException(prefix);
 		}
@@ -613,7 +612,7 @@ public class FileUtil {
 			throw new FilePathIllegalException(filePath);
 		}
 		String prefix = filePath.split(":")[0];
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
 		if (handler == null) {
 			throw new FileStorageMediumHandlerNotFoundException(prefix);
 		}
@@ -625,7 +624,7 @@ public class FileUtil {
 			throw new FilePathIllegalException(filePath);
 		}
 		String prefix = filePath.split(":")[0];
-		IFileStorageMediumHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+		IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
 		if (handler == null) {
 			throw new FileStorageMediumHandlerNotFoundException(prefix);
 		}

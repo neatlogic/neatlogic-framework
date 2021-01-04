@@ -1,21 +1,22 @@
 package codedriver.framework.service;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.zip.GZIPOutputStream;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Service;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.UserVo;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+import java.util.zip.GZIPOutputStream;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -64,6 +65,27 @@ public class LoginServiceImpl implements LoginService {
         jwtVo.setJwtbody(jwtbody);
         jwtVo.setJwtsign(jwtsign);
         return jwtVo;
+    }
+
+    @Override
+    public void setResponseAuthCookie(HttpServletResponse response, HttpServletRequest request,String tenant, JwtVo jwtVo ) {
+        Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" +  jwtVo.getCc());
+        authCookie.setPath("/" + tenant);
+        String domainName = request.getServerName();
+        if (StringUtils.isNotBlank(domainName)) {
+            String[] ds = domainName.split("\\.");
+            int len = ds.length;
+            if (len > 2 && !StringUtils.isNumeric(ds[len - 1])) {
+                authCookie.setDomain(ds[len - 2] + "." + ds[len - 1]);
+            }
+        }
+        Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
+        tenantCookie.setPath("/" + tenant);
+        response.addCookie(authCookie);
+        response.addCookie(tenantCookie);
+        // 允许跨域携带cookie
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType(Config.RESPONSE_TYPE_JSON);
     }
 
 }

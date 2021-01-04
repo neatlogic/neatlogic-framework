@@ -1,26 +1,24 @@
 package codedriver.framework.dto;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import codedriver.framework.common.constvalue.GroupSearch;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.DigestUtils;
-
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserVo extends BasePageVo implements Serializable{
 
@@ -77,7 +75,7 @@ public class UserVo extends BasePageVo implements Serializable{
 	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
 	private List<UserAuthVo> userAuthList = new ArrayList<>();
 	@JSONField(serialize=false)
-	private Boolean isHasAuthorization = true;
+	private String cookieAuthorization;
 	@JSONField(serialize=false)
 	private String authorization;
 	
@@ -434,15 +432,15 @@ public class UserVo extends BasePageVo implements Serializable{
 //		this.valueList = valueList;
 //	}
 
-    public Boolean getIsHasAuthorization() {
-        return isHasAuthorization;
-    }
+	public String getCookieAuthorization() {
+		return cookieAuthorization;
+	}
 
-    public void setIsHasAuthorization(Boolean isHasAuthorization) {
-        this.isHasAuthorization = isHasAuthorization;
-    }
+	public void setCookieAuthorization(String cookieAuthorization) {
+		this.cookieAuthorization = cookieAuthorization;
+	}
 
-    public String getAuthorization() {
+	public String getAuthorization() {
         return authorization;
     }
 

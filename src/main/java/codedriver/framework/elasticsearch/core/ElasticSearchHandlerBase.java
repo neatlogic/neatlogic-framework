@@ -86,11 +86,13 @@ public abstract class ElasticSearchHandlerBase<T, R> implements IElasticSearchHa
     protected abstract R makeupQueryResult(T t, QueryResult result);
 
     @Override
-    public QueryResultSet iterateSearch(T t) {
+    public R iterateSearch(T t) {
         QueryParser parser = getObjectPool(TenantContext.get().getTenantUuid()).createQueryParser();
         MultiAttrsQuery query = parser.parse(buildSql(t));
-        return query.iterate();
+        return makeupQueryIterateResult(t,query.iterate());
     }
+    
+    protected abstract R makeupQueryIterateResult(T t, QueryResultSet result);
 
     @Override
     public void delete(String documentId) {

@@ -60,7 +60,7 @@
 		#{name},
 		#{size},
 		#{userUuid},
-		NOW(),
+		NOW(3),
 		#{type},
 		#{contentType},
 		#{path}

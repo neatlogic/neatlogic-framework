@@ -32,9 +32,9 @@
 		#{name},
 		#{type},
 		#{fcu},
-		NOW(),
+		NOW(3),
 		#{lcu},
-		NOW()
+		NOW(3)
 		)
 	</insert>
 
@@ -148,7 +148,7 @@
 		UPDATE `process_matrix` SET
 		 `name` = #{name},
 		 `lcu` = #{lcu},
-		 `lcd` = NOW()
+		 `lcd` = NOW(3)
 		 WHERE `uuid` = #{uuid}
 	</update>
 

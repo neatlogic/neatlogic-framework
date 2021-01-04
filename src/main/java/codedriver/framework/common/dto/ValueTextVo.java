@@ -13,7 +13,7 @@ public class ValueTextVo {
 	public ValueTextVo() {
 	}
 
-	public ValueTextVo(String value, String text) {
+	public ValueTextVo(Object value, String text) {
 		this.value = value;
 		this.text = text;
 	}

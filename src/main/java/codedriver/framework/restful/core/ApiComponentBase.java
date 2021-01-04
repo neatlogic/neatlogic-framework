@@ -1,5 +1,6 @@
 package codedriver.framework.restful.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -68,8 +69,13 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 				}
 			}
 		} catch (Exception e) {
+		    Throwable target = e;
+		    //如果是反射抛得异常，则需要拆包，把真实得异常类找出来
+		    while (target instanceof InvocationTargetException) {
+		      target = ((InvocationTargetException) target).getTargetException();
+		    }
 			error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
-			throw e;
+			throw (Exception)target;
 		} finally {
 			long endTime = System.currentTimeMillis();
 			ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());

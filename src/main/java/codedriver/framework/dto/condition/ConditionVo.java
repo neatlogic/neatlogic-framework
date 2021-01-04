@@ -24,6 +24,7 @@ public class ConditionVo implements Serializable{
 	private String type;
 	private String handler;
 	private String expression;
+	private Integer isShowConditionValue;
 	private Object valueList;
 	private Boolean result;
 	public ConditionVo() {
@@ -36,6 +37,7 @@ public class ConditionVo implements Serializable{
 		this.type = jsonObj.getString("type");
 		this.handler = jsonObj.getString("handler");
 		this.expression = jsonObj.getString("expression");
+		this.isShowConditionValue = jsonObj.getInteger("isShowConditionValue");
 		String values = jsonObj.getString("valueList");
 		if(StringUtils.isNotBlank(values)) {
 			if(values.startsWith("[") && values.endsWith("]")) {
@@ -84,6 +86,14 @@ public class ConditionVo implements Serializable{
 
 	public void setExpression(String expression) {
 		this.expression = expression;
+	}
+
+	public Integer getIsShowConditionValue() {
+		return isShowConditionValue;
+	}
+
+	public void setIsShowConditionValue(Integer isShowConditionValue) {
+		this.isShowConditionValue = isShowConditionValue;
 	}
 
 	public Object getValueList() {

@@ -23,8 +23,14 @@ public class NotifyHandlerFactory implements ApplicationListener<ContextRefreshe
 
 	private static List<ValueTextVo> notifyHandlerTypeList = new ArrayList<>();
 
+	private static List<ValueTextVo> notifyHandlerNameList = new ArrayList<>();
+
 	public static List<ValueTextVo> getNotifyHandlerTypeList() {
 		return notifyHandlerTypeList;
+	}
+
+	public static List<ValueTextVo> getNotifyHandlerNameList() {
+		return notifyHandlerNameList;
 	}
 
 	public static INotifyHandler getHandler(String handler) {
@@ -40,6 +46,7 @@ public class NotifyHandlerFactory implements ApplicationListener<ContextRefreshe
 			if (plugin.getClassName() != null) {
 				notifyHandlerMap.put(plugin.getClassName(), plugin);
 				notifyHandlerTypeList.add(new ValueTextVo(plugin.getClassName(), plugin.getName()));
+				notifyHandlerNameList.add(new ValueTextVo(plugin.getClassName(), plugin.getType()));
 			}
 		}
 	}

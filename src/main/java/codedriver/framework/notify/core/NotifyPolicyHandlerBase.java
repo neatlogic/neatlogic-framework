@@ -3,6 +3,8 @@ package codedriver.framework.notify.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.notify.dto.NotifyTriggerTemplateVo;
+import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,12 +21,20 @@ import codedriver.framework.dto.ExpressionVo;
 public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 
 	@Override
-	public List<ValueTextVo> getNotifyTriggerList() {
+	public List<NotifyTriggerVo> getNotifyTriggerList() {
 		return myNotifyTriggerList();
 	}
 
-	protected abstract List<ValueTextVo> myNotifyTriggerList();
-	
+	/** 获取通知触发点模版列表 */
+	@Override
+	public List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type) {
+		return myNotifyTriggerTemplateList(type);
+	}
+
+	protected abstract List<NotifyTriggerVo> myNotifyTriggerList();
+
+	protected abstract List<NotifyTriggerTemplateVo> myNotifyTriggerTemplateList(NotifyHandlerType type);
+
 	@Override
 	public List<ValueTextVo> getParamTypeList() {
 		List<ValueTextVo> resultList = new ArrayList<>();

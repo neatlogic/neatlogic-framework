@@ -146,12 +146,36 @@
 		</foreach>
 	</select>
 
+	<select id="getRoleListByAuthName" parameterType="java.lang.String" resultMap="roleMap" useCache="false">
+		select
+		a.`uuid`,
+		a.`name`,
+		a.`description`
+		from
+		`role` a
+		join `role_authority` b
+		on a.`uuid` = b.`role_uuid`
+		where b.`auth` = #{value}
+		ORDER BY b.`id`
+	</select>
+	
+	<select id="getRoleUuidListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String">
+		select 
+		`role_uuid`	
+		from
+		`user_role`
+		where `user_uuid` in
+		<foreach collection="list" item="userUuid" separator="," open="(" close=")">
+			#{userUuid}
+		</foreach>
+	</select>
+
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
 		INSERT INTO `role` (`uuid`, `name`, `description`)
 		VALUES (#{uuid}, #{name}, #{description})
 	</insert>
 
-	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.UserVo">
+	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
 		INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
 		VALUES
 		(#{userUuid}, #{roleUuid})

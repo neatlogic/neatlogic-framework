@@ -1,14 +1,16 @@
 package codedriver.framework.auth.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.auth.label.NO_AUTH;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RootComponent
 public class AuthActionChecker {
@@ -31,9 +33,10 @@ public class AuthActionChecker {
             return false;
         }
         UserContext userContext = UserContext.get();
-        List<String> actionList = new ArrayList<>();
-        for (String a : action) {
-            actionList.add(a);
+        List<String> actionList = new ArrayList<>(Arrays.asList(action));
+        //无需鉴权
+        if(actionList.contains(NO_AUTH.class.getSimpleName())){
+            return true;
         }
         if (userContext != null) {
             List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
@@ -53,5 +56,21 @@ public class AuthActionChecker {
             return false;
         }
     }
-
+    
+    public static Boolean checkByUserUuid(String userUuid, String... action) {
+        if (action == null || action.length == 0) {
+            return false;
+        }
+        List<String> actionList = Arrays.asList(action);
+        List<String> actionRoleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
+        if(CollectionUtils.isNotEmpty(actionRoleUuidList)) {
+            List<String> roleUuidList = userMapper.getRoleUuidListByUserUuid(userUuid);
+            for (String roleUuid : actionRoleUuidList) {
+                if(roleUuidList.contains(roleUuid)) {
+                    return true;
+                }
+            }
+        }
+        return userMapper.checkUserAuthorityIsExists(userUuid, actionList) > 0;
+    }
 }

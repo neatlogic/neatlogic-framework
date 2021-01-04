@@ -90,6 +90,8 @@ public interface UserMapper {
 
     public List<UserVo> getUserListByUuidList(List<String> uuidList);
 
+	public List<UserVo> getUserListByRoleUuid(String roleUuid);
+
 	public int insertUserAuth(UserAuthVo userAuthVo);
 
 	public int insertUser(UserVo userVo);
@@ -121,6 +123,8 @@ public interface UserMapper {
 	public int updateUserInfo(UserVo userVo);
 
 	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
+
+	public int updateUserToDeleteByUuid(String uuid);
 
 	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 

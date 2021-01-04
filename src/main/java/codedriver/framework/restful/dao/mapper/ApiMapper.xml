@@ -376,7 +376,7 @@
 		#{qps},
 		#{timeout},
 		#{needAudit},
-		now()
+		now(3)
 		)
 	</insert>
 

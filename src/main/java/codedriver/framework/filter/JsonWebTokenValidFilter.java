@@ -1,24 +1,5 @@
 package codedriver.framework.filter;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.Date;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
@@ -27,8 +8,24 @@ import codedriver.framework.dao.cache.UserSessionCache;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
-import codedriver.framework.filter.core.ILoginAuth;
+import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.Date;
 
 /**
  * @Author:chenqiwei
@@ -67,7 +64,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         boolean hasTenant = false;
         UserVo userVo = null;
         JSONObject redirectObj = null;
-        ILoginAuth loginAuth = null;
+        ILoginAuthHandler loginAuth = null;
         //获取时区
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -82,15 +79,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             String tenant =  request.getHeader("Tenant");
             if (TenantUtil.hasTenant(tenant)) {
                 hasTenant = true;
-                //认证获取用户,先认证codedriver jwt，如果不存在,则认证其它认证（目前仅支持单一认证）。如果都不合法，则返回跳转url给前端跳转到对应登录页
-                loginAuth = LoginAuthFactory.getLoginAuth("codedriver");
-               
-                userVo = loginAuth.auth(request,response);
-                if(userVo == null && StringUtils.isNotBlank(Config.LOGIN_AUTH()) && !Config.LOGIN_AUTH().equals("codedriver")) {
-                    loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH());
-                    userVo = loginAuth.auth(request,response);
+                String auth = request.getHeader("AuthType");
+                if(StringUtils.isBlank(auth)){
+                    auth = "default";
                 }
-                
+                loginAuth = LoginAuthFactory.getLoginAuth(auth);
+                userVo = loginAuth.auth(request,response);
+
                 if(userVo != null ) {
                     if(StringUtils.isNotBlank(userVo.getUuid())){
                         JSONObject jwtBodyObj = new JSONObject();
@@ -100,9 +95,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         jwtBodyObj.put("tenant", tenant);
                         if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
                             JSONArray roleList = new JSONArray();
-                            for (String role : userVo.getRoleUuidList()) {
-                                roleList.add(role);
-                            }
+                            roleList.addAll(userVo.getRoleUuidList());
                             jwtBodyObj.put("rolelist", roleList);
                         }
                         UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);

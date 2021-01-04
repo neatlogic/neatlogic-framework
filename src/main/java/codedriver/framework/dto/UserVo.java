@@ -76,6 +76,11 @@ public class UserVo extends BasePageVo implements Serializable{
 	private List<TeamVo> teamList = new ArrayList<>();
 	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
 	private List<UserAuthVo> userAuthList = new ArrayList<>();
+	@JSONField(serialize=false)
+	private Boolean isHasAuthorization = true;
+	@JSONField(serialize=false)
+	private String authorization;
+	
 
 	/**
 	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
@@ -429,4 +434,21 @@ public class UserVo extends BasePageVo implements Serializable{
 //		this.valueList = valueList;
 //	}
 
+    public Boolean getIsHasAuthorization() {
+        return isHasAuthorization;
+    }
+
+    public void setIsHasAuthorization(Boolean isHasAuthorization) {
+        this.isHasAuthorization = isHasAuthorization;
+    }
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
+    }
+
+    
 }

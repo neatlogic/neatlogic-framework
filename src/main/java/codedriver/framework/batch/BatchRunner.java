@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * @Title: BatchRunner
  * @Package codedriver.framework.batch
- * @Description: TODO
+ * @Description: 批量处理框架，支持根据列表按照指定并行度并发处理逻辑
  * @Author: chenqiwei
  * @Date: 2021/1/4 9:31 上午
  **/
@@ -32,8 +32,8 @@ public class BatchRunner<T> {
     }
 
     static class Runner<T> extends CodeDriverThread {
-        int index = 0;
-        int parallel = 0;
+        int index;
+        int parallel;
         List<T> itemList;
         BatchJob<T> job;
         CountDownLatch latch;

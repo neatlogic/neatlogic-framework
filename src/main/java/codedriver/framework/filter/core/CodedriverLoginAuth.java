@@ -88,7 +88,9 @@ public class CodedriverLoginAuth extends LoginAuthBase{
                             userVo.setUuid(jwtBodyObj.getString("useruuid"));
                             userVo.setUserId(jwtBodyObj.getString("userid"));
                             userVo.setUserName(jwtBodyObj.getString("username"));
-                            userVo.setRoleUuidList(JSONArray.parseArray(jwtBodyObj.getJSONArray("rolelist").toJSONString(),String.class));
+                            if(jwtBodyObj.getJSONArray("rolelist") != null) {
+                                userVo.setRoleUuidList(JSONArray.parseArray(jwtBodyObj.getJSONArray("rolelist").toJSONString(),String.class));
+                            }
                             return userVo;
                         }
                     } catch (NoSuchAlgorithmException | InvalidKeyException e) {

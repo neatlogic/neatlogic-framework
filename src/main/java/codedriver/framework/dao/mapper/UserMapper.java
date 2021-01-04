@@ -69,6 +69,8 @@ public interface UserMapper {
 
 	public List<UserVo> getUserByUserIdList(List<String> list);
 
+	public List<UserVo> getUserListByTeamUuid(String teamUuid);
+
 	public int checkUserExistsInUserAgent(String userUuid);
 
 	public int checkAgentExistsInUserAgent(String agentUuid);

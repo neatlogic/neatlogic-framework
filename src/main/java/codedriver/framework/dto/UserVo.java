@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
@@ -58,6 +59,9 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String authGroup;
 	private JSONObject userInfoObj;
 
+	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
+	private String title;
+
 	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> teamUuidList = new ArrayList<>();
 	private List<String> teamNameList = new ArrayList<>();
@@ -78,8 +82,23 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String authorization;
 	
 
+	/**
+	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
+	 */
+	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+	private final String initType = GroupSearch.USER.getValue();
+	/***
+	 * 此字段专供前端使用，用于渲染用户插件
+	 */
+	@EntityField(name = "用户名(与userName取值相同)", type = ApiParamType.STRING)
+	private String name;
+
 	public UserVo() {
 
+	}
+
+	public UserVo(String uuid){
+		this.uuid = uuid;
 	}
 
 	public List<UserAuthVo> getUserAuthList() {
@@ -310,6 +329,14 @@ public class UserVo extends BasePageVo implements Serializable{
 		return userInfoObj;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getAvatar() {
 		if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
 			JSONObject jsonObject = JSONObject.parseObject(userInfo);
@@ -346,6 +373,15 @@ public class UserVo extends BasePageVo implements Serializable{
 			}
 		}
 		return roleUuidList;
+	}
+
+	public String getInitType() {
+		return initType;
+	}
+
+	public String getName() {
+		name = userName;
+		return name;
 	}
 
 	public void setRoleUuidList(List<String> roleUuidList) {

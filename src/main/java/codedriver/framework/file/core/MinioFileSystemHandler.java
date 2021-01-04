@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RootComponent
-public class MinioFileSystemHandler implements InitializingBean, IFileStorageMediumHandler {
+public class MinioFileSystemHandler implements InitializingBean, IFileStorageHandler {
 
 	public static final String NAME = "MINIO";
 

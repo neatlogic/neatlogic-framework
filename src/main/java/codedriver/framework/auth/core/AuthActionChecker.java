@@ -3,6 +3,7 @@ package codedriver.framework.auth.core;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.label.NO_AUTH;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,10 +35,11 @@ public class AuthActionChecker {
         }
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
-        //无需鉴权
-        if(actionList.contains(NO_AUTH.class.getSimpleName())){
+        //无需鉴权注解 || 维护模式下，维护用户，不需要鉴权
+        if(actionList.contains(NO_AUTH.class.getSimpleName()) || (Config.IS_MAINTENANCE_MODE()&&userContext.getUserUuid().equals(Config.MAINTENANCE_USER))){
             return true;
         }
+
         if (userContext != null) {
             List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
             if (roleUuidList != null && roleUuidList.size() > 0) {

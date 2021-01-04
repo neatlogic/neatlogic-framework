@@ -1,27 +1,20 @@
 package codedriver.framework.common.config;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executor;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import codedriver.framework.common.RootConfiguration;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import codedriver.framework.common.RootConfiguration;
+import javax.annotation.PostConstruct;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Executor;
 
 @RootConfiguration
 public class Config {
@@ -35,6 +28,8 @@ public class Config {
     public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
     public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
     public static final String RC4KEY = "codedriver.key.20200101";
+
+    public static final String MAINTENANCE_USER = "techsure";//维护用户 用于初始化系统
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
     private static String CODEDRIVER_HOME;
@@ -55,6 +50,8 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
+
+    private static boolean IS_MAINTENANCE_MODE;//是否维护模式
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -141,6 +138,8 @@ public class Config {
         return MOBILE_TEST_USER;
     }
 
+    public static boolean IS_MAINTENANCE_MODE(){ return IS_MAINTENANCE_MODE;}
+
     @PostConstruct
     public void init() {
         try {
@@ -185,9 +184,9 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
+            IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
-
             for (Map.Entry<Object, Object> el : prop.entrySet()) {
                 Object k = el.getKey();
                 Object v = el.getValue();

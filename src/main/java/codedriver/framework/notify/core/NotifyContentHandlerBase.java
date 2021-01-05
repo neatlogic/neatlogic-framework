@@ -1,7 +1,6 @@
 package codedriver.framework.notify.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import com.alibaba.fastjson.JSONArray;
 
@@ -9,7 +8,7 @@ import java.util.List;
 
 public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
     @Override
-    public List<ConditionParamVo> getConditionOptionList() {
+    public JSONArray getConditionOptionList() {
         return getMyConditionOptionList();
     }
 
@@ -28,7 +27,7 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
         return getMyNotifyData(id);
     }
 
-    protected abstract List<ConditionParamVo> getMyConditionOptionList();
+    protected abstract JSONArray getMyConditionOptionList();
 
     protected abstract JSONArray getMyMessageAttrList(String handler);
 

@@ -90,11 +90,6 @@ public class NotifyContentJob extends JobBase {
             }
         }
 
-
-        //TODO 根据插件、通知方式与配置获取待发送的数据，数据和接收人要有映射关系，不如在插件内实现发送？各插件自己实现各自的发送逻辑
-
-        //TODO 获取接收人
-
 	}
 
 

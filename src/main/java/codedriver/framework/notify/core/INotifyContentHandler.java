@@ -1,7 +1,6 @@
 package codedriver.framework.notify.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.util.ClassUtils;
@@ -52,7 +51,7 @@ public interface INotifyContentHandler {
 	 * 获取插件自带的条件，例如【待我处理的工单】插件自带【处理组】条件
 	 * @return
 	 */
-	public List<ConditionParamVo> getConditionOptionList();
+	public JSONArray getConditionOptionList();
 
 	/**
 	 * 根据通知方式插件获取消息相关表单属性，例如【通知消息标题】、【通知消息内容】、【接收人】、【抄送人】

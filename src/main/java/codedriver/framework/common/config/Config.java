@@ -1,27 +1,20 @@
 package codedriver.framework.common.config;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executor;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import codedriver.framework.common.RootConfiguration;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import codedriver.framework.common.RootConfiguration;
+import javax.annotation.PostConstruct;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Executor;
 
 @RootConfiguration
 public class Config {
@@ -140,7 +133,7 @@ public class Config {
     public static final String MOBILE_TEST_USER() {
         return MOBILE_TEST_USER;
     }
-
+    
     @PostConstruct
     public void init() {
         try {

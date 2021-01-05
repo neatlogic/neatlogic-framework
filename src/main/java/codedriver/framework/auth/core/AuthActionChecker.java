@@ -33,10 +33,7 @@ public class AuthActionChecker {
             return false;
         }
         UserContext userContext = UserContext.get();
-        List<String> actionList = new ArrayList<>();
-        for (String a : action) {
-            actionList.add(a);
-        }
+        List<String> actionList = new ArrayList<>(Arrays.asList(action));
         //无需鉴权
         if(actionList.contains(NO_AUTH.class.getSimpleName())){
             return true;

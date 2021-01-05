@@ -1,19 +1,17 @@
 package codedriver.framework.startup;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.common.CodeDriverBasicDataSource;
 import codedriver.framework.common.CodeDriverRoutingDataSource;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dto.DatasourceVo;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -34,7 +32,7 @@ public class DatasourceInitializer {
 	@Resource(name = "dataSourceMaster")
 	private CodeDriverBasicDataSource masterDatasource;
 
-	private static Map<Object, Object> datasourceMap = new HashMap<>();
+	private static final Map<Object, Object> datasourceMap = new HashMap<>();
 
 	@PostConstruct
 	public void init() {

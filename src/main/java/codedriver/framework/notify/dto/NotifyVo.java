@@ -14,183 +14,188 @@ import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
-	private Long id;
-	private INotifyTriggerType triggerType;
-	private Class<? extends INewsHandler> newsHandlerClass;
-	private String title;
-	private String content;
-	private List<NotifyReceiverVo> notifyReceiverVoList;
-	private String fromUser;
-	private String fromUserEmail;
-	private JSONObject data = new JSONObject();
-	private String templateContent;
-	private String templateTitle;
+    private Long id;
+    private INotifyTriggerType triggerType;
+    private Class<? extends INewsHandler> newsHandlerClass;
+    private String title;
+    private String content;
+    private List<NotifyReceiverVo> notifyReceiverVoList;
+    private String fromUser;
+    private String fromUserEmail;
+    private JSONObject data = new JSONObject();
+    private String templateContent;
+    private String templateTitle;
 
-	private List<String> exceptionNotifyUserUuidList;
-	private StringBuilder errorBuilder;
+    private List<String> exceptionNotifyUserUuidList;
+    private StringBuilder errorBuilder;
 
-	private String config;
-	private NotifyVo(Builder builder) {
-		this.triggerType = builder.triggerType;
-		this.newsHandlerClass = builder.newsHandlerClass;
-		this.data = builder.data;
-		this.notifyReceiverVoList = builder.notifyReceiverVoList;
-		this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
-		try {
-			title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
-		} catch (Exception e) {
-			this.appendError(e.getMessage());
-		}
-		try {
-			content = FreemarkerUtil.transform(builder.data, builder.templateContent);
-		} catch (Exception e) {
-			this.appendError(e.getMessage());
-		}
-	}
+    private String config;
 
-	public Long getId() {
-		return id;
-	}
+    private NotifyVo(Builder builder) {
+        this.triggerType = builder.triggerType;
+        this.newsHandlerClass = builder.newsHandlerClass;
+        this.data = builder.data;
+        this.notifyReceiverVoList = builder.notifyReceiverVoList;
+        this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
+        try {
+            title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
+        } catch (Exception e) {
+            this.appendError(e.getMessage());
+        }
+        try {
+            content = FreemarkerUtil.transform(builder.data, builder.templateContent);
+        } catch (Exception e) {
+            this.appendError(e.getMessage());
+        }
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getFromUser() {
-		return fromUser;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setFromUser(String fromUser) {
-		this.fromUser = fromUser;
-	}
+    public String getFromUser() {
+        return fromUser;
+    }
 
-	public String getTemplateContent() {
-		return templateContent;
-	}
+    public void setFromUser(String fromUser) {
+        this.fromUser = fromUser;
+    }
 
-	public String getTemplateTitle() {
-		return templateTitle;
-	}
+    public String getTemplateContent() {
+        return templateContent;
+    }
 
-	public List<NotifyReceiverVo> getNotifyReceiverVoList() {
-		return notifyReceiverVoList;
-	}
+    public String getTemplateTitle() {
+        return templateTitle;
+    }
 
-	public JSONObject getData() {
-		return data;
-	}
+    public List<NotifyReceiverVo> getNotifyReceiverVoList() {
+        return notifyReceiverVoList;
+    }
 
-	public String getFromUserEmail() {
-		return fromUserEmail;
-	}
+    public JSONObject getData() {
+        return data;
+    }
 
-	public void setFromUserEmail(String fromUserEmail) {
-		this.fromUserEmail = fromUserEmail;
-	}
+    public String getFromUserEmail() {
+        return fromUserEmail;
+    }
 
-	public List<String> getExceptionNotifyUserUuidList() {
-		return exceptionNotifyUserUuidList;
-	}
+    public void setFromUserEmail(String fromUserEmail) {
+        this.fromUserEmail = fromUserEmail;
+    }
 
-	public String getError() {
-		if(errorBuilder != null) {
-			return errorBuilder.toString().trim();
-		}
-		return null;
-	}
-	
-	public void appendError(String errorInfo) {
-		if(StringUtils.isNotBlank(errorInfo)) {
-			if(errorBuilder == null) {
-				errorBuilder = new StringBuilder();
-			}
-			errorBuilder.append(errorInfo);
-		}
-	}
-	
-	public INotifyTriggerType getTriggerType() {
-		return this.triggerType;
-	}
+    public List<String> getExceptionNotifyUserUuidList() {
+        return exceptionNotifyUserUuidList;
+    }
 
-	public Class<? extends INewsHandler> getNewsHandlerClass(){
-		return this.newsHandlerClass;
-	}
-	public String getConfig(){
-		if(StringUtils.isBlank(config)){
-			JSONObject configObj = new JSONObject();
-			configObj.put("notifyReceiverVoList", notifyReceiverVoList);
-			configObj.put("exceptionNotifyUserUuidList", exceptionNotifyUserUuidList);
-			config = configObj.toJSONString();
-		}
-		return config;
-	}
-	public static class Builder {
-		// 可选参数
-		private String templateContent;
-		private String templateTitle;
-		private JSONObject data = new JSONObject();
-		private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
-		private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
-		
-		private INotifyTriggerType triggerType;
-		private Class<? extends INewsHandler> newsHandlerClass;
-		public Builder(INotifyTriggerType _triggerType, Class<? extends INewsHandler> _newsHandlerClass) {
-			this.triggerType = _triggerType;
-			this.newsHandlerClass = _newsHandlerClass;
-		}
-		
-		public INotifyTriggerType getTriggerType() {
-			return triggerType;
-		}
+    public String getError() {
+        if (errorBuilder != null) {
+            return errorBuilder.toString().trim();
+        }
+        return null;
+    }
 
-		public Builder withContentTemplate(String contentTemplate) {
-			templateContent = contentTemplate;
-			return this;
-		}
+    public void appendError(String errorInfo) {
+        if (StringUtils.isNotBlank(errorInfo)) {
+            if (errorBuilder == null) {
+                errorBuilder = new StringBuilder();
+            }
+            errorBuilder.append(errorInfo);
+        }
+    }
 
-		public Builder withTitleTemplate(String titleTemplate) {
-			templateTitle = titleTemplate;
-			return this;
-		}
+    public INotifyTriggerType getTriggerType() {
+        return this.triggerType;
+    }
 
-		public Builder addData(String key, Object value) {
-			data.put(key, value);
-			return this;
-		}
-		
-		public Builder addAllData(JSONObject dataObj) {
-			data.putAll(dataObj);
-			return this;
-		}
-		
-		public NotifyVo build() {
-			return new NotifyVo(this);
-		}
+    public Class<? extends INewsHandler> getNewsHandlerClass() {
+        return this.newsHandlerClass;
+    }
 
-		public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo){
-			if(!this.notifyReceiverVoList.contains(notifyReceiverVo)){
-				this.notifyReceiverVoList.add(notifyReceiverVo);
-			}
-			return this;
-		}
-		public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList){
-			for(NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList){
-				addNotifyReceiverVo(notifyReceiverVo);
-			}
-			return this;
-		}
+    public String getConfig() {
+        if (StringUtils.isBlank(config)) {
+            JSONObject configObj = new JSONObject();
+            configObj.put("notifyReceiverVoList", notifyReceiverVoList);
+            configObj.put("exceptionNotifyUserUuidList", exceptionNotifyUserUuidList);
+            config = configObj.toJSONString();
+        }
+        return config;
+    }
 
-		public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
-			this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;
-			return this;
-		}
-	}
+    public static class Builder {
+        // 可选参数
+        private String templateContent;
+        private String templateTitle;
+        private JSONObject data = new JSONObject();
+        private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
+        private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
+
+        private INotifyTriggerType triggerType;
+        private Class<? extends INewsHandler> newsHandlerClass;
+
+        public Builder(INotifyTriggerType _triggerType, Class<? extends INewsHandler> _newsHandlerClass) {
+            this.triggerType = _triggerType;
+            this.newsHandlerClass = _newsHandlerClass;
+        }
+
+        public INotifyTriggerType getTriggerType() {
+            return triggerType;
+        }
+
+        public Builder withContentTemplate(String contentTemplate) {
+            templateContent = contentTemplate;
+            return this;
+        }
+
+        public Builder withTitleTemplate(String titleTemplate) {
+            templateTitle = titleTemplate;
+            return this;
+        }
+
+        public Builder addData(String key, Object value) {
+            data.put(key, value);
+            return this;
+        }
+
+        public Builder addAllData(JSONObject dataObj) {
+            data.putAll(dataObj);
+            return this;
+        }
+
+        public NotifyVo build() {
+            return new NotifyVo(this);
+        }
+
+        public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo) {
+            if (!this.notifyReceiverVoList.contains(notifyReceiverVo)) {
+                this.notifyReceiverVoList.add(notifyReceiverVo);
+            }
+            return this;
+        }
+
+        public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList) {
+            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList) {
+                addNotifyReceiverVo(notifyReceiverVo);
+            }
+            return this;
+        }
+
+        public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
+            this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;
+            return this;
+        }
+    }
 }

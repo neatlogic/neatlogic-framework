@@ -1,7 +1,9 @@
 package codedriver.framework.login;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.TenantVo;
@@ -31,7 +33,7 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
-    
+
     @Autowired
     private UserMapper userMapper;
 
@@ -40,7 +42,7 @@ public class LoginController {
 
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
-        HttpServletRequest request, HttpServletResponse response) throws Exception {
+                                  HttpServletRequest request, HttpServletResponse response) throws Exception {
         JSONObject returnObj = new JSONObject();
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
@@ -70,7 +72,13 @@ public class LoginController {
             userVo.setPassword(password);
             userVo.setTenant(tenant);
 
-            UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+            UserVo checkUserVo = null;
+            if (Config.IS_MAINTENANCE_MODE() && MaintenanceMode.MAINTENANCE_USER.equals(userVo.getUserId())) {
+                checkUserVo = MaintenanceMode.getMaintenanceUser();
+            } else {
+                checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+            }
+
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
@@ -80,9 +88,9 @@ public class LoginController {
                     userMapper.insertUserSession(checkUserVo.getUuid());
                 }
                 JwtVo jwtVo = loginService.buildJwt(checkUserVo);
-                loginService.setResponseAuthCookie(response,request,tenant,jwtVo);
+                loginService.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
-                returnObj.put("JwtToken", jwtVo.getJwthead() + "." +  jwtVo.getJwtbody() + "." +  jwtVo.getJwtsign());
+                returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
                 response.getWriter().print(returnObj);
             } else {
                 throw new UserAuthFailedException();

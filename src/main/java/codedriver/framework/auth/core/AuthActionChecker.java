@@ -1,6 +1,7 @@
 package codedriver.framework.auth.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.auth.label.NO_AUTH;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
@@ -35,8 +36,8 @@ public class AuthActionChecker {
         }
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
-        //无需鉴权注解 || 维护模式下，维护用户，不需要鉴权
-        if(actionList.contains(NO_AUTH.class.getSimpleName()) || (Config.IS_MAINTENANCE_MODE()&&userContext.getUserUuid().equals(Config.MAINTENANCE_USER))){
+        //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
+        if (actionList.contains(NO_AUTH.class.getSimpleName()) || (Config.IS_MAINTENANCE_MODE() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList))) {
             return true;
         }
 
@@ -58,17 +59,17 @@ public class AuthActionChecker {
             return false;
         }
     }
-    
+
     public static Boolean checkByUserUuid(String userUuid, String... action) {
         if (action == null || action.length == 0) {
             return false;
         }
         List<String> actionList = Arrays.asList(action);
         List<String> actionRoleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
-        if(CollectionUtils.isNotEmpty(actionRoleUuidList)) {
+        if (CollectionUtils.isNotEmpty(actionRoleUuidList)) {
             List<String> roleUuidList = userMapper.getRoleUuidListByUserUuid(userUuid);
             for (String roleUuid : actionRoleUuidList) {
-                if(roleUuidList.contains(roleUuid)) {
+                if (roleUuidList.contains(roleUuid)) {
                     return true;
                 }
             }

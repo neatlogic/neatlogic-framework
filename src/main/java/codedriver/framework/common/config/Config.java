@@ -48,6 +48,7 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
+    private static Boolean IS_MAINTENANCE_MODE;
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -133,7 +134,11 @@ public class Config {
     public static final String MOBILE_TEST_USER() {
         return MOBILE_TEST_USER;
     }
-    
+
+    public static boolean IS_MAINTENANCE_MODE() {
+        return IS_MAINTENANCE_MODE;
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -178,6 +183,7 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
+            IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
 

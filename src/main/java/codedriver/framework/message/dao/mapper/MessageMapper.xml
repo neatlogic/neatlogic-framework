@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="codedriver.framework.news.dao.mapper.NewsMapper">
+<mapper namespace="codedriver.framework.message.dao.mapper.MessageMapper">
 
-    <select id="getNewsSubscribeListByUserUuid" parameterType="java.lang.String"
-            resultType="codedriver.framework.news.dto.NewsHandlerVo">
+    <select id="getMessageSubscribeListByUserUuid" parameterType="java.lang.String"
+            resultType="codedriver.framework.message.dto.MessageHandlerVo">
         SELECT `handler`,
                `is_active` AS isActive,
                `pop_up`    AS popUp,
                `fcd`
-        FROM `news_subscribe`
+        FROM `message_subscribe`
         WHERE `user_uuid` = #{value}
     </select>
 
-    <select id="getNewsSubscribeByUserUuidAndHandler" parameterType="codedriver.framework.news.dto.NewsHandlerVo"
-            resultType="codedriver.framework.news.dto.NewsHandlerVo">
+    <select id="getMessageSubscribeByUserUuidAndHandler" parameterType="codedriver.framework.message.dto.MessageHandlerVo"
+            resultType="codedriver.framework.message.dto.MessageHandlerVo">
         SELECT `user_uuid`,
                `handler`,
                `is_active`,
                `pop_up`,
                `fcd`
-        FROM `news_subscribe`
+        FROM `message_subscribe`
         WHERE `user_uuid` = #{userUuid}
           AND `handler` = #{handler}
     </select>
 
-    <select id="getNewsMessageCount" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
+    <select id="getMessageCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `news_message_user`
+        FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
         AND `is_delete` = 0
-        <if test="newsMessageId != null">
-            AND `news_message_id` > #{newsMessageId}
+        <if test="messageId != null">
+            AND `message_id` > #{messageId}
         </if>
     </select>
 
-    <select id="getNewsMessageList" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
-            resultType="codedriver.framework.news.dto.NewsMessageVo">
+    <select id="getMessageList" parameterType="codedriver.framework.message.dto.MessageSearchVo"
+            resultType="codedriver.framework.message.dto.MessageVo">
         SELECT
         b.`id`,
         b.`title`,
@@ -45,34 +45,34 @@
         b.`fcd`,
         b.`handler`,
         a.`is_read` AS isRead
-        FROM `news_message_user` a
-        JOIN `news_message` b ON b.`id` = a.`news_message_id`
+        FROM `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{userUuid}
         AND a.`is_delete` = 0
-        <if test="newsMessageId != null">
-            AND a.`news_message_id` > #{newsMessageId}
+        <if test="messageId != null">
+            AND a.`message_id` > #{messageId}
         </if>
         LIMIT #{startNum}, #{pageSize}
     </select>
 
-    <select id="getNewsMessageNewCount" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
+    <select id="getMessageNewCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `news_message_user`
+        FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
-        <if test="newsMessageId != null">
-            AND `news_message_id` > #{newsMessageId}
+        <if test="messageId != null">
+            AND `message_id` > #{messageId}
         </if>
         AND `is_read` = 0
     </select>
 
-    <select id="getNewsMessageHistoryCount" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
+    <select id="getMessageHistoryCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `news_message` a
-        JOIN `news_message_user` b ON b.`news_message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
+        FROM `message` a
+        JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
         <where>
             <if test="handlerList != null and handlerList.size()">
                 AND a.`handler` in
@@ -86,16 +86,16 @@
         </where>
     </select>
 
-    <select id="getNewsMessageHistoryList" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
-            resultType="codedriver.framework.news.dto.NewsMessageVo">
+    <select id="getMessageHistoryList" parameterType="codedriver.framework.message.dto.MessageSearchVo"
+            resultType="codedriver.framework.message.dto.MessageVo">
         SELECT
         a.`id`,
         a.`title`,
         a.`content`,
         a.`fcd`,
         a.`handler`
-        FROM `news_message` a
-        JOIN `news_message_user` b ON b.`news_message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
+        FROM `message` a
+        JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
         <where>
             <if test="handlerList != null and handlerList.size()">
                 AND a.`handler` in
@@ -110,16 +110,16 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
-    <select id="getNewsMessagePullCount" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
+    <select id="getMessagePullCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
             resultType="int">
         SELECT
-        COUNT(DISTINCT a.`news_message_id`)
-        FROM `news_message_recipient` a
+        COUNT(DISTINCT a.`message_id`)
+        FROM `message_recipient` a
         <if test="handlerList != null and handlerList.size() > 0">
-            JOIN `news_message` b ON b.`id` = a.`news_message_id`
+            JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        LEFT JOIN `news_message_user` c ON c.`news_message_id` = c.`news_message_id` AND c.`user_uuid` = #{userUuid}
-        WHERE c.`news_message_id` IS NULL
+        LEFT JOIN `message_user` c ON c.`message_id` = c.`message_id` AND c.`user_uuid` = #{userUuid}
+        WHERE c.`message_id` IS NULL
         AND a.`fcd` >= #{startTime}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
@@ -141,16 +141,16 @@
         )
     </select>
 
-    <select id="getNewsMessagePullList" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo"
+    <select id="getMessagePullList" parameterType="codedriver.framework.message.dto.MessageSearchVo"
             resultType="java.lang.Long">
         SELECT
-        DISTINCT a.`news_message_id`
-        FROM `news_message_recipient` a
+        DISTINCT a.`message_id`
+        FROM `message_recipient` a
         <if test="handlerList != null and handlerList.size() > 0">
-            JOIN `news_message` b ON b.`id` = a.`news_message_id`
+            JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        LEFT JOIN `news_message_user` c ON c.`news_message_id` = c.`news_message_id` AND c.`user_uuid` = #{userUuid}
-        WHERE c.`news_message_id` IS NULL
+        LEFT JOIN `message_user` c ON c.`message_id` = c.`message_id` AND c.`user_uuid` = #{userUuid}
+        WHERE c.`message_id` IS NULL
         AND a.`fcd` >= #{startTime}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
@@ -170,38 +170,38 @@
         </foreach>
         )
         )
-        ORDER BY a.`news_message_id`
+        ORDER BY a.`message_id`
         LIMIT #{startNum}, #{pageSize}
     </select>
 
-    <select id="getNewsMessageListByIdList" parameterType="java.lang.Long"
-            resultType="codedriver.framework.news.dto.NewsMessageVo">
+    <select id="getMessageListByIdList" parameterType="java.lang.Long"
+            resultType="codedriver.framework.message.dto.MessageVo">
         SELECT
         `id`,
         `title`,
         `content`,
         `fcd`,
         `handler`
-        FROM `news_message`
+        FROM `message`
         WHERE `id` IN
         <foreach collection="list" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </select>
 
-    <select id="getNewsMessageUserMaxNewsMessageIdByUserUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+    <select id="getMessageUserMaxMessageIdByUserUuid" parameterType="java.lang.String" resultType="java.lang.Long">
         SELECT
-            MAX(`news_message_id`)
-        FROM `news_message_user`
+            MAX(`message_id`)
+        FROM `message_user`
         WHERE `user_uuid` = #{value}
     </select>
 
-    <select id="getNewsMessageFcdById" parameterType="java.lang.Long" resultType="java.util.Date">
-        SELECT `fcd` FROM `news_message` WHERE `id` = #{value}
+    <select id="getMessageFcdById" parameterType="java.lang.Long" resultType="java.util.Date">
+        SELECT `fcd` FROM `message` WHERE `id` = #{value}
     </select>
 
-    <insert id="insertNewsMessage" parameterType="codedriver.framework.news.dto.NewsMessageVo">
-        INSERT INTO `news_message` (
+    <insert id="insertMessage" parameterType="codedriver.framework.message.dto.MessageVo">
+        INSERT INTO `message` (
         `id`,
         `title`,
         `content`,
@@ -209,42 +209,42 @@
         `fcd`
         )
         VALUES
-        <foreach collection="list" item="newsMessageVo" separator=",">
+        <foreach collection="list" item="messageVo" separator=",">
             (
-            #{newsMessageVo.id},
-            #{newsMessageVo.title},
-            #{newsMessageVo.content},
-            #{newsMessageVo.handler},
+            #{messageVo.id},
+            #{messageVo.title},
+            #{messageVo.content},
+            #{messageVo.handler},
             NOW(3)
             )
         </foreach>
 
     </insert>
 
-    <insert id="insertNewsMessageRecipient" parameterType="codedriver.framework.news.dto.NewsMessageRecipientVo">
-        INSERT INTO `news_message_recipient` (`news_message_id`, `type`, `uuid`)
+    <insert id="insertMessageRecipient" parameterType="codedriver.framework.message.dto.MessageRecipientVo">
+        INSERT INTO `message_recipient` (`message_id`, `type`, `uuid`)
         VALUES
-        <foreach collection="list" item="newsMessageRecipientVo" separator=",">
-            (#{newsMessageRecipientVo.newsMessageId}, #{newsMessageRecipientVo.type}, #{newsMessageRecipientVo.uuid})
+        <foreach collection="list" item="messageRecipientVo" separator=",">
+            (#{messageRecipientVo.messageId}, #{messageRecipientVo.type}, #{messageRecipientVo.uuid})
         </foreach>
     </insert>
 
-    <insert id="insertNewsMessageUser" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo">
-        INSERT INTO `news_message_user` (
-        `news_message_id`,
+    <insert id="insertMessageUser" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+        INSERT INTO `message_user` (
+        `message_id`,
         `user_uuid`
         )
         VALUES
-        <foreach collection="list" item="newsMessageUserVo" separator=",">
+        <foreach collection="list" item="messageUserVo" separator=",">
             (
-            #{newsMessageUserVo.newsMessageId},
-            #{newsMessageUserVo.userUuid}
+            #{messageUserVo.messageId},
+            #{messageUserVo.userUuid}
             )
         </foreach>
     </insert>
 
-    <insert id="insertNewsSubscribe" parameterType="codedriver.framework.news.dto.NewsHandlerVo">
-        INSERT INTO `news_subscribe` (`user_uuid`,
+    <insert id="insertMessageSubscribe" parameterType="codedriver.framework.message.dto.MessageHandlerVo">
+        INSERT INTO `message_subscribe` (`user_uuid`,
                                       `handler`,
                                       `is_active`,
                                       `pop_up`,
@@ -256,31 +256,31 @@
                 NOW(3))
     </insert>
 
-    <update id="updateNewsMessageUserIsRead" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo">
-        UPDATE `news_message_user`
+    <update id="updateMessageUserIsRead" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
         SET `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
-          AND `news_message_id` = #{newsMessageId}
+          AND `message_id` = #{messageId}
     </update>
-    <update id="updateNewsMessageUserIsDelete" parameterType="codedriver.framework.news.dto.NewsMessageSearchVo">
-        UPDATE `news_message_user`
+    <update id="updateMessageUserIsDelete" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
         SET `is_read` = 1,
             `is_delete` = 1
         WHERE `user_uuid` = #{userUuid}
-          <if test="newsMessageId != null">
-              AND `news_message_id` = #{newsMessageId}
+          <if test="messageId != null">
+              AND `message_id` = #{messageId}
           </if>
     </update>
 
-    <update id="updateNewsSubscribePopUp" parameterType="codedriver.framework.news.dto.NewsHandlerVo">
-        UPDATE `news_subscribe`
+    <update id="updateMessageSubscribePopUp" parameterType="codedriver.framework.message.dto.MessageHandlerVo">
+        UPDATE `message_subscribe`
         SET `pop_up` = #{popUp}
         WHERE `user_uuid` = #{userUuid}
           AND `handler` = #{handler}
     </update>
 
-    <update id="updateNewsSubscribeActive" parameterType="codedriver.framework.news.dto.NewsHandlerVo">
-        UPDATE `news_subscribe`
+    <update id="updateMessageSubscribeActive" parameterType="codedriver.framework.message.dto.MessageHandlerVo">
+        UPDATE `message_subscribe`
         SET `is_active` = !`is_active`,
             `fcd` = NOW(3)
         WHERE `user_uuid` = #{userUuid}

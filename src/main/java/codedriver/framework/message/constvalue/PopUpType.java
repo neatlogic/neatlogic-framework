@@ -1,4 +1,4 @@
-package codedriver.framework.news.constvalue;
+package codedriver.framework.message.constvalue;
 
 /**
  * @Title: PopUpType

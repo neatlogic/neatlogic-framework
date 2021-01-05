@@ -1,4 +1,4 @@
-package codedriver.framework.news.exception;
+package codedriver.framework.message.exception;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
@@ -9,9 +9,9 @@ import codedriver.framework.exception.core.ApiRuntimeException;
  * @Author: linbq
  * @Date: 2020/12/31 15:19
  **/
-public class NewsHandlerNotFoundException extends ApiRuntimeException {
+public class MessageHandlerNotFoundException extends ApiRuntimeException {
 
-    public NewsHandlerNotFoundException(String handler) {
+    public MessageHandlerNotFoundException(String handler) {
         super("消息类型处理器：‘" + handler+ "’不存在");
     }
 }

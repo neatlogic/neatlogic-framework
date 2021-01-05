@@ -1,24 +1,18 @@
-package codedriver.framework.news.dto;
+package codedriver.framework.message.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BaseEditorVo;
-import codedriver.framework.notify.dto.NotifyReceiverVo;
 import codedriver.framework.restful.annotation.EntityField;
-import codedriver.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
- * @Title: NewsMessageVo
- * @Package codedriver.framework.news.dto
+ * @Title: MessageVo
+ * @Package codedriver.framework.message.dto
  * @Description: 消息详情Vo
  * @Author: linbq
  * @Date: 2020/12/30 15:13
  **/
-public class NewsMessageVo {
+public class MessageVo {
     @EntityField(name = "消息id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "标题", type = ApiParamType.STRING)

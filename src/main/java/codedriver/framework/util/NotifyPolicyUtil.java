@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import codedriver.framework.news.core.INewsHandler;
+import codedriver.framework.message.core.IMessageHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class NotifyPolicyUtil {
      * @Time:2020年7月2日
      * @Description: 执行通知策略
      */
-    public static void execute(INotifyTriggerType notifyTriggerType, Class<? extends INewsHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
+    public static void execute(INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
                                JSONObject templateParamData, JSONObject conditionParamData,
                                Map<String, List<NotifyReceiverVo>> receiverMap) {
         /** 异常通知用户uuid列表 **/

@@ -1,20 +1,19 @@
-package codedriver.framework.news.dto;
+package codedriver.framework.message.dto;
 
 import codedriver.framework.common.dto.BaseEditorVo;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * @Title: NewsMessageSearchVo
- * @Package codedriver.framework.news.dto
+ * @Title: MessageMessageSearchVo
+ * @Package codedriver.framework.message.dto
  * @Description: 消息查询Vo
  * @Author: linbq
  * @Date: 2021/1/4 20:56
  **/
-public class NewsMessageSearchVo extends BaseEditorVo {
-    private Long newsMessageId;
+public class MessageSearchVo extends BaseEditorVo {
+    private Long messageId;
     private Integer isDelete;
     private String userUuid;
     private List<String> teamUuidList;
@@ -23,21 +22,21 @@ public class NewsMessageSearchVo extends BaseEditorVo {
     private Date endTime;
     private List<String> handlerList;
 
-    public NewsMessageSearchVo(){
+    public MessageSearchVo(){
 
     }
 
-    public NewsMessageSearchVo(String userUuid, Long newsMessageId) {
-        this.newsMessageId = newsMessageId;
+    public MessageSearchVo(String userUuid, Long messageId) {
+        this.messageId = messageId;
         this.userUuid = userUuid;
     }
 
-    public Long getNewsMessageId() {
-        return newsMessageId;
+    public Long getMessageId() {
+        return messageId;
     }
 
-    public void setNewsMessageId(Long newsMessageId) {
-        this.newsMessageId = newsMessageId;
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
     }
 
     public Integer getIsDelete() {

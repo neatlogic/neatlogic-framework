@@ -1,22 +1,20 @@
 package codedriver.framework.notify.dto;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import codedriver.framework.news.core.INewsHandler;
+import codedriver.framework.message.core.IMessageHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
-import codedriver.framework.dto.UserVo;
 import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
     private Long id;
     private INotifyTriggerType triggerType;
-    private Class<? extends INewsHandler> newsHandlerClass;
+    private Class<? extends IMessageHandler> newsHandlerClass;
     private String title;
     private String content;
     private List<NotifyReceiverVo> notifyReceiverVoList;
@@ -121,7 +119,7 @@ public class NotifyVo {
         return this.triggerType;
     }
 
-    public Class<? extends INewsHandler> getNewsHandlerClass() {
+    public Class<? extends IMessageHandler> getNewsHandlerClass() {
         return this.newsHandlerClass;
     }
 
@@ -144,9 +142,9 @@ public class NotifyVo {
         private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 
         private INotifyTriggerType triggerType;
-        private Class<? extends INewsHandler> newsHandlerClass;
+        private Class<? extends IMessageHandler> newsHandlerClass;
 
-        public Builder(INotifyTriggerType _triggerType, Class<? extends INewsHandler> _newsHandlerClass) {
+        public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _newsHandlerClass) {
             this.triggerType = _triggerType;
             this.newsHandlerClass = _newsHandlerClass;
         }

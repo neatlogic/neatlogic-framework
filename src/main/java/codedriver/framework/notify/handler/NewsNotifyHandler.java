@@ -1,8 +1,7 @@
 package codedriver.framework.notify.handler;
 
-import codedriver.framework.news.core.INewsHandler;
-import codedriver.framework.news.core.NewsHandlerFactory;
-import codedriver.framework.news.dto.NewsMessageVo;
+import codedriver.framework.message.core.IMessageHandler;
+import codedriver.framework.message.core.MessageHandlerFactory;
 import codedriver.framework.notify.core.NotifyHandlerBase;
 import codedriver.framework.notify.core.NotifyHandlerType;
 import codedriver.framework.notify.dto.NotifyVo;
@@ -22,7 +21,7 @@ public class NewsNotifyHandler extends NotifyHandlerBase {
     @Override
     protected void myExecute(NotifyVo notifyVo) {
         if(CollectionUtils.isNotEmpty(notifyVo.getNotifyReceiverVoList())){
-            INewsHandler handler = NewsHandlerFactory.getHandler(notifyVo.getNewsHandlerClass().getName());
+            IMessageHandler handler = MessageHandlerFactory.getHandler(notifyVo.getNewsHandlerClass().getName());
             handler.send(notifyVo);
         }
     }

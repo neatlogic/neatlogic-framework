@@ -1,11 +1,7 @@
-package codedriver.framework.news.core;
+package codedriver.framework.message.core;
 
-import codedriver.framework.news.dto.NewsMessageVo;
-import codedriver.framework.notify.dto.NotifyReceiverVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import org.springframework.util.ClassUtils;
-
-import java.util.List;
 
 /**
  * @Title: INewsHandler
@@ -14,7 +10,7 @@ import java.util.List;
  * @Author: linbq
  * @Date: 2020/12/30 15:09
  **/
-public interface INewsHandler {
+public interface IMessageHandler {
     /**
      * @Description:
      * @Author: linbq

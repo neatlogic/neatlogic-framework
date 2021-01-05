@@ -1,4 +1,4 @@
-package codedriver.framework.news.dto;
+package codedriver.framework.message.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
@@ -6,13 +6,13 @@ import codedriver.framework.restful.annotation.EntityField;
 import java.util.Date;
 
 /**
- * @Title: NewsHandlerVo
- * @Package codedriver.framework.news.dto
+ * @Title: MessageHandlerVo
+ * @Package codedriver.framework.message.dto
  * @Description: 消息类型处理器Vo
  * @Author: linbq
  * @Date: 2020/12/30 18:33
  **/
-public class NewsHandlerVo implements Cloneable {
+public class MessageHandlerVo implements Cloneable {
     @EntityField(name = "模块id", type = ApiParamType.STRING)
     private String moduleId;
     @EntityField(name = "模块名", type = ApiParamType.STRING)
@@ -104,7 +104,7 @@ public class NewsHandlerVo implements Cloneable {
     }
 
     @Override
-    public NewsHandlerVo clone() throws CloneNotSupportedException {
-        return (NewsHandlerVo) super.clone();
+    public MessageHandlerVo clone() throws CloneNotSupportedException {
+        return (MessageHandlerVo) super.clone();
     }
 }

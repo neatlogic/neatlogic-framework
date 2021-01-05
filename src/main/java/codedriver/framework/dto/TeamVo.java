@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -40,6 +41,12 @@ public class TeamVo extends BasePageVo {
 	private List<String> pathNameList;
 	@EntityField(name = "级别", type = ApiParamType.STRING)
 	private String level;
+
+	/**
+	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
+	 */
+	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+	private final String initType = GroupSearch.TEAM.getValue();
 	
 	public List<String> getPathNameList() {
 		return pathNameList;
@@ -161,4 +168,7 @@ public class TeamVo extends BasePageVo {
 		this.level = level;
 	}
 
+	public String getInitType() {
+		return initType;
+	}
 }

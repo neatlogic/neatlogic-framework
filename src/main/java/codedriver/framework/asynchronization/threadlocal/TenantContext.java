@@ -1,19 +1,18 @@
 package codedriver.framework.asynchronization.threadlocal;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RootConfiguration
 public class TenantContext implements Serializable {
@@ -93,16 +92,14 @@ public class TenantContext implements Serializable {
 			this.tenantUuid = tenantUuid;
 			// 使用master库
 			this.setUseDefaultDatasource(true);
-			List<String> tenantModuleGroupList = new ArrayList<String>(); //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
-			tenantModuleGroupList.addAll(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
+			//防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
+			List<String> tenantModuleGroupList = new ArrayList<String>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
 			this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
 			this.activeModuleGroupList = new ArrayList<>();
-			if (tenantModuleGroupList != null) {
-				for (String group : tenantModuleGroupList) {
-					ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
-					if (groupVo != null) {
-						this.activeModuleGroupList.add(groupVo);
-					}
+			for (String group : tenantModuleGroupList) {
+				ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
+				if (groupVo != null) {
+					this.activeModuleGroupList.add(groupVo);
 				}
 			}
 

@@ -8,11 +8,14 @@
 		<result property="type" column="type"/>
 		<result property="fcu" column="fcu"/>
 		<result property="fcd" column="fcd"/>
-		<result property="lcu" column="lcu"/>
-		<result property="lcuName" column="lcuName"/>
-		<result property="lcuInfo" column="lcuInfo"/>
-		<result property="lcuVipLevel" column="lcuVipLevel"/>
 		<result property="lcd" column="lcd"/>
+		<association property="lcuVo" javaType="codedriver.framework.dto.UserVo">
+			<result property="uuid" column="lcuUuid" />
+			<result property="userName" column="lcuName" />
+			<result property="pinyin" column="lcuPinyin" />
+			<result property="vipLevel" column="lcuVipLevel" />
+			<result property="userInfo" column="lcuInfo" />
+		</association>
 	</resultMap>
 
 	<insert id="insertMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" >
@@ -82,9 +85,10 @@
 			a.`type`,
 			a.`fcu`,
 			a.`fcd`,
-			a.`lcu`,
+			a.`lcu` as lcuUuid,
 			(SELECT u.`user_name` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuName,
 			(SELECT u.`user_info` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuInfo,
+			(SELECT u.`pinyin` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuPinyin,
 			(SELECT u.`vip_level` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuVipLevel,
 			a.`lcd`
 			FROM `process_matrix` a

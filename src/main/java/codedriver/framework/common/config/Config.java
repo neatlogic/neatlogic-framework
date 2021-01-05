@@ -29,8 +29,6 @@ public class Config {
     public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
     public static final String RC4KEY = "codedriver.key.20200101";
 
-    public static final String MAINTENANCE_USER = "techsure";//维护用户 用于初始化系统
-
     private static String JWT_SECRET = "techsure#codedriver$secret";
     private static String CODEDRIVER_HOME;
     private static Map<String, String> ES_CLUSTERS;
@@ -50,8 +48,6 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
-
-    private static boolean IS_MAINTENANCE_MODE;//是否维护模式
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -137,9 +133,7 @@ public class Config {
     public static final String MOBILE_TEST_USER() {
         return MOBILE_TEST_USER;
     }
-
-    public static boolean IS_MAINTENANCE_MODE(){ return IS_MAINTENANCE_MODE;}
-
+    
     @PostConstruct
     public void init() {
         try {
@@ -184,9 +178,9 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
-            IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
+
             for (Map.Entry<Object, Object> el : prop.entrySet()) {
                 Object k = el.getKey();
                 Object v = el.getValue();

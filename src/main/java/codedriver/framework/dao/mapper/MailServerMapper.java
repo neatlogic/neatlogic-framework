@@ -29,13 +29,9 @@ public interface MailServerMapper {
 
 	public int resetAllMailServerStatus();
 
-	public int insertMailHistory(NotifyVo notifyVo);
-
 	public int activeMailServerByUuid(String uuid);
 
 	public int updateMailServerByUuid(MailServerVo mailServerVo);
-
-	public int updateMailHistoryStatusAndFailureReasonById(@Param("id") Long id, @Param("failureReason") String failureReason);
 
 	public int deleteMailServerByUuid(String string);
 }

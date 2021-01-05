@@ -119,7 +119,6 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                         }
                     }
                     if (isSend) {
-                        mailServerMapper.insertMailHistory(notifyVo);
                         se.send();
                     } else {
                         throw new NotifyNoReceiverException();
@@ -129,7 +128,6 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-                mailServerMapper.updateMailHistoryStatusAndFailureReasonById(notifyVo.getId(), ExceptionUtils.getStackTrace(ex));
             }
         }
     }

@@ -99,27 +99,6 @@
 	  ) 
 	</insert>
 
-	<insert id="insertMailHistory" parameterType="codedriver.framework.notify.dto.NotifyVo">
-		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER"> select LAST_INSERT_ID() as id </selectKey>
-		INSERT INTO `mail_history` (
-			`title`,
-			`content`,
-			`trigger_type`,
-			`config`,
-			`fcd`,
-			`error`
-		)
-		VALUES
-		(
-			#{title},
-			#{content},
-			#{triggerType.text},
-			#{config},
-			NOW(3),
-			#{error}
-		)
-	</insert>
-
 	<update id="resetAllMailServerStatus">
 	UPDATE `mail_server` SET `is_active` = 0
 	</update>
@@ -130,14 +109,6 @@
 	
 	<update id="updateMailServerByUuid" parameterType="codedriver.framework.dto.MailServerVo">
 	UPDATE `mail_server` SET `is_active` = #{isActive} WHERE `uuid` = #{uuid} 
-	</update>
-
-	<update id="updateMailHistoryStatusAndFailureReasonById">
-		UPDATE `mail_history`
-		SET
-			`status` = 0,
-			`failure_reason` = #{failureReason}
-		WHERE `id` = #{id}
 	</update>
 
 	<delete id="deleteMailServerByUuid" parameterType="java.lang.String">

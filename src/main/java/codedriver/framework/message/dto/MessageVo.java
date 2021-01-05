@@ -2,6 +2,7 @@ package codedriver.framework.message.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 import java.util.Date;
 
@@ -29,6 +30,9 @@ public class MessageVo {
     private String popUp;
 
     public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
         return id;
     }
 

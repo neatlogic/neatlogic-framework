@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import codedriver.framework.news.core.INewsHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +52,9 @@ public class NotifyPolicyUtil {
      *            可能用到的通知接收对象集合
      * @return void
      */
-    public static void execute(NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
-        INotifyTriggerType notifyTriggerType, JSONObject templateParamData, JSONObject conditionParamData,
-        Map<String, List<NotifyReceiverVo>> receiverMap) {
+    public static void execute(INotifyTriggerType notifyTriggerType, Class<? extends INewsHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
+                               JSONObject templateParamData, JSONObject conditionParamData,
+                               Map<String, List<NotifyReceiverVo>> receiverMap) {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
@@ -120,7 +121,7 @@ public class NotifyPolicyUtil {
                                 if (handler == null) {
                                     throw new NotifyHandlerNotFoundException(notifyHandler);
                                 }
-                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType);
+                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass);
                                 /** 设置异常通知接收人 **/
                                 if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
                                     notifyBuilder.setExceptionNotifyUserUuidList(adminUserUuidList);
@@ -165,28 +166,39 @@ public class NotifyPolicyUtil {
                                 /** 注入结束 **/
 
                                 /** 设置正常接收人 **/
+//                                for (String receiver : receiverList) {
+//                                    String[] split = receiver.split("#");
+//                                    if (GroupSearch.USER.getValue().equals(split[0])) {
+//                                        notifyBuilder.addUserUuid(split[1]);
+//                                    } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
+//                                        notifyBuilder.addTeamId(split[1]);
+//                                    } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
+//                                        notifyBuilder.addRoleUuid(split[1]);
+//                                    } else {
+//                                        List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
+//                                        if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
+//                                            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
+//                                                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
+//                                                    notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
+//                                                } else if (GroupSearch.TEAM.getValue()
+//                                                    .equals(notifyReceiverVo.getType())) {
+//                                                    notifyBuilder.addTeamId(notifyReceiverVo.getUuid());
+//                                                } else if (GroupSearch.ROLE.getValue()
+//                                                    .equals(notifyReceiverVo.getType())) {
+//                                                    notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
                                 for (String receiver : receiverList) {
                                     String[] split = receiver.split("#");
-                                    if (GroupSearch.USER.getValue().equals(split[0])) {
-                                        notifyBuilder.addUserUuid(split[1]);
-                                    } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
-                                        notifyBuilder.addTeamId(split[1]);
-                                    } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
-                                        notifyBuilder.addRoleUuid(split[1]);
-                                    } else {
-                                        List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
-                                        if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
-                                            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
-                                                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
-                                                    notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
-                                                } else if (GroupSearch.TEAM.getValue()
-                                                    .equals(notifyReceiverVo.getType())) {
-                                                    notifyBuilder.addTeamId(notifyReceiverVo.getUuid());
-                                                } else if (GroupSearch.ROLE.getValue()
-                                                    .equals(notifyReceiverVo.getType())) {
-                                                    notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
-                                                }
-                                            }
+                                    if (GroupSearch.USER.getValue().equals(split[0]) || GroupSearch.TEAM.getValue().equals(split[0]) || GroupSearch.ROLE.getValue().equals(split[0])) {
+                                        notifyBuilder.addNotifyReceiverVo(new NotifyReceiverVo(split[0], split[1]));
+                                    }else{
+                                        List<NotifyReceiverVo> notifyReceiverVoList = receiverMap.get(split[1]);
+                                        if (CollectionUtils.isNotEmpty(notifyReceiverVoList)) {
+                                            notifyBuilder.addAllNotifyReceiverVo(notifyReceiverVoList);
                                         }
                                     }
                                 }

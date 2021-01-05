@@ -6,6 +6,8 @@ import codedriver.framework.news.dto.NewsMessageVo;
 import codedriver.framework.notify.core.NotifyHandlerBase;
 import codedriver.framework.notify.core.NotifyHandlerType;
 import codedriver.framework.notify.dto.NotifyVo;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * @Title: NewsNotifyHandler
@@ -14,24 +16,14 @@ import codedriver.framework.notify.dto.NotifyVo;
  * @Author: linbq
  * @Date: 2020/12/31 15:19
  **/
-//@Component
+@Component
 public class NewsNotifyHandler extends NotifyHandlerBase {
-
-//    private static Logger logger = LoggerFactory.getLogger(RemindNotifyHandler.class);
 
     @Override
     protected void myExecute(NotifyVo notifyVo) {
-        this.sendRemind(notifyVo);
-    }
-
-    private void sendRemind(NotifyVo notifyVo){
-        if (notifyVo.getToUserList().size() > 0){
-            NewsMessageVo message = new NewsMessageVo();
-            message.setTitle(notifyVo.getTitle());
-            message.setContent(notifyVo.getContent());
-//            message.setRecipientList();
-            INewsHandler handler = NewsHandlerFactory.getHandler("ProcessTaskRemindHandler.class.getName()");//TODO linbq
-            handler.send(message);
+        if(CollectionUtils.isNotEmpty(notifyVo.getNotifyReceiverVoList())){
+            INewsHandler handler = NewsHandlerFactory.getHandler(notifyVo.getNewsHandlerClass().getName());
+            handler.send(notifyVo);
         }
     }
 

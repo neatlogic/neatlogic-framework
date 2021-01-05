@@ -1,7 +1,12 @@
 package codedriver.framework.notify.core;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.notify.dto.NotifyReceiverVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.HtmlEmail;
@@ -29,65 +34,54 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 
 
 	public final void execute(NotifyVo notifyVo) {
-		if (CollectionUtils.isEmpty(notifyVo.getToUserList())) {
-			if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
-				for (String userUuid : notifyVo.getToUserUuidList()) {
-					UserVo userVo = userMapper.getUserBaseInfoByUuid(userUuid);
-					if (userVo != null) {
-						notifyVo.addUser(userVo);
-					}
-				}
-			}
-			if (CollectionUtils.isNotEmpty(notifyVo.getToTeamIdList())) {
-				for (String teamId : notifyVo.getToTeamIdList()) {
-					List<UserVo> teamUserList = userMapper.getActiveUserByTeamId(teamId);
-					for (UserVo userVo : teamUserList) {
-						notifyVo.addUser(userVo);
-					}
-				}
-			}
-			if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
-				for (String roleUuid : notifyVo.getToRoleUuidList()) {
-					List<UserVo> roleUserList = userMapper.getActiveUserByRoleUuid(roleUuid);
-					for (UserVo userVo : roleUserList) {
-						notifyVo.addUser(userVo);
-					}
-				}
-			}
-		}
-		if (StringUtils.isNotBlank(notifyVo.getFromUser())) {
-			UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyVo.getFromUser());
-			if (userVo != null && StringUtils.isNotBlank(userVo.getEmail())) {
-				notifyVo.setFromUserEmail(userVo.getEmail());
-			}
-		}
-		if(CollectionUtils.isNotEmpty(notifyVo.getExceptionNotifyUserUuidList())) {
-			List<UserVo> exceptionNotifyUserList = notifyVo.getExceptionNotifyUserList();
-			for(String userUuid : notifyVo.getExceptionNotifyUserUuidList()) {
-				UserVo userVo = userMapper.getUserBaseInfoByUuid(userUuid);
-				if (userVo != null) {
-					exceptionNotifyUserList.add(userVo);
-				}
-			}
-		}
+
 		if(StringUtils.isNotBlank(notifyVo.getError())) {
-		    System.out.println(notifyVo.getError());
 		    logger.error(notifyVo.getError());
-			sendEmail(notifyVo);
+			sendEmail(notifyVo, false);
 		}else {
-			if (CollectionUtils.isNotEmpty(notifyVo.getToUserList())) {
-				myExecute(notifyVo);
-			} else {
-				throw new NotifyNoReceiverException();
-			}
+			myExecute(notifyVo);
 		}
 		
 	}
 
 	protected abstract void myExecute(NotifyVo notifyVo);
 	
-	private void sendEmail(NotifyVo notifyVo) {
-		if (CollectionUtils.isNotEmpty(notifyVo.getToUserList())) {
+	protected void sendEmail(NotifyVo notifyVo, boolean isNormal) {
+		Set<UserVo> toUserSet = new HashSet<>();
+		if(isNormal){
+			for(NotifyReceiverVo notifyReceiverVo : notifyVo.getNotifyReceiverVoList()){
+				if(GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())){
+					UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyReceiverVo.getUuid());
+					if (userVo != null) {
+						toUserSet.add(userVo);
+					}
+				}else if(GroupSearch.TEAM.getValue().equals(notifyReceiverVo.getType())){
+					List<UserVo> userVoList = userMapper.getActiveUserByTeamId(notifyReceiverVo.getUuid());
+					for (UserVo userVo : userVoList) {
+						toUserSet.add(userVo);
+					}
+				}else if(GroupSearch.ROLE.getValue().equals(notifyReceiverVo.getType())){
+					List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(notifyReceiverVo.getUuid());
+					for (UserVo userVo : userVoList) {
+						toUserSet.add(userVo);
+					}
+				}
+			}
+		}else{
+			for(String userUuid : notifyVo.getExceptionNotifyUserUuidList()) {
+				UserVo userVo = userMapper.getUserBaseInfoByUuid(userUuid);
+				if (userVo != null) {
+					toUserSet.add(userVo);
+				}
+			}
+		}
+		if (CollectionUtils.isNotEmpty(toUserSet)) {
+			if (StringUtils.isNotBlank(notifyVo.getFromUser())) {
+				UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyVo.getFromUser());
+				if (userVo != null && StringUtils.isNotBlank(userVo.getEmail())) {
+					notifyVo.setFromUserEmail(userVo.getEmail());
+				}
+			}
 			try {
 				MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
 				if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
@@ -105,7 +99,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 						}
 					}
 
-					se.setSubject("通知发送异常");
+					se.setSubject(isNormal ? clearStringHTML(notifyVo.getTitle()) : "通知发送异常");
 					StringBuilder sb = new StringBuilder();
 					sb.append("<html>");
 					sb.append("<head>");
@@ -113,25 +107,37 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 					sb.append("<style type=\"text/css\">");
 					sb.append("</style>");
 					sb.append("</head><body>");
-					sb.append(notifyVo.getError());
+					sb.append(isNormal ? notifyVo.getContent() : notifyVo.getError());
 					sb.append("</body></html>");
 					se.addPart(sb.toString(), "text/html;charset=utf-8");
 					boolean isSend = false;
-					for (UserVo user : notifyVo.getExceptionNotifyUserList()) {
+					for (UserVo user : toUserSet) {
 						if (StringUtils.isNotBlank(user.getEmail())) {
 						    isSend = true;
 							se.addTo(user.getEmail());
 						}
 					}
 					if(isSend) {
+						mailServerMapper.insertMailHistory(notifyVo);
 	                    se.send();					    
+					}else {
+						throw new NotifyNoReceiverException();
 					}
 				} else {
 					throw new EmailServerNotFoundException();
 				}
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
+				mailServerMapper.updateMailHistoryStatusAndFailureReasonById(notifyVo.getId(), ex.getMessage());
 			}
 		}
+	}
+
+	private String clearStringHTML(String sourceContent) {
+		String content = "";
+		if (sourceContent != null) {
+			content = sourceContent.replaceAll("</?[^>]+>", "");
+		}
+		return content;
 	}
 }

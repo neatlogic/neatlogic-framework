@@ -1,7 +1,11 @@
 package codedriver.framework.news.core;
 
 import codedriver.framework.news.dto.NewsMessageVo;
+import codedriver.framework.notify.dto.NotifyReceiverVo;
+import codedriver.framework.notify.dto.NotifyVo;
 import org.springframework.util.ClassUtils;
+
+import java.util.List;
 
 /**
  * @Title: INewsHandler
@@ -44,5 +48,5 @@ public interface INewsHandler {
      * @Params:[messageVo]
      * @Returns:void
      **/
-    void send(NewsMessageVo messageVo);
+    void send(NotifyVo notifyVo);
 }

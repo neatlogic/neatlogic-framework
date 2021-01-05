@@ -1,8 +1,10 @@
 package codedriver.framework.notify.dto;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.news.core.INewsHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -12,14 +14,12 @@ import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
-
+	private Long id;
 	private INotifyTriggerType triggerType;
+	private Class<? extends INewsHandler> newsHandlerClass;
 	private String title;
 	private String content;
-	private List<UserVo> toUserList = new ArrayList<>();
-	private List<String> toUserUuidList;
-	private List<String> toTeamIdList;
-	private List<String> toRoleUuidList;
+	private List<NotifyReceiverVo> notifyReceiverVoList;
 	private String fromUser;
 	private String fromUserEmail;
 	private JSONObject data = new JSONObject();
@@ -27,15 +27,14 @@ public class NotifyVo {
 	private String templateTitle;
 
 	private List<String> exceptionNotifyUserUuidList;
-	private List<UserVo> exceptionNotifyUserList = new ArrayList<>();
 	private StringBuilder errorBuilder;
-	
+
+	private String config;
 	private NotifyVo(Builder builder) {
 		this.triggerType = builder.triggerType;
+		this.newsHandlerClass = builder.newsHandlerClass;
 		this.data = builder.data;
-		this.toUserUuidList = builder.toUserUuidList;
-		this.toTeamIdList = builder.toTeamIdList;
-		this.toRoleUuidList = builder.toRoleUuidList;
+		this.notifyReceiverVoList = builder.notifyReceiverVoList;
 		this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
 		try {
 			title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
@@ -49,14 +48,12 @@ public class NotifyVo {
 		}
 	}
 
-	private NotifyVo() {
-
+	public Long getId() {
+		return id;
 	}
 
-	public void addUser(UserVo userVo) {
-		if (!toUserList.contains(userVo)) {
-			toUserList.add(userVo);
-		}
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getTitle() {
@@ -83,16 +80,8 @@ public class NotifyVo {
 		return templateTitle;
 	}
 
-	public List<UserVo> getToUserList() {
-		return toUserList;
-	}
-
-	public void setToUserList(List<UserVo> toUserList) {
-		this.toUserList = toUserList;
-	}
-
-	public List<String> getToUserUuidList() {
-		return toUserUuidList;
+	public List<NotifyReceiverVo> getNotifyReceiverVoList() {
+		return notifyReceiverVoList;
 	}
 
 	public JSONObject getData() {
@@ -107,24 +96,8 @@ public class NotifyVo {
 		this.fromUserEmail = fromUserEmail;
 	}
 
-	public List<String> getToTeamIdList() {
-		return toTeamIdList;
-	}
-
-	public List<String> getToRoleUuidList() {
-		return toRoleUuidList;
-	}
-
 	public List<String> getExceptionNotifyUserUuidList() {
 		return exceptionNotifyUserUuidList;
-	}
-
-	public List<UserVo> getExceptionNotifyUserList() {
-		return exceptionNotifyUserList;
-	}
-
-	public void setExceptionNotifyUserList(List<UserVo> exceptionNotifyUserList) {
-		this.exceptionNotifyUserList = exceptionNotifyUserList;
 	}
 
 	public String getError() {
@@ -147,21 +120,31 @@ public class NotifyVo {
 		return this.triggerType;
 	}
 
+	public Class<? extends INewsHandler> getNewsHandlerClass(){
+		return this.newsHandlerClass;
+	}
+	public String getConfig(){
+		if(StringUtils.isBlank(config)){
+			JSONObject configObj = new JSONObject();
+			configObj.put("notifyReceiverVoList", notifyReceiverVoList);
+			configObj.put("exceptionNotifyUserUuidList", exceptionNotifyUserUuidList);
+			config = configObj.toJSONString();
+		}
+		return config;
+	}
 	public static class Builder {
-
 		// 可选参数
 		private String templateContent;
 		private String templateTitle;
 		private JSONObject data = new JSONObject();
-		private List<String> toUserUuidList = new ArrayList<>();
-		private List<String> toTeamIdList = new ArrayList<>();
-		private List<String> toRoleUuidList = new ArrayList<>();
+		private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
 		private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 		
 		private INotifyTriggerType triggerType;
-		
-		public Builder(INotifyTriggerType _triggerType) {
+		private Class<? extends INewsHandler> newsHandlerClass;
+		public Builder(INotifyTriggerType _triggerType, Class<? extends INewsHandler> _newsHandlerClass) {
 			this.triggerType = _triggerType;
+			this.newsHandlerClass = _newsHandlerClass;
 		}
 		
 		public INotifyTriggerType getTriggerType() {
@@ -192,23 +175,15 @@ public class NotifyVo {
 			return new NotifyVo(this);
 		}
 
-		public Builder addUserUuid(String userUuid) {
-			if (!toUserUuidList.contains(userUuid)) {
-				toUserUuidList.add(userUuid);
+		public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo){
+			if(!this.notifyReceiverVoList.contains(notifyReceiverVo)){
+				this.notifyReceiverVoList.add(notifyReceiverVo);
 			}
 			return this;
 		}
-
-		public Builder addTeamId(String teamId) {
-			if (!toTeamIdList.contains(teamId)) {
-				toTeamIdList.add(teamId);
-			}
-			return this;
-		}
-
-		public Builder addRoleUuid(String roleUuid) {
-			if (!toRoleUuidList.contains(roleUuid)) {
-				toRoleUuidList.add(roleUuid);
+		public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList){
+			for(NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList){
+				addNotifyReceiverVo(notifyReceiverVo);
 			}
 			return this;
 		}

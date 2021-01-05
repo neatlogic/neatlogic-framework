@@ -12,6 +12,15 @@ public class NewsMessageRecipientVo {
     private String type;
     private String uuid;
 
+    public NewsMessageRecipientVo(){
+
+    }
+    public NewsMessageRecipientVo(Long newsMessageId, String type, String uuid) {
+        this.newsMessageId = newsMessageId;
+        this.type = type;
+        this.uuid = uuid;
+    }
+
     public Long getNewsMessageId() {
         return newsMessageId;
     }

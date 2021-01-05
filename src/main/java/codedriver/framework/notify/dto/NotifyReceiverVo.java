@@ -1,4 +1,7 @@
 package codedriver.framework.notify.dto;
+
+import java.util.Objects;
+
 /**
  * 
 * @Author:14378
@@ -28,5 +31,22 @@ public class NotifyReceiverVo {
 	}
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		NotifyReceiverVo that = (NotifyReceiverVo) o;
+		return Objects.equals(type, that.type) && Objects.equals(uuid, that.uuid);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
 	}
 }

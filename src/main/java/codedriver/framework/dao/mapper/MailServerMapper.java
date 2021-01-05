@@ -3,6 +3,8 @@ package codedriver.framework.dao.mapper;
 import java.util.List;
 
 import codedriver.framework.dto.MailServerVo;
+import codedriver.framework.notify.dto.NotifyVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @program: codedriver
@@ -27,9 +29,13 @@ public interface MailServerMapper {
 
 	public int resetAllMailServerStatus();
 
+	public int insertMailHistory(NotifyVo notifyVo);
+
 	public int activeMailServerByUuid(String uuid);
 
 	public int updateMailServerByUuid(MailServerVo mailServerVo);
+
+	public int updateMailHistoryStatusAndFailureReasonById(@Param("id") Long id, @Param("failureReason") String failureReason);
 
 	public int deleteMailServerByUuid(String string);
 }

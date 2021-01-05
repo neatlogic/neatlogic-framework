@@ -31,61 +31,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
 
 	@Override
 	public void myExecute(NotifyVo notifyVo) {
-		this.sendEmail(notifyVo);
-	}
-
-
-	private void sendEmail(NotifyVo notifyVo) {
-		if (CollectionUtils.isNotEmpty(notifyVo.getToUserList())) {
-			try {
-				MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
-				if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
-					HtmlEmail se = new HtmlEmail();
-					se.setHostName(mailServerVo.getHost());
-					se.setSmtpPort(mailServerVo.getPort());
-					if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
-						se.setAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
-					}
-					if (StringUtils.isNotBlank(notifyVo.getFromUserEmail())) {
-						se.setFrom(notifyVo.getFromUserEmail(), notifyVo.getFromUser());
-					} else {
-						if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
-							se.setFrom(mailServerVo.getFromAddress(), mailServerVo.getName());
-						}
-					}
-
-					se.setSubject(clearStringHTML(notifyVo.getTitle()));
-					StringBuilder sb = new StringBuilder();
-					sb.append("<html>");
-					sb.append("<head>");
-					sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-					sb.append("<style type=\"text/css\">");
-					sb.append("</style>");
-					sb.append("</head><body>");
-					sb.append(notifyVo.getContent());
-					sb.append("</body></html>");
-					se.addPart(sb.toString(), "text/html;charset=utf-8");
-					for (UserVo user : notifyVo.getToUserList()) {
-						if (StringUtils.isNotBlank(user.getEmail())) {
-							se.addTo(user.getEmail());
-						}
-					}
-					se.send();
-				} else {
-					throw new EmailServerNotFoundException();
-				}
-			} catch (Exception ex) {
-				logger.error(ex.getMessage(), ex);
-			}
-		}
-	}
-
-	public String clearStringHTML(String sourceContent) {
-		String content = "";
-		if (sourceContent != null) {
-			content = sourceContent.replaceAll("</?[^>]+>", "");
-		}
-		return content;
+		sendEmail(notifyVo, true);
 	}
 
 	@Override

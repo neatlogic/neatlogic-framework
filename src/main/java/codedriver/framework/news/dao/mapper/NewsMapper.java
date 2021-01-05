@@ -32,12 +32,6 @@ public interface NewsMapper {
 
     public List<Long> getNewsMessagePullList(NewsMessageSearchVo searchVo);
 
-//    public List<Long> getNewsMessagePullListByUserUuid(NewsMessageVo searchVo);
-//
-//    public List<Long> getNewsMessagePullListByTeamUuidList(NewsMessageVo searchVo);
-//
-//    public List<Long> getNewsMessagePullListByRoleUuidList(NewsMessageVo searchVo);
-
     public List<NewsMessageVo> getNewsMessageListByIdList(List<Long> newsMessageIdList);
 
     public Long getNewsMessageUserMaxNewsMessageIdByUserUuid(String userUuid);

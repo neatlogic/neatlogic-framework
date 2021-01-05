@@ -31,11 +31,8 @@ public class NewsMessageVo {
     private Date fcd;
     @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
     private Integer isRead;
-//    @EntityField(name = "是否已删除", type = ApiParamType.INTEGER)
-//    private Integer isDelete;
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
-    private transient List<NotifyReceiverVo> recipientList;
 
     public Long getId() {
         return id;
@@ -77,14 +74,6 @@ public class NewsMessageVo {
         this.fcd = fcd;
     }
 
-    public List<NotifyReceiverVo> getRecipientList() {
-        return recipientList;
-    }
-
-    public void setRecipientList(List<NotifyReceiverVo> recipientList) {
-        this.recipientList = recipientList;
-    }
-
     public Integer getIsRead() {
         return isRead;
     }
@@ -92,14 +81,6 @@ public class NewsMessageVo {
     public void setIsRead(Integer isRead) {
         this.isRead = isRead;
     }
-
-//    public Integer getIsDelete() {
-//        return isDelete;
-//    }
-//
-//    public void setIsDelete(Integer isDelete) {
-//        this.isDelete = isDelete;
-//    }
 
     public String getPopUp() {
         return popUp;

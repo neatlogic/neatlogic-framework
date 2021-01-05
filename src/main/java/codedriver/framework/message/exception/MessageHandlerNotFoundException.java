@@ -3,8 +3,8 @@ package codedriver.framework.message.exception;
 import codedriver.framework.exception.core.ApiRuntimeException;
 
 /**
- * @Title: NewsHandlerNotFoundException
- * @Package codedriver.framework.news.exception
+ * @Title: MessageHandlerNotFoundException
+ * @Package codedriver.framework.message.exception
  * @Description: 消息类型处理器不存在异常
  * @Author: linbq
  * @Date: 2020/12/31 15:19

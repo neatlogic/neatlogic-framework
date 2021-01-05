@@ -9,14 +9,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * @Title: NewsNotifyHandler
+ * @Title: MessageNotifyHandler
  * @Package codedriver.framework.notify.handler
  * @Description: 消息通知处理器
  * @Author: linbq
  * @Date: 2020/12/31 15:19
  **/
 @Component
-public class NewsNotifyHandler extends NotifyHandlerBase {
+public class MessageNotifyHandler extends NotifyHandlerBase {
 
     @Override
     protected void myExecute(NotifyVo notifyVo) {

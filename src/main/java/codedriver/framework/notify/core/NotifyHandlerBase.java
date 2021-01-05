@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.notify.dto.NotifyReceiverVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +129,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 				}
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
-				mailServerMapper.updateMailHistoryStatusAndFailureReasonById(notifyVo.getId(), ex.getMessage());
+				mailServerMapper.updateMailHistoryStatusAndFailureReasonById(notifyVo.getId(), ExceptionUtils.getStackTrace(ex));
 			}
 		}
 	}

@@ -113,7 +113,7 @@
 		(
 			#{title},
 			#{content},
-			#{triggerType.trigger},
+			#{triggerType.text},
 			#{config},
 			NOW(3),
 			#{error}

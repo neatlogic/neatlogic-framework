@@ -4,8 +4,8 @@ import codedriver.framework.notify.dto.NotifyVo;
 import org.springframework.util.ClassUtils;
 
 /**
- * @Title: INewsHandler
- * @Package codedriver.framework.news.core
+ * @Title: IMessageHandler
+ * @Package codedriver.framework.message.core
  * @Description: 消息处理器接口
  * @Author: linbq
  * @Date: 2020/12/30 15:09

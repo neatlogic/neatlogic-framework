@@ -14,7 +14,7 @@ import codedriver.framework.util.FreemarkerUtil;
 public class NotifyVo {
     private Long id;
     private INotifyTriggerType triggerType;
-    private Class<? extends IMessageHandler> newsHandlerClass;
+    private Class<? extends IMessageHandler> messageHandlerClass;
     private String title;
     private String content;
     private List<NotifyReceiverVo> notifyReceiverVoList;
@@ -31,7 +31,7 @@ public class NotifyVo {
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
-        this.newsHandlerClass = builder.newsHandlerClass;
+        this.messageHandlerClass = builder.messageHandlerClass;
         this.data = builder.data;
         this.notifyReceiverVoList = builder.notifyReceiverVoList;
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
@@ -119,8 +119,8 @@ public class NotifyVo {
         return this.triggerType;
     }
 
-    public Class<? extends IMessageHandler> getNewsHandlerClass() {
-        return this.newsHandlerClass;
+    public Class<? extends IMessageHandler> getMessageHandlerClass() {
+        return this.messageHandlerClass;
     }
 
     public String getConfig() {
@@ -142,11 +142,11 @@ public class NotifyVo {
         private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 
         private INotifyTriggerType triggerType;
-        private Class<? extends IMessageHandler> newsHandlerClass;
+        private Class<? extends IMessageHandler> messageHandlerClass;
 
-        public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _newsHandlerClass) {
+        public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _messageHandlerClass) {
             this.triggerType = _triggerType;
-            this.newsHandlerClass = _newsHandlerClass;
+            this.messageHandlerClass = _messageHandlerClass;
         }
 
         public INotifyTriggerType getTriggerType() {

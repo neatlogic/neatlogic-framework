@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Title: NewsHandlerFactory
- * @Package codedriver.framework.news.core
+ * @Title: MessageHandlerFactory
+ * @Package codedriver.framework.message.core
  * @Description: 消息处理器工厂类
  * @Author: linbq
  * @Date: 2020/12/30 15:36
  **/
 @RootComponent
 public class MessageHandlerFactory extends ApplicationListenerBase {
-    private static Map<String, IMessageHandler> newsHandlerMap = new HashMap<>();
+    private static Map<String, IMessageHandler> messageHandlerMap = new HashMap<>();
 
     private static List<MessageHandlerVo> messageHandlerVoList = new ArrayList<>();
 
@@ -33,7 +33,7 @@ public class MessageHandlerFactory extends ApplicationListenerBase {
     }
 
     public static IMessageHandler getHandler(String handler){
-        return newsHandlerMap.get(handler);
+        return messageHandlerMap.get(handler);
     }
 
     public static List<MessageHandlerVo> getMessageHandlerVoList(){
@@ -45,14 +45,13 @@ public class MessageHandlerFactory extends ApplicationListenerBase {
         ApplicationContext context = event.getApplicationContext();
         Map<String, IMessageHandler> map = context.getBeansOfType(IMessageHandler.class);
         for(Map.Entry<String, IMessageHandler> entry : map.entrySet()){
-            IMessageHandler newshandler = entry.getValue();
-            System.out.println("newshandler:"+newshandler);
-            newsHandlerMap.put(newshandler.getHandler(), newshandler);
+            IMessageHandler messageHandler = entry.getValue();
+            messageHandlerMap.put(messageHandler.getHandler(), messageHandler);
 
             MessageHandlerVo messageHandlerVo = new MessageHandlerVo();
-            messageHandlerVo.setHandler(newshandler.getHandler());
-            messageHandlerVo.setDescription(newshandler.getDescription());
-            messageHandlerVo.setName(newshandler.getName());
+            messageHandlerVo.setHandler(messageHandler.getHandler());
+            messageHandlerVo.setDescription(messageHandler.getDescription());
+            messageHandlerVo.setName(messageHandler.getName());
             messageHandlerVo.setIsActive(1);
             messageHandlerVo.setModuleId(context.getId());
             ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());

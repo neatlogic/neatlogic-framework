@@ -2,7 +2,7 @@ package codedriver.framework.message.constvalue;
 
 /**
  * @Title: PopUpType
- * @Package codedriver.framework.news.constvalue
+ * @Package codedriver.framework.message.constvalue
  * @Description: 消息桌面推送方式枚举
  * @Author: linbq
  * @Date: 2020/12/31 10:51

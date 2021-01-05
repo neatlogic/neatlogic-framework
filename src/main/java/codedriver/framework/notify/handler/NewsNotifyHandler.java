@@ -21,7 +21,7 @@ public class NewsNotifyHandler extends NotifyHandlerBase {
     @Override
     protected void myExecute(NotifyVo notifyVo) {
         if(CollectionUtils.isNotEmpty(notifyVo.getNotifyReceiverVoList())){
-            IMessageHandler handler = MessageHandlerFactory.getHandler(notifyVo.getNewsHandlerClass().getName());
+            IMessageHandler handler = MessageHandlerFactory.getHandler(notifyVo.getMessageHandlerClass().getName());
             handler.send(notifyVo);
         }
     }

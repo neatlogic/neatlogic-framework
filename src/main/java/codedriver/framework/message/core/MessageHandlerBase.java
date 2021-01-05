@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Title: NewsHandlerBase
- * @Package codedriver.framework.news.core
+ * @Title: MessageHandlerBase
+ * @Package codedriver.framework.message.core
  * @Description: 消息处理器基类
  * @Author: linbq
  * @Date: 2020/12/30 17:25
@@ -20,7 +20,7 @@ public abstract class MessageHandlerBase implements IMessageHandler {
 
     private static MessageMapper messageMapper;
 
-    public void setNewsMapper(MessageMapper _messageMapper){
+    public void setMessageMapper(MessageMapper _messageMapper){
         messageMapper = _messageMapper;
     }
 
@@ -29,7 +29,7 @@ public abstract class MessageHandlerBase implements IMessageHandler {
         MessageVo messageVo = new MessageVo();
         messageVo.setTitle(notifyVo.getTitle());
         messageVo.setContent(notifyVo.getContent());
-        messageVo.setHandler(notifyVo.getNewsHandlerClass().getName());
+        messageVo.setHandler(notifyVo.getMessageHandlerClass().getName());
         List<MessageVo> messageVoList = new ArrayList<>();
         messageVoList.add(messageVo);
         messageMapper.insertMessage(messageVoList);

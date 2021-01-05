@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Title: NewsMapper
- * @Package codedriver.framework.news.dao.mapper
+ * @Title: MessageMapper
+ * @Package codedriver.framework.message.dao.mapper
  * @Description: 消息通知Mapper
  * @Author: linbq
  * @Date: 2020/12/30 16:00

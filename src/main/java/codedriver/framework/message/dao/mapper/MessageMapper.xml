@@ -14,10 +14,10 @@
 
     <select id="getMessageSubscribeByUserUuidAndHandler" parameterType="codedriver.framework.message.dto.MessageHandlerVo"
             resultType="codedriver.framework.message.dto.MessageHandlerVo">
-        SELECT `user_uuid`,
+        SELECT `user_uuid` as userUuid,
                `handler`,
-               `is_active`,
-               `pop_up`,
+               `is_active` as isActive,
+               `pop_up` AS popUp,
                `fcd`
         FROM `message_subscribe`
         WHERE `user_uuid` = #{userUuid}

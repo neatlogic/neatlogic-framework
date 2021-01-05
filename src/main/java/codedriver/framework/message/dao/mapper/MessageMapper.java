@@ -44,13 +44,13 @@ public interface MessageMapper {
 
     public int insertMessageUser(List<MessageSearchVo> messageSearchVoList);
 
-    public int insertSubscribe(MessageHandlerVo messageHandlerVo);
+    public int insertMessageSubscribe(MessageHandlerVo messageHandlerVo);
 
     public int updateMessageUserIsRead(MessageSearchVo messageSearchVo);
 
     public int updateMessageUserIsDelete(MessageSearchVo messageSearchVo);
 
-    public int updateSubscribePopUp(MessageHandlerVo messageHandlerVo);
+    public int updateMessageSubscribePopUp(MessageHandlerVo messageHandlerVo);
 
-    public int updateSubscribeActive(MessageHandlerVo messageHandlerVo);
+    public int updateMessageSubscribeActive(MessageHandlerVo messageHandlerVo);
 }

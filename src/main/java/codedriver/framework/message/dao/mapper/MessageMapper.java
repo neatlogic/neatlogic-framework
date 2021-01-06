@@ -23,6 +23,10 @@ public interface MessageMapper {
 
     public List<MessageVo> getMessageList(MessageSearchVo searchVo);
 
+    public int getMessageNewCount(MessageSearchVo searchVo);
+
+    public List<MessageVo> getMessageNewList(MessageSearchVo searchVo);
+
     public int getMessageHistoryCount(MessageSearchVo searchVo);
 
     public List<MessageVo> getMessageHistoryList(MessageSearchVo searchVo);

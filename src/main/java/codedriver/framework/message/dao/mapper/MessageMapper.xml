@@ -118,7 +118,7 @@
         <if test="handlerList != null and handlerList.size() > 0">
             JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        WHERE a.`message_id` >= #{messageId}
+        WHERE a.`message_id` &gt;= #{messageId}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
@@ -147,7 +147,7 @@
         <if test="handlerList != null and handlerList.size() > 0">
             JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        WHERE a.`message_id` >= #{messageId}
+        WHERE a.`message_id` &gt;= #{messageId}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">

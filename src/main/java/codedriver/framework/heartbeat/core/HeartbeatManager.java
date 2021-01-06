@@ -31,6 +31,9 @@ public class HeartbeatManager extends ApplicationListenerBase {
     @Autowired
     private ServerMapper serverMapper;
 
+    @Autowired
+    private TransactionUtil transactionUtil;//强迫TransactionUtil先加载，否则可能会出现空指针
+
     private static final Set<IHeartbreakHandler> set = new HashSet<>();
 
     public final void myInit() {

@@ -1,22 +1,21 @@
 package codedriver.framework.transaction.util;
 
+import codedriver.framework.common.RootComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import codedriver.framework.common.RootComponent;
-
 @RootComponent
 public class TransactionUtil {
-
     private static DataSourceTransactionManager dataSourceTransactionManager;
 
     @Autowired
     public TransactionUtil(DataSourceTransactionManager _dataSourceTransactionManager) {
         dataSourceTransactionManager = _dataSourceTransactionManager;
     }
+
 
     // 开启事务
     public static TransactionStatus openTx() {

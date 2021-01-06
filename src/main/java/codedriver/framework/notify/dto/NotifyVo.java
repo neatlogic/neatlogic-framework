@@ -19,9 +19,7 @@ public class NotifyVo {
     private List<NotifyReceiverVo> notifyReceiverVoList;
     private String fromUser;
     private String fromUserEmail;
-    private JSONObject data = new JSONObject();
-    private String templateContent;
-    private String templateTitle;
+    private JSONObject data;
 
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
@@ -58,14 +56,6 @@ public class NotifyVo {
 
     public void setFromUser(String fromUser) {
         this.fromUser = fromUser;
-    }
-
-    public String getTemplateContent() {
-        return templateContent;
-    }
-
-    public String getTemplateTitle() {
-        return templateTitle;
     }
 
     public List<NotifyReceiverVo> getNotifyReceiverVoList() {

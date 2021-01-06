@@ -24,8 +24,6 @@ public class MessageVo {
     private String handler;
     @EntityField(name = "发送时间", type = ApiParamType.LONG)
     private Date fcd;
-    @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
-    private Integer isRead;
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
 
@@ -70,14 +68,6 @@ public class MessageVo {
 
     public void setFcd(Date fcd) {
         this.fcd = fcd;
-    }
-
-    public Integer getIsRead() {
-        return isRead;
-    }
-
-    public void setIsRead(Integer isRead) {
-        this.isRead = isRead;
     }
 
     public String getPopUp() {

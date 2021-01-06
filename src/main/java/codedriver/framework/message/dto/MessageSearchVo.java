@@ -14,7 +14,6 @@ import java.util.List;
  **/
 public class MessageSearchVo extends BaseEditorVo {
     private Long messageId;
-    private Integer isDelete;
     private String userUuid;
     private List<String> teamUuidList;
     private List<String> roleUuidList;
@@ -37,14 +36,6 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setMessageId(Long messageId) {
         this.messageId = messageId;
-    }
-
-    public Integer getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
     }
 
     public String getUserUuid() {

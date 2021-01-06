@@ -1,6 +1,7 @@
 package codedriver.framework.message.dao.mapper;
 
 import codedriver.framework.message.dto.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -21,8 +22,6 @@ public interface MessageMapper {
     public int getMessageCount(MessageSearchVo searchVo);
 
     public List<MessageVo> getMessageList(MessageSearchVo searchVo);
-
-    public int getMessageNewCount(MessageSearchVo searchVo);
 
     public int getMessageHistoryCount(MessageSearchVo searchVo);
 
@@ -48,11 +47,11 @@ public interface MessageMapper {
 
     public int insertMessageSubscribe(MessageHandlerVo messageHandlerVo);
 
-    public int updateMessageUserIsRead(MessageSearchVo messageSearchVo);
-
-    public int updateMessageUserIsDelete(MessageSearchVo messageSearchVo);
+    public int updateMessageUserIsRead(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
 
     public int updateMessageSubscribePopUp(MessageHandlerVo messageHandlerVo);
 
     public int updateMessageSubscribeActive(MessageHandlerVo messageHandlerVo);
+
+    public int deleteMessageUser(MessageSearchVo messageSearchVo);
 }

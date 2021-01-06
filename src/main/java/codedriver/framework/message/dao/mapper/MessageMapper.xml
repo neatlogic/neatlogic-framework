@@ -30,9 +30,9 @@
         COUNT(1)
         FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
-        AND `is_delete` = 0
+        AND `is_read` = 0
         <if test="messageId != null">
-            AND `message_id` > #{messageId}
+            AND `message_id` &lt; #{messageId}
         </if>
     </select>
 
@@ -43,28 +43,16 @@
         b.`title`,
         b.`content`,
         b.`fcd`,
-        b.`handler`,
-        a.`is_read` AS isRead
+        b.`handler`
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{userUuid}
-        AND a.`is_delete` = 0
+        AND a.`is_read` = 0
         <if test="messageId != null">
-            AND a.`message_id` > #{messageId}
+            AND a.`message_id` &lt; #{messageId}
         </if>
+        ORDER BY a.`message_id` DESC
         LIMIT #{startNum}, #{pageSize}
-    </select>
-
-    <select id="getMessageNewCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
-            resultType="int">
-        SELECT
-        COUNT(1)
-        FROM `message_user`
-        WHERE `user_uuid` = #{userUuid}
-        <if test="messageId != null">
-            AND `message_id` > #{messageId}
-        </if>
-        AND `is_read` = 0
     </select>
 
     <select id="getMessageHistoryCount" parameterType="codedriver.framework.message.dto.MessageSearchVo"
@@ -107,6 +95,7 @@
                 and a.`fcd` &gt;= #{startTime} and a.`fcd` &lt;= #{endTime}
             </if>
         </where>
+        ORDER BY a.`id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>
 
@@ -118,7 +107,7 @@
         <if test="handlerList != null and handlerList.size() > 0">
             JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        WHERE a.`message_id` &gt;= #{messageId}
+        WHERE a.`message_id` &gt; #{messageId}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
@@ -147,7 +136,7 @@
         <if test="handlerList != null and handlerList.size() > 0">
             JOIN `message` b ON b.`id` = a.`message_id`
         </if>
-        WHERE a.`message_id` &gt;= #{messageId}
+        WHERE a.`message_id` &gt; #{messageId}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
@@ -255,20 +244,16 @@
                 NOW(3))
     </insert>
 
-    <update id="updateMessageUserIsRead" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+    <update id="updateMessageUserIsRead">
         UPDATE `message_user`
         SET `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
-          AND `message_id` = #{messageId}
-    </update>
-    <update id="updateMessageUserIsDelete" parameterType="codedriver.framework.message.dto.MessageSearchVo">
-        UPDATE `message_user`
-        SET `is_read` = 1,
-            `is_delete` = 1
-        WHERE `user_uuid` = #{userUuid}
-          <if test="messageId != null">
-              AND `message_id` = #{messageId}
-          </if>
+        <if test="messageIdList != null and messageIdList.size() > 0">
+            AND `message_id` in
+            <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
+                #{messageId}
+            </foreach>
+        </if>
     </update>
 
     <update id="updateMessageSubscribePopUp" parameterType="codedriver.framework.message.dto.MessageHandlerVo">
@@ -284,5 +269,11 @@
             `fcd` = NOW(3)
         WHERE `user_uuid` = #{userUuid}
           AND `handler` = #{handler}
+    </update>
+
+    <update id="deleteMessageUser" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+        DELETE FROM `message_user`
+        WHERE `user_uuid` = #{userUuid}
+          AND `message_id` = #{messageId}
     </update>
 </mapper>

@@ -12,7 +12,6 @@ import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
-    private Long id;
     private INotifyTriggerType triggerType;
     private Class<? extends IMessageHandler> messageHandlerClass;
     private String title;
@@ -26,8 +25,6 @@ public class NotifyVo {
 
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
-
-    private String config;
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
@@ -45,14 +42,6 @@ public class NotifyVo {
         } catch (Exception e) {
             this.appendError(e.getMessage());
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -121,16 +110,6 @@ public class NotifyVo {
 
     public Class<? extends IMessageHandler> getMessageHandlerClass() {
         return this.messageHandlerClass;
-    }
-
-    public String getConfig() {
-        if (StringUtils.isBlank(config)) {
-            JSONObject configObj = new JSONObject();
-            configObj.put("notifyReceiverVoList", notifyReceiverVoList);
-            configObj.put("exceptionNotifyUserUuidList", exceptionNotifyUserUuidList);
-            config = configObj.toJSONString();
-        }
-        return config;
     }
 
     public static class Builder {

@@ -38,6 +38,8 @@ public interface MessageMapper {
 
     public Date getMessageFcdById(Long maxMessageId);
 
+    public Long getMessageMinIdByGreaterThanFcd(Date fcd);
+
     public int insertMessage(List<MessageVo> messageVoList);
 
     public int insertMessageRecipient(List<MessageRecipientVo> messageRecipientVoList);

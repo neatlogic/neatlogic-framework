@@ -151,7 +151,7 @@
         </if>
         LEFT JOIN `message_user` c ON c.`message_id` = c.`message_id` AND c.`user_uuid` = #{userUuid}
         WHERE c.`message_id` IS NULL
-        AND a.`fcd` >= #{startTime}
+        AND a.`message_id` >= #{messageId}
         <if test="handlerList != null and handlerList.size() > 0">
             AND b.`handler` IN
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
@@ -200,6 +200,9 @@
         SELECT `fcd` FROM `message` WHERE `id` = #{value}
     </select>
 
+    <select id="getMessageMinIdByGreaterThanFcd" parameterType="java.util.Date" resultType="java.lang.Long">
+        SELECT `id` FROM `message` WHERE `fcd` &gt;= #{value} LIMIT 1
+    </select>
     <insert id="insertMessage" parameterType="codedriver.framework.message.dto.MessageVo">
         INSERT INTO `message` (
         `id`,

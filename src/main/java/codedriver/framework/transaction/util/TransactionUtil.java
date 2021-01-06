@@ -10,25 +10,29 @@ import codedriver.framework.common.RootComponent;
 
 @RootComponent
 public class TransactionUtil {
-	@Autowired
-	private DataSourceTransactionManager dataSourceTransactionManager;
+    @Autowired
+    private static DataSourceTransactionManager dataSourceTransactionManager;
 
-	// 开启事务
-	public TransactionStatus openTx() {
-		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-		def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		return dataSourceTransactionManager.getTransaction(def);
-	}
+    public TransactionUtil(DataSourceTransactionManager _dataSourceTransactionManager) {
+        dataSourceTransactionManager = _dataSourceTransactionManager;
+    }
 
-	// 提交事务
-	public void commitTx(TransactionStatus ts) {
-		dataSourceTransactionManager.commit(ts);
-	}
+    // 开启事务
+    public static TransactionStatus openTx() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        return dataSourceTransactionManager.getTransaction(def);
+    }
 
-	// 回滚事务
-	public void rollbackTx(TransactionStatus ts) {
-		dataSourceTransactionManager.rollback(ts);
-	}
+    // 提交事务
+    public static void commitTx(TransactionStatus ts) {
+        dataSourceTransactionManager.commit(ts);
+    }
+
+    // 回滚事务
+    public static void rollbackTx(TransactionStatus ts) {
+        dataSourceTransactionManager.rollback(ts);
+    }
 
 }

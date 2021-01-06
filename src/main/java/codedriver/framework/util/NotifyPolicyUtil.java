@@ -149,15 +149,30 @@ public class NotifyPolicyUtil {
                                 /** 设置正常接收人 **/
                                 for (String receiver : receiverList) {
                                     String[] split = receiver.split("#");
-                                    if (GroupSearch.USER.getValue().equals(split[0]) || GroupSearch.TEAM.getValue().equals(split[0]) || GroupSearch.ROLE.getValue().equals(split[0])) {
-                                        notifyBuilder.addNotifyReceiverVo(new NotifyReceiverVo(split[0], split[1]));
+                                    if (GroupSearch.USER.getValue().equals(split[0])) {
+                                        notifyBuilder.addUserUuid(split[1]);
+                                    } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
+                                        notifyBuilder.addTeamUuid(split[1]);
+                                    } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
+                                        notifyBuilder.addRoleUuid(split[1]);
                                     } else {
-                                        List<NotifyReceiverVo> notifyReceiverVoList = receiverMap.get(split[1]);
-                                        if (CollectionUtils.isNotEmpty(notifyReceiverVoList)) {
-                                            notifyBuilder.addAllNotifyReceiverVo(notifyReceiverVoList);
+                                        List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
+                                        if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
+                                            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
+                                                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
+                                                    notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
+                                                } else if (GroupSearch.TEAM.getValue()
+                                                        .equals(notifyReceiverVo.getType())) {
+                                                    notifyBuilder.addTeamUuid(notifyReceiverVo.getUuid());
+                                                } else if (GroupSearch.ROLE.getValue()
+                                                        .equals(notifyReceiverVo.getType())) {
+                                                    notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
+                                                }
+                                            }
                                         }
                                     }
                                 }
+
                                 NotifyVo notifyVo = notifyBuilder.build();
                                 /** 发送通知 **/
                                 handler.execute(notifyVo);

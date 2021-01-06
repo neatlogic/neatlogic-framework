@@ -16,7 +16,10 @@ public class NotifyVo {
     private Class<? extends IMessageHandler> messageHandlerClass;
     private String title;
     private String content;
-    private List<NotifyReceiverVo> notifyReceiverVoList;
+//    private List<NotifyReceiverVo> notifyReceiverVoList;
+    private List<String> toUserUuidList;
+    private List<String> toTeamUuidList;
+    private List<String> toRoleUuidList;
     private String fromUser;
     private String fromUserEmail;
     private JSONObject data;
@@ -28,7 +31,10 @@ public class NotifyVo {
         this.triggerType = builder.triggerType;
         this.messageHandlerClass = builder.messageHandlerClass;
         this.data = builder.data;
-        this.notifyReceiverVoList = builder.notifyReceiverVoList;
+//        this.notifyReceiverVoList = builder.notifyReceiverVoList;
+        this.toUserUuidList = builder.toUserUuidList;
+        this.toTeamUuidList = builder.toTeamUuidList;
+        this.toRoleUuidList = builder.toRoleUuidList;
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
         try {
             title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
@@ -58,9 +64,9 @@ public class NotifyVo {
         this.fromUser = fromUser;
     }
 
-    public List<NotifyReceiverVo> getNotifyReceiverVoList() {
-        return notifyReceiverVoList;
-    }
+//    public List<NotifyReceiverVo> getNotifyReceiverVoList() {
+//        return notifyReceiverVoList;
+//    }
 
     public JSONObject getData() {
         return data;
@@ -72,6 +78,18 @@ public class NotifyVo {
 
     public void setFromUserEmail(String fromUserEmail) {
         this.fromUserEmail = fromUserEmail;
+    }
+
+    public List<String> getToUserUuidList() {
+        return toUserUuidList;
+    }
+
+    public List<String> getToTeamUuidList() {
+        return toTeamUuidList;
+    }
+
+    public List<String> getToRoleUuidList() {
+        return toRoleUuidList;
     }
 
     public List<String> getExceptionNotifyUserUuidList() {
@@ -107,7 +125,11 @@ public class NotifyVo {
         private String templateContent;
         private String templateTitle;
         private JSONObject data = new JSONObject();
-        private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
+//        private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
+        private List<String> toUserUuidList = new ArrayList<>();
+        private List<String> toTeamUuidList = new ArrayList<>();
+        private List<String> toRoleUuidList = new ArrayList<>();
+
         private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 
         private INotifyTriggerType triggerType;
@@ -146,19 +168,40 @@ public class NotifyVo {
             return new NotifyVo(this);
         }
 
-        public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo) {
-            if (!this.notifyReceiverVoList.contains(notifyReceiverVo)) {
-                this.notifyReceiverVoList.add(notifyReceiverVo);
+        public Builder addUserUuid(String userUuid) {
+            if (!toUserUuidList.contains(userUuid)) {
+                toUserUuidList.add(userUuid);
             }
             return this;
         }
 
-        public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList) {
-            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList) {
-                addNotifyReceiverVo(notifyReceiverVo);
+        public Builder addTeamUuid(String teamUuid) {
+            if (!toTeamUuidList.contains(teamUuid)) {
+                toTeamUuidList.add(teamUuid);
             }
             return this;
         }
+
+        public Builder addRoleUuid(String roleUuid) {
+            if (!toRoleUuidList.contains(roleUuid)) {
+                toRoleUuidList.add(roleUuid);
+            }
+            return this;
+        }
+
+//        public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo) {
+//            if (!this.notifyReceiverVoList.contains(notifyReceiverVo)) {
+//                this.notifyReceiverVoList.add(notifyReceiverVo);
+//            }
+//            return this;
+//        }
+//
+//        public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList) {
+//            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList) {
+//                addNotifyReceiverVo(notifyReceiverVo);
+//            }
+//            return this;
+//        }
 
         public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
             this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;

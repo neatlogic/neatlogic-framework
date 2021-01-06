@@ -50,24 +50,41 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
     protected void sendEmail(NotifyVo notifyVo, boolean isNormal) {
         Set<UserVo> toUserSet = new HashSet<>();
         if (isNormal) {
-            for (NotifyReceiverVo notifyReceiverVo : notifyVo.getNotifyReceiverVoList()) {
-                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
-                    UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyReceiverVo.getUuid());
-                    if (userVo != null) {
-                        toUserSet.add(userVo);
-                    }
-                } else if (GroupSearch.TEAM.getValue().equals(notifyReceiverVo.getType())) {
-                    List<UserVo> userVoList = userMapper.getActiveUserByTeamId(notifyReceiverVo.getUuid());
-                    for (UserVo userVo : userVoList) {
-                        toUserSet.add(userVo);
-                    }
-                } else if (GroupSearch.ROLE.getValue().equals(notifyReceiverVo.getType())) {
-                    List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(notifyReceiverVo.getUuid());
-                    for (UserVo userVo : userVoList) {
-                        toUserSet.add(userVo);
-                    }
+//            for (NotifyReceiverVo notifyReceiverVo : notifyVo.getNotifyReceiverVoList()) {
+//                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
+//                    UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyReceiverVo.getUuid());
+//                    if (userVo != null) {
+//                        toUserSet.add(userVo);
+//                    }
+//                } else if (GroupSearch.TEAM.getValue().equals(notifyReceiverVo.getType())) {
+//                    List<UserVo> userVoList = userMapper.getActiveUserByTeamId(notifyReceiverVo.getUuid());
+//                    for (UserVo userVo : userVoList) {
+//                        toUserSet.add(userVo);
+//                    }
+//                } else if (GroupSearch.ROLE.getValue().equals(notifyReceiverVo.getType())) {
+//                    List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(notifyReceiverVo.getUuid());
+//                    for (UserVo userVo : userVoList) {
+//                        toUserSet.add(userVo);
+//                    }
+//                }
+//            }
+            if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
+                List<UserVo> userVoList = userMapper.getUserByUserUuidList(notifyVo.getToUserUuidList());
+                toUserSet.addAll(userVoList);
+            }
+            if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
+                for (String teamId : notifyVo.getToTeamUuidList()) {
+                    List<UserVo> userVoList = userMapper.getActiveUserByTeamId(teamId);
+                    toUserSet.addAll(userVoList);
                 }
             }
+            if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
+                for (String roleUuid : notifyVo.getToRoleUuidList()) {
+                    List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(roleUuid);
+                    toUserSet.addAll(userVoList);
+                }
+            }
+
         } else {
             for (String userUuid : notifyVo.getExceptionNotifyUserUuidList()) {
                 UserVo userVo = userMapper.getUserBaseInfoByUuid(userUuid);

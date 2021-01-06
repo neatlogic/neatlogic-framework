@@ -20,7 +20,7 @@ public class MessageNotifyHandler extends NotifyHandlerBase {
 
     @Override
     protected void myExecute(NotifyVo notifyVo) {
-        if(CollectionUtils.isNotEmpty(notifyVo.getNotifyReceiverVoList())){
+        if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList()) || CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList()) || CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
             IMessageHandler handler = MessageHandlerFactory.getHandler(notifyVo.getMessageHandlerClass().getName());
             handler.send(notifyVo);
         }
@@ -31,8 +31,8 @@ public class MessageNotifyHandler extends NotifyHandlerBase {
         return NotifyHandlerType.REMIND.getText();
     }
 
-	@Override
-	public String getType() {
-		return NotifyHandlerType.REMIND.getValue();
-	}
+    @Override
+    public String getType() {
+        return NotifyHandlerType.REMIND.getValue();
+    }
 }

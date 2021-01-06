@@ -178,6 +178,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     UserSessionCache.addItem(tenant, userUuid);
                     return true;
                 }
+                userMapper.deleteUserSessionByUserUuid(userUuid);
             }
         } else {
             return true;

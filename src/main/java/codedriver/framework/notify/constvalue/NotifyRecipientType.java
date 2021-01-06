@@ -8,7 +8,8 @@ public enum NotifyRecipientType {
 	USER("user", "用户"),
 	TEAM("team", "组"),
 	ROLE("role", "角色"),
-	EMAIL("email", "邮箱")
+	EMAIL("email", "邮箱"),
+	PROCESSUSERTYPE("processUserType", "工单干系人")
 	;
 
 	private String value;

@@ -1,6 +1,7 @@
 package codedriver.framework.login;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
@@ -11,9 +12,13 @@ import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
+import codedriver.framework.login.core.ILoginPostProcessor;
+import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.LoginService;
 import codedriver.framework.service.TenantService;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +82,21 @@ public class LoginController {
                 checkUserVo = MaintenanceMode.getMaintenanceUser();
             } else {
                 checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+                if(checkUserVo != null){
+                    JSONObject jwtBodyObj = new JSONObject();
+                    jwtBodyObj.put("useruuid", checkUserVo.getUuid());
+                    jwtBodyObj.put("userid", checkUserVo.getUserId());
+                    jwtBodyObj.put("username", checkUserVo.getUserName());
+                    jwtBodyObj.put("tenant", tenant);
+                    if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
+                        jwtBodyObj.put("rolelist", userVo.getRoleUuidList());
+                    }
+                    String timezone = "+8:00";
+                    UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
+                    for(ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()){
+                        loginPostProcessor.loginAfterInitialization();
+                    }
+                }
             }
 
             if (checkUserVo != null) {
@@ -102,6 +122,9 @@ public class LoginController {
             ReturnJson.error(ex.getMessage(), response);
         } finally {
             tenantContext.release();
+            if (UserContext.get() != null) {
+                UserContext.get().release();
+            }
         }
     }
 }

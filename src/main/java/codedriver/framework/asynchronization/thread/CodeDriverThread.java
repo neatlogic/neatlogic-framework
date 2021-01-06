@@ -26,14 +26,24 @@ public abstract class CodeDriverThread implements Runnable {
     public final void run() {
         TenantContext.init(tenantContext);
         UserContext.init(userContext);
-        String oldThreadName = Thread.currentThread().getName();
-        if (StringUtils.isNotBlank(threadName)) {
-            Thread.currentThread().setName(threadName);
+        try{
+            String oldThreadName = Thread.currentThread().getName();
+            if (StringUtils.isNotBlank(threadName)) {
+                Thread.currentThread().setName(threadName);
+            }
+            /** 等待所有模块加载完成 **/
+            ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
+            execute();
+            Thread.currentThread().setName(oldThreadName);
+        }finally {
+            // 清除所有threadlocal
+            if (TenantContext.get() != null) {
+                TenantContext.get().release();
+            }
+            if (UserContext.get() != null) {
+                UserContext.get().release();
+            }
         }
-        /** 等待所有模块加载完成 **/
-        ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
-        execute();
-        Thread.currentThread().setName(oldThreadName);
     }
 
     protected abstract void execute();

@@ -31,4 +31,7 @@ public interface INotifyPolicyHandler {
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();
 	}
+
+	/** 绑定权限，每种handler对应不同的权限 */
+	public String getAuthName();
 }

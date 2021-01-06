@@ -123,7 +123,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "租户 '" + tenant + "' 不存在或已被禁用");
                 } else if (loginAuth == null) {
-                    response.setStatus(521);
+                    response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
                 } else if (userVo != null && StringUtils.isBlank(userVo.getAuthorization())) {

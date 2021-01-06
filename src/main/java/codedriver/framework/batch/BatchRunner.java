@@ -2,7 +2,11 @@ package codedriver.framework.batch;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.transaction.util.TransactionUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.TransactionStatus;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +19,8 @@ import java.util.concurrent.CountDownLatch;
  * @Date: 2021/1/4 9:31 上午
  **/
 public class BatchRunner<T> {
+    private final static Logger logger = LoggerFactory.getLogger(BatchRunner.class);
+
     public void execute(List<T> itemList, int parallel, BatchJob<T> job) {
         if (CollectionUtils.isNotEmpty(itemList)) {
             parallel = Math.min(itemList.size(), parallel);
@@ -50,7 +56,14 @@ public class BatchRunner<T> {
         protected void execute() {
             try {
                 for (int i = index; i < itemList.size(); i += parallel) {
-                    job.execute(itemList.get(i));
+                    TransactionStatus ts = TransactionUtil.openTx();
+                    try {
+                        job.execute(itemList.get(i));
+                        TransactionUtil.commitTx(ts);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                        TransactionUtil.rollbackTx(ts);
+                    }
                 }
             } finally {
                 latch.countDown();

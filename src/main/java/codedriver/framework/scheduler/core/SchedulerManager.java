@@ -1,29 +1,5 @@
 package codedriver.framework.scheduler.core;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.quartz.CronExpression;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -36,14 +12,24 @@ import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobStatusVo;
+import org.apache.commons.lang3.StringUtils;
+import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+
+import java.util.*;
 
 @RootComponent
 public class SchedulerManager extends ApplicationListenerBase {
 	private Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
-	private static Map<String, IJob> jobHandlerMap = new HashMap<>();
-	private static Map<String, JobClassVo> jobClassMap = new HashMap<>();
-	private static List<JobClassVo> publicJobClassList = new ArrayList<>();
+	private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
+	private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
+	private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
 
 	@Autowired
 	private TenantMapper tenantMapper;

@@ -10,9 +10,10 @@ import codedriver.framework.common.RootComponent;
 
 @RootComponent
 public class TransactionUtil {
-    @Autowired
+
     private static DataSourceTransactionManager dataSourceTransactionManager;
 
+    @Autowired
     public TransactionUtil(DataSourceTransactionManager _dataSourceTransactionManager) {
         dataSourceTransactionManager = _dataSourceTransactionManager;
     }

@@ -1,21 +1,7 @@
 package codedriver.framework.login;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -27,6 +13,18 @@ import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
 import codedriver.framework.service.LoginService;
 import codedriver.framework.service.TenantService;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/login/")
@@ -35,7 +33,7 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
-    
+
     @Autowired
     private UserMapper userMapper;
 
@@ -44,7 +42,7 @@ public class LoginController {
 
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
-        HttpServletRequest request, HttpServletResponse response) throws Exception {
+                                  HttpServletRequest request, HttpServletResponse response) throws Exception {
         JSONObject returnObj = new JSONObject();
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
@@ -74,7 +72,13 @@ public class LoginController {
             userVo.setPassword(password);
             userVo.setTenant(tenant);
 
-            UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+            UserVo checkUserVo = null;
+            if (Config.IS_MAINTENANCE_MODE() && MaintenanceMode.MAINTENANCE_USER.equals(userVo.getUserId())) {
+                checkUserVo = MaintenanceMode.getMaintenanceUser();
+            } else {
+                checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+            }
+
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
@@ -84,25 +88,9 @@ public class LoginController {
                     userMapper.insertUserSession(checkUserVo.getUuid());
                 }
                 JwtVo jwtVo = loginService.buildJwt(checkUserVo);
-                Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" +  jwtVo.getCc());
-                authCookie.setPath("/" + tenant);
-                String domainName = request.getServerName();
-                if (StringUtils.isNotBlank(domainName)) {
-                    String[] ds = domainName.split("\\.");
-                    int len = ds.length;
-                    if (len > 2 && !StringUtils.isNumeric(ds[len - 1])) {
-                        authCookie.setDomain(ds[len - 2] + "." + ds[len - 1]);
-                    }
-                }
-                Cookie tenantCookie = new Cookie("codedriver_tenant", tenant);
-                tenantCookie.setPath("/" + tenant);
-                response.addCookie(authCookie);
-                response.addCookie(tenantCookie);
-                // 允许跨域携带cookie
-                response.setHeader("Access-Control-Allow-Credentials", "true");
-                response.setContentType(Config.RESPONSE_TYPE_JSON);
+                loginService.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
-                returnObj.put("JwtToken", jwtVo.getJwthead() + "." +  jwtVo.getJwtbody() + "." +  jwtVo.getJwtsign());
+                returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
                 response.getWriter().print(returnObj);
             } else {
                 throw new UserAuthFailedException();

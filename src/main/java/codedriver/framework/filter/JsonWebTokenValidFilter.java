@@ -29,6 +29,7 @@ import java.util.Date;
 
 /**
  * @Author:chenqiwei
+ * @descrition 先按default（jwt）认证认证用户，如果不存在则按authType认证重新获取认证信息,认证通过后按默认认证生成(jwt)Token 后续按 默认(jwt)认证
  * @Time:Aug 25, 2020
  * @ClassName: JsonWebTokenValidFilter
  */
@@ -56,7 +57,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
         boolean isAuth = false;
@@ -65,6 +66,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         UserVo userVo = null;
         JSONObject redirectObj = null;
         ILoginAuthHandler loginAuth = null;
+        String authType = null;
         //获取时区
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -73,68 +75,77 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 }
             }
         }
-        
+
         //判断租户
         try {
-            String tenant =  request.getHeader("Tenant");
+            String tenant = request.getHeader("Tenant");
             if (TenantUtil.hasTenant(tenant)) {
                 hasTenant = true;
-                String auth = request.getHeader("AuthType");
-                if(StringUtils.isBlank(auth)){
-                    auth = "default";
-                }
-                loginAuth = LoginAuthFactory.getLoginAuth(auth);
-                userVo = loginAuth.auth(request,response);
-
-                if(userVo != null ) {
-                    if(StringUtils.isNotBlank(userVo.getUuid())){
-                        JSONObject jwtBodyObj = new JSONObject();
-                        jwtBodyObj.put("useruuid", userVo.getUuid());
-                        jwtBodyObj.put("userid", userVo.getUserId());
-                        jwtBodyObj.put("username", userVo.getUserName());
-                        jwtBodyObj.put("tenant", tenant);
-                        if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
-                            JSONArray roleList = new JSONArray();
-                            roleList.addAll(userVo.getRoleUuidList());
-                            jwtBodyObj.put("rolelist", roleList);
+                //先按 default 认证，不存在才根据具体 AuthType 认证用户
+                loginAuth = LoginAuthFactory.getLoginAuth("default");
+                userVo = loginAuth.auth(request, response);
+                if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
+                    authType = request.getHeader("AuthType");
+                    if (StringUtils.isNotBlank(authType)) {
+                        loginAuth = LoginAuthFactory.getLoginAuth(authType);
+                        if (loginAuth != null) {
+                            userVo = loginAuth.auth(request, response);
                         }
-                        UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
-                        TenantContext.init();
-                        TenantContext.get().switchTenant(tenant);
-                        isUnExpired = userExpirationValid();
-                        isAuth = true;
+                    } else {
+                        loginAuth = null;
                     }
                 }
+                if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+                    JSONObject jwtBodyObj = new JSONObject();
+                    jwtBodyObj.put("useruuid", userVo.getUuid());
+                    jwtBodyObj.put("userid", userVo.getUserId());
+                    jwtBodyObj.put("username", userVo.getUserName());
+                    jwtBodyObj.put("tenant", tenant);
+                    if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
+                        JSONArray roleList = new JSONArray();
+                        roleList.addAll(userVo.getRoleUuidList());
+                        jwtBodyObj.put("rolelist", roleList);
+                    }
+                    UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
+                    TenantContext.init();
+                    TenantContext.get().switchTenant(tenant);
+                    isUnExpired = userExpirationValid();
+                    isAuth = true;
+                }
             }
-            
+
             if (hasTenant && isAuth && isUnExpired) {
                 filterChain.doFilter(request, response);
             } else {
                 redirectObj = new JSONObject();
-                 if (!hasTenant) {
+                if (!hasTenant) {
                     response.setStatus(521);
                     redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "租户" + tenant + "不存在或已被禁用");
-                } else if (!userVo.getIsHasAuthorization()) {
+                    redirectObj.put("Message", "租户 '" + tenant + "' 不存在或已被禁用");
+                } else if (loginAuth == null) {
+                    response.setStatus(522);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
+                } else if (userVo != null && StringUtils.isBlank(userVo.getAuthorization())) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "没有找到认证信息，请登录");
                     redirectObj.put("directUrl", loginAuth.directUrl());
-                } else if (!isAuth) {
-                    response.setStatus(522);
-                    redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "没有找到登录信息，请登录");
-                    redirectObj.put("directUrl", loginAuth.directUrl());
-                } else if (!isUnExpired) {
+                } else if (isAuth && !isUnExpired) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
+                    redirectObj.put("directUrl", loginAuth.directUrl());
+                } else {
+                    response.setStatus(522);
+                    redirectObj.put("Status", "FAILED");
+                    redirectObj.put("Message", "用户认证失败，请登录");
                     redirectObj.put("directUrl", loginAuth.directUrl());
                 }
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
                 response.getWriter().print(redirectObj.toJSONString());
             }
-        }catch(Exception  ex) {
+        } catch (Exception ex) {
             logger.error("认证失败", ex);
             response.setStatus(522);
             redirectObj.put("Status", "FAILED");
@@ -173,6 +184,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
         return false;
     }
-    
+
 
 }

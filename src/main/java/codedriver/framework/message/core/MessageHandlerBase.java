@@ -56,12 +56,26 @@ public abstract class MessageHandlerBase implements IMessageHandler {
         messageVoList.add(messageVo);
         messageMapper.insertMessage(messageVoList);
         List<MessageRecipientVo> messageRecipientVoList = new ArrayList<>();
+        /** 计算出用户登录失效时间点 **/
         long expireTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Config.USER_EXPIRETIME());
-        List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(notifyVo.getToUserUuidList(), notifyVo.getToTeamUuidList(), notifyVo.getToRoleUuidList(), new Date(expireTime));
+        /** 根据用户、组、角色和登录失效时间点，找出所有在线用户 **/
+        List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
+                notifyVo.getToUserUuidList(), notifyVo.getToTeamUuidList(), notifyVo.getToRoleUuidList(), new Date(expireTime));
         if(CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())){
-            List<String> toUserUuidList = ListUtils.removeAll(notifyVo.getToUserUuidList(), onlineUserUuidList);
-            for(String userUuid : toUserUuidList){
-                messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), userUuid));
+            List<String> toUserUuidList = notifyVo.getToUserUuidList();
+            if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
+                /** 去掉所有在线用户 **/
+                toUserUuidList.removeAll(onlineUserUuidList);
+            }
+            if(CollectionUtils.isNotEmpty(toUserUuidList)) {
+                List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(messageVo.getHandler(), toUserUuidList);
+                if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
+                    /** 去掉所有取消订阅用户 **/
+                    toUserUuidList.removeAll(unsubscribedUserUuidList);
+                }
+                for (String userUuid : toUserUuidList) {
+                    messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), userUuid));
+                }
             }
         }
         for(String teamUuid : notifyVo.getToTeamUuidList()){
@@ -73,6 +87,11 @@ public abstract class MessageHandlerBase implements IMessageHandler {
         messageMapper.insertMessageRecipient(messageRecipientVoList);
         /** 直接发送给已订阅的在线用户 **/
         if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
+            List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(messageVo.getHandler(), onlineUserUuidList);
+            if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
+                /** 去掉所有取消订阅用户 **/
+                onlineUserUuidList.removeAll(unsubscribedUserUuidList);
+            }
             List<MessageSearchVo> messageSearchVoList = new ArrayList<>();
             for(String userUuid : onlineUserUuidList){
                 messageSearchVoList.add(new MessageSearchVo(userUuid, messageVo.getId()));

@@ -43,6 +43,8 @@ public interface MessageMapper {
 
     public Long getMessageMinIdByGreaterThanFcd(Date fcd);
 
+    public List<String> getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(@Param("handler") String handler, @Param("userUuidList") List<String> userUuidList);
+
     public int insertMessage(List<MessageVo> messageVoList);
 
     public int insertMessageRecipient(List<MessageRecipientVo> messageRecipientVoList);

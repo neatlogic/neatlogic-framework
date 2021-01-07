@@ -219,6 +219,19 @@
     <select id="getMessageMinIdByGreaterThanFcd" parameterType="java.util.Date" resultType="java.lang.Long">
         SELECT `id` FROM `message` WHERE `fcd` &gt;= #{value} LIMIT 1
     </select>
+
+    <select id="getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList" resultType="java.lang.String">
+        SELECT
+               `user_uuid`
+        FROM `message_subscribe`
+        WHERE `is_active` = 0
+          AND `handler` = #{handler}
+          AND `user_uuid` IN
+        <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+            #{userUuid}
+        </foreach>
+    </select>
+
     <insert id="insertMessage" parameterType="codedriver.framework.message.dto.MessageVo">
         INSERT INTO `message` (
         `id`,

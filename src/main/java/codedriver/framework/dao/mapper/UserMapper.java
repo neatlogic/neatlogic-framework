@@ -69,6 +69,8 @@ public interface UserMapper {
 
 	public List<UserVo> getUserByUserIdList(List<String> list);
 
+	public List<UserVo> getUserListByTeamUuid(String teamUuid);
+
 	public int checkUserExistsInUserAgent(String userUuid);
 
 	public int checkAgentExistsInUserAgent(String agentUuid);
@@ -123,6 +125,8 @@ public interface UserMapper {
 	public int updateUserInfo(UserVo userVo);
 
 	public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
+
+	public int updateUserToDeleteByUuid(String uuid);
 
 	public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 

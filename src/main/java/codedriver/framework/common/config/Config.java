@@ -1,27 +1,20 @@
 package codedriver.framework.common.config;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executor;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import codedriver.framework.common.RootConfiguration;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import codedriver.framework.common.RootConfiguration;
+import javax.annotation.PostConstruct;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Executor;
 
 @RootConfiguration
 public class Config {
@@ -55,6 +48,7 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
+    private static Boolean IS_MAINTENANCE_MODE;
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -141,6 +135,10 @@ public class Config {
         return MOBILE_TEST_USER;
     }
 
+    public static boolean IS_MAINTENANCE_MODE() {
+        return IS_MAINTENANCE_MODE;
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -185,6 +183,7 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
+            IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
 

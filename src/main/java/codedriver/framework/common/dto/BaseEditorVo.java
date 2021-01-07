@@ -2,7 +2,9 @@ package codedriver.framework.common.dto;
 
 import java.util.Date;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -33,10 +35,18 @@ public class BaseEditorVo extends BasePageVo {
 	@EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
 	private Integer lcuVipLevel;
 
+	@EntityField(name = "创建者VO")
+	private UserVo fcuVo;
+	@EntityField(name = "修改者VO")
+	private UserVo lcuVo;
+
 	public BaseEditorVo() {
 	}
 
 	public String getFcu() {
+		if (StringUtils.isBlank(fcu)) {
+			fcu = UserContext.get().getUserUuid();
+		}
 		return fcu;
 	}
 
@@ -61,6 +71,9 @@ public class BaseEditorVo extends BasePageVo {
 	}
 
 	public String getLcu() {
+		if (StringUtils.isBlank(lcu)) {
+			lcu = UserContext.get().getUserUuid();
+		}
 		return lcu;
 	}
 
@@ -130,5 +143,21 @@ public class BaseEditorVo extends BasePageVo {
 
 	public void setLcuVipLevel(Integer lcuVipLevel) {
 		this.lcuVipLevel = lcuVipLevel;
+	}
+
+	public UserVo getFcuVo() {
+		return fcuVo;
+	}
+
+	public void setFcuVo(UserVo fcuVo) {
+		this.fcuVo = fcuVo;
+	}
+
+	public UserVo getLcuVo() {
+		return lcuVo;
+	}
+
+	public void setLcuVo(UserVo lcuVo) {
+		this.lcuVo = lcuVo;
 	}
 }

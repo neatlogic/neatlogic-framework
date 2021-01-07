@@ -6,6 +6,7 @@ import codedriver.framework.notify.constvalue.NotifyRecipientType;
 import codedriver.framework.notify.core.INotifyHandler;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -28,8 +29,8 @@ public class NotifyJobVo extends BaseEditorVo {
 	private String handler;
 	@EntityField(name = "通知方式插件", type = ApiParamType.STRING)
 	private String notifyHandler;
-	@EntityField(name = "配置信息", type = ApiParamType.STRING)
-	private String config;
+	@EntityField(name = "配置信息", type = ApiParamType.JSONOBJECT)
+	private JSONObject config;
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
 	private Integer isActive;
 
@@ -117,12 +118,20 @@ public class NotifyJobVo extends BaseEditorVo {
 		this.notifyHandlerName = notifyHandlerName;
 	}
 
-	public String getConfig() {
+	public JSONObject getConfig() {
 		return config;
 	}
 
 	public void setConfig(String config) {
-		this.config = config;
+		this.config = JSONObject.parseObject(config);
+	}
+
+	@JSONField(serialize = false)
+	public String getConfigStr() {
+		if (config != null) {
+			return config.toJSONString();
+		}
+		return null;
 	}
 
 	public Integer getIsActive() {

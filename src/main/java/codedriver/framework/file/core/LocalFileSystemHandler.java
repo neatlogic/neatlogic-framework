@@ -14,17 +14,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RootComponent
-public class LocalFileSystemHandler implements IFileStorageMediumHandler {
+public class LocalFileSystemHandler implements IFileStorageHandler {
 
-	public static final String NAME = "FILE";
+    public static final String NAME = "FILE";
 
 
-	@Override
-	public String getName() {
-		return NAME;
-	}
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
-	@Override
+    @Override
 	public String saveData(String tenantUuid, InputStream inputStream, String fileId,String contentType,String fileType) throws Exception {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy" + File.separator + "MM" + File.separator + "dd");
 		String filePath = tenantUuid + File.separator + fileType + File.separator + format.format(new Date()) + File.separator + fileId;

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+import codedriver.framework.common.constvalue.GroupSearch;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -33,6 +34,12 @@ public class RoleVo extends BasePageVo implements Serializable {
 	private String auth;
 	private List<String> userUuidList;
 	private List<RoleAuthVo> roleAuthList;
+
+	/**
+	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
+	 */
+	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+	private final String initType = GroupSearch.ROLE.getValue();
 
 	public List<RoleAuthVo> getRoleAuthList() {
 		return roleAuthList;
@@ -109,4 +116,7 @@ public class RoleVo extends BasePageVo implements Serializable {
 		this.keyword = keyword;
 	}
 
+	public String getInitType() {
+		return initType;
+	}
 }

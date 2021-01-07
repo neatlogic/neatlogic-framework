@@ -10,10 +10,8 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`is_active` as `isActive`,
 		`from_address` AS `fromAddress`
 		FROM `mail_server`
-		WHERE `is_active` = 1 
 		limit 1
 	</select>
 	
@@ -26,7 +24,6 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`is_active` as `isActive`,
 		`from_address` AS `fromAddress`
 		FROM `mail_server`
 		WHERE `uuid` = #{uuid}
@@ -52,7 +49,6 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`is_active` as `isActive`,
 		`from_address` AS `fromAddress`
 		FROM `mail_server`
 		<where>
@@ -82,8 +78,7 @@
 	  `from_address`,
 	  `username`,
 	  `password`,
-	  `domain`,
-	  `is_active`
+	  `domain`
 	) 
 	VALUES
 	  (
@@ -94,22 +89,21 @@
 	    #{fromAddress},
 	    #{userName},
 	    #{password},
-	    #{domain},
-	    #{isActive}
+	    #{domain}
 	  ) 
 	</insert>
 
-	<update id="resetAllMailServerStatus">
-	UPDATE `mail_server` SET `is_active` = 0
-	</update>
-	
-	<update id="activeMailServerByUuid">
-	UPDATE `mail_server` SET `is_active` = 1 WHERE `uuid` = #{uuid} 
-	</update>
-	
-	<update id="updateMailServerByUuid" parameterType="codedriver.framework.dto.MailServerVo">
-	UPDATE `mail_server` SET `is_active` = #{isActive} WHERE `uuid` = #{uuid} 
-	</update>
+<!--	<update id="resetAllMailServerStatus">-->
+<!--	UPDATE `mail_server` SET `is_active` = 0-->
+<!--	</update>-->
+<!--	-->
+<!--	<update id="activeMailServerByUuid">-->
+<!--	UPDATE `mail_server` SET `is_active` = 1 WHERE `uuid` = #{uuid} -->
+<!--	</update>-->
+<!--	-->
+<!--	<update id="updateMailServerByUuid" parameterType="codedriver.framework.dto.MailServerVo">-->
+<!--	UPDATE `mail_server` SET `is_active` = #{isActive} WHERE `uuid` = #{uuid} -->
+<!--	</update>-->
 
 	<delete id="deleteMailServerByUuid" parameterType="java.lang.String">
 	DELETE FROM `mail_server` WHERE `uuid` = #{uuid}

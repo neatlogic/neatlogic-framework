@@ -38,13 +38,8 @@ public class MailServerVo extends BasePageVo {
 	@EntityField(name = "域名", type = ApiParamType.STRING)
     private String domain;
 	
-	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
-    private Integer isActive;
-	
 	@EntityField(name = "邮箱地址", type = ApiParamType.EMAIL)
     private String fromAddress;
-	@JSONField(serialize=false)
-    private transient String keyword;
     
     public String getUuid() {
     	if(StringUtils.isBlank(uuid)) {
@@ -105,14 +100,6 @@ public class MailServerVo extends BasePageVo {
         this.domain = domain;
     }
 
-    public Integer getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Integer isActive) {
-        this.isActive = isActive;
-    }
-
     public String getFromAddress() {
         return fromAddress;
     }
@@ -120,12 +107,4 @@ public class MailServerVo extends BasePageVo {
     public void setFromAddress(String fromAddress) {
         this.fromAddress = fromAddress;
     }
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
 }

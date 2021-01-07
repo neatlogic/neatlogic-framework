@@ -92,17 +92,13 @@
         COUNT(1)
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
-        <where>
-            <if test="handlerList != null and handlerList.size()">
-                AND a.`handler` in
-                <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
-                    #{handler}
-                </foreach>
-            </if>
-            <if test="startTime != null and endTime != null">
-                and a.`fcd` &gt;= #{startTime} and a.`fcd` &lt;= #{endTime}
-            </if>
-        </where>
+        WHERE a.`fcd` &gt;= #{startTime} and a.`fcd` &lt;= #{endTime}
+        <if test="handlerList != null and handlerList.size()">
+            AND a.`handler` in
+            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+                #{handler}
+            </foreach>
+        </if>
     </select>
 
     <select id="getMessageHistoryList" parameterType="codedriver.framework.message.dto.MessageSearchVo"

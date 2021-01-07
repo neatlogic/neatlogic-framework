@@ -13,6 +13,8 @@ import java.util.Date;
  * @Description: 消息详情Vo
  * @Author: linbq
  * @Date: 2020/12/30 15:13
+ * Copyright(c) 2020 TechSureCo.,Ltd.AllRightsReserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  **/
 public class MessageVo {
     @EntityField(name = "消息id", type = ApiParamType.LONG)

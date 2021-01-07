@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
  * @Description: 消息通知处理器
  * @Author: linbq
  * @Date: 2020/12/31 15:19
+ * Copyright(c) 2020 TechSureCo.,Ltd.AllRightsReserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  **/
 @Component
 public class MessageNotifyHandler extends NotifyHandlerBase {

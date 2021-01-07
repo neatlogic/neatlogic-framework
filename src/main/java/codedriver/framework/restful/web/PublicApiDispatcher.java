@@ -105,21 +105,8 @@ public class PublicApiDispatcher {
         //自定义接口 访问人初始化
         String user = request.getHeader("User");
         UserVo userVo = userMapper.getUserByUuid(user);
-        JSONObject userJson = new JSONObject();
-        if(userVo != null) {
-            userJson.put("useruuid", userVo.getUuid());
-            userJson.put("userid", userVo.getUserId());
-            userJson.put("username", userVo.getUserName());
-            userJson.put("tenant", TenantContext.get().getTenantUuid());
-            if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
-                JSONArray roleList = new JSONArray();
-                for (String role : userVo.getRoleUuidList()) {
-                    roleList.add(role);
-                }
-                userJson.put("rolelist", roleList);
-            }
-        }
-        UserContext.init(userJson, authorization, timezone, request, response);
+		userVo.setAuthorization(authorization);
+        UserContext.init(userVo, timezone, request, response);
        
         
         

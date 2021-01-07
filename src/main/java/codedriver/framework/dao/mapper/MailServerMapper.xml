@@ -98,7 +98,7 @@
 	    #{isActive}
 	  ) 
 	</insert>
-	
+
 	<update id="resetAllMailServerStatus">
 	UPDATE `mail_server` SET `is_active` = 0
 	</update>
@@ -110,7 +110,7 @@
 	<update id="updateMailServerByUuid" parameterType="codedriver.framework.dto.MailServerVo">
 	UPDATE `mail_server` SET `is_active` = #{isActive} WHERE `uuid` = #{uuid} 
 	</update>
-	
+
 	<delete id="deleteMailServerByUuid" parameterType="java.lang.String">
 	DELETE FROM `mail_server` WHERE `uuid` = #{uuid}
 	</delete>

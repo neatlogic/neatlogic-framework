@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import codedriver.framework.dto.UserVo;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -63,6 +64,38 @@ public class UserContext implements Serializable {
 			for (int i = 0; i < roleList.size(); i++) {
 				context.addRole(roleList.getString(i));
 			}
+		}
+		instance.set(context);
+		return context;
+	}
+
+	public static UserContext init(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+		UserContext context = new UserContext();
+		context.setUserId(userVo.getUserId());
+		context.setUserUuid(userVo.getUuid());
+		context.setUserName(userVo.getUserName());
+		context.setTenant(userVo.getTenant());
+		context.setToken(userVo.getAuthorization());
+		context.setRequest(request);
+		context.setResponse(response);
+		context.setTimezone(timezone);
+		for(String roleUuid : userVo.getRoleUuidList()){
+			context.addRole(roleUuid);
+		}
+		instance.set(context);
+		return context;
+	}
+
+	public static UserContext init(UserVo userVo, String timezone) {
+		UserContext context = new UserContext();
+		context.setUserId(userVo.getUserId());
+		context.setUserUuid(userVo.getUuid());
+		context.setUserName(userVo.getUserName());
+		context.setTenant(userVo.getTenant());
+		context.setToken(userVo.getAuthorization());
+		context.setTimezone(timezone);
+		for(String roleUuid : userVo.getRoleUuidList()){
+			context.addRole(roleUuid);
 		}
 		instance.set(context);
 		return context;

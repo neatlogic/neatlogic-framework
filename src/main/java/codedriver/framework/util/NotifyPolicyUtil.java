@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import codedriver.framework.message.core.IMessageHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,27 +34,20 @@ public class NotifyPolicyUtil {
     private static Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
 
     /**
-     * 
-     * @Author: 14378
+     * @param policyConfig       通知策略配置信息
+     * @param paramMappingList   引用通知策略时参数映射
+     * @param notifyTriggerType  触发类型
+     * @param templateParamData  模板参数数据
+     * @param conditionParamData 条件参数数据
+     * @param receiverMap        可能用到的通知接收对象集合
+     * @return void
+     * @Author: linbq
      * @Time:2020年7月2日
      * @Description: 执行通知策略
-     * @param policyConfig
-     *            通知策略配置信息
-     * @param paramMappingList
-     *            引用通知策略时参数映射
-     * @param notifyTriggerType
-     *            触发类型
-     * @param templateParamData
-     *            模板参数数据
-     * @param conditionParamData
-     *            条件参数数据
-     * @param receiverMap
-     *            可能用到的通知接收对象集合
-     * @return void
      */
-    public static void execute(NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
-        INotifyTriggerType notifyTriggerType, JSONObject templateParamData, JSONObject conditionParamData,
-        Map<String, List<NotifyReceiverVo>> receiverMap) {
+    public static void execute(INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
+                               JSONObject templateParamData, JSONObject conditionParamData,
+                               Map<String, List<NotifyReceiverVo>> receiverMap) {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
@@ -67,7 +61,7 @@ public class NotifyPolicyUtil {
                     /** 模板列表 **/
                     List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
                     Map<Long, NotifyTemplateVo> templateMap =
-                        templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
+                            templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
                     for (NotifyTriggerNotifyVo notifyObj : notifyList) {
                         /** 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
                         ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
@@ -79,18 +73,6 @@ public class NotifyPolicyUtil {
                                     if ("constant".equals(paramMappingVo.getType())) {
                                         conditionParamData.put(paramMappingVo.getName(), paramMappingVo.getValue());
                                     }
-                                    // else if (Objects.equals(paramMappingVo.getName(), paramMappingVo.getValue())) {
-                                    // if (!conditionParamData.containsKey(paramMappingVo.getValue())) {
-                                    // logger.error("没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
-                                    // }
-                                    // } else {
-                                    // Object processFieldValue = conditionParamData.get(paramMappingVo.getValue());
-                                    // if (processFieldValue != null) {
-                                    // conditionParamData.put(paramMappingVo.getName(), processFieldValue);
-                                    // } else {
-                                    // logger.error("没有找到参数'" + paramMappingVo.getValue() + "'信息");
-                                    // }
-                                    // }
                                 }
                             }
 
@@ -120,7 +102,7 @@ public class NotifyPolicyUtil {
                                 if (handler == null) {
                                     throw new NotifyHandlerNotFoundException(notifyHandler);
                                 }
-                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType);
+                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass);
                                 /** 设置异常通知接收人 **/
                                 if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
                                     notifyBuilder.setExceptionNotifyUserUuidList(adminUserUuidList);
@@ -148,7 +130,7 @@ public class NotifyPolicyUtil {
                                         if ("constant".equals(paramMappingVo.getType())) {
                                             notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());
                                         } else if (Objects.equals(paramMappingVo.getName(),
-                                            paramMappingVo.getValue())) {
+                                                paramMappingVo.getValue())) {
                                             if (!templateParamData.containsKey(paramMappingVo.getValue())) {
                                                 logger.error("没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
                                             }
@@ -170,7 +152,7 @@ public class NotifyPolicyUtil {
                                     if (GroupSearch.USER.getValue().equals(split[0])) {
                                         notifyBuilder.addUserUuid(split[1]);
                                     } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
-                                        notifyBuilder.addTeamId(split[1]);
+                                        notifyBuilder.addTeamUuid(split[1]);
                                     } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
                                         notifyBuilder.addRoleUuid(split[1]);
                                     } else {
@@ -180,16 +162,17 @@ public class NotifyPolicyUtil {
                                                 if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
                                                     notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
                                                 } else if (GroupSearch.TEAM.getValue()
-                                                    .equals(notifyReceiverVo.getType())) {
-                                                    notifyBuilder.addTeamId(notifyReceiverVo.getUuid());
+                                                        .equals(notifyReceiverVo.getType())) {
+                                                    notifyBuilder.addTeamUuid(notifyReceiverVo.getUuid());
                                                 } else if (GroupSearch.ROLE.getValue()
-                                                    .equals(notifyReceiverVo.getType())) {
+                                                        .equals(notifyReceiverVo.getType())) {
                                                     notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
                                                 }
                                             }
                                         }
                                     }
                                 }
+
                                 NotifyVo notifyVo = notifyBuilder.build();
                                 /** 发送通知 **/
                                 handler.execute(notifyVo);

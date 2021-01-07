@@ -79,12 +79,15 @@ public abstract class MessageHandlerBase implements IMessageHandler {
             }
         }
         for(String teamUuid : notifyVo.getToTeamUuidList()){
-            messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), teamUuid));
+            messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.TEAM.getValue(), teamUuid));
         }
         for(String roleUuid : notifyVo.getToRoleUuidList()){
-            messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), roleUuid));
+            messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.ROLE.getValue(), roleUuid));
         }
-        messageMapper.insertMessageRecipient(messageRecipientVoList);
+        if(CollectionUtils.isNotEmpty(messageRecipientVoList)){
+            messageMapper.insertMessageRecipient(messageRecipientVoList);
+        }
+
         /** 直接发送给已订阅的在线用户 **/
         if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
             List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(messageVo.getHandler(), onlineUserUuidList);
@@ -96,7 +99,9 @@ public abstract class MessageHandlerBase implements IMessageHandler {
             for(String userUuid : onlineUserUuidList){
                 messageSearchVoList.add(new MessageSearchVo(userUuid, messageVo.getId()));
             }
-            messageMapper.insertMessageUser(messageSearchVoList);
+            if(CollectionUtils.isNotEmpty(messageSearchVoList)){
+                messageMapper.insertMessageUser(messageSearchVoList);
+            }
         }
     }
 }

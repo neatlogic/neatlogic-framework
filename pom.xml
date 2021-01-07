@@ -47,5 +47,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.github.magese</groupId>
+			<artifactId>ik-analyzer</artifactId>
+			<version>8.1.0.techsure</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project> 

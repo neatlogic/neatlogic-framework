@@ -16,7 +16,6 @@ public class NotifyVo {
     private Class<? extends IMessageHandler> messageHandlerClass;
     private String title;
     private String content;
-//    private List<NotifyReceiverVo> notifyReceiverVoList;
     private List<String> toUserUuidList;
     private List<String> toTeamUuidList;
     private List<String> toRoleUuidList;
@@ -31,7 +30,6 @@ public class NotifyVo {
         this.triggerType = builder.triggerType;
         this.messageHandlerClass = builder.messageHandlerClass;
         this.data = builder.data;
-//        this.notifyReceiverVoList = builder.notifyReceiverVoList;
         this.toUserUuidList = builder.toUserUuidList;
         this.toTeamUuidList = builder.toTeamUuidList;
         this.toRoleUuidList = builder.toRoleUuidList;
@@ -63,10 +61,6 @@ public class NotifyVo {
     public void setFromUser(String fromUser) {
         this.fromUser = fromUser;
     }
-
-//    public List<NotifyReceiverVo> getNotifyReceiverVoList() {
-//        return notifyReceiverVoList;
-//    }
 
     public JSONObject getData() {
         return data;
@@ -125,7 +119,6 @@ public class NotifyVo {
         private String templateContent;
         private String templateTitle;
         private JSONObject data = new JSONObject();
-//        private List<NotifyReceiverVo> notifyReceiverVoList = new ArrayList<>();
         private List<String> toUserUuidList = new ArrayList<>();
         private List<String> toTeamUuidList = new ArrayList<>();
         private List<String> toRoleUuidList = new ArrayList<>();
@@ -188,20 +181,6 @@ public class NotifyVo {
             }
             return this;
         }
-
-//        public Builder addNotifyReceiverVo(NotifyReceiverVo notifyReceiverVo) {
-//            if (!this.notifyReceiverVoList.contains(notifyReceiverVo)) {
-//                this.notifyReceiverVoList.add(notifyReceiverVo);
-//            }
-//            return this;
-//        }
-//
-//        public Builder addAllNotifyReceiverVo(List<NotifyReceiverVo> notifyReceiverVoList) {
-//            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverVoList) {
-//                addNotifyReceiverVo(notifyReceiverVo);
-//            }
-//            return this;
-//        }
 
         public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
             this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;

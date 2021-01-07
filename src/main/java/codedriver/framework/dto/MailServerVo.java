@@ -39,7 +39,7 @@ public class MailServerVo extends BasePageVo {
     private String domain;
 	
 	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
-    private int isActive;
+    private Integer isActive;
 	
 	@EntityField(name = "邮箱地址", type = ApiParamType.EMAIL)
     private String fromAddress;
@@ -105,11 +105,11 @@ public class MailServerVo extends BasePageVo {
         this.domain = domain;
     }
 
-    public int getIsActive() {
+    public Integer getIsActive() {
         return isActive;
     }
 
-    public void setIsActive(int isActive) {
+    public void setIsActive(Integer isActive) {
         this.isActive = isActive;
     }
 

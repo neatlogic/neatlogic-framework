@@ -83,16 +83,8 @@ public class LoginController {
             } else {
                 checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
                 if(checkUserVo != null){
-                    JSONObject jwtBodyObj = new JSONObject();
-                    jwtBodyObj.put("useruuid", checkUserVo.getUuid());
-                    jwtBodyObj.put("userid", checkUserVo.getUserId());
-                    jwtBodyObj.put("username", checkUserVo.getUserName());
-                    jwtBodyObj.put("tenant", tenant);
-                    if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
-                        jwtBodyObj.put("rolelist", userVo.getRoleUuidList());
-                    }
                     String timezone = "+8:00";
-                    UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
+                    UserContext.init(checkUserVo, timezone, request, response);
                     for(ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()){
                         loginPostProcessor.loginAfterInitialization();
                     }

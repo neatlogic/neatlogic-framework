@@ -1,6 +1,7 @@
 package codedriver.framework.message.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 
@@ -26,6 +27,14 @@ public class MessageVo {
     private Date fcd;
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
+
+    public MessageVo() {
+    }
+    public MessageVo(NotifyVo notifyVo) {
+        this.title = notifyVo.getTitle();
+        this.content = notifyVo.getContent();
+        this.handler = notifyVo.getMessageHandlerClass().getName();
+    }
 
     public Long getId() {
         if (id == null) {

@@ -96,17 +96,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     }
                 }
                 if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                    JSONObject jwtBodyObj = new JSONObject();
-                    jwtBodyObj.put("useruuid", userVo.getUuid());
-                    jwtBodyObj.put("userid", userVo.getUserId());
-                    jwtBodyObj.put("username", userVo.getUserName());
-                    jwtBodyObj.put("tenant", tenant);
-                    if (CollectionUtils.isNotEmpty(userVo.getRoleUuidList())) {
-                        JSONArray roleList = new JSONArray();
-                        roleList.addAll(userVo.getRoleUuidList());
-                        jwtBodyObj.put("rolelist", roleList);
-                    }
-                    UserContext.init(jwtBodyObj, userVo.getAuthorization(), timezone, request, response);
+                    UserContext.init(userVo, timezone, request, response);
                     TenantContext.init();
                     TenantContext.get().switchTenant(tenant);
                     isUnExpired = userExpirationValid();

@@ -9,7 +9,7 @@ package codedriver.framework.message.constvalue;
  **/
 public enum PopUpType {
     SHORTSHOW("shortshow", "临时"),
-    longshow("longshow", "持续"),
+    LONGSHOW("longshow", "持续"),
     CLOSE("close", "关闭")
     ;
 

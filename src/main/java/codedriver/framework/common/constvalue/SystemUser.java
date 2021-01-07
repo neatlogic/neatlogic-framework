@@ -1,5 +1,6 @@
 package codedriver.framework.common.constvalue;
 
+import codedriver.framework.dto.UserVo;
 import com.alibaba.fastjson.JSONObject;
 /**
  * 
@@ -32,12 +33,12 @@ public enum SystemUser {
 	public String getTimezone() {
 		return timezone;
 	}
-	public JSONObject getConfig() {
-		JSONObject config = new JSONObject();
-		config.put("userid", userId);
-		config.put("useruuid", userUuid);
-		config.put("userName", userName);
-		return config;
+	public UserVo getUserVo() {
+		UserVo userVo = new UserVo();
+		userVo.setUuid(userUuid);
+		userVo.setUserId(userId);
+		userVo.setUserName(userName);
+		return userVo;
 	};
 	
 	public static String getUserName(String userUuid) {

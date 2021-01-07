@@ -48,10 +48,7 @@ public abstract class MessageHandlerBase implements IMessageHandler {
 
     @Override
     public void send(NotifyVo notifyVo) {
-        MessageVo messageVo = new MessageVo();
-        messageVo.setTitle(notifyVo.getTitle());
-        messageVo.setContent(notifyVo.getContent());
-        messageVo.setHandler(notifyVo.getMessageHandlerClass().getName());
+        MessageVo messageVo = new MessageVo(notifyVo);
         List<MessageVo> messageVoList = new ArrayList<>();
         messageVoList.add(messageVo);
         messageMapper.insertMessage(messageVoList);

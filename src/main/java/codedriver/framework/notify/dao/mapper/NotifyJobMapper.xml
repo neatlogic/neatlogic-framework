@@ -11,6 +11,7 @@
 		`name`,
 		`handler`,
 		`notify_handler` as notifyHandler,
+		`config`,
 		`cron`,
 		`is_active` as isActive
 		FROM `notify_job`
@@ -80,6 +81,15 @@
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
+	</select>
+
+	<select id="getAllActiveJob" resultType="codedriver.framework.notify.dto.job.NotifyJobVo">
+		SELECT
+		`id`,
+		`name`,
+		`cron`
+		FROM `notify_job`
+		WHERE `is_active` = 1
 	</select>
 
     <insert id="insertJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo">

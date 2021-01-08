@@ -27,6 +27,11 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
         return getMyNotifyData(id);
     }
 
+    @Override
+    public String preview() {
+        return myPreview();
+    }
+
     protected abstract JSONArray getMyConditionOptionList();
 
     protected abstract JSONArray getMyMessageAttrList(String handler);
@@ -34,4 +39,6 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
     protected abstract List<ValueTextVo> getMyDataColumnList();
 
     protected abstract List<NotifyVo> getMyNotifyData(Long id);
+
+    protected abstract String myPreview();
 }

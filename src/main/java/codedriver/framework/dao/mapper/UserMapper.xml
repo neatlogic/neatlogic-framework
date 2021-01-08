@@ -658,7 +658,7 @@
 	SELECT COUNT(`user_id`) FROM `user` WHERE `user_id` = #{userId} AND `uuid` != #{uuid}
 	</select>
 	
-	<select id="getUserListByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo">
+	<select id="getUserListByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
 	SELECT
 	  `id`,
 	  `uuid`,

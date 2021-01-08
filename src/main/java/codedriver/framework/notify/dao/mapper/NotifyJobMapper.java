@@ -17,6 +17,8 @@ public interface NotifyJobMapper {
 
     public List<NotifyJobVo> searchJob(NotifyJobVo vo);
 
+    public List<NotifyJobReceiverVo> getToListByJobId(Long id);
+
     public List<NotifyJobVo> getAllActiveJob();
 
     public int updateJob(NotifyJobVo vo);

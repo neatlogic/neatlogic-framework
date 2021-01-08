@@ -15,6 +15,16 @@ public interface UserMapper {
 
 	public UserVo getUserBaseInfoByUuid(String userUuid);
 
+	/**
+	 * @Description: 有些场景下，使用缓存可能会有问题
+	 * 比如两个相同的userVo放在JSONArray时，第二个userVo可能会替换成$ref:
+	 * @Author: laiwt
+	 * @Date: 2021/1/8 17:23
+	 * @Params: [userUuid]
+	 * @Returns: codedriver.framework.dto.UserVo
+	**/
+	public UserVo getUserBaseInfoByUuidWithoutCache(String userUuid);
+
 	public UserVo getUserByUserId(String userId);
 
 	public UserVo getUserByUuid(String uuid);

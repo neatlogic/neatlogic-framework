@@ -83,6 +83,16 @@
 		</if>
 	</select>
 
+	<select id="getToListByJobId" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.job.NotifyJobReceiverVo">
+		SELECT
+		`receiver`,
+		`type`,
+		`receive_type` as receiveType
+		FROM `notify_job_receiver`
+		WHERE `receive_type` = 'to'
+		and `notify_job_id` = #{value}
+	</select>
+
 	<select id="getAllActiveJob" resultType="codedriver.framework.notify.dto.job.NotifyJobVo">
 		SELECT
 		`id`,

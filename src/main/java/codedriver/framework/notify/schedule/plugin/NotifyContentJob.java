@@ -59,7 +59,7 @@ public class NotifyContentJob extends JobBase {
 
 	@Override
 	public void initJob(String tenantUuid) {
-		/** 初始化所有已激活的定时任务 */
+		/** 初始化所有可用的定时任务 */
 		List<NotifyJobVo> jobList = notifyJobMapper.getAllActiveJob();
 		if(CollectionUtils.isNotEmpty(jobList)){
 			for(NotifyJobVo vo : jobList){
@@ -83,15 +83,12 @@ public class NotifyContentJob extends JobBase {
         }
 
         List<NotifyVo> notifyData = handler.getNotifyData(id);
-
         if(CollectionUtils.isNotEmpty(notifyData)){
             for(NotifyVo vo : notifyData){
                 notifyHandler.execute(vo);
             }
         }
-
 	}
-
 
 
     @Override

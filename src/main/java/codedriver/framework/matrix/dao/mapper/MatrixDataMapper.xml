@@ -270,7 +270,7 @@
 	</foreach>
 	)
 	SELECT 
-	REPLACE(UUID(),'-',''),
+	MD5(UUID()),
 	<foreach collection="sourceColumnList" item="sourceColumn" separator=",">
 		`${sourceColumn}`
 	</foreach>

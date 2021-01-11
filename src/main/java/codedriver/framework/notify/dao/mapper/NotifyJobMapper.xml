@@ -11,6 +11,7 @@
 		`name`,
 		`handler`,
 		`notify_handler` as notifyHandler,
+		`config`,
 		`cron`,
 		`is_active` as isActive
 		FROM `notify_job`
@@ -66,6 +67,7 @@
 		select
 		a.`id`,
 		a.`name`,
+		a.`handler`,
 		a.`notify_handler` as notifyHandler,
 		a.`cron`,
 		a.`is_active` as isActive,
@@ -77,6 +79,41 @@
 		</if>
 		</where>
 		order by a.`lcd` desc
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getToListByJobId" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.job.NotifyJobReceiverVo">
+		SELECT
+		`receiver`,
+		`type`,
+		`receive_type` as receiveType
+		FROM `notify_job_receiver`
+		WHERE `receive_type` = 'to'
+		and `notify_job_id` = #{value}
+	</select>
+
+	<select id="getAllActiveJob" resultType="codedriver.framework.notify.dto.job.NotifyJobVo">
+		SELECT
+		`id`,
+		`name`,
+		`cron`
+		FROM `notify_job`
+		WHERE `is_active` = 1
+	</select>
+
+	<select id="searchJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo" resultType="codedriver.framework.notify.dto.job.NotifyJobAuditVo">
+		select
+		`id`,
+		`job_uuid`,
+		`start_time` as startTime,
+		`status`,
+		`server_id` as serverId,
+		`content_hash` as contentHash
+		from `schedule_job_audit`
+		WHERE `job_uuid` = #{jobUuid}
+		ORDER BY `start_time` DESC
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>

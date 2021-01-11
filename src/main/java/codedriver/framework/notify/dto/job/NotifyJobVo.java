@@ -6,6 +6,7 @@ import codedriver.framework.notify.constvalue.NotifyRecipientType;
 import codedriver.framework.notify.core.INotifyHandler;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,6 +42,9 @@ public class NotifyJobVo extends BaseEditorVo {
 	private List<String> toList;
 	@EntityField(name = "抄送人列表", type = ApiParamType.JSONARRAY)
 	private List<String> ccList;
+
+	@EntityField(name = "收件人vo列表")
+	private JSONArray toVoList;
 
 	@JSONField(serialize = false)
 	@EntityField(name = "接收者列表", type = ApiParamType.JSONARRAY)
@@ -198,5 +202,13 @@ public class NotifyJobVo extends BaseEditorVo {
 
 	public void setExecCount(Integer execCount) {
 		this.execCount = execCount;
+	}
+
+	public JSONArray getToVoList() {
+		return toVoList;
+	}
+
+	public void setToVoList(JSONArray toVoList) {
+		this.toVoList = toVoList;
 	}
 }

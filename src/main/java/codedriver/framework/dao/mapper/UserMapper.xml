@@ -40,6 +40,21 @@
 		WHERE a.`uuid` = #{value}
 	</select>
 
+	<select id="getUserBaseInfoByUuidWithoutCache" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="false">
+		SELECT
+		a.`uuid`,
+		a.`user_id` as userId,
+		a.`user_name` as userName,
+		a.`email`,
+		a.`phone`,
+		a.`pinyin`,
+		a.`is_active` as isActive,
+		a.`user_info` as userInfo,
+		a.`vip_level` as vipLevel
+		FROM `user` a
+		WHERE a.`uuid` = #{value}
+	</select>
+
 	<select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo" useCache="true">
 		SELECT
 		a.`uuid`,

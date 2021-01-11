@@ -24,8 +24,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 通知内容定时器
- */
+ * @Title: 通知内容定时器
+ * @Package: codedriver.framework.notify.schedule.plugin
+ * @Description:
+ * @Author: laiwt
+ * @Date: 2021/1/8 11:00
+ * <p>
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * <p>
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ **/
 @Component
 public class NotifyContentJob extends JobBase {
 	static Logger logger = LoggerFactory.getLogger(NotifyContentJob.class);

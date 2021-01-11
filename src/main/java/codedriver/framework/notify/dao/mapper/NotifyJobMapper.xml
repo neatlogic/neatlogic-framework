@@ -67,6 +67,7 @@
 		select
 		a.`id`,
 		a.`name`,
+		a.`handler`,
 		a.`notify_handler` as notifyHandler,
 		a.`cron`,
 		a.`is_active` as isActive,
@@ -100,6 +101,22 @@
 		`cron`
 		FROM `notify_job`
 		WHERE `is_active` = 1
+	</select>
+
+	<select id="searchJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo" resultType="codedriver.framework.notify.dto.job.NotifyJobAuditVo">
+		select
+		`id`,
+		`job_uuid`,
+		`start_time` as startTime,
+		`status`,
+		`server_id` as serverId,
+		`content_hash` as contentHash
+		from `schedule_job_audit`
+		WHERE `job_uuid` = #{jobUuid}
+		ORDER BY `start_time` DESC
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
 	</select>
 
     <insert id="insertJob" parameterType="codedriver.framework.notify.dto.job.NotifyJobVo">

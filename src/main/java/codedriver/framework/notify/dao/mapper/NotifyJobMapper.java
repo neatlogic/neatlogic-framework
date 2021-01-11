@@ -1,7 +1,9 @@
 package codedriver.framework.notify.dao.mapper;
 
+import codedriver.framework.notify.dto.job.NotifyJobAuditVo;
 import codedriver.framework.notify.dto.job.NotifyJobReceiverVo;
 import codedriver.framework.notify.dto.job.NotifyJobVo;
+import codedriver.framework.scheduler.dto.JobAuditVo;
 
 import java.util.List;
 
@@ -20,6 +22,8 @@ public interface NotifyJobMapper {
     public List<NotifyJobReceiverVo> getToListByJobId(Long id);
 
     public List<NotifyJobVo> getAllActiveJob();
+
+    public List<NotifyJobAuditVo> searchJobAudit(JobAuditVo vo);
 
     public int updateJob(NotifyJobVo vo);
 

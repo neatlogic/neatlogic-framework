@@ -1,6 +1,11 @@
 package codedriver.framework.common.constvalue;
 
-public enum TeamUserTitle {
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum TeamUserTitle implements IEnum{
 
 	DEPARTMENTLEADER("departmentleader", "部门长"),
 	TEAMLEADER("teamleader", "组长"),
@@ -34,5 +39,20 @@ public enum TeamUserTitle {
 			}
 		}
 		return "";
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for(TeamUserTitle title : TeamUserTitle.values()){
+			array.add(new JSONObject(){
+				{
+					this.put("value",title.getValue());
+					this.put("text",title.getText());
+				}
+			});
+		}
+		return array;
 	}
 }

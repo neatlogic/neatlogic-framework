@@ -157,9 +157,9 @@ public abstract class JobBase implements IJob {
 				jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
 				try {
 					jobHandler.executeInternal(context, jobObject);
-					auditVo.setStatus(JobAuditVo.SUCCEED);
+					auditVo.setStatus(JobAuditVo.Status.SUCCEED.getValue());
 				} catch (Exception ex) {
-					auditVo.setStatus(JobAuditVo.FAILED);
+					auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
 					auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
 					//logger.error(ex.getMessage(), ex); //已记录到数据库，无需日志
 				} finally {

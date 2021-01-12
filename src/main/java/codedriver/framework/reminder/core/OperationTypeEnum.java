@@ -1,6 +1,12 @@
 package codedriver.framework.reminder.core;
 
-public enum OperationTypeEnum {
+import codedriver.framework.common.constvalue.IEnum;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum OperationTypeEnum implements IEnum {
     CREATE("create","增加"),
     DELETE("delete","删除"),
     UPDATE("update","更新"),
@@ -29,5 +35,20 @@ public enum OperationTypeEnum {
             }
         }
         return "";
+    }
+
+
+    @Override
+    public List getValueTextList() {
+        JSONArray array = new JSONArray();
+        for(OperationTypeEnum typeEnum : OperationTypeEnum.values()){
+            array.add(new JSONObject(){
+                {
+                    this.put("value",typeEnum.getValue());
+                    this.put("text",typeEnum.getText());
+                }
+            });
+        }
+        return array;
     }
 }

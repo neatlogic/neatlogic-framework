@@ -1,6 +1,7 @@
 package codedriver.framework.restful.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleGroupVo;
@@ -8,6 +9,8 @@ import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 
+import codedriver.framework.restful.web.core.ApiAuthFactory;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
@@ -123,7 +126,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 		}
 	}
 	
-	public enum AuthenticateType {
+	public enum AuthenticateType implements IEnum {
 	    NOAUTH("-", "无需认证"), BASIC("basic", "Basic认证");
 
 	    private String type;
@@ -141,6 +144,24 @@ public class ApiVo extends BasePageVo implements Serializable {
 	    public String getText() {
 	        return this.text;
 	    }
+
+
+		@Override
+		public List getValueTextList() {
+			JSONArray array = new JSONArray();
+			for(ApiVo.AuthenticateType type : ApiVo.AuthenticateType.values()){
+				array.add(new JSONObject(){
+					{
+						this.put("value",type.getValue());
+						this.put("text",type.getText());
+						if(!type.getValue().equals(ApiVo.AuthenticateType.NOAUTH.getValue())){
+							this.put("help", ApiAuthFactory.getApiAuth(type.getValue()).help());
+						}
+					}
+				});
+			}
+			return array;
+		}
 	}
 
 	@EntityField(name = "名称", type = ApiParamType.STRING)

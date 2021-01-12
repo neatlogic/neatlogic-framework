@@ -1,6 +1,12 @@
 package codedriver.framework.matrix.constvalue;
 
-public enum MatrixType {
+import codedriver.framework.common.constvalue.IEnum;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum MatrixType implements IEnum {
     CUSTOM("custom", "自定义数据源"), EXTERNAL("external", "外部数据源");
 
     private String value;
@@ -35,5 +41,20 @@ public enum MatrixType {
             }
         }
         return "";
+    }
+
+
+    @Override
+    public List getValueTextList() {
+        JSONArray array = new JSONArray();
+        for(MatrixType type : MatrixType.values()){
+            array.add(new JSONObject(){
+                {
+                    this.put("value",type.getValue());
+                    this.put("text",type.getName());
+                }
+            });
+        }
+        return array;
     }
 }

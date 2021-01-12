@@ -1,6 +1,11 @@
 package codedriver.framework.common.constvalue;
 
-public enum Expression {
+import codedriver.framework.dto.ExpressionVo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public enum Expression implements IEnum{
 	LIKE("like", "包含", " %s contains %s ",1),
 	NOTLIKE("notlike", "不包含", " not %s contains %s ",1),
 	EQUAL("equal", "等于", " %s = %s ",1),
@@ -67,5 +72,15 @@ public enum Expression {
 			}
 		}
 		return null;
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		List<ExpressionVo> array = new ArrayList<>();
+		for(Expression expression : Expression.values()){
+			array.add(new ExpressionVo(expression));
+		}
+		return array;
 	}
 }

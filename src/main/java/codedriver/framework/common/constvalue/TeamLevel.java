@@ -1,6 +1,11 @@
 package codedriver.framework.common.constvalue;
 
-public enum TeamLevel {
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum TeamLevel implements IEnum{
 
 	GROUP("group", "集团", 1),
 	COMPANY("company", "公司", 2),
@@ -32,5 +37,19 @@ public enum TeamLevel {
 		}
 		return null;
 	}
-	
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for(TeamLevel level : TeamLevel.values()){
+			array.add(new JSONObject(){
+				{
+					this.put("value",level.getValue());
+					this.put("text",level.getText());
+				}
+			});
+		}
+		return array;
+	}
 }

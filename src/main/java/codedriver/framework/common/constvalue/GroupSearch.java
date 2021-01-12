@@ -1,6 +1,12 @@
 package codedriver.framework.common.constvalue;
 
-public enum GroupSearch {
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+
+public enum GroupSearch implements IEnum{
 	USER("user", "用户类型"),
 	TEAM("team", "组类型"),
 	ROLE("role", "角色类型"),
@@ -50,5 +56,20 @@ public enum GroupSearch {
 			}
 		}
 		return _value;
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for(GroupSearch groupSearch : GroupSearch.values()){
+			array.add(new JSONObject(){
+				{
+					this.put("value",groupSearch.getValue());
+					this.put("text",groupSearch.getText());
+				}
+			});
+		}
+		return array;
 	}
 }

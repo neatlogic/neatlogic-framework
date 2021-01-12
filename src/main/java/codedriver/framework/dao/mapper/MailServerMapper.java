@@ -25,11 +25,11 @@ public interface MailServerMapper {
 
 	public int replaceMailServer(MailServerVo mailServerVo);
 
-	public int resetAllMailServerStatus();
-
-	public int activeMailServerByUuid(String uuid);
-
-	public int updateMailServerByUuid(MailServerVo mailServerVo);
+//	public int resetAllMailServerStatus();
+//
+//	public int activeMailServerByUuid(String uuid);
+//
+//	public int updateMailServerByUuid(MailServerVo mailServerVo);
 
 	public int deleteMailServerByUuid(String string);
 }

@@ -2,6 +2,7 @@ package codedriver.framework.scheduler.dto;
 
 import java.util.Date;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
@@ -12,11 +13,55 @@ import codedriver.framework.util.SnowflakeUtil;
 
 public class JobAuditVo extends BasePageVo {
 
-	public final static String RUNNING = "running";
+//	public final static String RUNNING = "running";
+//
+//	public final static String SUCCEED = "succeed";
+//
+//	public final static String FAILED = "failed";
 
-	public final static String SUCCEED = "succeed";
+	public enum Status{
+		SUCCEED("succeed","成功","#25b865"),
+		RUNNING("running","进行中","#2d84fb"),
+		FAILED("failed","失败","#f71010");
 
-	public final static String FAILED = "failed";
+		private String value;
+		private String text;
+		private String color;
+
+		private Status(String _value,String _text,String _color){
+			value = _value;
+			text = _text;
+			color = _color;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public String getColor() {
+			return color;
+		}
+
+		public static JSONObject getStatus(String value){
+			for(Status status : Status.values()){
+				if(status.getValue().equals(value)){
+					JSONObject obj = new JSONObject();
+					obj.put("value",value);
+					obj.put("text",status.getText());
+					obj.put("color",status.getColor());
+					return obj;
+				}
+			}
+			return null;
+		}
+
+
+	}
+
 	@EntityField(name = "记录id", type = ApiParamType.LONG)
 	private Long id;
 	@EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
@@ -29,7 +74,7 @@ public class JobAuditVo extends BasePageVo {
 	private String content;
 	private String contentHash;
 	@EntityField(name = "执行状态(succeed：成功；failed:失败；running：进行中)", type = ApiParamType.STRING)
-	private String status = RUNNING;
+	private String status = Status.RUNNING.getValue();
 	@EntityField(name = "服务器id", type = ApiParamType.INTEGER)
 	private Integer serverId;
 	@EntityField(name = "日志内容长度", type = ApiParamType.INTEGER)

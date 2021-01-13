@@ -2,6 +2,7 @@ package codedriver.framework.notify.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import codedriver.framework.message.core.IMessageHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -13,26 +14,19 @@ import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
     private INotifyTriggerType triggerType;
-    private Class<? extends IMessageHandler> messageHandlerClass;
     private String title;
     private String content;
-    private List<String> toUserUuidList;
-    private List<String> toTeamUuidList;
-    private List<String> toRoleUuidList;
     private String fromUser;
     private String fromUserEmail;
     private JSONObject data;
-
+    private MessageHandlerAndRecipientVo messageHandlerAndRecipientVo;
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
-        this.messageHandlerClass = builder.messageHandlerClass;
         this.data = builder.data;
-        this.toUserUuidList = builder.toUserUuidList;
-        this.toTeamUuidList = builder.toTeamUuidList;
-        this.toRoleUuidList = builder.toRoleUuidList;
+        this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
         try {
             title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
@@ -75,15 +69,15 @@ public class NotifyVo {
     }
 
     public List<String> getToUserUuidList() {
-        return toUserUuidList;
+        return messageHandlerAndRecipientVo.toUserUuidList;
     }
 
     public List<String> getToTeamUuidList() {
-        return toTeamUuidList;
+        return messageHandlerAndRecipientVo.toTeamUuidList;
     }
 
     public List<String> getToRoleUuidList() {
-        return toRoleUuidList;
+        return messageHandlerAndRecipientVo.toRoleUuidList;
     }
 
     public List<String> getExceptionNotifyUserUuidList() {
@@ -111,7 +105,15 @@ public class NotifyVo {
     }
 
     public Class<? extends IMessageHandler> getMessageHandlerClass() {
-        return this.messageHandlerClass;
+        return messageHandlerAndRecipientVo.messageHandlerClass;
+    }
+
+    public MessageHandlerAndRecipientVo getMessageHandlerAndRecipientVo() {
+        return messageHandlerAndRecipientVo;
+    }
+
+    public void setMessageHandlerAndRecipientVo(MessageHandlerAndRecipientVo messageHandlerAndRecipientVo) {
+        this.messageHandlerAndRecipientVo = messageHandlerAndRecipientVo;
     }
 
     public static class Builder {
@@ -185,6 +187,38 @@ public class NotifyVo {
         public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
             this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;
             return this;
+        }
+    }
+
+    public static class MessageHandlerAndRecipientVo {
+
+        private Class<? extends IMessageHandler> messageHandlerClass;
+        private List<String> toUserUuidList;
+        private List<String> toTeamUuidList;
+        private List<String> toRoleUuidList;
+
+        public MessageHandlerAndRecipientVo(Builder builder) {
+            this.messageHandlerClass = builder.messageHandlerClass;
+            this.toUserUuidList = builder.toUserUuidList;
+            this.toTeamUuidList = builder.toTeamUuidList;
+            this.toRoleUuidList = builder.toRoleUuidList;
+        }
+
+        public Class<? extends IMessageHandler> getMessageHandlerClass() {
+            return messageHandlerClass;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            MessageHandlerAndRecipientVo that = (MessageHandlerAndRecipientVo) o;
+            return messageHandlerClass.equals(that.messageHandlerClass) && toUserUuidList.equals(that.toUserUuidList) && toTeamUuidList.equals(that.toTeamUuidList) && toRoleUuidList.equals(that.toRoleUuidList);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(messageHandlerClass, toUserUuidList, toTeamUuidList, toRoleUuidList);
         }
     }
 }

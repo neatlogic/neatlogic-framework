@@ -1,6 +1,6 @@
 package codedriver.framework.restful.annotation;
 
-import codedriver.framework.restful.core.constvalue.OperationTypeEnum;
+import codedriver.framework.restful.constvalue.OperationTypeEnum;
 
 import java.lang.annotation.*;
 

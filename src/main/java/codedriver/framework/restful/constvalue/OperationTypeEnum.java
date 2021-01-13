@@ -1,4 +1,4 @@
-package codedriver.framework.restful.core.constvalue;
+package codedriver.framework.restful.constvalue;
 
 import codedriver.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;

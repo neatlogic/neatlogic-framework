@@ -91,7 +91,7 @@ public class ApiValidateAndHelpBase {
 	/*
 	private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
 	private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
-	private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+	private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOLL);
 	*/
 
     private static String escapeXss(String str) {
@@ -150,7 +150,6 @@ public class ApiValidateAndHelpBase {
         Output output = method.getAnnotation(Output.class);
         if (output != null) {
             Param[] params = output.value();
-            JSONArray outputList = new JSONArray();
             JSONObject outputObj = new JSONObject();
             if (params.length > 0) {
                 for (Param p : params) {
@@ -164,7 +163,7 @@ public class ApiValidateAndHelpBase {
                                     for (Annotation annotation : annotations) {
                                         if (annotation.annotationType().equals(EntityField.class)) {
                                             EntityField entityField = (EntityField) annotation;
-                                            String type = "";
+                                            String type;
                                             if (entityField.type().getValue().equalsIgnoreCase("integer") || entityField.type().getValue().equalsIgnoreCase("long")
                                                     || entityField.type().getValue().equalsIgnoreCase("int")) {
                                                 type = "number";
@@ -218,7 +217,7 @@ public class ApiValidateAndHelpBase {
                 System.out.println("API:" + apiClass.getName());
                 System.out.println("返回参数：" + returnFormat.toJSONString());
                 System.out.println("接口配置：" + JSON.toJSONString(outputObj));
-                System.out.println("");
+                System.out.println();
             }
         }
     }
@@ -369,9 +368,9 @@ public class ApiValidateAndHelpBase {
                         if (params.length > 0) {
                             for (Param p : params) {
                                 if (!p.explode().getName().equals(NotDefined.class.getName())) {
-                                    String paramNamePrefix = p.name();
+                                    //String paramNamePrefix = p.name();
                                     if (!p.explode().isArray()) {
-                                        paramNamePrefix = StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? "" : paramNamePrefix + ".";
+                                        //paramNamePrefix = StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? "" : paramNamePrefix + ".";
                                         for (Field field : p.explode().getDeclaredFields()) {
                                             drawFieldMessageRecursive(field, outputList, true);
                                         }

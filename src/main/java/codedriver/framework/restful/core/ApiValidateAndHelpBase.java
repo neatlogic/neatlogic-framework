@@ -190,9 +190,9 @@ public class ApiValidateAndHelpBase {
                     if (obj.get(key) instanceof String) {
                         returnFormat.put(key, "string");
                     } else if (obj.get(key) instanceof JSONObject) {
-                        returnFormat.put(key, "jsonObject");
+                        returnFormat.put(key, "jsonobject");
                     } else if (obj.get(key) instanceof JSONArray) {
-                        returnFormat.put(key, "jsonArray");
+                        returnFormat.put(key, "jsonarray");
                     } else if (obj.get(key) instanceof Number) {
                         returnFormat.put(key, "number");
                     } else if (obj.get(key) instanceof Boolean) {

@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
@@ -41,6 +43,8 @@ public class Config {
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
     private static String HOME_URL;
     private static String USER_EXPIRETIME; // 会话超时时间
+    private static String RUN_MODE;//运行模式，为空代表PRD模式，可以设为DEVELOP模式，DEVELOP模式影响性能，但有更多提示
+
 
     private static String MINIO_URL;
     private static String MINIO_BUCKET;
@@ -53,8 +57,12 @@ public class Config {
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
         if (StringUtils.isBlank(CODEDRIVER_HOME)) {
-            CODEDRIVER_HOME = "/app";
+            CODEDRIVER_HOME = System.getProperty("codedriverhome");
+            if (StringUtils.isBlank(CODEDRIVER_HOME)) {
+                CODEDRIVER_HOME = "/app";
+            }
         }
+        RUN_MODE = StringUtils.isBlank(System.getProperty("runmode")) ? "PRD" : System.getProperty("runmode");
         try {
             SCHEDULE_SERVER_ID = Integer.parseInt(getProperty(CONFIG_FILE, "schedule.server.id", "1", true));
         } catch (Exception ex) {
@@ -64,79 +72,83 @@ public class Config {
         }
     }
 
-    public static final String CODEDRIVER_HOME() {
+    public static String CODEDRIVER_HOME() {
         return CODEDRIVER_HOME;
     }
 
-    public static final String JWT_SECRET() {
+    public static String JWT_SECRET() {
         return JWT_SECRET;
     }
 
-    public static final Map<String, String> ES_CLUSTERS() {
+    public static Map<String, String> ES_CLUSTERS() {
         return ES_CLUSTERS;
     }
 
-    public static final boolean ES_ENABLE() {
+    public static boolean ES_ENABLE() {
         return ES_ENABLE;
     }
 
-    public static final String DB_HOST() {
+    public static String DB_HOST() {
         return DB_HOST;
     }
 
-    public static final Integer DB_PORT() {
+    public static Integer DB_PORT() {
         return DB_PORT;
     }
 
-    public static final String DB_DRIVER() {
+    public static String DB_DRIVER() {
         return DB_DRIVER;
     }
 
-    public static final String DATA_HOME() {
+    public static String DATA_HOME() {
         if (!DATA_HOME.endsWith(File.separator)) {
             DATA_HOME += File.separator;
         }
         return DATA_HOME;
     }
 
-    public static final int SERVER_HEARTBEAT_RATE() {
+    public static int SERVER_HEARTBEAT_RATE() {
         return SERVER_HEARTBEAT_RATE;
     }
 
-    public static final int SERVER_HEARTBEAT_THRESHOLD() {
+    public static int SERVER_HEARTBEAT_THRESHOLD() {
         return SERVER_HEARTBEAT_THRESHOLD;
     }
 
-    public static final String HOME_URL() {
+    public static String HOME_URL() {
         return HOME_URL;
     }
 
-    public static final int USER_EXPIRETIME() {
-        return Integer.valueOf(USER_EXPIRETIME);
+    public static int USER_EXPIRETIME() {
+        return Integer.parseInt(USER_EXPIRETIME);
     }
 
-    public static final String MINIO_URL() {
+    public static String MINIO_URL() {
         return MINIO_URL;
     }
 
-    public static final String MINIO_ACCESSKEY() {
+    public static String MINIO_ACCESSKEY() {
         return MINIO_ACCESSKEY;
     }
 
-    public static final String MINIO_SECRETKEY() {
+    public static String MINIO_SECRETKEY() {
         return MINIO_SECRETKEY;
     }
 
-    public static final String MINIO_BUCKET() {
+    public static String MINIO_BUCKET() {
         return MINIO_BUCKET;
     }
 
-    public static final String MOBILE_TEST_USER() {
+    public static String MOBILE_TEST_USER() {
         return MOBILE_TEST_USER;
     }
 
     public static boolean IS_MAINTENANCE_MODE() {
         return IS_MAINTENANCE_MODE;
+    }
+
+    public static String RUN_MODE() {
+        return RUN_MODE;
     }
 
     @PostConstruct
@@ -167,7 +179,7 @@ public class Config {
                 prop.load(new ByteArrayInputStream(configInfo.getBytes()));
             } else {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
-                prop.load(new InputStreamReader(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE), "UTF-8"));
+                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
             }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
@@ -238,5 +250,6 @@ public class Config {
     public static String getProperty(String configFile, String keyName, boolean isRequired) {
         return getProperty(configFile, keyName, "", isRequired);
     }
+
 
 }

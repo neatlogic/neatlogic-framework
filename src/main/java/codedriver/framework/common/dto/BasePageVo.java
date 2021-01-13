@@ -38,7 +38,7 @@ public class BasePageVo {
     }
 
     public Boolean getNeedPage() {
-        return needPage;
+        return true;
     }
 
     public void setNeedPage(Boolean needPage) {
@@ -51,9 +51,8 @@ public class BasePageVo {
 
     public void setPageSize(Integer pageSize) {
         if (pageSize != null) {
-            this.pageSize = pageSize;
+            this.pageSize = Math.min(100, pageSize);//pagesize最大100
         }
-
     }
 
     public Integer getCurrentPage() {

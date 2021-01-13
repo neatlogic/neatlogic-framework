@@ -32,7 +32,7 @@
         WHERE `user_uuid` = #{userUuid}
         AND `is_read` = 0
         <if test="messageId != null">
-            AND `message_id` &lt;= #{messageId}
+            AND `message_id` &lt; #{messageId}
         </if>
     </select>
 
@@ -49,7 +49,7 @@
         WHERE a.`user_uuid` = #{userUuid}
         AND a.`is_read` = 0
         <if test="messageId != null">
-            AND a.`message_id` &lt;= #{messageId}
+            AND a.`message_id` &lt; #{messageId}
         </if>
         ORDER BY a.`message_id` DESC
         LIMIT #{startNum}, #{pageSize}

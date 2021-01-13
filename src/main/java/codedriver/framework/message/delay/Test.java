@@ -60,9 +60,9 @@ public class Test {
             String tenantUuid = entry.getKey();
             ConcurrentMap<NotifyVo, Object> notifyVoMap = entry.getValue();
             System.out.println(tenantUuid + ":" + notifyVoMap.size());
-//            for (Map.Entry<NotifyVo, Object> notifyEntry : notifyVoMap.entrySet()) {
-//                if (!tenantUuid.equals(notifyEntry.getKey().getTenantUuid())) {
-//                    System.out.println(tenantUuid + ":" + notifyEntry.getKey().getTenantUuid());
+//            for (NotifyVo notifyVo : notifyVoMap.keySet()) {
+//                if (!tenantUuid.equals(notifyVo.getTenantUuid())) {
+//                    System.out.println(tenantUuid + ":" + notifyVo.getTenantUuid());
 //                }
 //            }
         }

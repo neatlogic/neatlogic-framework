@@ -61,8 +61,8 @@ public class MessageSendThread extends CodeDriverThread {
             }
             ConcurrentMap<NotifyVo, Object> notifyVoMap = messageCache.getNotifyVoMap();
             /** 开始处理消息 **/
-            System.out.println(TenantContext.get().getTenantUuid() + ":" + notifyVoMap.size());
-            Test.putAllNotifyVoMap(notifyVoMap);
+//            System.out.println(TenantContext.get().getTenantUuid() + ":" + notifyVoMap.size());
+//            Test.putAllNotifyVoMap(notifyVoMap);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

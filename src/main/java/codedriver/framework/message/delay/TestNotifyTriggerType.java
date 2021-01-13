@@ -5,7 +5,7 @@ import codedriver.framework.notify.core.INotifyTriggerType;
 /**
  * @Title: TestNotifyTriggerType
  * @Package codedriver.framework.message.delay
- * @Description: TODO
+ * @Description: 测试触发点，用于压测
  * @Author: linbq
  * @Date: 2021/1/12 7:49
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
@@ -13,7 +13,7 @@ import codedriver.framework.notify.core.INotifyTriggerType;
  **/
 public enum TestNotifyTriggerType implements INotifyTriggerType {
 
-    TEST("test", "测试触发点","用于测试消息缓存");
+    TEST("test", "测试触发点", "用于测试消息缓存");
 
     private String trigger;
     private String text;

@@ -3,14 +3,12 @@ package codedriver.framework.message.delay;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.message.core.IMessageHandler;
-import codedriver.framework.message.dto.MessageVo;
-import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.notify.dto.NotifyVo;
 
 /**
  * @Title: MessageProducer
  * @Package codedriver.framework.message.delay
- * @Description: TODO
+ * @Description: 消息缓存生产消息任务类，用于压测
  * @Author: linbq
  * @Date: 2021/1/12 7:24
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
@@ -20,24 +18,23 @@ public class MessageProducerThread extends CodeDriverThread {
 
     private Class<? extends IMessageHandler> messageHandlerClass;
 
-    public MessageProducerThread(Class<? extends IMessageHandler> messageHandlerClass){
+    public MessageProducerThread(Class<? extends IMessageHandler> messageHandlerClass) {
         super.setThreadName("message-producer-thread-" + TenantContext.get().getTenantUuid());
         this.messageHandlerClass = messageHandlerClass;
     }
 
-    public MessageProducerThread(){
+    public MessageProducerThread() {
         super.setThreadName("message-producer-thread-" + TenantContext.get().getTenantUuid());
     }
 
     @Override
     protected void execute() {
-        System.out.println("MessageProducerThread.execute start...");
         MessageCache.add(getNotifyVo());
-        System.out.println("MessageProducerThread.execute end...");
     }
 
-    private NotifyVo getNotifyVo(){
+    private NotifyVo getNotifyVo() {
         NotifyVo.Builder builder = new NotifyVo.Builder(TestNotifyTriggerType.TEST, TestMessageHandler.class);
+//        builder.withTenantUuid(TenantContext.get().getTenantUuid());
         return builder.build();
     }
 }

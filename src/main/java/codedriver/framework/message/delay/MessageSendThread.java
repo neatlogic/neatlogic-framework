@@ -2,19 +2,17 @@ package codedriver.framework.message.delay;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.message.dto.MessageVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @Title: MessageSendThread
  * @Package codedriver.framework.message.delay
- * @Description: TODO
+ * @Description: 监听缓存对象的任务
  * @Author: linbq
  * @Date: 2021/1/10 16:45
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
@@ -26,40 +24,46 @@ public class MessageSendThread extends CodeDriverThread {
 
     private MessageCache messageCache;
 
-    public MessageSendThread(MessageCache messageCache){
+    public MessageSendThread(MessageCache messageCache) {
         super.setThreadName("MESSAGE-SEND-THREAD-" + TenantContext.get().getTenantUuid());
         this.messageCache = messageCache;
     }
 
     @Override
     protected void execute() {
-        System.out.println("MessageSendThread.execute start...");
-        while(true){
+        while (true) {
             long currentTimeMillis = System.currentTimeMillis();
-            if(currentTimeMillis >= messageCache.getMaxDelayTime()){
+            /** 如果当前时间大于最大延迟时间，则开始发送信息 **/
+            if (currentTimeMillis >= messageCache.getMaxDelayTime()) {
                 break;
             }
-            if(currentTimeMillis >= messageCache.getMinDelayTime()){
+            /** 如果当前时间大于最小延迟时间，则开始发送信息 **/
+            if (currentTimeMillis >= messageCache.getMinDelayTime()) {
                 break;
             }
-            try{
+            /** 睡眠到最小的延迟时间 **/
+            try {
                 TimeUnit.MILLISECONDS.sleep(messageCache.getMinDelayTime() - currentTimeMillis);
-            }catch (InterruptedException e){
-
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        try{
+        try {
+            MessageCache.clear();
+            /** 将缓存对象设置为失效 **/
             messageCache.setExpired(true);
-            while(messageCache.getWritingDataThreadNum() > 0) {
-                /** 如果还有线程正在往当前延迟对象中写数据 **/
-                synchronized(messageCache.getLock()) {
-                    /** 等待所有正在往当前延迟对象中写数据的线程完成后，唤醒当前线程 **/
-                    messageCache.getLock().wait();
+            while (messageCache.getWritingDataThreadNum() > 0) {
+                /** 如果还有线程正在往当前缓存对象中写数据 **/
+                synchronized (messageCache.getLOCK()) {
+                    /** 等待所有正在往当前缓存对象中写数据的线程完成后，唤醒当前线程 **/
+                    messageCache.getLOCK().wait();
                 }
             }
             ConcurrentMap<NotifyVo, Object> notifyVoMap = messageCache.getNotifyVoMap();
+            /** 开始处理消息 **/
             System.out.println(TenantContext.get().getTenantUuid() + ":" + notifyVoMap.size());
-        }catch(Exception e) {
+            Test.putAllNotifyVoMap(notifyVoMap);
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }

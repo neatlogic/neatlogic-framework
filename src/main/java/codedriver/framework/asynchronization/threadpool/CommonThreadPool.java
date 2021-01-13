@@ -47,5 +47,7 @@ public class CommonThreadPool {
 		return workQueue.size();
 	}
 	
-	
+	public static int getThreadActiveCount(){
+		return threadPoolExecutor.getActiveCount();
+	}
 }

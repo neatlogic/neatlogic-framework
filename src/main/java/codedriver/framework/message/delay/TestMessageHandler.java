@@ -5,7 +5,7 @@ import codedriver.framework.message.core.MessageHandlerBase;
 /**
  * @Title: TestMessageHandler
  * @Package codedriver.framework.message.delay
- * @Description: TODO
+ * @Description: 消息测试类型，用于压测
  * @Author: linbq
  * @Date: 2021/1/12 7:55
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.

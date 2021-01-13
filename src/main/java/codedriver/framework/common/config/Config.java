@@ -50,6 +50,9 @@ public class Config {
     private static String MOBILE_TEST_USER;//移动端测试用户
     private static Boolean IS_MAINTENANCE_MODE;
 
+    private static int NEW_MESSAGE_EXPIRED_DAY;
+    private static int HISTORY_MESSAGE_EXPIRED_DAY;
+
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
         if (StringUtils.isBlank(CODEDRIVER_HOME)) {
@@ -139,6 +142,13 @@ public class Config {
         return IS_MAINTENANCE_MODE;
     }
 
+    public static final int NEW_MESSAGE_EXPIRED_DAY(){
+        return NEW_MESSAGE_EXPIRED_DAY;
+    }
+
+    public static final int HISTORY_MESSAGE_EXPIRED_DAY(){
+        return HISTORY_MESSAGE_EXPIRED_DAY;
+    }
     @PostConstruct
     public void init() {
         try {
@@ -184,6 +194,8 @@ public class Config {
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
             IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
+            NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
+            HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "30"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
 

@@ -299,9 +299,21 @@
           AND `handler` = #{handler}
     </update>
 
-    <update id="deleteMessageUser" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+    <delete id="deleteMessageUser" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         DELETE FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
           AND `message_id` = #{messageId}
-    </update>
+    </delete>
+
+    <delete id="deleteMessageRecipientByLessThanMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_recipient` WHERE `message_id` &lt; #{value}
+    </delete>
+
+    <delete id="deleteMessageUserByLessThanMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_user` WHERE `message_id` &lt; #{value}
+    </delete>
+
+    <delete id="deleteMessageByLessThanId" parameterType="java.lang.Long">
+        DELETE FROM `message` WHERE `id` &lt; #{value}
+    </delete>
 </mapper>

@@ -62,4 +62,10 @@ public interface MessageMapper {
     public int updateMessageSubscribeActive(MessageHandlerVo messageHandlerVo);
 
     public int deleteMessageUser(MessageSearchVo messageSearchVo);
+
+    public int deleteMessageRecipientByLessThanMessageId(Long messageId);
+
+    public int deleteMessageUserByLessThanMessageId();
+
+    public int deleteMessageByLessThanId(Long messageId);
 }

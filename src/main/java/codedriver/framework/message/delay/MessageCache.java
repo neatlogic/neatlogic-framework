@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MessageCache {
     /** 缓存集合 **/
     private ConcurrentMap<NotifyVo, Object> notifyVoMap = new ConcurrentHashMap<>();
-    /** 最大缓存持续时间 **/
-    private final long maxDelayDuration = TimeUnit.SECONDS.toMillis(20);
-    /** 最小缓存持续时间 **/
-    private final long minDelayDuration = TimeUnit.SECONDS.toMillis(1);
+    /** 最大缓存持续时间，5分钟 **/
+    private final long maxDelayDuration = TimeUnit.MINUTES.toMillis(5);
+    /** 最小缓存持续时间，15秒 **/
+    private final long minDelayDuration = TimeUnit.SECONDS.toMillis(15);
     /** 最大缓存时间点，缓存对象创建时就确定了，不会变 **/
     private final long maxDelayTime;
     /** 最小缓存时间点，每次加入缓存数据都会改变这个值，新值 minDelayTime = System.currentTimeMillis() + minDelayDuration **/

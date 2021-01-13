@@ -154,7 +154,32 @@ public class ApiValidateAndHelpBase {
             JSONObject outputObj = new JSONObject();
             if (params.length > 0) {
                 for (Param p : params) {
-                    outputObj.put(p.name(), p.type().getValue());
+                    if (!p.explode().getName().equals(NotDefined.class.getName())) {
+                        if (p.explode().isArray()) {
+                            outputObj.put(p.name(), "jsonArray");
+                        } else {
+                            for (Field field : p.explode().getDeclaredFields()) {
+                                Annotation[] annotations = field.getDeclaredAnnotations();
+                                if (annotations.length > 0) {
+                                    for (Annotation annotation : annotations) {
+                                        if (annotation.annotationType().equals(EntityField.class)) {
+                                            EntityField entityField = (EntityField) annotation;
+                                            String type = "";
+                                            if (entityField.type().getValue().equalsIgnoreCase("integer") || entityField.type().getValue().equalsIgnoreCase("long")
+                                                    || entityField.type().getValue().equalsIgnoreCase("int")) {
+                                                type = "number";
+                                            } else {
+                                                type = entityField.type().getValue().toLowerCase();
+                                            }
+                                            outputObj.put(field.getName(), type);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        outputObj.put(p.name(), p.type().getValue());
+                    }
                 }
             }
             JSONObject returnObj = new JSONObject();
@@ -169,10 +194,8 @@ public class ApiValidateAndHelpBase {
                         returnFormat.put(key, "jsonObject");
                     } else if (obj.get(key) instanceof JSONArray) {
                         returnFormat.put(key, "jsonArray");
-                    } else if (obj.get(key) instanceof Integer) {
-                        returnFormat.put(key, "integer");
-                    } else if (obj.get(key) instanceof Long) {
-                        returnFormat.put(key, "long");
+                    } else if (obj.get(key) instanceof Number) {
+                        returnFormat.put(key, "number");
                     } else if (obj.get(key) instanceof Boolean) {
                         returnFormat.put(key, "boolean");
                     }
@@ -183,7 +206,7 @@ public class ApiValidateAndHelpBase {
                 for (String key : returnFormat.keySet()) {
                     if (!outputObj.containsKey(key)) {
                         isDifferent = true;
-                    } else if (!returnFormat.getString(key).equals(outputObj.getString(key))) {
+                    } else if (!returnFormat.getString(key).contains(outputObj.getString(key))) {
                         isDifferent = true;
                     }
                     if (isDifferent) {
@@ -326,22 +349,7 @@ public class ApiValidateAndHelpBase {
                         Param[] params = input.value();
                         if (params.length > 0) {
                             for (Param p : params) {
-                                /*
-                                 * if (!p.explode().getName().equals(NotDefined.class.getName())) { String
-                                 * paramNamePrefix = p.name(); if (!p.explode().isArray()) { paramNamePrefix =
-                                 * StringUtils.isBlank(paramNamePrefix) || "Return".equals(paramNamePrefix) ? ""
-                                 * : paramNamePrefix + "."; for (Field field : p.explode().getDeclaredFields())
-                                 * { drawFieldMessageRecursive(field, inputList, true); } } else { JSONObject
-                                 * paramObj = new JSONObject(); paramObj.put("name", p.name());
-                                 * paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" +
-                                 * ApiParamType.JSONARRAY.getText() + "]"); paramObj.put("description",
-                                 * p.desc()); JSONArray elementObjList = new JSONArray(); for (Field field :
-                                 * p.explode().getComponentType().getDeclaredFields()) {
-                                 * drawFieldMessageRecursive(field, elementObjList, true); } if
-                                 * (elementObjList.size() > 0) { paramObj.put("children", elementObjList); }
-                                 *
-                                 * inputList.add(paramObj); } } else {
-                                 */
+
                                 JSONObject paramObj = new JSONObject();
                                 paramObj.put("name", p.name());
                                 paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");

@@ -50,6 +50,9 @@ public class MessageSendThread extends CodeDriverThread {
 
     private MessageCache messageCache;
 
+    public MessageSendThread(){
+
+    }
     public MessageSendThread(MessageCache messageCache) {
         super.setThreadName("MESSAGE-SEND-THREAD-" + TenantContext.get().getTenantUuid());
         this.messageCache = messageCache;

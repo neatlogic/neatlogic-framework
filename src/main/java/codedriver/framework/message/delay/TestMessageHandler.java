@@ -1,6 +1,9 @@
 package codedriver.framework.message.delay;
 
 import codedriver.framework.message.core.MessageHandlerBase;
+import codedriver.framework.notify.dto.NotifyVo;
+
+import java.util.List;
 
 /**
  * @Title: TestMessageHandler
@@ -20,5 +23,15 @@ public class TestMessageHandler extends MessageHandlerBase {
     @Override
     public String getDescription() {
         return "用于测试消息缓存";
+    }
+
+    @Override
+    public boolean getNeedCompression() {
+        return false;
+    }
+
+    @Override
+    public NotifyVo compress(List<NotifyVo> notifyVoList) {
+        return null;
     }
 }

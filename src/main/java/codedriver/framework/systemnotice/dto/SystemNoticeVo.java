@@ -17,6 +17,34 @@ import java.util.Date;
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  **/
 public class SystemNoticeVo extends BaseEditorVo {
+
+    public enum Status{
+        NOTISSUED("not_issued","未下发",""),
+        ISSUED("issued","已下发",""),
+        STOPPED("stopped","停用","");
+        private String value;
+        private String text;
+        private String color;
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        private Status(String value, String text, String color) {
+            this.value = value;
+            this.text = text;
+            this.color = color;
+        }
+    }
+
     @EntityField(name = "公告id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "标题", type = ApiParamType.STRING)

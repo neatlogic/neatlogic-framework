@@ -2,5 +2,109 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.systemnotice.dao.mapper.SystemNoticeMapper">
 
+    <select id="getSystemNoticeBaseInfoById" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`,
+        `title`,
+        `content`,
+        `start_time` as startTime,
+        `end_time` as endTime,
+        `status`,
+        `pop_up` as popUp,
+        `ignore_read` as ignoreRead,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcd`
+        from
+        `system_notice`
+        where `id` = #{value}
+    </select>
+
+    <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        <if test="title != null and title != ''">
+            `title` = #{title},
+        </if>
+        <if test="content != null and content != ''">
+            `content` = #{content},
+        </if>
+        <if test="startTime != null">
+            `start_time` = #{startTime},
+        </if>
+        <if test="endTime != null">
+            `end_time` = #{endTime},
+        </if>
+        <if test="popUp != null and popUp != ''">
+            `pop_up` = #{popUp},
+        </if>
+        <if test="ignoreRead != null and ignoreRead != ''">
+            `ignore_read` = #{ignoreRead},
+        </if>
+        where `id` = #{id}
+    </update>
+
+    <insert id="insertSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        insert into
+        `system_notice`(
+        `id`,
+        `title`,
+        `content`,
+        `start_time`,
+        `end_time`,
+        `status`,
+        `pop_up`,
+        `ignore_read`,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcd`
+        )values(
+        #{id},
+        #{title},
+        #{content},
+        #{startTime},
+        #{endTime},
+        #{status},
+        #{popUp},
+        #{ignoreRead},
+        now(3),
+        #{fcu},
+        now(3),
+        #{lcu}
+        )
+    </insert>
+
+    <insert id="batchInsertSystemNoticeRecipient" parameterType="java.util.List">
+        INSERT INTO `system_notice_recipient`(
+        `system_notice_id`,
+        `uuid`,
+        `type`
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.systemNoticeId},
+            #{item.uuid},
+            #{item.type}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteRecipientByNoticeId" parameterType="java.lang.Long">
+        delete
+        from
+        `system_notice_recipient`
+        where `system_notice_id` = #{value}
+    </delete>
+
+    <delete id="deleteNoticeUserByNoticeId" parameterType="java.lang.Long">
+        delete
+        from
+        `system_notice_user`
+        where `system_notice_id` = #{value}
+    </delete>
 
 </mapper>

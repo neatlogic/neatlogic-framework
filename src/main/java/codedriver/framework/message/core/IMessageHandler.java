@@ -3,6 +3,8 @@ package codedriver.framework.message.core;
 import codedriver.framework.notify.dto.NotifyVo;
 import org.springframework.util.ClassUtils;
 
+import java.util.List;
+
 /**
  * @Title: IMessageHandler
  * @Package codedriver.framework.message.core
@@ -14,40 +16,58 @@ import org.springframework.util.ClassUtils;
  **/
 public interface IMessageHandler {
     /**
-     * @Description:
+     * @Description: 消息类型名称
      * @Author: linbq
      * @Date: 2021/1/7 11:45
      * @Params:[]
      * @Returns:java.lang.String
      **/
-    String getName();
+    public String getName();
 
     /**
-     * @Description:
+     * @Description: 消息类型处理器全类名
      * @Author: linbq
      * @Date: 2020/12/30 15:11
      * @Params:[]
      * @Returns:java.lang.String
      **/
-    default String getHandler() {
+    public default String getHandler() {
         return ClassUtils.getUserClass(this.getClass()).getName();
     }
 
     /**
-     * @Description:
+     * @Description: 消息类型描述
      * @Author: linbq
      * @Date: 2020/12/30 15:11
      * @Params:[]
      * @Returns:java.lang.String
      **/
-    String getDescription();
+    public String getDescription();
 
     /**
-     * @Description:
+     * @Description: 发送消息
      * @Author: linbq
      * @Date: 2020/12/30 15:11
      * @Params:[messageVo]
      * @Returns:void
      **/
-    void send(NotifyVo notifyVo);
+    public void send(NotifyVo notifyVo);
+
+    /**
+     * @Description: 该类型消息是否需要压缩
+     * @Author: linbq
+     * @Date: 2021/1/13 11:36
+     * @Params:[]
+     * @Returns:boolean
+     **/
+    public boolean getNeedCompression();
+
+    /**
+     * @Description: 将多条消息压缩成一条消息
+     * @Author: linbq
+     * @Date: 2021/1/13 11:37
+     * @Params:[notifyVoList]
+     * @Returns:codedriver.framework.notify.dto.NotifyVo
+     **/
+    public NotifyVo compress(List<NotifyVo> notifyVoList);
 }

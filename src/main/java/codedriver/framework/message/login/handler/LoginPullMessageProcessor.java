@@ -1,6 +1,7 @@
 package codedriver.framework.message.login.handler;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -102,7 +103,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
      **/
     private Long getMinMessageId(){
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - 7);
+        calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - Config.NEW_MESSAGE_EXPIRED_DAY());
         Date earliestSendingTime = calendar.getTime();
 
         Date lastPullTime = null;

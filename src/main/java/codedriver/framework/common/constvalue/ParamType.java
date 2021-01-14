@@ -8,7 +8,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public enum ParamType {
+public enum ParamType implements IEnum{
 	STRING("string","字符串",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
 	NUMBER("number","数字",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
 	ARRAY("array","数组",Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
@@ -77,5 +77,20 @@ public enum ParamType {
 			default : break;
 		}
 		return null;
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for (ParamType type : ParamType.values()) {
+			array.add(new JSONObject(){
+				{
+					this.put("value",type.getName());
+					this.put("text",type.getText());
+				}
+			});
+		}
+		return array;
 	}
 }

@@ -1,10 +1,5 @@
 package codedriver.framework.scheduler.heartbreak;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
@@ -14,6 +9,10 @@ import codedriver.framework.scheduler.core.SchedulerManager;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import codedriver.framework.scheduler.dto.JobLockVo;
 import codedriver.framework.scheduler.dto.JobObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
@@ -40,7 +39,6 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			schedulerMapper.resetJobLockByServerId(serverId);
 			// 接管异常server的作业
 			List<JobLockVo> jobLockList = schedulerMapper.getJobLockByServerId(serverId);
-			// TODO 获取所有tenant
 			for (JobLockVo jobLockVo : jobLockList) {
 				if (!schedulerManager.checkJobIsExists(jobLockVo.getJobName(), jobLockVo.getJobGroup())) {
 					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobHandler());

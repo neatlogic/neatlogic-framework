@@ -4,8 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import codedriver.framework.common.constvalue.Expression;
+import codedriver.framework.common.constvalue.IEnum;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
-public enum MatrixAttributeType {
+public enum MatrixAttributeType implements IEnum {
 	INPUT("input","文本框", Arrays.asList(Expression.EQUAL, Expression.LIKE), Expression.LIKE),
 	SELECT("select","下拉框", Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
 	DATE("date","日期", Arrays.asList(Expression.EQUAL, Expression.LESSTHAN,Expression.GREATERTHAN), Expression.EQUAL),
@@ -53,5 +56,20 @@ public enum MatrixAttributeType {
 			}
 		}
 		return null;
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for(MatrixAttributeType type : MatrixAttributeType.values()){
+			array.add(new JSONObject(){
+				{
+					this.put("value",type.getValue());
+					this.put("text",type.getText());
+				}
+			});
+		}
+		return array;
 	}
 }

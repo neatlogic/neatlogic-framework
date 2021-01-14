@@ -1,6 +1,12 @@
 package codedriver.framework.integration.authentication.costvalue;
 
-public enum AuthenticateType {
+import codedriver.framework.common.constvalue.IEnum;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum AuthenticateType implements IEnum {
 	NOAUTH("noauth", "无需认证"), BUILDIN("buildin", "内部验证"), BASIC("basicauth", "Basic认证"), BEARER("bearertoken", "Bearer Token");
 
 	private String type;
@@ -17,5 +23,20 @@ public enum AuthenticateType {
 
 	public String getText() {
 		return this.text;
+	}
+
+
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for(AuthenticateType type : AuthenticateType.values()){
+			array.add(new JSONObject(){
+				{
+					this.put("value",type.getValue());
+					this.put("text",type.getText());
+				}
+			});
+		}
+		return array;
 	}
 }

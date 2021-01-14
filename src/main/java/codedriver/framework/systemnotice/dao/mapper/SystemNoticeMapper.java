@@ -18,11 +18,15 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeBaseInfoById(Long id);
 
+    public SystemNoticeVo getSystemNoticeById(Long id);
+
     public int updateSystemNotice(SystemNoticeVo vo);
 
     public int insertSystemNotice(SystemNoticeVo vo);
 
     public int batchInsertSystemNoticeRecipient(List<SystemNoticeRecipientVo> recipientVoList);
+
+    public int deleteSystemNoticeById(Long id);
 
     public int deleteRecipientByNoticeId(Long id);
 

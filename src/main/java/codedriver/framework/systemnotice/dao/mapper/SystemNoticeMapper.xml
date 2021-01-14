@@ -21,6 +21,47 @@
         where `id` = #{value}
     </select>
 
+    <resultMap id="systemNoticeMap" type="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="status" column="status"/>
+        <result property="popUp" column="popUp"/>
+        <result property="fcd" column="fcd"/>
+        <result property="lcd" column="lcd"/>
+        <result property="fcu" column="lcd"/>
+        <result property="lcu" column="lcd"/>
+        <collection property="recipientVoList" ofType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
+            <result property="uuid" column="recipientUuid" />
+            <result property="type" column="recipientType" />
+        </collection>
+    </resultMap>
+
+    <select id="getSystemNoticeById" parameterType="java.lang.Long" resultMap="systemNoticeMap">
+        select
+        a.`id`,
+        a.`title`,
+        a.`content`,
+        a.`start_time` as startTime,
+        a.`end_time` as endTime,
+        a.`status`,
+        a.`pop_up` as popUp,
+        a.`ignore_read` as ignoreRead,
+        a.`fcd`,
+        a.`fcu`,
+        a.`lcd`,
+        a.`lcu`,
+        b.`uuid` as recipientUuid,
+        b.`type` as recipientType
+        from
+        `system_notice` a
+        left join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where a.`id` = #{value}
+    </select>
+
     <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
@@ -63,7 +104,7 @@
         #{content},
         #{startTime},
         #{endTime},
-        #{status},
+        'not_issued',
         #{popUp},
         #{ignoreRead},
         now(3),
@@ -88,6 +129,12 @@
             )
         </foreach>
     </insert>
+
+    <delete id="deleteSystemNoticeById" parameterType="java.lang.Long">
+        delete
+        from `system_notice`
+        where `id` = #{value}
+    </delete>
 
     <delete id="deleteRecipientByNoticeId" parameterType="java.lang.Long">
         delete

@@ -1,11 +1,16 @@
 package codedriver.framework.systemnotice.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BaseEditorVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Title: SystemNoticeVo
@@ -61,6 +66,13 @@ public class SystemNoticeVo extends BaseEditorVo {
     private String popUp;
     @EntityField(name = "是否忽略已读", type = ApiParamType.INTEGER)
     private Integer ignoreRead;
+
+    @EntityField(name = "通知对象Vo列表", type = ApiParamType.JSONARRAY)
+    @JSONField(serialize = false)
+    private transient List<SystemNoticeRecipientVo> recipientVoList;
+
+    @EntityField(name = "通知对象列表",type = ApiParamType.JSONARRAY)
+    private List<String> recipientList;
 
     public Long getId() {
         if (id == null) {
@@ -127,5 +139,30 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public void setIgnoreRead(Integer ignoreRead) {
         this.ignoreRead = ignoreRead;
+    }
+
+    public List<SystemNoticeRecipientVo> getRecipientVoList() {
+        return recipientVoList;
+    }
+
+    public void setRecipientVoList(List<SystemNoticeRecipientVo> recipientVoList) {
+        this.recipientVoList = recipientVoList;
+    }
+
+    public void setRecipientList(List<String> recipientList) {
+        this.recipientList = recipientList;
+    }
+
+    public List<String> getRecipientList() {
+        if(CollectionUtils.isEmpty(recipientList) && CollectionUtils.isNotEmpty(recipientVoList)){
+            recipientList = new ArrayList<>();
+            for(SystemNoticeRecipientVo vo : recipientVoList){
+                GroupSearch groupSearch = GroupSearch.getGroupSearch(vo.getType());
+                if(groupSearch != null) {
+                    recipientList.add(groupSearch.getValuePlugin() + vo.getUuid());
+                }
+            }
+        }
+        return recipientList;
     }
 }

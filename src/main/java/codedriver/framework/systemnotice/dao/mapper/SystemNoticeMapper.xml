@@ -62,6 +62,57 @@
         where a.`id` = #{value}
     </select>
 
+    <select id="searchSystemNoticeCount" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo" resultType="int">
+        select
+        count(1)
+        from `system_notice`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `title` LIKE CONCAT('%', #{keyword}, '%')
+                or
+                `content` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="searchSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`,
+        `title`,
+        `content`,
+        `start_time` as startTime,
+        `end_time` as endTime,
+        `status`,
+        `pop_up` as popUp,
+        `ignore_read` as ignoreRead,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcu`
+        from
+        `system_notice`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `title` LIKE CONCAT('%', #{keyword}, '%')
+                or
+                `content` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        order by `id` desc
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getRecipientListByNoticeId" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
+        select
+        `system_notice_id` as systemNoticeId,
+        `uuid`,
+        `type`
+        from `system_notice_recipient`
+        where `system_notice_id` = #{value}
+    </select>
+
     <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`

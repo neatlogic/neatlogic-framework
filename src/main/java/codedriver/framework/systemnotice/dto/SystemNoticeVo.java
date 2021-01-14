@@ -5,6 +5,7 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BaseEditorVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -48,6 +49,19 @@ public class SystemNoticeVo extends BaseEditorVo {
             this.text = text;
             this.color = color;
         }
+
+        public static JSONObject getStatus(String value){
+            for(Status status : Status.values()){
+                if(status.getValue().equals(value)){
+                    JSONObject obj = new JSONObject();
+                    obj.put("value",value);
+                    obj.put("text",status.getText());
+                    obj.put("color",status.getColor());
+                    return obj;
+                }
+            }
+            return null;
+        }
     }
 
     @EntityField(name = "公告id", type = ApiParamType.LONG)
@@ -73,6 +87,12 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     @EntityField(name = "通知对象列表",type = ApiParamType.JSONARRAY)
     private List<String> recipientList;
+
+    @EntityField(name = "通知对象列表，供前端组件使用",type = ApiParamType.JSONARRAY)
+    private List<Object> recipientObjList;
+
+    @EntityField(name = "状态vo", type = ApiParamType.JSONOBJECT)
+    private JSONObject statusVo;
 
     public Long getId() {
         if (id == null) {
@@ -164,5 +184,21 @@ public class SystemNoticeVo extends BaseEditorVo {
             }
         }
         return recipientList;
+    }
+
+    public List<Object> getRecipientObjList() {
+        return recipientObjList;
+    }
+
+    public void setRecipientObjList(List<Object> recipientObjList) {
+        this.recipientObjList = recipientObjList;
+    }
+
+    public JSONObject getStatusVo() {
+        return statusVo;
+    }
+
+    public void setStatusVo(JSONObject statusVo) {
+        this.statusVo = statusVo;
     }
 }

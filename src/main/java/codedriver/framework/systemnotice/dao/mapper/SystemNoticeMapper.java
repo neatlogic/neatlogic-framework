@@ -20,6 +20,12 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeById(Long id);
 
+    public List<SystemNoticeVo> searchSystemNotice(SystemNoticeVo vo);
+
+    public int searchSystemNoticeCount(SystemNoticeVo vo);
+
+    public List<SystemNoticeRecipientVo> getRecipientListByNoticeId(Long id);
+
     public int updateSystemNotice(SystemNoticeVo vo);
 
     public int insertSystemNotice(SystemNoticeVo vo);

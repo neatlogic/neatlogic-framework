@@ -15,7 +15,7 @@
         `fcd`,
         `fcu`,
         `lcd`,
-        `lcd`
+        `lcu`
         from
         `system_notice`
         where `id` = #{value}
@@ -25,12 +25,6 @@
         update
         `system_notice`
         set
-        <if test="title != null and title != ''">
-            `title` = #{title},
-        </if>
-        <if test="content != null and content != ''">
-            `content` = #{content},
-        </if>
         <if test="startTime != null">
             `start_time` = #{startTime},
         </if>
@@ -43,6 +37,8 @@
         <if test="ignoreRead != null and ignoreRead != ''">
             `ignore_read` = #{ignoreRead},
         </if>
+        `title` = #{title},
+        `content` = #{content}
         where `id` = #{id}
     </update>
 
@@ -60,7 +56,7 @@
         `fcd`,
         `fcu`,
         `lcd`,
-        `lcd`
+        `lcu`
         )values(
         #{id},
         #{title},

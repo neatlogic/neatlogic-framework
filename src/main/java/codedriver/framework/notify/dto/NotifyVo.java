@@ -208,6 +208,18 @@ public class NotifyVo {
             return messageHandlerClass;
         }
 
+        public List<String> getToUserUuidList() {
+            return toUserUuidList;
+        }
+
+        public List<String> getToTeamUuidList() {
+            return toTeamUuidList;
+        }
+
+        public List<String> getToRoleUuidList() {
+            return toRoleUuidList;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;

@@ -114,7 +114,8 @@ public class MessageSendThread extends CodeDriverThread {
         List<MessageSearchVo> messageSearchVoList = new ArrayList<>();
         for(Map.Entry<NotifyVo.MessageHandlerAndRecipientVo, List<NotifyVo>> entry : notifyVoListMap.entrySet()){
             NotifyVo.MessageHandlerAndRecipientVo messageHandlerAndRecipientVo = entry.getKey();
-            IMessageHandler messageHandler = MessageHandlerFactory.getHandler(messageHandlerAndRecipientVo.getMessageHandlerClass().getName());
+            String handler = messageHandlerAndRecipientVo.getMessageHandlerClass().getName();
+            IMessageHandler messageHandler = MessageHandlerFactory.getHandler(handler);
             if(messageHandler != null){
                 List<NotifyVo> notifyList = new ArrayList<>();
                 List<NotifyVo> notifyVoList = entry.getValue();
@@ -128,30 +129,40 @@ public class MessageSendThread extends CodeDriverThread {
                 }else{
                     notifyList = notifyVoList;
                 }
+                /** 计算出用户登录失效时间点 **/
+                long expireTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Config.USER_EXPIRETIME());
+                /** 根据用户、组、角色和登录失效时间点，找出所有在线用户 **/
+                List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
+                        messageHandlerAndRecipientVo.getToUserUuidList(), messageHandlerAndRecipientVo.getToTeamUuidList(), messageHandlerAndRecipientVo.getToRoleUuidList(), new Date(expireTime));
+
+                List<String> toUserUuidList = messageHandlerAndRecipientVo.getToUserUuidList();
+                if(CollectionUtils.isNotEmpty(toUserUuidList)){
+                    if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
+                        /** 去掉所有在线用户 **/
+                        toUserUuidList.removeAll(onlineUserUuidList);
+                    }
+                    if(CollectionUtils.isNotEmpty(toUserUuidList)) {
+                        List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(handler, toUserUuidList);
+                        if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
+                            /** 去掉所有取消订阅用户 **/
+                            toUserUuidList.removeAll(unsubscribedUserUuidList);
+                        }
+                    }
+                }
+
+                /** 直接发送给已订阅的在线用户 **/
+                if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
+                    List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(handler, onlineUserUuidList);
+                    if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
+                        /** 去掉所有取消订阅用户 **/
+                        onlineUserUuidList.removeAll(unsubscribedUserUuidList);
+                    }
+                }
                 for(NotifyVo notifyVo : notifyList){
                     MessageVo messageVo = new MessageVo(notifyVo);
                     messageVoList.add(messageVo);
-                    /** 计算出用户登录失效时间点 **/
-                    long expireTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Config.USER_EXPIRETIME());
-                    /** 根据用户、组、角色和登录失效时间点，找出所有在线用户 **/
-                    List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
-                            notifyVo.getToUserUuidList(), notifyVo.getToTeamUuidList(), notifyVo.getToRoleUuidList(), new Date(expireTime));
-                    if(CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())){
-                        List<String> toUserUuidList = notifyVo.getToUserUuidList();
-                        if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
-                            /** 去掉所有在线用户 **/
-                            toUserUuidList.removeAll(onlineUserUuidList);
-                        }
-                        if(CollectionUtils.isNotEmpty(toUserUuidList)) {
-                            List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(messageVo.getHandler(), toUserUuidList);
-                            if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
-                                /** 去掉所有取消订阅用户 **/
-                                toUserUuidList.removeAll(unsubscribedUserUuidList);
-                            }
-                            for (String userUuid : toUserUuidList) {
-                                messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), userUuid));
-                            }
-                        }
+                    for (String userUuid : toUserUuidList) {
+                        messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.USER.getValue(), userUuid));
                     }
                     for(String teamUuid : notifyVo.getToTeamUuidList()){
                         messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.TEAM.getValue(), teamUuid));
@@ -159,21 +170,12 @@ public class MessageSendThread extends CodeDriverThread {
                     for(String roleUuid : notifyVo.getToRoleUuidList()){
                         messageRecipientVoList.add(new MessageRecipientVo(messageVo.getId(), GroupSearch.ROLE.getValue(), roleUuid));
                     }
-
-                    /** 直接发送给已订阅的在线用户 **/
-                    if(CollectionUtils.isNotEmpty(onlineUserUuidList)){
-                        List<String> unsubscribedUserUuidList = messageMapper.getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(messageVo.getHandler(), onlineUserUuidList);
-                        if(CollectionUtils.isNotEmpty(unsubscribedUserUuidList)){
-                            /** 去掉所有取消订阅用户 **/
-                            onlineUserUuidList.removeAll(unsubscribedUserUuidList);
-                        }
-                        for(String userUuid : onlineUserUuidList){
-                            messageSearchVoList.add(new MessageSearchVo(userUuid, messageVo.getId()));
-                        }
+                    for(String userUuid : onlineUserUuidList){
+                        messageSearchVoList.add(new MessageSearchVo(userUuid, messageVo.getId()));
                     }
-                }
-                if(messageVoList.size() >= BATCH_INSERT_MAX_COUNT){
-                    batchInsertData(messageVoList, messageRecipientVoList, messageSearchVoList);
+                    if(messageVoList.size() >= BATCH_INSERT_MAX_COUNT){
+                        batchInsertData(messageVoList, messageRecipientVoList, messageSearchVoList);
+                    }
                 }
             }
         }

@@ -177,7 +177,12 @@ public class ApiValidateAndHelpBase {
                             }
                         }
                     } else {
-                        outputObj.put(p.name(), p.type().getValue());
+                        if (p.type().getValue().equalsIgnoreCase("integer") || p.type().getValue().equalsIgnoreCase("long")
+                                || p.type().getValue().equalsIgnoreCase("int")) {
+                            outputObj.put(p.name(), "number");
+                        } else {
+                            outputObj.put(p.name(), p.type().getValue().toLowerCase());
+                        }
                     }
                 }
             }

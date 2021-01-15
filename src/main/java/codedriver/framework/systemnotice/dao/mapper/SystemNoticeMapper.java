@@ -22,6 +22,8 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeById(Long id);
 
+    public List<SystemNoticeVo> getSystemNoticeLockByIdList(List<Long> idList);
+
     public List<SystemNoticeVo> searchSystemNotice(SystemNoticeVo vo);
 
     public int searchSystemNoticeCount(SystemNoticeVo vo);
@@ -29,6 +31,26 @@ public interface SystemNoticeMapper {
     public List<SystemNoticeRecipientVo> getRecipientListByNoticeId(Long id);
 
     public int getNotReadNoticeUserCountByNoticeId(Long id);
+
+    public List<Long> getNoticeIdListByRecipientUuidList(List<String> uuidList);
+
+    /**
+     * @Description: 根据通知对象uuid获取超过生效时间的公告
+     * @Author: laiwt
+     * @Date: 2021/1/15 16:07
+     * @Params: [uuidList]
+     * @Returns: java.util.List<codedriver.framework.systemnotice.dto.SystemNoticeVo>
+    **/
+    public List<SystemNoticeVo> getExpiredNoticeListByRecipientUuidList(List<String> uuidList);
+
+    /**
+     * @Description: 根据通知对象uuid获取到了生效时间、状态是未发布的公告
+     * @Author: laiwt
+     * @Date: 2021/1/15 16:23
+     * @Params: [uuidList]
+     * @Returns: java.util.List<codedriver.framework.systemnotice.dto.SystemNoticeVo>
+    **/
+    public List<SystemNoticeVo> getHasBeenActiveNoticeListByRecipientUuidList(List<String> uuidList);
 
     public int updateSystemNotice(SystemNoticeVo vo);
 
@@ -42,7 +64,23 @@ public interface SystemNoticeMapper {
 
     public int deleteRecipientByNoticeId(Long id);
 
+    /**
+     * @Description: 批量删除system_notice_user
+     * @Author: laiwt
+     * @Date: 2021/1/15 17:11
+     * @Params: [id, isRead, limitCount]
+     * @Returns: int
+    **/
     public int deleteNoticeUserByNoticeId(@Param("noticeId") Long id,@Param("isRead") Integer isRead,@Param("limitCount") Integer limitCount);
+
+    /**
+     * @Description: 根据userUuid清理system_notice_user中不存在的公告记录
+     * @Author: laiwt
+     * @Date: 2021/1/15 16:06
+     * @Params: [uuid]
+     * @Returns: int
+    **/
+    public int deleteNotExistsNoticeByUserUuid(String uuid);
 
 
 }

@@ -21,6 +21,18 @@
         where `id` = #{value}
     </select>
 
+    <select id="getSystemNoticeLockByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`
+        from
+        `system_notice`
+        where `id` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        for update
+    </select>
+
     <resultMap id="systemNoticeMap" type="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
@@ -120,6 +132,56 @@
         `system_notice_user`
         where `system_notice_id` = #{value}
         and `is_read` = 0
+    </select>
+
+    <select id="getNoticeIdListByRecipientUuidList" parameterType="java.lang.String" resultType="java.lang.Long">
+        select
+        distinct a.`id`
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` = 'issued'
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getExpiredNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        distinct
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` = 'issued'
+        and a.`end_time` &lt; now(3)
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getHasBeenActiveNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        distinct
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` = 'not_issued'
+        and a.`start_time` &gt;= now(3)
+        and a.`end_time` &lt; now(3)
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
     <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -238,6 +300,14 @@
         <if test="limitCount != null">
             limit #{limitCount}
         </if>
+    </delete>
+
+    <delete id="deleteNotExistsNoticeByUserUuid" parameterType="java.lang.String">
+        delete
+		from `system_notice_user`
+		where `user_uuid` = #{value}
+		and `system_notice_id` not in
+		(select `id` from `system_notice`)
     </delete>
 
 </mapper>

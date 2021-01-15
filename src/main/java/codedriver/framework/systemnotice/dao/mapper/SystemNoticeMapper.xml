@@ -117,6 +117,12 @@
         update
         `system_notice`
         set
+        <if test="title != null and title != ''">
+            `title` = #{title},
+        </if>
+        <if test="content != null and content != ''">
+            `content` = #{content},
+        </if>
         <if test="startTime != null">
             `start_time` = #{startTime},
         </if>
@@ -126,11 +132,10 @@
         <if test="popUp != null and popUp != ''">
             `pop_up` = #{popUp},
         </if>
-        <if test="ignoreRead != null and ignoreRead != ''">
+        <if test="ignoreRead != null">
             `ignore_read` = #{ignoreRead},
         </if>
-        `title` = #{title},
-        `content` = #{content}
+        `lcd` = now(3)
         where `id` = #{id}
     </update>
 

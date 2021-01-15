@@ -1,7 +1,9 @@
 package codedriver.framework.systemnotice.dao.mapper;
 
 import codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo;
+import codedriver.framework.systemnotice.dto.SystemNoticeUserVo;
 import codedriver.framework.systemnotice.dto.SystemNoticeVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -26,17 +28,21 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeRecipientVo> getRecipientListByNoticeId(Long id);
 
+    public int getNotReadNoticeUserCountByNoticeId(Long id);
+
     public int updateSystemNotice(SystemNoticeVo vo);
 
     public int insertSystemNotice(SystemNoticeVo vo);
 
     public int batchInsertSystemNoticeRecipient(List<SystemNoticeRecipientVo> recipientVoList);
 
+    public int batchInsertSystemNoticeUser(List<SystemNoticeUserVo> recipientUserList);
+
     public int deleteSystemNoticeById(Long id);
 
     public int deleteRecipientByNoticeId(Long id);
 
-    public int deleteNoticeUserByNoticeId(Long id);
+    public int deleteNoticeUserByNoticeId(@Param("noticeId") Long id,@Param("isRead") Integer isRead,@Param("limitCount") Integer limitCount);
 
 
 }

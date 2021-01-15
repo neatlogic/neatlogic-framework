@@ -20,6 +20,11 @@ public class SystemNoticeUserVo {
     @EntityField(name = "是否已读(1:已读;0:未读)", type = ApiParamType.INTEGER)
     private Integer isRead;
 
+    public SystemNoticeUserVo(Long systemNoticeId, String userUuid) {
+        this.systemNoticeId = systemNoticeId;
+        this.userUuid = userUuid;
+    }
+
     public Long getSystemNoticeId() {
         return systemNoticeId;
     }

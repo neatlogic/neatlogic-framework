@@ -114,6 +114,8 @@ public interface UserMapper {
             @Param("roleUuidList") List<String> roleUuidList,
             @Param("sessionTime") Date sessionTime);
 
+    public List<String> getAllOnlineUser(Date sessionTime);
+
     public int insertUserAuth(UserAuthVo userAuthVo);
 
     public int insertUser(UserVo userVo);

@@ -113,6 +113,15 @@
         where `system_notice_id` = #{value}
     </select>
 
+    <select id="getNotReadNoticeUserCountByNoticeId" parameterType="java.lang.Long" resultType="int">
+        select
+        count(1)
+        from
+        `system_notice_user`
+        where `system_notice_id` = #{value}
+        and `is_read` = 0
+    </select>
+
     <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
@@ -122,6 +131,9 @@
         </if>
         <if test="content != null and content != ''">
             `content` = #{content},
+        </if>
+        <if test="status != null and status != ''">
+            `status` = #{status},
         </if>
         <if test="startTime != null">
             `start_time` = #{startTime},
@@ -170,7 +182,7 @@
         )
     </insert>
 
-    <insert id="batchInsertSystemNoticeRecipient" parameterType="java.util.List">
+    <insert id="batchInsertSystemNoticeRecipient" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
         INSERT INTO `system_notice_recipient`(
         `system_notice_id`,
         `uuid`,
@@ -182,6 +194,22 @@
             #{item.systemNoticeId},
             #{item.uuid},
             #{item.type}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertSystemNoticeUser" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeUserVo">
+        INSERT IGNORE INTO `system_notice_user`(
+        `system_notice_id`,
+        `user_uuid`,
+        `is_read`
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.systemNoticeId},
+            #{item.userUuid},
+            0
             )
         </foreach>
     </insert>
@@ -203,7 +231,13 @@
         delete
         from
         `system_notice_user`
-        where `system_notice_id` = #{value}
+        where `system_notice_id` = #{noticeId}
+        <if test="isRead != null">
+            and `is_read` = #{isRead}
+        </if>
+        <if test="limitCount != null">
+            limit #{limitCount}
+        </if>
     </delete>
 
 </mapper>

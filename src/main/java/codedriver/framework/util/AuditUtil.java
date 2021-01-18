@@ -151,6 +151,9 @@ public class AuditUtil {
                         len = (int) (len - (endPoint - offset));
                     }
                     sb.append(new String(buff, 0, len, StandardCharsets.UTF_8));
+                    if (endPoint > offset) {
+                        break;
+                    }
                 }
                 result = sb.toString();
             }
@@ -211,6 +214,9 @@ public class AuditUtil {
                     }
                     os.write(buff, 0, len);
                     os.flush();
+                    if (endPoint > offset) {
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {

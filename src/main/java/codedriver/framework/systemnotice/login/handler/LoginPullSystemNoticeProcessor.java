@@ -51,10 +51,12 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
         /** 检查是否存在【已发布却到了失效时间的】公告，如果有，则停用 **/
         List<SystemNoticeVo> expiredNoticeList = systemNoticeMapper.getExpiredNoticeListByRecipientUuidList(uuidList);
         if (CollectionUtils.isNotEmpty(expiredNoticeList)) {
+            TransactionStatus transactionStatus = TransactionUtil.openTx();
             for (SystemNoticeVo vo : expiredNoticeList) {
                 vo.setStatus(SystemNoticeVo.Status.STOPPED.getValue());
                 systemNoticeMapper.updateSystemNotice(vo);
             }
+            TransactionUtil.commitTx(transactionStatus);
         }
 
 

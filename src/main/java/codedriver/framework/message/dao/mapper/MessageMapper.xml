@@ -30,7 +30,7 @@
         COUNT(1)
         FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
-        AND `is_read` = 0
+        AND `is_delete` = 0
         <if test="messageId != null">
             AND `message_id` &lt; #{messageId}
         </if>
@@ -43,11 +43,12 @@
         b.`title`,
         b.`content`,
         b.`fcd`,
-        b.`handler`
+        b.`handler`,
+        a.`is_read` as isRead
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{userUuid}
-        AND a.`is_read` = 0
+        AND a.`is_delete` = 0
         <if test="messageId != null">
             AND a.`message_id` &lt; #{messageId}
         </if>
@@ -61,7 +62,7 @@
         COUNT(1)
         FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
-        AND `is_read` = 0
+        AND `is_delete` = 0
         <if test="messageId != null">
             AND `message_id` &gt; #{messageId}
         </if>
@@ -78,7 +79,7 @@
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{userUuid}
-        AND a.`is_read` = 0
+        AND a.`is_delete` = 0
         <if test="messageId != null">
             AND a.`message_id` &gt; #{messageId}
         </if>
@@ -271,6 +272,18 @@
                 #{popUp},
                 NOW(3))
     </insert>
+
+    <update id="updateMessageUserIsDelete">
+        UPDATE `message_user`
+        SET `is_delete` = 1
+        WHERE `user_uuid` = #{userUuid}
+        <if test="messageIdList != null and messageIdList.size() > 0">
+            AND `message_id` in
+            <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
+                #{messageId}
+            </foreach>
+        </if>
+    </update>
 
     <update id="updateMessageUserIsRead">
         UPDATE `message_user`

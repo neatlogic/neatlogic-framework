@@ -104,7 +104,7 @@ public class PublicApiDispatcher {
         
         //自定义接口 访问人初始化
         String user = request.getHeader("User");
-        if(user != null){
+        if(StringUtils.isNotBlank(user)){
 			UserVo userVo = userMapper.getUserByUuid(user);
 			if(userVo != null){
 				userVo.setAuthorization(authorization);

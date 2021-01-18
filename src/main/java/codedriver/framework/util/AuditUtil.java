@@ -126,7 +126,9 @@ public class AuditUtil {
         long startIndex = Long.parseLong(indexs[0].split("=")[1]);
         long offset = Long.parseLong(indexs[1].split("=")[1]);
 
-        try (InputStream in = FileUtil.getData(path)) {
+        InputStream in = null;
+        try {
+            in = FileUtil.getData(path);
             if (in != null) {
                 /*
                  * 如果偏移量大于最大字节数限制，那么就只截取最大字节数长度的数据
@@ -140,12 +142,28 @@ public class AuditUtil {
 
                 in.skip(startIndex);
                 byte[] buff = new byte[buffSize];
-                in.read(buff);
-
-                result = new String(buff, StandardCharsets.UTF_8);
+                StringBuilder sb = new StringBuilder();
+                int len = 0;
+                long endPoint = 0;
+                while ((len = in.read(buff)) != -1) {
+                    endPoint += len;
+                    if (endPoint > offset) {
+                        len = (int) (len - (endPoint - offset));
+                    }
+                    sb.append(new String(buff, 0, len, StandardCharsets.UTF_8));
+                }
+                result = sb.toString();
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        }finally {
+            if(in != null){
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return result;

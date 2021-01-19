@@ -54,6 +54,8 @@ public interface SystemNoticeMapper {
 
     public int updateSystemNotice(SystemNoticeVo vo);
 
+    public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid);
+
     public int insertSystemNotice(SystemNoticeVo vo);
 
     public int batchInsertSystemNoticeRecipient(List<SystemNoticeRecipientVo> recipientVoList);

@@ -51,12 +51,11 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
         /** 检查是否存在【已发布却到了失效时间的】公告，如果有，则停用 **/
         List<SystemNoticeVo> expiredNoticeList = systemNoticeMapper.getExpiredNoticeListByRecipientUuidList(uuidList);
         if (CollectionUtils.isNotEmpty(expiredNoticeList)) {
-            TransactionStatus transactionStatus = TransactionUtil.openTx();
+            systemNoticeMapper.getSystemNoticeLockByIdList(expiredNoticeList.stream().map(SystemNoticeVo::getId).collect(Collectors.toList()));
             for (SystemNoticeVo vo : expiredNoticeList) {
                 vo.setStatus(SystemNoticeVo.Status.STOPPED.getValue());
                 systemNoticeMapper.updateSystemNotice(vo);
             }
-            TransactionUtil.commitTx(transactionStatus);
         }
 
 
@@ -72,7 +71,7 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
 
         /**
          * 检查是否存在【当前用户可看的】、【到了生效时间，状态却还是未发布的】公告，如果有，则下发给自己
-         * 其他的通知用户，如果在线则由其定时拉取，如果离线则登录时自己拉取
+         * 其他的通知用户，如果在线则由前端定时拉取，如果离线则登录时拉取
          **/
         List<SystemNoticeVo> hasBeenActiveNoticeList = systemNoticeMapper.getHasBeenActiveNoticeListByRecipientUuidList(uuidList);
         if (CollectionUtils.isNotEmpty(hasBeenActiveNoticeList)) {
@@ -86,15 +85,13 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
                 systemNoticeMapper.updateSystemNotice(vo);
                 currentUserNoticeList.add(new SystemNoticeUserVo(vo.getId(), UserContext.get().getUserUuid(true)));
             }
-            TransactionUtil.commitTx(transactionStatus);
             /** 发送给当前用户 **/
             if (CollectionUtils.isNotEmpty(currentUserNoticeList)) {
                 systemNoticeMapper.batchInsertSystemNoticeUser(currentUserNoticeList);
             }
+            TransactionUtil.commitTx(transactionStatus);
 
         }
-
-
     }
 
 }

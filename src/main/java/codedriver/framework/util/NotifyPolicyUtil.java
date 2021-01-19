@@ -54,7 +54,7 @@ public class NotifyPolicyUtil {
         List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
         for (NotifyTriggerVo triggerObj : triggerList) {
             /** 找到要触发类型对应的信息 **/
-            if (notifyTriggerType.getTrigger().equalsIgnoreCase(triggerObj.getTrigger())) {
+            if (notifyTriggerType.getTrigger().equals(triggerObj.getTrigger())) {
                 /** 通知列表 **/
                 List<NotifyTriggerNotifyVo> notifyList = triggerObj.getNotifyList();
                 if (CollectionUtils.isNotEmpty(notifyList)) {

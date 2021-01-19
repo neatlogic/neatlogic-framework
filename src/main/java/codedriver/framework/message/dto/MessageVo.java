@@ -4,6 +4,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
@@ -29,6 +30,8 @@ public class MessageVo {
     private Date fcd;
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
+    @JSONField(serialize = false)
+    private transient Integer isRead;
 
     public MessageVo() {
     }
@@ -87,5 +90,13 @@ public class MessageVo {
 
     public void setPopUp(String popUp) {
         this.popUp = popUp;
+    }
+
+    public Integer getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
     }
 }

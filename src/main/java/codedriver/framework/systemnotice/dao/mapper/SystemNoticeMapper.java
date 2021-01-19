@@ -52,7 +52,11 @@ public interface SystemNoticeMapper {
     **/
     public List<SystemNoticeVo> getHasBeenActiveNoticeListByRecipientUuidList(List<String> uuidList);
 
-    public int updateSystemNotice(SystemNoticeVo vo);
+    public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
+
+    public int updateSystemNoticeIssueInfo(SystemNoticeVo vo);
+
+    public int updateSystemNoticeStatus(SystemNoticeVo vo);
 
     public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid);
 

@@ -169,22 +169,23 @@
     <select id="getHasBeenActiveNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         select
         distinct
-        a.`id`
+        a.`id`,
+        a.`start_time` as startTime
         from
         `system_notice` a
         join `system_notice_recipient` b
         on a.`id` = b.`system_notice_id`
         where
-        a.`status` = 'not_issued'
-        and a.`start_time` &gt;= now(3)
-        and a.`end_time` &lt; now(3)
+        a.`status` != 'issued'
+        and a.`start_time` &lt;= now(3)
+        and a.`end_time` &gt; now(3)
         and b.`uuid` in
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
     </select>
 
-    <update id="updateSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+    <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
         set
@@ -194,21 +195,36 @@
         <if test="content != null and content != ''">
             `content` = #{content},
         </if>
+        `lcd` = now(3)
+        where `id` = #{id}
+    </update>
+
+    <update id="updateSystemNoticeIssueInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
         <if test="status != null and status != ''">
             `status` = #{status},
         </if>
-        <if test="startTime != null">
-            `start_time` = #{startTime},
+        <if test="issueTime != null">
+            `issue_time` = #{issueTime},
         </if>
-        <if test="endTime != null">
-            `end_time` = #{endTime},
+        `start_time` = #{startTime},
+        `end_time` = #{endTime},
+        `pop_up` = #{popUp},
+        `ignore_read` = #{ignoreRead},
+        `lcd` = now(3)
+        where `id` = #{id}
+    </update>
+
+    <update id="updateSystemNoticeStatus" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        <if test="issueTime != null">
+            `issue_time` = #{issueTime},
         </if>
-        <if test="popUp != null and popUp != ''">
-            `pop_up` = #{popUp},
-        </if>
-        <if test="ignoreRead != null">
-            `ignore_read` = #{ignoreRead},
-        </if>
+        `status` = #{status},
         `lcd` = now(3)
         where `id` = #{id}
     </update>

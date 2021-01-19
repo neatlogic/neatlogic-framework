@@ -54,7 +54,7 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
             systemNoticeMapper.getSystemNoticeLockByIdList(expiredNoticeList.stream().map(SystemNoticeVo::getId).collect(Collectors.toList()));
             for (SystemNoticeVo vo : expiredNoticeList) {
                 vo.setStatus(SystemNoticeVo.Status.STOPPED.getValue());
-                systemNoticeMapper.updateSystemNotice(vo);
+                systemNoticeMapper.updateSystemNoticeStatus(vo);
             }
         }
 
@@ -70,7 +70,7 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
         }
 
         /**
-         * 检查是否存在【当前用户可看的】、【到了生效时间，状态却还是未发布的】公告，如果有，则下发给自己
+         * 检查是否存在【当前用户可看的】、【到了生效时间，却还没发布】公告，如果有，则下发给自己
          * 其他的通知用户，如果在线则由前端定时拉取，如果离线则登录时拉取
          **/
         List<SystemNoticeVo> hasBeenActiveNoticeList = systemNoticeMapper.getHasBeenActiveNoticeListByRecipientUuidList(uuidList);
@@ -82,7 +82,8 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
             /** 更改这些公告的状态为已发布 **/
             for (SystemNoticeVo vo : hasBeenActiveNoticeList) {
                 vo.setStatus(SystemNoticeVo.Status.ISSUED.getValue());
-                systemNoticeMapper.updateSystemNotice(vo);
+                vo.setIssueTime(vo.getStartTime());
+                systemNoticeMapper.updateSystemNoticeStatus(vo);
                 currentUserNoticeList.add(new SystemNoticeUserVo(vo.getId(), UserContext.get().getUserUuid(true)));
             }
             /** 发送给当前用户 **/

@@ -232,7 +232,7 @@
             #{messageVo.title},
             #{messageVo.content},
             #{messageVo.handler},
-            NOW(3)
+            #{messageVo.fcd}
             )
         </foreach>
 

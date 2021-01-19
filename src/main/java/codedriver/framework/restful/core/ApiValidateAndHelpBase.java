@@ -295,7 +295,7 @@ public class ApiValidateAndHelpBase {
                             }
                         }
                         if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
-                            throw new ParamIrregularException("参数“" + p.name() + "”不符合格式要求");
+                            throw new ParamIrregularException("参数“" + p.desc() + "（" +p.name() + "）" + "”不符合格式要求");
                         }
                     }
                 }

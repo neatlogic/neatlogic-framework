@@ -112,7 +112,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
             lastPullTime = messageMapper.getMessageFcdById(maxMessageId);
         }
         if (lastPullTime == null || lastPullTime.before(earliestSendingTime)) {
-            return messageMapper.getMessageMinIdByGreaterThanFcd(earliestSendingTime);
+            return messageMapper.getMessageMaxIdByLessThanFcd(earliestSendingTime);
         } else {
             return maxMessageId;
         }

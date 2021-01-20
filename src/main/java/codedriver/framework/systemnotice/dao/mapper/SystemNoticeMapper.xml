@@ -21,18 +21,6 @@
         where `id` = #{value}
     </select>
 
-    <select id="getSystemNoticeLockByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
-        select
-        `id`
-        from
-        `system_notice`
-        where `id` in
-        <foreach collection="list" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-        for update
-    </select>
-
     <resultMap id="systemNoticeMap" type="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
@@ -123,15 +111,6 @@
         `type`
         from `system_notice_recipient`
         where `system_notice_id` = #{value}
-    </select>
-
-    <select id="getNotReadNoticeUserCountByNoticeId" parameterType="java.lang.Long" resultType="int">
-        select
-        count(1)
-        from
-        `system_notice_user`
-        where `system_notice_id` = #{value}
-        and `is_read` = 0
     </select>
 
     <select id="getIssuedNoticeIdListByRecipientUuidList" parameterType="java.lang.String" resultType="java.lang.Long">
@@ -402,17 +381,25 @@
         where `system_notice_id` = #{value}
     </delete>
 
-    <delete id="deleteNoticeUserByNoticeId" parameterType="java.lang.Long">
+    <delete id="deleteNoticeUserWhoIsNotInNoticeScope">
         delete
-        from
-        `system_notice_user`
-        where `system_notice_id` = #{noticeId}
-        <if test="isRead != null">
-            and `is_read` = #{isRead}
-        </if>
-        <if test="limitCount != null">
-            limit #{limitCount}
-        </if>
+		from
+		`system_notice_user`
+		where `user_uuid` = #{userUuid}
+		and `system_notice_id` not in
+		(
+		select
+		DISTINCT
+		`id`
+		from
+		`system_notice` a
+		JOIN `system_notice_recipient` b
+		on a.`id` = b.`system_notice_id`
+		where b.`uuid` in
+        <foreach collection="recipientUuidList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+		)
     </delete>
 
     <delete id="deleteNotExistsNoticeByUserUuid" parameterType="java.lang.String">

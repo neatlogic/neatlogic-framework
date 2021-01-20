@@ -22,15 +22,11 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeById(Long id);
 
-    public List<SystemNoticeVo> getSystemNoticeLockByIdList(List<Long> idList);
-
     public List<SystemNoticeVo> searchSystemNotice(SystemNoticeVo vo);
 
     public int searchSystemNoticeCount(SystemNoticeVo vo);
 
     public List<SystemNoticeRecipientVo> getRecipientListByNoticeId(Long id);
-
-    public int getNotReadNoticeUserCountByNoticeId(Long id);
 
     public List<Long> getIssuedNoticeIdListByRecipientUuidList(List<String> uuidList);
 
@@ -79,13 +75,13 @@ public interface SystemNoticeMapper {
     public int deleteRecipientByNoticeId(Long id);
 
     /**
-     * @Description: 批量删除system_notice_user
+     * @Description: 清理掉system_notice_user中因删除公告或更改公告通知对象而遗留的记录
      * @Author: laiwt
-     * @Date: 2021/1/15 17:11
-     * @Params: [id, isRead, limitCount]
+     * @Date: 2021/1/20 18:46
+     * @Params: [userUuid, recipientUuidList]
      * @Returns: int
     **/
-    public int deleteNoticeUserByNoticeId(@Param("noticeId") Long id,@Param("isRead") Integer isRead,@Param("limitCount") Integer limitCount);
+    public int deleteNoticeUserWhoIsNotInNoticeScope(@Param("userUuid") String userUuid,@Param("recipientUuidList") List<String> recipientUuidList);
 
     /**
      * @Description: 根据userUuid清理system_notice_user中不存在的公告记录

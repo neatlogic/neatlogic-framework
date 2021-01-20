@@ -796,6 +796,13 @@
         </if>
     </select>
 
+    <select id="getAllOnlineUser" parameterType="java.util.Date" resultType="java.lang.String">
+		SELECT
+		a.`uuid`
+		FROM `user` a
+		JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{value}
+	</select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(`user_uuid`,
                                      `auth_group`,

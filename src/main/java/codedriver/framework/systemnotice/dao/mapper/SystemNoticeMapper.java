@@ -75,7 +75,7 @@ public interface SystemNoticeMapper {
     public int deleteRecipientByNoticeId(Long id);
 
     /**
-     * @Description: 清理掉system_notice_user中因删除公告或更改公告通知对象而遗留的记录
+     * @Description: 清理掉system_notice_user中因更改公告通知对象而遗留的记录
      * @Author: laiwt
      * @Date: 2021/1/20 18:46
      * @Params: [userUuid, recipientUuidList]

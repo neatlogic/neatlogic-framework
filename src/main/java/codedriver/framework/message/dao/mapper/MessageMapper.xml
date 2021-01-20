@@ -201,8 +201,8 @@
         SELECT `fcd` FROM `message` WHERE `id` = #{value}
     </select>
 
-    <select id="getMessageMinIdByGreaterThanFcd" parameterType="java.util.Date" resultType="java.lang.Long">
-        SELECT `id` FROM `message` WHERE `fcd` &gt;= #{value} LIMIT 1
+    <select id="getMessageMaxIdByLessThanFcd" parameterType="java.util.Date" resultType="java.lang.Long">
+        SELECT MAX(`id`) FROM `message` WHERE `fcd` &lt; #{value}
     </select>
 
     <select id="getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList" resultType="java.lang.String">
@@ -318,15 +318,15 @@
           AND `message_id` = #{messageId}
     </delete>
 
-    <delete id="deleteMessageRecipientByLessThanMessageId" parameterType="java.lang.Long">
-        DELETE FROM `message_recipient` WHERE `message_id` &lt; #{value}
+    <delete id="deleteMessageRecipientByLessThanOrEqualMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_recipient` WHERE `message_id` &lt;= #{value}
     </delete>
 
-    <delete id="deleteMessageUserByLessThanMessageId" parameterType="java.lang.Long">
-        DELETE FROM `message_user` WHERE `message_id` &lt; #{value}
+    <delete id="deleteMessageUserByLessThanOrEqualMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_user` WHERE `message_id` &lt;= #{value}
     </delete>
 
-    <delete id="deleteMessageByLessThanId" parameterType="java.lang.Long">
-        DELETE FROM `message` WHERE `id` &lt; #{value}
+    <delete id="deleteMessageByLessThanOrEqualId" parameterType="java.lang.Long">
+        DELETE FROM `message` WHERE `id` &lt;= #{value}
     </delete>
 </mapper>

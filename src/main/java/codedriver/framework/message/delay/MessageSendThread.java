@@ -85,7 +85,7 @@ public class MessageSendThread extends CodeDriverThread {
                 /** 如果还有线程正在往当前缓存对象中写数据 **/
                 synchronized (messageCache.getLOCK()) {
                     /** 等待所有正在往当前缓存对象中写数据的线程完成后，唤醒当前线程 **/
-                    messageCache.getLOCK().wait();
+                    messageCache.getLOCK().wait(50);
                 }
             }
             ConcurrentMap<NotifyVo, Object> notifyVoMap = messageCache.getNotifyVoMap();

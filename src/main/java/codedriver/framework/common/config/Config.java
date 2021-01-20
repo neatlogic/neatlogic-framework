@@ -207,7 +207,7 @@ public class Config {
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
             IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
-            HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "30"));
+            HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ES_CLUSTERS = new HashMap<>();
 

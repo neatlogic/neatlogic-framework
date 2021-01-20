@@ -33,7 +33,7 @@ public class MessageClearJob extends JobBase {
     @Autowired
     private MessageMapper messageMapper;
 
-    private String cron = "0 0 0 * * ?";
+    private String cron = "0 0 4 * * ?";
 
     @Override
     public String getGroupName() {
@@ -64,17 +64,28 @@ public class MessageClearJob extends JobBase {
     @Override
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
         /** 删除message_recipient表数据 **/
-        Long messageId = getMinMessageId(Config.NEW_MESSAGE_EXPIRED_DAY());
-        messageMapper.deleteMessageRecipientByLessThanMessageId(messageId);
+        Long messageId = getMaxnMessageId(Config.NEW_MESSAGE_EXPIRED_DAY());
+        if(messageId != null){
+            messageMapper.deleteMessageRecipientByLessThanOrEqualMessageId(messageId);
+        }
         /** 删除message和message_user表数据 **/
-        messageId = getMinMessageId(Config.HISTORY_MESSAGE_EXPIRED_DAY());
-        messageMapper.deleteMessageUserByLessThanMessageId();
-        messageMapper.deleteMessageByLessThanId(messageId);
+        messageId = getMaxnMessageId(Config.HISTORY_MESSAGE_EXPIRED_DAY());
+        if(messageId != null){
+            messageMapper.deleteMessageUserByLessThanOrEqualMessageId();
+            messageMapper.deleteMessageByLessThanOrEqualId(messageId);
+        }
     }
-    private Long getMinMessageId(int expiredDay){
+    /**
+     * @Description: 根据时效天数计算出时效时间点，再根据时效时间点查出需要删除数据中的最大messageId，如果messageId为null,则无需删除
+     * @Author: linbq
+     * @Date: 2021/1/20 11:32
+     * @Params:[expiredDay]
+     * @Returns:java.lang.Long
+     **/
+    private Long getMaxnMessageId(int expiredDay){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - expiredDay);
         Date earliestSendingTime = calendar.getTime();
-        return messageMapper.getMessageMinIdByGreaterThanFcd(earliestSendingTime);
+        return messageMapper.getMessageMaxIdByLessThanFcd(earliestSendingTime);
     }
 }

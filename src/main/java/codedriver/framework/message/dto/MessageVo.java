@@ -39,6 +39,7 @@ public class MessageVo {
         this.title = notifyVo.getTitle();
         this.content = notifyVo.getContent();
         this.handler = notifyVo.getMessageHandlerClass().getName();
+        this.fcd = notifyVo.getFcd();
     }
 
     public Long getId() {

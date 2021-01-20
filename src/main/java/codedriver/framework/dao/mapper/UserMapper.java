@@ -148,8 +148,6 @@ public interface UserMapper {
 
     public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
 
-    public int updateUserToDeleteByUuid(String uuid);
-
     public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
     public int deleteUserByUuid(String uuid);

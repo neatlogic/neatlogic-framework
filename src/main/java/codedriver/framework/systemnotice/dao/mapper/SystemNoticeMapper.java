@@ -32,7 +32,15 @@ public interface SystemNoticeMapper {
 
     public int getNotReadNoticeUserCountByNoticeId(Long id);
 
-    public List<Long> getNoticeIdListByRecipientUuidList(List<String> uuidList);
+    public List<Long> getIssuedNoticeIdListByRecipientUuidList(List<String> uuidList);
+
+    public int searchIssuedNoticeCountByUserUuid(String userUuid);
+
+    public List<SystemNoticeVo> searchIssuedNoticeListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
+
+    public SystemNoticeVo getFirstPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
+
+    public int checkHasNextNeedPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
 
     /**
      * @Description: 根据通知对象uuid获取超过生效时间的公告

@@ -94,6 +94,10 @@ public class SystemNoticeVo extends BaseEditorVo {
     @EntityField(name = "状态vo", type = ApiParamType.JSONOBJECT)
     private JSONObject statusVo;
 
+    @EntityField(name = "下发时间", type = ApiParamType.LONG)
+    @JSONField(serialize = false)
+    private transient Date issueTime;
+
     public Long getId() {
         if (id == null) {
             id = SnowflakeUtil.uniqueLong();
@@ -200,5 +204,13 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public void setStatusVo(JSONObject statusVo) {
         this.statusVo = statusVo;
+    }
+
+    public Date getIssueTime() {
+        return issueTime;
+    }
+
+    public void setIssueTime(Date issueTime) {
+        this.issueTime = issueTime;
     }
 }

@@ -43,7 +43,7 @@ public interface MessageMapper {
 
     public Date getMessageFcdById(Long maxMessageId);
 
-    public Long getMessageMinIdByGreaterThanFcd(Date fcd);
+    public Long getMessageMaxIdByLessThanFcd(Date fcd);
 
     public List<String> getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(@Param("handler") String handler, @Param("userUuidList") List<String> userUuidList);
 
@@ -64,9 +64,9 @@ public interface MessageMapper {
 
     public int deleteMessageUser(MessageSearchVo messageSearchVo);
 
-    public int deleteMessageRecipientByLessThanMessageId(Long messageId);
+    public int deleteMessageRecipientByLessThanOrEqualMessageId(Long messageId);
 
-    public int deleteMessageUserByLessThanMessageId();
+    public int deleteMessageUserByLessThanOrEqualMessageId();
 
-    public int deleteMessageByLessThanId(Long messageId);
+    public int deleteMessageByLessThanOrEqualId(Long messageId);
 }

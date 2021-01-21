@@ -3,6 +3,7 @@ package codedriver.framework.notify.core;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
@@ -28,8 +29,8 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
     }
 
     @Override
-    public String preview() {
-        return myPreview();
+    public String preview(JSONObject config) {
+        return myPreview(config);
     }
 
     protected abstract JSONArray getMyConditionOptionList();
@@ -40,5 +41,5 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
 
     protected abstract List<NotifyVo> getMyNotifyData(Long id);
 
-    protected abstract String myPreview();
+    protected abstract String myPreview(JSONObject config);
 }

@@ -3,6 +3,7 @@ package codedriver.framework.notify.core;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
@@ -99,7 +100,7 @@ public interface INotifyContentHandler {
 	 * @Params: [config]
 	 * @Returns: java.lang.String
 	**/
-	public String preview();
+	public String preview(JSONObject config);
 
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();

@@ -756,8 +756,7 @@
         order by g.`id`
     </select>
 
-    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime"
-            resultType="java.lang.String">
+    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime" resultType="java.lang.String">
         <if test="userUuidList != null and userUuidList.size() > 0">
             SELECT
             a.`uuid`
@@ -768,33 +767,42 @@
                 #{userUuid}
             </foreach>
         </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0 and userUuidList != null and userUuidList.size() > 0">
-            UNION
-        </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0">
-            SELECT
-            a.`user_uuid`
-            FROM `user_role` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `role_uuid` IN
-            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                #{teamUuid}
-            </foreach>
-        </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0 and roleUuidList != null and roleUuidList.size() > 0">
+        <if test="userUuidList != null and userUuidList.size() > 0
+        and ((roleUuidList != null and roleUuidList.size() > 0) || (teamUuidList != null and teamUuidList.size() > 0))">
             UNION
         </if>
         <if test="roleUuidList != null and roleUuidList.size() > 0">
             SELECT
             a.`user_uuid`
-            FROM `user_team` a
+            FROM `user_role` a
             JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `team_uuid` IN
+            WHERE `role_uuid` IN
             <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
                 #{roleUuid}
             </foreach>
         </if>
+        <if test="teamUuidList != null and teamUuidList.size() > 0
+        and ((roleUuidList != null and roleUuidList.size() > 0) || (userUuidList != null and userUuidList.size() > 0))">
+            UNION
+        </if>
+        <if test="teamUuidList != null and teamUuidList.size() > 0">
+            SELECT
+            a.`user_uuid`
+            FROM `user_team` a
+            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
+            WHERE `team_uuid` IN
+            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                #{teamUuid}
+            </foreach>
+        </if>
     </select>
+
+    <select id="getAllOnlineUser" parameterType="java.util.Date" resultType="java.lang.String">
+		SELECT
+		a.`uuid`
+		FROM `user` a
+		JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{value}
+	</select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(`user_uuid`,

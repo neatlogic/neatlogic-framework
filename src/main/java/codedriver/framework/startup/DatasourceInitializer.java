@@ -14,9 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
- * @Author:chenqiwei
- * @Time:Jun 11, 2020
+ * @Author: chenqiwei
+ * @Time: Jun 11, 2020
  * @ClassName: DatasourceInitializer
  * @Description: 此类在root-context.xml中初始化
  */
@@ -55,16 +54,16 @@ public class DatasourceInitializer {
 				tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
 				datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
 				// 创建OLAP库
-				CodeDriverBasicDataSource tenantDatasourceOlap = new CodeDriverBasicDataSource();
+				CodeDriverBasicDataSource tenantDatasourceData = new CodeDriverBasicDataSource();
 				String urlOlap = datasourceVo.getUrl();
 				urlOlap = urlOlap.replace("{host}", datasourceVo.getHost());
 				urlOlap = urlOlap.replace("{port}", datasourceVo.getPort().toString());
-				urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_olap");
-				tenantDatasourceOlap.setUrl(urlOlap);
-				tenantDatasourceOlap.setDriverClassName(datasourceVo.getDriver());
-				tenantDatasourceOlap.setUsername(datasourceVo.getUsername());
-				tenantDatasourceOlap.setPassword(datasourceVo.getPasswordPlain());
-				datasourceMap.put(datasourceVo.getTenantUuid() + "_OLAP", tenantDatasourceOlap);
+				urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_data");
+				tenantDatasourceData.setUrl(urlOlap);
+				tenantDatasourceData.setDriverClassName(datasourceVo.getDriver());
+				tenantDatasourceData.setUsername(datasourceVo.getUsername());
+				tenantDatasourceData.setPassword(datasourceVo.getPasswordPlain());
+				datasourceMap.put(datasourceVo.getTenantUuid() + "_DATA", tenantDatasourceData);
 
 				TenantUtil.addTenant(datasourceVo.getTenantUuid());
 			}

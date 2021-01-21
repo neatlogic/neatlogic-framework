@@ -767,7 +767,8 @@
                 #{userUuid}
             </foreach>
         </if>
-        <if test="roleUuidList != null and roleUuidList.size() > 0 and userUuidList != null and userUuidList.size() > 0">
+        <if test="userUuidList != null and userUuidList.size() > 0
+        and ((roleUuidList != null and roleUuidList.size() > 0) || (teamUuidList != null and teamUuidList.size() > 0))">
             UNION
         </if>
         <if test="roleUuidList != null and roleUuidList.size() > 0">
@@ -780,7 +781,8 @@
                 #{roleUuid}
             </foreach>
         </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0 and roleUuidList != null and roleUuidList.size() > 0">
+        <if test="teamUuidList != null and teamUuidList.size() > 0
+        and ((roleUuidList != null and roleUuidList.size() > 0) || (userUuidList != null and userUuidList.size() > 0))">
             UNION
         </if>
         <if test="teamUuidList != null and teamUuidList.size() > 0">

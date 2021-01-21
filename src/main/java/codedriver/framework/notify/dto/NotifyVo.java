@@ -1,6 +1,7 @@
 package codedriver.framework.notify.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,12 +23,14 @@ public class NotifyVo {
     private MessageHandlerAndRecipientVo messageHandlerAndRecipientVo;
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
+    private Date fcd;
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
         this.data = builder.data;
         this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
+        this.fcd = builder.fcd;
         try {
             title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
         } catch (Exception e) {
@@ -116,6 +119,10 @@ public class NotifyVo {
         this.messageHandlerAndRecipientVo = messageHandlerAndRecipientVo;
     }
 
+    public Date getFcd() {
+        return fcd;
+    }
+
     public static class Builder {
         // 可选参数
         private String templateContent;
@@ -129,6 +136,7 @@ public class NotifyVo {
 
         private INotifyTriggerType triggerType;
         private Class<? extends IMessageHandler> messageHandlerClass;
+        private Date fcd = new Date();
 
         public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _messageHandlerClass) {
             this.triggerType = _triggerType;

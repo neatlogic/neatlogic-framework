@@ -60,6 +60,9 @@ public class UserVo extends BasePageVo implements Serializable{
 	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
 	private String title;
 
+	@EntityField(name = "用户所在组的头衔中文名", type = ApiParamType.ENUM)
+	private String titleText;
+
 	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
 	private List<String> teamUuidList = new ArrayList<>();
 	private List<String> teamNameList = new ArrayList<>();
@@ -392,6 +395,14 @@ public class UserVo extends BasePageVo implements Serializable{
 
 	public void setRoleList(List<RoleVo> roleList) {
 		this.roleList = roleList;
+	}
+
+	public String getTitleText() {
+		return titleText;
+	}
+
+	public void setTitleText(String titleText) {
+		this.titleText = titleText;
 	}
 
 	@Override

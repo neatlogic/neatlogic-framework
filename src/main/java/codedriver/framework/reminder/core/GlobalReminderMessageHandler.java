@@ -3,6 +3,7 @@ package codedriver.framework.reminder.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.asynchronization.threadpool.TransactionSynchronizationPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,6 @@ public class GlobalReminderMessageHandler {
 
     static Logger logger = LoggerFactory.getLogger(GlobalReminderMessageHandler.class);
 
-    private static final ThreadLocal<List<CodeDriverThread>> RUNNABLES = new ThreadLocal<>();
-
     private static GlobalReminderMapper reminderMapper;
 
     private static GlobalReminderMessageMapper reminderMessageMapper;
@@ -47,31 +46,7 @@ public class GlobalReminderMessageHandler {
     public synchronized static void sendMessage(ReminderMessageVo messageVo, String pluginId){
         String tenantUuid = TenantContext.get().getTenantUuid();
         GlobalReminderMessageHandler.MessageRunner runner = new GlobalReminderMessageHandler.MessageRunner(messageVo, pluginId, tenantUuid);
-        if (!TransactionSynchronizationManager.isSynchronizationActive()){
-            CommonThreadPool.execute(runner);
-            return;
-        }
-        List<CodeDriverThread> runnables = RUNNABLES.get();
-        if (runnables == null){
-            runnables = new ArrayList<>();
-            RUNNABLES.set(runnables);
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                @Override
-                public void afterCommit() {
-                    List<CodeDriverThread> runnables = RUNNABLES.get();
-                    for (int i = 0; i < runnables.size(); i++){
-                        CodeDriverThread runnable = runnables.get(i);
-                        CommonThreadPool.execute(runnable);
-                    }
-                }
-
-                @Override
-                public void afterCompletion(int status){
-                    RUNNABLES.remove();
-                }
-            });
-        }
-        runnables.add(runner);
+        TransactionSynchronizationPool.execute(runner);
     }
 
     static class MessageRunner extends CodeDriverThread{

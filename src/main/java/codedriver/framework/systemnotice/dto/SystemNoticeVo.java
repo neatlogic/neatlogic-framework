@@ -81,22 +81,21 @@ public class SystemNoticeVo extends BaseEditorVo {
     @EntityField(name = "是否忽略已读", type = ApiParamType.INTEGER)
     private Integer ignoreRead;
 
-    @EntityField(name = "通知对象Vo列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "通知对象列表", type = ApiParamType.JSONARRAY)
     @JSONField(serialize = false)
     private transient List<SystemNoticeRecipientVo> recipientVoList;
 
-    @EntityField(name = "通知对象列表",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "通知对象uuid列表",type = ApiParamType.JSONARRAY)
     private List<String> recipientList;
 
     @EntityField(name = "通知对象列表，供前端组件使用",type = ApiParamType.JSONARRAY)
     private List<Object> recipientObjList;
 
-    @EntityField(name = "状态vo", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "状态(包含中文名与颜色值)", type = ApiParamType.JSONOBJECT)
     private JSONObject statusVo;
 
     @EntityField(name = "下发时间", type = ApiParamType.LONG)
-    @JSONField(serialize = false)
-    private transient Date issueTime;
+    private Date issueTime;
 
     public Long getId() {
         if (id == null) {

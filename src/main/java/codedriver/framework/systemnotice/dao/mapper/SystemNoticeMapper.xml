@@ -113,7 +113,7 @@
         where `system_notice_id` = #{value}
     </select>
 
-    <select id="getIssuedNoticeIdListByRecipientUuidList" parameterType="java.lang.String" resultType="java.lang.Long">
+    <select id="getIssuedNoticeIdListByRecipientUuidList" parameterType="java.util.List" resultType="java.lang.Long">
         select
         distinct a.`id`
         from
@@ -133,15 +133,9 @@
 		count(1)
 		from
 		`system_notice` a
-		where
-		a.`status` = 'issued'
-		and a.`id` in
-		(
-			select
-			`system_notice_id`
-			from `system_notice_user`
-			where `user_uuid` = #{value}
-		)
+		join `system_notice_user` b
+		on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
+		and b.`user_uuid` = #{value}
     </select>
 
     <select id="searchIssuedNoticeListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -152,15 +146,9 @@
         a.`issue_time`
         from
         `system_notice` a
-        where
-        a.`status` = 'issued'
-        and a.`id` in
-        (
-          select
-          `system_notice_id`
-          from `system_notice_user`
-          where `user_uuid` = #{userUuid}
-        )
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
+        and b.`user_uuid` = #{userUuid}
         ORDER BY `issue_time` desc
         <if test="noticeVo.needPage">
             LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}

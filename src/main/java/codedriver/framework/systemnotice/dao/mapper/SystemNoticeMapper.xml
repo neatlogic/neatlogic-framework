@@ -240,6 +240,37 @@
         </foreach>
     </select>
 
+    <select id="getNotExistsNoticeIdListFromNoticeUserByUserUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+        select
+        a.`system_notice_id`
+        from
+        `system_notice_user` a
+        left join
+        `system_notice` b
+        on a.`system_notice_id` = b.`id`
+        where a.`user_uuid` = #{value} and b.`id` is null
+    </select>
+
+    <select id="getNotInNoticeScopeNoticeIdListByUserUuid" resultType="java.lang.Long">
+        select
+		a.`system_notice_id`
+		from
+		`system_notice_user` a
+		left join
+		(
+		select
+		`system_notice_id`
+		from
+		`system_notice_recipient` b
+		where b.`uuid` in
+        <foreach collection="recipientUuidList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+		) b
+		on a.`system_notice_id` = b.`system_notice_id`
+		where a.`user_uuid` = #{userUuid} and b.`system_notice_id` is null
+    </select>
+
     <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
@@ -369,33 +400,14 @@
         where `system_notice_id` = #{value}
     </delete>
 
-    <delete id="deleteNoticeUserWhoIsNotInNoticeScope">
-        delete
-		from
-		`system_notice_user`
-		where `user_uuid` = #{userUuid}
-		and `system_notice_id` not in
-		(
-		select
-		DISTINCT
-		`id`
-		from
-		`system_notice` a
-		JOIN `system_notice_recipient` b
-		on a.`id` = b.`system_notice_id`
-		where b.`uuid` in
-        <foreach collection="recipientUuidList" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-		)
-    </delete>
-
-    <delete id="deleteNotExistsNoticeByUserUuid" parameterType="java.lang.String">
+    <delete id="deleteSystemNoticeUserByUserUuid">
         delete
 		from `system_notice_user`
-		where `user_uuid` = #{value}
-		and `system_notice_id` not in
-		(select `id` from `system_notice`)
+		where `user_uuid` = #{userUuid}
+		and `system_notice_id` in
+        <foreach collection="noticeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </delete>
 
 </mapper>

@@ -6,6 +6,7 @@ import codedriver.framework.systemnotice.dto.SystemNoticeVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Title: SystemNoticeMapper
@@ -56,6 +57,24 @@ public interface SystemNoticeMapper {
     **/
     public List<SystemNoticeVo> getHasBeenActiveNoticeListByRecipientUuidList(List<String> uuidList);
 
+    /**
+     * @Description: 根据user_uuid从system_notice_user中寻找已经不存在的公告ID
+     * @Author: laiwt
+     * @Date: 2021/1/21 17:31
+     * @Params: [userUuid]
+     * @Returns: java.util.List<java.lang.Long>
+    **/
+    public List<Long> getNotExistsNoticeIdListFromNoticeUserByUserUuid(String userUuid);
+
+    /**
+     * @Description: 在system_notice_user中寻找某个用户已经不在通知范围内的公告记录
+     * @Author: laiwt
+     * @Date: 2021/1/21 19:08
+     * @Params: [recipientUuidList, userUuid]
+     * @Returns: java.util.List<java.lang.Long>
+    **/
+    public List<Long> getNotInNoticeScopeNoticeIdListByUserUuid(@Param("recipientUuidList") List<String> recipientUuidList,@Param("userUuid") String userUuid);
+
     public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
 
     public int updateSystemNoticeIssueInfo(SystemNoticeVo vo);
@@ -75,22 +94,13 @@ public interface SystemNoticeMapper {
     public int deleteRecipientByNoticeId(Long id);
 
     /**
-     * @Description: 清理掉system_notice_user中因更改公告通知对象而遗留的记录
-     * @Author: laiwt
-     * @Date: 2021/1/20 18:46
-     * @Params: [userUuid, recipientUuidList]
-     * @Returns: int
-    **/
-    public int deleteNoticeUserWhoIsNotInNoticeScope(@Param("userUuid") String userUuid,@Param("recipientUuidList") List<String> recipientUuidList);
-
-    /**
-     * @Description: 根据userUuid清理system_notice_user中不存在的公告记录
+     * @Description: 根据noticeIdList清理某个用户system_notice_user中的记录
      * @Author: laiwt
      * @Date: 2021/1/15 16:06
      * @Params: [uuid]
      * @Returns: int
     **/
-    public int deleteNotExistsNoticeByUserUuid(String uuid);
+    public int deleteSystemNoticeUserByUserUuid(@Param("userUuid") String uuid,@Param("noticeIdList") Set<Long> noticeIdList);
 
 
 }

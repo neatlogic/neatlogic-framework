@@ -55,7 +55,14 @@ public interface MessageMapper {
 
     public int insertMessageSubscribe(MessageHandlerVo messageHandlerVo);
 
-    public int updateMessageUserIsDelete(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
+    public int updateMessageUserIsDeleteByUserUuidAndMessageId(@Param("userUuid") String userUuid, @Param("messageId") Long messageId);
+
+    public int updateMessageUserIsDeleteByUserUuidAndMessageIdList(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
+
+    public int updateMessageUserIsDeleteByUserUuidAndMessageIdRange(@Param("userUuid") String userUuid, @Param("fromMessageId") Long fromMessageId, @Param("toMessageId") Long toMessageId);
+
+    public int updateMessageUserIsDeleteByUserUuid(String userUuid);
+
     public int updateMessageUserIsRead(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
 
     public int updateMessageSubscribePopUp(MessageHandlerVo messageHandlerVo);

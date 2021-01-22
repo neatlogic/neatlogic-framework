@@ -35,9 +35,7 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeVo> searchIssuedNoticeListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
-//    public SystemNoticeVo getFirstPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
-
-//    public int checkHasNextNeedPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
+    public List<Long> getPopUpNoticeIdListByUserUuid(String userUuid);
 
     /**
      * @Description: 根据通知对象uuid获取超过生效时间的公告

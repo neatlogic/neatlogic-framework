@@ -162,34 +162,34 @@
         (
         select
 		DISTINCT
-		a.`id`
-		from
-		`system_notice` a
-		join `system_notice_user` b
-		on a.`id` = b.`system_notice_id`
-		and b.`user_uuid` = #{value}
-		and a.`pop_up` = 'longshow'
-		where
-		b.`is_read` = 0
-		or a.`ignore_read` = 0
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id`
+        and b.`user_uuid` = #{value}
+        and a.`pop_up` = 'longshow'
+        where
+        b.`is_read` = 0
+        or a.`ignore_read` = 0
 		) a
     </select>
 
     <select id="getPopUpNoticeIdListByUserUuid" resultType="java.lang.Long">
         select
-		DISTINCT
-		a.`id`
-		from
-		`system_notice` a
-		join `system_notice_user` b
-		on a.`id` = b.`system_notice_id`
-		and b.`user_uuid` = #{userUuid}
-		and a.`pop_up` = 'longshow'
-		where
-		b.`is_read` = 0
-		or a.`ignore_read` = 0
-		ORDER BY a.`issue_time` desc
-		LIMIT #{startNum}, #{pageSize}
+        DISTINCT
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id`
+        and b.`user_uuid` = #{userUuid}
+        and a.`pop_up` = 'longshow'
+        where
+        b.`is_read` = 0
+        or a.`ignore_read` = 0
+        ORDER BY a.`issue_time` desc
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <select id="getExpiredNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

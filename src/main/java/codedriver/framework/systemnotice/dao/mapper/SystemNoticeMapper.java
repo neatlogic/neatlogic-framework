@@ -1,5 +1,6 @@
 package codedriver.framework.systemnotice.dao.mapper;
 
+import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo;
 import codedriver.framework.systemnotice.dto.SystemNoticeUserVo;
 import codedriver.framework.systemnotice.dto.SystemNoticeVo;
@@ -35,9 +36,9 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeVo> searchIssuedNoticeListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
-//    public SystemNoticeVo getFirstPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
+    public List<Long> getPopUpNoticeIdListByUserUuid(@Param("userUuid") String userUuid, @Param("pageVo") BasePageVo pageVo);
 
-//    public int checkHasNextNeedPopUpNoticeByUserUuid(@Param("userUuid") String userUuid,@Param("noticeId") Long noticeId);
+    public int getPopUpNoticeCountByUserUuid(String userUuid);
 
     /**
      * @Description: 根据通知对象uuid获取超过生效时间的公告

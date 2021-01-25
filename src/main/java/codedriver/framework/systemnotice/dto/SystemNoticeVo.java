@@ -26,8 +26,8 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public enum Status{
         NOTISSUED("not_issued","未下发",""),
-        ISSUED("issued","已下发",""),
-        STOPPED("stopped","停用","");
+        ISSUED("issued","已下发","#15bf81"),
+        STOPPED("stopped","已停用","#ff8484");
         private String value;
         private String text;
         private String color;
@@ -96,6 +96,9 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     @EntityField(name = "下发时间", type = ApiParamType.LONG)
     private Date issueTime;
+
+    @EntityField(name = "公告内容中包含的所有图片，供前端展示使用",type = ApiParamType.JSONARRAY)
+    private List<String> imgList;
 
     public Long getId() {
         if (id == null) {
@@ -211,5 +214,13 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public void setIssueTime(Date issueTime) {
         this.issueTime = issueTime;
+    }
+
+    public List<String> getImgList() {
+        return imgList;
+    }
+
+    public void setImgList(List<String> imgList) {
+        this.imgList = imgList;
     }
 }

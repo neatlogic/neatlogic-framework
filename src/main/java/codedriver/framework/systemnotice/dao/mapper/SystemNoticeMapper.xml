@@ -172,7 +172,7 @@
         where
         b.`is_read` = 0
         or a.`ignore_read` = 0
-		) a
+        ) a
     </select>
 
     <select id="getPopUpNoticeIdListByUserUuid" resultType="java.lang.Long">

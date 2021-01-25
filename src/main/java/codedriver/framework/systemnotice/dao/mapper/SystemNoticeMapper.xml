@@ -189,7 +189,7 @@
         b.`is_read` = 0
         or a.`ignore_read` = 0
         ORDER BY a.`issue_time` desc
-        LIMIT #{startNum}, #{pageSize}
+        LIMIT #{pageVo.startNum}, #{pageVo.pageSize}
     </select>
 
     <select id="getExpiredNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

@@ -97,6 +97,9 @@ public class SystemNoticeVo extends BaseEditorVo {
     @EntityField(name = "下发时间", type = ApiParamType.LONG)
     private Date issueTime;
 
+    @EntityField(name = "公告内容中包含的所有图片，供前端展示使用",type = ApiParamType.JSONARRAY)
+    private List<String> imgList;
+
     public Long getId() {
         if (id == null) {
             id = SnowflakeUtil.uniqueLong();
@@ -211,5 +214,13 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public void setIssueTime(Date issueTime) {
         this.issueTime = issueTime;
+    }
+
+    public List<String> getImgList() {
+        return imgList;
+    }
+
+    public void setImgList(List<String> imgList) {
+        this.imgList = imgList;
     }
 }

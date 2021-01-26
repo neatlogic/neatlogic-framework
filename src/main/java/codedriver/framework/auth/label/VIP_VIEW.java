@@ -11,7 +11,7 @@ public class VIP_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthIntroduction() {
-		return "vip用户拥有更高的工单优先级和SLA响应权限";
+		return "vip用户拥有更高的工单优先级和SLA响应权限，可控制用户头像中VIP图标的显示";
 	}
 
 	@Override

@@ -94,9 +94,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 
     public String getAction() {
         if (action == null) {
-            if (getLcd() != null) {
+            if (getLcuName() != null) {
                 action = ActionType.UPDATE.getValue();
-            } else if (getFcd() != null) {
+            } else if (getFcuName() != null) {
                 action = ActionType.CREATE.getValue();
             }
         }
@@ -109,9 +109,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
 
     public String getActionName() {
         if (actionName == null) {
-            if (getLcd() != null) {
+            if (getLcuName() != null) {
                 actionName = ActionType.UPDATE.getText();
-            } else if (getFcd() != null) {
+            } else if (getFcuName() != null) {
                 actionName = ActionType.CREATE.getText();
             }
         }

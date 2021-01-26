@@ -16,9 +16,7 @@ import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.LoginService;
 import codedriver.framework.service.TenantService;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,14 +76,18 @@ public class LoginController {
             userVo.setTenant(tenant);
 
             UserVo checkUserVo = null;
-            if (Config.IS_MAINTENANCE_MODE() && MaintenanceMode.MAINTENANCE_USER.equals(userVo.getUserId())) {
+            if (Config.ENABLE_SUPERADMIN() && MaintenanceMode.MAINTENANCE_USER.equals(userVo.getUserId())) {
                 checkUserVo = MaintenanceMode.getMaintenanceUser();
             } else {
-                checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
-                if(checkUserVo != null){
+                if (Config.ENABLE_NO_SECRET()) {
+                    checkUserVo = userMapper.getActiveUserByUserId(userVo);
+                } else {
+                    checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+                }
+                if (checkUserVo != null) {
                     String timezone = "+8:00";
                     UserContext.init(checkUserVo, timezone, request, response);
-                    for(ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()){
+                    for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
                     }
                 }

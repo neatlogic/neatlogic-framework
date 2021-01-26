@@ -37,7 +37,7 @@ public class AuthActionChecker {
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
         //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
-        if (actionList.contains(NO_AUTH.class.getSimpleName()) || (Config.IS_MAINTENANCE_MODE() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList))) {
+        if (actionList.contains(NO_AUTH.class.getSimpleName()) || (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList))) {
             return true;
         }
 

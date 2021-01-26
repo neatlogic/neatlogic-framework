@@ -1,11 +1,9 @@
 package codedriver.framework.startup;
 
-import java.io.IOException;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-
+import codedriver.framework.asynchronization.thread.ModuleInitApplicationListener;
+import codedriver.framework.common.config.Config;
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.ModuleVo;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -20,10 +18,10 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import codedriver.framework.asynchronization.thread.ModuleInitApplicationListener;
-import codedriver.framework.common.config.Config;
-import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dto.ModuleVo;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+import java.io.IOException;
 public class ModuleInitializer implements WebApplicationInitializer {
 	static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
 
@@ -80,7 +78,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 					moduleVo.setVersion(version);
 					moduleVo.setGroup(group);
 					moduleVo.setGroupName(groupName);
-					moduleVo.setGroupSort(Integer.valueOf(groupSort));
+					moduleVo.setGroupSort(Integer.parseInt(groupSort));
 					moduleVo.setGroupDescription(groupDescription);
 					ModuleUtil.addModule(moduleVo);
 				}

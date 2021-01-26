@@ -45,7 +45,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 if (canRun) {
                     Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
                     result = method.invoke(proxy, paramObj);
-                    if (Config.RUN_MODE().equalsIgnoreCase("develop")) {
+                    if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(targetClass, result, JSONObject.class);
                     }
                 }
@@ -62,7 +62,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 }
                 if (canRun) {
                     result = myDoService(paramObj);
-                    if (Config.RUN_MODE().equalsIgnoreCase("develop")) {
+                    if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(this.getClass(), result, JSONObject.class);
                     }
                 }

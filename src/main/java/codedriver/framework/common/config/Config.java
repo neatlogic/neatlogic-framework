@@ -43,7 +43,6 @@ public class Config {
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
     private static String HOME_URL;
     private static String USER_EXPIRETIME; // 会话超时时间
-    private static String RUN_MODE;//运行模式，为空代表PRD模式，可以设为DEVELOP模式，DEVELOP模式影响性能，但有更多提示
 
 
     private static String MINIO_URL;
@@ -52,10 +51,14 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
-    private static Boolean IS_MAINTENANCE_MODE;
 
     private static int NEW_MESSAGE_EXPIRED_DAY;
     private static int HISTORY_MESSAGE_EXPIRED_DAY;
+
+
+    private static Boolean ENABLE_SUPERADMIN;//是否激活超级管理员，超级管理员用户名是techsure，是虚拟用户，免密登录，拥有管理员权限，可以授权给其他真实用户
+    private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
+    private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -65,7 +68,37 @@ public class Config {
                 CODEDRIVER_HOME = "/app";
             }
         }
-        RUN_MODE = StringUtils.isBlank(System.getProperty("runmode")) ? "PRD" : System.getProperty("runmode");
+
+        if (StringUtils.isNotBlank(System.getProperty("enableNoSecret"))) {
+            try {
+                ENABLE_NO_SECRET = Boolean.valueOf(System.getProperty("enableNoSecret"));
+            } catch (Exception ex) {
+                ENABLE_NO_SECRET = false;
+            }
+        } else {
+            ENABLE_NO_SECRET = false;
+        }
+
+        if (StringUtils.isNotBlank(System.getProperty("enableInterfaceVerify"))) {
+            try {
+                ENABLE_INTERFACE_VERIFY = Boolean.valueOf(System.getProperty("enableInterfaceVerify"));
+            } catch (Exception ex) {
+                ENABLE_INTERFACE_VERIFY = false;
+            }
+        } else {
+            ENABLE_INTERFACE_VERIFY = false;
+        }
+
+        if (StringUtils.isNotBlank(System.getProperty("enableSuperAdmin"))) {
+            try {
+                ENABLE_SUPERADMIN = Boolean.valueOf(System.getProperty("enableSuperAdmin"));
+            } catch (Exception ex) {
+                ENABLE_SUPERADMIN = false;
+            }
+        } else {
+            ENABLE_SUPERADMIN = false;
+        }
+
         try {
             SCHEDULE_SERVER_ID = Integer.parseInt(getProperty(CONFIG_FILE, "schedule.server.id", "1", true));
         } catch (Exception ex) {
@@ -146,21 +179,26 @@ public class Config {
         return MOBILE_TEST_USER;
     }
 
-    public static boolean IS_MAINTENANCE_MODE() {
-        return IS_MAINTENANCE_MODE;
+    public static boolean ENABLE_INTERFACE_VERIFY() {
+        return ENABLE_INTERFACE_VERIFY;
     }
 
-    public static String RUN_MODE() {
-        return RUN_MODE;
+    public static boolean ENABLE_SUPERADMIN() {
+        return ENABLE_SUPERADMIN;
     }
 
-    public static final int NEW_MESSAGE_EXPIRED_DAY(){
+    public static boolean ENABLE_NO_SECRET() {
+        return ENABLE_NO_SECRET;
+    }
+
+    public static final int NEW_MESSAGE_EXPIRED_DAY() {
         return NEW_MESSAGE_EXPIRED_DAY;
     }
 
-    public static final int HISTORY_MESSAGE_EXPIRED_DAY(){
+    public static final int HISTORY_MESSAGE_EXPIRED_DAY() {
         return HISTORY_MESSAGE_EXPIRED_DAY;
     }
+
     @PostConstruct
     public void init() {
         try {
@@ -205,7 +243,6 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
-            IS_MAINTENANCE_MODE = Boolean.parseBoolean(prop.getProperty("is.maintenance.mode", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));

@@ -55,6 +55,8 @@ public interface UserMapper {
 
     public UserVo getUserByUserIdAndPassword(UserVo userVo);
 
+    UserVo getActiveUserByUserId(UserVo userVo);
+
     public UserSessionVo getUserSessionByUserUuid(String userUuid);
 
     public List<UserVo> getUserByUserUuidList(List<String> userUuidList);

@@ -37,6 +37,9 @@ public class AuditUtil {
     /*查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看*/
     public final static long maxFileSize = 1024 * 1024;
 
+    /** 可导出的最大字节数 **/
+    public final static long maxExportSize = 1024;
+
     private static Logger logger = LoggerFactory.getLogger(AuditUtil.class);
 
     public static void saveAuditDetail(AuditVoHandler vo, String fileType) {

@@ -213,7 +213,7 @@
 		COUNT(1)
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
-		where 1=1
+		<where>
 		<if test="userUuid != null and userUuid != ''">
 			and `api_audit`.`user_uuid` = #{userUuid}
 		</if>
@@ -232,6 +232,7 @@
 		<if test="ip != null and ip != ''">
 			and `ip` LIKE CONCAT('%', #{ip}, '%')
 		</if>
+		</where>
 		<choose>
 			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc
@@ -262,7 +263,7 @@
 -- 		(SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
 		from `api_audit` LEFT JOIN `user`
 		on `api_audit`.`user_uuid` = `user`.`uuid`
-		where 1=1
+		<where>
 		<if test="userUuid != null and userUuid != ''">
 			and `api_audit`.`user_uuid` = #{userUuid}
 		</if>
@@ -281,6 +282,7 @@
 		<if test="ip != null and ip != ''">
 			and `ip` LIKE CONCAT('%', #{ip}, '%')
 		</if>
+		</where>
 		<choose>
 			<when test="orderType == 'desc' or orderType == ''">
 				order by `start_time` desc

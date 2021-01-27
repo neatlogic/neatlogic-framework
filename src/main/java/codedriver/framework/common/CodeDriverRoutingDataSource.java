@@ -6,16 +6,16 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 
 public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
-	@Override
-	protected Object determineCurrentLookupKey() {
-		if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
-			String key = TenantContext.get().getTenantUuid();
-			if (TenantContext.get().isOlap()) {
-				key += "_OLAP";
-			}
-			return key;
-		} else {
-			return null;
-		}
-	}
+    @Override
+    protected Object determineCurrentLookupKey() {
+        if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
+            String key = TenantContext.get().getTenantUuid();
+            if (TenantContext.get().isData()) {
+                key += "_DATA";
+            }
+            return key;
+        } else {
+            return null;
+        }
+    }
 }

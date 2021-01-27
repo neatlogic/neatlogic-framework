@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.systemnotice.dao.mapper.SystemNoticeMapper">
+
+    <select id="getSystemNoticeBaseInfoById" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`,
+        `title`,
+        `content`,
+        `start_time` as startTime,
+        `end_time` as endTime,
+        `status`,
+        `pop_up` as popUp,
+        `ignore_read` as ignoreRead,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcu`
+        from
+        `system_notice`
+        where `id` = #{value}
+    </select>
+
+    <resultMap id="systemNoticeMap" type="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="status" column="status"/>
+        <result property="popUp" column="popUp"/>
+        <result property="fcd" column="fcd"/>
+        <result property="lcd" column="lcd"/>
+        <result property="fcu" column="lcd"/>
+        <result property="lcu" column="lcd"/>
+        <collection property="recipientVoList" ofType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
+            <result property="uuid" column="recipientUuid" />
+            <result property="type" column="recipientType" />
+        </collection>
+    </resultMap>
+
+    <select id="getSystemNoticeById" parameterType="java.lang.Long" resultMap="systemNoticeMap">
+        select
+        a.`id`,
+        a.`title`,
+        a.`content`,
+        a.`start_time` as startTime,
+        a.`end_time` as endTime,
+        a.`status`,
+        a.`pop_up` as popUp,
+        a.`ignore_read` as ignoreRead,
+        a.`fcd`,
+        a.`fcu`,
+        a.`lcd`,
+        a.`lcu`,
+        b.`uuid` as recipientUuid,
+        b.`type` as recipientType
+        from
+        `system_notice` a
+        left join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where a.`id` = #{value}
+    </select>
+
+    <select id="searchSystemNoticeCount" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo" resultType="int">
+        select
+        count(1)
+        from `system_notice`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `title` LIKE CONCAT('%', #{keyword}, '%')
+                or
+                `content` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="searchSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`,
+        `title`,
+        `content`,
+        `start_time` as startTime,
+        `end_time` as endTime,
+        `status`,
+        `pop_up` as popUp,
+        `ignore_read` as ignoreRead,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcu`
+        from
+        `system_notice`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `title` LIKE CONCAT('%', #{keyword}, '%')
+                or
+                `content` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        order by `id` desc
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getRecipientListByNoticeId" parameterType="java.lang.Long" resultType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
+        select
+        `system_notice_id` as systemNoticeId,
+        `uuid`,
+        `type`
+        from `system_notice_recipient`
+        where `system_notice_id` = #{value}
+    </select>
+
+    <select id="getIssuedNoticeIdListByRecipientUuidList" parameterType="java.util.List" resultType="java.lang.Long">
+        select
+        distinct a.`id`
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` = 'issued'
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="searchIssuedNoticeCountByUserUuid" parameterType="java.lang.String" resultType="int">
+        select
+		count(1)
+		from
+		`system_notice` a
+		join `system_notice_user` b
+		on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
+		and b.`user_uuid` = #{value}
+    </select>
+
+    <select id="searchIssuedNoticeListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        a.`id`,
+        a.`title`,
+        a.`content`,
+        a.`issue_time`
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
+        and b.`user_uuid` = #{userUuid}
+        ORDER BY `issue_time` desc
+        <if test="noticeVo.needPage">
+            LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}
+        </if>
+    </select>
+
+    <select id="getPopUpNoticeCountByUserUuid" resultType="int">
+        select
+        count(1)
+        from
+        (
+        select
+		DISTINCT
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id`
+        and b.`user_uuid` = #{value}
+        and a.`pop_up` = 'longshow'
+        where
+        b.`is_read` = 0
+        or a.`ignore_read` = 0
+        ) a
+    </select>
+
+    <select id="getPopUpNoticeIdListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        a.`id`,
+        a.`issue_time`
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id`
+        and b.`user_uuid` = #{userUuid}
+        and a.`pop_up` = 'longshow'
+        where
+        b.`is_read` = 0
+        or a.`ignore_read` = 0
+        ORDER BY a.`issue_time` desc
+        LIMIT #{pageVo.startNum}, #{pageVo.pageSize}
+    </select>
+
+    <select id="getExpiredNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        distinct
+        a.`id`
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` = 'issued'
+        and a.`end_time` &lt; now(3)
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getHasBeenActiveNoticeListByRecipientUuidList" parameterType="java.lang.String" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        distinct
+        a.`id`,
+        a.`start_time` as startTime
+        from
+        `system_notice` a
+        join `system_notice_recipient` b
+        on a.`id` = b.`system_notice_id`
+        where
+        a.`status` != 'issued'
+        and a.`start_time` &lt;= now(3)
+        and a.`end_time` &gt; now(3)
+        and b.`uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getNotExistsNoticeIdListFromNoticeUserByUserUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+        select
+        a.`system_notice_id`
+        from
+        `system_notice_user` a
+        left join
+        `system_notice` b
+        on a.`system_notice_id` = b.`id`
+        where a.`user_uuid` = #{value} and b.`id` is null
+    </select>
+
+    <select id="getNotInNoticeScopeNoticeIdListByUserUuid" resultType="java.lang.Long">
+        select
+		a.`system_notice_id`
+		from
+		`system_notice_user` a
+		left join
+		(
+		select
+		`system_notice_id`
+		from
+		`system_notice_recipient` b
+		where b.`uuid` in
+        <foreach collection="recipientUuidList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+		) b
+		on a.`system_notice_id` = b.`system_notice_id`
+		where a.`user_uuid` = #{userUuid} and b.`system_notice_id` is null
+    </select>
+
+    <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        <if test="title != null and title != ''">
+            `title` = #{title},
+        </if>
+        <if test="content != null and content != ''">
+            `content` = #{content},
+        </if>
+        `lcd` = now(3)
+        where `id` = #{id}
+    </update>
+
+    <update id="updateSystemNoticeIssueInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        <if test="status != null and status != ''">
+            `status` = #{status},
+        </if>
+        <if test="issueTime != null">
+            `issue_time` = #{issueTime},
+        </if>
+        `start_time` = #{startTime},
+        `end_time` = #{endTime},
+        `pop_up` = #{popUp},
+        `ignore_read` = #{ignoreRead},
+        `lcd` = now(3)
+        where `id` = #{id}
+    </update>
+
+    <update id="updateSystemNoticeStatus" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        <if test="issueTime != null">
+            `issue_time` = #{issueTime},
+        </if>
+        `status` = #{status},
+        `lcd` = now(3)
+        where `id` = #{id}
+    </update>
+
+    <update id="updateSystemNoticeUserReadStatus">
+        update
+        `system_notice_user`
+        set `is_read` = 1
+        where
+        `system_notice_id` = #{noticeId}
+        and `user_uuid` = #{userUuid}
+    </update>
+
+    <insert id="insertSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        insert into
+        `system_notice`(
+        `id`,
+        `title`,
+        `content`,
+        `start_time`,
+        `end_time`,
+        `status`,
+        `pop_up`,
+        `ignore_read`,
+        `fcd`,
+        `fcu`,
+        `lcd`,
+        `lcu`
+        )values(
+        #{id},
+        #{title},
+        #{content},
+        #{startTime},
+        #{endTime},
+        'not_issued',
+        #{popUp},
+        #{ignoreRead},
+        now(3),
+        #{fcu},
+        now(3),
+        #{lcu}
+        )
+    </insert>
+
+    <insert id="batchInsertSystemNoticeRecipient" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeRecipientVo">
+        INSERT INTO `system_notice_recipient`(
+        `system_notice_id`,
+        `uuid`,
+        `type`
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.systemNoticeId},
+            #{item.uuid},
+            #{item.type}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertSystemNoticeUser" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeUserVo">
+        INSERT IGNORE INTO `system_notice_user`(
+        `system_notice_id`,
+        `user_uuid`,
+        `is_read`
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.systemNoticeId},
+            #{item.userUuid},
+            0
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteSystemNoticeById" parameterType="java.lang.Long">
+        delete
+        from `system_notice`
+        where `id` = #{value}
+    </delete>
+
+    <delete id="deleteRecipientByNoticeId" parameterType="java.lang.Long">
+        delete
+        from
+        `system_notice_recipient`
+        where `system_notice_id` = #{value}
+    </delete>
+
+    <delete id="deleteSystemNoticeUserByUserUuid">
+        delete
+		from `system_notice_user`
+		where `user_uuid` = #{userUuid}
+		and `system_notice_id` in
+        <foreach collection="noticeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

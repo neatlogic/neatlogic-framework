@@ -133,7 +133,7 @@ public class MessageSendThread extends CodeDriverThread {
                 long expireTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Config.USER_EXPIRETIME());
                 /** 根据用户、组、角色和登录失效时间点，找出所有在线用户 **/
                 List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
-                        messageHandlerAndRecipientVo.getToUserUuidList(), messageHandlerAndRecipientVo.getToTeamUuidList(), messageHandlerAndRecipientVo.getToRoleUuidList(), new Date(expireTime));
+                        messageHandlerAndRecipientVo.getToUserUuidList(), messageHandlerAndRecipientVo.getToTeamUuidList(), messageHandlerAndRecipientVo.getToRoleUuidList(), new Date(expireTime),false,null,null);
 
                 List<String> toUserUuidList = messageHandlerAndRecipientVo.getToUserUuidList();
                 if(CollectionUtils.isNotEmpty(toUserUuidList)){

@@ -273,16 +273,36 @@
                 NOW(3))
     </insert>
 
-    <update id="updateMessageUserIsDelete">
+    <update id="updateMessageUserIsDeleteByUserUuidAndMessageId">
         UPDATE `message_user`
         SET `is_delete` = 1
         WHERE `user_uuid` = #{userUuid}
-        <if test="messageIdList != null and messageIdList.size() > 0">
-            AND `message_id` in
-            <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
-                #{messageId}
-            </foreach>
+        AND `message_id` = #{messageId}
+    </update>
+    <update id="updateMessageUserIsDeleteByUserUuidAndMessageIdList">
+        UPDATE `message_user`
+        SET `is_delete` = 1
+        WHERE `user_uuid` = #{userUuid}
+        AND `message_id` IN
+        <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </update>
+    <update id="updateMessageUserIsDeleteByUserUuidAndMessageIdRange">
+        UPDATE `message_user`
+        SET `is_delete` = 1
+        WHERE `user_uuid` = #{userUuid}
+          <if test="fromMessageId != null">
+            AND `message_id` &gt; #{fromMessageId}
+          </if>
+        <if test="toMessageId != null">
+            AND `message_id` &lt;= #{toMessageId}
         </if>
+    </update>
+    <update id="updateMessageUserIsDeleteByUserUuid">
+        UPDATE `message_user`
+        SET `is_delete` = 1
+        WHERE `user_uuid` = #{value}
     </update>
 
     <update id="updateMessageUserIsRead">

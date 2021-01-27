@@ -55,6 +55,8 @@ public interface UserMapper {
 
     public UserVo getUserByUserIdAndPassword(UserVo userVo);
 
+    UserVo getActiveUserByUserId(UserVo userVo);
+
     public UserSessionVo getUserSessionByUserUuid(String userUuid);
 
     public List<UserVo> getUserByUserUuidList(List<String> userUuidList);
@@ -108,11 +110,26 @@ public interface UserMapper {
 
     public List<UserVo> getUserListByRoleUuid(String roleUuid);
 
+    public int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
+            @Param("userUuidList") List<String> userUuidList,
+            @Param("teamUuidList") List<String> teamUuidList,
+            @Param("roleUuidList") List<String> roleUuidList,
+            @Param("sessionTime") Date sessionTime
+    );
+
     public List<String> getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
             @Param("userUuidList") List<String> userUuidList,
             @Param("teamUuidList") List<String> teamUuidList,
             @Param("roleUuidList") List<String> roleUuidList,
-            @Param("sessionTime") Date sessionTime);
+            @Param("sessionTime") Date sessionTime,
+            @Param("needPage") Boolean needPage,
+            @Param("startNum") Integer startNum,
+            @Param("pageSize") Integer pageSize
+    );
+
+    public int getAllOnlineUserCount(Date sessionTime);
+
+    public List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime,@Param("startNum") Integer startNum,@Param("pageSize") Integer pageSize);
 
     public int insertUserAuth(UserAuthVo userAuthVo);
 

@@ -36,7 +36,7 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeVo> searchIssuedNoticeListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
-    public List<Long> getPopUpNoticeIdListByUserUuid(@Param("userUuid") String userUuid, @Param("pageVo") BasePageVo pageVo);
+    public List<SystemNoticeVo> getPopUpNoticeIdListByUserUuid(@Param("userUuid") String userUuid, @Param("pageVo") BasePageVo pageVo);
 
     public int getPopUpNoticeCountByUserUuid(String userUuid);
 

@@ -175,10 +175,10 @@
         ) a
     </select>
 
-    <select id="getPopUpNoticeIdListByUserUuid" resultType="java.lang.Long">
+    <select id="getPopUpNoticeIdListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         select
-        DISTINCT
-        a.`id`
+        a.`id`,
+        a.`issue_time`
         from
         `system_notice` a
         join `system_notice_user` b

@@ -100,6 +100,9 @@ public class SystemNoticeVo extends BaseEditorVo {
     @EntityField(name = "公告内容中包含的所有图片，供前端展示使用",type = ApiParamType.JSONARRAY)
     private List<String> imgList;
 
+    @EntityField(name = "是否已读(1:已读;0:未读)",type = ApiParamType.INTEGER)
+    private Integer isRead;
+
     public Long getId() {
         if (id == null) {
             id = SnowflakeUtil.uniqueLong();
@@ -222,5 +225,13 @@ public class SystemNoticeVo extends BaseEditorVo {
 
     public void setImgList(List<String> imgList) {
         this.imgList = imgList;
+    }
+
+    public Integer getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
     }
 }

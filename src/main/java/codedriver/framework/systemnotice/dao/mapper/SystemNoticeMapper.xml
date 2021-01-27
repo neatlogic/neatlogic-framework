@@ -128,14 +128,26 @@
         </foreach>
     </select>
 
-    <select id="searchIssuedNoticeCountByUserUuid" parameterType="java.lang.String" resultType="int">
+    <select id="searchIssuedNoticeCountByUserUuid" resultType="int">
         select
 		count(1)
 		from
 		`system_notice` a
 		join `system_notice_user` b
 		on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
-		and b.`user_uuid` = #{value}
+		and b.`user_uuid` = #{userUuid}
+        <if test="noticeVo.isRead != null">
+            and b.`is_read` = #{noticeVo.isRead}
+        </if>
+        <if test="noticeVo.keyword != null and noticeVo.keyword != ''">
+            and (
+            a.`title` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            or a.`content` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            )
+        </if>
+        <if test="noticeVo.startTime != null and noticeVo.endTime != null">
+            and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
+        </if>
     </select>
 
     <select id="searchIssuedNoticeListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -143,12 +155,25 @@
         a.`id`,
         a.`title`,
         a.`content`,
-        a.`issue_time`
+        a.`issue_time` as issueTime,
+        b.`is_read` as isRead
         from
         `system_notice` a
         join `system_notice_user` b
         on a.`id` = b.`system_notice_id` and a.`status` = 'issued'
         and b.`user_uuid` = #{userUuid}
+        <if test="noticeVo.isRead != null">
+            and b.`is_read` = #{noticeVo.isRead}
+        </if>
+        <if test="noticeVo.keyword != null and noticeVo.keyword != ''">
+            and (
+            a.`title` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            or a.`content` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            )
+        </if>
+        <if test="noticeVo.startTime != null and noticeVo.endTime != null">
+            and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
+        </if>
         ORDER BY `issue_time` desc
         <if test="noticeVo.needPage">
             LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}
@@ -310,6 +335,27 @@
         where
         `system_notice_id` = #{noticeId}
         and `user_uuid` = #{userUuid}
+    </update>
+
+    <update id="updateNoticeUserReadStatusByIdList">
+        update
+        `system_notice_user`
+        set `is_read` = 1
+        where
+        `user_uuid` = #{userUuid}
+        and `system_notice_id` in
+        <foreach collection="noticeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateNotReadNoticeToReadByUserUuid" parameterType="java.lang.String">
+        update
+        `system_notice_user`
+        set `is_read` = 1
+        where
+        `user_uuid` = #{userUuid}
+        and `is_read` = 0
     </update>
 
     <insert id="insertSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

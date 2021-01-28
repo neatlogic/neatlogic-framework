@@ -148,6 +148,18 @@
         <if test="noticeVo.startTime != null and noticeVo.endTime != null">
             and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
         </if>
+        <if test="noticeVo.issueTime != null and noticeVo.direction != null and noticeVo.direction != ''">
+            <choose>
+                <when test="noticeVo.direction == 'before'">
+                    and a.`issue_time` &lt; #{noticeVo.issueTime}
+                </when>
+                <otherwise>
+                    <if test="noticeVo.direction == 'after'">
+                        and a.`issue_time` &gt; #{noticeVo.issueTime}
+                    </if>
+                </otherwise>
+            </choose>
+        </if>
     </select>
 
     <select id="searchIssuedNoticeListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -173,6 +185,18 @@
         </if>
         <if test="noticeVo.startTime != null and noticeVo.endTime != null">
             and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
+        </if>
+        <if test="noticeVo.issueTime != null and noticeVo.direction != null and noticeVo.direction != ''">
+            <choose>
+                <when test="noticeVo.direction == 'before'">
+                    and a.`issue_time` &lt; #{noticeVo.issueTime}
+                </when>
+                <otherwise>
+                    <if test="noticeVo.direction == 'after'">
+                        and a.`issue_time` &gt; #{noticeVo.issueTime}
+                    </if>
+                </otherwise>
+            </choose>
         </if>
         ORDER BY `issue_time` desc
         <if test="noticeVo.needPage">

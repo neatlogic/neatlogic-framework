@@ -35,7 +35,9 @@ public class HtmlUtil {
 	private static final Pattern SCRIPTPATTREN = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>");// 定义script的正则表达式
 	private static final Pattern STYLEPATTREN = Pattern.compile("<style[^>]*?>[\\s\\S]*?<\\/style>");// 定义style的正则表达式
 	private static final Pattern HTMLPATTREN = Pattern.compile("<[^>]+>");// 定义HTML标签的正则表达式
-	private static final Pattern IMGSRCPATTREN = Pattern.compile("\"[^<>]*?/api/binary/image/download\\?id=[0-9]*\"");// 定义img标签中src的正则表达式
+//	private static final Pattern IMGSRCPATTREN = Pattern.compile("\"[^<>]*?/api/binary/image/download\\?id=[0-9]*\"");// 定义img标签中src的正则表达式
+	private static final Pattern IMGSRCPATTREN = Pattern.compile("img src=\".*?\"");// 定义img标签中src的正则表达式
+	private static final Pattern SRCCONTENTPATTREN = Pattern.compile("\".*?\"");// 定义img标签中src内容的正则表达式
 
 	public static String removeHtml(String htmlStr, Integer length) {
 		Matcher m_script = SCRIPTPATTREN.matcher(htmlStr);
@@ -44,6 +46,7 @@ public class HtmlUtil {
 		htmlStr = m_style.replaceAll(""); // 过滤style标签
 		Matcher m_html = HTMLPATTREN.matcher(htmlStr);
 		htmlStr = m_html.replaceAll(""); // 过滤html标签
+		htmlStr = htmlStr.replaceAll("&nbsp;"," ");//转义空格符
 		if (length != null && length > 0) {
 			if (htmlStr.length() <= length) {
 				return htmlStr;
@@ -68,7 +71,10 @@ public class HtmlUtil {
 			Matcher figureMatcher = IMGSRCPATTREN.matcher(htmlStr);
 			while (figureMatcher.find()){
 				String src = figureMatcher.group();
-				srcList.add(src.replaceAll("\"",""));
+				Matcher srcContentMatcher = SRCCONTENTPATTREN.matcher(src);
+				if(srcContentMatcher.find()){
+					srcList.add(srcContentMatcher.group().replaceAll("\"",""));
+				}
 			}
 		}
 		return srcList;

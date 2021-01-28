@@ -148,6 +148,18 @@
         <if test="noticeVo.startTime != null and noticeVo.endTime != null">
             and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
         </if>
+        <if test="noticeVo.issueTime != null and noticeVo.direction != null and noticeVo.direction != ''">
+            <choose>
+                <when test="noticeVo.direction == 'before'">
+                    and a.`issue_time` &lt; #{noticeVo.issueTime}
+                </when>
+                <otherwise>
+                    <if test="noticeVo.direction == 'after'">
+                        and a.`issue_time` &gt; #{noticeVo.issueTime}
+                    </if>
+                </otherwise>
+            </choose>
+        </if>
     </select>
 
     <select id="searchIssuedNoticeListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -174,6 +186,18 @@
         <if test="noticeVo.startTime != null and noticeVo.endTime != null">
             and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
         </if>
+        <if test="noticeVo.issueTime != null and noticeVo.direction != null and noticeVo.direction != ''">
+            <choose>
+                <when test="noticeVo.direction == 'before'">
+                    and a.`issue_time` &lt; #{noticeVo.issueTime}
+                </when>
+                <otherwise>
+                    <if test="noticeVo.direction == 'after'">
+                        and a.`issue_time` &gt; #{noticeVo.issueTime}
+                    </if>
+                </otherwise>
+            </choose>
+        </if>
         ORDER BY `issue_time` desc
         <if test="noticeVo.needPage">
             LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}
@@ -193,6 +217,7 @@
         join `system_notice_user` b
         on a.`id` = b.`system_notice_id`
         and b.`user_uuid` = #{value}
+        and a.`status` = 'issued'
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0
@@ -209,6 +234,7 @@
         join `system_notice_user` b
         on a.`id` = b.`system_notice_id`
         and b.`user_uuid` = #{userUuid}
+        and a.`status` = 'issued'
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0

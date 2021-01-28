@@ -217,6 +217,7 @@
         join `system_notice_user` b
         on a.`id` = b.`system_notice_id`
         and b.`user_uuid` = #{value}
+        and a.`status` = 'issued'
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0
@@ -233,6 +234,7 @@
         join `system_notice_user` b
         on a.`id` = b.`system_notice_id`
         and b.`user_uuid` = #{userUuid}
+        and a.`status` = 'issued'
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0

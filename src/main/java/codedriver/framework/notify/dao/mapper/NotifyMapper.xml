@@ -235,13 +235,20 @@
 	</if>
 	</select>
 	
-	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
+	<select id="getNotifyPolicyInvokerCountByInvoker" parameterType="java.lang.String" resultType="int">
 	SELECT 
 	  COUNT(1)
 	FROM `notify_policy_invoke` 
+	WHERE `invoker` = #{invoker}
+	</select>
+
+	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
+	SELECT
+	  COUNT(1)
+	FROM `notify_policy_invoke`
 	WHERE `policy_id` = #{policyId}
 	</select>
-	
+
 	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
 	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
 	</select>

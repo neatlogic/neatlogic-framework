@@ -354,6 +354,17 @@
         where `id` = #{id}
     </update>
 
+    <update id="stopSystemNoticeById" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        update
+        `system_notice`
+        set
+        `status` = 'stopped',
+        `start_time` = null,
+        `end_time` = null,
+        `lcd` = now(3)
+        where `id` = #{value}
+    </update>
+
     <update id="updateSystemNoticeUserReadStatus">
         update
         `system_notice_user`

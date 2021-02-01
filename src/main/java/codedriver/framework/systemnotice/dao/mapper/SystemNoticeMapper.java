@@ -82,6 +82,8 @@ public interface SystemNoticeMapper {
 
     public int updateSystemNoticeStatus(SystemNoticeVo vo);
 
+    public int stopSystemNoticeById(Long noticeId);
+
     public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid);
 
     public int updateNoticeUserReadStatusByIdList(@Param("noticeIdList") List<Long> noticeIdList, @Param("userUuid") String userUuid);

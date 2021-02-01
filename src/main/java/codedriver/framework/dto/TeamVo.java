@@ -42,6 +42,13 @@ public class TeamVo extends BasePageVo {
 	@EntityField(name = "级别", type = ApiParamType.STRING)
 	private String level;
 
+	@EntityField(name = "父分组名称", type = ApiParamType.STRING)
+	@JSONField(serialize = false)
+	private transient String parentName;
+
+	@EntityField(name = "分组完整路径", type = ApiParamType.STRING)
+	private String fullPath;
+
 	/**
 	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
 	 */
@@ -170,5 +177,21 @@ public class TeamVo extends BasePageVo {
 
 	public String getInitType() {
 		return initType;
+	}
+
+	public String getParentName() {
+		return parentName;
+	}
+
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
+	public String getFullPath() {
+		return fullPath;
+	}
+
+	public void setFullPath(String fullPath) {
+		this.fullPath = fullPath;
 	}
 }

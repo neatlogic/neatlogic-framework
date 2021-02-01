@@ -69,7 +69,7 @@ public interface UserMapper {
 
     public List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
-    public List<String> getUserNameListByUuidList(List<String> uuidList);
+    public List<String> getUserUuidListByUserName(String userName);
 
     public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 

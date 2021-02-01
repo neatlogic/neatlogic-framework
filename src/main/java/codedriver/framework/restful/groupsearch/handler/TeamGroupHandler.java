@@ -3,6 +3,8 @@ package codedriver.framework.restful.groupsearch.handler;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +45,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		teamVo.setCurrentPage(1);
 		teamVo.setKeyword(jsonObj.getString("keyword"));
 		teamList = teamMapper.searchTeam(teamVo);
+		setFullPathAndParentName(teamList);
 		return (List<T>) teamList;
 	}
 
@@ -58,6 +61,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		}
 		if(teamUuidList.size()>0) {
 			teamList = teamMapper.getTeamByUuidList(teamUuidList);
+			setFullPathAndParentName(teamList);
 		}
 		return (List<T>) teamList;
 	}
@@ -71,7 +75,8 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		for(T team:teamList) {
 			JSONObject teamTmp = new JSONObject();
 			teamTmp.put("value", getHeader()+((TeamVo) team).getUuid());
-			teamTmp.put("text", ((TeamVo) team).getName());
+			teamTmp.put("text", StringUtils.isNotBlank(((TeamVo) team).getParentName()) ? ((TeamVo) team).getParentName() + "->" + ((TeamVo) team).getName() : ((TeamVo) team).getName());
+			teamTmp.put("fullPath",((TeamVo) team).getFullPath());
 			teamArray.add(teamTmp);
 		}
 		teamObj.put("sort", getSort());
@@ -87,5 +92,36 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 	@Override
 	public Boolean isLimit() {
 		return true;
+	}
+
+	/**
+	 * @Description: 查询分组的全路径与父分组名称
+	 * @Author: laiwt
+	 * @Date: 2021/2/1 15:51
+	 * @Params: [teamList]
+	 * @Returns: void
+	 **/
+	private void setFullPathAndParentName(List<TeamVo> teamList) {
+		if (CollectionUtils.isNotEmpty(teamList)) {
+			for (TeamVo team : teamList) {
+				List<TeamVo> ancestorsAndSelf = teamMapper.getAncestorsAndSelfByLftRht(team.getLft(), team.getRht(), null);
+				if (CollectionUtils.isNotEmpty(ancestorsAndSelf)) {
+					List<String> pathNameList = new ArrayList<>();
+					for (TeamVo ancestor : ancestorsAndSelf) {
+						pathNameList.add(ancestor.getName());
+					}
+					if(CollectionUtils.isNotEmpty(pathNameList)){
+						team.setFullPath(String.join("->",pathNameList));
+					}
+				}
+				/** 如果有重名的分组，找出其父分组的名称 **/
+				if(teamList.stream().anyMatch(o -> o.getName().equals(team.getName()))){
+					TeamVo parent = teamMapper.getTeamByUuid(team.getParentUuid());
+					if(parent != null){
+						team.setParentName(parent.getName());
+					}
+				}
+			}
+		}
 	}
 }

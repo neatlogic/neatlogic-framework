@@ -361,8 +361,9 @@
         `status` = 'stopped',
         `start_time` = null,
         `end_time` = null,
-        `lcd` = now(3)
-        where `id` = #{value}
+        `lcd` = now(3),
+        `lcu` = #{lcu}
+        where `id` = #{id}
     </update>
 
     <update id="updateSystemNoticeUserReadStatus">

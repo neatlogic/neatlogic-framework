@@ -74,7 +74,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		for (T user : userList) {
 			JSONObject userTmp = new JSONObject();
 			userTmp.put("value", getHeader() + ((UserVo) user).getUuid());
-			userTmp.put("text", ((UserVo) user).getUserName());
+			userTmp.put("text", ((UserVo) user).getUserName() + "（" + ((UserVo) user).getUserId() + "）");
 //			userTmp.put("userInfo", ((UserVo) user).getUserInfo());
 			userTmp.put("pinyin",((UserVo) user).getPinyin());
 			userTmp.put("avatar", ((UserVo) user).getAvatar());

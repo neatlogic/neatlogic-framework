@@ -21,6 +21,17 @@
         where `id` = #{value}
     </select>
 
+    <select id="getSystemNoticeByIdAndUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        `id`,
+        `title`,
+        `content`,
+        (select `is_read` from `system_notice_user` where `system_notice_id` = #{noticeId} and `user_uuid` = #{userUuid}) as isRead
+        from
+        `system_notice`
+        where `id` = #{noticeId}
+    </select>
+
     <resultMap id="systemNoticeMap" type="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         <id property="id" column="id"/>
         <result property="title" column="title"/>

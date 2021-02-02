@@ -100,7 +100,7 @@ public interface INotifyContentHandler {
 	 * @Params: [config]
 	 * @Returns: java.lang.String
 	**/
-	public String preview(JSONObject config);
+	public String preview(JSONObject config,String notifyHandler);
 
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();

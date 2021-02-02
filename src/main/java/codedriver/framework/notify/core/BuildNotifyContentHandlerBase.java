@@ -1,6 +1,7 @@
 package codedriver.framework.notify.core;
 
 import codedriver.framework.notify.dto.NotifyVo;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,11 @@ import java.util.Map;
 public abstract class BuildNotifyContentHandlerBase implements IBuildNotifyContentHandler {
 
     @Override
+    public String getPreviewContent(JSONObject config) {
+        return myGetPreviewContent(config);
+    }
+
+    @Override
     public List<NotifyVo> getNotifyVoList(Map<String, Object> map) {
         return myGetNotifyVoList(map);
     }
@@ -30,6 +36,8 @@ public abstract class BuildNotifyContentHandlerBase implements IBuildNotifyConte
     public String getNotifyContentHandlerClassName() {
         return myGetNotifyContentHandlerClassName();
     }
+
+    protected abstract String myGetPreviewContent(JSONObject config);
 
     protected abstract List<NotifyVo> myGetNotifyVoList(Map<String, Object> map);
 

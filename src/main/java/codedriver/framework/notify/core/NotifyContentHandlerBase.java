@@ -29,8 +29,8 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
     }
 
     @Override
-    public String preview(JSONObject config) {
-        return myPreview(config);
+    public String preview(JSONObject config,String notifyHandler) {
+        return myPreview(config,notifyHandler);
     }
 
     protected abstract JSONArray getMyConditionOptionList();
@@ -41,5 +41,5 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
 
     protected abstract List<NotifyVo> getMyNotifyData(Long id);
 
-    protected abstract String myPreview(JSONObject config);
+    protected abstract String myPreview(JSONObject config, String notifyHandler);
 }

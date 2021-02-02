@@ -283,7 +283,7 @@
         where
         a.`status` != 'issued'
         and a.`start_time` &lt;= now(3)
-        and a.`end_time` &gt; now(3)
+        and (a.`end_time` is null or a.`end_time` &gt; now(3))
         and b.`uuid` in
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
@@ -319,6 +319,52 @@
 		) b
 		on a.`system_notice_id` = b.`system_notice_id`
 		where a.`user_uuid` = #{userUuid} and b.`system_notice_id` is null
+    </select>
+
+    <select id="searchNoticeHistoryCountByUserUuid" resultType="int">
+        select
+        count(1)
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id` and (a.`status` = 'issued' or a.`status` = 'stopped')
+        and b.`user_uuid` = #{userUuid}
+        <if test="noticeVo.keyword != null and noticeVo.keyword != ''">
+            and (
+            a.`title` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            or a.`content` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            )
+        </if>
+        <if test="noticeVo.startTime != null and noticeVo.endTime != null">
+            and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
+        </if>
+    </select>
+
+    <select id="searchNoticeHistoryListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
+        select
+        a.`id`,
+        a.`title`,
+        a.`content`,
+        a.`issue_time` as issueTime,
+        b.`is_read` as isRead
+        from
+        `system_notice` a
+        join `system_notice_user` b
+        on a.`id` = b.`system_notice_id` and (a.`status` = 'issued' or a.`status` = 'stopped')
+        and b.`user_uuid` = #{userUuid}
+        <if test="noticeVo.keyword != null and noticeVo.keyword != ''">
+            and (
+            a.`title` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            or a.`content` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            )
+        </if>
+        <if test="noticeVo.startTime != null and noticeVo.endTime != null">
+            and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
+        </if>
+        ORDER BY `issue_time` desc
+        <if test="noticeVo.needPage">
+            LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}
+        </if>
     </select>
 
     <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

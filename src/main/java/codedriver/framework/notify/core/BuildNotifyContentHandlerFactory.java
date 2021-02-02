@@ -20,10 +20,10 @@ import java.util.Map;
 @RootComponent
 public class BuildNotifyContentHandlerFactory extends ApplicationListenerBase {
 
-    private static Map<Map<String,String>, IBuildNotifyContentHandler> buildNotifyVoHandlerMap = new HashMap();
+    private static Map<String, IBuildNotifyContentHandler> buildNotifyVoHandlerMap = new HashMap();
 
-    public static IBuildNotifyContentHandler getHandler(Map<String,String> map){
-        return buildNotifyVoHandlerMap.get(map);
+    public static IBuildNotifyContentHandler getHandler(String handler){
+        return buildNotifyVoHandlerMap.get(handler);
     }
 
     @Override
@@ -31,9 +31,8 @@ public class BuildNotifyContentHandlerFactory extends ApplicationListenerBase {
         ApplicationContext context = event.getApplicationContext();
         Map<String, IBuildNotifyContentHandler> myMap = context.getBeansOfType(IBuildNotifyContentHandler.class);
         for (Map.Entry<String, IBuildNotifyContentHandler> entry : myMap.entrySet()) {
-            Map<String,String> map = new HashMap<>();
-            map.put(entry.getValue().getNotifyHandlerClassName(),entry.getValue().getNotifyContentHandlerClassName());
-            buildNotifyVoHandlerMap.put(map,entry.getValue());
+            buildNotifyVoHandlerMap.put(entry.getValue().getNotifyHandlerClassName()
+                            + "," + entry.getValue().getNotifyContentHandlerClassName(),entry.getValue());
         }
     }
 

@@ -76,6 +76,10 @@ public interface SystemNoticeMapper {
     **/
     public List<Long> getNotInNoticeScopeNoticeIdListByUserUuid(@Param("recipientUuidList") List<String> recipientUuidList,@Param("userUuid") String userUuid);
 
+    public int searchNoticeHistoryCountByUserUuid(@Param("userUuid") String userUuid,@Param("noticeVo") SystemNoticeVo noticeVo);
+
+    public List<SystemNoticeVo> searchNoticeHistoryListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
+
     public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
 
     public int updateSystemNoticeIssueInfo(SystemNoticeVo vo);

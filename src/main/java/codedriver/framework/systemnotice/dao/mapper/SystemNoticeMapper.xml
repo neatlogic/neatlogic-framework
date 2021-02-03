@@ -408,7 +408,9 @@
         `start_time` = null,
         `end_time` = null,
         `lcd` = now(3),
-        `lcu` = #{lcu}
+        <if test="lcu != null and lcu != ''">
+            `lcu` = #{lcu}
+        </if>
         where `id` = #{id}
     </update>
 

@@ -22,6 +22,8 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeBaseInfoById(Long id);
 
+    public SystemNoticeVo getSystemNoticeByIdAndUserUuid(@Param("noticeId") Long id,@Param("userUuid") String userUuid);
+
     public SystemNoticeVo getSystemNoticeById(Long id);
 
     public List<SystemNoticeVo> searchSystemNotice(SystemNoticeVo vo);
@@ -75,6 +77,10 @@ public interface SystemNoticeMapper {
      * @Returns: java.util.List<java.lang.Long>
     **/
     public List<Long> getNotInNoticeScopeNoticeIdListByUserUuid(@Param("recipientUuidList") List<String> recipientUuidList,@Param("userUuid") String userUuid);
+
+    public int searchNoticeHistoryCountByUserUuid(@Param("userUuid") String userUuid,@Param("noticeVo") SystemNoticeVo noticeVo);
+
+    public List<SystemNoticeVo> searchNoticeHistoryListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
     public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
 

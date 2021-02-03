@@ -94,10 +94,12 @@ public interface INotifyContentHandler {
 	public List<NotifyVo> getNotifyData(Long id);
 
 	/**
-	 * @Description: 插件预览
+	 * @Description: 插件内容预览方法，不同的通知方式，发送的通知内容也不同
+	 * 以【待我处理的工单】为例，邮件通知的内容是工单列表，而消息通知的内容是
+	 * 待处理的工单数量与工单中心的链接
 	 * @Author: laiwt
-	 * @Date: 2021/1/8 18:15
-	 * @Params: [config]
+	 * @Date: 2021/2/3 14:52
+	 * @Params: [config, notifyHandler]
 	 * @Returns: java.lang.String
 	**/
 	public String preview(JSONObject config,String notifyHandler);

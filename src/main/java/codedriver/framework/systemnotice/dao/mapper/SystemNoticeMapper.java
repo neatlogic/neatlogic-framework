@@ -80,6 +80,8 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeVo> searchNoticeHistoryListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
+    public int getHasReadSystemNoticeUserCountById(Long id);
+
     public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
 
     public int updateSystemNoticeIssueInfo(SystemNoticeVo vo);
@@ -88,11 +90,13 @@ public interface SystemNoticeMapper {
 
     public int stopSystemNoticeById(SystemNoticeVo vo);
 
-    public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid);
+    public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid,@Param("isRead") Integer isRead);
 
     public int updateNoticeUserReadStatusByIdList(@Param("noticeIdList") List<Long> noticeIdList, @Param("userUuid") String userUuid);
 
     public int updateNotReadNoticeToReadByUserUuid(String userUuid);
+
+    public int batchUpdateHasReadSystemNoticeUser(@Param("noticeId") Long id,@Param("limitNum") Integer limitNum);
 
     public int insertSystemNotice(SystemNoticeVo vo);
 

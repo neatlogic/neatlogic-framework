@@ -232,7 +232,6 @@
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0
-        or a.`ignore_read` = 0
         ) a
     </select>
 
@@ -249,7 +248,6 @@
         and a.`pop_up` = 'longshow'
         where
         b.`is_read` = 0
-        or a.`ignore_read` = 0
         ORDER BY a.`issue_time` desc
         LIMIT #{pageVo.startNum}, #{pageVo.pageSize}
     </select>
@@ -275,7 +273,8 @@
         select
         distinct
         a.`id`,
-        a.`start_time` as startTime
+        a.`start_time` as startTime,
+        a.`ignore_read` as ignoreRead
         from
         `system_notice` a
         join `system_notice_recipient` b
@@ -428,7 +427,7 @@
     <update id="updateSystemNoticeUserReadStatus">
         update
         `system_notice_user`
-        set `is_read` = 1
+        set `is_read` = #{isRead}
         where
         `system_notice_id` = #{noticeId}
         and `user_uuid` = #{userUuid}
@@ -453,6 +452,14 @@
         where
         `user_uuid` = #{userUuid}
         and `is_read` = 0
+    </update>
+
+    <update id="updateReadStatusToNotReadByNoticeId" parameterType="java.lang.Long">
+        update
+        `system_notice_user`
+        set `is_read` = 0
+        where `system_notice_id` = #{value}
+        and `is_read` = 1
     </update>
 
     <insert id="insertSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

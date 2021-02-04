@@ -1,5 +1,12 @@
 package codedriver.framework.dto.condition;
 
+import codedriver.framework.common.dto.BasePageVo;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,31 +14,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.dto.BasePageVo;
-
 public class ConditionConfigVo extends BasePageVo implements Serializable {
 
     private static final long serialVersionUID = 5439300427812355573L;
 
-    private List<ConditionGroupVo> conditionGroupList;
+    protected List<ConditionGroupVo> conditionGroupList = new ArrayList<ConditionGroupVo>();;
     @JSONField(serialize = false)
-    private transient Map<String, ConditionGroupVo> conditionGroupMap;
-    private List<ConditionGroupRelVo> conditionGroupRelList;
+    private transient Map<String, ConditionGroupVo> conditionGroupMap ;
+    protected List<ConditionGroupRelVo> conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();;
 
     public ConditionConfigVo() {}
 
     public ConditionConfigVo(JSONObject jsonObj) {
         JSONArray conditionGroupArray = jsonObj.getJSONArray("conditionGroupList");
         if (CollectionUtils.isNotEmpty(conditionGroupArray)) {
-
-            conditionGroupList = new ArrayList<ConditionGroupVo>();
             conditionGroupMap = new HashMap<String, ConditionGroupVo>();
             for (int i = 0; i < conditionGroupArray.size(); i++) {
                 JSONObject conditionGroupJson = conditionGroupArray.getJSONObject(i);
@@ -41,7 +37,6 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
             }
             JSONArray conditionGroupRelArray = jsonObj.getJSONArray("conditionGroupRelList");
             if (CollectionUtils.isNotEmpty(conditionGroupRelArray)) {
-                conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();
                 for (int i = 0; i < conditionGroupRelArray.size(); i++) {
                     JSONObject conditionRelGroup = conditionGroupRelArray.getJSONObject(i);
                     conditionGroupRelList.add(new ConditionGroupRelVo(conditionRelGroup));

@@ -366,15 +366,6 @@
         </if>
     </select>
 
-    <select id="getHasReadSystemNoticeUserCountById" parameterType="java.lang.Long" resultType="int">
-        select
-        count(1)
-        from
-        `system_notice_user`
-        where `system_notice_id` = #{value}
-        and `is_read` = 1
-    </select>
-
     <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
@@ -463,13 +454,12 @@
         and `is_read` = 0
     </update>
 
-    <update id="batchUpdateHasReadSystemNoticeUser">
+    <update id="updateReadStatusToNotReadByNoticeId" parameterType="java.lang.Long">
         update
         `system_notice_user`
         set `is_read` = 0
-        where `system_notice_id` = #{noticeId}
+        where `system_notice_id` = #{value}
         and `is_read` = 1
-        limit #{limitNum}
     </update>
 
     <insert id="insertSystemNotice" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">

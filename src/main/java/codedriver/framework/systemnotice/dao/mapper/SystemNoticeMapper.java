@@ -22,6 +22,8 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeBaseInfoById(Long id);
 
+    public SystemNoticeVo getSystemNoticeByIdAndUserUuid(@Param("noticeId") Long id,@Param("userUuid") String userUuid);
+
     public SystemNoticeVo getSystemNoticeById(Long id);
 
     public List<SystemNoticeVo> searchSystemNotice(SystemNoticeVo vo);

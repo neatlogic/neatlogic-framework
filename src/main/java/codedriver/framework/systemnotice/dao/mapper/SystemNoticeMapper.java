@@ -52,7 +52,7 @@ public interface SystemNoticeMapper {
     public List<SystemNoticeVo> getExpiredNoticeListByRecipientUuidList(List<String> uuidList);
 
     /**
-     * @Description: 根据通知对象uuid获取到了生效时间、状态是未发布的公告
+     * @Description: 根据通知对象uuid获取到了生效时间、状态是未下发的公告
      * @Author: laiwt
      * @Date: 2021/1/15 16:23
      * @Params: [uuidList]
@@ -90,11 +90,13 @@ public interface SystemNoticeMapper {
 
     public int stopSystemNoticeById(SystemNoticeVo vo);
 
-    public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid);
+    public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid,@Param("isRead") Integer isRead);
 
     public int updateNoticeUserReadStatusByIdList(@Param("noticeIdList") List<Long> noticeIdList, @Param("userUuid") String userUuid);
 
     public int updateNotReadNoticeToReadByUserUuid(String userUuid);
+
+    public int updateReadStatusToNotReadByNoticeId(Long id);
 
     public int insertSystemNotice(SystemNoticeVo vo);
 

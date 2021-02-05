@@ -3,6 +3,8 @@ package codedriver.framework.restful.groupsearch.handler;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.common.constvalue.DeviceType;
+import codedriver.framework.common.util.CommonUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +77,13 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		for(T team:teamList) {
 			JSONObject teamTmp = new JSONObject();
 			teamTmp.put("value", getHeader()+((TeamVo) team).getUuid());
-			teamTmp.put("text", StringUtils.isNotBlank(((TeamVo) team).getParentName()) ? ((TeamVo) team).getParentName() + "->" + ((TeamVo) team).getName() : ((TeamVo) team).getName());
+			if(DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())){
+				teamTmp.put("text", StringUtils.isNotBlank(((TeamVo) team).getParentName())
+						? ((TeamVo) team).getName() + "(" + ((TeamVo) team).getParentName() + ")"
+						: ((TeamVo) team).getName());
+			}else{
+				teamTmp.put("text", ((TeamVo) team).getName());
+			}
 			teamTmp.put("fullPath",((TeamVo) team).getFullPath());
 			teamArray.add(teamTmp);
 		}

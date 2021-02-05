@@ -1,11 +1,11 @@
 package codedriver.framework.notify.core;
 
 import codedriver.framework.notify.dto.NotifyVo;
+import codedriver.framework.notify.dto.job.NotifyJobVo;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Title: IBuildNotifyContentHandler
@@ -20,7 +20,7 @@ public interface IBuildNotifyContentHandler {
 
     public String getPreviewContent(JSONObject config);
 
-    public List<NotifyVo> getNotifyVoList(Map<String,Object> map);
+    public List<NotifyVo> getNotifyVoList(NotifyJobVo job);
 
     public String getNotifyHandlerClassName();
 

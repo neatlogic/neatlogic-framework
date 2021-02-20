@@ -47,6 +47,10 @@ public interface MessageMapper {
 
     public List<String> getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(@Param("handler") String handler, @Param("userUuidList") List<String> userUuidList);
 
+    public int getMessagePopUpCount(MessageSearchVo searchVo);
+
+    public List<MessageVo> getMessagePopUpList(MessageSearchVo searchVo);
+
     public int insertMessage(List<MessageVo> messageVoList);
 
     public int insertMessageRecipient(List<MessageRecipientVo> messageRecipientVoList);

@@ -1,5 +1,6 @@
 package codedriver.framework.restful.core;
 
+import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
@@ -83,5 +84,5 @@ public interface IApiComponent {
 	 * @Params: [interfaceVo, paramObj, validField]
 	 * @Returns: void
 	 **/
-	void doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
+	FieldValidResultVo doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
 }

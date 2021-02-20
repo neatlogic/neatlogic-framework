@@ -1,7 +1,7 @@
 package codedriver.framework.restful.web;
 
 import codedriver.framework.common.config.Config;
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
@@ -70,7 +70,12 @@ public class ApiDispatcher {
         String validField = request.getHeader("codedriver-validfield");
         if(StringUtils.isNotBlank(validField)) {
             IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
-            restComponent.doValid(interfaceVo,paramObj,validField);
+            FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo,paramObj,validField);
+            if(StringUtils.isNotBlank(validResultVo.getMsg())) {
+                response.setStatus(530);
+                returnObj.put("Message", validResultVo.getMsg());
+            }
+            returnObj.put("Status", validResultVo.getStatus());
         }else {
             if (apiType.equals(ApiVo.Type.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
@@ -166,10 +171,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -219,10 +220,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -260,10 +257,6 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -306,10 +299,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -347,10 +336,6 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -392,10 +377,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -424,10 +405,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -454,10 +431,6 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -482,10 +455,6 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiFieldValidRuntimeException ex) {
-            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {

@@ -28,7 +28,6 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         IApiComponent restComponent = PrivateApiComponentFactory.getInstance(apiVo.getHandler());
         Method[] methods = new Method[]{};
         Object target = null;
-        String[] validFieldArray = validField.split(",");
         try {
             Object proxy = AopContext.currentProxy();
             //获取代理的真实bean
@@ -38,16 +37,13 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             target = restComponent;
             methods = restComponent.getClass().getMethods();
         } finally {
-            for (String valid : validFieldArray) {
-                for (Method method : methods) {
-                    //System.out.println(method.getName());
-                    if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(valid)) {
-                        //特殊入参校验：重复、特殊规则等
-                        IValid validComponent = (IValid) method.invoke(target, null);
-                        validComponent.valid(paramObj);
-                    }
+            for (Method method : methods) {
+                //System.out.println(method.getName());
+                if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(validField)) {
+                    //特殊入参校验：重复、特殊规则等
+                    IValid validComponent = (IValid) method.invoke(target, null);
+                    validComponent.valid(paramObj);
                 }
-
             }
         }
     }

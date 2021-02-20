@@ -1,6 +1,7 @@
 package codedriver.framework.restful.web;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
@@ -65,73 +66,79 @@ public class ApiDispatcher {
         } else {
             throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
         }
-
-
-        if (apiType.equals(ApiVo.Type.OBJECT)) {
+        //如果只是接口校验入参
+        String validField = request.getHeader("codedriver-validfield");
+        if(StringUtils.isNotBlank(validField)) {
             IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj);
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
+            restComponent.doValid(interfaceVo,paramObj,validField);
+        }else {
+            if (apiType.equals(ApiVo.Type.OBJECT)) {
+                IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
                     } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    returnObj.putAll(restComponent.help());
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
-            }
-        } else if (apiType.equals(ApiVo.Type.STREAM)) {
-            IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
+            } else if (apiType.equals(ApiVo.Type.STREAM)) {
+                IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
                     } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    returnObj.putAll(restComponent.help());
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
-            }
-        } else if (apiType.equals(ApiVo.Type.BINARY)) {
-            IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
+            } else if (apiType.equals(ApiVo.Type.BINARY)) {
+                IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
                     } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    returnObj.putAll(restComponent.help());
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
             }
         }
     }
@@ -157,6 +164,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -208,6 +219,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -245,6 +260,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -287,6 +306,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -324,6 +347,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -365,6 +392,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -393,6 +424,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -419,6 +454,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -443,6 +482,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiFieldValidRuntimeException ex) {
+            response.setStatus(530);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {

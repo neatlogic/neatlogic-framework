@@ -2,10 +2,12 @@ package codedriver.framework.restful.core;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,33 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         return 0;
     }
 
+    public final void doValid(ApiVo apiVo, JSONObject paramObj, String validField) throws Exception {
+        IApiComponent restComponent = PrivateApiComponentFactory.getInstance(apiVo.getHandler());
+        Method[] methods = new Method[]{};
+        Object target = null;
+        String[] validFieldArray = validField.split(",");
+        try {
+            Object proxy = AopContext.currentProxy();
+            //获取代理的真实bean
+            target = ((Advised) proxy).getTargetSource().getTarget();
+            methods = AopUtils.getTargetClass(proxy).getMethods();
+        } catch (IllegalStateException | IllegalArgumentException | SecurityException ex) {
+            target = restComponent;
+            methods = restComponent.getClass().getMethods();
+        } finally {
+            for (String valid : validFieldArray) {
+                for (Method method : methods) {
+                    //System.out.println(method.getName());
+                    if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(valid)) {
+                        //特殊入参校验：重复、特殊规则等
+                        IValid validComponent = (IValid) method.invoke(target, null);
+                        validComponent.valid(paramObj);
+                    }
+                }
+
+            }
+        }
+    }
 
     public final Object doService(ApiVo apiVo, JSONObject paramObj) throws Exception {
         String error = "";

@@ -12,14 +12,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
 
-    @Autowired
+    @Resource
     private ApiMapper apiMapper;
 
     public int needAudit() {

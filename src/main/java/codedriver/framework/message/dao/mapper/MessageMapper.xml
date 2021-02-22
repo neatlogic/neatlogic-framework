@@ -93,7 +93,7 @@
         COUNT(1)
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
-        WHERE a.`fcd` &gt;= #{startTime} and a.`fcd` &lt;= #{endTime}
+        WHERE a.`insert_time` &gt;= #{startTime} and a.`insert_time` &lt;= #{endTime}
         <if test="handlerList != null and handlerList.size()">
             AND a.`handler` in
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
@@ -109,7 +109,8 @@
         a.`title`,
         a.`content`,
         a.`fcd`,
-        a.`handler`
+        a.`handler`,
+        b.`is_delete` AS isDelete
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
         <where>
@@ -120,7 +121,7 @@
                 </foreach>
             </if>
             <if test="startTime != null and endTime != null">
-                and a.`fcd` &gt;= #{startTime} and a.`fcd` &lt;= #{endTime}
+                and a.`insert_time` &gt;= #{startTime} and a.`insert_time` &lt;= #{endTime}
             </if>
         </where>
         ORDER BY a.`id` DESC
@@ -198,11 +199,11 @@
     </select>
 
     <select id="getMessageFcdById" parameterType="java.lang.Long" resultType="java.util.Date">
-        SELECT `fcd` FROM `message` WHERE `id` = #{value}
+        SELECT `insert_time` FROM `message` WHERE `id` = #{value}
     </select>
 
     <select id="getMessageMaxIdByLessThanFcd" parameterType="java.util.Date" resultType="java.lang.Long">
-        SELECT MAX(`id`) FROM `message` WHERE `fcd` &lt; #{value}
+        SELECT MAX(`id`) FROM `message` WHERE `insert_time` &lt; #{value}
     </select>
 
     <select id="getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList" resultType="java.lang.String">
@@ -215,6 +216,37 @@
         <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
             #{userUuid}
         </foreach>
+    </select>
+
+    <select id="getMessagePopUpCount" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `message_user`
+        WHERE `user_uuid` = #{userUuid}
+        AND `is_delete` = 0
+        AND `is_read` = 0
+        <if test="messageId != null">
+            AND `message_id` &lt; #{messageId}
+        </if>
+    </select>
+
+    <select id="getMessagePopUpList" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="codedriver.framework.message.dto.MessageVo">
+        SELECT
+        b.`id`,
+        b.`title`,
+        b.`content`,
+        b.`fcd`,
+        b.`handler`
+        FROM `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        WHERE a.`user_uuid` = #{userUuid}
+        AND a.`is_delete` = 0
+        AND a.`is_read` = 0
+        <if test="messageId != null">
+            AND a.`message_id` &lt; #{messageId}
+        </if>
+        ORDER BY a.`message_id` DESC
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <insert id="insertMessage" parameterType="codedriver.framework.message.dto.MessageVo">
@@ -275,13 +307,15 @@
 
     <update id="updateMessageUserIsDeleteByUserUuidAndMessageId">
         UPDATE `message_user`
-        SET `is_delete` = 1
+        SET `is_delete` = 1,
+            `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
         AND `message_id` = #{messageId}
     </update>
     <update id="updateMessageUserIsDeleteByUserUuidAndMessageIdList">
         UPDATE `message_user`
-        SET `is_delete` = 1
+        SET `is_delete` = 1,
+        `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
         AND `message_id` IN
         <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
@@ -290,7 +324,8 @@
     </update>
     <update id="updateMessageUserIsDeleteByUserUuidAndMessageIdRange">
         UPDATE `message_user`
-        SET `is_delete` = 1
+        SET `is_delete` = 1,
+        `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
           <if test="fromMessageId != null">
             AND `message_id` &gt; #{fromMessageId}
@@ -301,7 +336,8 @@
     </update>
     <update id="updateMessageUserIsDeleteByUserUuid">
         UPDATE `message_user`
-        SET `is_delete` = 1
+        SET `is_delete` = 1,
+            `is_read` = 1
         WHERE `user_uuid` = #{value}
     </update>
 
@@ -309,12 +345,10 @@
         UPDATE `message_user`
         SET `is_read` = 1
         WHERE `user_uuid` = #{userUuid}
-        <if test="messageIdList != null and messageIdList.size() > 0">
-            AND `message_id` in
-            <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
-                #{messageId}
-            </foreach>
-        </if>
+        AND `message_id` IN
+        <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
     </update>
 
     <update id="updateMessageSubscribePopUp" parameterType="codedriver.framework.message.dto.MessageHandlerVo">

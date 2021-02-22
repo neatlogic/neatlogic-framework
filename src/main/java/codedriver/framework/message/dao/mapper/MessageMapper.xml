@@ -223,11 +223,9 @@
         COUNT(1)
         FROM `message_user`
         WHERE `user_uuid` = #{userUuid}
+        AND `message_id` &lt; #{messageId}
         AND `is_delete` = 0
         AND `is_read` = 0
-        <if test="messageId != null">
-            AND `message_id` &lt; #{messageId}
-        </if>
     </select>
 
     <select id="getMessagePopUpList" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="codedriver.framework.message.dto.MessageVo">
@@ -240,11 +238,9 @@
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{userUuid}
+        AND a.`message_id` &lt; #{messageId}
         AND a.`is_delete` = 0
         AND a.`is_read` = 0
-        <if test="messageId != null">
-            AND a.`message_id` &lt; #{messageId}
-        </if>
         ORDER BY a.`message_id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>

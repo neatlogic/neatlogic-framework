@@ -32,6 +32,8 @@ public class MessageVo {
     private String popUp;
     @JSONField(serialize = false)
     private transient Integer isRead;
+    @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
+    private  Integer isDelete;
 
     public MessageVo() {
     }
@@ -99,5 +101,13 @@ public class MessageVo {
 
     public void setIsRead(Integer isRead) {
         this.isRead = isRead;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
     }
 }

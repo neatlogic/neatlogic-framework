@@ -190,8 +190,11 @@ public class MessageSendThread extends CodeDriverThread {
      * @Returns:void
      **/
     private void batchInsertData(List<MessageVo> messageVoList, List<MessageRecipientVo> messageRecipientVoList, List<MessageSearchVo> messageSearchVoList){
-        messageMapper.insertMessage(messageVoList);
-        messageVoList.clear();
+        if(CollectionUtils.isNotEmpty(messageVoList)){
+            messageMapper.insertMessage(messageVoList);
+            messageVoList.clear();
+        }
+
         if(CollectionUtils.isNotEmpty(messageRecipientVoList)){
             int count = messageRecipientVoList.size() / BATCH_INSERT_MAX_COUNT + 1;
             for(int i = 0; i < count; i++){

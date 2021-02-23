@@ -1,10 +1,9 @@
 package codedriver.framework.restful.core;
 
-import org.springframework.util.ClassUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
+import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.util.ClassUtils;
 
 public interface IApiComponent {
 
@@ -77,4 +76,13 @@ public interface IApiComponent {
 	 * @return JSONObject
 	 */
 	public JSONObject help();
+
+	/**
+	 * @Description: 校验入参特殊规则，如：去重
+	 * @Author: 89770
+	 * @Date: 2021/2/20 16:09
+	 * @Params: [interfaceVo, paramObj, validField]
+	 * @Returns: void
+	 **/
+	FieldValidResultVo doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
 }

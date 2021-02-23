@@ -94,10 +94,19 @@
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
         WHERE a.`insert_time` &gt;= #{startTime} and a.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND a.`title` like concat('%', #{keyword}, '%')
+        </if>
         <if test="handlerList != null and handlerList.size()">
             AND a.`handler` in
             <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
                 #{handler}
+            </foreach>
+        </if>
+        <if test="triggerList != null and triggerList.size()">
+            AND a.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
             </foreach>
         </if>
     </select>
@@ -113,17 +122,22 @@
         b.`is_delete` AS isDelete
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
-        <where>
-            <if test="handlerList != null and handlerList.size()">
-                AND a.`handler` in
-                <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
-                    #{handler}
-                </foreach>
-            </if>
-            <if test="startTime != null and endTime != null">
-                and a.`insert_time` &gt;= #{startTime} and a.`insert_time` &lt;= #{endTime}
-            </if>
-        </where>
+        WHERE a.`insert_time` &gt;= #{startTime} AND a.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND a.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="handlerList != null and handlerList.size()">
+            AND a.`handler` in
+            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+                #{handler}
+            </foreach>
+        </if>
+        <if test="triggerList != null and triggerList.size()">
+            AND a.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
+            </foreach>
+        </if>
         ORDER BY a.`id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>
@@ -245,13 +259,25 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
+    <select id="getTriggerMessageCountListGroupByTrigger" parameterType="java.lang.String" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
+        SELECT
+               b.`trigger`,
+               COUNT(1) AS count
+        FROM `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        WHERE a.`user_uuid` = #{value}
+        GROUP BY b.`trigger`
+    </select>
+
     <insert id="insertMessage" parameterType="codedriver.framework.message.dto.MessageVo">
         INSERT INTO `message` (
         `id`,
         `title`,
         `content`,
         `handler`,
-        `fcd`
+        `fcd`,
+        `trigger`,
+        `insert_time`
         )
         VALUES
         <foreach collection="list" item="messageVo" separator=",">
@@ -260,7 +286,9 @@
             #{messageVo.title},
             #{messageVo.content},
             #{messageVo.handler},
-            #{messageVo.fcd}
+            #{messageVo.fcd},
+            #{messageVo.trigger},
+            NOW(3)
             )
         </foreach>
 

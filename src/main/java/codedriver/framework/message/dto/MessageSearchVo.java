@@ -22,7 +22,7 @@ public class MessageSearchVo extends BaseEditorVo {
     private Date startTime;
     private Date endTime;
     private List<String> handlerList;
-
+    private List<String> triggerList;
     public MessageSearchVo(){
 
     }
@@ -86,5 +86,13 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setHandlerList(List<String> handlerList) {
         this.handlerList = handlerList;
+    }
+
+    public List<String> getTriggerList() {
+        return triggerList;
+    }
+
+    public void setTriggerList(List<String> triggerList) {
+        this.triggerList = triggerList;
     }
 }

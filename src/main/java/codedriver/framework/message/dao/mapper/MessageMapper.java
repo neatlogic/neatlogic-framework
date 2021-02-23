@@ -51,6 +51,8 @@ public interface MessageMapper {
 
     public List<MessageVo> getMessagePopUpList(MessageSearchVo searchVo);
 
+    public List<TriggerMessageCountVo> getTriggerMessageCountListGroupByTrigger(String userUuid);
+
     public int insertMessage(List<MessageVo> messageVoList);
 
     public int insertMessageRecipient(List<MessageRecipientVo> messageRecipientVoList);

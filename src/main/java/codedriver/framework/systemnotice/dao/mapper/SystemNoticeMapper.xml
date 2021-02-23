@@ -366,6 +366,15 @@
         </if>
     </select>
 
+    <select id="getNotReadNoticeCountByUserUuid" parameterType="java.lang.String" resultType="int">
+        select
+        count(1)
+        from
+        `system_notice_user`
+        where `user_uuid` = #{value}
+        and `is_read` = 0
+    </select>
+
     <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`

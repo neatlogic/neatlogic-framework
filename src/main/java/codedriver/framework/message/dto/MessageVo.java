@@ -32,6 +32,8 @@ public class MessageVo {
     private String popUp;
     @JSONField(serialize = false)
     private transient Integer isRead;
+    @JSONField(serialize = false)
+    private transient String trigger;
     @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
     private  Integer isDelete;
 
@@ -42,6 +44,7 @@ public class MessageVo {
         this.content = notifyVo.getContent();
         this.handler = notifyVo.getMessageHandlerClass().getName();
         this.fcd = notifyVo.getFcd();
+        this.trigger = notifyVo.getTriggerType().getTrigger();
     }
 
     public Long getId() {
@@ -109,5 +112,13 @@ public class MessageVo {
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public String getTrigger() {
+        return trigger;
+    }
+
+    public void setTrigger(String trigger) {
+        this.trigger = trigger;
     }
 }

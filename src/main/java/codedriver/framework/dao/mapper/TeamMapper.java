@@ -78,6 +78,8 @@ public interface TeamMapper {
 
     public List<ValueTextVo> getTeamUuidAndNameMapList(List<String> list);
 
+    public int checkTeamNameIsRepeated(TeamVo vo);
+
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);

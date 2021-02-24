@@ -333,12 +333,16 @@
 		</foreach>
 	</select>
 
-	<select id="checkTeamNameIsRepeated" parameterType="codedriver.framework.dto.TeamVo" resultType="int">
+	<select id="getRepeatTeamNameByNameList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo">
 		select
-		count(1)
+		`name`,
+		count(1) as `nameRepeatCount`
 		from `team`
-		where `name` = #{name}
-		and `uuid` != #{uuid}
+		where `name` in
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+		group by `name`
 	</select>
 
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

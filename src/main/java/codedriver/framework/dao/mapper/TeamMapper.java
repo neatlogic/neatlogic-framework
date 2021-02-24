@@ -78,7 +78,7 @@ public interface TeamMapper {
 
     public List<ValueTextVo> getTeamUuidAndNameMapList(List<String> list);
 
-    public int checkTeamNameIsRepeated(TeamVo vo);
+    public List<TeamVo> getRepeatTeamNameByNameList(List<String> list);
 
 	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 

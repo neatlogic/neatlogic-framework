@@ -123,7 +123,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 					}
 				}
 				/** 如果有重名的分组，找出其父分组的名称 **/
-				if(teamList.stream().anyMatch(o -> o.getName().equals(team.getName()))){
+				if(teamList.stream().anyMatch(o -> o.getName().equals(team.getName()) && !o.getUuid().equals(team.getUuid()))){
 					TeamVo parent = teamMapper.getTeamByUuid(team.getParentUuid());
 					if(parent != null){
 						team.setParentName(parent.getName());

@@ -199,6 +199,7 @@
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{value}
+        AND a.`is_read` = 0
         GROUP BY b.`trigger`
     </select>
 

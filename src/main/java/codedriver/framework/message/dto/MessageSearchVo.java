@@ -16,6 +16,8 @@ import java.util.List;
  **/
 public class MessageSearchVo extends BaseEditorVo {
     private Long messageId;
+    private Long minMessageId;
+    private Long maxMessageId;
     private String userUuid;
     private List<String> teamUuidList;
     private List<String> roleUuidList;
@@ -23,6 +25,8 @@ public class MessageSearchVo extends BaseEditorVo {
     private Date endTime;
     private List<String> handlerList;
     private List<String> triggerList;
+    private Integer isShow;
+    private Date expiredTime;
     public MessageSearchVo(){
 
     }
@@ -38,6 +42,22 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setMessageId(Long messageId) {
         this.messageId = messageId;
+    }
+
+    public Long getMinMessageId() {
+        return minMessageId;
+    }
+
+    public void setMinMessageId(Long minMessageId) {
+        this.minMessageId = minMessageId;
+    }
+
+    public Long getMaxMessageId() {
+        return maxMessageId;
+    }
+
+    public void setMaxMessageId(Long maxMessageId) {
+        this.maxMessageId = maxMessageId;
     }
 
     public String getUserUuid() {
@@ -94,5 +114,21 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setTriggerList(List<String> triggerList) {
         this.triggerList = triggerList;
+    }
+
+    public Integer getIsShow() {
+        return isShow;
+    }
+
+    public void setIsShow(Integer isShow) {
+        this.isShow = isShow;
+    }
+
+    public Date getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(Date expiredTime) {
+        this.expiredTime = expiredTime;
     }
 }

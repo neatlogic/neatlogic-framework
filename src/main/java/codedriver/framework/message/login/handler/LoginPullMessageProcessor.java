@@ -109,10 +109,10 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
         Date lastPullTime = null;
         Long maxMessageId = messageMapper.getMessageUserMaxMessageIdByUserUuid(UserContext.get().getUserUuid(true));
         if (maxMessageId != null) {
-            lastPullTime = messageMapper.getMessageFcdById(maxMessageId);
+            lastPullTime = messageMapper.getMessageInsertTimeById(maxMessageId);
         }
         if (lastPullTime == null || lastPullTime.before(earliestSendingTime)) {
-            return messageMapper.getMessageMaxIdByLessThanFcd(earliestSendingTime);
+            return messageMapper.getMessageMaxIdByLessThanInsertTime(earliestSendingTime);
         } else {
             return maxMessageId;
         }

@@ -26,6 +26,7 @@ public class MessageSearchVo extends BaseEditorVo {
     private List<String> handlerList;
     private List<String> triggerList;
     private Integer isShow;
+    private Integer isRead;
     private Date expiredTime;
     List<Long> messageIdList;
     public MessageSearchVo(){
@@ -139,5 +140,13 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setMessageIdList(List<Long> messageIdList) {
         this.messageIdList = messageIdList;
+    }
+
+    public Integer getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
     }
 }

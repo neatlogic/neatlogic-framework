@@ -72,17 +72,14 @@
         <if test="keyword != null and keyword != ''">
             AND a.`title` like concat('%', #{keyword}, '%')
         </if>
-        <if test="handlerList != null and handlerList.size()">
-            AND a.`handler` in
-            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
-                #{handler}
-            </foreach>
-        </if>
         <if test="triggerList != null and triggerList.size()">
             AND a.`trigger` in
             <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
                 #{trigger}
             </foreach>
+        </if>
+        <if test="isRead != null">
+            AND b.`is_read` = #{isRead}
         </if>
     </select>
 
@@ -100,12 +97,6 @@
         WHERE a.`insert_time` &gt;= #{startTime} AND a.`insert_time` &lt;= #{endTime}
         <if test="keyword != null and keyword != ''">
             AND a.`title` LIKE CONCAT('%', #{keyword}, '%')
-        </if>
-        <if test="handlerList != null and handlerList.size()">
-            AND a.`handler` in
-            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
-                #{handler}
-            </foreach>
         </if>
         <if test="triggerList != null and triggerList.size()">
             AND a.`trigger` in
@@ -192,15 +183,15 @@
         </foreach>
     </select>
 
-    <select id="getTriggerMessageCountListGroupByTrigger" parameterType="java.lang.String" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
+    <select id="getTriggerMessageCountListGroupByTriggerAndIsRead" parameterType="java.lang.String" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
         SELECT
                b.`trigger`,
+               a.`is_read` AS isRead,
                COUNT(1) AS count
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{value}
-        AND a.`is_read` = 0
-        GROUP BY b.`trigger`
+        GROUP BY b.`trigger`, a.`is_read`
     </select>
 
     <select id="getMessageShortShowPopUpCountByUserUuidAndHandlerList" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="int">
@@ -325,7 +316,8 @@
     <update id="updateMessageUserIsReadByUserUuidAndMessageId" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
-            `is_show` = 2
+            `is_show` = 2,
+            `expired_time` = NULL
         WHERE `user_uuid` = #{userUuid}
         AND `message_id` = #{messageId}
     </update>
@@ -333,7 +325,8 @@
     <update id="updateMessageUserIsReadByUserUuidAndMessageIdList" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
-        `is_show` = 2
+        `is_show` = 2,
+        `expired_time` = NULL
         WHERE `user_uuid` = #{userUuid}
         AND `message_id` IN
         <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
@@ -344,7 +337,8 @@
     <update id="updateMessageUserIsReadByUserUuidAndMessageIdRange" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
-        `is_show` = 2
+        `is_show` = 2,
+        `expired_time` = NULL
         WHERE `user_uuid` = #{userUuid}
           <if test="minMessageId != null">
             AND `message_id` &gt; #{minMessageId}
@@ -354,22 +348,33 @@
         </if>
     </update>
 
-    <update id="updateMessageUserIsReadByUserUuidAndTriggerList" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+    <update id="updateMessageUserIsReadByUserUuidAndKeywordAndTriggerList" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
-        SET a.`is_read` = 1,
-            a.`is_show` = 2
-        WHERE a.`user_uuid` = #{userUuid}
-        AND b.`trigger` IN
-        <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
-            #{trigger}
-        </foreach>
+        set
+        a.`is_read` = 1,
+        a.`is_show` = 2,
+        a.`expired_time` = NULL
+        WHERE b.`insert_time` &gt;= #{startTime}
+        AND b.`insert_time` &lt;= #{endTime}
+        AND a.`user_uuid` = #{userUuid}
+        and a.`is_read` = 0
+        <if test="keyword != null and keyword != ''">
+            AND b.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="triggerList != null and triggerList.size()">
+            AND b.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
+            </foreach>
+        </if>
     </update>
 
     <update id="updateMessageUserIsReadByUserUuid" parameterType="java.lang.String">
         UPDATE `message_user`
         SET `is_read` = 1,
-            `is_show` = 2
+            `is_show` = 2,
+            `expired_time` = NULL
         WHERE `user_uuid` = #{value}
     </update>
 
@@ -418,8 +423,9 @@
     <update id="updateMessageUserIsShow1To2AndIsRead0To1ByUserUuidAndMessageId" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET
+        `is_read` = 1,
         `is_show` = 2,
-        `is_read` = 1
+        `expired_time` = NULL
         WHERE `user_uuid` = #{userUuid}
         <if test="messageId != null">
             AND `message_id` = #{messageId}

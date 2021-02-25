@@ -12,6 +12,7 @@ package codedriver.framework.message.dto;
 public class TriggerMessageCountVo {
     private String trigger;
     private Integer count;
+    private Integer isRead;
 
     public String getTrigger() {
         return trigger;
@@ -27,5 +28,13 @@ public class TriggerMessageCountVo {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
     }
 }

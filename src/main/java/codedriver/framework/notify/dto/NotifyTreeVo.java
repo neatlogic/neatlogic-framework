@@ -17,7 +17,8 @@ public class NotifyTreeVo {
     private String name;
     private List<NotifyTreeVo> children;
 
-    private int count;
+    private int unreadCount;
+    private int total;
     public NotifyTreeVo(){}
 
     public NotifyTreeVo(String uuid, String name){
@@ -57,18 +58,33 @@ public class NotifyTreeVo {
         this.children.add(treeVo);
     }
 
-    public int getCount() {
+    public int getUnreadCount() {
         if(this.children != null){
             int sum = 0;
             for(NotifyTreeVo child : this.children){
-                sum += child.getCount();
+                sum += child.getUnreadCount();
             }
             return sum;
         }
-        return count;
+        return unreadCount;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+    }
+
+    public int getTotal() {
+        if(this.children != null){
+            int sum = 0;
+            for(NotifyTreeVo child : this.children){
+                sum += child.getTotal();
+            }
+            return sum;
+        }
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }

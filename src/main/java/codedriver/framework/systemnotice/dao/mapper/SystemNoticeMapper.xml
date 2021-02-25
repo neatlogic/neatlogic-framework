@@ -337,6 +337,9 @@
         <if test="noticeVo.startTime != null and noticeVo.endTime != null">
             and a.`issue_time` &gt;= #{noticeVo.startTime} and a.`issue_time` &lt;= #{noticeVo.endTime}
         </if>
+        <if test="noticeVo.isRead != null">
+            and b.`is_read` = #{noticeVo.isRead}
+        </if>
     </select>
 
     <select id="searchNoticeHistoryListByUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -364,15 +367,6 @@
         <if test="noticeVo.needPage">
             LIMIT #{noticeVo.startNum}, #{noticeVo.pageSize}
         </if>
-    </select>
-
-    <select id="getNotReadNoticeCountByUserUuid" parameterType="java.lang.String" resultType="int">
-        select
-        count(1)
-        from
-        `system_notice_user`
-        where `user_uuid` = #{value}
-        and `is_read` = 0
     </select>
 
     <update id="updateSystemNoticeBaseInfo" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
@@ -461,6 +455,23 @@
         where
         `user_uuid` = #{userUuid}
         and `is_read` = 0
+        and `system_notice_id` in
+        (
+          select
+          `id`
+          from `system_notice`
+          where
+          (`status` = 'issued' or `status` = 'stopped')
+          <if test="noticeVo.keyword != null and noticeVo.keyword != ''">
+            and (
+            `title` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            or `content` LIKE CONCAT('%', #{noticeVo.keyword}, '%')
+            )
+          </if>
+          <if test="noticeVo.startTime != null and noticeVo.endTime != null">
+            and `issue_time` &gt;= #{noticeVo.startTime} and `issue_time` &lt;= #{noticeVo.endTime}
+          </if>
+        )
     </update>
 
     <update id="updateReadStatusToNotReadByNoticeId" parameterType="java.lang.Long">

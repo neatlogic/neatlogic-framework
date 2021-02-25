@@ -61,11 +61,13 @@ public interface MessageMapper {
 
     public int insertMessageSubscribe(MessageHandlerVo messageHandlerVo);
 
-    public int updateMessageUserIsReadByUserUuidAndMessageId(@Param("userUuid") String userUuid, @Param("messageId") Long messageId);
+    public int updateMessageUserIsReadByUserUuidAndMessageId(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsReadByUserUuidAndMessageIdList(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
+    public int updateMessageUserIsReadByUserUuidAndMessageIdList(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsReadByUserUuidAndMessageIdRange(@Param("userUuid") String userUuid, @Param("fromMessageId") Long fromMessageId, @Param("toMessageId") Long toMessageId);
+    public int updateMessageUserIsReadByUserUuidAndMessageIdRange(MessageSearchVo searchVo);
+
+    public int updateMessageUserIsReadByUserUuidAndTriggerList(MessageSearchVo searchVo);
 
     public int updateMessageUserIsReadByUserUuid(String userUuid);
 

@@ -199,6 +199,7 @@
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{value}
+        AND a.`is_read` = 0
         GROUP BY b.`trigger`
     </select>
 
@@ -321,14 +322,15 @@
                 NOW(3))
     </insert>
 
-    <update id="updateMessageUserIsReadByUserUuidAndMessageId">
+    <update id="updateMessageUserIsReadByUserUuidAndMessageId" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
             `is_show` = 2
         WHERE `user_uuid` = #{userUuid}
         AND `message_id` = #{messageId}
     </update>
-    <update id="updateMessageUserIsReadByUserUuidAndMessageIdList">
+
+    <update id="updateMessageUserIsReadByUserUuidAndMessageIdList" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
         `is_show` = 2
@@ -338,19 +340,33 @@
             #{messageId}
         </foreach>
     </update>
-    <update id="updateMessageUserIsReadByUserUuidAndMessageIdRange">
+
+    <update id="updateMessageUserIsReadByUserUuidAndMessageIdRange" parameterType="codedriver.framework.message.dto.MessageSearchVo">
         UPDATE `message_user`
         SET `is_read` = 1,
         `is_show` = 2
         WHERE `user_uuid` = #{userUuid}
-          <if test="fromMessageId != null">
-            AND `message_id` &gt; #{fromMessageId}
+          <if test="minMessageId != null">
+            AND `message_id` &gt; #{minMessageId}
           </if>
-        <if test="toMessageId != null">
-            AND `message_id` &lt;= #{toMessageId}
+        <if test="maxMessageId != null">
+            AND `message_id` &lt;= #{maxMessageId}
         </if>
     </update>
-    <update id="updateMessageUserIsReadByUserUuid">
+
+    <update id="updateMessageUserIsReadByUserUuidAndTriggerList" parameterType="codedriver.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        SET a.`is_read` = 1,
+            a.`is_show` = 2
+        WHERE a.`user_uuid` = #{userUuid}
+        AND b.`trigger` IN
+        <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+            #{trigger}
+        </foreach>
+    </update>
+
+    <update id="updateMessageUserIsReadByUserUuid" parameterType="java.lang.String">
         UPDATE `message_user`
         SET `is_read` = 1,
             `is_show` = 2

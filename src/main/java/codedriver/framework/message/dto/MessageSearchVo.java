@@ -27,6 +27,7 @@ public class MessageSearchVo extends BaseEditorVo {
     private List<String> triggerList;
     private Integer isShow;
     private Date expiredTime;
+    List<Long> messageIdList;
     public MessageSearchVo(){
 
     }
@@ -130,5 +131,13 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setExpiredTime(Date expiredTime) {
         this.expiredTime = expiredTime;
+    }
+
+    public List<Long> getMessageIdList() {
+        return messageIdList;
+    }
+
+    public void setMessageIdList(List<Long> messageIdList) {
+        this.messageIdList = messageIdList;
     }
 }

@@ -86,6 +86,6 @@ public class MessageClearJob extends JobBase {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - expiredDay);
         Date earliestSendingTime = calendar.getTime();
-        return messageMapper.getMessageMaxIdByLessThanFcd(earliestSendingTime);
+        return messageMapper.getMessageMaxIdByLessThanInsertTime(earliestSendingTime);
     }
 }

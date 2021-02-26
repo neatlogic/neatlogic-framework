@@ -16,13 +16,19 @@ import java.util.List;
  **/
 public class MessageSearchVo extends BaseEditorVo {
     private Long messageId;
+    private Long minMessageId;
+    private Long maxMessageId;
     private String userUuid;
     private List<String> teamUuidList;
     private List<String> roleUuidList;
     private Date startTime;
     private Date endTime;
     private List<String> handlerList;
-
+    private List<String> triggerList;
+    private Integer isShow;
+    private Integer isRead;
+    private Date expiredTime;
+    List<Long> messageIdList;
     public MessageSearchVo(){
 
     }
@@ -38,6 +44,22 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setMessageId(Long messageId) {
         this.messageId = messageId;
+    }
+
+    public Long getMinMessageId() {
+        return minMessageId;
+    }
+
+    public void setMinMessageId(Long minMessageId) {
+        this.minMessageId = minMessageId;
+    }
+
+    public Long getMaxMessageId() {
+        return maxMessageId;
+    }
+
+    public void setMaxMessageId(Long maxMessageId) {
+        this.maxMessageId = maxMessageId;
     }
 
     public String getUserUuid() {
@@ -86,5 +108,45 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setHandlerList(List<String> handlerList) {
         this.handlerList = handlerList;
+    }
+
+    public List<String> getTriggerList() {
+        return triggerList;
+    }
+
+    public void setTriggerList(List<String> triggerList) {
+        this.triggerList = triggerList;
+    }
+
+    public Integer getIsShow() {
+        return isShow;
+    }
+
+    public void setIsShow(Integer isShow) {
+        this.isShow = isShow;
+    }
+
+    public Date getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(Date expiredTime) {
+        this.expiredTime = expiredTime;
+    }
+
+    public List<Long> getMessageIdList() {
+        return messageIdList;
+    }
+
+    public void setMessageIdList(List<Long> messageIdList) {
+        this.messageIdList = messageIdList;
+    }
+
+    public Integer getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(Integer isRead) {
+        this.isRead = isRead;
     }
 }

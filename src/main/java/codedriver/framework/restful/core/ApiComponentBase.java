@@ -1,27 +1,73 @@
 package codedriver.framework.restful.core;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dto.FieldValidResultVo;
+import codedriver.framework.exception.core.ApiFieldValidNotFoundException;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
 
-    @Autowired
+    @Resource
     private ApiMapper apiMapper;
 
     public int needAudit() {
         return 0;
     }
 
+    public final FieldValidResultVo doValid(ApiVo apiVo, JSONObject paramObj, String validField) throws Exception {
+
+        Method[] methods = new Method[]{};
+        Object target = null;
+        boolean isHasValid = false;
+        FieldValidResultVo resultVo = null;
+        try {
+            IApiComponent restComponent = PrivateApiComponentFactory.getInstance(apiVo.getHandler());
+            try {
+                Object proxy = AopContext.currentProxy();
+                //获取代理的真实bean
+                target = ((Advised) proxy).getTargetSource().getTarget();
+                methods = AopUtils.getTargetClass(proxy).getMethods();
+            } catch (IllegalStateException | IllegalArgumentException | SecurityException ex) {
+                target = restComponent;
+                methods = restComponent.getClass().getMethods();
+            } finally {
+                for (Method method : methods) {
+                    //System.out.println(method.getName());
+                    if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(validField)) {
+                        isHasValid = true;
+                        //特殊入参校验：重复、特殊规则等
+                        IValid validComponent = (IValid) method.invoke(target, null);
+                        resultVo = validComponent.valid(paramObj);
+                        break;
+                    }
+                }
+                //如果不存在该校验方法则抛异常
+                if(!isHasValid){
+                    throw new  ApiFieldValidNotFoundException(validField);
+                }
+            }
+        } catch (Exception e) {
+            Throwable targetException = e;
+            //如果是反射抛得异常，则需要拆包，把真实得异常类找出来
+            while (targetException instanceof InvocationTargetException) {
+                targetException = ((InvocationTargetException) targetException).getTargetException();
+            }
+            throw (Exception) targetException;
+        }
+        return resultVo;
+    }
 
     public final Object doService(ApiVo apiVo, JSONObject paramObj) throws Exception {
         String error = "";

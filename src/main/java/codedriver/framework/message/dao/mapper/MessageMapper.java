@@ -25,10 +25,6 @@ public interface MessageMapper {
 
     public List<MessageVo> getMessageList(MessageSearchVo searchVo);
 
-    public int getMessageNewCount(MessageSearchVo searchVo);
-
-    public List<MessageVo> getMessageNewList(MessageSearchVo searchVo);
-
     public int getMessageHistoryCount(MessageSearchVo searchVo);
 
     public List<MessageVo> getMessageHistoryList(MessageSearchVo searchVo);
@@ -37,15 +33,25 @@ public interface MessageMapper {
 
     public List<Long> getMessagePullList(MessageSearchVo searchVo);
 
-    public List<MessageVo> getMessageListByIdList(List<Long> messageIdList);
-
     public Long getMessageUserMaxMessageIdByUserUuid(String userUuid);
 
-    public Date getMessageFcdById(Long maxMessageId);
+    public Date getMessageInsertTimeById(Long maxMessageId);
 
-    public Long getMessageMaxIdByLessThanFcd(Date fcd);
+    public Long getMessageMaxIdByLessThanInsertTime(Date fcd);
 
     public List<String> getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(@Param("handler") String handler, @Param("userUuidList") List<String> userUuidList);
+
+    public List<TriggerMessageCountVo> getTriggerMessageCountListGroupByTriggerAndIsRead(String userUuid);
+
+    public int getMessageShortShowPopUpCountByUserUuidAndHandlerList(MessageSearchVo messageSearchVo);
+
+    public int getMessageLongShowPopUpCountByUserUuidAndHandlerList(MessageSearchVo messageSearchVo);
+
+    public int getMessageUnreadCountByUserUuid(String userUuid);
+
+    public MessageVo getLastPopUpMessage(MessageSearchVo messageSearchVo);
+
+    public MessageVo getMessageByIdAndUserUuid(MessageSearchVo searchVo);
 
     public int insertMessage(List<MessageVo> messageVoList);
 
@@ -55,19 +61,25 @@ public interface MessageMapper {
 
     public int insertMessageSubscribe(MessageHandlerVo messageHandlerVo);
 
-    public int updateMessageUserIsDeleteByUserUuidAndMessageId(@Param("userUuid") String userUuid, @Param("messageId") Long messageId);
+    public int updateMessageUserIsReadByUserUuidAndMessageId(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsDeleteByUserUuidAndMessageIdList(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
+    public int updateMessageUserIsReadByUserUuidAndMessageIdList(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsDeleteByUserUuidAndMessageIdRange(@Param("userUuid") String userUuid, @Param("fromMessageId") Long fromMessageId, @Param("toMessageId") Long toMessageId);
+    public int updateMessageUserIsReadByUserUuidAndMessageIdRange(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsDeleteByUserUuid(String userUuid);
+    public int updateMessageUserIsReadByUserUuidAndKeywordAndTriggerList(MessageSearchVo searchVo);
 
-    public int updateMessageUserIsRead(@Param("userUuid") String userUuid, @Param("messageIdList") List<Long> messageIdList);
+    public int updateMessageUserIsReadByUserUuid(String userUuid);
 
     public int updateMessageSubscribePopUp(MessageHandlerVo messageHandlerVo);
 
     public int updateMessageSubscribeActive(MessageHandlerVo messageHandlerVo);
+
+    public int updateMessageUserExpiredIsShow1To2AndExpiredTimeIsNullByUserUuid(String userUuid);
+
+    public int updateMessageUserIsShowAndExpiredTimeByUserUuidAndHandlerList(MessageSearchVo messageSearchVo);
+
+    public int updateMessageUserIsShow1To2AndIsRead0To1ByUserUuidAndMessageId(MessageSearchVo searchVo);
 
     public int deleteMessageUser(MessageSearchVo messageSearchVo);
 

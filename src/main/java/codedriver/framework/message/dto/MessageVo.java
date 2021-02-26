@@ -31,7 +31,9 @@ public class MessageVo {
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
     @JSONField(serialize = false)
-    private transient Integer isRead;
+    private transient String trigger;
+    @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
+    private  Integer isRead;
 
     public MessageVo() {
     }
@@ -40,6 +42,7 @@ public class MessageVo {
         this.content = notifyVo.getContent();
         this.handler = notifyVo.getMessageHandlerClass().getName();
         this.fcd = notifyVo.getFcd();
+        this.trigger = notifyVo.getTriggerType().getTrigger();
     }
 
     public Long getId() {
@@ -99,5 +102,13 @@ public class MessageVo {
 
     public void setIsRead(Integer isRead) {
         this.isRead = isRead;
+    }
+
+    public String getTrigger() {
+        return trigger;
+    }
+
+    public void setTrigger(String trigger) {
+        this.trigger = trigger;
     }
 }

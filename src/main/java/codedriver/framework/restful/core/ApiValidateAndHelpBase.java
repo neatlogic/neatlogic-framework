@@ -248,55 +248,66 @@ public class ApiValidateAndHelpBase {
             }
             // 判断参数是否合法
             Method method = apiClass.getMethod("myDoService", classes);
-            Input input = method.getAnnotation(Input.class);
-            if (input != null) {
-                Param[] params = input.value();
-                if (params.length > 0) {
-                    for (Param p : params) {
-                        if (p.type().equals(ApiParamType.NOAUTH)) {
-                            continue;
-                        }
-                        // xss过滤
-                        if (p.xss() && paramObj.containsKey(p.name())) {
-                            escapeXss(paramObj, p.name());
-                        }
+            validInput(method,paramObj);
+        }
+    }
 
-                        Object paramValue = null;
+    /**
+     * @Description: 校验input注解的方法入参是否合法
+     * @Author: 89770
+     * @Date: 2021/2/20 13:04
+     * @Params: [method, paramObj]
+     * @Returns: void
+     **/
+    public void validInput(Method method, JSONObject paramObj){
+        Input input = method.getAnnotation(Input.class);
+        if (input != null) {
+            Param[] params = input.value();
+            if (params.length > 0) {
+                for (Param p : params) {
+                    if (p.type().equals(ApiParamType.NOAUTH)) {
+                        continue;
+                    }
+                    // xss过滤
+                    if (p.xss() && paramObj.containsKey(p.name())) {
+                        escapeXss(paramObj, p.name());
+                    }
 
-                        if (paramObj.containsKey(p.name())) {
-                            // 参数类型校验
-                            paramValue = paramObj.get(p.name());
-                            // 如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
-                            if (paramValue == null) {
-                                paramObj.remove(p.name());
-                            }
-                        }
-                        // 前后去空格
-                        if (p.type().equals(ApiParamType.STRING)) {
-                            if (paramValue != null) {
-                                paramObj.replace(p.name(), paramValue.toString().trim());
-                            }
-                        }
-                        // 判断是否必填
-                        if (p.isRequired() && !paramObj.containsKey(p.name())) {
-                            throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
-                        }
+                    Object paramValue = null;
 
-                        // 判断最大长度
-                        if (p.maxLength() > 0 && paramValue instanceof String) {
-                            if (paramValue.toString().trim().length() > p.maxLength()) {
-                                throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.maxLength());
-                            }
+                    if (paramObj.containsKey(p.name())) {
+                        // 参数类型校验
+                        paramValue = paramObj.get(p.name());
+                        // 如果值为null，则remove（前端约定不使用的接口参数会传null过来，故去掉）
+                        if (paramValue == null) {
+                            paramObj.remove(p.name());
                         }
-                        // 判断最小长度
-                        if (p.minLength() > 0 && paramValue instanceof String) {
-                            if (paramValue.toString().trim().length() < p.minLength()) {
-                                throw new ParamValueTooShortException(p.name(), paramValue.toString().length(), p.minLength());
-                            }
+                    }
+                    // 前后去空格
+                    if (p.type().equals(ApiParamType.STRING)) {
+                        if (paramValue != null) {
+                            paramObj.replace(p.name(), paramValue.toString().trim());
                         }
-                        if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
-                            throw new ParamIrregularException("参数“" + p.desc() + "（" +p.name() + "）" + "”不符合格式要求");
+                    }
+                    // 判断是否必填
+                    if (p.isRequired() && !paramObj.containsKey(p.name())) {
+                        throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
+                    }
+
+                    // 判断最大长度
+                    if (p.maxLength() > 0 && paramValue instanceof String) {
+                        if (paramValue.toString().trim().length() > p.maxLength()) {
+                            throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.maxLength());
                         }
+                    }
+                    // 判断最小长度
+                    if (p.minLength() > 0 && paramValue instanceof String) {
+                        if (paramValue.toString().trim().length() < p.minLength()) {
+                            throw new ParamValueTooShortException(p.name(), paramValue.toString().length(), p.minLength());
+                        }
+                    }
+                    if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
+                        throw new ParamIrregularException("参数“" + p.desc() + "（" +p.name() + "）" + "”不符合格式要求");
                     }
                 }
             }

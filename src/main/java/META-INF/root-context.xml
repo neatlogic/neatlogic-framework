@@ -24,9 +24,7 @@
 		<property name="driverClassName">
 			<value>${db.driverClassName}</value>
 		</property>
-		<property name="url">
-			<value>${db.url}</value>
-		</property>
+		<property name="url" value="${db.url}"/>
 		<property name="username">
 			<value>${db.username}</value>
 		</property>

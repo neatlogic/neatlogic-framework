@@ -1,6 +1,7 @@
 package codedriver.framework.restful.web;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
@@ -19,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import java.util.Enumeration;
 public class ApiDispatcher {
     Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
 
-    @Autowired
+    @Resource
     private ApiMapper apiMapper;
 
 
@@ -65,73 +66,84 @@ public class ApiDispatcher {
         } else {
             throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
         }
-
-
-        if (apiType.equals(ApiVo.Type.OBJECT)) {
+        //如果只是接口校验入参
+        String validField = request.getHeader("codedriver-validfield");
+        if(StringUtils.isNotBlank(validField)) {
             IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj);
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
-                    } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
-                    }
-                } else {
-                    returnObj.putAll(restComponent.help());
-                }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+            FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo,paramObj,validField);
+            if(StringUtils.isNotBlank(validResultVo.getMsg())) {
+                response.setStatus(530);
+                returnObj.put("Message", validResultVo.getMsg());
             }
-        } else if (apiType.equals(ApiVo.Type.STREAM)) {
-            IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
+            returnObj.put("Status", validResultVo.getStatus());
+        }else {
+            if (apiType.equals(ApiVo.Type.OBJECT)) {
+                IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
                     } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    returnObj.putAll(restComponent.help());
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
-            }
-        } else if (apiType.equals(ApiVo.Type.BINARY)) {
-            IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
-            if (restComponent != null) {
-                if (action.equals("doservice")) {
-                    /* 统计接口访问次数 */
-                    ApiAccessCountUpdateThread.putToken(token);
-                    Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
-                    Long endtime = System.currentTimeMillis();
-                    if (!restComponent.isRaw()) {
-                        returnObj.put("TimeCost", endtime - starttime);
-                        returnObj.put("Return", returnV);
-                        returnObj.put("Status", "OK");
+            } else if (apiType.equals(ApiVo.Type.STREAM)) {
+                IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
                     } else {
-                        returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    returnObj.putAll(restComponent.help());
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else {
-                throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+            } else if (apiType.equals(ApiVo.Type.BINARY)) {
+                IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                        } else {
+                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                        }
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
             }
         }
     }

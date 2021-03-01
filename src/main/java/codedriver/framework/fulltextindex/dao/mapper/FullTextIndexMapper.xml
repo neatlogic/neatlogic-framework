@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.fulltextindex.dao.mapper.FullTextIndexMapper">
+    <insert id="insertField" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexFieldWordVo">
+        INSERT INTO `fulltextindex_field` (`id`,
+                                           `word_id`,
+                                           `target_field`,
+                                           `target_type`,
+                                           `target_id`,
+                                           `counter`)
+        VALUES (#{id},
+                #{wordId},
+                #{targetField},
+                #{targetType},
+                #{targetId},
+                #{counter})
+    </insert>
+
+    <insert id="insertFieldOffset" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexOffsetVo">
+        INSERT IGNORE INTO `fulltextindex_offset` (`field_id`, `start`, `end`)
+        VALUES (#{fieldId}, #{start}, #{end})
+    </insert>
+
+    <insert id="insertContent" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexContentVo">
+        INSERT INTO `fulltextindex_content` (`target_id`,
+                                             `target_type`,
+                                             `target_field`,
+                                             `content`)
+        VALUES (#{targetId},
+                #{targetType},
+                #{targetField},
+                #{content,typeHandler=CompressHandler})
+    </insert>
+
+    <delete id="deleteFullTextIndexByTargetIdAndType"
+            parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexVo">
+        DELETE a,b,c
+        FROM fulltextindex_field a
+                 LEFT JOIN fulltextindex_offset b ON
+            a.`id` = b.field_id
+                 LEFT JOIN fulltextindex_content c ON a.target_id = c.target_id AND a.target_type = c.target_type
+        WHERE a.`target_id` = #{targetId}
+          and a.`target_type` = #{targetType}
+    </delete>
+
+</mapper>
+

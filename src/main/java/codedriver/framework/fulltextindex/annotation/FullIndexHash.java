@@ -1,4 +1,4 @@
-package codedriver.framework.fullindex.annotation;
+package codedriver.framework.fulltextindex.annotation;
 
 import codedriver.framework.elasticsearch.constvalue.ESKeyType;
 

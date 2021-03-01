@@ -1,14 +1,9 @@
-package codedriver.framework.fullindex.aop;
+package codedriver.framework.fulltextindex.aop;
 
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.fullindex.annotation.FullIndex;
-import codedriver.framework.fullindex.annotation.FullIndexContent;
-import codedriver.framework.fullindex.core.FullIndexUtil;
-import codedriver.framework.fullindex.dao.mapper.WordMapper;
-import codedriver.framework.fullindex.dto.WordVo;
-import codedriver.framework.transaction.core.AfterTransactionJob;
-import codedriver.framework.transaction.core.ICommitted;
-import org.apache.commons.lang3.StringUtils;
+import codedriver.framework.fulltextindex.annotation.FullIndex;
+import codedriver.framework.fulltextindex.annotation.FullIndexContent;
+import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexMapper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,10 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +32,7 @@ public class FullIndexAspect {
     private static final Logger logger = LoggerFactory.getLogger(FullIndexAspect.class);
 
     @Autowired
-    private WordMapper wordMapper;
+    private FullTextIndexMapper fullTextIndexMapper;
 
     @After("@annotation(fullIndex)")
     public void createFullIndex(JoinPoint point, FullIndex fullIndex) {
@@ -67,22 +60,6 @@ public class FullIndexAspect {
                 }
             }
         }
-        AfterTransactionJob<String> committer = new AfterTransactionJob<>();
-        committer.execute(content, new ICommitted<String>() {
-            @Override
-            public void execute(String s) {
-                if (StringUtils.isNotBlank(s)) {
-                    try {
-                        List<WordVo> wordList = FullIndexUtil.sliceWord(s);
-                        for (WordVo word : wordList) {
-                            wordMapper.insertWordbook(word);
-                        }
-                    } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-            }
-        });
 
         System.out.println(content);
     }

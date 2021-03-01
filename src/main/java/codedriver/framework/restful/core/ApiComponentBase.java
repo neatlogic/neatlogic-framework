@@ -82,6 +82,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         Object result = null;
         long startTime = System.currentTimeMillis();
         try {
+            Method m = this.getClass().getDeclaredMethod("myDoService", JSONObject.class);
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
@@ -98,8 +99,8 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 }
                 if (canRun) {
                     Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
-                    if (method.isAnnotationPresent(ResubmitInterval.class)) {
-                        for (Annotation anno : method.getDeclaredAnnotations()) {
+                    if (m.isAnnotationPresent(ResubmitInterval.class)) {
+                        for (Annotation anno : m.getDeclaredAnnotations()) {
                             if (anno.annotationType().equals(ResubmitInterval.class)) {
                                 ResubmitInterval resubmitInterval = (ResubmitInterval) anno;
                                 if (resubmitInterval.value() > 0) {

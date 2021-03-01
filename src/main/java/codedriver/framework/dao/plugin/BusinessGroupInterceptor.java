@@ -1,8 +1,5 @@
 package codedriver.framework.dao.plugin;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.plugin.Interceptor;
@@ -11,6 +8,9 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.sql.Connection;
 
 /**
  * BG方式查询拦截器

@@ -30,6 +30,7 @@
                 #{targetType},
                 #{targetField},
                 #{content,typeHandler=CompressHandler})
+        ON DUPLICATE KEY UPDATE `content` = #{content,typeHandler=CompressHandler}
     </insert>
 
     <delete id="deleteFullTextIndexByTargetIdAndType"

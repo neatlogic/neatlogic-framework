@@ -25,9 +25,19 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     @Resource
     private FullTextIndexMapper fullTextIndexMapper;
 
+    /*
+     * @Description: 返回模块名，mybatis拦截器需要根据模块名自动选择合适表，要注意编写的正确性
+     * @Author: chenqiwei
+     * @Date: 2021/3/1 5:09 下午
+     * @Params: []
+     * @Returns: java.lang.String
+     **/
+    protected abstract String getModuleId();
 
     @Override
     public void deleteIndex(Long targetId) {
+        //设置threadlocal告诉拦截器分配到哪个表
+        FullTextIndexModuleContainer.set(this.getModuleId());
         fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()));
     }
 
@@ -35,9 +45,12 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     @Override
     public final void createIndex(Long targetId) {
         AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>();
+        String moduleId = this.getModuleId();
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), new ICommitted<FullTextIndexVo>() {
             @Override
             public void execute(FullTextIndexVo fullTextIndexVo) {
+                //设置threadlocal告诉拦截器分配到哪个表
+                FullTextIndexModuleContainer.set(moduleId);
                 String oldName = Thread.currentThread().getName();
                 Thread.currentThread().setName("FULLTEXTINDEX-CREATE-" + fullTextIndexVo.getTargetType().toUpperCase(Locale.ROOT) + "-" + fullTextIndexVo.getTargetId());
                 try {

@@ -37,6 +37,7 @@ public class FullTextIndexVo {
         return targetId;
     }
 
+
     public void setTargetId(Long targetId) {
         this.targetId = targetId;
     }

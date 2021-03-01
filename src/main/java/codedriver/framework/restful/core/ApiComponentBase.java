@@ -1,16 +1,12 @@
 package codedriver.framework.restful.core;
 
-import codedriver.framework.asynchronization.threadpool.ScheduledThreadPool;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiFieldValidNotFoundException;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.resubmit.ResubmitException;
-import codedriver.framework.restful.annotation.ResubmitInterval;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
-import codedriver.framework.util.Md5Util;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.Advised;
@@ -18,14 +14,10 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 
 import javax.annotation.Resource;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
-    private static final Map<String, Integer> SUBMIT_MAP = new ConcurrentHashMap<>();
 
     @Resource
     private ApiMapper apiMapper;
@@ -82,7 +74,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         Object result = null;
         long startTime = System.currentTimeMillis();
         try {
-            Method m = this.getClass().getDeclaredMethod("myDoService", JSONObject.class);
+
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
@@ -98,29 +90,8 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     canRun = true;
                 }
                 if (canRun) {
+                    validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class);
                     Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
-                    if (m.isAnnotationPresent(ResubmitInterval.class)) {
-                        for (Annotation anno : m.getDeclaredAnnotations()) {
-                            if (anno.annotationType().equals(ResubmitInterval.class)) {
-                                ResubmitInterval resubmitInterval = (ResubmitInterval) anno;
-                                if (resubmitInterval.value() > 0) {
-                                    String key = Md5Util.encryptMD5(paramObj.toString());
-                                    if (SUBMIT_MAP.containsKey(apiVo.getToken() + "_" + key)) {
-                                        throw new ResubmitException(apiVo.getToken());
-                                    } else {
-                                        SUBMIT_MAP.put(apiVo.getToken() + "_" + key, resubmitInterval.value());
-                                        ScheduledThreadPool.execute(new RemoveSubmitKeyThread(apiVo.getToken() + "_" + key) {
-                                            @Override
-                                            protected void execute() {
-                                                SUBMIT_MAP.remove(this.getKey());
-                                            }
-                                        }, resubmitInterval.value());
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
                     result = method.invoke(proxy, paramObj);
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(targetClass, result, JSONObject.class);
@@ -138,6 +109,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     canRun = true;
                 }
                 if (canRun) {
+                    validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class);
                     result = myDoService(paramObj);
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(this.getClass(), result, JSONObject.class);

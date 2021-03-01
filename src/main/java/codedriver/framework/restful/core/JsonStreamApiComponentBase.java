@@ -1,19 +1,17 @@
 package codedriver.framework.restful.core;
 
-import java.lang.reflect.Method;
-
+import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONReader;
-
-import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.restful.dao.mapper.ApiMapper;
-import codedriver.framework.restful.dto.ApiVo;
+import java.lang.reflect.Method;
 
 public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements MyJsonStreamApiComponent {
 	// private static Logger logger =
@@ -38,10 +36,12 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 				Object proxy = AopContext.currentProxy();
 				Class<?> targetClass = AopUtils.getTargetClass(proxy);
 				validApi(targetClass, paramObj, JSONObject.class, JSONReader.class);
+				validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
 				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class, JSONReader.class);
 				result = method.invoke(proxy, paramObj, jsonReader);
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
 				validApi(this.getClass(), paramObj, JSONObject.class, JSONReader.class);
+				validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
 				result = myDoService(paramObj, jsonReader);
 			} catch (Exception ex) {
 				if(ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException ){

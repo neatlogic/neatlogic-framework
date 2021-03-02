@@ -97,7 +97,7 @@ public class FullTextIndexUtil {
      * @Params: [keywordStartIndex, maxWord, contentParam]
      * @Returns: java.lang.String
      **/
-    public static String getShortcut(int keywordStartIndex, int maxWord, String contentParam) {
+    public static String getShortcut(int keywordStartIndex,int keywordEndIndex, int maxWord, String contentParam) {
         String content = StringUtils.EMPTY;
         //计算截取下标
         int startIndex = 0;
@@ -107,7 +107,7 @@ public class FullTextIndexUtil {
         if (StringUtils.isNotBlank(contentParam)) {
             int contentLen = contentParam.length();
             //找到截取结束点
-            endIndex = Math.min(contentLen, startIndex + maxWord);
+            endIndex = Math.min(contentLen, keywordEndIndex + maxWord);
             //截取长度
             content = contentParam.substring(startIndex, endIndex);
             if (startIndex > 0) {

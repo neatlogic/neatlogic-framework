@@ -46,17 +46,16 @@ public class SqlCostInterceptor implements Interceptor {
         }
 
         public static boolean isExists(String id) {
+            if (sqlSet.contains("*")) {
+                return true;
+            }
             if (sqlSet.contains(id)) {
                 return true;
             }
-            for (String t : sqlSet) {
-                if (id.endsWith(t)) {
-                    return true;
-                } else if (t.equals("*")) {
-                    return true;
-                }
+            if (id.contains(".")) {
+                id = id.substring(id.lastIndexOf(".") + 1);
             }
-            return false;
+            return sqlSet.contains(id);
         }
 
         public static boolean isEmpty() {
@@ -72,9 +71,6 @@ public class SqlCostInterceptor implements Interceptor {
                 // Object target = invocation.getTarget();
                 MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
-                if (sqlId.contains(".")) {
-                    sqlId = sqlId.substring(sqlId.lastIndexOf(".") + 1);
-                }
                 if (SqlIdMap.isExists(sqlId)) {
                     starttime = System.currentTimeMillis();
                     Object parameter = null;

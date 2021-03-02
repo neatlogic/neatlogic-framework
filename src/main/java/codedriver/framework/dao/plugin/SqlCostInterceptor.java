@@ -72,6 +72,9 @@ public class SqlCostInterceptor implements Interceptor {
                 // Object target = invocation.getTarget();
                 MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
+                if (sqlId.contains(".")) {
+                    sqlId = sqlId.substring(sqlId.lastIndexOf(".") + 1);
+                }
                 if (SqlIdMap.isExists(sqlId)) {
                     starttime = System.currentTimeMillis();
                     Object parameter = null;

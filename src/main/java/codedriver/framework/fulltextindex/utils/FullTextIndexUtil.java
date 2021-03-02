@@ -89,4 +89,34 @@ public class FullTextIndexUtil {
         }
         return wordList;
     }
+
+    /**
+     * @Description: 根据最匹配的关键字截取前后maxWord 长度的内容
+     * @Author: 89770
+     * @Date: 2021/3/1 18:35
+     * @Params: [keywordStartIndex, maxWord, contentParam]
+     * @Returns: java.lang.String
+     **/
+    public static String getShortcut(int keywordStartIndex, int maxWord, String contentParam) {
+        String content = StringUtils.EMPTY;
+        //计算截取下标
+        int startIndex = 0;
+        int endIndex = 0;
+        //先找到截取起始点，
+        startIndex = Math.max(0, keywordStartIndex - maxWord);
+        if (StringUtils.isNotBlank(contentParam)) {
+            int contentLen = contentParam.length();
+            //找到截取结束点
+            endIndex = Math.min(contentLen, startIndex + maxWord);
+            //截取长度
+            content = contentParam.substring(startIndex, endIndex);
+            if (startIndex > 0) {
+                content = "..." + content;
+            }
+            if (endIndex < contentParam.length()) {
+                content = content + "...";
+            }
+        }
+        return content;
+    }
 }

@@ -17,6 +17,8 @@ public class FullTextIndexWordOffsetVo {
     private int start;
     private int end;
 
+    public FullTextIndexWordOffsetVo(){}
+
     public FullTextIndexWordOffsetVo(String _word, String _type, int _start, int _end) {
         word = _word.toLowerCase(Locale.ROOT);
         type = _type;

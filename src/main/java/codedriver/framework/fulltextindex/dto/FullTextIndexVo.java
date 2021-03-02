@@ -25,8 +25,12 @@ public class FullTextIndexVo {
 
     private Long targetId;
     private String targetType;
+    private String targetField;
+    private List<FullTextIndexWordOffsetVo>  wordOffsetVoList;
     private Map<String, String> fieldContentMap = new HashMap<>();
     private Map<String, List<FullTextIndexWordOffsetVo>> wordOffsetMap = new HashMap<>();
+
+    public FullTextIndexVo(){}
 
     public FullTextIndexVo(Long _targetId, String _targetType) {
         targetId = _targetId;
@@ -45,6 +49,12 @@ public class FullTextIndexVo {
     public void addFieldContent(String field, String content) {
         if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(content)) {
             fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), HtmlUtil.removeHtml(content.trim()));
+        }
+    }
+
+    public void addFieldContentWithHtml(String field, String content) {
+        if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(content)) {
+            fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), content);
         }
     }
 
@@ -138,5 +148,25 @@ public class FullTextIndexVo {
     @Override
     public int hashCode() {
         return Objects.hash(targetId, targetType);
+    }
+
+    public List<FullTextIndexWordOffsetVo> getWordOffsetVoList() {
+        return wordOffsetVoList;
+    }
+
+    public void setWordOffsetVoList(List<FullTextIndexWordOffsetVo> wordOffsetVoList) {
+        this.wordOffsetVoList = wordOffsetVoList;
+    }
+
+    public String getTargetField() {
+        return targetField;
+    }
+
+    public void setTargetField(String targetField) {
+        this.targetField = targetField;
+    }
+
+    public Map<String, String> getFieldContentMap() {
+        return fieldContentMap;
     }
 }

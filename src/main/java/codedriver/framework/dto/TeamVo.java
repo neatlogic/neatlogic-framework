@@ -49,6 +49,9 @@ public class TeamVo extends BasePageVo {
 	@EntityField(name = "分组完整路径", type = ApiParamType.STRING)
 	private String fullPath;
 
+	@JSONField(serialize = false)
+	private transient Integer nameRepeatCount;//重名的分组数量
+
 	/**
 	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
 	 */
@@ -193,5 +196,13 @@ public class TeamVo extends BasePageVo {
 
 	public void setFullPath(String fullPath) {
 		this.fullPath = fullPath;
+	}
+
+	public Integer getNameRepeatCount() {
+		return nameRepeatCount;
+	}
+
+	public void setNameRepeatCount(Integer nameRepeatCount) {
+		this.nameRepeatCount = nameRepeatCount;
 	}
 }

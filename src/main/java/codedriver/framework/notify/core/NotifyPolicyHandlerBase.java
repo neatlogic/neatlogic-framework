@@ -25,6 +25,11 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 		return myNotifyTriggerList();
 	}
 
+	@Override
+	public List<NotifyTriggerVo> getNotifyTriggerListForNotifyTree() {
+		return myNotifyTriggerList();
+	}
+
 	/** 获取通知触发点模版列表 */
 	@Override
 	public List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type) {

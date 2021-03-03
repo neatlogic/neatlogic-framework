@@ -17,6 +17,8 @@ public interface INotifyPolicyHandler {
 	
 	public List<NotifyTriggerVo> getNotifyTriggerList();
 
+	public List<NotifyTriggerVo> getNotifyTriggerListForNotifyTree();
+
 	/** 获取通知触发点模版列表 */
 	public List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type);
 

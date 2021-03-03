@@ -54,8 +54,8 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     }
                 }
                 //如果不存在该校验方法则抛异常
-                if(!isHasValid){
-                    throw new  ApiFieldValidNotFoundException(validField);
+                if (!isHasValid) {
+                    throw new ApiFieldValidNotFoundException(validField);
                 }
             }
         } catch (Exception e) {
@@ -74,6 +74,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         Object result = null;
         long startTime = System.currentTimeMillis();
         try {
+
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
@@ -89,6 +90,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     canRun = true;
                 }
                 if (canRun) {
+                    validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class);
                     Method method = proxy.getClass().getMethod("myDoService", JSONObject.class);
                     result = method.invoke(proxy, paramObj);
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
@@ -107,6 +109,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     canRun = true;
                 }
                 if (canRun) {
+                    validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class);
                     result = myDoService(paramObj);
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(this.getClass(), result, JSONObject.class);

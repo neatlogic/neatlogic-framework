@@ -1,25 +1,12 @@
 package codedriver.framework.dao.plugin;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
@@ -28,17 +15,23 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+
 /**
  * Sql执行时间记录拦截器
  */
-@Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
-    @Signature(type = Executor.class, method = "query",
-        args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})})
+@Intercepts({
+        @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
+})
 public class SqlCostInterceptor implements Interceptor {
     Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
 
     public static class SqlIdMap {
-        private static Set<String> sqlSet = new HashSet<>();
+        private static final Set<String> sqlSet = new HashSet<>();
 
         public static void addId(String id) {
             sqlSet.add(id);
@@ -53,19 +46,16 @@ public class SqlCostInterceptor implements Interceptor {
         }
 
         public static boolean isExists(String id) {
+            if (sqlSet.contains("*")) {
+                return true;
+            }
             if (sqlSet.contains(id)) {
                 return true;
             }
-            Iterator<String> it = sqlSet.iterator();
-            while (it.hasNext()) {
-                String t = it.next();
-                if (id.endsWith(t)) {
-                    return true;
-                } else if (t.equals("*")) {
-                    return true;
-                }
+            if (id.contains(".")) {
+                id = id.substring(id.lastIndexOf(".") + 1);
             }
-            return false;
+            return sqlSet.contains(id);
         }
 
         public static boolean isEmpty() {
@@ -79,7 +69,7 @@ public class SqlCostInterceptor implements Interceptor {
         try {
             if (!SqlIdMap.isEmpty()) {
                 // Object target = invocation.getTarget();
-                MappedStatement mappedStatement = (MappedStatement)invocation.getArgs()[0];
+                MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
                 if (SqlIdMap.isExists(sqlId)) {
                     starttime = System.currentTimeMillis();
@@ -103,7 +93,7 @@ public class SqlCostInterceptor implements Interceptor {
         // 执行完上面的任务后，不改变原有的sql执行过程
         Object val = invocation.proceed();
         if (starttime > 0) {
-            System.out.println("timecost:" + (System.currentTimeMillis() - starttime) + "ms");
+            System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
             System.out.println("###########################################################################");
         }
         return val;
@@ -111,8 +101,7 @@ public class SqlCostInterceptor implements Interceptor {
 
     // 封装了一下sql语句，使得结果返回完整xml路径下的sql语句节点id + sql语句
     private static String getSql(Configuration configuration, BoundSql boundSql, String sqlId) {
-        String sql = showSql(configuration, boundSql);
-        return sql;
+        return showSql(configuration, boundSql);
     }
 
     // 如果参数是String，则添加单引号， 如果是日期，则转换为时间格式器并加单引号； 对参数是null和不是null的情况作了处理

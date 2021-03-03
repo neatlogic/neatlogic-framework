@@ -2,6 +2,8 @@ package codedriver.framework.restful.groupsearch.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.util.CommonUtil;
@@ -111,6 +113,8 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 	 **/
 	private void setFullPathAndParentName(List<TeamVo> teamList) {
 		if (CollectionUtils.isNotEmpty(teamList)) {
+			List<TeamVo> nameRepeatedCount = teamMapper.getRepeatTeamNameByNameList(teamList.stream().map(TeamVo::getName).collect(Collectors.toList()));
+			Map<String, Integer> map = nameRepeatedCount.stream().collect(Collectors.toMap(e -> e.getName(), e -> e.getNameRepeatCount()));
 			for (TeamVo team : teamList) {
 				List<TeamVo> ancestorsAndSelf = teamMapper.getAncestorsAndSelfByLftRht(team.getLft(), team.getRht(), null);
 				if (CollectionUtils.isNotEmpty(ancestorsAndSelf)) {
@@ -123,7 +127,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 					}
 				}
 				/** 如果有重名的分组，找出其父分组的名称 **/
-				if(teamList.stream().anyMatch(o -> o.getName().equals(team.getName()))){
+				if(map.get(team.getName()) > 1){
 					TeamVo parent = teamMapper.getTeamByUuid(team.getParentUuid());
 					if(parent != null){
 						team.setParentName(parent.getName());

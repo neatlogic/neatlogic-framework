@@ -100,7 +100,11 @@ public class Config {
         }
 
         try {
-            SCHEDULE_SERVER_ID = Integer.parseInt(getProperty(CONFIG_FILE, "schedule.server.id", "1", true));
+            String sid = getProperty(CONFIG_FILE, "schedule.server.id", "1", true);
+            if (StringUtils.isBlank(sid)) {
+                sid = "1";
+            }
+            SCHEDULE_SERVER_ID = Integer.parseInt(sid);
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");

@@ -1,9 +1,8 @@
 package codedriver.framework.asynchronization.thread;
 
-import org.apache.commons.lang3.StringUtils;
-
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeDriverThread implements Runnable {
 
@@ -26,16 +25,16 @@ public abstract class CodeDriverThread implements Runnable {
     public final void run() {
         TenantContext.init(tenantContext);
         UserContext.init(userContext);
-        try{
+        try {
             String oldThreadName = Thread.currentThread().getName();
             if (StringUtils.isNotBlank(threadName)) {
                 Thread.currentThread().setName(threadName);
             }
-            /** 等待所有模块加载完成 **/
+            /* 等待所有模块加载完成 **/
             ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
             execute();
             Thread.currentThread().setName(oldThreadName);
-        }finally {
+        } finally {
             // 清除所有threadlocal
             if (TenantContext.get() != null) {
                 TenantContext.get().release();
@@ -48,9 +47,6 @@ public abstract class CodeDriverThread implements Runnable {
 
     protected abstract void execute();
 
-    public String getThreadName() {
-        return threadName;
-    }
 
     public void setThreadName(String threadName) {
         this.threadName = threadName;

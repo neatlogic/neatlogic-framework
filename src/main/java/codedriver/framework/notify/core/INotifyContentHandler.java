@@ -45,6 +45,19 @@ public interface INotifyContentHandler {
 		}
 	}
 
+	/**
+	 * @Description: 不同通知方式的预览内容与发送内容形式不一，
+	 * 故需要在插件内各自实现具体的方法
+	 * @Author: laiwt
+	 * @Date: 2021/3/3 14:15
+	**/
+	interface BuildNotifyHandler{
+
+		String getPreviewContent(JSONObject config);
+
+		List<NotifyVo> getNotifyVoList(JSONObject config);
+	}
+
 
 	public String getName();
 

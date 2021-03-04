@@ -41,7 +41,7 @@ public interface MessageMapper {
 
     public List<String> getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList(@Param("handler") String handler, @Param("userUuidList") List<String> userUuidList);
 
-    public List<TriggerMessageCountVo> getTriggerMessageCountListGroupByTriggerAndIsRead(String userUuid);
+    public List<TriggerMessageCountVo> getTriggerMessageCountListGroupByTriggerAndIsRead(MessageSearchVo searchVo);
 
     public int getMessageShortShowPopUpCountByUserUuidAndHandlerList(MessageSearchVo messageSearchVo);
 

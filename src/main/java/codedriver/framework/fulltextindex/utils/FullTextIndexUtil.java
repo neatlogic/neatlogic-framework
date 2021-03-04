@@ -1,6 +1,7 @@
 package codedriver.framework.fulltextindex.utils;
 
 import codedriver.framework.fulltextindex.dto.FullTextIndexWordOffsetVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -68,6 +69,9 @@ public class FullTextIndexUtil {
                 stream.end();
                 stream.close();
             }
+        }
+        if(CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(keyword)){
+            wordList.add(keyword);
         }
         return wordList;
     }

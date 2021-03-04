@@ -47,6 +47,7 @@
         b.`content`,
         b.`fcd`,
         b.`handler`,
+        b.`trigger`,
         a.`is_show` as isShow
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
@@ -91,6 +92,7 @@
         a.`content`,
         a.`fcd`,
         a.`handler`,
+        a.`trigger`,
         b.`is_read` AS isRead
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
@@ -183,7 +185,7 @@
         </foreach>
     </select>
 
-    <select id="getTriggerMessageCountListGroupByTriggerAndIsRead" parameterType="java.lang.String" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
+    <select id="getTriggerMessageCountListGroupByTriggerAndIsRead" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
         SELECT
                b.`trigger`,
                a.`is_read` AS isRead,
@@ -191,6 +193,10 @@
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
         WHERE a.`user_uuid` = #{value}
+        AND a.`insert_time` &gt;= #{startTime} AND a.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND a.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
         GROUP BY b.`trigger`, a.`is_read`
     </select>
 
@@ -230,7 +236,8 @@
             a.`title`,
             a.`content`,
             a.`fcd`,
-            a.`handler`
+            a.`handler`,
+            a.`trigger`
         FROM `message` a
         JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid} AND b.`is_read` = 0 AND b.`is_show` != 2 AND (b.`expired_time` IS NULL OR b.`expired_time` &gt; NOW(3))
         WHERE a.`handler` IN
@@ -247,7 +254,8 @@
             b.`title`,
             b.`content`,
             b.`fcd`,
-            b.`handler`
+            b.`handler`,
+            b.`trigger`
         FROM `message_user` a
         JOIN `message` b ON a.`message_id` = b.`id`
         WHERE a.`user_uuid` = #{userUuid} AND a.`message_id` = #{messageId}

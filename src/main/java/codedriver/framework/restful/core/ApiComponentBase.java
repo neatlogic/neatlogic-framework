@@ -2,6 +2,7 @@ package codedriver.framework.restful.core;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.FieldValidResultVo;
+import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.exception.core.ApiFieldValidNotFoundException;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
@@ -14,6 +15,7 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -39,7 +41,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 //获取代理的真实bean
                 target = ((Advised) proxy).getTargetSource().getTarget();
                 methods = AopUtils.getTargetClass(proxy).getMethods();
-            } catch (IllegalStateException | IllegalArgumentException | SecurityException ex) {
+            } catch (Exception ex) {
                 target = restComponent;
                 methods = restComponent.getClass().getMethods();
             } finally {
@@ -69,7 +71,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         return resultVo;
     }
 
-    public final Object doService(ApiVo apiVo, JSONObject paramObj) throws Exception {
+    public final Object doService(ApiVo apiVo, JSONObject paramObj, HttpServletResponse response) throws Exception {
         String error = "";
         Object result = null;
         long startTime = System.currentTimeMillis();
@@ -96,6 +98,13 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(targetClass, result, JSONObject.class);
                     }
+                    //设置Cache-Control
+                    if (response != null) {
+                        CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
+                        if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() + cacheControlVo.getMaxAge());
+                        }
+                    }
                 }
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
                 validApi(this.getClass(), paramObj, JSONObject.class);
@@ -114,6 +123,13 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (Config.ENABLE_INTERFACE_VERIFY()) {
                         validOutput(this.getClass(), result, JSONObject.class);
                     }
+                    //设置Cache-Control
+                    if (response != null) {
+                        CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
+                        if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                            response.setHeader("Cache-Control", "max-age=" + cacheControlVo.getMaxAge());
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
@@ -124,7 +140,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
-            //如果是反射抛得异常，则需要拆包，把真实得异常类找出来
+            //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
             while (target instanceof InvocationTargetException) {
                 target = ((InvocationTargetException) target).getTargetException();
             }

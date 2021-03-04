@@ -81,12 +81,11 @@ public class ApiDispatcher {
             if (apiType.equals(ApiVo.Type.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
                         ApiAccessCountUpdateThread.putToken(token);
                         Long starttime = System.currentTimeMillis();
-                        Object returnV = restComponent.doService(interfaceVo, paramObj);
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, response);
                         Long endtime = System.currentTimeMillis();
                         if (!restComponent.isRaw()) {
                             returnObj.put("TimeCost", endtime - starttime);

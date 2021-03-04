@@ -118,6 +118,16 @@
         WHERE a.`uuid` = #{value}
     </select>
 
+    <select id="getUserSimpleInfoByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
+        SELECT a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_info` AS userInfo,
+               a.`vip_level` AS vipLevel,
+               a.`user_name` AS userName
+        FROM `user` a
+        WHERE a.`uuid` = #{value}
+    </select>
+
     <select id="getUserVip" resultType="codedriver.framework.dto.UserVo">
         SELECT a.`uuid`,
                a.`user_id`   AS userId,

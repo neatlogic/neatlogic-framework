@@ -8,6 +8,7 @@ import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
+import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.*;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
@@ -23,20 +24,18 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.AopContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
-
 
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
         ApiAuditVo audit = new ApiAuditVo();
@@ -230,6 +229,7 @@ public class ApiValidateAndHelpBase {
     }
 
     protected void validIsReSubmit(Class<?> targetClass, String token, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException {
+
         Method m = targetClass.getDeclaredMethod("myDoService", classes);
         if (m.isAnnotationPresent(ResubmitInterval.class)) {
             for (Annotation anno : m.getDeclaredAnnotations()) {
@@ -466,5 +466,57 @@ public class ApiValidateAndHelpBase {
             jsonObj.put("input", inputList);
         }
         return jsonObj;
+    }
+
+    private CacheControlVo cacheControlVo;
+
+    public CacheControlVo getCacheControl(Class<?>... paramClass) {
+        if (cacheControlVo == null) {
+            CacheControl cacheControl = null;
+            Annotation annotation = getAnnotation("myDoService", CacheControl.class, paramClass);
+            if (annotation != null) {
+                cacheControlVo = new CacheControlVo();
+                cacheControl = (CacheControl) annotation;
+                cacheControlVo.setCacheControlType(cacheControl.cacheControlType());
+                cacheControlVo.setMaxAge(cacheControl.maxAge());
+            }
+        }
+        return cacheControlVo;
+    }
+
+    /**
+     * @Description: 根据注解，获取对应api的对应方法的注解
+     * @Author: 89770
+     * @Date: 2021/3/4 12:00
+     * @Params: [t]
+     * @Returns: java.lang.annotation.Annotation
+     **/
+    protected Annotation getAnnotation(String methodName, Class<?> t, Class<?>... paramClass) {
+        Object target = null;
+        try {
+            Object proxy = AopContext.currentProxy();
+            //获取代理的真实bean
+            target = ((Advised) proxy).getTargetSource().getTarget();
+        } catch (Exception ex) {
+            target = this;
+        }
+        try {
+            Method m = target.getClass().getDeclaredMethod(methodName, paramClass);
+            if (m.isAnnotationPresent(CacheControl.class)) {
+                for (Annotation anno : m.getDeclaredAnnotations()) {
+                    if (anno.annotationType().equals(t)) {
+                        return anno;
+                    }
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            Throwable targetException = e;
+            //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
+            while (targetException instanceof InvocationTargetException) {
+                targetException = ((InvocationTargetException) targetException).getTargetException();
+            }
+            targetException.printStackTrace();
+        }
+        return null;
     }
 }

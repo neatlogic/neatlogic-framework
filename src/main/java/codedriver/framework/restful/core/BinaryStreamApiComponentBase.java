@@ -1,5 +1,7 @@
 package codedriver.framework.restful.core;
 
+import codedriver.framework.common.constvalue.CacheControlType;
+import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
@@ -37,11 +39,23 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 validApi(targetClass, paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 Method method = proxy.getClass().getMethod("myDoService", JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header
+                CacheControlVo cacheControlVo = getCacheControl(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                    response.setHeader("Cache-Control", "max-age=" + cacheControlVo.getMaxAge());
+                }
                 result = method.invoke(proxy, paramObj, request, response);
+
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
                 validApi(this.getClass(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header
+                CacheControlVo cacheControlVo = getCacheControl(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                    response.setHeader("Cache-Control", "max-age=" + cacheControlVo.getMaxAge());
+                }
                 result = myDoService(paramObj, request, response);
+
             } catch (Exception ex) {
                 if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
                     throw new ApiRuntimeException(ex.getCause().getMessage());
@@ -50,6 +64,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 }
             }
         } catch (Exception e) {
+            response.setHeader("Cache-Control", CacheControlType.NOCACHE.getValue());//下次还需验证
             error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
             throw e;
         } finally {

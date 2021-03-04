@@ -89,13 +89,13 @@ public interface INotifyContentHandler {
 	public JSONArray getMessageAttrList(String handler);
 
 	/**
-	 * @Description: 获取通知内容插件的相关数据列，例如【待我处理的工单】包含工单中心的可显示列
+	 * @Description: 根据通知方式决定是否可选择工单显示字段
 	 * @Author: laiwt
 	 * @Date: 2021/1/8 18:21
 	 * @Params: []
 	 * @Returns: java.util.List<codedriver.framework.common.dto.ValueTextVo>
 	**/
-	public List<ValueTextVo> getDataColumnList();
+	public List<ValueTextVo> getDataColumnList(String notifyHandler);
 
 	/**
 	 * @Description: 组装待发送数据

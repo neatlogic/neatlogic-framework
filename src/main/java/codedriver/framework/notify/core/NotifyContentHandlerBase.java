@@ -19,8 +19,8 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
     }
 
     @Override
-    public List<ValueTextVo> getDataColumnList() {
-        return getMyDataColumnList();
+    public List<ValueTextVo> getDataColumnList(String notifyHandler) {
+        return getMyDataColumnList(notifyHandler);
     }
 
     @Override
@@ -37,7 +37,7 @@ public abstract class NotifyContentHandlerBase implements INotifyContentHandler{
 
     protected abstract JSONArray getMyMessageAttrList(String handler);
 
-    protected abstract List<ValueTextVo> getMyDataColumnList();
+    protected abstract List<ValueTextVo> getMyDataColumnList(String notifyHandler);
 
     protected abstract List<NotifyVo> getMyNotifyData(Long id);
 

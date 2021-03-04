@@ -361,6 +361,10 @@
                 and a.`vip_level` = #{vipLevel}
             </if>
 
+            <if test="isActive != null">
+                AND a.`is_active` = #{isActive}
+            </if>
+
             <if test="teamUuid != null and teamUuid != ''">
                 AND b.`team_uuid` = #{teamUuid}
             </if>

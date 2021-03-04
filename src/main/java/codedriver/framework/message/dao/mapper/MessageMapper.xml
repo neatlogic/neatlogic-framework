@@ -192,10 +192,10 @@
                COUNT(1) AS count
         FROM `message_user` a
         JOIN `message` b ON b.`id` = a.`message_id`
-        WHERE a.`user_uuid` = #{value}
-        AND a.`insert_time` &gt;= #{startTime} AND a.`insert_time` &lt;= #{endTime}
+        WHERE a.`user_uuid` = #{userUuid}
+        AND b.`insert_time` &gt;= #{startTime} AND b.`insert_time` &lt;= #{endTime}
         <if test="keyword != null and keyword != ''">
-            AND a.`title` LIKE CONCAT('%', #{keyword}, '%')
+            AND b.`title` LIKE CONCAT('%', #{keyword}, '%')
         </if>
         GROUP BY b.`trigger`, a.`is_read`
     </select>

@@ -36,7 +36,7 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 	</select>
-	
+
 	<select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
 		SELECT
 		a.`uuid`,
@@ -45,7 +45,7 @@
 		a.`rht`,
 		a.`parent_uuid` AS `parentUuid`,
 		a.`level`
-		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid} 
+		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
 		AND a.`level` in
 		<foreach collection="list" item="level" separator="," open="(" close=")">
 			#{level}
@@ -109,6 +109,19 @@
 		</where>
 	</select>
 
+	<select id="getTeamSimpleInfoByUuid" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.dto.TeamVo" useCache="true">
+		SELECT
+		a.`uuid`,
+		a.`name`
+		FROM
+		`team` a
+		<where>
+			<if test="uuid !=null and uuid != ''">
+				AND a.`uuid` = #{uuid}
+			</if>
+		</where>
+	</select>
+
 	<select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo" useCache="false">
 		SELECT
 		a.`uuid`,
@@ -150,7 +163,7 @@
 		WHERE a.`parent_uuid` = #{value}
 		ORDER BY `lft` ASC
 	</select>
-	
+
 	<select id="getDepartmentTeamUuidByTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
 		SELECT
 		a.`uuid`,
@@ -161,14 +174,14 @@
 		a.`level`
 		FROM `team` a
 		WHERE
-		 `level` = 'department' 
+		 `level` = 'department'
 		and (
 		<foreach collection="list" item="team" separator=") or (" open="(" close=")">
 			a.`lft` &lt;= #{team.lft} and a.`rht` >= #{team.rht}
 		</foreach>
 		)
 	</select>
-	
+
 	<select id="getAllSonTeamByParentTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
 		SELECT
 		a.`uuid`,

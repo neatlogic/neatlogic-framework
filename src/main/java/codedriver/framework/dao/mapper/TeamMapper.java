@@ -1,14 +1,16 @@
 package codedriver.framework.dao.mapper;
 
-import java.util.List;
-
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.TeamUserVo;
 import codedriver.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface TeamMapper {
 	public TeamVo getTeam(TeamVo teamVo);
+
+	public TeamVo getTeamSimpleInfoByUuid(TeamVo teamVo);
 
 	public int checkTeamIsExists(String uuid);
 	

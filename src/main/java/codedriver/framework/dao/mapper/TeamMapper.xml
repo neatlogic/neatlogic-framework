@@ -275,7 +275,7 @@
 		ORDER BY `lft` ASC
 	</select>
 
-	<select id="getTeamUserCountAndChildCountListByUuidList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo" useCache="false">
+	<select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo" useCache="false">
 		SELECT
 		a.`uuid`,
 		COUNT(DISTINCT b.`user_uuid`) AS userCount,
@@ -283,10 +283,14 @@
 		FROM `team` a
 		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
 		LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
+		LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
 		WHERE a.`uuid` IN
 		<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
 			#{teamUuid}
 		</foreach>
+		<if test="isActive != null">
+			and d.`is_active` = #{isActive}
+		</if>
 		GROUP BY a.`uuid`
 	</select>
 

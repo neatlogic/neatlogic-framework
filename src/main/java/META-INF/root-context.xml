@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hdp="http://www.springframework.org/schema/hadoop" xmlns:nacos="http://nacos.io/schema/nacos" xsi:schemaLocation="http://www.springframework.org/schema/aop
+<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nacos="http://nacos.io/schema/nacos"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -8,8 +11,8 @@
 		http://nacos.io/schema/nacos
 		http://nacos.io/schema/nacos.xsd">
 
-	<!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
-	<!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
+    <!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
+    <!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
 	<!-- 本地配置加载器,nacos不可用时加载配置数据 -->
 	<bean class="codedriver.framework.common.config.LocalConfig"></bean>
 	<nacos:annotation-driven></nacos:annotation-driven>

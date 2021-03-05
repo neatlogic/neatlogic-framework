@@ -1,7 +1,8 @@
 package codedriver.framework.util;
 
-import static org.apache.commons.lang3.time.DateUtils.isSameDay;
-import static org.apache.commons.lang3.time.DateUtils.toCalendar;
+import codedriver.framework.exception.type.ParamIrregularException;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,9 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
-import codedriver.framework.exception.type.ParamIrregularException;
+import static org.apache.commons.lang3.time.DateUtils.isSameDay;
+import static org.apache.commons.lang3.time.DateUtils.toCalendar;
 
 /**
  * @program: codedriver
@@ -739,5 +739,30 @@ public class TimeUtil {
         }else {
             return null;
         }
+    }
+
+    /**
+     * @return
+     * @Author 89770
+     * @Time 2020年11月6日
+     * @Description: 根据前端date插件入参，获取startTime 和 endTime
+     * @Param
+     */
+    public static JSONObject getStartTimeAndEndTimeByDateJson(JSONObject dateConfig) {
+        JSONObject json = new JSONObject();
+        String startTime = StringUtils.EMPTY;
+        String endTime = StringUtils.EMPTY;
+        SimpleDateFormat format = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
+        if (dateConfig.containsKey("startTime")) {
+            startTime = format.format(new Date(dateConfig.getLong("startTime")));
+            endTime = format.format(new Date(dateConfig.getLong("endTime")));
+        } else {
+            startTime = TimeUtil.timeTransfer(dateConfig.getInteger("timeRange"), dateConfig.getString("timeUnit"));
+            endTime = TimeUtil.timeNow();
+        }
+        json.put("startTime", startTime);
+        json.put("endTime", endTime);
+
+        return json;
     }
 }

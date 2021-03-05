@@ -1,10 +1,10 @@
 package codedriver.framework.dao.mapper;
 
-import java.util.Date;
-import java.util.List;
-
 import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 public interface UserMapper {
 
@@ -30,6 +30,8 @@ public interface UserMapper {
     public UserVo getUserByUserId(String userId);
 
     public UserVo getUserByUuid(String uuid);
+
+    public UserVo getUserSimpleInfoByUuid(String uuid);
 
     public List<UserVo> searchUser(UserVo userVo);
 
@@ -73,7 +75,7 @@ public interface UserMapper {
 
     public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
 
-    public List<String> checkUserUuidListIsExists(List<String> userUuidList);
+    public List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList,@Param("isActive") Integer isActive);
 
     public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 

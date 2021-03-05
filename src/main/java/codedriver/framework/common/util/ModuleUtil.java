@@ -1,25 +1,18 @@
 package codedriver.framework.common.util;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import codedriver.framework.dto.ModuleGroupVo;
+import codedriver.framework.dto.ModuleVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import codedriver.framework.dto.ModuleGroupVo;
-import codedriver.framework.dto.ModuleVo;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ModuleUtil {
 	static Logger logger = LoggerFactory.getLogger(ModuleUtil.class);
-	private static List<ModuleVo> moduleList = new ArrayList<>();
-	private static Map<String, ModuleVo> moduleMap = new HashMap<>();
+	private static final List<ModuleVo> moduleList = new ArrayList<>();
+	private static final Map<String, ModuleVo> moduleMap = new HashMap<>();
 
 	public static List<ModuleVo> getAllModuleList() {
 		return moduleList;

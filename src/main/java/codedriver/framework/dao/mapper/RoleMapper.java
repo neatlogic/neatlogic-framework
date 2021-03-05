@@ -1,14 +1,13 @@
 package codedriver.framework.dao.mapper;
 
-import java.util.List;
-
 import codedriver.framework.common.dto.ValueTextVo;
-import org.apache.ibatis.annotations.Param;
-
 import codedriver.framework.dto.AuthVo;
 import codedriver.framework.dto.RoleAuthVo;
 import codedriver.framework.dto.RoleUserVo;
 import codedriver.framework.dto.RoleVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface RoleMapper {
     public List<String> getRoleUuidListByAuth(@Param("authList") List<String> authList);
@@ -30,6 +29,8 @@ public interface RoleMapper {
     public int searchRoleUserCountByRoleUuid(String roleUuid);
 
     public RoleVo getRoleByUuid(String uuid);
+
+    public RoleVo getRoleSimpleInfoByUuid(String uuid);
 
     public List<RoleVo> getRoleByUuidList(List<String> uuidList);
 

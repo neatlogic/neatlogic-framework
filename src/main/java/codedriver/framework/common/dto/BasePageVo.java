@@ -1,11 +1,14 @@
 package codedriver.framework.common.dto;
 
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.fulltextindex.utils.FullTextIndexUtil;
+import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.restful.annotation.EntityField;
+import java.io.IOException;
+import java.util.Set;
 
 public class BasePageVo {
     @JSONField(serialize = false)
@@ -23,6 +26,8 @@ public class BasePageVo {
     private transient Integer startNum;
     @JSONField(serialize = false)
     private transient String keyword;
+    @JSONField(serialize = false)
+    private transient Set<String> keywordList;
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
     private transient Integer rowNum = 0;
 
@@ -86,6 +91,17 @@ public class BasePageVo {
     public String getKeyword() {
         return keyword;
     }
+
+    public Set<String> getKeywordList() {
+        if (CollectionUtils.isEmpty(this.keywordList) && StringUtils.isNotBlank(keyword)) {
+            try {
+                this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
+            } catch (IOException ignored) {
+            }
+        }
+        return this.keywordList;
+    }
+
 
     public void setKeyword(String keyword) {
         if (StringUtils.isNotBlank(keyword)) {

@@ -45,6 +45,19 @@ public interface INotifyContentHandler {
 		}
 	}
 
+	/**
+	 * @Description: 不同通知方式的预览内容与发送内容形式不一，
+	 * 故需要在插件内各自实现具体的方法
+	 * @Author: laiwt
+	 * @Date: 2021/3/3 14:15
+	**/
+	interface BuildNotifyHandler{
+
+		String getPreviewContent(JSONObject config);
+
+		List<NotifyVo> getNotifyVoList(JSONObject config);
+	}
+
 
 	public String getName();
 
@@ -76,13 +89,13 @@ public interface INotifyContentHandler {
 	public JSONArray getMessageAttrList(String handler);
 
 	/**
-	 * @Description: 获取通知内容插件的相关数据列，例如【待我处理的工单】包含工单中心的可显示列
+	 * @Description: 根据通知方式决定是否可选择工单显示字段
 	 * @Author: laiwt
 	 * @Date: 2021/1/8 18:21
 	 * @Params: []
 	 * @Returns: java.util.List<codedriver.framework.common.dto.ValueTextVo>
 	**/
-	public List<ValueTextVo> getDataColumnList();
+	public List<ValueTextVo> getDataColumnList(String notifyHandler);
 
 	/**
 	 * @Description: 组装待发送数据
@@ -94,13 +107,15 @@ public interface INotifyContentHandler {
 	public List<NotifyVo> getNotifyData(Long id);
 
 	/**
-	 * @Description: 插件预览
+	 * @Description: 插件内容预览方法，不同的通知方式，发送的通知内容也不同
+	 * 以【待我处理的工单】为例，邮件通知的内容是工单列表，而消息通知的内容是
+	 * 待处理的工单数量与工单中心的链接
 	 * @Author: laiwt
-	 * @Date: 2021/1/8 18:15
-	 * @Params: [config]
+	 * @Date: 2021/2/3 14:52
+	 * @Params: [config, notifyHandler]
 	 * @Returns: java.lang.String
 	**/
-	public String preview(JSONObject config);
+	public String preview(JSONObject config,String notifyHandler);
 
 	public default String getClassName() {
 		return ClassUtils.getUserClass(this.getClass()).getName();

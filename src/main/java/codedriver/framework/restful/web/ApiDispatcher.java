@@ -3,6 +3,7 @@ package codedriver.framework.restful.web;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.exception.type.PermissionDeniedException;
@@ -68,24 +69,23 @@ public class ApiDispatcher {
         }
         //如果只是接口校验入参
         String validField = request.getHeader("codedriver-validfield");
-        if(StringUtils.isNotBlank(validField)) {
+        if (StringUtils.isNotBlank(validField)) {
             IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
-            FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo,paramObj,validField);
-            if(StringUtils.isNotBlank(validResultVo.getMsg())) {
+            FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo, paramObj, validField);
+            if (StringUtils.isNotBlank(validResultVo.getMsg())) {
                 response.setStatus(530);
                 returnObj.put("Message", validResultVo.getMsg());
             }
             returnObj.put("Status", validResultVo.getStatus());
-        }else {
+        } else {
             if (apiType.equals(ApiVo.Type.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
                         ApiAccessCountUpdateThread.putToken(token);
                         Long starttime = System.currentTimeMillis();
-                        Object returnV = restComponent.doService(interfaceVo, paramObj);
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, response);
                         Long endtime = System.currentTimeMillis();
                         if (!restComponent.isRaw()) {
                             returnObj.put("TimeCost", endtime - starttime);
@@ -220,6 +220,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -234,6 +238,7 @@ public class ApiDispatcher {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(returnObj);
         }
+
     }
 
     @RequestMapping(value = "/stream/**", method = RequestMethod.POST)
@@ -257,6 +262,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
@@ -299,6 +308,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -338,6 +351,10 @@ public class ApiDispatcher {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
@@ -375,6 +392,10 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {

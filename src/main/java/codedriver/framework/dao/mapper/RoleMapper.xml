@@ -108,6 +108,14 @@
 		WHERE `uuid` = #{value}
 	</select>
 
+	<select id="getRoleSimpleInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo" useCache="true">
+		SELECT
+			`uuid`,
+			`name`
+		FROM `role`
+		WHERE `uuid` = #{value}
+	</select>
+
 	<select id="getRoleByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo" useCache="false">
 		SELECT
 		`uuid`,

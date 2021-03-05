@@ -25,7 +25,7 @@ import java.util.*;
 
 @RootComponent
 public class SchedulerManager extends ApplicationListenerBase {
-	private Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
+	private final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
 	private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
 	private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();

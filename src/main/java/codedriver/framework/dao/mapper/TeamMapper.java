@@ -1,14 +1,16 @@
 package codedriver.framework.dao.mapper;
 
-import java.util.List;
-
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.TeamUserVo;
 import codedriver.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface TeamMapper {
 	public TeamVo getTeam(TeamVo teamVo);
+
+	public TeamVo getTeamSimpleInfoByUuid(TeamVo teamVo);
 
 	public int checkTeamIsExists(String uuid);
 	
@@ -55,7 +57,7 @@ public interface TeamMapper {
 	
 	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
-	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
+	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(@Param("list") List<String> teamUuidList,@Param("isActive") Integer isActive);
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 

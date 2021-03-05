@@ -598,8 +598,7 @@
         </foreach>
     </select>
 
-    <select id="checkUserUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String"
-            useCache="false">
+    <select id="checkUserUuidListIsExists" resultType="java.lang.String" useCache="false">
         SELECT
         DISTINCT `uuid`
         FROM `user`
@@ -607,6 +606,9 @@
         <foreach collection="list" item="userUuid" open="(" close=")" separator=",">
             #{userUuid}
         </foreach>
+        <if test="isActive != null">
+            and `is_active` = #{isActive}
+        </if>
     </select>
 
     <select id="getUserDataByUserUuidAndType" parameterType="java.lang.String"

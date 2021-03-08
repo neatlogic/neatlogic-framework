@@ -57,7 +57,7 @@ public interface TeamMapper {
 	
 	public List<TeamVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("level") String level);
 
-	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(List<String> teamUuidList);
+	public List<TeamVo> getTeamUserCountAndChildCountListByUuidList(@Param("list") List<String> teamUuidList,@Param("isActive") Integer isActive);
 
 	public List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 

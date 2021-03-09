@@ -187,6 +187,7 @@
 
     <select id="getTriggerMessageCountListGroupByTriggerAndIsRead" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="codedriver.framework.message.dto.TriggerMessageCountVo">
         SELECT
+               b.`notify_policy_handler` as notifyPolicyHandler,
                b.`trigger`,
                a.`is_read` AS isRead,
                COUNT(1) AS count
@@ -197,7 +198,7 @@
         <if test="keyword != null and keyword != ''">
             AND b.`title` LIKE CONCAT('%', #{keyword}, '%')
         </if>
-        GROUP BY b.`trigger`, a.`is_read`
+        GROUP BY b.`notify_policy_handler`,b.`trigger`, a.`is_read`
     </select>
 
     <select id="getMessageShortShowPopUpCountByUserUuidAndHandlerList" parameterType="codedriver.framework.message.dto.MessageSearchVo" resultType="int">
@@ -269,6 +270,7 @@
         `handler`,
         `fcd`,
         `trigger`,
+        `notify_policy_handler`,
         `insert_time`
         )
         VALUES
@@ -280,6 +282,7 @@
             #{messageVo.handler},
             #{messageVo.fcd},
             #{messageVo.trigger},
+            #{messageVo.notifyPolicyHandler},
             NOW(3)
             )
         </foreach>

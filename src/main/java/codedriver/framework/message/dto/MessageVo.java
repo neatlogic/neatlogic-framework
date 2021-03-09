@@ -32,6 +32,8 @@ public class MessageVo {
     private String popUp;
     @EntityField(name = "触发点", type = ApiParamType.STRING)
     private String trigger;
+    @EntityField(name = "通知策略处理器全类名", type = ApiParamType.STRING)
+    private String notifyPolicyHandler;
     @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
     private  Integer isRead;
 
@@ -43,6 +45,7 @@ public class MessageVo {
         this.handler = notifyVo.getMessageHandlerClass().getName();
         this.fcd = notifyVo.getFcd();
         this.trigger = notifyVo.getTriggerType().getTrigger();
+        this.notifyPolicyHandler = notifyVo.getNotifyPolicyHandler();
     }
 
     public Long getId() {
@@ -110,5 +113,13 @@ public class MessageVo {
 
     public void setTrigger(String trigger) {
         this.trigger = trigger;
+    }
+
+    public String getNotifyPolicyHandler() {
+        return notifyPolicyHandler;
+    }
+
+    public void setNotifyPolicyHandler(String notifyPolicyHandler) {
+        this.notifyPolicyHandler = notifyPolicyHandler;
     }
 }

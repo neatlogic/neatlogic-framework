@@ -45,7 +45,7 @@ public class NotifyPolicyUtil {
      * @Time:2020年7月2日
      * @Description: 执行通知策略
      */
-    public static void execute(INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
+    public static void execute(String notifyPolicyHandler, INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
                                JSONObject templateParamData, JSONObject conditionParamData,
                                Map<String, List<NotifyReceiverVo>> receiverMap) {
         /** 异常通知用户uuid列表 **/
@@ -102,7 +102,7 @@ public class NotifyPolicyUtil {
                                 if (handler == null) {
                                     throw new NotifyHandlerNotFoundException(notifyHandler);
                                 }
-                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass);
+                                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
                                 /** 设置异常通知接收人 **/
                                 if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
                                     notifyBuilder.setExceptionNotifyUserUuidList(adminUserUuidList);

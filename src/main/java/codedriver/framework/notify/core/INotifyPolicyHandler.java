@@ -36,4 +36,6 @@ public interface INotifyPolicyHandler {
 
 	/** 绑定权限，每种handler对应不同的权限 */
 	public String getAuthName();
+
+	public INotifyPolicyHandlerGroup getGroup();
 }

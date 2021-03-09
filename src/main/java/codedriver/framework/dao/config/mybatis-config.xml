@@ -11,7 +11,7 @@
                      handler="codedriver.framework.dao.plugin.CompressHandler"/>
     </typeHandlers>
     <plugins>
-        <plugin interceptor="codedriver.framework.dao.plugin.BusinessGroupInterceptor"/>
+        <!-- <plugin interceptor="codedriver.framework.dao.plugin.BusinessGroupInterceptor"/>-->
         <plugin interceptor="codedriver.framework.dao.plugin.FulltextIndexInterceptor"/>
         <plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor"/>
     </plugins>

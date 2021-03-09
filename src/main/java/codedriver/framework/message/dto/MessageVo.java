@@ -30,8 +30,8 @@ public class MessageVo {
     private Date fcd;
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
-    @JSONField(serialize = false)
-    private transient String trigger;
+    @EntityField(name = "触发点", type = ApiParamType.STRING)
+    private String trigger;
     @EntityField(name = "是否已读", type = ApiParamType.INTEGER)
     private  Integer isRead;
 

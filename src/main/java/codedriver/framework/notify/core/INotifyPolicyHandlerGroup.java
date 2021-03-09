@@ -3,7 +3,7 @@ package codedriver.framework.notify.core;
 /**
  * @Title: INotifyPolicyHandlerGroup
  * @Package codedriver.framework.notify.core
- * @Description: TODO
+ * @Description: 通知策略分组接口
  * @Author: linbq
  * @Date: 2021/3/8 16:02
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.

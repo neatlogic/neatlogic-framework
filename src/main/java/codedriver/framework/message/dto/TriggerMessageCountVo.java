@@ -10,9 +10,18 @@ package codedriver.framework.message.dto;
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  **/
 public class TriggerMessageCountVo {
+    private String notifyPolicyHandler;
     private String trigger;
     private Integer count;
     private Integer isRead;
+
+    public String getNotifyPolicyHandler() {
+        return notifyPolicyHandler;
+    }
+
+    public void setNotifyPolicyHandler(String notifyPolicyHandler) {
+        this.notifyPolicyHandler = notifyPolicyHandler;
+    }
 
     public String getTrigger() {
         return trigger;

@@ -25,6 +25,7 @@ public class MessageSearchVo extends BaseEditorVo {
     private Date endTime;
     private List<String> handlerList;
     private List<String> triggerList;
+    private String notifyPolicyHandler;
     private Integer isShow;
     private Integer isRead;
     private Date expiredTime;
@@ -116,6 +117,14 @@ public class MessageSearchVo extends BaseEditorVo {
 
     public void setTriggerList(List<String> triggerList) {
         this.triggerList = triggerList;
+    }
+
+    public String getNotifyPolicyHandler() {
+        return notifyPolicyHandler;
+    }
+
+    public void setNotifyPolicyHandler(String notifyPolicyHandler) {
+        this.notifyPolicyHandler = notifyPolicyHandler;
     }
 
     public Integer getIsShow() {

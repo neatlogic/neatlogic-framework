@@ -21,8 +21,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>**/*.ttc</include>
-                    <include>**/*.ttf</include>
+                    <include>**</include>
                 </includes>
             </resource>
         </resources>
@@ -52,7 +51,6 @@
             <groupId>com.github.magese</groupId>
             <artifactId>ik-analyzer</artifactId>
             <version>8.1.0.techsure</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project> 

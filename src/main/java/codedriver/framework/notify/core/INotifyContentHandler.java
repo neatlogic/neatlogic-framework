@@ -58,6 +58,10 @@ public interface INotifyContentHandler {
 		List<NotifyVo> getNotifyVoList(JSONObject config);
 	}
 
+	interface ICondition{
+		String getConditionSql(JSONObject conditionConfig);
+	}
+
 
 	public String getName();
 

@@ -1,8 +1,8 @@
 package codedriver.framework.exception.user;
 
-import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
 
-public class UserIdRepeatException extends ApiRuntimeException {
+public class UserIdRepeatException extends ApiFieldValidRuntimeException {
 
     private static final long serialVersionUID = 5436636984492123266L;
 

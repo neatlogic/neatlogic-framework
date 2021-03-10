@@ -1,8 +1,8 @@
 package codedriver.framework.notify.exception;
 
-import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
 
-public class NotifyPolicyParamNameRepeatException extends ApiRuntimeException {
+public class NotifyPolicyParamNameRepeatException extends ApiFieldValidRuntimeException {
 
 	private static final long serialVersionUID = 3346275964221351899L;
 

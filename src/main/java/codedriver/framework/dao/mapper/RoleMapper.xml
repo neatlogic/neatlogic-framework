@@ -169,7 +169,7 @@
 	
 	<select id="getRoleUuidListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String">
 		select 
-		`role_uuid`	
+		distinct `role_uuid`
 		from
 		`user_role`
 		where `user_uuid` in

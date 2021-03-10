@@ -20,6 +20,8 @@ public class MatrixVo extends BaseEditorVo {
     private String uuid;
     @EntityField( name = "数据源名称", type = ApiParamType.STRING)
     private String name;
+    @EntityField( name = "唯一标识", type = ApiParamType.STRING)
+    private String label;
     @EntityField( name = "类型",  type = ApiParamType.STRING)
     private String type;
     @EntityField( name = "类型名称", type = ApiParamType.STRING)
@@ -64,6 +66,14 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getType() {

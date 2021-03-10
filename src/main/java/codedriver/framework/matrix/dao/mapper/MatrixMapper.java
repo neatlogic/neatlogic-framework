@@ -22,7 +22,9 @@ public interface MatrixMapper {
 	public int checkMatrixIsExists(String uuid);
 
 	public int checkMatrixNameIsRepeat(MatrixVo matrixVo);
-	
+
+	public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
+
 	public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(String matrixUuid);
 
     public int deleteMatrixByUuid(String uuid);

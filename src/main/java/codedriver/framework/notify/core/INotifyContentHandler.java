@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *@Title: 通知定时任务插件接口
@@ -59,7 +60,7 @@ public interface INotifyContentHandler {
 	}
 
 	interface ICondition{
-		String getConditionSql(JSONObject conditionConfig);
+		void getConditionMap(Map<String,Object> map,JSONObject conditionConfig);
 	}
 
 

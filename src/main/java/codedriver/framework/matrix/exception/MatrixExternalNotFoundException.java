@@ -1,12 +1,12 @@
 package codedriver.framework.matrix.exception;
 
-import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
 
-public class MatrixExternalNotFoundException extends ApiRuntimeException {
+public class MatrixExternalNotFoundException extends ApiFieldValidRuntimeException {
 
 	private static final long serialVersionUID = 1708428607162097984L;
 
 	public MatrixExternalNotFoundException(String name) {
-		super("矩阵外部数据源：'" + name + "'信息不存在");
+		super(name + "的数据源关联的集成配置信息异常");
 	}
 }

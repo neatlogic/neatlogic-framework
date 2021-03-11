@@ -15,6 +15,7 @@ import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
     private INotifyTriggerType triggerType;
+    private String notifyPolicyHandler;
     private String title;
     private String content;
     private String fromUser;
@@ -27,6 +28,7 @@ public class NotifyVo {
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
+        this.notifyPolicyHandler = builder.notifyPolicyHandler;
         this.data = builder.data;
         this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
@@ -107,6 +109,10 @@ public class NotifyVo {
         return this.triggerType;
     }
 
+    public String getNotifyPolicyHandler() {
+        return notifyPolicyHandler;
+    }
+
     public Class<? extends IMessageHandler> getMessageHandlerClass() {
         return messageHandlerAndRecipientVo.messageHandlerClass;
     }
@@ -136,6 +142,7 @@ public class NotifyVo {
 
         private INotifyTriggerType triggerType;
         private Class<? extends IMessageHandler> messageHandlerClass;
+        private String notifyPolicyHandler;
         private Date fcd = new Date();
 
         public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _messageHandlerClass) {
@@ -143,8 +150,18 @@ public class NotifyVo {
             this.messageHandlerClass = _messageHandlerClass;
         }
 
+        public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _messageHandlerClass, String _notifyPolicyHandler) {
+            this.triggerType = _triggerType;
+            this.messageHandlerClass = _messageHandlerClass;
+            this.notifyPolicyHandler = _notifyPolicyHandler;
+        }
+
         public INotifyTriggerType getTriggerType() {
             return triggerType;
+        }
+
+        public String getNotifyPolicyHandler() {
+            return notifyPolicyHandler;
         }
 
         public Builder withContentTemplate(String contentTemplate) {

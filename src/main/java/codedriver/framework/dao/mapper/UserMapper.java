@@ -69,6 +69,15 @@ public interface UserMapper {
 
     public List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
 
+    /**
+     * @Description: 根据分组uuid，找出所有用户uuid与其所在所有分组的uuid
+     * @Author: laiwt
+     * @Date: 2021/3/12 15:15
+     * @Params: [teamUuidList]
+     * @Returns: java.util.List<codedriver.framework.dto.UserVo>
+    **/
+    public List<UserVo> getUserTeamListByTeamUuidList(List<String> teamUuidList);
+
     public List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
     public List<String> getUserUuidListByUserName(String userName);

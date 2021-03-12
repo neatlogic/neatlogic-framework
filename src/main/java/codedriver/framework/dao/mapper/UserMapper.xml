@@ -542,13 +542,34 @@
     <select id="getUserUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String"
             useCache="false">
         SELECT
-        a.`user_uuid`
+        distinct a.`user_uuid`
         FROM user_team a
         JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
         WHERE a.`team_uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
         </foreach>
+    </select>
+
+    <resultMap id="userTeamMap" type="codedriver.framework.dto.UserVo">
+        <id property="uuid" column="uuid"/>
+        <collection property="teamUuidList" ofType="java.lang.String">
+            <result column="teamUuid"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserTeamListByTeamUuidList" parameterType="java.util.List" resultMap="userTeamMap"
+            useCache="false">
+        SELECT
+        a.`user_uuid` as uuid,
+        a.`team_uuid` as teamUuid
+        FROM user_team a
+        JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+        WHERE a.`team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+        GROUP BY a.`user_uuid`,a.`team_uuid`
     </select>
 
     <select id="getUserUuidListByRoleUuidList" parameterType="java.util.List" resultType="java.lang.String"

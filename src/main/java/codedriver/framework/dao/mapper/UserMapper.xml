@@ -556,20 +556,33 @@
         <collection property="teamUuidList" ofType="java.lang.String">
             <result column="teamUuid"/>
         </collection>
+        <collection property="roleUuidList" ofType="java.lang.String">
+            <result column="roleUuid"/>
+        </collection>
     </resultMap>
 
-    <select id="getUserTeamListByTeamUuidList" parameterType="java.util.List" resultMap="userTeamMap"
+    <select id="getUserTeamRoleListByTeamUuidList" parameterType="java.util.List" resultMap="userTeamMap"
             useCache="false">
         SELECT
-        a.`user_uuid` as uuid,
-        a.`team_uuid` as teamUuid
-        FROM user_team a
-        JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
-        WHERE a.`team_uuid` IN
+        a.`uuid` as uuid,
+        c.`team_uuid` as teamUuid,
+        d.`role_uuid` as roleUuid
+        from
+        `user` a
+        join (
+        select DISTINCT a.`uuid`
+        from
+        `user` a
+        join `user_team` b
+        on a.`uuid` = b.`user_uuid` AND a.`is_active` = 1
+        where b.`team_uuid` in
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
         </foreach>
-        GROUP BY a.`user_uuid`,a.`team_uuid`
+        ) b
+        on a.`uuid` = b.`uuid`
+        LEFT JOIN `user_team` c on a.uuid = c.`user_uuid`
+        LEFT JOIN `user_role` d on a.uuid = d.`user_uuid`
     </select>
 
     <select id="getUserUuidListByRoleUuidList" parameterType="java.util.List" resultType="java.lang.String"

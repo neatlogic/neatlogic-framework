@@ -59,7 +59,6 @@ public class UpdateMessageUserIsShowThread extends CodeDriverThread {
 
     @Override
     protected void execute() {
-        System.out.println("UpdateMessageUserThread...");
         String userUuid = UserContext.get().getUserUuid(true);
         /** 将is_show=1,expired_time>=NOW(3) （临时弹窗且已自动消失）的消息改成 is_show = 2, expired_time = null **/
         messageMapper.updateMessageUserExpiredIsShow1To2AndExpiredTimeIsNullByUserUuid(userUuid);

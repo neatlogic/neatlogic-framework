@@ -140,6 +140,17 @@
 		SELECT COUNT(`uuid`) FROM `team` WHERE `uuid` = #{uuid}
 	</select>
 
+	<select id="checkTeamUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+		SELECT
+		distinct `uuid`
+		FROM `team`
+		WHERE
+		`uuid` in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
 	<resultMap id="childrenTeamMap" type="codedriver.framework.dto.TeamVo">
 		<id property="uuid" column="uuid" />
 		<result property="name" column="name" />

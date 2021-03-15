@@ -11,7 +11,6 @@ import java.util.concurrent.RejectedExecutionException;
 public class CachedThreadPool {
 	private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
 	private static final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-
 	public static void execute(CodeDriverThread command) {
 		try {
 			cachedThreadPool.execute(command);

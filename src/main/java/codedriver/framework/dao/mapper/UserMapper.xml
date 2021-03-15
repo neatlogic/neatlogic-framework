@@ -542,10 +542,37 @@
     <select id="getUserUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String"
             useCache="false">
         SELECT
-        a.`user_uuid`
+        distinct a.`user_uuid`
         FROM user_team a
         JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
         WHERE a.`team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+    </select>
+
+    <resultMap id="userTeamMap" type="codedriver.framework.dto.UserVo">
+        <id property="uuid" column="uuid"/>
+        <collection property="teamUuidList" ofType="java.lang.String">
+            <result column="teamUuid"/>
+        </collection>
+        <collection property="roleUuidList" ofType="java.lang.String">
+            <result column="roleUuid"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserTeamRoleListByTeamUuidList" parameterType="java.util.List" resultMap="userTeamMap"
+            useCache="false">
+        SELECT
+        DISTINCT
+        a.`uuid` as uuid,c.`team_uuid` as teamUuid,d.`role_uuid` as roleUuid
+        FROM
+        `user` a
+        JOIN `user_team` b
+        ON a.`uuid` = b.`user_uuid` AND a.`is_active` = 1
+        LEFT JOIN `user_team` c ON a.uuid = c.`user_uuid`
+        LEFT JOIN `user_role` d ON a.uuid = d.`user_uuid`
+        WHERE b.`team_uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
         </foreach>

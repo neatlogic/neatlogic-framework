@@ -36,17 +36,6 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>com.techsure</groupId>
-			<artifactId>multiattr-search</artifactId>
-			<version>0.5-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>com.github.magese</groupId>
 			<artifactId>ik-analyzer</artifactId>
 			<version>8.1.0.techsure</version>

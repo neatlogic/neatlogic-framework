@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -33,7 +31,7 @@ public class Config {
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
     private static String CODEDRIVER_HOME;
-    private static Map<String, String> ES_CLUSTERS;
+//    private static Map<String, String> ES_CLUSTERS;
     private static boolean ES_ENABLE;
     private static String DB_HOST;
     private static Integer DB_PORT;
@@ -120,9 +118,9 @@ public class Config {
         return JWT_SECRET;
     }
 
-    public static Map<String, String> ES_CLUSTERS() {
+    /*public static Map<String, String> ES_CLUSTERS() {
         return ES_CLUSTERS;
-    }
+    }*/
 
     public static boolean ES_ENABLE() {
         return ES_ENABLE;
@@ -250,9 +248,9 @@ public class Config {
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
-            ES_CLUSTERS = new HashMap<>();
+            //ES_CLUSTERS = new HashMap<>();
 
-            for (Map.Entry<Object, Object> el : prop.entrySet()) {
+            /*for (Map.Entry<Object, Object> el : prop.entrySet()) {
                 Object k = el.getKey();
                 Object v = el.getValue();
 
@@ -272,7 +270,7 @@ public class Config {
                     continue;
                 }
                 ES_CLUSTERS.put(clusterName, value);
-            }
+            }*/
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

@@ -2,7 +2,7 @@ package codedriver.framework.common.util;
 
 public class RC4Util {
 
-	private static final String RC4_KEY = "techsure";
+	private static final String RC4_KEY = "6fdff97dcb1a3f50809dc6a020283db507b501eb4bed9a28f16a2fba7b9e364a47b2cf7eb02f0ae9cca7c8054f8b116a07591797729e00f7366b486d59e9f93a";
 
 	public static String encrypt(final String plaintext) {
 		return byte2HexStr(encrypt(RC4_KEY.getBytes(), plaintext.getBytes()));

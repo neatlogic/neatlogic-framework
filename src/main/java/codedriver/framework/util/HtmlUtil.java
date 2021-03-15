@@ -1,5 +1,6 @@
 package codedriver.framework.util;
 
+import codedriver.framework.dto.UrlInfoVo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -85,6 +86,50 @@ public class HtmlUtil {
             }
         }
         return srcList;
+    }
+
+    public static List<UrlInfoVo> getUrlInfoList(String content, String prefix, String suffix){
+        List<UrlInfoVo> resultList = new ArrayList<>();
+        int prefixIndex = -1;
+        int suffixIndex = -1;
+        int fromIndex = 0;
+        while(fromIndex < content.length()){
+            prefixIndex = content.indexOf(prefix, fromIndex);
+            if(prefixIndex == -1){
+                return resultList;
+            }
+            fromIndex = prefixIndex + prefix.length();
+            suffixIndex = content.indexOf(suffix, fromIndex);
+            if(suffixIndex == -1){
+                return resultList;
+            }
+            int beginIndex = prefixIndex + prefix.length();
+            resultList.add(new UrlInfoVo(beginIndex, suffixIndex, content.substring(beginIndex, suffixIndex)));
+            fromIndex = suffixIndex + suffix.length();
+        }
+        return resultList;
+    }
+
+    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList){
+        int sourceTotalLength = 0;
+        int targetTotalLength = 0;
+        for(UrlInfoVo urlInfo : urlInfoVoList){
+            sourceTotalLength += urlInfo.getSource().length();
+            targetTotalLength += urlInfo.getTarget().length();
+        }
+        StringBuilder stringBuilder = new StringBuilder(content.length() + targetTotalLength - sourceTotalLength);
+        int fromIndex = 0;
+        for(UrlInfoVo urlInfoVo : urlInfoVoList){
+            for (int i = fromIndex; i < urlInfoVo.getBeginIndex(); i++) {
+                stringBuilder.append(content.charAt(i));
+            }
+            stringBuilder.append(urlInfoVo.getTarget());
+            fromIndex = urlInfoVo.getEndIndex();
+        }
+        for (int i = fromIndex; i < content.length(); i++) {
+            stringBuilder.append(content.charAt(i));
+        }
+        return stringBuilder.toString();
     }
 
 }

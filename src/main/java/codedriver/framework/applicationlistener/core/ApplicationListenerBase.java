@@ -1,11 +1,10 @@
 package codedriver.framework.applicationlistener.core;
 
-import javax.annotation.PostConstruct;
-
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import javax.annotation.PostConstruct;
 
 public abstract class ApplicationListenerBase implements ApplicationListener<ContextRefreshedEvent> {
 

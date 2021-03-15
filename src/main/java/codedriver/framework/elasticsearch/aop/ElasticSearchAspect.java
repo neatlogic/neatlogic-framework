@@ -1,34 +1,7 @@
 package codedriver.framework.elasticsearch.aop;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.elasticsearch.annotation.ESKey;
-import codedriver.framework.elasticsearch.annotation.ESParam;
-import codedriver.framework.elasticsearch.annotation.ESSearch;
-import codedriver.framework.elasticsearch.constvalue.ESKeyType;
-import codedriver.framework.elasticsearch.core.ElasticSearchHandlerFactory;
-import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
+import org.aspectj.lang.annotation.Aspect;
 
 @Aspect
 @RootComponent
@@ -39,7 +12,7 @@ import codedriver.framework.elasticsearch.core.IElasticSearchHandler;
  * @Description: 处理带ESSearch注解的函数
  */
 public class ElasticSearchAspect {
-    private static final ThreadLocal<Map<Long, String>> DOCUMENT_MAP = new ThreadLocal<>();
+    /*private static final ThreadLocal<Map<Long, String>> DOCUMENT_MAP = new ThreadLocal<>();
     private static Logger logger = LoggerFactory.getLogger(ElasticSearchAspect.class);
 
     @After("@annotation(eSSearch)")
@@ -197,5 +170,5 @@ public class ElasticSearchAspect {
             Thread.currentThread().setName(oldName);
         }
 
-    }
+    }*/
 }

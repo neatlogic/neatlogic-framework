@@ -6,17 +6,17 @@ public interface IElasticSearchHandler<T, R> {
      * 
      * @return
      */
-    public String getDocument();
+//    public String getDocument();
 
     /**
      * 保存、修改
      */
-    public void save(Long documentId, String tenantUuid);
+//    public void save(Long documentId, String tenantUuid);
 
     /**
      * 保存、修改
      */
-    public void save(Long documentId);
+//    public void save(Long documentId);
 
     /**
      * 
@@ -26,7 +26,7 @@ public interface IElasticSearchHandler<T, R> {
      * @Param
      * @return
      */
-    public void delete(String documentId);
+//    public void delete(String documentId);
 
     /**
      * 
@@ -38,7 +38,7 @@ public interface IElasticSearchHandler<T, R> {
      * @demo List<MultiAttrsObject> resultData = result.getData(); if (!resultData.isEmpty()) { for (MultiAttrsObject el
      *       : resultData) { el.getId();//documentId el.getJSON("键");//根据对应的key，获取value } }
      */
-    public R search(T target);
+//    public R search(T target);
 
     /**
      * 
@@ -50,7 +50,7 @@ public interface IElasticSearchHandler<T, R> {
      * @param @return
      * @return int
      */
-    public int searchCount(T target);
+//    public int searchCount(T target);
 
     /**
      * 
@@ -63,6 +63,6 @@ public interface IElasticSearchHandler<T, R> {
      *       (!result.getData().isEmpty()) { for (MultiAttrsObject el : result.getData()) { el.getId();//documentId
      *       el.getJSON("键");//根据对应的key，获取value } } }
      */
-    public R iterateSearch(T target);
+//    public R iterateSearch(T target);
 
 }

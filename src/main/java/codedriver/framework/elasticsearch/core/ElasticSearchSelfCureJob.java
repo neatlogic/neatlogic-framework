@@ -1,16 +1,12 @@
 package codedriver.framework.elasticsearch.core;
 
-import java.util.List;
-
+import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
+import codedriver.framework.scheduler.core.PublicJobBase;
+import codedriver.framework.scheduler.dto.JobObject;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import codedriver.framework.elasticsearch.dao.mapper.ElasticSearchMapper;
-import codedriver.framework.elasticsearch.dto.ElasticSearchAuditVo;
-import codedriver.framework.scheduler.core.PublicJobBase;
-import codedriver.framework.scheduler.dto.JobObject;
 
 @Component
 public class ElasticSearchSelfCureJob extends PublicJobBase {
@@ -19,11 +15,11 @@ public class ElasticSearchSelfCureJob extends PublicJobBase {
 
     @Override
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
-        List<ElasticSearchAuditVo> auditList = elasticSearchMapper.getElasticSearchAudit();
-        for (ElasticSearchAuditVo audit : auditList) {
-            ElasticSearchHandlerFactory.getHandler(audit.getHandler()).save(audit.getDocumentId());
-            elasticSearchMapper.deleteElasticSearchAuditByDocumentId(audit.getDocumentId());
-        }
+//        List<ElasticSearchAuditVo> auditList = elasticSearchMapper.getElasticSearchAudit();
+//        for (ElasticSearchAuditVo audit : auditList) {
+//            ElasticSearchHandlerFactory.getHandler(audit.getHandler()).save(audit.getDocumentId());
+//            elasticSearchMapper.deleteElasticSearchAuditByDocumentId(audit.getDocumentId());
+//        }
 
     }
 

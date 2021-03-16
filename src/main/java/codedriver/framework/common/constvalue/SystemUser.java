@@ -10,7 +10,8 @@ import com.alibaba.fastjson.JSONObject;
 * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser {
-	SYSTEM("system","system","系统");
+	SYSTEM("system","system","系统"),
+	ANONYMOUS("anonymous","anonymous","匿名用户");
 	private String userId;
 	private String userUuid;
 	private String userName;

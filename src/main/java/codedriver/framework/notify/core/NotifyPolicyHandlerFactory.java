@@ -28,17 +28,17 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
 
     private static final Map<String, NotifyTreeVo> moduleTreeVoMap = new HashMap<>();
 
-	private static List<NotifyTreeVo> notifyPolicyTreeVoList = new ArrayList<>();
+    private static final List<NotifyTreeVo> notifyPolicyTreeVoList = new ArrayList<>();
 
-	private static Map<String, NotifyTreeVo> notifyPolicyGroupTreeVoMap = new HashMap<>();
+    private static final Map<String, NotifyTreeVo> notifyPolicyGroupTreeVoMap = new HashMap<>();
 
-	public static INotifyPolicyHandler getHandler(String handler) {
-		return notifyPolicyHandlerMap.get(handler);
-	}
+    public static INotifyPolicyHandler getHandler(String handler) {
+        return notifyPolicyHandlerMap.get(handler);
+    }
 
-	public static List<ValueTextVo> getNotifyPolicyHandlerList(){
-		return notifyPolicyHandlerList;
-	}
+    public static List<ValueTextVo> getNotifyPolicyHandlerList() {
+        return notifyPolicyHandlerList;
+    }
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {
         return moduleTreeVoList;
@@ -93,7 +93,8 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
         }
         return resultList;
     }
-    public static List<NotifyTreeVo> getNotifyPolicyTreeVoList(){
+
+    public static List<NotifyTreeVo> getNotifyPolicyTreeVoList() {
         return notifyPolicyTreeVoList;
     }
 
@@ -106,35 +107,37 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
             notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
             notifyPolicyHandlerList.add(new ValueTextVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
 
-			NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
-			List<NotifyTreeVo> children = new ArrayList<>();
-			for(NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerListForNotifyTree()){
-				children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));
-			}
-			treeVo.setChildren(children);
-			ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
-			NotifyTreeVo parentTreeVo = moduleTreeVoMap.get(moduleVo.getGroup());
-			if(parentTreeVo == null){
-				parentTreeVo = new NotifyTreeVo(moduleVo.getGroup(), moduleVo.getGroupName());
-				moduleTreeVoMap.put(moduleVo.getGroup(), parentTreeVo);
-				moduleTreeVoList.add(parentTreeVo);
-			}
-			parentTreeVo.addChildren(treeVo);
+            NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
+            List<NotifyTreeVo> children = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerListForNotifyTree())) {
+                for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerListForNotifyTree()) {
+                    children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));
+                }
+            }
+            treeVo.setChildren(children);
+            ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
+            NotifyTreeVo parentTreeVo = moduleTreeVoMap.get(moduleVo.getGroup());
+            if (parentTreeVo == null) {
+                parentTreeVo = new NotifyTreeVo(moduleVo.getGroup(), moduleVo.getGroupName());
+                moduleTreeVoMap.put(moduleVo.getGroup(), parentTreeVo);
+                moduleTreeVoList.add(parentTreeVo);
+            }
+            parentTreeVo.addChildren(treeVo);
 
-			INotifyPolicyHandlerGroup  notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
-			if(notifyPolicyHandlerGroup == null){
-				notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-			}else {
-				NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
-				if(notifyPolicyGroupTreeVo == null){
-					notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
-					notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
-					notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
-				}
-				notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-			}
-		}
-	}
+            INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
+            if (notifyPolicyHandlerGroup == null) {
+                notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+            } else {
+                NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
+                if (notifyPolicyGroupTreeVo == null) {
+                    notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
+                    notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
+                    notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
+                }
+                notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+            }
+        }
+    }
 
     @Override
     protected void myInit() {

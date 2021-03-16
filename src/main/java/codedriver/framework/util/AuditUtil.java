@@ -40,7 +40,7 @@ public class AuditUtil {
     /** 可导出的最大字节数 **/
     public final static long maxExportSize = 1024;
 
-    private static Logger logger = LoggerFactory.getLogger(AuditUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuditUtil.class);
 
     public static void saveAuditDetail(AuditVoHandler vo, String fileType) {
         /*

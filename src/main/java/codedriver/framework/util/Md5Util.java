@@ -1,27 +1,26 @@
 package codedriver.framework.util;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @ClassName: EncryptUtil
  * @Description: 加密工具类
  * @author: fandong
- * 
  */
 public class Md5Util {
-	
-	private static Logger logger = LoggerFactory.getLogger(Md5Util.class);
+
+	private static final Logger logger = LoggerFactory.getLogger(Md5Util.class);
 
 	private static final String DEFAULT_CHARSET = "UTF-8";
-	
+
 	private static Md5Util instance = null;
-	
+
 	private Md5Util() {
 
 	}

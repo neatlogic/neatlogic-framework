@@ -88,7 +88,7 @@ public class FileVo {
 	}
 
 	public String getExt() {
-		if (StringUtils.isNotBlank(name) && name.indexOf(".") > -1) {
+		if (StringUtils.isNotBlank(name) && name.contains(".")) {
 			ext = name.substring(name.lastIndexOf(".") + 1);
 		}
 		return ext;

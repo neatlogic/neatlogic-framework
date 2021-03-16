@@ -21,6 +21,14 @@
         where `id` = #{value}
     </select>
 
+    <select id="checkSystemNoticeNameRepeat" parameterType="codedriver.framework.systemnotice.dto.SystemNoticeVo" resultType="int">
+        select
+        count(1)
+        from
+        `system_notice`
+        where `title` = #{title} and `id` != #{id}
+    </select>
+
     <select id="getSystemNoticeByIdAndUserUuid" resultType="codedriver.framework.systemnotice.dto.SystemNoticeVo">
         select
         `id`,

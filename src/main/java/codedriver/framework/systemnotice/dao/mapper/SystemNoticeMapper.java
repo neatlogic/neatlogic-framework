@@ -22,6 +22,8 @@ public interface SystemNoticeMapper {
 
     public SystemNoticeVo getSystemNoticeBaseInfoById(Long id);
 
+    public int checkSystemNoticeNameRepeat(SystemNoticeVo vo);
+
     public SystemNoticeVo getSystemNoticeByIdAndUserUuid(@Param("noticeId") Long id,@Param("userUuid") String userUuid);
 
     public SystemNoticeVo getSystemNoticeById(Long id);

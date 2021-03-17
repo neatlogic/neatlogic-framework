@@ -13,7 +13,7 @@
             UNION
             SELECT parent.`${idKey}` FROM `${tableName}` parent
             LEFT JOIN `${tableName}` child ON child.`${parentIdKey}` = parent.`${idKey}`
-            WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1
+            WHERE child.`${idKey}` IS NULL AND parent.`rht` - parent.`lft` != 1
         ) a
     </select>
 

@@ -31,6 +31,13 @@ public class LRCodeManager {
         treeMapper = _treeMapper;
     }
 
+    /**
+     * @Description: 添加节点
+     * @Author: linbq
+     * @Date: 2021/3/17 17:41
+     * @Params:[tableName, idKey, idValue, lft, rht]
+     * @Returns:int
+     **/
     public static int addTreeNode(String tableName, String idKey, Object idValue, int lft, int rht) {
         //计算被移动块右边的节点移动步长
         int step = rht - lft + 1;
@@ -41,6 +48,13 @@ public class LRCodeManager {
         return 1;
     }
 
+    /**
+     * @Description: 移动节点
+     * @Author: linbq
+     * @Date: 2021/3/17 17:41
+     * @Params:[tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
+     * @Returns:int
+     **/
     public static int moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, String moveType, Object targetIdValue) {
 //        initializeLRCode(tableName);
         if(Objects.equals(idValue, targetIdValue)) {
@@ -126,6 +140,13 @@ public class LRCodeManager {
         return 1;
     }
 
+    /**
+     * @Description: 删除节点
+     * @Author: linbq
+     * @Date: 2021/3/17 17:42
+     * @Params:[tableName, lft, rht]
+     * @Returns:int
+     **/
     public static int deleteTreeNode(String tableName, int lft, int rht) {
         //计算被移动块右边的节点移动步长
         int step = rht - lft + 1;
@@ -135,6 +156,13 @@ public class LRCodeManager {
         return 1;
     }
 
+    /**
+     * @Description: 重建左右编码
+     * @Author: linbq
+     * @Date: 2021/3/17 17:42
+     * @Params:[tableName, idKey, parentIdKey]
+     * @Returns:void
+     **/
     public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
         rebuildLeftRightCode(tableName, idKey, parentIdKey, TreeNodeVo.ROOT_UUID, 1);
 
@@ -156,6 +184,13 @@ public class LRCodeManager {
         return parentLft;
     }
 
+    /**
+     * @Description: 初始化左右编码
+     * @Author: linbq
+     * @Date: 2021/3/17 17:42
+     * @Params:[tableName, idKey, parentIdKey]
+     * @Returns:void
+     **/
     public static void initializeLRCode(String tableName, String idKey, String parentIdKey){
         LockManager.getLockById(tableName);
         if(treeMapper.checkLeftRightCodeIsWrong(tableName, idKey, parentIdKey) > 0) {

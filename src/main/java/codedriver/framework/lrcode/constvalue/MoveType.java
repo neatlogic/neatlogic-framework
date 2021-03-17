@@ -3,7 +3,7 @@ package codedriver.framework.lrcode.constvalue;
 /**
  * @Title: MoveType
  * @Package codedriver.framework.lrcode.constvalue
- * @Description: TODO
+ * @Description: 移动类型
  * @Author: linbq
  * @Date: 2021/3/17 17:24
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.

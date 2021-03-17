@@ -22,8 +22,6 @@ public class TreeNodeVo {
     private String parentIdKey;
     private Object idValue;
     private Object parentIdValue;
-//    private String uuid;
-//    private String parentUuid;
     private String tableName;
     private Integer lft;
     private Integer rht;
@@ -60,21 +58,6 @@ public class TreeNodeVo {
     public void setParentIdValue(Object parentIdValue) {
         this.parentIdValue = parentIdValue;
     }
-//    public String getUuid() {
-//        return uuid;
-//    }
-//
-//    public void setUuid(String uuid) {
-//        this.uuid = uuid;
-//    }
-//
-//    public String getParentUuid() {
-//        return parentUuid;
-//    }
-//
-//    public void setParentUuid(String parentUuid) {
-//        this.parentUuid = parentUuid;
-//    }
 
     public String getTableName() {
         return tableName;

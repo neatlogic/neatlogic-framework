@@ -5,7 +5,7 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 /**
  * @Title: TreeNodeIllegalParameterException
  * @Package codedriver.framework.tree.service
- * @Description: TODO
+ * @Description: 移动到的目标节点不合法异常
  * @Author: linbq
  * @Date: 2021/3/17 10:03
  * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.

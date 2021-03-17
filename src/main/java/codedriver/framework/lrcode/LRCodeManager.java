@@ -124,8 +124,6 @@ public class LRCodeManager {
 
         //更新被移动块中节点的左右编码值
         treeMapper.batchUpdateTreeNodeLeftRightCodeByLeftRightCode(tableName, moveCatalog.getLft() - moveCatalog.getRht(), moveCatalog.getRht() - moveCatalog.getRht(), lft - moveCatalog.getLft() + moveCatalog.getRht());
-        //-------------------------------------------------------------------------------------------------------
-//        return null;
         return 1;
     }
 
@@ -161,20 +159,8 @@ public class LRCodeManager {
 
     public static void initializeLRCode(String tableName, String idKey, String parentIdKey){
         LockManager.getLockById(tableName);
-//        treeMapper.getTreeNodeCountOnLock(tableName);
         if(treeMapper.checkLeftRightCodeIsWrong(tableName, idKey, parentIdKey) > 0) {
             rebuildLeftRightCode(tableName, idKey, parentIdKey);
         }
     }
-//    private TreeNodeVo buildRootCatalog() {
-////        Integer maxRhtCode = treeMapper.getMaxRhtCode();
-//        TreeNodeVo rootCatalog = new TreeNodeVo();
-//        rootCatalog.setUuid(TreeNodeVo.ROOT_UUID);
-//        rootCatalog.setName("所有");
-//        rootCatalog.setParentUuid(TreeNodeVo.ROOT_PARENTUUID);
-//        rootCatalog.setLft(1);
-//        rootCatalog.setRht(Integer.MAX_VALUE);
-////        rootCatalog.setRht(maxRhtCode == null ? 2 : maxRhtCode.intValue() + 1);
-//        return rootCatalog;
-//    }
 }

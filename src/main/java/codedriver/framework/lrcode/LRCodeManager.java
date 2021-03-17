@@ -31,13 +31,13 @@ public class LRCodeManager {
         treeMapper = _treeMapper;
     }
 
-    public static int addTreeNode(String tableName, String idKey, String uuid, int lft, int rht) {
+    public static int addTreeNode(String tableName, String idKey, Object idValue, int lft, int rht) {
         //计算被移动块右边的节点移动步长
         int step = rht - lft + 1;
         //更新插入位置右边的左右编码值
         treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, step);
         treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, step);
-        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, uuid, lft, rht);
+        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, idValue, lft, rht);
         return 1;
     }
 
@@ -115,7 +115,6 @@ public class LRCodeManager {
                 lft = targetCatalog.getRht() + 1;
             }
         }
-//        moveCatalog.setParentUuid(parentUuid);
         treeMapper.updateTreeNodeParentIdById(tableName, idKey, parentIdKey, idValue, parentIdValue);
 
         //更新新位置右边的左右编码值

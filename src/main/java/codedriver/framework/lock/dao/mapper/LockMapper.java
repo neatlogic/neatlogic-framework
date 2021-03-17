@@ -1,12 +1,10 @@
 package codedriver.framework.lock.dao.mapper;
 
-import codedriver.framework.dto.ConfigVo;
-
 public interface LockMapper {
 
-    public int insertLock(String id);
+    void insertLock(String id);
 
-    public String getLockByIdForUpdate(String id);
+    String getLockByIdForUpdate(String id);
 
-    public String getLockById(String id);
+    void deleteLock(String id);
 }

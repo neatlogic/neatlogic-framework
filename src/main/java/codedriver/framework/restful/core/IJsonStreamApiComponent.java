@@ -23,4 +23,15 @@ public interface IJsonStreamApiComponent {
 	public Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception;
 
 	public JSONObject help();
+
+	/**
+	 * @Description: 是否支持匿名访问
+	 * @Author: linbq
+	 * @Date: 2021/3/11 18:37
+	 * @Params:[]
+	 * @Returns:boolean
+	 **/
+	public default boolean supportAnonymousAccess(){
+		return false;
+	}
 }

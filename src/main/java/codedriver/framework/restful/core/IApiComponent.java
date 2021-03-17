@@ -87,4 +87,15 @@ public interface IApiComponent {
      * @Returns: void
      **/
     FieldValidResultVo doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
+
+    /**
+     * @Description: 是否支持匿名访问
+     * @Author: linbq
+     * @Date: 2021/3/11 18:37
+     * @Params:[]
+     * @Returns:boolean
+     **/
+    public default boolean supportAnonymousAccess(){
+        return false;
+    }
 }

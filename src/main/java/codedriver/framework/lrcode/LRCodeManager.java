@@ -35,8 +35,8 @@ public class LRCodeManager {
      * @Description: 添加节点
      * @Author: linbq
      * @Date: 2021/3/17 17:41
-     * @Params:[tableName, idKey, idValue, lft, rht]
-     * @Returns:int
+     * @Params: [tableName, idKey, idValue, lft, rht]
+     * @Returns: int
      **/
     public static int addTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, int lft, int rht) {
         initializeLRCode(tableName, idKey, parentIdKey, idValue);
@@ -53,8 +53,8 @@ public class LRCodeManager {
      * @Description: 移动节点
      * @Author: linbq
      * @Date: 2021/3/17 17:41
-     * @Params:[tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
-     * @Returns:int
+     * @Params: [tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
+     * @Returns: int
      **/
     public static int moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, String moveType, Object targetIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey, null);
@@ -145,8 +145,8 @@ public class LRCodeManager {
      * @Description: 删除节点
      * @Author: linbq
      * @Date: 2021/3/17 17:42
-     * @Params:[tableName, lft, rht]
-     * @Returns:int
+     * @Params: [tableName, lft, rht]
+     * @Returns: int
      **/
     public static int deleteTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, null);
@@ -167,7 +167,7 @@ public class LRCodeManager {
      * @Description: 重建左右编码
      * @Author: linbq
      * @Date: 2021/3/17 17:42
-     * @Params:[tableName, idKey, parentIdKey]
+     * @Params: [tableName, idKey, parentIdKey]
      * @Returns:void
      **/
     private static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
@@ -195,7 +195,7 @@ public class LRCodeManager {
      * @Description: 初始化左右编码
      * @Author: linbq
      * @Date: 2021/3/17 17:42
-     * @Params:[tableName, idKey, parentIdKey]
+     * @Params: [tableName, idKey, parentIdKey]
      * @Returns:void
      **/
     private static void initializeLRCode(String tableName, String idKey, String parentIdKey, Object idValue){

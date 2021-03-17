@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RootConfiguration
@@ -30,7 +31,14 @@ public class LockManager {
 
     public static void invoke(String lock, ISerialMethod method) {
         lock = Md5Util.encryptMD5(lock);
-        TransactionStatus transactionStatus = TransactionUtil.openTx();
+        boolean needOpenNewTx = false;
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            needOpenNewTx = true;
+        }
+        TransactionStatus transactionStatus = null;
+        if (needOpenNewTx) {
+            transactionStatus = TransactionUtil.openTx();
+        }
         lockMapper.insertLock(lock);
         lockMapper.getLockByIdForUpdate(lock);
         try {
@@ -39,7 +47,9 @@ public class LockManager {
             logger.error(ex.getMessage(), ex);
         }
         lockMapper.deleteLock(lock);
-        TransactionUtil.commitTx(transactionStatus);
+        if (needOpenNewTx) {
+            TransactionUtil.commitTx(transactionStatus);
+        }
     }
 
 }

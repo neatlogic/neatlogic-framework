@@ -38,14 +38,27 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, idValue, lft, rht]
      * @Returns: int
      **/
-    public static int addTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, int lft, int rht) {
+    public static int addTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, idValue);
-        //计算被移动块右边的节点移动步长
-        int step = rht - lft + 1;
+        TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
+        if(treeNodeVo == null){
+            throw new TreeNodeNotFoundException(tableName, idValue);
+        }
+        int lft;
+        if(TreeNodeVo.ROOT_UUID.equals(treeNodeVo.getParentIdValue().toString())){
+            lft = treeMapper.getMaxRht(tableName);
+        }else{
+            TreeNodeVo parentTreeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, treeNodeVo.getParentIdValue());
+            if(treeNodeVo == null){
+                throw new TreeNodeNotFoundException(tableName, idValue);
+            }
+            lft = parentTreeNodeVo.getRht();
+        }
+
         //更新插入位置右边的左右编码值
-        treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, step);
-        treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, step);
-        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, idValue, lft, rht);
+        treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, 2);
+        treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, 2);
+        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, idValue, lft, lft + 1);
         return 1;
     }
 

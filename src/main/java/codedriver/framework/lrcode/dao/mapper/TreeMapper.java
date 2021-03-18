@@ -65,4 +65,6 @@ public interface TreeMapper {
     public int updateTreeNodeParentIdById(@Param("tableName")String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("idValue")Object idValue, @Param("parentIdValue") Object parentIdValue);
 
     public int batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode(@Param("tableName")String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    public int getMaxRht(String tableName);
 }

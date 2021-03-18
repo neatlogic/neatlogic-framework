@@ -37,4 +37,13 @@ public enum MoveType {
     public void setText(String text) {
         this.text = text;
     }
+
+    public static MoveType getMoveType(String _value){
+        for(MoveType e : values()){
+            if(e.getValue().equals(_value)){
+                return e;
+            }
+        }
+        return null;
+    }
 }

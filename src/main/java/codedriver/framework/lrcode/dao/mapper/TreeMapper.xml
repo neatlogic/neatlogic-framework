@@ -2,20 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="codedriver.framework.lrcode.dao.mapper.TreeMapper">
 
-    <select id="checkLeftRightCodeIsWrong" parameterType="java.lang.String" resultType="int">
-        SELECT COUNT(a.`${idKey}`) FROM (
-            SELECT `${idKey}` FROM `${tableName}`  WHERE `lft` IS NULL OR `rht` IS NULL
-            UNION
-            SELECT `${idKey}` FROM `${tableName}`  WHERE `lft` &lt; 2 OR `rht` &lt; 3
-            UNION
-            SELECT parent.`${idKey}` FROM `${tableName}` parent
-            JOIN `${tableName}` child ON child.`${parentIdKey}`=parent.`${idKey}` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)
-            UNION
-            SELECT parent.`${idKey}` FROM `${tableName}` parent
-            LEFT JOIN `${tableName}` child ON child.`${parentIdKey}` = parent.`${idKey}`
-            WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1
-        ) a
+    <select id="checkLeftRightCodeIsWrong" resultType="java.lang.Object">
+        SELECT
+        a.`${idKey}`
+        FROM `${tableName}` a
+        WHERE a.`lft` IS NULL
+        OR a.`rht` IS NULL
+        OR a.`lft` &lt; 2
+        OR a.`rht` &lt; 3
+        OR (a.`rht` - a.`lft` - 1) != (SELECT COUNT(1) * 2 FROM `${tableName}` b WHERE b.`lft` &gt; a.`lft` AND b.`rht` &lt; a.`rht`)
+        LIMIT 1
     </select>
+
+<!--    <select id="checkLeftRightCodeIsNull" resultType="java.lang.Object">-->
+<!--        SELECT `${idKey}` FROM `${tableName}`-->
+<!--        WHERE (`lft` IS NULL OR `rht` IS NULL)-->
+<!--        <if test="idValue != null">-->
+<!--            AND `${idKey}` != #{idValue}-->
+<!--        </if>-->
+<!--        limit 1-->
+<!--    </select>-->
+<!--    <select id="checkLftLt2OrRhtLt3IsExists" resultType="java.lang.Object">-->
+<!--        SELECT `${idKey}` FROM `${tableName}`  WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1-->
+<!--    </select>-->
+<!--    <select id="checkChildLftLeParentLftOrChildRhtGeParentRhtIsExists" resultType="java.lang.Object">-->
+<!--        SELECT parent.`${idKey}` FROM `${tableName}` parent-->
+<!--        JOIN `${tableName}` child ON child.`${parentIdKey}`=parent.`${idKey}` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)-->
+<!--        limit 1-->
+<!--    </select>-->
+<!--    <select id="checkLeafNodeLeftRightCodeAreNotContinuous" resultType="java.lang.Object">-->
+<!--        SELECT parent.`${idKey}` FROM `${tableName}` parent-->
+<!--        LEFT JOIN `${tableName}` child ON child.`${parentIdKey}` = parent.`${idKey}`-->
+<!--        WHERE child.`${idKey}` IS NULL-->
+<!--        AND parent.`rht` - parent.`lft` != 1-->
+<!--        limit 1-->
+<!--    </select>-->
 
     <select id="getTreeNodeListByParentId" resultType="codedriver.framework.lrcode.dto.TreeNodeVo">
         SELECT
@@ -44,6 +65,10 @@
         where `${idKey}` = #{idValue}
     </select>
 
+    <select id="getMaxRht" parameterType="java.lang.String" resultType="int">
+        select IFNULL(MAX(`rht`), 2) from `${tableName}`
+    </select>
+
     <update id="batchUpdateTreeNodeLeftCode">
         UPDATE `${tableName}` set `lft` = `lft` + #{step} WHERE `lft` &gt;= #{minCode}
     </update>
@@ -62,5 +87,9 @@
 
     <update id="updateTreeNodeParentIdById" parameterType="codedriver.framework.lrcode.dto.TreeNodeVo">
         UPDATE `${tableName}` SET `${parentIdKey}` = #{parentIdValue} WHERE `${idKey}` = #{idValue}
+    </update>
+
+    <update id="batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode">
+        UPDATE `${tableName}` SET `lft` = NULL, `rht` = NULL WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
     </update>
 </mapper>

@@ -32,20 +32,29 @@ public class LRCodeManager {
     }
 
     /**
-     * @Description: 添加节点
+     * @Description: 添加节点，调用方插入A新节点前，先调用该方法获取A节点左右编码并更新其他节点左右编码，再插入A节点
      * @Author: linbq
      * @Date: 2021/3/17 17:41
      * @Params: [tableName, idKey, idValue, lft, rht]
      * @Returns: int
      **/
-    public static int addTreeNode(String tableName, String idKey, Object idValue, int lft, int rht) {
-        //计算被移动块右边的节点移动步长
-        int step = rht - lft + 1;
+    public static int beforeAddTreeNode(String tableName, String idKey, String parentIdKey, Object parentIdValue) {
+        initializeLRCode(tableName, idKey, parentIdKey);
+        int lft;
+        if(TreeNodeVo.ROOT_UUID.equals(parentIdValue.toString())){
+            lft = treeMapper.getMaxRht(tableName);
+        }else{
+            TreeNodeVo parentTreeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, parentIdValue);
+            if(parentTreeNodeVo == null){
+                throw new TreeNodeNotFoundException(tableName, parentIdValue);
+            }
+            lft = parentTreeNodeVo.getRht();
+        }
+
         //更新插入位置右边的左右编码值
-        treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, step);
-        treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, step);
-        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, idValue, lft, rht);
-        return 1;
+        treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, 2);
+        treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, 2);
+        return lft;
     }
 
     /**
@@ -53,10 +62,10 @@ public class LRCodeManager {
      * @Author: linbq
      * @Date: 2021/3/17 17:41
      * @Params: [tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
-     * @Returns: int
+     * @Returns: void
      **/
-    public static int moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, String moveType, Object targetIdValue) {
-//        initializeLRCode(tableName);
+    public static void moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, MoveType moveType, Object targetIdValue) {
+        initializeLRCode(tableName, idKey, parentIdKey);
         if(Objects.equals(idValue, targetIdValue)) {
             throw new MoveTargetNodeIllegalException();
         }
@@ -76,25 +85,25 @@ public class LRCodeManager {
             throw new TreeNodeNotFoundException(tableName, targetIdValue);
         }
         Object parentIdValue;
-        if(MoveType.INNER.getValue().equals(moveType)) {
+        if(MoveType.INNER == moveType) {
             parentIdValue = targetIdValue;
             if(Objects.equals(moveCatalog.getParentIdValue(), targetIdValue)){
                 if(moveCatalog.getRht() + 1 == targetCatalog.getRht()){
-                    return 0;
+                    return;
                 }
             }
         }else {
             parentIdValue = targetCatalog.getParentIdValue();
-            if(MoveType.PREV.getValue().equals(moveType)) {
+            if(MoveType.PREV == moveType) {
                 if(Objects.equals(moveCatalog.getParentIdValue(), parentIdValue)){
                     if(moveCatalog.getRht() + 1 == targetCatalog.getLft()){
-                        return 0;
+                        return;
                     }
                 }
             }else {
                 if(Objects.equals(moveCatalog.getParentIdValue(), parentIdValue)){
                     if(targetCatalog.getRht() + 1 == moveCatalog.getLft()){
-                        return 0;
+                        return;
                     }
                 }
             }
@@ -120,10 +129,10 @@ public class LRCodeManager {
         //找出被移动块移动后左编码值
         int lft = 0;
         //目标节点uuid
-        if(MoveType.INNER.getValue().equals(moveType)) {//移动到末尾
+        if(MoveType.INNER == moveType) {//移动到末尾
             lft = targetCatalog.getRht();
         }else {
-            if(MoveType.PREV.getValue().equals(moveType)) {
+            if(MoveType.PREV == moveType) {
                 lft = targetCatalog.getLft();
             }else {
                 lft = targetCatalog.getRht() + 1;
@@ -137,23 +146,27 @@ public class LRCodeManager {
 
         //更新被移动块中节点的左右编码值
         treeMapper.batchUpdateTreeNodeLeftRightCodeByLeftRightCode(tableName, moveCatalog.getLft() - moveCatalog.getRht(), moveCatalog.getRht() - moveCatalog.getRht(), lft - moveCatalog.getLft() + moveCatalog.getRht());
-        return 1;
     }
 
     /**
-     * @Description: 删除节点
+     * @Description: 删除节点，调用方删除A节点前，先调用该方法将A节点左右编码置空并更新其他节点左右编码，再删除A节点
      * @Author: linbq
      * @Date: 2021/3/17 17:42
      * @Params: [tableName, lft, rht]
-     * @Returns: int
+     * @Returns: void
      **/
-    public static int deleteTreeNode(String tableName, int lft, int rht) {
+    public static void beforeDeleteTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
+        initializeLRCode(tableName, idKey, parentIdKey);
+        TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
+        if(treeNodeVo == null){
+            throw new TreeNodeNotFoundException(tableName, idValue);
+        }
+        treeMapper.batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode(tableName, treeNodeVo.getLft(), treeNodeVo.getRht());
         //计算被移动块右边的节点移动步长
-        int step = rht - lft + 1;
+        int step = treeNodeVo.getRht() - treeNodeVo.getLft() + 1;
         //更新删除位置右边的左右编码值
-        treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, -step);
-        treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, -step);
-        return 1;
+        treeMapper.batchUpdateTreeNodeLeftCode(tableName, treeNodeVo.getLft(), -step);
+        treeMapper.batchUpdateTreeNodeRightCode(tableName, treeNodeVo.getLft(), -step);
     }
 
     /**
@@ -163,7 +176,7 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, parentIdKey]
      * @Returns:void
      **/
-    public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
+    private static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
         rebuildLeftRightCode(tableName, idKey, parentIdKey, TreeNodeVo.ROOT_UUID, 1);
 
     }
@@ -191,10 +204,19 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, parentIdKey]
      * @Returns:void
      **/
-    public static void initializeLRCode(String tableName, String idKey, String parentIdKey){
+    private static void initializeLRCode(String tableName, String idKey, String parentIdKey){
         LockManager.getLockById(tableName);
-        if(treeMapper.checkLeftRightCodeIsWrong(tableName, idKey, parentIdKey) > 0) {
+        if(treeMapper.checkLeftRightCodeIsWrong(tableName, idKey) != null){
             rebuildLeftRightCode(tableName, idKey, parentIdKey);
         }
+//        if(treeMapper.checkLeftRightCodeIsNull(tableName, idKey, idValue) != null){
+//            rebuildLeftRightCode(tableName, idKey, parentIdKey);
+//        }else if(treeMapper.checkLftLt2OrRhtLt3IsExists(tableName, idKey)  != null){
+//            rebuildLeftRightCode(tableName, idKey, parentIdKey);
+//        }else if(treeMapper.checkChildLftLeParentLftOrChildRhtGeParentRhtIsExists(tableName, idKey, parentIdKey)  != null){
+//            rebuildLeftRightCode(tableName, idKey, parentIdKey);
+//        }else if(treeMapper.checkLeafNodeLeftRightCodeAreNotContinuous(tableName, idKey, parentIdKey)  != null){
+//            rebuildLeftRightCode(tableName, idKey, parentIdKey);
+//        }
     }
 }

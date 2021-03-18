@@ -64,7 +64,7 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
      * @Returns: void
      **/
-    public static void moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, String moveType, Object targetIdValue) {
+    public static void moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, MoveType moveType, Object targetIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey);
         if(Objects.equals(idValue, targetIdValue)) {
             throw new MoveTargetNodeIllegalException();
@@ -85,7 +85,7 @@ public class LRCodeManager {
             throw new TreeNodeNotFoundException(tableName, targetIdValue);
         }
         Object parentIdValue;
-        if(MoveType.INNER.getValue().equals(moveType)) {
+        if(MoveType.INNER == moveType) {
             parentIdValue = targetIdValue;
             if(Objects.equals(moveCatalog.getParentIdValue(), targetIdValue)){
                 if(moveCatalog.getRht() + 1 == targetCatalog.getRht()){
@@ -94,7 +94,7 @@ public class LRCodeManager {
             }
         }else {
             parentIdValue = targetCatalog.getParentIdValue();
-            if(MoveType.PREV.getValue().equals(moveType)) {
+            if(MoveType.PREV == moveType) {
                 if(Objects.equals(moveCatalog.getParentIdValue(), parentIdValue)){
                     if(moveCatalog.getRht() + 1 == targetCatalog.getLft()){
                         return;
@@ -129,10 +129,10 @@ public class LRCodeManager {
         //找出被移动块移动后左编码值
         int lft = 0;
         //目标节点uuid
-        if(MoveType.INNER.getValue().equals(moveType)) {//移动到末尾
+        if(MoveType.INNER == moveType) {//移动到末尾
             lft = targetCatalog.getRht();
         }else {
-            if(MoveType.PREV.getValue().equals(moveType)) {
+            if(MoveType.PREV == moveType) {
                 lft = targetCatalog.getLft();
             }else {
                 lft = targetCatalog.getRht() + 1;

@@ -38,7 +38,7 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, idValue, lft, rht]
      * @Returns: int
      **/
-    public static int afterAddTreeNode(String tableName, String idKey, String parentIdKey, Object parentIdValue) {
+    public static int beforeAddTreeNode(String tableName, String idKey, String parentIdKey, Object parentIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey);
         int lft;
         if(TreeNodeVo.ROOT_UUID.equals(parentIdValue.toString())){

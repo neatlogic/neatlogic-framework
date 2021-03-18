@@ -32,13 +32,13 @@ public class LRCodeManager {
     }
 
     /**
-     * @Description: 添加节点
+     * @Description: 添加节点，调用方插入新节点后，调用该方法更新左右编码
      * @Author: linbq
      * @Date: 2021/3/17 17:41
      * @Params: [tableName, idKey, idValue, lft, rht]
      * @Returns: int
      **/
-    public static int addTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
+    public static int addTreeNodeAfter(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, idValue);
         TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
         if(treeNodeVo == null){
@@ -155,13 +155,13 @@ public class LRCodeManager {
     }
 
     /**
-     * @Description: 删除节点
+     * @Description: 删除节点，调用方删除A节点前，先调用该方法将A节点左右编码置空并更新其他节点左右编码，再删除A节点
      * @Author: linbq
      * @Date: 2021/3/17 17:42
      * @Params: [tableName, lft, rht]
      * @Returns: int
      **/
-    public static int deleteTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
+    public static int deleteTreeNodeBefore(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, null);
         TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
         if(treeNodeVo == null){

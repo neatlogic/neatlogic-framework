@@ -38,7 +38,7 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, idValue, lft, rht]
      * @Returns: int
      **/
-    public static int addTreeNodeAfter(String tableName, String idKey, String parentIdKey, Object idValue) {
+    public static int afterAddTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, idValue);
         TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
         if(treeNodeVo == null){
@@ -161,7 +161,7 @@ public class LRCodeManager {
      * @Params: [tableName, lft, rht]
      * @Returns: int
      **/
-    public static int deleteTreeNodeBefore(String tableName, String idKey, String parentIdKey, Object idValue) {
+    public static int beforeDeleteTreeNode(String tableName, String idKey, String parentIdKey, Object idValue) {
         initializeLRCode(tableName, idKey, parentIdKey, null);
         TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
         if(treeNodeVo == null){

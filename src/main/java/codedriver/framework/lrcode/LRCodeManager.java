@@ -32,7 +32,7 @@ public class LRCodeManager {
     }
 
     /**
-     * @Description: 添加节点，调用方插入新节点后，调用该方法更新左右编码
+     * @Description: 添加节点，调用方插入A新节点前，先调用该方法获取A节点左右编码并更新其他节点左右编码，再插入A节点
      * @Author: linbq
      * @Date: 2021/3/17 17:41
      * @Params: [tableName, idKey, idValue, lft, rht]
@@ -40,10 +40,6 @@ public class LRCodeManager {
      **/
     public static int afterAddTreeNode(String tableName, String idKey, String parentIdKey, Object parentIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey);
-//        TreeNodeVo treeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, idValue);
-//        if(treeNodeVo == null){
-//            throw new TreeNodeNotFoundException(tableName, idValue);
-//        }
         int lft;
         if(TreeNodeVo.ROOT_UUID.equals(parentIdValue.toString())){
             lft = treeMapper.getMaxRht(tableName);
@@ -58,7 +54,6 @@ public class LRCodeManager {
         //更新插入位置右边的左右编码值
         treeMapper.batchUpdateTreeNodeLeftCode(tableName, lft, 2);
         treeMapper.batchUpdateTreeNodeRightCode(tableName, lft, 2);
-//        treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, idValue, lft, lft + 1);
         return lft;
     }
 

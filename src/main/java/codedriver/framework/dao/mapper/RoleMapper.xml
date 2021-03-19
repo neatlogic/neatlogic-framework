@@ -18,12 +18,14 @@
 
 	<resultMap id="roleMap" type="codedriver.framework.dto.RoleVo">
 		<id column="uuid" property="uuid" />
+		<result column="id" property="id" />
 		<result column="name" property="name" />
 		<result column="description" property="description" />
 	</resultMap>
 
 	<select id="searchRole" parameterType="codedriver.framework.dto.RoleVo" resultMap="roleMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`description`,
@@ -101,6 +103,7 @@
 
 	<select id="getRoleByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo" useCache="false">
 		SELECT
+		`id`,
 		`uuid`,
 		`name`,
 		`description`
@@ -110,6 +113,7 @@
 
 	<select id="getRoleSimpleInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo" useCache="true">
 		SELECT
+			`id`,
 			`uuid`,
 			`name`
 		FROM `role`
@@ -118,6 +122,7 @@
 
 	<select id="getRoleByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo" useCache="false">
 		SELECT
+		`id`,
 		`uuid`,
 		`name`,
 		`description`
@@ -179,8 +184,8 @@
 	</select>
 
 	<insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
-		INSERT INTO `role` (`uuid`, `name`, `description`)
-		VALUES (#{uuid}, #{name}, #{description})
+		INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
+		VALUES (#{id}, #{uuid}, #{name}, #{description})
 	</insert>
 
 	<insert id="insertRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">

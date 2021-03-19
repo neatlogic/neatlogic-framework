@@ -77,5 +77,5 @@ public interface TreeMapper {
 
     public int batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode(@Param("tableName")String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht);
 
-    public int getMaxRht(String tableName);
+    public int getRootRht(String tableName);
 }

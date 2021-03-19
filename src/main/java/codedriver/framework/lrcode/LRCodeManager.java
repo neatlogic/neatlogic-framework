@@ -41,8 +41,8 @@ public class LRCodeManager {
     public static int beforeAddTreeNode(String tableName, String idKey, String parentIdKey, Object parentIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey);
         int lft;
-        if(TreeNodeVo.ROOT_UUID.equals(parentIdValue.toString())){
-            lft = treeMapper.getMaxRht(tableName);
+        if(parentIdValue == null || TreeNodeVo.ROOT_UUID.equals(parentIdValue.toString())){
+            lft = treeMapper.getRootRht(tableName);
         }else{
             TreeNodeVo parentTreeNodeVo = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, parentIdValue);
             if(parentTreeNodeVo == null){
@@ -78,12 +78,32 @@ public class LRCodeManager {
         if(treeMapper.checkTreeNodeIsExistsByLeftRightCode(tableName, idKey, targetIdValue, moveCatalog.getLft(), moveCatalog.getRht()) > 0) {
             throw new MoveTargetNodeIllegalException();
         }
-        //移动到目标节点前面或后面
-        TreeNodeVo targetCatalog = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, targetIdValue);
-        //判断目标节点服务目录是否存在
-        if(targetCatalog == null) {
-            throw new TreeNodeNotFoundException(tableName, targetIdValue);
+        TreeNodeVo targetCatalog = null;
+        if(targetIdValue == null){
+            targetCatalog = new TreeNodeVo();
+            if(idValue instanceof Long){
+                targetIdValue = 0;
+                targetCatalog.setIdValue(0);
+                targetCatalog.setParentIdValue(-1);
+            }else if(idValue instanceof Integer){
+                targetIdValue = 0;
+                targetCatalog.setIdValue(0);
+                targetCatalog.setParentIdValue(-1);
+            }else if(idValue instanceof String){
+                targetIdValue = "0";
+                targetCatalog.setIdValue("0");
+                targetCatalog.setParentIdValue("-1");
+            }
+            targetCatalog.setLft(1);
+            targetCatalog.setRht(treeMapper.getRootRht(tableName));
+        }else {
+            targetCatalog = treeMapper.getTreeNodeById(tableName, idKey, parentIdKey, targetIdValue);
+            //判断目标节点服务目录是否存在
+            if(targetCatalog == null) {
+                throw new TreeNodeNotFoundException(tableName, targetIdValue);
+            }
         }
+        //移动到目标节点前面或后面
         Object parentIdValue;
         if(MoveType.INNER == moveType) {
             parentIdValue = targetIdValue;
@@ -178,7 +198,6 @@ public class LRCodeManager {
      **/
     private static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
         rebuildLeftRightCode(tableName, idKey, parentIdKey, TreeNodeVo.ROOT_UUID, 1);
-
     }
 
     private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft) {

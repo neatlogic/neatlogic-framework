@@ -65,8 +65,8 @@
         where `${idKey}` = #{idValue}
     </select>
 
-    <select id="getMaxRht" parameterType="java.lang.String" resultType="int">
-        select IFNULL(MAX(`rht`), 2) from `${tableName}`
+    <select id="getRootRht" parameterType="java.lang.String" resultType="int">
+        select IFNULL(MAX(`rht`), 1) + 1 from `${tableName}`
     </select>
 
     <update id="batchUpdateTreeNodeLeftCode">

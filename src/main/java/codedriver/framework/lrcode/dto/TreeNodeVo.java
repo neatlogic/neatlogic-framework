@@ -16,7 +16,6 @@ import java.io.Serializable;
 public class TreeNodeVo {
 
     public final static String ROOT_UUID = "0";
-    public final static String ROOT_PARENTUUID = "-1";
 
     private String idKey;
     private String parentIdKey;
@@ -52,6 +51,15 @@ public class TreeNodeVo {
     }
 
     public Object getParentIdValue() {
+        if(parentIdValue == null && idValue != null){
+            if(idValue instanceof Long){
+                parentIdValue = 0;
+            }else if(idValue instanceof Integer){
+                parentIdValue = 0;
+            }else if(idValue instanceof String){
+                parentIdValue = "0";
+            }
+        }
         return parentIdValue;
     }
 

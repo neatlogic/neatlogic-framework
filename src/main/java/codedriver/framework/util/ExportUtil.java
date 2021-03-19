@@ -1,7 +1,6 @@
 package codedriver.framework.util;
 
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,20 +38,45 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
 
-import codedriver.framework.util.ChineseFont;
+import org.w3c.tidy.Tidy;
 
 public class ExportUtil {
 
 	public static void getPdfFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
-		Document doc = Jsoup.parse(html.toString());
+		html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")"," ");
+		Document doc = Jsoup.parse(completeHtml(html));
 		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
 		savePdf(xhtml2word(doc, landscape), os);
 	}
 
 	public static void getWordFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
-		Document doc = Jsoup.parse(html.toString());
+		Document doc = Jsoup.parse(completeHtml(html));
 		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
 		saveDocx(xhtml2word(doc, landscape), os);
+	}
+
+	/**
+	 * @Description: 补全HTML标签
+	 * @Author: laiwt
+	 * @Date: 2021/3/19 11:19
+	 * @Params: [html]
+	 * @Returns: java.lang.String
+	 **/
+	private static String completeHtml(String html) throws IOException {
+		Tidy tidy = new Tidy();
+		tidy.setXHTML(true);
+		tidy.setInputEncoding("utf8");
+		tidy.setTabsize(4);
+		tidy.setShowWarnings(false);
+		tidy.setPrintBodyOnly(false);
+		tidy.setSmartIndent(true);
+		tidy.setOutputEncoding("utf8");
+		StringReader sr = new StringReader(html);
+		StringWriter sw = new StringWriter();
+		tidy.parse(sr, sw);
+		sr.close();
+		sw.close();
+		return sw.toString();
 	}
 	
 	public static WordprocessingMLPackage xhtml2word(Document doc, boolean landscape) throws Exception {

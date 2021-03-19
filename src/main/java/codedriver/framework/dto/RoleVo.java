@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -20,7 +21,8 @@ public class RoleVo extends BasePageVo implements Serializable {
 	public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
 	@JSONField(serialize=false)
 	private transient String keyword;
-	@EntityField(name = "角色uuis",
+	private Long id;
+	@EntityField(name = "角色uuid",
 			type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "角色名称",
@@ -71,6 +73,17 @@ public class RoleVo extends BasePageVo implements Serializable {
 
 	public void setAuth(String auth) {
 		this.auth = auth;
+	}
+
+	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
+		}
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public synchronized String getUuid() {

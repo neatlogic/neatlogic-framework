@@ -4,6 +4,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -25,8 +26,8 @@ public class UserVo extends BasePageVo implements Serializable{
     private static final long serialVersionUID = 3670529362145832083L;
     @JSONField(serialize=false)
     private transient String keyword;
-//    @JSONField(serialize=false)
-//	private transient List<String> valueList;
+
+    private Long id;
 	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "用户id", type = ApiParamType.STRING)
@@ -124,6 +125,17 @@ public class UserVo extends BasePageVo implements Serializable{
 
 	public void setAuthGroup(String authGroup) {
 		this.authGroup = authGroup;
+	}
+
+	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
+		}
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getUuid() {

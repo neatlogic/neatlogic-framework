@@ -4,6 +4,7 @@
 	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
 	<resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
 		<id property="uuid" column="uuid" />
+		<result property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="parentUuid" column="parentUuid" />
 		<result property="level" column="level" />
@@ -13,6 +14,7 @@
 
 	<select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
 		SELECT
+		`id`,
 		`uuid`,
 		`name`,
 		`lft`,
@@ -39,6 +41,7 @@
 
 	<select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`lft`,
@@ -91,6 +94,7 @@
 
 	<select id="getTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`lft`,
@@ -111,6 +115,7 @@
 
 	<select id="getTeamSimpleInfoByUuid" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.dto.TeamVo" useCache="true">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`
 		FROM
@@ -124,6 +129,7 @@
 
 	<select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
@@ -153,6 +159,7 @@
 
 	<resultMap id="childrenTeamMap" type="codedriver.framework.dto.TeamVo">
 		<id property="uuid" column="uuid" />
+		<result property="id" column="id" />
 		<result property="name" column="name" />
 		<result property="parentUuid" column="parentUuid" />
 		<result property="lft" column="lft" />
@@ -163,6 +170,7 @@
 
 	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultMap="childrenTeamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`parent_uuid` AS parentUuid,
@@ -177,6 +185,7 @@
 
 	<select id="getDepartmentTeamUuidByTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`parent_uuid` AS parentUuid,
@@ -195,6 +204,7 @@
 
 	<select id="getAllSonTeamByParentTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`parent_uuid` AS parentUuid,
@@ -214,6 +224,7 @@
 
 	<select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo" useCache="false">
 		SELECT
+		`id`,
 		`uuid`,
 		`name`,
 		`parent_uuid` AS parentUuid,
@@ -240,6 +251,7 @@
 
 	<select id="getTeamByParentUuidAndStartNum" resultType="codedriver.framework.dto.TeamVo" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`parent_uuid` AS parentUuid,
@@ -271,6 +283,7 @@
 
 	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap" useCache="false">
 		SELECT
+		a.`id`,
 		a.`uuid`,
 		a.`name`,
 		a.`parent_uuid` AS parentUuid,
@@ -375,6 +388,7 @@
 
 	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
 		INSERT INTO `team` (
+		`id`,
 		`uuid`,
 		`name`,
 		`parent_uuid`,
@@ -382,6 +396,7 @@
 		`rht`,
 		`level`
 		) VALUES (
+		#{id},
 		#{uuid},
 		#{name},
 		#{parentUuid},

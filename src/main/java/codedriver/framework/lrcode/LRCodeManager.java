@@ -201,7 +201,7 @@ public class LRCodeManager {
     }
 
     private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft) {
-        List<TreeNodeVo> catalogList= treeMapper.getTreeNodeListByParentId(tableName, parentIdKey, parentIdValue);
+        List<TreeNodeVo> catalogList = treeMapper.getTreeNodeListByParentId(tableName, idKey, parentIdKey, parentIdValue);
         for(TreeNodeVo catalog : catalogList) {
             if(catalog.getChildrenCount() == 0) {
                 treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, catalog.getIdValue(), parentLft + 1, parentLft + 2);

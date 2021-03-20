@@ -253,12 +253,18 @@ public class ApiValidateAndHelpBase {
         // 获取目标类
         boolean isAuth = false;
         if (apiClass != null) {
-            AuthAction action = apiClass.getAnnotation(AuthAction.class);
-            if (null != action && StringUtils.isNotBlank(action.action().getSimpleName())) {
-                String actionName = action.action().getSimpleName();
-                // 判断用户角色是否拥有接口权限
-                if (AuthActionChecker.check(actionName)) {
-                    isAuth = true;
+            //AuthAction action = apiClass.getAnnotation(AuthAction.class);
+            AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
+            if (actions.length > 0) {
+                for (AuthAction action : actions) {
+                    if (StringUtils.isNotBlank(action.action().getSimpleName())) {
+                        String actionName = action.action().getSimpleName();
+                        // 判断用户角色是否拥有接口权限
+                        if (AuthActionChecker.check(actionName)) {
+                            isAuth = true;
+                            break;
+                        }
+                    }
                 }
             } else {
                 isAuth = true;

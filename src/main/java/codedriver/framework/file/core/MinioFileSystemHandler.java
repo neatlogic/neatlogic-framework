@@ -3,6 +3,7 @@ package codedriver.framework.file.core;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.file.FilePathIllegalException;
+import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import io.minio.MinioClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,7 +27,9 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// 使用MinIO服务的URL，端口，Access key和Secret key创建一个MinioClient对象
-		this.minioClient = new MinioClient(Config.MINIO_URL(), Config.MINIO_ACCESSKEY(), Config.MINIO_SECRETKEY());
+		if(StringUtils.isNotBlank(Config.MINIO_URL())) {
+			this.minioClient = new MinioClient(Config.MINIO_URL(), Config.MINIO_ACCESSKEY(), Config.MINIO_SECRETKEY());
+		}
 	}
 
 	/**
@@ -38,6 +41,9 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
 	 */
 	@Override
 	public String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+		if(minioClient == null){
+			throw new FileStorageMediumHandlerNotFoundException("minio");
+		}
 		// 检查存储桶是否已经存在
 		boolean bucketExists = minioClient.bucketExists(Config.MINIO_BUCKET());
 		if (!bucketExists) {

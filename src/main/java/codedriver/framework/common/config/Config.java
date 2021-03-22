@@ -240,7 +240,7 @@ public class Config {
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
             DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
-            MINIO_URL = prop.getProperty("minio.url", "http://192.168.0.10:9001");
+            MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");

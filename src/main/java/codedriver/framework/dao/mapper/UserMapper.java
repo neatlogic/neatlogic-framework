@@ -82,7 +82,7 @@ public interface UserMapper {
 
     public List<String> getUserUuidListByUserName(String userName);
 
-    public List<UserVo> getUserListByUserUuidList(List<String> userUuidList);
+    public List<UserVo> getUserListByUserUuidList(@Param("list") List<String> userUuidList,@Param("isActive") Integer isActive);
 
     public List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList,@Param("isActive") Integer isActive);
 

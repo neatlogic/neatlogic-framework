@@ -626,7 +626,7 @@
         WHERE `user_name` = #{value}
     </select>
 
-    <select id="getUserListByUserUuidList" parameterType="java.util.List" resultMap="userInfoMap" useCache="false">
+    <select id="getUserListByUserUuidList" resultMap="userInfoMap" useCache="false">
         SELECT
         a.`id`,
         a.`uuid`,
@@ -652,6 +652,9 @@
         <foreach collection="list" item="userUuid" open="(" close=")" separator=",">
             #{userUuid}
         </foreach>
+        <if test="isActive != null">
+            and a.`is_active` = #{isActive}
+        </if>
     </select>
 
     <select id="checkUserUuidListIsExists" resultType="java.lang.String" useCache="false">

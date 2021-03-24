@@ -12,9 +12,9 @@
         </collection>
     </resultMap>
 
-    <select id="getFullTextIndexListByKeywordListAndTargetList" parameterType="java.util.List" resultMap="fullTextIndexMap">
-        SELECT `target_id`,`target_field`,`word`,`start`,`end` FROM `fulltextindex_field` ftf
-        LEFT JOIN `fulltextindex_offset` fto ON ftf.id = fto.`field_id`
+    <select id="getFullTextIndexListByKeywordListAndTargetList" resultMap="fullTextIndexMap">
+        SELECT `target_id`,`target_field`,`word`,`start`,`end` FROM `fulltextindex_field_${moduleId}` ftf
+        LEFT JOIN `fulltextindex_offset_${moduleId}` fto ON ftf.id = fto.`field_id`
         LEFT JOIN `fulltextindex_word` ftw ON ftw.`id` = ftf.`word_id`
         WHERE
         target_id IN
@@ -29,64 +29,63 @@
         ORDER BY ftf.`counter` DESC
     </select>
 
-    <select id="getContentByTargetId" parameterType="java.lang.Long"
+    <select id="getContentByTargetId"
             resultType="codedriver.framework.fulltextindex.dto.FullTextIndexContentVo">
         SELECT target_id AS targetId, target_type AS targetType, target_field AS targetField, content
-        FROM `fulltextindex_content`
-        WHERE target_id = #{value}
+        FROM `fulltextindex_content_${moduleId}`
+        WHERE target_id = #{targetId}
     </select>
 
-    <select id="getContentByTargetIdList" parameterType="java.lang.Long"
+    <select id="getContentByTargetIdList"
             resultType="codedriver.framework.fulltextindex.dto.FullTextIndexContentVo">
         SELECT target_id AS targetId, target_type AS targetType, target_field AS targetField, content
-        FROM `fulltextindex_content`
+        FROM `fulltextindex_content_${moduleId}`
         WHERE target_id in
-        <foreach collection="list" item="k" open="("
+        <foreach collection="targetIdList" item="k" open="("
                  separator="," close=")">#{k}
         </foreach>
     </select>
 
-    <insert id="insertField" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexFieldWordVo">
-        INSERT INTO `fulltextindex_field` (`id`,
+    <insert id="insertField" >
+        INSERT INTO `fulltextindex_field_${moduleId}` (`id`,
                                            `word_id`,
                                            `target_field`,
                                            `target_type`,
                                            `target_id`,
                                            `counter`)
-        VALUES (#{id},
-                #{wordId},
-                #{targetField},
-                #{targetType},
-                #{targetId},
-                #{counter})
+        VALUES (#{fieldVo.id},
+                #{fieldVo.wordId},
+                #{fieldVo.targetField},
+                #{fieldVo.targetType},
+                #{fieldVo.targetId},
+                #{fieldVo.counter})
     </insert>
 
-    <insert id="insertFieldOffset" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexOffsetVo">
-        INSERT IGNORE INTO `fulltextindex_offset` (`field_id`, `start`, `end`)
-        VALUES (#{fieldId}, #{start}, #{end})
+    <insert id="insertFieldOffset" >
+        INSERT IGNORE INTO `fulltextindex_offset_${moduleId}` (`field_id`, `start`, `end`)
+        VALUES (#{offsetVo.fieldId}, #{offsetVo.start}, #{offsetVo.end})
     </insert>
 
-    <insert id="insertContent" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexContentVo">
-        INSERT INTO `fulltextindex_content` (`target_id`,
+    <insert id="insertContent">
+        INSERT INTO `fulltextindex_content_${moduleId}` (`target_id`,
                                              `target_type`,
                                              `target_field`,
                                              `content`)
-        VALUES (#{targetId},
-                #{targetType},
-                #{targetField},
-                #{content,typeHandler=CompressHandler})
-        ON DUPLICATE KEY UPDATE `content` = #{content,typeHandler=CompressHandler}
+        VALUES (#{contentVo.targetId},
+                #{contentVo.targetType},
+                #{contentVo.targetField},
+                #{contentVo.content,typeHandler=CompressHandler})
+        ON DUPLICATE KEY UPDATE `content` = #{contentVo.content,typeHandler=CompressHandler}
     </insert>
 
-    <delete id="deleteFullTextIndexByTargetIdAndType"
-            parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexVo">
+    <delete id="deleteFullTextIndexByTargetIdAndType">
         DELETE a,b,c
-        FROM fulltextindex_field a
-                 LEFT JOIN fulltextindex_offset b ON
+        FROM fulltextindex_field_${moduleId} a
+                 LEFT JOIN fulltextindex_offset_${moduleId} b ON
             a.`id` = b.field_id
-                 LEFT JOIN fulltextindex_content c ON a.target_id = c.target_id AND a.target_type = c.target_type
-        WHERE a.`target_id` = #{targetId}
-          and a.`target_type` = #{targetType}
+                 LEFT JOIN fulltextindex_content_${moduleId} c ON a.target_id = c.target_id AND a.target_type = c.target_type
+        WHERE a.`target_id` = #{fullTextIndexVo.targetId}
+          and a.`target_type` = #{fullTextIndexVo.targetType}
     </delete>
 
 </mapper>

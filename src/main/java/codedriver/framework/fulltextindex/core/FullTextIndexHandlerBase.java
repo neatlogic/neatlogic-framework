@@ -36,9 +36,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     @Override
     public void deleteIndex(Long targetId) {
-        //设置threadlocal告诉拦截器分配到哪个表
-        FullTextIndexModuleContainer.set(this.getModuleId());
-        fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()));
+       /* //设置threadlocal告诉拦截器分配到哪个表
+        FullTextIndexModuleContainer.set(this.getModuleId());*/
+        fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()),this.getModuleId());
     }
 
 
@@ -49,8 +49,8 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), new ICommitted<FullTextIndexVo>() {
             @Override
             public void execute(FullTextIndexVo fullTextIndexVo) {
-                //设置threadlocal告诉拦截器分配到哪个表
-                FullTextIndexModuleContainer.set(moduleId);
+                /*//设置threadlocal告诉拦截器分配到哪个表
+                FullTextIndexModuleContainer.set(moduleId);*/
                 String oldName = Thread.currentThread().getName();
                 Thread.currentThread().setName("FULLTEXTINDEX-CREATE-" + fullTextIndexVo.getTargetType().toUpperCase(Locale.ROOT) + "-" + fullTextIndexVo.getTargetId());
                 try {
@@ -58,7 +58,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                     // 一定要在这里设置，不然后面都取不到targetType
                     fullTextIndexVo.setTargetType(fullTextIndexVo.getTargetType());
                     //删除索引
-                    fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo);
+                    fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo,moduleId);
 
                     //写入分词表
                     List<FullTextIndexWordVo> wordList = fullTextIndexVo.getWordList();
@@ -72,7 +72,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                     List<FullTextIndexContentVo> contentList = fullTextIndexVo.getContentList();
                     if (CollectionUtils.isNotEmpty(contentList)) {
                         for (FullTextIndexContentVo contentVo : contentList) {
-                            fullTextIndexMapper.insertContent(contentVo);
+                            fullTextIndexMapper.insertContent(contentVo,moduleId);
                         }
                     }
 
@@ -84,11 +84,11 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                                 FullTextIndexWordVo wordVo = fullTextIndexWordMapper.getWordByWord(fieldVo.getWord());
                                 if (wordVo != null) {
                                     fieldVo.setWordId(wordVo.getId());
-                                    fullTextIndexMapper.insertField(fieldVo);
+                                    fullTextIndexMapper.insertField(fieldVo,moduleId);
                                     Set<FullTextIndexOffsetVo> offsetList = fieldVo.getOffsetList();
                                     if (CollectionUtils.isNotEmpty(offsetList)) {
                                         for (FullTextIndexOffsetVo offsetVo : offsetList) {
-                                            fullTextIndexMapper.insertFieldOffset(offsetVo);
+                                            fullTextIndexMapper.insertFieldOffset(offsetVo,moduleId);
                                         }
                                     }
                                 }

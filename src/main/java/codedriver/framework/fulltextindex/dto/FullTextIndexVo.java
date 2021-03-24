@@ -2,6 +2,7 @@ package codedriver.framework.fulltextindex.dto;
 
 import codedriver.framework.fulltextindex.utils.FullTextIndexUtil;
 import codedriver.framework.util.HtmlUtil;
+import codedriver.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +27,12 @@ public class FullTextIndexVo {
     private Long targetId;
     private String targetType;
     private String targetField;
-    private List<FullTextIndexWordOffsetVo>  wordOffsetVoList;
-    private Map<String, String> fieldContentMap = new HashMap<>();
+    private List<FullTextIndexWordOffsetVo> wordOffsetVoList;
+    private Map<String, WordVo> fieldContentMap = new HashMap<>();
     private Map<String, List<FullTextIndexWordOffsetVo>> wordOffsetMap = new HashMap<>();
 
-    public FullTextIndexVo(){}
+    public FullTextIndexVo() {
+    }
 
     public FullTextIndexVo(Long _targetId, String _targetType) {
         targetId = _targetId;
@@ -46,15 +48,16 @@ public class FullTextIndexVo {
         this.targetId = targetId;
     }
 
-    public void addFieldContent(String field, String content) {
-        if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(content)) {
-            fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), HtmlUtil.removeHtml(content.trim()));
+    public void addFieldContent(String field, WordVo wordVo) {
+        if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(wordVo.getContent())) {
+            wordVo.setContent(HtmlUtil.removeHtml(wordVo.getContent().trim()));
+            fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), wordVo);
         }
     }
 
-    public void addFieldContentWithHtml(String field, String content) {
-        if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(content)) {
-            fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), content);
+    public void addFieldContentWithHtml(String field, WordVo wordVo) {
+        if (StringUtils.isNotBlank(field) && StringUtils.isNotBlank(wordVo.getContent())) {
+            fieldContentMap.put(field.trim().toLowerCase(Locale.ROOT), wordVo);
         }
     }
 
@@ -65,7 +68,7 @@ public class FullTextIndexVo {
             contentVo.setTargetId(this.getTargetId());
             contentVo.setTargetType(this.getTargetType());
             contentVo.setTargetField(field);
-            contentVo.setContent(fieldContentMap.get(field));
+            contentVo.setContent(fieldContentMap.get(field).getContent());
             contentList.add(contentVo);
         }
         return contentList;
@@ -77,7 +80,13 @@ public class FullTextIndexVo {
             for (String field : fieldContentMap.keySet()) {
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
-                        wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field)));
+                        if(fieldContentMap.get(field).getNeedSliceWord()) {
+                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
+                        }else{
+                            List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length()-1));
+                            wordOffsetMap.put(field, wordTmpList);
+                        }
                     }
                     List<FullTextIndexWordOffsetVo> wordOffsetList = wordOffsetMap.get(field);
                     if (CollectionUtils.isNotEmpty(wordOffsetList)) {
@@ -100,7 +109,13 @@ public class FullTextIndexVo {
             for (String field : fieldContentMap.keySet()) {
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
-                        wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field)));
+                        if(fieldContentMap.get(field).getNeedSliceWord()) {
+                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
+                        }else{
+                            List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length()-1));
+                            wordOffsetMap.put(field, wordTmpList);
+                        }
                     }
                     List<FullTextIndexWordOffsetVo> wordOffsetList = wordOffsetMap.get(field);
                     if (CollectionUtils.isNotEmpty(wordOffsetList)) {
@@ -166,7 +181,40 @@ public class FullTextIndexVo {
         this.targetField = targetField;
     }
 
-    public Map<String, String> getFieldContentMap() {
+    public Map<String, WordVo> getFieldContentMap() {
         return fieldContentMap;
+    }
+
+    public static class WordVo{
+        private Boolean isNeedSliceWord = true;
+        private String content;
+
+        public WordVo(){
+
+        }
+        public WordVo(String content) {
+            this.content = content;
+        }
+
+        public WordVo(Boolean isNeedSliceWord, String content) {
+            this.isNeedSliceWord = isNeedSliceWord;
+            this.content = content;
+        }
+
+        public Boolean getNeedSliceWord() {
+            return isNeedSliceWord;
+        }
+
+        public void setNeedSliceWord(Boolean needSliceWord) {
+            isNeedSliceWord = needSliceWord;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
     }
 }

@@ -9,17 +9,17 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface FullTextIndexMapper {
-    List<FullTextIndexVo> getFullTextIndexListByKeywordListAndTargetList(@Param("keywordList")List<String> keywordList, @Param("targetIdList") List<Long> targetIdList);
+    List<FullTextIndexVo> getFullTextIndexListByKeywordListAndTargetList(@Param("keywordList") List<String> keywordList, @Param("targetIdList") List<Long> targetIdList, @Param("moduleId") String moduleId);
 
-    FullTextIndexContentVo getContentByTargetId(Long targetId);
+    FullTextIndexContentVo getContentByTargetId(@Param("targetId") Long targetId, @Param("moduleId") String moduleId);
 
-    List<FullTextIndexContentVo> getContentByTargetIdList(List<Long> targetIdList);
+    List<FullTextIndexContentVo> getContentByTargetIdList(@Param("targetIdList") List<Long> targetIdList, @Param("moduleId") String moduleId);
 
-    void insertField(FullTextIndexFieldWordVo fieldVo);
+    void insertField(@Param("fieldVo") FullTextIndexFieldWordVo fieldVo, @Param("moduleId") String moduleId);
 
-    void insertFieldOffset(FullTextIndexOffsetVo offsetVo);
+    void insertFieldOffset(@Param("offsetVo") FullTextIndexOffsetVo offsetVo, @Param("moduleId") String moduleId);
 
-    void insertContent(FullTextIndexContentVo contentVo);
+    void insertContent(@Param("contentVo") FullTextIndexContentVo contentVo, @Param("moduleId") String moduleId);
 
-    void deleteFullTextIndexByTargetIdAndType(FullTextIndexVo fullTextIndexVo);
+    void deleteFullTextIndexByTargetIdAndType(@Param("fullTextIndexVo") FullTextIndexVo fullTextIndexVo, @Param("moduleId") String moduleId);
 }

@@ -38,7 +38,6 @@ public class FulltextIndexInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         if (invocation.getTarget() instanceof Executor) {//如果是Executor,则在threadlocal中设置模块名
             MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
-
             String id = mappedStatement.getId();
             if (id.startsWith("codedriver.module.")) {
                 String moduleId = id.split("\\.")[2];

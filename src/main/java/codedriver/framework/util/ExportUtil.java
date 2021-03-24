@@ -1,12 +1,5 @@
 package codedriver.framework.util;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-
 import org.docx4j.Docx4J;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.fonts.IdentityPlusMapper;
@@ -18,32 +11,22 @@ import org.docx4j.model.structure.PageSizePaper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.wml.BooleanDefaultTrue;
-import org.docx4j.wml.CTTblLayoutType;
-import org.docx4j.wml.CTTblOverlap;
-import org.docx4j.wml.ContentAccessor;
-import org.docx4j.wml.RFonts;
-import org.docx4j.wml.RPr;
-import org.docx4j.wml.STTblLayoutType;
-import org.docx4j.wml.STTblOverlap;
-import org.docx4j.wml.Tbl;
-import org.docx4j.wml.TblGrid;
-import org.docx4j.wml.TblGridCol;
-import org.docx4j.wml.TblPr;
-import org.docx4j.wml.TblWidth;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.TcPr;
-import org.docx4j.wml.Tr;
+import org.docx4j.wml.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
-
 import org.w3c.tidy.Tidy;
+
+import javax.xml.bind.JAXBElement;
+import java.io.*;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExportUtil {
 
 	public static void getPdfFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
-		html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")"," ");
+		html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
 		Document doc = Jsoup.parse(completeHtml(html));
 		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
 		savePdf(xhtml2word(doc, landscape), os);
@@ -119,9 +102,6 @@ public class ExportUtil {
 	private static List<Tc> getTrAllCell(Tr tr) {
 		List<Object> objList = getAllElementFromObject(tr, Tc.class);
 		List<Tc> tcList = new ArrayList<Tc>();
-		if (objList == null) {
-			return tcList;
-		}
 		for (Object tcObj : objList) {
 			if (tcObj instanceof Tc) {
 				Tc objTc = (Tc) tcObj;
@@ -134,9 +114,6 @@ public class ExportUtil {
 	private static List<Tr> getTblAllTr(Tbl tbl) {
 		List<Object> objList = getAllElementFromObject(tbl, Tr.class);
 		List<Tr> trList = new ArrayList<Tr>();
-		if (objList == null) {
-			return trList;
-		}
 		for (Object obj : objList) {
 			if (obj instanceof Tr) {
 				Tr tr = (Tr) obj;
@@ -298,7 +275,7 @@ public class ExportUtil {
 	}
 
 	private static List<Object> getAllElementFromObject(Object obj, Class<?> toSearch) {
-		List<Object> result = new ArrayList<Object>();
+		List<Object> result = new ArrayList<>();
 		if (obj instanceof JAXBElement)
 			obj = ((JAXBElement<?>) obj).getValue();
 		if (obj.getClass().equals(toSearch))

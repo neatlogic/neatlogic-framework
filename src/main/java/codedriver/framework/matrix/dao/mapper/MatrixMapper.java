@@ -19,15 +19,17 @@ public interface MatrixMapper {
 
     public List<ValueTextVo> searchMatrixForSelect(MatrixVo matrixVo);
 
-	public int checkMatrixIsExists(String uuid);
+    public int checkMatrixIsExists(String uuid);
 
-	public int checkMatrixNameIsRepeat(MatrixVo matrixVo);
+    public int checkMatrixNameIsRepeat(MatrixVo matrixVo);
 
-	public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
+    public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
 
-	public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(String matrixUuid);
+    public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(String matrixUuid);
 
     public int deleteMatrixByUuid(String uuid);
 
     public int updateMatrixNameAndLcu(MatrixVo matrixVo);
+
+    public int insertMatrixFormComponent(ProcessMatrixFormComponentVo componentVo);
 }

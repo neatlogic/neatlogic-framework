@@ -1,11 +1,10 @@
 package codedriver.framework.condition.core;
 
-import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.ParamType;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
 /**
  * 
 * @Time:2020年7月10日
@@ -48,8 +47,16 @@ public interface IConditionHandler {
 	public String getType();
 	
 	/**
+	 * @description 获取控件配置
+	 * @param  type 根据不同类型获取配置
+	 * @return com.alibaba.fastjson.JSONObject
+	 * @since 2020/2/11
+	 */
+	public JSONObject getConfig(Enum<?> type);
+
+	/**
 	 * @Description: 获取控件配置
-	 * @Param: 
+	 * @Param:
 	 * @return: com.alibaba.fastjson.JSONObject
 	 * @Date: 2020/2/11
 	 */

@@ -33,7 +33,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
             String.class.getSimpleName().toLowerCase(), true, true, true, false, false),
     FORMTIME("formtime", "时间", "ts-timer", "form", FormHandlerType.TIME, ParamType.DATE, "string", true, true, true,
             false, false),
-    FORMSTATICLIST("formstaticlist", "静态列表", "ts-list", "form", true, true, true, false, false),
+    FORMSTATICLIST("formstaticlist", "静态列表", "ts-list", "form", false, true, true, false, false),
     FORMCASCADELIST("formcascadelist", "级联下拉", "ts-formlist", "form", FormHandlerType.CASCADELIST, ParamType.STRING,
             "string", true, true, true, false, false),
     FORMDYNAMICLIST("formdynamiclist", "动态列表", "ts-viewlist", "form", false, true, false, false, false),
@@ -119,7 +119,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     }
 
     public static String getHandlerName(String _handler) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
                 return s.getHandlerName();
             }
@@ -127,10 +127,9 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
         return null;
     }
 
-    public static FormHandlerType getHandlerType(String _handler, String processWorkcenterConditionType) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+    public static FormHandlerType getHandlerType(String _handler, FormConditionModel processWorkcenterConditionType) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
-
                 return s.getHandlerType(processWorkcenterConditionType);
             }
         }
@@ -138,7 +137,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     }
 
     public static List<Expression> getExpressionList(String _handler) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
                 return s.getExpressionList();
             }
@@ -146,8 +145,8 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
         return null;
     }
 
-    public FormHandlerType getHandlerType(String processWorkcenterConditionType) {
-        if (FormConditionModel.CUSTOM.getValue().equals(processWorkcenterConditionType)) {
+    public FormHandlerType getHandlerType(FormConditionModel processWorkcenterConditionType) {
+        if (FormConditionModel.CUSTOM == processWorkcenterConditionType) {
             if (handlerType == FormHandlerType.RADIO || handlerType == FormHandlerType.CHECKBOX) {
                 return FormHandlerType.SELECT;
             }
@@ -159,7 +158,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     }
 
     public static Expression getExpression(String _handler) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
                 return s.getExpression();
             }
@@ -168,7 +167,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     }
 
     public static String getDataType(String _handler) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
                 return s.getDataType();
             }
@@ -207,7 +206,7 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     }
 
     public static ParamType getParamType(String _handler) {
-        for (FormHandlerTypeBak s : FormHandlerTypeBak.values()) {
+        for (FormHandlerTypeBak s : values()) {
             if (s.getHandler().equals(_handler)) {
                 return s.getParamType();
             }
@@ -229,5 +228,4 @@ public enum FormHandlerTypeBak implements IFormHandlerType {
     public FormHandlerType getHandlerType() {
         return handlerType;
     }
-
 }

@@ -5,9 +5,9 @@
 
 package codedriver.framework.form.exception;
 
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class FormNameRepeatException extends ApiFieldValidRuntimeException {
+public class FormNameRepeatException extends ApiRuntimeException {
 
     private static final long serialVersionUID = 1901910086387644808L;
 

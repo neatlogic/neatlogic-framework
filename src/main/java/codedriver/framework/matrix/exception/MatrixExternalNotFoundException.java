@@ -1,8 +1,8 @@
 package codedriver.framework.matrix.exception;
 
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class MatrixExternalNotFoundException extends ApiFieldValidRuntimeException {
+public class MatrixExternalNotFoundException extends ApiRuntimeException {
 
 	private static final long serialVersionUID = 1708428607162097984L;
 

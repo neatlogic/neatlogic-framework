@@ -7,11 +7,11 @@ package codedriver.framework.matrix.exception;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class MatrixExternalDataNotFormattedException extends ApiRuntimeException {
+public class MatrixExternalNoReturnException extends ApiRuntimeException {
 
-    private static final long serialVersionUID = 6425792449420226082L;
+    private static final long serialVersionUID = 8558168883177657125L;
 
-    public MatrixExternalDataNotFormattedException(String msg) {
-        super("集成配置接口返回结果不符合格式，缺少：" + msg);
+    public MatrixExternalNoReturnException() {
+        super("集成配置接口无返回结果");
     }
 }

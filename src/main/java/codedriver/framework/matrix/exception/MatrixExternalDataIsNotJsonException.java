@@ -5,9 +5,9 @@
 
 package codedriver.framework.matrix.exception;
 
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class MatrixExternalDataIsNotJsonException extends ApiFieldValidRuntimeException {
+public class MatrixExternalDataIsNotJsonException extends ApiRuntimeException {
 
     private static final long serialVersionUID = 7391664365834538416L;
 

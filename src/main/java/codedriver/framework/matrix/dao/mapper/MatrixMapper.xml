@@ -156,6 +156,20 @@
 	LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
 	WHERE a.`matrix_uuid` = #{matrixUuid}
 	</select>
+
+	<insert id="insertMatrixFormComponent" parameterType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+		INSERT INTO `process_matrix_form_component` (
+			`form_version_uuid`,
+			`matrix_uuid`,
+			`form_attribute_uuid`,
+			`form_attribute_label`
+		) VALUES (
+					 #{formVersionUuid},
+					 #{matrixUuid},
+					 #{formAttributeUuid},
+					 #{formAttributeLabel}
+				 )
+	</insert>
 	
 	<update id="updateMatrixNameAndLcu" parameterType="codedriver.framework.matrix.dto.MatrixVo">
 		UPDATE `process_matrix` SET

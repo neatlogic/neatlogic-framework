@@ -1,5 +1,6 @@
 package codedriver.framework.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.fonts.IdentityPlusMapper;
@@ -27,13 +28,22 @@ public class ExportUtil {
 
 	public static void getPdfFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
 		html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
-		Document doc = Jsoup.parse(completeHtml(html));
+		String completedHtml = completeHtml(html);
+		if(StringUtils.isNotBlank(completedHtml)){
+			html = completedHtml;
+		}
+		Document doc = Jsoup.parse(html);
 		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
 		savePdf(xhtml2word(doc, landscape), os);
 	}
 
 	public static void getWordFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
-		Document doc = Jsoup.parse(completeHtml(html));
+		String completedHtml = completeHtml(html);
+		// fixme --laiwt 有部分html经过tidy解析后，返回空串，暂不清楚是何原因
+		if(StringUtils.isNotBlank(completedHtml)){
+			html = completedHtml;
+		}
+		Document doc = Jsoup.parse(html);
 		doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
 		saveDocx(xhtml2word(doc, landscape), os);
 	}

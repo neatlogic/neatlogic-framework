@@ -87,7 +87,7 @@ public class DivideHandler extends FormHandlerBase {
 
     @Override
     public String getModule() {
-        return "process";
+        return "framework";
     }
 
     @Override

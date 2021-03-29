@@ -87,7 +87,7 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public String getModule() {
-        return "process";
+        return "framework";
     }
 
     @Override

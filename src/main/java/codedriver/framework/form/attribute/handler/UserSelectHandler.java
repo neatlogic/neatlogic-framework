@@ -234,7 +234,7 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     public String getModule() {
-        return "process";
+        return "framework";
     }
 
     @Override

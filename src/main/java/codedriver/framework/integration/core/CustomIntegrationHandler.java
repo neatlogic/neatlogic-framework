@@ -10,7 +10,12 @@ import codedriver.framework.integration.dto.PatternVo;
 @Component
 public class CustomIntegrationHandler extends IntegrationHandlerBase {
 	public String getName() {
-		return "自定义";
+		return Type.CUSTOM.getText();
+	}
+
+	@Override
+	public String getType() {
+		return Type.CUSTOM.getValue();
 	}
 
 	public Object myGetData() {

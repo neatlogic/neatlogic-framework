@@ -9,6 +9,26 @@ import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
 
 public interface IIntegrationHandler {
+
+	public enum Type{
+		MATRIX("matrix","矩阵外部数据源查询"),
+		CUSTOM("custom","自定义");
+
+		private String value;
+		private String text;
+
+		private Type(String value,String text){
+			this.value = value;
+			this.text = text;
+		}
+		public String getValue(){
+			return value;
+		}
+		public String getText(){
+			return text;
+		}
+	}
+
 	public String getName();
 
 	public default String getHandler() {
@@ -22,5 +42,7 @@ public interface IIntegrationHandler {
 	public List<PatternVo> getInputPattern();
 
 	public List<PatternVo> getOutputPattern();
+
+	public String getType();
 
 }

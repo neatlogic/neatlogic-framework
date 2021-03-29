@@ -1,6 +1,6 @@
 package codedriver.framework.dto;
 
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
 /**
  * @Title: FieldValidResultVo
@@ -16,9 +16,9 @@ public class FieldValidResultVo {
     //错误信息
     private String msg;
 
-    private ApiFieldValidRuntimeException exception;
+    private ApiRuntimeException exception;
 
-    public FieldValidResultVo(ApiFieldValidRuntimeException exception) {
+    public FieldValidResultVo(ApiRuntimeException exception) {
         this.msg = exception.getMessage();
         this.status = "ERROR";
     }
@@ -41,11 +41,11 @@ public class FieldValidResultVo {
         return status;
     }
 
-    public ApiFieldValidRuntimeException getException() {
+    public ApiRuntimeException getException() {
         return exception;
     }
 
-    public void setException(ApiFieldValidRuntimeException exception) {
+    public void setException(ApiRuntimeException exception) {
         this.exception = exception;
     }
 }

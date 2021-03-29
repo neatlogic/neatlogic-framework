@@ -1,8 +1,8 @@
 package codedriver.framework.notify.exception;
 
-import codedriver.framework.exception.core.ApiFieldValidRuntimeException;
+import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class NotifyPolicyNotFoundException extends ApiFieldValidRuntimeException {
+public class NotifyPolicyNotFoundException extends ApiRuntimeException {
 
 	private static final long serialVersionUID = 4427302613682187323L;
 

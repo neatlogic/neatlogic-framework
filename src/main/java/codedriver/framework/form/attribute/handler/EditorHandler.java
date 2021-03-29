@@ -112,4 +112,9 @@ public class EditorHandler extends FormHandlerBase {
         return true;
     }
 
+    @Override
+    public Boolean isUseFormConfig() {
+        return false;
+    }
+
 }

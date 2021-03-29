@@ -165,4 +165,9 @@ public class DateHandler extends FormHandlerBase {
         return true;
     }
 
+    @Override
+    public Boolean isUseFormConfig() {
+        return false;
+    }
+
 }

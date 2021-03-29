@@ -216,4 +216,10 @@ public interface IFormAttributeHandler {
      * @author lvzk
      */
     public Boolean isNeedSliceWord();
+
+    /**
+     *  供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config
+     * @return 是否需要表单管理编辑保存的config
+     */
+    public Boolean isUseFormConfig();
 }

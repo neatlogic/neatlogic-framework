@@ -46,6 +46,8 @@ public class FormAttributeVo implements Serializable {
     List<ExpressionVo> expressionList;
     @EntityField(name = "默认表达式", type = ApiParamType.JSONOBJECT)
     ExpressionVo defaultExpression;
+    @EntityField(name = "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config", type = ApiParamType.BOOLEAN)
+    private boolean isUseFormConfig;
 
     @EntityField(name = "条件模型")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
@@ -240,5 +242,13 @@ public class FormAttributeVo implements Serializable {
             }
         }
         return null;
+    }
+
+    public boolean getIsUseFormConfig() {
+        return this.isUseFormConfig;
+    }
+
+    public void setIsUseFormConfig(boolean isUseFormConfig) {
+        this.isUseFormConfig = isUseFormConfig;
     }
 }

@@ -2,6 +2,8 @@ package codedriver.framework.integration.core;
 
 import java.util.List;
 
+import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.integration.dto.IntegrationResultVo;
 import org.springframework.stereotype.Component;
 
 import codedriver.framework.integration.dto.IntegrationVo;
@@ -10,12 +12,7 @@ import codedriver.framework.integration.dto.PatternVo;
 @Component
 public class CustomIntegrationHandler extends IntegrationHandlerBase {
 	public String getName() {
-		return Type.CUSTOM.getText();
-	}
-
-	@Override
-	public String getType() {
-		return Type.CUSTOM.getValue();
+		return "自定义";
 	}
 
 	public Object myGetData() {
@@ -47,4 +44,8 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase {
 		return 0;
 	}
 
+	@Override
+	public void validate(IntegrationResultVo resultVo) throws ApiRuntimeException {
+
+	}
 }

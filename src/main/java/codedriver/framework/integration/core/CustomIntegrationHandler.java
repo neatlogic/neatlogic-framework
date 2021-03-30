@@ -2,6 +2,8 @@ package codedriver.framework.integration.core;
 
 import java.util.List;
 
+import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.integration.dto.IntegrationResultVo;
 import org.springframework.stereotype.Component;
 
 import codedriver.framework.integration.dto.IntegrationVo;
@@ -42,4 +44,8 @@ public class CustomIntegrationHandler extends IntegrationHandlerBase {
 		return 0;
 	}
 
+	@Override
+	public void validate(IntegrationResultVo resultVo) throws ApiRuntimeException {
+
+	}
 }

@@ -21,7 +21,7 @@ public class WORKTIME_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthGroup() {
-		return "process";
+		return "framework";
 	}
 
 }

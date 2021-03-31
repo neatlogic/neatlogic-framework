@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 
 @RootComponent
-public class PrivateApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class PrivateApiComponentFactory extends ApplicationListenerBase {
     static Logger logger = LoggerFactory.getLogger(PrivateApiComponentFactory.class);
 
     private static Map<String, IApiComponent> componentMap = new HashMap<>();
@@ -379,5 +380,10 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                 }
             }
         }      
+    }
+
+    @Override
+    protected void myInit() {
+
     }
 }

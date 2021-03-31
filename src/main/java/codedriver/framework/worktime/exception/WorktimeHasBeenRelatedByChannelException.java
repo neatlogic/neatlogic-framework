@@ -9,9 +9,9 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 
 public class WorktimeHasBeenRelatedByChannelException extends ApiRuntimeException {
 
-	private static final long serialVersionUID = -3889598914385553027L;
+    private static final long serialVersionUID = -3889598914385553027L;
 
-	public WorktimeHasBeenRelatedByChannelException(String name) {
-		super("服务窗口:'" + name + "'已被服务引用");
-	}
+    public WorktimeHasBeenRelatedByChannelException(String name) {
+        super("服务窗口:'" + name + "'已被服务引用");
+    }
 }

@@ -1,26 +1,23 @@
 package codedriver.framework.asynchronization.threadlocal;
 
+import codedriver.framework.dto.UserVo;
+import codedriver.framework.exception.user.NoUserException;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import codedriver.framework.dto.UserVo;
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.exception.user.NoUserException;
-
 public class UserContext implements Serializable {
 	private static final long serialVersionUID = -578199115176786224L;
-	@JSONField(serialize=false)
-	private transient static ThreadLocal<UserContext> instance = new ThreadLocal<UserContext>();
-	@JSONField(serialize=false)
+	@JSONField(serialize = false)
+	private final transient static ThreadLocal<UserContext> instance = new ThreadLocal<UserContext>();
+	@JSONField(serialize = false)
 	private transient HttpServletRequest request;
 	@JSONField(serialize=false)
 	private transient HttpServletResponse response;

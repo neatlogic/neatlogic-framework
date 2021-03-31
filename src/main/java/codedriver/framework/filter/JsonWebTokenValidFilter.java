@@ -10,9 +10,7 @@ import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,12 +25,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Date;
 
-/**
- * @Author:chenqiwei
- * @descrition 先按default（jwt）认证认证用户，如果不存在则按authType认证重新获取认证信息,认证通过后按默认认证生成(jwt)Token 后续按 默认(jwt)认证
- * @Time:Aug 25, 2020
- * @ClassName: JsonWebTokenValidFilter
- */
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     // private ServletContext context;
 
@@ -43,7 +35,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * Default constructor.
      */
     public JsonWebTokenValidFilter() {
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -51,8 +42,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      */
     @Override
     public void destroy() {
-        TenantContext.get().release();// 清除线程变量值
-        UserContext.get().release();
     }
 
     @Override
@@ -144,13 +133,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
-        // 清除所有threadlocal
-        if (TenantContext.get() != null) {
-            TenantContext.get().release();
-        }
-        if (UserContext.get() != null) {
-            UserContext.get().release();
-        }
+
     }
 
     private boolean userExpirationValid() {

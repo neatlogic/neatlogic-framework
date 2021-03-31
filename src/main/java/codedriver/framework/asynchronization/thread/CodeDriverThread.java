@@ -2,6 +2,7 @@ package codedriver.framework.asynchronization.thread;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.cache.threadlocal.CacheContext;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeDriverThread implements Runnable {
@@ -42,6 +43,7 @@ public abstract class CodeDriverThread implements Runnable {
             if (UserContext.get() != null) {
                 UserContext.get().release();
             }
+            CacheContext.release();
         }
     }
 

@@ -5,6 +5,7 @@
 <configuration>
     <typeAliases>
         <typeAlias type="codedriver.framework.dao.plugin.CompressHandler" alias="CompressHandler"/>
+        <typeAlias type="codedriver.framework.dao.plugin.Md5Handler" alias="Md5Handler"/>
     </typeAliases>
     <typeHandlers>
         <typeHandler jdbcType="LONGVARCHAR" javaType="String"

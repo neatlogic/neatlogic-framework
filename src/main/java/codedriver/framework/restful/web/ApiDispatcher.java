@@ -242,7 +242,7 @@ public class ApiDispatcher {
     }
 
     @RequestMapping(value = "/stream/**", method = RequestMethod.POST)
-    public void displatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
@@ -285,7 +285,7 @@ public class ApiDispatcher {
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)
-    public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 

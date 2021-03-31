@@ -1,33 +1,24 @@
 package codedriver.framework.util;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import codedriver.framework.message.core.IMessageHandler;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dto.condition.ConditionConfigVo;
 import codedriver.framework.dto.condition.ConditionGroupVo;
+import codedriver.framework.message.core.IMessageHandler;
 import codedriver.framework.notify.core.INotifyHandler;
 import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.notify.core.NotifyHandlerFactory;
-import codedriver.framework.notify.dto.NotifyActionVo;
-import codedriver.framework.notify.dto.NotifyPolicyConfigVo;
-import codedriver.framework.notify.dto.NotifyReceiverVo;
-import codedriver.framework.notify.dto.NotifyTemplateVo;
-import codedriver.framework.notify.dto.NotifyTriggerNotifyVo;
-import codedriver.framework.notify.dto.NotifyTriggerVo;
-import codedriver.framework.notify.dto.NotifyVo;
-import codedriver.framework.notify.dto.ParamMappingVo;
+import codedriver.framework.notify.dto.*;
 import codedriver.framework.notify.exception.NotifyHandlerNotFoundException;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class NotifyPolicyUtil {
 
@@ -78,10 +69,10 @@ public class NotifyPolicyUtil {
 
                             try {
                                 ConditionParamContext.init(conditionParamData);
-                                /** 解析条件表达式，生成javascript脚本，如(true&&false)&&(false||true)||(false||true) **/
+                                /* 解析条件表达式，生成javascript脚本，如(true&&false)&&(false||true)||(false||true) **/
                                 String script = conditionConfig.buildScript();
                                 // System.out.println(script);
-                                /** 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
+                                /* 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
                                 if (!RunScriptUtil.runScript(script)) {
                                     continue;
                                 }
@@ -91,10 +82,10 @@ public class NotifyPolicyUtil {
                                 ConditionParamContext.get().release();
                             }
                         }
-                        /** 通知动作列表 **/
+                        /* 通知动作列表 **/
                         List<NotifyActionVo> actionList = notifyObj.getActionList();
                         for (NotifyActionVo actionObj : actionList) {
-                            /** 接收人列表 **/
+                            /* 接收人列表 **/
                             List<String> receiverList = actionObj.getReceiverList();
                             if (CollectionUtils.isNotEmpty(receiverList)) {
                                 String notifyHandler = actionObj.getNotifyHandler();

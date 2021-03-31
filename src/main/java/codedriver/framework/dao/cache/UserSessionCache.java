@@ -39,4 +39,7 @@ public class UserSessionCache {
 		return cachedElement.getObjectValue();
 	}
 
+	public static boolean removeItem(String tenant, String userUuid){
+		return getCache().remove(tenant + ":" + userUuid);
+	}
 }

@@ -194,7 +194,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
-                            throw new RuntimeException("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                            System.exit(1);
                         }
                     }
                     // 即使是regex path也需要存到apiMap里，这样才能获取帮助信息
@@ -202,7 +203,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         apiList.add(apiVo);
                         apiMap.put(token, apiVo);
                     } else {
-                        throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
+                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
+                        System.exit(1);
                     }
 
                 }
@@ -266,7 +268,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
-                            throw new RuntimeException("路径匹配接口：" + token + "已存在，请重新定义访问路径");
+                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                            System.exit(1);
                         }
                     }
 
@@ -274,7 +277,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         apiList.add(apiVo);
                         apiMap.put(token, apiVo);
                     } else {
-                        throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
+                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
+                        System.exit(1);
                     }
                 }
             }
@@ -338,7 +342,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
-                            throw new RuntimeException("路径匹配接口：" + token + "已存在，请重新定义访问路径");
+                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                            System.exit(1);
                         }
                     }
 
@@ -346,7 +351,8 @@ public class PrivateApiComponentFactory implements ApplicationListener<ContextRe
                         apiList.add(apiVo);
                         apiMap.put(token, apiVo);
                     } else {
-                        throw new RuntimeException("接口：" + token + "已存在，请重新定义访问路径");
+                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
+                        System.exit(1);
                     }
                 }
             }

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.worktime.dao.mapper.WorktimeMapper">
+	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
+	<select id="getWorktimeByUuid" parameterType="java.lang.String" resultType="codedriver.framework.worktime.dto.WorktimeVo" useCache="true">
+		SELECT
+		wt.`uuid`,
+		wt.`name`,
+		wt.`is_active` AS isActive,
+		wt.`lcu`,
+		wt.`lcd`,
+		wt.`config`
+		FROM `worktime` wt
+		WHERE wt.`uuid` = #{uuid}
+	</select>
+	
+	<select id="getWorktimeByName" parameterType="java.lang.String" resultType="codedriver.framework.worktime.dto.WorktimeVo" useCache="false">
+		SELECT
+		wt.`uuid`,
+		wt.`name`,
+		wt.`is_active` AS isActive,
+		wt.`lcu`,
+		wt.`lcd`,
+		wt.`config`
+		FROM `worktime` wt
+		WHERE wt.`name` = #{value}
+	</select>
+
+	<select id="checkWorktimeNameIsRepeat" parameterType="codedriver.framework.worktime.dto.WorktimeVo" resultType="int" useCache="false">
+		SELECT COUNT(1) FROM `worktime` WHERE `name` = #{name} AND `uuid` != #{uuid}
+	</select>
+
+	<select id="checkWorktimeIsExists" parameterType="java.lang.String" resultType="int" useCache="false">
+		SELECT COUNT(`uuid`) FROM `worktime` WHERE `uuid` = #{uuid}
+	</select>
+
+	<select id="searchWorktimeCount" parameterType="codedriver.framework.worktime.dto.WorktimeVo" resultType="int" useCache="false">
+		SELECT
+		COUNT(`uuid`)
+		FROM `worktime` wt
+		WHERE `is_delete` = 0
+		<if test="keyword != null and keyword != ''">
+			AND wt.`name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="isActive != null">
+			AND wt.`is_active` = #{isActive}
+		</if>
+	</select>
+
+	<resultMap id="worktimeMap" type="codedriver.framework.worktime.dto.WorktimeVo">
+		<id column="uuid" property="uuid" />
+		<result column="name" property="name" />
+		<result column="is_active" property="isActive" />
+		<result column="config" property="config" />
+	</resultMap>
+
+	<select id="searchWorktimeList" parameterType="codedriver.framework.worktime.dto.WorktimeVo" resultMap="worktimeMap" useCache="false">
+		SELECT
+		wt.`uuid`,
+		wt.`name`,
+		wt.`is_active`,
+		wt.`config`,
+		(select count(`channel_uuid`) from `channel_worktime` where `worktime_uuid` = wt.`uuid`) as relCount
+		FROM `worktime` wt
+		WHERE `is_delete` = 0
+		<if test="keyword != null and keyword != ''">
+			AND wt.`name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="isActive != null">
+			AND wt.`is_active` = #{isActive}
+		</if>
+		ORDER BY wt.`lcd`
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="searchWorktimeListForSelect" parameterType="codedriver.framework.worktime.dto.WorktimeVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
+		SELECT
+		wt.`uuid` as `value`,
+		wt.`name` as `text`
+		FROM `worktime` wt
+		WHERE `is_delete` = 0
+		<if test="keyword != null and keyword != ''">
+			AND wt.`name` LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="isActive != null">
+			AND wt.`is_active` = #{isActive}
+		</if>
+		ORDER BY wt.`lcd`
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="checkWorktimeHasBeenRelatedByChannel" parameterType="java.lang.String" resultType="int">
+		select
+		count(`channel_uuid`)
+		from `channel_worktime`
+		where `worktime_uuid` = #{value}
+	</select>
+
+	<select id="checkWorktimeHasBeenRelatedByTask" parameterType="java.lang.String" resultType="int">
+		select
+		count(`id`)
+		from `processtask`
+		where `worktime_uuid` = #{value}
+	</select>
+
+	<resultMap type="codedriver.framework.worktime.dto.WorktimeRangeVo" id="worktimeRangeMap">
+		<result column="year" property="year" />
+		<result column="date" property="date" />
+		<result column="worktime_uuid" property="worktimeUuid" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+	</resultMap>
+	<select id="getWorktimeRangeListByWorktimeUuid" parameterType="java.lang.String" resultMap="worktimeRangeMap" useCache="false">
+		SELECT
+		`year`,
+		`date`,
+		`worktime_uuid`,
+		`start_time`,
+		`end_time`
+		FROM
+		`worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		ORDER BY `start_time`
+	</select>
+
+	<select id="getWorktimeDateList" parameterType="codedriver.framework.worktime.dto.WorktimeRangeVo" resultType="java.lang.String" useCache="false">
+		SELECT
+		DISTINCT `date`
+		FROM
+		`worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		AND `year` = #{year}
+	</select>
+
+	<select id="getRecentWorktimeRange" parameterType="codedriver.framework.worktime.dto.WorktimeRangeVo" resultMap="worktimeRangeMap" useCache="false">
+		SELECT
+		`year`,
+		`date`,
+		`worktime_uuid`,
+		`start_time`,
+		`end_time`
+		FROM
+		`worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		AND `end_time` &gt; #{startTime}
+		ORDER BY `start_time`
+		limit 0,1
+	</select>
+	
+	<select id="getRecentWorktimeRangeBackward" parameterType="codedriver.framework.worktime.dto.WorktimeRangeVo" resultMap="worktimeRangeMap" useCache="false">
+		SELECT
+		`year`,
+		`date`,
+		`worktime_uuid`,
+		`start_time`,
+		`end_time`
+		FROM
+		`worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		AND `start_time` &lt; #{startTime}
+		ORDER BY `start_time` DESC
+		limit 1
+	</select>
+
+	<select id="calculateCostTime" resultType="long" useCache="false">
+		SELECT
+		IFNULL(SUM(IF(wtd.`end_time` &gt; #{endTime}, #{endTime}, wtd.`end_time`) - IF(wtd.`start_time` &lt; #{startTime}, #{startTime}, wtd.`start_time`)),0)
+		FROM `worktime_range` wtd
+		WHERE wtd.`worktime_uuid` = #{worktimeUuid}
+		AND wtd.`end_time` &gt;= #{startTime}
+		AND wtd.`start_time` &lt;= #{endTime}
+	</select>
+
+	<select id="checkIsWithinWorktimeRange" resultType="int" useCache="false">
+		SELECT
+		COUNT(`worktime_uuid`)
+		FROM `worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		AND `start_time` &lt;= #{value}
+		AND `end_time` &gt;= #{value}
+	</select>
+
+	<select id="checkIsWithinWorktime" resultType="int" useCache="false">
+		SELECT
+		COUNT(`worktime_uuid`)
+		FROM `worktime_range`
+		WHERE `worktime_uuid` = #{worktimeUuid}
+		AND `date` = #{date}
+	</select>
+
+	<resultMap id="worktimeYearListMap" type="codedriver.framework.worktime.dto.WorktimeVo">
+		<id column="worktime_uuid" property="uuid" />
+		<collection property="yearList" ofType="java.lang.Integer">
+			<id column="year" />
+		</collection>
+	</resultMap>
+	<select id="getYearListByWorktimeUuidList" parameterType="java.util.List" resultMap="worktimeYearListMap" useCache="false">
+		SELECT
+		`worktime_uuid`,
+		`year`
+		FROM `worktime_range`
+		<where>
+			<if test="list != null and list.size() > 0">
+				`worktime_uuid` in
+				<foreach collection="list" item="worktimeUuid" open="(" separator="," close=")">
+					#{worktimeUuid}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertWorktime" parameterType="codedriver.framework.worktime.dto.WorktimeVo">
+		INSERT INTO `worktime` ( `uuid`, `name`, `is_active`, `lcu`, `lcd`, `config`, `is_delete` )
+		VALUES ( #{uuid}, #{name}, #{isActive}, #{lcu}, now(3), #{config}, 0)
+	</insert>
+
+	<insert id="insertBatchWorktimeRange" parameterType="codedriver.framework.worktime.dto.WorktimeRangeVo">
+		INSERT INTO `worktime_range` ( `year`, `date`, `worktime_uuid`, `start_time`, `end_time` )
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.year}, #{item.date}, #{item.worktimeUuid}, #{item.startTime}, #{item.endTime})
+		</foreach>
+	</insert>
+
+	<update id="updateWorktime" parameterType="codedriver.framework.worktime.dto.WorktimeVo">
+		UPDATE
+		`worktime`
+		SET
+		`uuid` = #{uuid},
+		`name` = #{name},
+		`is_active` = #{isActive},
+		`lcu` = #{lcu},
+		`config` = #{config},
+		`lcd` = now(3)
+		WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateWorktimeDeleteStatus" parameterType="codedriver.framework.worktime.dto.WorktimeVo">
+		update
+		`worktime`
+		set
+		`is_delete` = #{isDelete},
+		`lcu` = #{lcu},
+		`lcd` = now(3)
+		where `uuid` = #{uuid}
+	</update>
+
+	<delete id="deleteWorktimeByUuid" parameterType="java.lang.String">
+		DELETE FROM `worktime` WHERE `uuid`=#{uuid}
+	</delete>
+
+	<delete id="deleteWorktimeRange" parameterType="codedriver.framework.worktime.dto.WorktimeRangeVo">
+		delete from `worktime_range`
+		where `worktime_uuid` = #{worktimeUuid}
+		<if test="year != null">
+			AND `year` = #{year}
+		</if>
+	</delete>
+</mapper>

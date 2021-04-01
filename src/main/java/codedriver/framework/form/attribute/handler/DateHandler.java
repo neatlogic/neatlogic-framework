@@ -13,8 +13,8 @@ import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -31,8 +31,8 @@ import javax.annotation.Resource;
 @Component
 public class DateHandler extends FormHandlerBase {
 
-//    @Resource
-//    private WorktimeMapper worktimeMapper;
+    @Resource
+    private WorktimeMapper worktimeMapper;
 
     private final static String DATE_FORMAT = "yyyy-MM-dd";
     private final static String DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
@@ -55,39 +55,39 @@ public class DateHandler extends FormHandlerBase {
         JSONObject configObj = jsonObj.getJSONObject("attributeConfig");
         List<String> validTypeList = JSON.parseArray(configObj.getString("validType"), String.class);
         if (CollectionUtils.isNotEmpty(validTypeList)) {
-//            if (validTypeList.contains("workdate")) {
-//                String worktimeUuid = jsonObj.getString("worktimeUuid");
-//                int count = 0;
-//                String data = attributeDataVo.getData();
-//                String styleType = configObj.getString("styleType");
-//                String showType = configObj.getString("showType");
-//                if (DATE_FORMAT.equals(showType)) {
-//                    String date = data.replace(styleType, "-");
-//                    try {
-//                        dateFormatter.parse(date);
-//                        count = worktimeMapper.checkIsWithinWorktime(worktimeUuid, date);
-//                    } catch (DateTimeParseException ex) {
-//                        String format = DATE_FORMAT.replace("-", styleType);
-//                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
-//                    }
-//                } else if (DATETIME_FORMAT.equals(showType)) {
-//                    String dateTime = data.replace(styleType, "-");
-//                    try {
-//                        TemporalAccessor temporalAccessor = dateTimeFormatter.parse(dateTime);
-//                        LocalDateTime endLocalDateTime = LocalDateTime.from(temporalAccessor);
-//                        long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
-//                        count = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime);
-//                    } catch (DateTimeParseException ex) {
-//                        String format = DATETIME_FORMAT.replace("-", styleType);
-//                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
-//                    }
-//                }
-//                if (count > 0) {
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
+            if (validTypeList.contains("workdate")) {
+                String worktimeUuid = jsonObj.getString("worktimeUuid");
+                int count = 0;
+                String data = attributeDataVo.getData();
+                String styleType = configObj.getString("styleType");
+                String showType = configObj.getString("showType");
+                if (DATE_FORMAT.equals(showType)) {
+                    String date = data.replace(styleType, "-");
+                    try {
+                        dateFormatter.parse(date);
+                        count = worktimeMapper.checkIsWithinWorktime(worktimeUuid, date);
+                    } catch (DateTimeParseException ex) {
+                        String format = DATE_FORMAT.replace("-", styleType);
+                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+                    }
+                } else if (DATETIME_FORMAT.equals(showType)) {
+                    String dateTime = data.replace(styleType, "-");
+                    try {
+                        TemporalAccessor temporalAccessor = dateTimeFormatter.parse(dateTime);
+                        LocalDateTime endLocalDateTime = LocalDateTime.from(temporalAccessor);
+                        long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
+                        count = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime);
+                    } catch (DateTimeParseException ex) {
+                        String format = DATETIME_FORMAT.replace("-", styleType);
+                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+                    }
+                }
+                if (count > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
         return true;
     }

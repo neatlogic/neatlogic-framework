@@ -57,7 +57,6 @@ public class DateHandler extends FormHandlerBase {
         if (CollectionUtils.isNotEmpty(validTypeList)) {
             if (validTypeList.contains("workdate")) {
                 String worktimeUuid = jsonObj.getString("worktimeUuid");
-                int count = 0;
                 String data = attributeDataVo.getData();
                 String styleType = configObj.getString("styleType");
                 String showType = configObj.getString("showType");
@@ -65,7 +64,7 @@ public class DateHandler extends FormHandlerBase {
                     String date = data.replace(styleType, "-");
                     try {
                         dateFormatter.parse(date);
-                        count = worktimeMapper.checkIsWithinWorktime(worktimeUuid, date);
+                        return worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
                     } catch (DateTimeParseException ex) {
                         String format = DATE_FORMAT.replace("-", styleType);
                         throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
@@ -76,16 +75,11 @@ public class DateHandler extends FormHandlerBase {
                         TemporalAccessor temporalAccessor = dateTimeFormatter.parse(dateTime);
                         LocalDateTime endLocalDateTime = LocalDateTime.from(temporalAccessor);
                         long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
-                        count = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime);
+                        return worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
                     } catch (DateTimeParseException ex) {
                         String format = DATETIME_FORMAT.replace("-", styleType);
                         throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
                     }
-                }
-                if (count > 0) {
-                    return true;
-                } else {
-                    return false;
                 }
             }
         }

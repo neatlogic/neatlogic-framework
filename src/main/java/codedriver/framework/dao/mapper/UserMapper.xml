@@ -155,17 +155,6 @@
         WHERE a.`vip_level` !=  0
     </select>
 
-    <select id="getLeaderUserUuidByTeamIds" resultType="java.lang.String" useCache="false">
-        SELECT
-        `user_uuid`
-        FROM `user_team_role`
-        WHERE `role` = 'leader'
-        AND team_uuid IN
-        <foreach collection="teamUuidIdList" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
-
     <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
         SELECT
         k.`id`,

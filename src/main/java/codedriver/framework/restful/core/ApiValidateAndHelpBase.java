@@ -364,12 +364,14 @@ public class ApiValidateAndHelpBase {
                         if (genericType instanceof ParameterizedType) {
                             ParameterizedType parameterizedType = (ParameterizedType) genericType;
                             Type actualType = parameterizedType.getActualTypeArguments()[0];
-                            Class<?> integerClass = (Class<?>) actualType;
-                            JSONArray subParamList = new JSONArray();
-                            for (Field subField : integerClass.getDeclaredFields()) {
-                                drawFieldMessageRecursive(subField, subParamList, false);
+                            if(actualType instanceof  Class) { //如果不是class 则无需继续递归
+                                Class<?> integerClass = (Class<?>) actualType;
+                                JSONArray subParamList = new JSONArray();
+                                for (Field subField : integerClass.getDeclaredFields()) {
+                                    drawFieldMessageRecursive(subField, subParamList, false);
+                                }
+                                paramObj.put("children", subParamList);
                             }
-                            paramObj.put("children", subParamList);
                         }
                     }
                     paramList.add(paramObj);

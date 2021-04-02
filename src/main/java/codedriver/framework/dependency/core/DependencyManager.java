@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 依赖关系管理类，基本操作：保存依赖关系数据，删除依赖关系数据，查询依赖数量，查询引用列表
  * @author: linbq
  * @since: 2021/4/1 12:03
  **/
@@ -33,25 +34,6 @@ public class DependencyManager {
     }
 
     /**
-     * 插入多条引用关系数据
-     * @param clazz
-     * @param dependencyVoList
-     * @return
-     */
-//    public static int insertList(Class<? extends IDependencyHandler> clazz, List<DependencyVo> dependencyVoList){
-//        if(CollectionUtils.isEmpty(dependencyVoList)){
-//            return 0;
-//        }
-//        IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
-//        dependencyHandler.delete(dependencyVoList.get(0).getCaller());
-//        int sum = 0;
-//        for(DependencyVo dependencyVo : dependencyVoList){
-//            sum += dependencyHandler.insert(dependencyVo.getCallee(), dependencyVo.getCaller());
-//        }
-//        return sum;
-//    }
-
-    /**
      * 删除引用关系
      * @param clazz
      * @param caller
@@ -63,7 +45,7 @@ public class DependencyManager {
     }
 
     /**
-     * 获取引用列表
+     * 查询引用列表
      * @param calleeType
      * @param callee
      * @return
@@ -91,7 +73,7 @@ public class DependencyManager {
     }
 
     /**
-     * 获取引用个数
+     * 查询引用个数
      * @param calleeType
      * @param callee
      * @return

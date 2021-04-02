@@ -8,6 +8,7 @@ package codedriver.framework.dependency.constvalue;
 import codedriver.framework.dependency.core.ICalleeType;
 
 /**
+ * 被调用者类型
  * @author: linbq
  * @since: 2021/4/2 10:30
  **/

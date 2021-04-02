@@ -11,6 +11,7 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 
 /**
+ * 依赖关系处理器接口
  * @author: linbq
  * @since: 2021/4/1 11:09
  **/

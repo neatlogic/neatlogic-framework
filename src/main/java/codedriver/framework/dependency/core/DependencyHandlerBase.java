@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 依赖关系处理器基类
  * @author: linbq
  * @since: 2021/4/1 11:43
  **/

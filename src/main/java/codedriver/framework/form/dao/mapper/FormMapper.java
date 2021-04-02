@@ -44,7 +44,9 @@ public interface FormMapper {
 
     public List<FormAttributeVo> getFormAttributeList(FormAttributeVo formAttributeVo);
 
-    public List<FormAttributeVo> getFormAttributeListByChannelUuidList(@Param("channelUuidList") List<String> channelUuidList);
+//    public List<FormAttributeVo> getFormAttributeListByChannelUuidList(@Param("channelUuidList") List<String> channelUuidList);
+
+    public List<FormAttributeVo> getFormAttributeListByFormUuidList(List<String> formUuidList);
 
     public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(@Param("matrixUuid")String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
 

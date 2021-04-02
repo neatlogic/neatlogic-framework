@@ -5,7 +5,6 @@
 
 package codedriver.framework.dependency.core;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.dao.mapper.DependencyMapper;
 
@@ -73,15 +72,10 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
 
     @Override
     public int getCallerCount(Object callee) {
-        System.out.println(this);
-        System.out.println(getTableName());
-        System.out.println(getCalleeField());
-        System.out.println(callee);
-        System.out.println(dependencyMapper);
-        System.out.println(TenantContext.get().getTenantUuid());
-        Integer count = dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
-        System.out.println(count);
-        return count;
+        if(canBeLifted()){
+            return dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
+        }
+        return 0;
     }
 
     /**

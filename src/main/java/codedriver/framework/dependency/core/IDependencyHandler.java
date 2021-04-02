@@ -28,6 +28,14 @@ public interface IDependencyHandler {
      */
     public ICalleeType getCalleeType();
 
+    /**
+     * 依赖关系能否解除
+     * @return
+     */
+    public default boolean canBeLifted() {
+        return true;
+    }
+
     public int insert(Object callee, Object caller);
 
     public int delete(Object caller);

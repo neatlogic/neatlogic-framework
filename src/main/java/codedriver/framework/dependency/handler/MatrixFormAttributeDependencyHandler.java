@@ -5,11 +5,13 @@
 
 package codedriver.framework.dependency.handler;
 
-import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.constvalue.CalleeType;
 import codedriver.framework.dependency.core.DependencyHandlerBase;
 import codedriver.framework.dependency.core.ICalleeType;
+import codedriver.framework.form.dao.mapper.FormMapper;
+import codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,11 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 表单引用矩阵处理器
  * @author: linbq
  * @since: 2021/4/1 11:42
  **/
 @Service
 public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase {
+
+    @Resource
+    private FormMapper formMapper;
+
     @Override
     public String getTableName() {
         return "process_matrix_form_component";
@@ -44,11 +51,31 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
 
     @Override
     public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize) {
-        return null;
+        List<ValueTextVo> resultList = new ArrayList<>();
+        List<ProcessMatrixFormComponentVo> callerList = formMapper.getMatrixFormComponentByMatrixUuid((String)callee, startNum, pageSize);
+        for (ProcessMatrixFormComponentVo caller : callerList) {
+            ValueTextVo valueTextVo = parse(caller);
+            if (valueTextVo != null) {
+                resultList.add(valueTextVo);
+            }
+        }
+        return resultList;
     }
 
     @Override
     protected ValueTextVo parse(Object caller) {
-        return null;
+        if(caller == null){
+            return null;
+        }
+        ProcessMatrixFormComponentVo processMatrixFormComponentVo = (ProcessMatrixFormComponentVo) caller;
+        ValueTextVo valueTextVo = new ValueTextVo();
+        valueTextVo.setValue(processMatrixFormComponentVo.getFormAttributeUuid());
+        String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\">%s</a>",
+                TenantContext.get().getTenantUuid(),
+                processMatrixFormComponentVo.getFormUuid(),
+                processMatrixFormComponentVo.getFormVersionUuid(),
+                processMatrixFormComponentVo.getFormName() + "-" + processMatrixFormComponentVo.getVersion() + "-" + processMatrixFormComponentVo.getFormAttributeLabel());
+        valueTextVo.setText(text);
+        return valueTextVo;
     }
 }

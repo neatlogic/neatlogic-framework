@@ -56,6 +56,9 @@ public class DependencyManager {
         int pageSize = basePageVo.getPageSize();
         int startNum = basePageVo.getStartNum();
         for(IDependencyHandler handler : dependencyHandlerList){
+            if(!handler.canBeLifted()){
+                continue;
+            }
             if(pageSize == 0){
                 break;
             }
@@ -76,16 +79,30 @@ public class DependencyManager {
      * 查询引用个数
      * @param calleeType
      * @param callee
+     * @param canBeLifted
      * @return
      */
-    public static int getDependencyCount(ICalleeType calleeType, Object callee){
+    public static int getDependencyCount(ICalleeType calleeType, Object callee, boolean canBeLifted){
         int sum = 0;
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(calleeType);
         if(CollectionUtils.isNotEmpty(dependencyHandlerList)){
             for(IDependencyHandler handler : dependencyHandlerList){
+                if(handler.canBeLifted() != canBeLifted){
+                    continue;
+                }
                 sum += handler.getCallerCount(callee);
             }
         }
         return sum;
+    }
+
+    /**
+     * 查询引用个数
+     * @param calleeType
+     * @param callee
+     * @return
+     */
+    public static int getDependencyCount(ICalleeType calleeType, Object callee){
+        return getDependencyCount(calleeType, callee, true);
     }
 }

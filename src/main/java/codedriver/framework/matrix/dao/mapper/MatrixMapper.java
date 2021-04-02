@@ -25,11 +25,7 @@ public interface MatrixMapper {
 
     public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
 
-    public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(String matrixUuid);
-
     public int deleteMatrixByUuid(String uuid);
 
     public int updateMatrixNameAndLcu(MatrixVo matrixVo);
-
-    public int insertMatrixFormComponent(ProcessMatrixFormComponentVo componentVo);
 }

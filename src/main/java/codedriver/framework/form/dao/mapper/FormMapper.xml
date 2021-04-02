@@ -193,6 +193,22 @@
         </where>
     </select>
 
+    <select id="getMatrixFormComponentByMatrixUuid" resultType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+        select
+            a.`matrix_uuid` AS matrixUuid,
+            a.`form_version_uuid` AS formVersionUuid,
+            a.`form_attribute_label` AS formAttributeLabel,
+            a.`form_attribute_uuid` AS formAttributeUuid,
+            b.`version`,
+            c.`uuid` AS formUuid,
+            c.`name` AS formName
+        FROM `process_matrix_form_component` a
+        LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+        LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
+        WHERE a.`matrix_uuid` = #{matrixUuid}
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
     <update id="updateFormVersion" parameterType="codedriver.framework.form.dto.FormVersionVo">
         UPDATE
         `form_version`
@@ -273,6 +289,20 @@
                 #{data})
     </insert>
 
+    <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+        INSERT INTO `process_matrix_form_component` (
+            `form_version_uuid`,
+            `matrix_uuid`,
+            `form_attribute_uuid`,
+            `form_attribute_label`
+        ) VALUES (
+                     #{formVersionUuid},
+                     #{matrixUuid},
+                     #{formAttributeUuid},
+                     #{formAttributeLabel}
+                 )
+    </insert>
+
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_attribute`
@@ -288,12 +318,6 @@
     <delete id="deleteFormVersionByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_version`
-        WHERE `form_uuid` = #{formUuid}
-    </delete>
-
-    <delete id="deleteProcessFormByFormUuid" parameterType="java.lang.String">
-        DELETE
-        FROM `process_form`
         WHERE `form_uuid` = #{formUuid}
     </delete>
 

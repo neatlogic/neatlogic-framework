@@ -8,6 +8,7 @@ package codedriver.framework.form.dao.mapper;
 import java.util.List;
 
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,11 @@ public interface FormMapper {
 
     public List<FormAttributeVo> getFormAttributeListByChannelUuidList(@Param("channelUuidList") List<String> channelUuidList);
 
+    public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(@Param("matrixUuid")String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
+
     public int insertForm(FormVo formVo);
+
+    public int insertMatrixFormComponent(ProcessMatrixFormComponentVo componentVo);
 
     public int resetFormVersionIsActiveByFormUuid(String formUuid);
 
@@ -62,8 +67,6 @@ public interface FormMapper {
     public int deleteFormByUuid(String uuid);
 
     public int deleteFormVersionByFormUuid(String formUuid);
-
-    public int deleteProcessFormByFormUuid(String formUuid);
 
     public int deleteFormVersionByUuid(String uuid);
 

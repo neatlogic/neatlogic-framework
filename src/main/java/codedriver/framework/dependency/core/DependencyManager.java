@@ -8,7 +8,6 @@ package codedriver.framework.dependency.core;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.dto.ValueTextVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.xlsx4j.sml.Col;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +20,26 @@ import java.util.List;
 public class DependencyManager {
 
     /**
+     * 先清空再插入一条引用关系数据
+     * @param clazz
+     * @param callee
+     * @param caller
+     * @return
+     */
+    public static int clearAndInsert(Class<? extends IDependencyHandler> clazz, Object callee, Object caller){
+        IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
+        dependencyHandler.delete(caller);
+        return dependencyHandler.insert(callee, caller);
+    }
+    /**
      * 插入一条引用关系数据
      * @param clazz
      * @param callee
      * @param caller
      * @return
      */
-    public static int insertOne(Class<? extends IDependencyHandler> clazz, Object callee, Object caller){
+    public static int insert(Class<? extends IDependencyHandler> clazz, Object callee, Object caller){
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
-        dependencyHandler.delete(caller);
         return dependencyHandler.insert(callee, caller);
     }
 
@@ -39,9 +49,24 @@ public class DependencyManager {
      * @param caller
      * @return
      */
-    public static int delete(Class<? extends IDependencyHandler> clazz, String caller){
+    public static int delete(Class<? extends IDependencyHandler> clazz, Object caller){
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
         return dependencyHandler.delete(caller);
+    }
+
+    /**
+     * 删除引用关系
+     * @param clazz
+     * @param callerList
+     * @return
+     */
+    public static int delete(Class<? extends IDependencyHandler> clazz, List<Object> callerList){
+        IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
+        int sum = 0;
+        for(Object caller : callerList){
+            sum += dependencyHandler.delete(caller);
+        }
+        return sum;
     }
 
     /**

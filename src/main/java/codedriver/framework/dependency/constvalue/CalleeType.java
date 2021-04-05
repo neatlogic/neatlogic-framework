@@ -17,7 +17,7 @@ public enum CalleeType implements ICalleeType {
     FORM("form", "表单"),
     INTEGRATION("integration", "集成"),
     WORKTIME("worktime", "服务窗口"),
-    NOTIFYPOLICY("notifypolicy", "通知策略");
+    NOTIFY_POLICY("notifypolicy", "通知策略");
 
     private String value;
     private String text;

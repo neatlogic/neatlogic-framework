@@ -1,142 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.notify.dao.mapper.NotifyMapper">
-	<!-- <select id="getNotifyTemplateByUuid" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`title`,
-		`content`,
-		`type`,
-		`notify_handler` AS notifyHandler,
-		`trigger`
-		FROM
-		`process_notifytemplate`
-		WHERE
-		uuid = #{value}
-	</select>
-
-	<select id="searchNotifyTemplateCount" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM `process_notifytemplate`
-		<where>
-			<if test="notifyHandler != null and notifyHandler != ''">
-				AND `notify_handler` = #{notifyHandler}
-			</if>
-			<if test="trigger != null and trigger != ''">
-				AND `trigger` = #{trigger}
-			</if>
-			<if test="type != null and type != ''">
-				AND `type` = #{type}
-			</if>
-			<if test="keyword != null and keyword != ''">
-				AND `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-		</where>
-	</select>
-
-	<select id="searchNotifyTemplate" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="codedriver.framework.notify.dto.NotifyTemplateVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`title`,
-		`content`,
-		`type`,
-		`notify_handler` AS notifyHandler,
-		`trigger`
-		FROM `process_notifytemplate`
-		<where>
-			<if test="notifyHandler != null and notifyHandler != ''">
-				AND `notify_handler` = #{notifyHandler}
-			</if>
-			<if test="trigger != null and trigger != ''">
-				AND `trigger` = #{trigger}
-			</if>
-			<if test="type != null and type != ''">
-				AND `type` = #{type}
-			</if>
-			<if test="keyword != null and keyword != ''">
-				AND `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-		</where>
-		ORDER BY `fcd` DESC
-		<if test="needPage">
-			limit #{startNum}, #{pageSize}
-		</if>
-	</select>
-	
-	<select id="getNotifyTemplateTypeList" resultType="java.lang.String">
-	SELECT 
-	  DISTINCT `type`
-	FROM `process_notifytemplate` 
-	ORDER BY `type`
-	</select>
-	
-	<select id="getNotifyTemplateListForSelect" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="codedriver.framework.common.dto.ValueTextVo">
-	SELECT
-	`uuid` AS value,
-	`name` AS text
-	FROM `process_notifytemplate`
-	<where>
-		<if test="notifyHandler != null and notifyHandler != ''">
-		AND `notify_handler` = #{notifyHandler}
-		</if>
-		<if test="trigger != null and trigger != ''">
-		AND `trigger` = #{trigger}
-		</if>
-	</where>
-	ORDER BY `name`
-	</select>
-	
-	<select id="checkNotifyTemplateNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo" resultType="int">
-	SELECT COUNT(1) FROM `process_notifytemplate` WHERE `name` = #{name} AND `uuid` != #{uuid}
-	</select>
-	
-	<insert id="insertNotifyTemplate" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo">
-	INSERT INTO `process_notifytemplate` (
-	  `uuid`,
-	  `name`,
-	  `title`,
-	  `content`,
-	  `type`,
-	  `notify_handler`,
-	  `trigger`,
-	  `fcd`,
-	  `fcu`
-	) 
-	VALUES
-	  (
-	    #{uuid},
-	    #{name},
-	    #{title},
-	    #{content},
-	    #{type},
-	    #{notifyHandler},
-	    #{trigger},
-	    NOW(),
-	    #{fcu}
-	  ) 
-	</insert>
-	
-	<update id="updateNotifyTemplateByUuid" parameterType="codedriver.framework.notify.dto.NotifyTemplateVo">
-	UPDATE 
-	  `process_notifytemplate` 
-	SET
-	  `name` = #{name},
-	  `title` = #{title},
-	  `content` = #{content},
-	  `type` = #{type},
-	  `notify_handler`=#{notifyHandler},
-	  `trigger`=#{trigger},
-	  `lcd` = NOW(),
-	  `lcu` = #{lcu} 
-	WHERE `uuid` = #{uuid}
-	</update>
-	
-	<delete id="deleteNotifyTemplateByUuid" parameterType="java.lang.String">
-	DELETE FROM `process_notifytemplate` where `uuid`=#{uuid}
-	</delete> -->
 	
 	<select id="getNotifyPolicyById" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
 	SELECT 
@@ -203,20 +67,8 @@
 		AND `name` LIKE concat('%',#{keyword},'%') 
 	</if>
 	</select>
-	
-	<select id="getNotifyPolicyInvokerCountListByPolicyIdList" parameterType="java.util.List" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
-	SELECT 
-	  `policy_id` AS id,
-	  COUNT(`policy_id`) AS invokerCount 
-	FROM `notify_policy_invoke` 
-	WHERE `policy_id` IN 
-	<foreach collection="list" item="policyId" open="(" separator="," close=")">
-	#{policyId}
-	</foreach>
-	GROUP BY `policy_id`
-	</select>
 
-	<select id="getNotifyPolicyInvokerList" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo" resultType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
+	<!--<select id="getNotifyPolicyInvokerList" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo" resultType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
 	SELECT 
 	  `policy_id` AS policyId,
 	  `invoker`,
@@ -233,21 +85,14 @@
 	<if test="needPage">
 	LIMIT #{startNum}, #{pageSize}
 	</if>
-	</select>
+	</select>-->
 	
-	<select id="getNotifyPolicyInvokerCountByInvoker" parameterType="java.lang.String" resultType="int">
+	<!--<select id="getNotifyPolicyInvokerCountByInvoker" parameterType="java.lang.String" resultType="int">
 	SELECT 
 	  COUNT(1)
 	FROM `notify_policy_invoke` 
 	WHERE `invoker` = #{invoker}
-	</select>
-
-	<select id="getNotifyPolicyInvokerCountByPolicyId" parameterType="java.lang.Long" resultType="int">
-	SELECT
-	  COUNT(1)
-	FROM `notify_policy_invoke`
-	WHERE `policy_id` = #{policyId}
-	</select>
+	</select>-->
 
 	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
 	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
@@ -256,11 +101,6 @@
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
 	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3))
-	</insert>
-	
-	<insert id="insertNotifyPolicyInvoker" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
-	INSERT INTO `notify_policy_invoke` (`policy_id`, `invoker`, `config`) 
-	VALUES (#{policyId}, #{invoker}, #{configStr})
 	</insert>
 
 	<update id="updateNotifyPolicyById">
@@ -275,9 +115,5 @@
 	<delete id="deleteNotifyPolicyById">
 	DELETE FROM `notify_policy` WHERE id = #{id}
 	</delete>
-	
-	<delete id="deleteNotifyPolicyInvoker" parameterType="java.lang.String">
-	DELETE FROM `notify_policy_invoke` 
-	WHERE `invoker` = #{invoker}
-	</delete>
+
 </mapper>

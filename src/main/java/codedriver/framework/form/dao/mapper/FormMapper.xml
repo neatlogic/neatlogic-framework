@@ -213,7 +213,7 @@
         </foreach>
     </select>
 
-    <select id="getMatrixFormComponentByMatrixUuid" resultType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+    <select id="getMatrixFormComponentByMatrixUuid" resultType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
         select
             a.`matrix_uuid` AS matrixUuid,
             a.`form_version_uuid` AS formVersionUuid,
@@ -309,7 +309,7 @@
                 #{data})
     </insert>
 
-    <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo">
+    <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
         INSERT INTO `process_matrix_form_component` (
             `form_version_uuid`,
             `matrix_uuid`,

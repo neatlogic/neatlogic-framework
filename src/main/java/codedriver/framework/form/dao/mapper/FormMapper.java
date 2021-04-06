@@ -8,7 +8,7 @@ package codedriver.framework.form.dao.mapper;
 import java.util.List;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo;
+import codedriver.framework.form.dto.ProcessMatrixFormComponentVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 

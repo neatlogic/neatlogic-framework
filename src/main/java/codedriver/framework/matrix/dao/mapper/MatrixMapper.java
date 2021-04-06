@@ -4,7 +4,6 @@ import java.util.List;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.matrix.dto.MatrixVo;
-import codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo;
 
 public interface MatrixMapper {
     public int insertMatrix(MatrixVo matrixVo);

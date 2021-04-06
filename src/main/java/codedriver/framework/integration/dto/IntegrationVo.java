@@ -37,6 +37,8 @@ public class IntegrationVo extends BasePageVo {
 	private List<PatternVo> outputPatternList = new ArrayList<>();
 	@EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
 	private JSONObject config;
+	@EntityField(name = "被引用次数", type = ApiParamType.INTEGER)
+	private int referenceCount;
 	// 请求参数
 	@JSONField(serialize = false)
 	private transient JSONObject paramObj = new JSONObject();
@@ -131,6 +133,14 @@ public class IntegrationVo extends BasePageVo {
 
 	public JSONObject getConfig() {
 		return config;
+	}
+
+	public int getReferenceCount() {
+		return referenceCount;
+	}
+
+	public void setReferenceCount(int referenceCount) {
+		this.referenceCount = referenceCount;
 	}
 
 	public JSONObject getParamObj() {

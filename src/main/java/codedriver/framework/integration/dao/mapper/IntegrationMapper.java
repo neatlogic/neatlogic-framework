@@ -17,6 +17,8 @@ public interface IntegrationMapper {
 
 	public IntegrationVo getIntegrationByUuid(String uuid);
 
+	public int checkIntegrationExists(String uuid);
+
 	public List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);
 
 	public List<ValueTextVo> searchIntegrationForSelect(IntegrationVo integrationVo);

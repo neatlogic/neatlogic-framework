@@ -9,6 +9,14 @@ public class MatrixExternalVo {
     private String matrixUuid;
     private String integrationUuid;
 
+    public MatrixExternalVo() {
+    }
+
+    public MatrixExternalVo(String matrixUuid, String integrationUuid) {
+        this.matrixUuid = matrixUuid;
+        this.integrationUuid = integrationUuid;
+    }
+
     public String getMatrixUuid() {
         return matrixUuid;
     }

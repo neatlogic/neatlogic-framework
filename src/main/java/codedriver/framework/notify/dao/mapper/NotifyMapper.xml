@@ -68,32 +68,6 @@
 	</if>
 	</select>
 
-	<!--<select id="getNotifyPolicyInvokerList" parameterType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo" resultType="codedriver.framework.notify.dto.NotifyPolicyInvokerVo">
-	SELECT 
-	  `policy_id` AS policyId,
-	  `invoker`,
-	  `config` 
-	FROM `notify_policy_invoke` 
-	<where>
-		<if test="policyId != null">
-			AND `policy_id` = #{policyId}
-		</if>
-		<if test="invoker != null and invoker != ''">
-			AND `invoker` = #{invoker}
-		</if>
-	</where> 
-	<if test="needPage">
-	LIMIT #{startNum}, #{pageSize}
-	</if>
-	</select>-->
-	
-	<!--<select id="getNotifyPolicyInvokerCountByInvoker" parameterType="java.lang.String" resultType="int">
-	SELECT 
-	  COUNT(1)
-	FROM `notify_policy_invoke` 
-	WHERE `invoker` = #{invoker}
-	</select>-->
-
 	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
 	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
 	</select>

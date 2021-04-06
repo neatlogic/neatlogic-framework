@@ -28,10 +28,6 @@ public interface WorktimeMapper {
 
     public List<ValueTextVo> searchWorktimeListForSelect(WorktimeVo worktimeVo);
 
-//    public int checkWorktimeHasBeenRelatedByChannel(String uuid);
-
-//    public int checkWorktimeHasBeenRelatedByTask(String uuid);
-
     public List<WorktimeRangeVo> getWorktimeRangeListByWorktimeUuid(String worktimeUuid);
 
     public List<String> getWorktimeDateList(WorktimeRangeVo worktimeRangeVo);

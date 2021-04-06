@@ -3,7 +3,6 @@ package codedriver.framework.notify.dao.mapper;
 import java.util.List;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.notify.dto.NotifyPolicyInvokerVo;
 import codedriver.framework.notify.dto.NotifyPolicyVo;
 
 public interface NotifyMapper {
@@ -17,10 +16,6 @@ public interface NotifyMapper {
 	public List<ValueTextVo> getNotifyPolicyListForSelect(NotifyPolicyVo notifyPolicyVo);
 
 	public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
-
-//	public List<NotifyPolicyInvokerVo> getNotifyPolicyInvokerList(NotifyPolicyInvokerVo notifyPolicyInvokerVo);
-//
-//	public int getNotifyPolicyInvokerCountByInvoker(String invoker);
 
 	public int checkNotifyPolicyIsExists(Long policyId);
 

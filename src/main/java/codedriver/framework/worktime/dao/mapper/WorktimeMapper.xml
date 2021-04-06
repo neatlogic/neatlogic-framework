@@ -97,20 +97,6 @@
 		</if>
 	</select>
 
-<!--	<select id="checkWorktimeHasBeenRelatedByChannel" parameterType="java.lang.String" resultType="int">-->
-<!--		select-->
-<!--		count(`channel_uuid`)-->
-<!--		from `channel_worktime`-->
-<!--		where `worktime_uuid` = #{value}-->
-<!--	</select>-->
-
-<!--	<select id="checkWorktimeHasBeenRelatedByTask" parameterType="java.lang.String" resultType="int">-->
-<!--		select-->
-<!--		count(`id`)-->
-<!--		from `processtask`-->
-<!--		where `worktime_uuid` = #{value}-->
-<!--	</select>-->
-
 	<resultMap type="codedriver.framework.worktime.dto.WorktimeRangeVo" id="worktimeRangeMap">
 		<result column="year" property="year" />
 		<result column="date" property="date" />

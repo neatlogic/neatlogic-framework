@@ -7,11 +7,22 @@ package codedriver.framework.dependency.core;
 
 /**
  * 被调用者类型接口
+ *
  * @author: linbq
  * @since: 2021/4/2 10:29
  **/
 public interface ICalleeType {
+    /**
+     * 被调用者类型值
+     *
+     * @return
+     */
     public String getValue();
 
+    /**
+     * 被调用者类型名
+     *
+     * @return
+     */
     public String getText();
 }

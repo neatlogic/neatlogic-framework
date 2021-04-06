@@ -9,6 +9,7 @@ import codedriver.framework.dependency.core.ICalleeType;
 
 /**
  * 被调用者类型
+ *
  * @author: linbq
  * @since: 2021/4/2 10:30
  **/
@@ -27,11 +28,21 @@ public enum CalleeType implements ICalleeType {
         this.text = text;
     }
 
+    /**
+     * 被调用者类型值
+     *
+     * @return
+     */
     @Override
     public String getValue() {
         return value;
     }
 
+    /**
+     * 被调用者类型名
+     *
+     * @return
+     */
     @Override
     public String getText() {
         return text;

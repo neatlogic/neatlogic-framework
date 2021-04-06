@@ -16,6 +16,8 @@ import codedriver.framework.matrix.dto.MatrixVo;
 import javax.annotation.Resource;
 
 /**
+ * 矩阵引用集成处理器
+ *
  * @author: linbq
  * @since: 2021/4/6 15:21
  **/
@@ -55,19 +57,21 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
     }
 
     /**
-     * 解析数据，拼装跳转url
+     * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
-     * @param caller
+     * @param caller 调用者值
      * @return
      */
     @Override
     protected ValueTextVo parse(Object caller) {
-        MatrixVo matrixVo = matrixMapper.getMatrixByUuid((String) caller);
-        if(matrixVo != null){
-            ValueTextVo valueTextVo = new ValueTextVo();
-            valueTextVo.setValue(caller);
-            valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-edit?uuid=%s&name=%s&type=%s\">%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
-            return valueTextVo;
+        if (caller instanceof String) {
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid((String) caller);
+            if (matrixVo != null) {
+                ValueTextVo valueTextVo = new ValueTextVo();
+                valueTextVo.setValue(caller);
+                valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-edit?uuid=%s&name=%s&type=%s\">%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
+                return valueTextVo;
+            }
         }
         return null;
     }

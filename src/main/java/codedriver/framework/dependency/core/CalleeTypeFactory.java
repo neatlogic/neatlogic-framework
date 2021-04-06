@@ -13,6 +13,7 @@ import java.util.Set;
 
 /**
  * 被调用者类型工厂
+ *
  * @author: linbq
  * @since: 2021/4/2 11:37
  **/
@@ -26,6 +27,11 @@ public class CalleeTypeFactory {
 
     private static String allCalleeTypeToString;
 
+    /**
+     * 获取ICalleeType接口所有实现枚举类集合
+     *
+     * @return
+     */
     public static Set<ICalleeType> getCalleeTypeSet() {
         if (isUninitialized) {
             synchronized (CalleeTypeFactory.class) {
@@ -44,6 +50,12 @@ public class CalleeTypeFactory {
         return set;
     }
 
+    /**
+     * 通过_value值查询对应的枚举类
+     *
+     * @param _value
+     * @return
+     */
     public static ICalleeType getCalleeType(String _value) {
         for (ICalleeType type : getCalleeTypeSet()) {
             if (type.getValue().equals(_value)) {
@@ -53,6 +65,11 @@ public class CalleeTypeFactory {
         return null;
     }
 
+    /**
+     * 用于用户传入错误数据访问接口时，提示calleeType参数的所有可选值
+     *
+     * @return 返回ICalleeType接口所有实现枚举类集合的数据信息
+     */
     public static String getAllCalleeTypeToString() {
         if (StringUtils.isBlank(allCalleeTypeToString)) {
             StringBuilder stringBuilder = new StringBuilder();

@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * 依赖关系处理器基类
+ *
  * @author: linbq
  * @since: 2021/4/1 11:43
  **/
@@ -47,16 +48,37 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     protected abstract String getCallerField();
 
+    /**
+     * 插入一条引用关系数据
+     *
+     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param caller 调用者值（如：服务uuid）
+     * @return
+     */
     @Override
     public int insert(Object callee, Object caller) {
         return dependencyMapper.insertDependency(getTableName(), getCalleeField(), getCallerField(), callee, caller);
     }
 
+    /**
+     * 删除引用关系
+     *
+     * @param caller 调用者值（如：服务uuid）
+     * @return
+     */
     @Override
     public int delete(Object caller) {
         return dependencyMapper.deleteDependencyByCaller(getTableName(), getCallerField(), caller);
     }
 
+    /**
+     * 查询引用列表数据
+     *
+     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param startNum 开始行号
+     * @param pageSize 每页条数
+     * @return
+     */
     @Override
     public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize) {
         List<ValueTextVo> resultList = new ArrayList<>();
@@ -70,18 +92,24 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
         return resultList;
     }
 
+    /**
+     * 查询引用次数
+     *
+     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @return
+     */
     @Override
     public int getCallerCount(Object callee) {
-        if(canBeLifted()){
+        if (canBeLifted()) {
             return dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
         }
         return 0;
     }
 
     /**
-     * 解析数据，拼装跳转url
+     * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
-     * @param caller
+     * @param caller 调用者值
      * @return
      */
     protected abstract ValueTextVo parse(Object caller);

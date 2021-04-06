@@ -64,6 +64,7 @@ public class DependencyHandlerFactory extends ApplicationListenerBase {
         Map<String, IDependencyHandler> myMap = context.getBeansOfType(IDependencyHandler.class);
         for (Map.Entry<String, IDependencyHandler> entry : myMap.entrySet()) {
             IDependencyHandler component = entry.getValue();
+            System.out.println(component.getHandler());
             componentMap.put(component.getHandler(), component);
             calleeHandlerListMap.computeIfAbsent(component.getCalleeType(), k -> new ArrayList<>()).add(component);
         }

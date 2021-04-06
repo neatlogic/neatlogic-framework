@@ -12,6 +12,7 @@ import codedriver.framework.dependency.core.DependencyHandlerBase;
 import codedriver.framework.dependency.core.ICalleeType;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixVo;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
  * @author: linbq
  * @since: 2021/4/6 15:21
  **/
+@Service
 public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
 
     @Resource

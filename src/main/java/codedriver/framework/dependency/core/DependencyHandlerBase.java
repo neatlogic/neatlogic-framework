@@ -74,7 +74,7 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
     /**
      * 查询引用列表数据
      *
-     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param callee   被调用者值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 每页条数
      * @return
@@ -100,10 +100,7 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int getCallerCount(Object callee) {
-        if (canBeLifted()) {
-            return dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
-        }
-        return 0;
+        return dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
     }
 
     /**

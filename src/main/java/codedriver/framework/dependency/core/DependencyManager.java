@@ -120,10 +120,9 @@ public class DependencyManager {
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(calleeType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
             for (IDependencyHandler handler : dependencyHandlerList) {
-                if (handler.canBeLifted() != canBeLifted) {
-                    continue;
+                if (handler.canBeLifted() == canBeLifted) {
+                    sum += handler.getCallerCount(callee);
                 }
-                sum += handler.getCallerCount(callee);
             }
         }
         return sum;

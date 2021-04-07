@@ -53,8 +53,8 @@ public class WorktimeVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private transient String keyword;
 
-    @EntityField(name = "被服务引用的次数", type = ApiParamType.INTEGER)
-    private Integer relCount;
+    @EntityField(name = "被引用的次数", type = ApiParamType.INTEGER)
+    private int referenceCount;
 
     @EntityField(name = "是否已经被删除", type = ApiParamType.INTEGER)
     private Integer isDelete;
@@ -134,12 +134,12 @@ public class WorktimeVo extends BasePageVo implements Serializable {
         this.workingHoursSet = workingHoursSet;
     }
 
-    public Integer getRelCount() {
-        return relCount;
+    public int getReferenceCount() {
+        return referenceCount;
     }
 
-    public void setRelCount(Integer relCount) {
-        this.relCount = relCount;
+    public void setReferenceCount(int referenceCount) {
+        this.referenceCount = referenceCount;
     }
 
     public Integer getIsDelete() {

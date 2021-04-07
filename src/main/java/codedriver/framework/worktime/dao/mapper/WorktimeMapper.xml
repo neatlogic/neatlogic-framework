@@ -64,8 +64,7 @@
 		wt.`uuid`,
 		wt.`name`,
 		wt.`is_active`,
-		wt.`config`,
-		(select count(`channel_uuid`) from `channel_worktime` where `worktime_uuid` = wt.`uuid`) as relCount
+		wt.`config`
 		FROM `worktime` wt
 		WHERE `is_delete` = 0
 		<if test="keyword != null and keyword != ''">
@@ -96,20 +95,6 @@
 		<if test="needPage">
 			limit #{startNum}, #{pageSize}
 		</if>
-	</select>
-
-	<select id="checkWorktimeHasBeenRelatedByChannel" parameterType="java.lang.String" resultType="int">
-		select
-		count(`channel_uuid`)
-		from `channel_worktime`
-		where `worktime_uuid` = #{value}
-	</select>
-
-	<select id="checkWorktimeHasBeenRelatedByTask" parameterType="java.lang.String" resultType="int">
-		select
-		count(`id`)
-		from `processtask`
-		where `worktime_uuid` = #{value}
 	</select>
 
 	<resultMap type="codedriver.framework.worktime.dto.WorktimeRangeVo" id="worktimeRangeMap">

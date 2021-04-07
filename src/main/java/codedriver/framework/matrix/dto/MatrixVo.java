@@ -13,7 +13,6 @@ import codedriver.framework.restful.annotation.EntityField;
  * @create: 2020-03-26 18:59
  **/
 public class MatrixVo extends BaseEditorVo {
-    private String keyword;
     @EntityField( name = "自增ID", type = ApiParamType.LONG)
     private Long id;
     @EntityField( name = "唯一主键uuid", type = ApiParamType.STRING)
@@ -26,23 +25,8 @@ public class MatrixVo extends BaseEditorVo {
     private String type;
     @EntityField( name = "类型名称", type = ApiParamType.STRING)
     private String typeName;
-//    @EntityField( name = "创建人",  type = ApiParamType.STRING)
-//    private String fcu;
-//    @EntityField( name = "创建时间",  type = ApiParamType.LONG)
-//    private Date fcd;
-//    @EntityField( name = "修改人",  type = ApiParamType.STRING)
-//    private String lcu;
-//    @EntityField(name = "修改时间", type = ApiParamType.LONG)
-//    private Date lcd;
-
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
+    @EntityField( name = "被引用次数", type = ApiParamType.INTEGER)
+    private int referenceCount;
 
     public Long getId() {
         return id;
@@ -84,37 +68,6 @@ public class MatrixVo extends BaseEditorVo {
         this.type = type;
     }
 
-//    public String getFcu() {
-//        return fcu;
-//    }
-//
-//    public void setFcu(String fcu) {
-//        this.fcu = fcu;
-//    }
-//
-//    public Date getFcd() {
-//		return fcd;
-//	}
-//
-//	public void setFcd(Date fcd) {
-//		this.fcd = fcd;
-//	}
-//
-//	public Date getLcd() {
-//		return lcd;
-//	}
-//
-//	public void setLcd(Date lcd) {
-//		this.lcd = lcd;
-//	}
-//
-//	public String getLcu() {
-//        return lcu;
-//    }
-//
-//    public void setLcu(String lcu) {
-//        this.lcu = lcu;
-//    }
 
     public String getTypeName() {
         if (StringUtils.isNotBlank(type)){
@@ -127,4 +80,11 @@ public class MatrixVo extends BaseEditorVo {
         this.typeName = typeName;
     }
 
+    public int getReferenceCount() {
+        return referenceCount;
+    }
+
+    public void setReferenceCount(int referenceCount) {
+        this.referenceCount = referenceCount;
+    }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.matrix.dto.MatrixVo;
-import codedriver.framework.matrix.dto.ProcessMatrixFormComponentVo;
 
 public interface MatrixMapper {
     public int insertMatrix(MatrixVo matrixVo);
@@ -25,11 +24,7 @@ public interface MatrixMapper {
 
     public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
 
-    public List<ProcessMatrixFormComponentVo> getMatrixFormComponentByMatrixUuid(String matrixUuid);
-
     public int deleteMatrixByUuid(String uuid);
 
     public int updateMatrixNameAndLcu(MatrixVo matrixVo);
-
-    public int insertMatrixFormComponent(ProcessMatrixFormComponentVo componentVo);
 }

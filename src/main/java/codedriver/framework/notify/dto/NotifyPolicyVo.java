@@ -27,8 +27,8 @@ public class NotifyPolicyVo extends BaseEditorVo {
     private String action;
     @EntityField(name = "操作类型名，创建|修改", type = ApiParamType.STRING)
     private String actionName;
-    @EntityField(name = "引用数量", type = ApiParamType.INTEGER)
-    private int invokerCount;
+    @EntityField(name = "被引用次数", type = ApiParamType.INTEGER)
+    private int referenceCount;
     @EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
     private NotifyPolicyConfigVo config;
     @EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
@@ -122,12 +122,12 @@ public class NotifyPolicyVo extends BaseEditorVo {
         this.actionName = actionName;
     }
 
-    public int getInvokerCount() {
-        return invokerCount;
+    public int getReferenceCount() {
+        return referenceCount;
     }
 
-    public void setInvokerCount(int invokerCount) {
-        this.invokerCount = invokerCount;
+    public void setReferenceCount(int referenceCount) {
+        this.referenceCount = referenceCount;
     }
 
     public NotifyPolicyConfigVo getConfig() {

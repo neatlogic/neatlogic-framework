@@ -168,29 +168,40 @@
         </if>
     </select>
 
-    <select id="getFormAttributeListByChannelUuidList" parameterType="java.util.List"
+    <select id="getFormAttributeListByFormUuidList" parameterType="java.util.List"
             resultType="codedriver.framework.form.dto.FormAttributeVo">
         SELECT
-        fa.`form_uuid` AS formUuid,
-        fa.`formversion_uuid` AS formversionUuid,
-        fa.`uuid`,
-        fa.`label`,
-        fa.`type`,
-        fa.`handler`,
-        fa.`config`,
-        fa.`data`
-        FROM `channel_process` cp
-        JOIN `process_form` pf ON cp.`process_uuid` = pf.`process_uuid`
-        JOIN `form_version` fv ON pf.`form_uuid` = fv.`form_uuid` AND fv.`is_active` =1
-        JOIN `form_attribute` fa ON fv.`form_uuid` = fa.`form_uuid` AND fv.`uuid` = fa.`formversion_uuid`
-        <where>
-            cp.`channel_uuid` IN
-            <if test="channelUuidList != null and channelUuidList.size() > 0 ">
-                <foreach collection="channelUuidList" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-        </where>
+        b.`form_uuid` AS formUuid,
+        b.`formversion_uuid` AS formversionUuid,
+        b.`uuid`,
+        b.`label`,
+        b.`type`,
+        b.`handler`,
+        b.`config`,
+        b.`data`
+        FROM `form_version` a
+        JOIN `form_attribute` b ON b.`form_uuid` = a.`form_uuid` AND a.`uuid` = b.`formversion_uuid`
+        WHERE a.`is_active` = 1
+        AND a.`form_uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getMatrixFormComponentByMatrixUuid" resultType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
+        select
+            a.`matrix_uuid` AS matrixUuid,
+            a.`form_version_uuid` AS formVersionUuid,
+            a.`form_attribute_label` AS formAttributeLabel,
+            a.`form_attribute_uuid` AS formAttributeUuid,
+            b.`version`,
+            c.`uuid` AS formUuid,
+            c.`name` AS formName
+        FROM `process_matrix_form_component` a
+        LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+        LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
+        WHERE a.`matrix_uuid` = #{matrixUuid}
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <update id="updateFormVersion" parameterType="codedriver.framework.form.dto.FormVersionVo">
@@ -273,6 +284,20 @@
                 #{data})
     </insert>
 
+    <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
+        INSERT INTO `process_matrix_form_component` (
+            `form_version_uuid`,
+            `matrix_uuid`,
+            `form_attribute_uuid`,
+            `form_attribute_label`
+        ) VALUES (
+                     #{formVersionUuid},
+                     #{matrixUuid},
+                     #{formAttributeUuid},
+                     #{formAttributeLabel}
+                 )
+    </insert>
+
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_attribute`
@@ -288,12 +313,6 @@
     <delete id="deleteFormVersionByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_version`
-        WHERE `form_uuid` = #{formUuid}
-    </delete>
-
-    <delete id="deleteProcessFormByFormUuid" parameterType="java.lang.String">
-        DELETE
-        FROM `process_form`
         WHERE `form_uuid` = #{formUuid}
     </delete>
 

@@ -71,7 +71,7 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
             if (matrixVo != null) {
                 ValueTextVo valueTextVo = new ValueTextVo();
                 valueTextVo.setValue(caller);
-                valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-edit?uuid=%s&name=%s&type=%s\">%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
+                valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
                 return valueTextVo;
             }
         }

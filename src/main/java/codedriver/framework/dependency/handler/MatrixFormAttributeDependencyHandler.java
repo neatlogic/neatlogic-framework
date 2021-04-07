@@ -75,7 +75,7 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
             ProcessMatrixFormComponentVo processMatrixFormComponentVo = (ProcessMatrixFormComponentVo) caller;
             ValueTextVo valueTextVo = new ValueTextVo();
             valueTextVo.setValue(processMatrixFormComponentVo.getFormAttributeUuid());
-            String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\">%s</a>",
+            String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
                     TenantContext.get().getTenantUuid(),
                     processMatrixFormComponentVo.getFormUuid(),
                     processMatrixFormComponentVo.getFormVersionUuid(),

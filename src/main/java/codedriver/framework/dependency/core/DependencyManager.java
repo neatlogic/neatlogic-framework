@@ -56,23 +56,15 @@ public class DependencyManager {
      */
     public static int delete(Class<? extends IDependencyHandler> clazz, Object caller) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
-        return dependencyHandler.delete(caller);
-    }
-
-    /**
-     * 删除引用关系
-     *
-     * @param clazz      引用关系处理器类
-     * @param callerList 调用者值列表
-     * @return
-     */
-    public static int delete(Class<? extends IDependencyHandler> clazz, List<Object> callerList) {
-        IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
-        int sum = 0;
-        for (Object caller : callerList) {
-            sum += dependencyHandler.delete(caller);
+        if (caller instanceof List) {
+            int sum = 0;
+            for (Object c : (List) caller) {
+                sum += dependencyHandler.delete(c);
+            }
+            return sum;
+        } else {
+            return dependencyHandler.delete(caller);
         }
-        return sum;
     }
 
     /**

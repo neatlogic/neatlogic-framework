@@ -29,7 +29,7 @@ public interface DependencyMapper {
             @Param("calleeField") String calleeField,
             @Param("callee") Object callee);
 
-    public int insertDependency(
+    public int insertIgnoreDependency(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callerField") String callerField,

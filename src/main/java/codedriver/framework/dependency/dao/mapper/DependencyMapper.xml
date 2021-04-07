@@ -19,8 +19,8 @@
         WHERE `${calleeField}` = #{callee}
     </select>
 
-    <insert id="insertDependency">
-        INSERT INTO `${tableName}` (`${callerField}`, `${calleeField}`)
+    <insert id="insertIgnoreDependency">
+        INSERT IGNORE INTO `${tableName}` (`${callerField}`, `${calleeField}`)
         VALUES (#{caller}, #{callee})
     </insert>
 

@@ -57,7 +57,7 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int insert(Object callee, Object caller) {
-        return dependencyMapper.insertDependency(getTableName(), getCalleeField(), getCallerField(), callee, caller);
+        return dependencyMapper.insertIgnoreDependency(getTableName(), getCalleeField(), getCallerField(), callee, caller);
     }
 
     /**

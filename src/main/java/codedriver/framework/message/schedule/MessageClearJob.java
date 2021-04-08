@@ -71,7 +71,7 @@ public class MessageClearJob extends JobBase {
         /** 删除message和message_user表数据 **/
         messageId = getMaxnMessageId(Config.HISTORY_MESSAGE_EXPIRED_DAY());
         if(messageId != null){
-            messageMapper.deleteMessageUserByLessThanOrEqualMessageId();
+            messageMapper.deleteMessageUserByLessThanOrEqualMessageId(messageId);
             messageMapper.deleteMessageByLessThanOrEqualId(messageId);
         }
     }

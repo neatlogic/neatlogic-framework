@@ -85,7 +85,7 @@ public interface MessageMapper {
 
     public int deleteMessageRecipientByLessThanOrEqualMessageId(Long messageId);
 
-    public int deleteMessageUserByLessThanOrEqualMessageId();
+    public int deleteMessageUserByLessThanOrEqualMessageId(Long messageId);
 
     public int deleteMessageByLessThanOrEqualId(Long messageId);
 }

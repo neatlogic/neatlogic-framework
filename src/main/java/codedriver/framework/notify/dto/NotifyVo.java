@@ -145,6 +145,10 @@ public class NotifyVo {
         private String notifyPolicyHandler;
         private Date fcd = new Date();
 
+        public Builder(INotifyTriggerType _triggerType) {
+            this.triggerType = _triggerType;
+        }
+
         public Builder(INotifyTriggerType _triggerType, Class<? extends IMessageHandler> _messageHandlerClass) {
             this.triggerType = _triggerType;
             this.messageHandlerClass = _messageHandlerClass;

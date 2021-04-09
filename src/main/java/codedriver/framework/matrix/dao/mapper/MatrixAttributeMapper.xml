@@ -10,7 +10,7 @@
                `is_required` AS isRequired,
                `sort`,
                `config`
-        FROM `process_matrix_attribute`
+        FROM `matrix_attribute`
         WHERE `matrix_uuid` = #{matrixUuid}
         ORDER BY `sort`
     </select>
@@ -24,12 +24,12 @@
 
     <delete id="deleteAttributeByMatrixUuid" parameterType="string">
         DELETE
-        FROM `process_matrix_attribute`
+        FROM `matrix_attribute`
         WHERE `matrix_uuid` = #{matrixUuid}
     </delete>
 
     <insert id="insertMatrixAttribute" parameterType="codedriver.framework.matrix.dto.MatrixAttributeVo">
-        INSERT INTO `process_matrix_attribute` (`matrix_uuid`,
+        INSERT INTO `matrix_attribute` (`matrix_uuid`,
                                                 `uuid`,
                                                 `name`,
                                                 `type`,

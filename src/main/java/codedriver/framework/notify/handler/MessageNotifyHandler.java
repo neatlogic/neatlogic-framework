@@ -30,11 +30,11 @@ public class MessageNotifyHandler extends NotifyHandlerBase {
 
     @Override
     public String getName() {
-        return NotifyHandlerType.REMIND.getText();
+        return NotifyHandlerType.MESSAGE.getText();
     }
 
     @Override
     public String getType() {
-        return NotifyHandlerType.REMIND.getValue();
+        return NotifyHandlerType.MESSAGE.getValue();
     }
 }

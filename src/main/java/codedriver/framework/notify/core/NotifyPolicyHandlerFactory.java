@@ -104,8 +104,23 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
         Map<String, INotifyPolicyHandler> map = context.getBeansOfType(INotifyPolicyHandler.class);
         for (Entry<String, INotifyPolicyHandler> entry : map.entrySet()) {
             INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
-            notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
-            notifyPolicyHandlerList.add(new ValueTextVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+            if(notifyPolicyHandler.isPublic()){
+                notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
+                notifyPolicyHandlerList.add(new ValueTextVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+
+                INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
+                if (notifyPolicyHandlerGroup == null) {
+                    notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+                } else {
+                    NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
+                    if (notifyPolicyGroupTreeVo == null) {
+                        notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
+                        notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
+                        notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
+                    }
+                    notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+                }
+            }
 
             NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
             List<NotifyTreeVo> children = new ArrayList<>();
@@ -123,19 +138,6 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
                 moduleTreeVoList.add(parentTreeVo);
             }
             parentTreeVo.addChildren(treeVo);
-
-            INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
-            if (notifyPolicyHandlerGroup == null) {
-                notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-            } else {
-                NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
-                if (notifyPolicyGroupTreeVo == null) {
-                    notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
-                    notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
-                    notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
-                }
-                notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-            }
         }
     }
 

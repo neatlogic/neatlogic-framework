@@ -11,7 +11,7 @@ import codedriver.framework.dependency.constvalue.CalleeType;
 import codedriver.framework.dependency.core.DependencyHandlerBase;
 import codedriver.framework.dependency.core.ICalleeType;
 import codedriver.framework.form.dao.mapper.FormMapper;
-import codedriver.framework.form.dto.ProcessMatrixFormComponentVo;
+import codedriver.framework.form.dto.FormAttributeMatrixVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,7 +37,7 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
      */
     @Override
     protected String getTableName() {
-        return "matrix_form_component";
+        return "form_attribute_matrix";
     }
 
     /**
@@ -71,15 +71,15 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
         if (caller == null) {
             return null;
         }
-        if (caller instanceof ProcessMatrixFormComponentVo) {
-            ProcessMatrixFormComponentVo processMatrixFormComponentVo = (ProcessMatrixFormComponentVo) caller;
+        if (caller instanceof FormAttributeMatrixVo) {
+            FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) caller;
             ValueTextVo valueTextVo = new ValueTextVo();
-            valueTextVo.setValue(processMatrixFormComponentVo.getFormAttributeUuid());
+            valueTextVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());
             String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
                     TenantContext.get().getTenantUuid(),
-                    processMatrixFormComponentVo.getFormUuid(),
-                    processMatrixFormComponentVo.getFormVersionUuid(),
-                    processMatrixFormComponentVo.getFormName() + "-" + processMatrixFormComponentVo.getVersion() + "-" + processMatrixFormComponentVo.getFormAttributeLabel());
+                    formAttributeMatrixVo.getFormUuid(),
+                    formAttributeMatrixVo.getFormVersionUuid(),
+                    formAttributeMatrixVo.getFormName() + "-" + formAttributeMatrixVo.getVersion() + "-" + formAttributeMatrixVo.getFormAttributeLabel());
             valueTextVo.setText(text);
             return valueTextVo;
         }
@@ -107,8 +107,8 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
     @Override
     public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize) {
         List<ValueTextVo> resultList = new ArrayList<>();
-        List<ProcessMatrixFormComponentVo> callerList = formMapper.getMatrixFormComponentByMatrixUuid((String) callee, startNum, pageSize);
-        for (ProcessMatrixFormComponentVo caller : callerList) {
+        List<FormAttributeMatrixVo> callerList = formMapper.getFormAttributeMatrixByMatrixUuid((String) callee, startNum, pageSize);
+        for (FormAttributeMatrixVo caller : callerList) {
             ValueTextVo valueTextVo = parse(caller);
             if (valueTextVo != null) {
                 resultList.add(valueTextVo);

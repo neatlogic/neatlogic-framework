@@ -188,7 +188,7 @@
         </foreach>
     </select>
 
-    <select id="getMatrixFormComponentByMatrixUuid" resultType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
+    <select id="getFormAttributeMatrixByMatrixUuid" resultType="codedriver.framework.form.dto.FormAttributeMatrixVo">
         select
             a.`matrix_uuid` AS matrixUuid,
             a.`form_version_uuid` AS formVersionUuid,
@@ -197,7 +197,7 @@
             b.`version`,
             c.`uuid` AS formUuid,
             c.`name` AS formName
-        FROM `matrix_form_component` a
+        FROM `form_attribute_matrix` a
         LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
         LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
         WHERE a.`matrix_uuid` = #{matrixUuid}
@@ -284,8 +284,8 @@
                 #{data})
     </insert>
 
-    <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
-        INSERT INTO `matrix_form_component` (
+    <insert id="insertFormAttributeMatrix" parameterType="codedriver.framework.form.dto.FormAttributeMatrixVo">
+        INSERT INTO `form_attribute_matrix` (
             `form_version_uuid`,
             `matrix_uuid`,
             `form_attribute_uuid`,
@@ -322,9 +322,9 @@
         WHERE `uuid` = #{uuid}
     </delete>
 
-    <delete id="deleteProcessMatrixFormComponentByFormVersionUuid" parameterType="java.lang.String">
+    <delete id="deleteFormAttributeMatrixByFormVersionUuid" parameterType="java.lang.String">
         DELETE
-        FROM `matrix_form_component`
+        FROM `form_attribute_matrix`
         WHERE `form_version_uuid` = #{formVersionUuid}
     </delete>
 </mapper>

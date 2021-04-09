@@ -10,7 +10,7 @@ package codedriver.framework.form.dto;
  * @description:
  * @create: 2020-03-27 15:57
  **/
-public class ProcessMatrixFormComponentVo {
+public class FormAttributeMatrixVo {
     private String matrixUuid;
     private String formVersionUuid;
     private String formAttributeUuid;

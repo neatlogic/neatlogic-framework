@@ -32,7 +32,7 @@ public class MessageHandlerVo implements Cloneable {
 
     private transient Date fcd;
     private transient String userUuid;
-
+    private transient boolean isPublic;
     public String getModuleId() {
         return moduleId;
     }
@@ -108,5 +108,13 @@ public class MessageHandlerVo implements Cloneable {
     @Override
     public MessageHandlerVo clone() throws CloneNotSupportedException {
         return (MessageHandlerVo) super.clone();
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }

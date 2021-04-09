@@ -58,7 +58,8 @@ public class MessageHandlerFactory extends ApplicationListenerBase {
             messageHandlerVo.setModuleId(context.getId());
             ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
             messageHandlerVo.setModuleName(moduleVo.getGroupName());
-            messageHandlerVo.setPopUp(PopUpType.CLOSE.getValue());
+            messageHandlerVo.setPopUp(messageHandler.getPopUp());
+            messageHandlerVo.setPublic(messageHandler.isPublic());
             messageHandlerVoList.add(messageHandlerVo);
         }
     }

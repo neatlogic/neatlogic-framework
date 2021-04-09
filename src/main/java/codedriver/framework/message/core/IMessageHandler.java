@@ -1,5 +1,6 @@
 package codedriver.framework.message.core;
 
+import codedriver.framework.message.constvalue.PopUpType;
 import codedriver.framework.notify.dto.NotifyVo;
 import org.springframework.util.ClassUtils;
 
@@ -70,4 +71,20 @@ public interface IMessageHandler {
      * @Returns:codedriver.framework.notify.dto.NotifyVo
      **/
     public NotifyVo compress(List<NotifyVo> notifyVoList);
+
+    /**
+     * 是否公开给用户修改配置，默认公开
+     * @return
+     */
+    public default boolean isPublic(){
+        return true;
+    }
+
+    /**
+     * 弹框方式，默认关闭
+     * @return
+     */
+    public default String getPopUp(){
+        return PopUpType.CLOSE.getValue();
+    }
 }

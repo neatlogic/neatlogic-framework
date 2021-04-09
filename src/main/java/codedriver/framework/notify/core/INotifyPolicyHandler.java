@@ -38,4 +38,12 @@ public interface INotifyPolicyHandler {
 	public String getAuthName();
 
 	public INotifyPolicyHandlerGroup getGroup();
+
+	/**
+	 * 是否公开，默认公开
+	 * @return
+	 */
+	public default boolean isPublic(){
+		return true;
+	}
 }

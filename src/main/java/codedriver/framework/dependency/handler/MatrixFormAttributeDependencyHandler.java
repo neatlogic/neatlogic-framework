@@ -37,7 +37,7 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
      */
     @Override
     protected String getTableName() {
-        return "process_matrix_form_component";
+        return "matrix_form_component";
     }
 
     /**

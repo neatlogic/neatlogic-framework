@@ -197,7 +197,7 @@
             b.`version`,
             c.`uuid` AS formUuid,
             c.`name` AS formName
-        FROM `process_matrix_form_component` a
+        FROM `matrix_form_component` a
         LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
         LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
         WHERE a.`matrix_uuid` = #{matrixUuid}
@@ -285,7 +285,7 @@
     </insert>
 
     <insert id="insertMatrixFormComponent" parameterType="codedriver.framework.form.dto.ProcessMatrixFormComponentVo">
-        INSERT INTO `process_matrix_form_component` (
+        INSERT INTO `matrix_form_component` (
             `form_version_uuid`,
             `matrix_uuid`,
             `form_attribute_uuid`,
@@ -324,7 +324,7 @@
 
     <delete id="deleteProcessMatrixFormComponentByFormVersionUuid" parameterType="java.lang.String">
         DELETE
-        FROM `process_matrix_form_component`
+        FROM `matrix_form_component`
         WHERE `form_version_uuid` = #{formVersionUuid}
     </delete>
 </mapper>

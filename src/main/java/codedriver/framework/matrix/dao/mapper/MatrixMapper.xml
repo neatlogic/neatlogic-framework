@@ -23,7 +23,7 @@
 		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
 			select LAST_INSERT_ID() as id
 		</selectKey>
-		INSERT INTO `process_matrix` (
+		INSERT INTO `matrix` (
 		`uuid`,
 		`name`,
 		`label`,
@@ -47,7 +47,7 @@
 	<select id="searchMatrixCount" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="int">
 		SELECT
 			COUNT(`uuid`)
-		FROM `process_matrix`
+		FROM `matrix`
 		<where>
 			<if test="type != null and type != ''">
 				AND `type` = #{type}
@@ -69,7 +69,7 @@
 		`fcd`,
 		`lcu`,
 		`lcd`
-		FROM `process_matrix`
+		FROM `matrix`
 		WHERE `uuid` = #{uuid}
 	</select>
 
@@ -77,7 +77,7 @@
 		SELECT
 		`uuid` as `value`,
 		`name` as `text`
-		FROM `process_matrix`
+		FROM `matrix`
 		WHERE `uuid` = #{uuid}
 	</select>
 
@@ -96,7 +96,7 @@
 			(SELECT u.`pinyin` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuPinyin,
 			(SELECT u.`vip_level` from `user` u WHERE u.`uuid` = a.`lcu`) AS lcuVipLevel,
 			a.`lcd`
-			FROM `process_matrix` a
+			FROM `matrix` a
 			<where>
 				<if test="type != null and type != ''">
 					AND a.`type` = #{type}
@@ -115,7 +115,7 @@
 		SELECT
 		`uuid` as `value`,
 		`name` as `text`
-		FROM `process_matrix`
+		FROM `matrix`
 		<where>
 			<if test="type != null and type != ''">
 				AND `type` = #{type}
@@ -131,19 +131,19 @@
 	</select>
 	
 	<select id="checkMatrixIsExists" parameterType="java.lang.String" resultType="int">
-	SELECT COUNT(`uuid`) FROM `process_matrix` WHERE `uuid` = #{uuid}
+	SELECT COUNT(`uuid`) FROM `matrix` WHERE `uuid` = #{uuid}
 	</select>
 	
 	<select id="checkMatrixNameIsRepeat" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="int">
-	SELECT COUNT(1) FROM `process_matrix` WHERE `name` = #{name} AND `uuid` != #{uuid}
+	SELECT COUNT(1) FROM `matrix` WHERE `name` = #{name} AND `uuid` != #{uuid}
 	</select>
 
 	<select id="checkMatrixLabelIsRepeat" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="int">
-	SELECT COUNT(1) FROM `process_matrix` WHERE `label` = #{label} AND `uuid` != #{uuid}
+	SELECT COUNT(1) FROM `matrix` WHERE `label` = #{label} AND `uuid` != #{uuid}
 	</select>
 	
 	<update id="updateMatrixNameAndLcu" parameterType="codedriver.framework.matrix.dto.MatrixVo">
-		UPDATE `process_matrix` SET
+		UPDATE `matrix` SET
 		 `name` = #{name},
 		 `lcu` = #{lcu},
 		 `lcd` = NOW(3)
@@ -151,6 +151,6 @@
 	</update>
 
 	<delete id="deleteMatrixByUuid" parameterType="string">
-		DELETE FROM `process_matrix` WHERE `uuid` = #{uuid}
+		DELETE FROM `matrix` WHERE `uuid` = #{uuid}
 	</delete>
 </mapper>

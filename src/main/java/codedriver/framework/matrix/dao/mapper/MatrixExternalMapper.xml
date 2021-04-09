@@ -5,20 +5,20 @@
 		SELECT
 		`matrix_uuid` AS matrixUuid, 
 		`integration_uuid` AS integrationUuid
-		FROM `process_matrix_external` 
+		FROM `matrix_external`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
 	<select id="getMatrixExternalIsExists" parameterType="string" resultType="int">
 		SELECT
 		COUNT(`matrix_uuid`) 
-		FROM `process_matrix_external` 
+		FROM `matrix_external`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
 	<insert id="insertMatrixExternal" parameterType="codedriver.framework.matrix.dto.MatrixExternalVo">
 		INSERT INTO
-		`process_matrix_external`(
+		`matrix_external`(
 			`matrix_uuid`,
 			`integration_uuid`
 		) VALUES (
@@ -29,13 +29,13 @@
 	</insert>
 
 	<update id="updateMatrixExternal" parameterType="codedriver.framework.matrix.dto.MatrixExternalVo">
-		UPDATE `process_matrix_external` SET
+		UPDATE `matrix_external` SET
 		 `integration_uuid` = #{integrationUuid}
 		 WHERE `matrix_uuid` = #{matrixUuid}
 	</update>
 
 	<delete id="deleteMatrixExternalByMatrixUuid" parameterType="String">
-		DELETE FROM `process_matrix_external` WHERE `matrix_uuid` = #{matrixUuid}
+		DELETE FROM `matrix_external` WHERE `matrix_uuid` = #{matrixUuid}
 	</delete>
 
 

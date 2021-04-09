@@ -35,7 +35,7 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      */
     @Override
     protected String getTableName() {
-        return "process_matrix_external";
+        return "matrix_external";
     }
 
     /**

@@ -37,7 +37,7 @@ public class FormVersionVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private transient List<FormAttributeVo> formAttributeList;
     @JSONField(serialize = false)
-    private transient List<ProcessMatrixFormComponentVo> processMatrixFormComponentList;
+    private transient List<FormAttributeMatrixVo> processMatrixFormComponentList;
 
     public synchronized String getUuid() {
         if (StringUtils.isBlank(uuid)) {
@@ -132,7 +132,7 @@ public class FormVersionVo extends BasePageVo implements Serializable {
         this.formName = formName;
     }
 
-    public List<ProcessMatrixFormComponentVo> getProcessMatrixFormComponentList() {
+    public List<FormAttributeMatrixVo> getProcessMatrixFormComponentList() {
         if (processMatrixFormComponentList == null) {
             if (StringUtils.isNotBlank(this.formConfig)) {
                 JSONObject formConfigObj = JSONObject.parseObject(this.formConfig);
@@ -148,12 +148,12 @@ public class FormVersionVo extends BasePageVo implements Serializable {
                                 if (CollectionUtils.isNotEmpty(relMatrixUuidList)) {
                                     for (String matrixUuid : relMatrixUuidList) {
                                         if (StringUtils.isNotBlank(matrixUuid)) {
-                                            ProcessMatrixFormComponentVo processMatrixFormComponentVo = new ProcessMatrixFormComponentVo();
-                                            processMatrixFormComponentVo.setMatrixUuid(matrixUuid);
-                                            processMatrixFormComponentVo.setFormVersionUuid(getUuid());
-                                            processMatrixFormComponentVo.setFormAttributeLabel(controllerObj.getString("label"));
-                                            processMatrixFormComponentVo.setFormAttributeUuid(controllerObj.getString("uuid"));
-                                            processMatrixFormComponentList.add(processMatrixFormComponentVo);
+                                            FormAttributeMatrixVo formAttributeMatrixVo = new FormAttributeMatrixVo();
+                                            formAttributeMatrixVo.setMatrixUuid(matrixUuid);
+                                            formAttributeMatrixVo.setFormVersionUuid(getUuid());
+                                            formAttributeMatrixVo.setFormAttributeLabel(controllerObj.getString("label"));
+                                            formAttributeMatrixVo.setFormAttributeUuid(controllerObj.getString("uuid"));
+                                            processMatrixFormComponentList.add(formAttributeMatrixVo);
                                         }
                                     }
                                 }
@@ -166,7 +166,7 @@ public class FormVersionVo extends BasePageVo implements Serializable {
         return processMatrixFormComponentList;
     }
 
-    public void setProcessMatrixFormComponentList(List<ProcessMatrixFormComponentVo> processMatrixFormComponentList) {
+    public void setProcessMatrixFormComponentList(List<FormAttributeMatrixVo> processMatrixFormComponentList) {
         this.processMatrixFormComponentList = processMatrixFormComponentList;
     }
 

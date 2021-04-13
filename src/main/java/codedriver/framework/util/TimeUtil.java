@@ -722,12 +722,12 @@ public class TimeUtil {
 
     /**
      * 
-    * @Time:2020年9月14日
-    * @Description: 将毫秒转换换为最大单位显示文案
-    * @param milliseconds
+    * @since  2020年9月14日
+    * @description : 将毫秒转换换为最大单位显示文案
+    * @param milliseconds 毫秒数
     * @return String
      */
-    public static String millisecondsTranferMaxTimeUnit(long milliseconds) {
+    public static String millisecondsTransferMaxTimeUnit(long milliseconds) {
         if(milliseconds >= 24 * 60 * 60 * 1000) {
             return (milliseconds / (24 * 60 * 60 * 1000)) + " 天";
         }else if(milliseconds >= (60 * 60 * 1000)) {
@@ -742,11 +742,11 @@ public class TimeUtil {
     }
 
     /**
-     * @return
-     * @Author 89770
-     * @Time 2020年11月6日
-     * @Description: 根据前端date插件入参，获取startTime 和 endTime
-     * @Param
+     * @return 包含转化后的starttime 和 endtime
+     * @author lvzk
+     * @since  2020年11月6日
+     * @description 根据前端date插件入参，获取startTime 和 endTime
+     * @param dateConfig 前端date插件入参
      */
     public static JSONObject getStartTimeAndEndTimeByDateJson(JSONObject dateConfig) {
         JSONObject json = new JSONObject();

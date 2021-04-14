@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.web;
 
 import codedriver.framework.common.config.Config;
@@ -169,10 +174,16 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -218,14 +229,23 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -262,14 +282,23 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -306,19 +335,31 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -349,14 +390,23 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -392,19 +442,27 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -424,10 +482,16 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -450,10 +514,16 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
@@ -476,10 +546,16 @@ public class ApiDispatcher {
             doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {

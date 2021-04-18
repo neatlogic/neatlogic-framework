@@ -26,12 +26,52 @@ import java.util.concurrent.CountDownLatch;
 public class BatchRunner<T> {
     private final static Logger logger = LoggerFactory.getLogger(BatchRunner.class);
 
-    public void execute(List<T> itemList, int parallel, BatchJob<T> job) {
+    public static class State {
+        private boolean isSucceed = false;
+        private String error;
+
+        public boolean isSucceed() {
+            return isSucceed;
+        }
+
+        public void setSucceed(boolean succeed) {
+            isSucceed = succeed;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+    }
+
+    /**
+     * @param itemList 对象列表
+     * @param parallel 并发度（多少个线程）
+     * @param job      执行函数
+     */
+    public State execute(List<T> itemList, int parallel, BatchJob<T> job) {
+        return execute(itemList, parallel, false, job);
+    }
+
+    /**
+     * @param itemList        对象列表
+     * @param parallel        并发度（多少个线程）
+     * @param needTransaction 每个对象的执行过程是否需要启用事务
+     * @param job             执行函数
+     */
+    public State execute(List<T> itemList, int parallel, boolean needTransaction, BatchJob<T> job) {
+        State state = new State();
         if (CollectionUtils.isNotEmpty(itemList)) {
+            //状态默认是成功状态，任意线程出现异常则置为失败
+            state.setSucceed(true);
             parallel = Math.min(itemList.size(), parallel);
             CountDownLatch latch = new CountDownLatch(parallel);
+
             for (int i = 0; i < parallel; i++) {
-                Runner<T> runner = new Runner<>(i, parallel, itemList, job, latch);
+                Runner<T> runner = new Runner<>(i, parallel, needTransaction, itemList, job, latch, state);
                 CachedThreadPool.execute(runner);
             }
             try {
@@ -40,6 +80,7 @@ public class BatchRunner<T> {
                 logger.error(e.getMessage(), e);
             }
         }
+        return state;
     }
 
     static class Runner<T> extends CodeDriverThread {
@@ -48,26 +89,39 @@ public class BatchRunner<T> {
         List<T> itemList;
         BatchJob<T> job;
         CountDownLatch latch;
+        boolean needTransaction;
+        State state;
 
-        public Runner(int _index, int _parallel, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch) {
+        public Runner(int _index, int _parallel, boolean _needTransaction, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch, State _state) {
             index = _index;
             parallel = _parallel;
             itemList = _itemList;
             job = _job;
             latch = _latch;
+            needTransaction = _needTransaction;
+            state = _state;
         }
 
         @Override
         protected void execute() {
             try {
                 for (int i = index; i < itemList.size(); i += parallel) {
-                    TransactionStatus ts = TransactionUtil.openTx();
+                    TransactionStatus ts = null;
+                    if (needTransaction) {
+                        ts = TransactionUtil.openTx();
+                    }
                     try {
                         job.execute(itemList.get(i));
-                        TransactionUtil.commitTx(ts);
+                        if (ts != null) {
+                            TransactionUtil.commitTx(ts);
+                        }
                     } catch (Exception e) {
+                        state.setSucceed(false);
+                        state.setError(e.getMessage());
                         logger.error(e.getMessage(), e);
-                        TransactionUtil.rollbackTx(ts);
+                        if (ts != null) {
+                            TransactionUtil.rollbackTx(ts);
+                        }
                     }
                 }
             } finally {

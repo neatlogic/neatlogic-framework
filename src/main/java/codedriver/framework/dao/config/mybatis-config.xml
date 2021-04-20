@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE configuration
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
@@ -13,7 +18,7 @@
     </typeHandlers>
     <plugins>
         <!-- <plugin interceptor="codedriver.framework.dao.plugin.BusinessGroupInterceptor"/>-->
-       <!-- <plugin interceptor="codedriver.framework.dao.plugin.FulltextIndexInterceptor"/>-->
+        <!-- <plugin interceptor="codedriver.framework.dao.plugin.FulltextIndexInterceptor"/>-->
         <plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor"/>
     </plugins>
 </configuration>

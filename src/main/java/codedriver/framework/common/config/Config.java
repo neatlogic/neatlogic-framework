@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.common.config;
 
 import codedriver.framework.common.RootConfiguration;
@@ -31,7 +36,7 @@ public class Config {
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
     private static String CODEDRIVER_HOME;
-//    private static Map<String, String> ES_CLUSTERS;
+    //    private static Map<String, String> ES_CLUSTERS;
     private static boolean ES_ENABLE;
     private static String DB_HOST;
     private static Integer DB_PORT;
@@ -53,10 +58,10 @@ public class Config {
     private static int NEW_MESSAGE_EXPIRED_DAY;
     private static int HISTORY_MESSAGE_EXPIRED_DAY;
 
-
     private static Boolean ENABLE_SUPERADMIN;//是否激活超级管理员，超级管理员用户名是techsure，是虚拟用户，免密登录，拥有管理员权限，可以授权给其他真实用户
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
+    private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -193,11 +198,16 @@ public class Config {
         return ENABLE_NO_SECRET;
     }
 
-    public static final int NEW_MESSAGE_EXPIRED_DAY() {
+    public static boolean ENABLE_GZIP() {
+        return ENABLE_GZIP;
+    }
+
+
+    public static int NEW_MESSAGE_EXPIRED_DAY() {
         return NEW_MESSAGE_EXPIRED_DAY;
     }
 
-    public static final int HISTORY_MESSAGE_EXPIRED_DAY() {
+    public static int HISTORY_MESSAGE_EXPIRED_DAY() {
         return HISTORY_MESSAGE_EXPIRED_DAY;
     }
 
@@ -248,6 +258,7 @@ public class Config {
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
+            ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             //ES_CLUSTERS = new HashMap<>();
 
             /*for (Map.Entry<Object, Object> el : prop.entrySet()) {

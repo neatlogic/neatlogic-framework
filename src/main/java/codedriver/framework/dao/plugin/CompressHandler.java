@@ -5,6 +5,7 @@
 
 package codedriver.framework.dao.plugin;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.util.GzipUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.JdbcType;
@@ -19,7 +20,7 @@ public class CompressHandler implements TypeHandler<String> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        if (StringUtils.isNotBlank(parameter) && parameter.length() > 150) {//大于150个字符才开始压缩
+        if (Config.ENABLE_GZIP() && StringUtils.isNotBlank(parameter) && parameter.length() > 150) {//大于150个字符才开始压缩
             parameter = "GZIP:" + GzipUtil.compress(parameter);
         }
         ps.setString(i, parameter);

@@ -1,18 +1,16 @@
 package codedriver.framework.dto;
 
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.util.SnowflakeUtil;
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.restful.annotation.EntityField;
 
 public class TeamVo extends BasePageVo {
 	
@@ -58,7 +56,11 @@ public class TeamVo extends BasePageVo {
 	 */
 	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
 	private final String initType = GroupSearch.TEAM.getValue();
-	
+
+	public TeamVo(String uuid) {
+		this.uuid = uuid;
+	}
+
 	public List<String> getPathNameList() {
 		return pathNameList;
 	}

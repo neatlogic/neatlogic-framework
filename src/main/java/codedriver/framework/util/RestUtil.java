@@ -20,7 +20,7 @@ import java.security.cert.X509Certificate;
 
 public class RestUtil {
 
-    protected static Logger logger = LoggerFactory.getLogger(RestUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestUtil.class);
     static TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
@@ -94,6 +94,8 @@ public class RestUtil {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 result = e.getMessage();
+            }finally {
+                connection.disconnect();
             }
         }
         return result;

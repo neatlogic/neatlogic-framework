@@ -15,7 +15,7 @@ public class JSONObjectApiParam extends ApiParamValidatorBase {
 	@Override
 	public boolean validate(Object param, String rule) {
 		try {
-			JSONObject.parseObject(param.toString());
+			JSONObject.parseObject(JSONObject.toJSONString(param));
 			return true;
 		} catch (Exception ex) {
 			return false;

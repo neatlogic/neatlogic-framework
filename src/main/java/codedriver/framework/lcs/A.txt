@@ -1,0 +1,5 @@
+主机名&nbsp; ip&nbsp; 端口&nbsp; 环境描述&nbsp; 用户名/密码
+ezdeploy-app001&nbsp; 192.168.0.36&nbsp; 22&nbsp; 集成测试环境&nbsp; ADMIN/Techsure@3636
+sit-apm-30&nbsp; 192.168.0.30&nbsp; 22&nbsp; 监控测试环境&nbsp; ADMIN/Techsure@30
+prd_install_27&nbsp; 192.168.0.27&nbsp; 22 安装包环境&nbsp; ADMIN/Techsure@27
+sit_deploy_24&nbsp; 192.168.0.24&nbsp; 22&nbsp; 发布测试环境&nbsp; ADMIN/123456

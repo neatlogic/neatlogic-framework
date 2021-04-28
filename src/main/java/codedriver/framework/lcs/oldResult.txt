@@ -1,0 +1,8 @@
+<span class='delete'>abctest123测试@@@@</span>
+abctest123测试@@<span class='delete'>@@</span>
+abctest123<span class='delete'>测试</span>@@@@
+abctest123测试@@@@
+abctest123测试@@@@
+abctest123测试@@@@
+abctest123测试@@@@
+

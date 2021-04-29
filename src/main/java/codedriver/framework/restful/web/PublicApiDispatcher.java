@@ -3,6 +3,7 @@ package codedriver.framework.restful.web;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -105,8 +106,11 @@ public class PublicApiDispatcher {
                 userVo.setAuthorization(authorization);
                 UserContext.init(userVo, timezone, request, response);
             }
+        }else{
+            UserContext.init(new UserVo(SystemUser.SYSTEM.getUserUuid()), timezone, request, response);
         }
 
+        UserContext.get().setRequest(request);
 
         ApiVo interfaceVo = apiMapper.getApiByToken(token);
         String uri = request.getRequestURI();
@@ -303,7 +307,7 @@ public class PublicApiDispatcher {
     }
 
     @RequestMapping(value = "/stream/**", method = RequestMethod.POST)
-    public void displatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 
@@ -351,7 +355,7 @@ public class PublicApiDispatcher {
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)
-    public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
 

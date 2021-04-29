@@ -223,7 +223,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
             apiVo.setAuthtype("token");
             apiVo.setToken(token);
             apiVo.setHandler(componentJson.getString("id"));
-            apiVo.setHandlerName(componentJson.getString("className"));
+            apiVo.setHandlerName(componentJson.getString("handler"));
             apiVo.setName(componentJson.getString("name"));
             apiVo.setIsActive(1);
             apiVo.setNeedAudit(componentJson.getInteger("needAudit"));

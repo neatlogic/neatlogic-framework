@@ -73,6 +73,9 @@ public class RestUtil {
 
             // 设置默认header
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            if(StringUtils.isNotBlank(restVo.getTenant())){
+                connection.setRequestProperty("Tenant", restVo.getTenant());
+            }
 
             connection.connect();
         } catch (Exception e) {

@@ -5,8 +5,10 @@
 
 package codedriver.framework.dto;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.integration.authentication.costvalue.AuthenticateType;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ public class RestVo {
 	private String token;
 	private String method;
 	private JSONObject payload;
+	private String tenant;
 	List<String> paramNameList;
 	List<String> paramValueList;
 
@@ -163,4 +166,10 @@ public class RestVo {
 		this.timeout = timeout;
 	}
 
+	public String getTenant() {
+		if(StringUtils.isBlank(tenant)){
+			return TenantContext.get().getTenantUuid();
+		}
+		return tenant;
+	}
 }

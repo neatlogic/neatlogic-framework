@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -85,12 +86,12 @@ public class RestUtil {
         if (connection != null) {
             try (DataOutputStream out = new DataOutputStream(connection.getOutputStream());) {
                 if (restVo.getPayload() != null) {
-                    out.write(restVo.getPayload().toJSONString().getBytes("utf-8"));
+                    out.write(restVo.getPayload().toJSONString().getBytes(StandardCharsets.UTF_8));
                     out.flush();
                 }
                 out.close();
                 // 处理返回值
-                InputStreamReader reader = new InputStreamReader(connection.getInputStream(), "utf-8");
+                InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(reader, writer);
                 result = writer.toString();

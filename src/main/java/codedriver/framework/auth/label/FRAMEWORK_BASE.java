@@ -7,7 +7,7 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
-public class FRAMEWOKR_BASE extends AuthBase {
+public class FRAMEWORK_BASE extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {

@@ -18,4 +18,9 @@ public class VIP_VIEW extends AuthBase {
 	public String getAuthGroup() {
 		return "framework";
 	}
+
+	@Override
+	public Integer sort() {
+		return 2;
+	}
 }

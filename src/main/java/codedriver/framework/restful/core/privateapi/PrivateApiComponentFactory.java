@@ -5,17 +5,18 @@
 
 package codedriver.framework.restful.core.privateapi;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.auth.core.AuthAction;
+import codedriver.framework.auth.core.AuthActions;
+import codedriver.framework.common.RootComponent;
+import codedriver.framework.restful.annotation.OperationType;
+import codedriver.framework.restful.core.IApiComponent;
+import codedriver.framework.restful.core.IBinaryStreamApiComponent;
+import codedriver.framework.restful.core.IJsonStreamApiComponent;
+import codedriver.framework.restful.dto.ApiHandlerVo;
+import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +24,9 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.auth.core.AuthAction;
-import codedriver.framework.common.RootComponent;
-import codedriver.framework.restful.constvalue.OperationTypeEnum;
-import codedriver.framework.restful.annotation.OperationType;
-import codedriver.framework.restful.core.IApiComponent;
-import codedriver.framework.restful.core.IBinaryStreamApiComponent;
-import codedriver.framework.restful.core.IJsonStreamApiComponent;
-import codedriver.framework.restful.dto.ApiHandlerVo;
-import codedriver.framework.restful.dto.ApiVo;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RootComponent
 public class PrivateApiComponentFactory extends ApplicationListenerBase {
@@ -86,7 +78,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
                 if (matcher.find()) {
                     apiVo = regexApiMap.get(regex);
                     if (apiVo.getPathVariableList() != null
-                        && apiVo.getPathVariableList().size() == matcher.groupCount()) {
+                            && apiVo.getPathVariableList().size() == matcher.groupCount()) {
                         JSONObject pathVariableObj = new JSONObject();
                         for (int i = 0; i < apiVo.getPathVariableList().size(); i++) {
                             try {
@@ -146,6 +138,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         for (Map.Entry<String, IPrivateApiComponent> entry : myMap.entrySet()) {
             IPrivateApiComponent component = entry.getValue();
             if (component.getClassName() != null) {
+                checkAnnotation(component);
                 componentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getClassName());
@@ -219,6 +212,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         for (Map.Entry<String, IPrivateJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
             IPrivateJsonStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
+                checkAnnotation(component);
                 streamComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
@@ -363,27 +357,40 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
             }
         }
     }
-    
+
     /**
-    * @Time 2020年12月22日  
-    * @Description: 补充注解提示，防止越权
-    * @Param 
-    * @return
+     * @return
+     * @Time 2020年12月22日
+     * @Description: 补充注解提示，防止越权
+     * @Param
      */
     public void checkAnnotation(Object component) {
         Class<?> clazz = AopUtils.getTargetClass(component);
         OperationType operationType = clazz.getAnnotation(OperationType.class);
-        if(operationType == null) {
+        if (operationType == null) {
             logger.error(clazz.getName() + "接口没有OperationType注解");
-        }else {
-            OperationTypeEnum operationTypeEnum = operationType.type();
-            if(operationTypeEnum == OperationTypeEnum.DELETE || operationTypeEnum == OperationTypeEnum.CREATE || operationTypeEnum == OperationTypeEnum.UPDATE|| operationTypeEnum == OperationTypeEnum.OPERATE) {
-                AuthAction authAction = clazz.getAnnotation(AuthAction.class);
-                if(authAction == null) {
-                    logger.error(clazz.getName() + "接口没有AuthAction注解");
-                }
+        }
+
+        //System.out.println(clazz.getSimpleName());
+
+        AuthAction authAction = clazz.getAnnotation(AuthAction.class);
+        AuthActions authActions = clazz.getAnnotation(AuthActions.class);
+        if (authAction == null && authActions == null) {
+            logger.error(clazz.getName() + "接口没有AuthAction注解");
+        }
+
+        /*Annotation[] annotations = clazz.getAnnotations();
+        boolean isHasAuthAction = false;
+        for (Annotation annotation : annotations) {
+            if (Objects.equals(annotation.annotationType().getName(), AuthAction.class.getName()) || Objects.equals(annotation.annotationType().getName(), AuthActions.class.getName())) {
+                isHasAuthAction = true;
+                break;
             }
-        }      
+        }
+        if (!isHasAuthAction) {
+            logger.error(clazz.getName() + "接口没有AuthAction注解");
+        }*/
+
     }
 
     @Override

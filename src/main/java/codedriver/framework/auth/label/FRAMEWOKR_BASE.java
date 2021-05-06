@@ -7,16 +7,16 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
-public class FORM_MODIFY extends AuthBase {
+public class FRAMEWOKR_BASE extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "表单管理权限";
+        return "基础模块权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "对表单进行添加、修改和删除";
+        return "查看基础功能";
     }
 
     @Override
@@ -26,7 +26,7 @@ public class FORM_MODIFY extends AuthBase {
 
     @Override
     public Integer sort() {
-        return 6;
+        return 1;
     }
 
 }

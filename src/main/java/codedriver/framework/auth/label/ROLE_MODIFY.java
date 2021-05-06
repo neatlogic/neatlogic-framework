@@ -23,4 +23,9 @@ public class ROLE_MODIFY extends AuthBase {
 	public String getAuthGroup() {
 		return "framework";
 	}
+
+	@Override
+	public Integer sort() {
+		return 4;
+	}
 }

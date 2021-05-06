@@ -24,4 +24,9 @@ public class WORKTIME_MODIFY extends AuthBase {
 		return "framework";
 	}
 
+	@Override
+	public Integer sort() {
+		return 7;
+	}
+
 }

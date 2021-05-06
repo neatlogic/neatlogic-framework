@@ -23,4 +23,9 @@ public class USER_MODIFY extends AuthBase {
 	public String getAuthGroup() {
 		return "framework";
 	}
+
+	@Override
+	public Integer sort() {
+		return 3;
+	}
 }

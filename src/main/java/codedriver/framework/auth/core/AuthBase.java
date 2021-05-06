@@ -11,4 +11,6 @@ public abstract class AuthBase {
 
 	public abstract String getAuthGroup();
 
+	public abstract Integer sort();
+
 }

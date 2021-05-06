@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dao.mapper;
 
 import codedriver.framework.common.dto.ValueTextVo;
@@ -10,56 +15,58 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface RoleMapper {
-    public List<String> getRoleUuidListByAuth(@Param("authList") List<String> authList);
+    List<String> getRoleUuidListByAuth(@Param("authList") List<String> authList);
 
-    public int checkRoleIsExists(String uuid);
+    int checkRoleIsExists(String uuid);
 
-    public List<RoleVo> searchRole(RoleVo roleVo);
+    List<RoleVo> searchRole(RoleVo roleVo);
 
-    public List<RoleVo> getRoleListByAuthName(String auth);
-    
-    public List<String> getRoleUuidListByUserUuidList(@Param("list")List<String> userUuidList);
+    List<RoleVo> getRoleListByAuthName(String auth);
 
-    public List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
+    List<String> getRoleUuidListByUserUuidList(@Param("list") List<String> userUuidList);
 
-    public List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
+    List<String> getRoleUuidListByUserUuid(String userUuid);
 
-    public int searchRoleCount(RoleVo roleVo);
+    List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
-    public int searchRoleUserCountByRoleUuid(String roleUuid);
+    List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
 
-    public RoleVo getRoleByUuid(String uuid);
+    int searchRoleCount(RoleVo roleVo);
 
-    public RoleVo getRoleSimpleInfoByUuid(String uuid);
+    int searchRoleUserCountByRoleUuid(String roleUuid);
 
-    public List<RoleVo> getRoleByUuidList(List<String> uuidList);
+    RoleVo getRoleByUuid(String uuid);
 
-    public List<AuthVo> getRoleCountByAuth();
+    RoleVo getRoleSimpleInfoByUuid(String uuid);
 
-    public List<String> getRoleUuidByName(String name);
+    List<RoleVo> getRoleByUuidList(List<String> uuidList);
 
-    public List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
+    List<AuthVo> getRoleCountByAuth();
 
-    public int insertRoleAuth(RoleAuthVo roleAuthVo);
+    List<String> getRoleUuidByName(String name);
 
-    public int insertRole(RoleVo roleVo);
+    List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
-    public int insertRoleUser(RoleUserVo vo);
+    int insertRoleAuth(RoleAuthVo roleAuthVo);
 
-    public int updateRole(RoleVo roleVo);
+    int insertRole(RoleVo roleVo);
 
-    public int deleteRoleAuthByRoleUuid(String roleUuid);
+    int insertRoleUser(RoleUserVo vo);
 
-    public int deleteRoleAuth(RoleAuthVo roleAuthVo);
+    int updateRole(RoleVo roleVo);
 
-    public int deleteRoleByUuid(String uuid);
+    int deleteRoleAuthByRoleUuid(String roleUuid);
 
-    public int deleteMenuRoleByRoleUuid(String roleUuid);
+    int deleteRoleAuth(RoleAuthVo roleAuthVo);
 
-    public int deleteTeamRoleByRoleUuid(String roleUuid);
+    int deleteRoleByUuid(String uuid);
 
-    public int deleteRoleAuthByAuth(String auth);
+    int deleteMenuRoleByRoleUuid(String roleUuid);
 
-    public int deleteRoleUser(RoleUserVo roleUserVo);
+    int deleteTeamRoleByRoleUuid(String roleUuid);
+
+    int deleteRoleAuthByAuth(String auth);
+
+    int deleteRoleUser(RoleUserVo roleUserVo);
 
 }

@@ -25,7 +25,7 @@ public class USER_MODIFY extends AuthBase {
 	}
 
 	@Override
-	public Integer sort() {
+	public Integer getSort() {
 		return 3;
 	}
 }

@@ -20,7 +20,7 @@ public class VIP_VIEW extends AuthBase {
 	}
 
 	@Override
-	public Integer sort() {
+	public Integer getSort() {
 		return 2;
 	}
 }

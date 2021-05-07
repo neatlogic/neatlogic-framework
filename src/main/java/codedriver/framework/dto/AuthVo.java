@@ -10,6 +10,7 @@ public class AuthVo {
     private String description;
     private int userCount;
     private int roleCount;
+    private int sort;
 
     public String getDescription() {
         return description;
@@ -49,5 +50,13 @@ public class AuthVo {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public int getSort() {
+        return sort;
+    }
+
+    public void setSort(int sort) {
+        this.sort = sort;
     }
 }

@@ -68,6 +68,7 @@ public class AuthActionChecker {
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
+
         for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
             if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {
                 return true;
@@ -87,6 +88,9 @@ public class AuthActionChecker {
     private static boolean checkAuthList(String auth, List<String> authList, List<String> actionList) {
         AuthBase authBase = AuthFactory.getAuthInstance(auth);
         if (authBase != null) {
+            if(actionList.contains(authBase.getAuthName())){
+                return true;
+            }
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (actionList.contains(authClass.getSimpleName())) {

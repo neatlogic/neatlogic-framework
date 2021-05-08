@@ -4,13 +4,16 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RootComponent
 public class AuthActionChecker {
@@ -101,7 +104,6 @@ public class AuthActionChecker {
                         getAuthList(authClass.getSimpleName(), authList);
                     }
                 }
-
             }
         }
     }

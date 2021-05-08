@@ -8,14 +8,14 @@ import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RootComponent
 public class AuthActionChecker {
+    private static RoleMapper roleMapper;
+
     private static UserMapper userMapper;
 
     @Resource
@@ -35,8 +35,19 @@ public class AuthActionChecker {
         }
 
         if (userContext != null) {
-            //穿透校验该用户是拥有在满足的权限
-            return checkByUserUuid(userContext.getUserUuid(),actionList);
+            List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
+            if (roleUuidList != null && roleUuidList.size() > 0) {
+                for (String roleUuid : roleUuidList) {
+                    if (null != userContext.getRoleUuidList() && userContext.getRoleUuidList().contains(roleUuid)) {
+                        return true;
+                    }
+                }
+            }
+            if (userMapper.checkUserAuthorityIsExists(userContext.getUserUuid(true), actionList) > 0) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

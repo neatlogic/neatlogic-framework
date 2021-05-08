@@ -4,27 +4,21 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RootComponent
 public class AuthActionChecker {
-    private static RoleMapper roleMapper;
-
     private static UserMapper userMapper;
 
-    @Autowired
-    public void setRoleMapper(RoleMapper _roleMapper) {
-        roleMapper = _roleMapper;
-    }
-
-    @Autowired
+    @Resource
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
     }
@@ -41,38 +35,63 @@ public class AuthActionChecker {
         }
 
         if (userContext != null) {
-            List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
-            if (roleUuidList != null && roleUuidList.size() > 0) {
-                for (String roleUuid : roleUuidList) {
-                    if (null != userContext.getRoleUuidList() && userContext.getRoleUuidList().contains(roleUuid)) {
-                        return true;
-                    }
-                }
-            }
-            if (userMapper.checkUserAuthorityIsExists(userContext.getUserUuid(true), actionList) > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            //穿透校验该用户是拥有在满足的权限
+            return checkByUserUuid(userContext.getUserUuid(),actionList);
         } else {
             return false;
         }
     }
 
+    /**
+     * 穿透校验该用户是拥有在满足的权限
+     * @param userUuid 当前登录人
+     * @param action 权限
+     * @return 是否有权限 有：true 否：false
+     */
     public static Boolean checkByUserUuid(String userUuid, String... action) {
         if (action == null || action.length == 0) {
             return false;
         }
         List<String> actionList = Arrays.asList(action);
-        List<String> actionRoleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
-        if (CollectionUtils.isNotEmpty(actionRoleUuidList)) {
-            List<String> roleUuidList = userMapper.getRoleUuidListByUserUuid(userUuid);
-            for (String roleUuid : actionRoleUuidList) {
-                if (roleUuidList.contains(roleUuid)) {
-                    return true;
+        return checkByUserUuid(userUuid,actionList);
+    }
+
+    /**
+     * 穿透校验该用户是拥有在满足的权限
+     * 1、递归获取该用户所有权限
+     * 2、比对用户所有权限中是否包含需要检验的权限
+     * @param userUuid 当前登录人
+     * @param actionList 权限
+     * @return 是否有权限 有：true 否：false
+     */
+    public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
+        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(new UserAuthVo(UserContext.get().getUserUuid(true)));
+        List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
+        for (int i = 0; i < userAuthList.size() ; i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
+            getAuthList(userAuthList.get(i), userAuthList);
+        }
+        List<String> existAuthList = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
+        return CollectionUtils.isNotEmpty(existAuthList);
+    }
+
+    /**
+     * 递归获取权限
+     * @param auth 权限
+     * @param authList 当前登录人所有权限列表
+     */
+    private static void getAuthList(String auth, List<String> authList){
+        AuthBase authBase = AuthFactory.getAuthInstance(auth);
+        if(authBase != null){
+            List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
+            for(Class<? extends AuthBase> authClass : authClassList){
+                if(!authList.contains(authClass.getSimpleName())){
+                    authList.add(authClass.getSimpleName());
+                    if(!authList.contains(auth)) {//防止回环
+                        getAuthList(authClass.getSimpleName(), authList);
+                    }
                 }
+
             }
         }
-        return userMapper.checkUserAuthorityIsExists(userUuid, actionList) > 0;
     }
 }

@@ -138,7 +138,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         for (Map.Entry<String, IPrivateApiComponent> entry : myMap.entrySet()) {
             IPrivateApiComponent component = entry.getValue();
             if (component.getClassName() != null) {
-                checkAnnotation(component);
+                checkAnnotation(component, context);
                 componentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getClassName());
@@ -212,7 +212,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         for (Map.Entry<String, IPrivateJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
             IPrivateJsonStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
-                checkAnnotation(component);
+                checkAnnotation(component, context);
                 streamComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
@@ -286,7 +286,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         for (Map.Entry<String, IPrivateBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
             IPrivateBinaryStreamApiComponent component = entry.getValue();
             if (component.getId() != null) {
-                checkAnnotation(component);
+                checkAnnotation(component, context);
                 binaryComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
@@ -364,33 +364,24 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
      * @Description: 补充注解提示，防止越权
      * @Param
      */
-    public void checkAnnotation(Object component) {
-        Class<?> clazz = AopUtils.getTargetClass(component);
-        OperationType operationType = clazz.getAnnotation(OperationType.class);
-        if (operationType == null) {
-            logger.error(clazz.getName() + "接口没有OperationType注解");
-        }
+    public void checkAnnotation(Object component, ApplicationContext context) {
+        //TODO 后续master模块完善后放开
+        if (!Objects.equals(context.getId(), "master")) {
+            Class<?> clazz = AopUtils.getTargetClass(component);
+            OperationType operationType = clazz.getAnnotation(OperationType.class);
+            if (operationType == null) {
+                logger.error(clazz.getName() + "接口没有OperationType注解");
+            }
 
-        //System.out.println(clazz.getSimpleName());
-
-        AuthAction authAction = clazz.getAnnotation(AuthAction.class);
-        AuthActions authActions = clazz.getAnnotation(AuthActions.class);
-        if (authAction == null && authActions == null) {
-            logger.error(clazz.getName() + "接口没有AuthAction注解");
-        }
-
-        /*Annotation[] annotations = clazz.getAnnotations();
-        boolean isHasAuthAction = false;
-        for (Annotation annotation : annotations) {
-            if (Objects.equals(annotation.annotationType().getName(), AuthAction.class.getName()) || Objects.equals(annotation.annotationType().getName(), AuthActions.class.getName())) {
-                isHasAuthAction = true;
-                break;
+            //System.out.println(clazz.getSimpleName());
+            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant") ) {
+                AuthAction authAction = clazz.getAnnotation(AuthAction.class);
+                AuthActions authActions = clazz.getAnnotation(AuthActions.class);
+                if (authAction == null && authActions == null) {
+                    logger.error(clazz.getName() + "接口没有AuthAction注解");
+                }
             }
         }
-        if (!isHasAuthAction) {
-            logger.error(clazz.getName() + "接口没有AuthAction注解");
-        }*/
-
     }
 
     @Override

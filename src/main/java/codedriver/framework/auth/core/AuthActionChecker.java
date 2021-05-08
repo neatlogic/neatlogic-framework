@@ -38,20 +38,8 @@ public class AuthActionChecker {
         }
 
         if (userContext != null) {
-            List<String> roleUuidList = roleMapper.getRoleUuidListByAuth(actionList);
-            if (roleUuidList != null && roleUuidList.size() > 0) {
-                for (String roleUuid : roleUuidList) {
-                    if (null != userContext.getRoleUuidList() && userContext.getRoleUuidList().contains(roleUuid)) {
-                        return true;
-                    }
-                }
-            }
-            if (userMapper.checkUserAuthorityIsExists(userContext.getUserUuid(true), actionList) > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+            return checkByUserUuid(userContext.getUserUuid(), actionList);
+        }else{
             return false;
         }
     }

@@ -4,7 +4,6 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
 
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class AuthActionChecker {
-    private static RoleMapper roleMapper;
 
     private static UserMapper userMapper;
 
@@ -101,6 +99,5 @@ public class AuthActionChecker {
             }
         }
         return false;
-
     }
 }

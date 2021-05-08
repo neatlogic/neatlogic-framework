@@ -68,7 +68,7 @@ public class AuthActionChecker {
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
-        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(UserContext.get().getUserUuid(true)));
+        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
         for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
             if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {

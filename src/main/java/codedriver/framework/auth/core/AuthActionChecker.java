@@ -6,11 +6,13 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RootComponent
@@ -68,7 +70,12 @@ public class AuthActionChecker {
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
-
+        //判断从数据库查询的用户权限是否满足
+        List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(contains)){
+            return true;
+        }
+        //以上不满足，则遍历递归所有权限寻找
         for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
             if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {
                 return true;
@@ -86,16 +93,13 @@ public class AuthActionChecker {
      * @return 存在权限 是：true 否：false
      */
     private static boolean checkAuthList(String auth, List<String> authList, List<String> actionList) {
-        AuthBase authBase = AuthFactory.getAuthInstance(auth);
+        AuthBase authBase = AuthFactory.getAuthInstance(auth.toUpperCase(Locale.ROOT));
         if (authBase != null) {
-            if(actionList.contains(authBase.getAuthName())){
+            if (actionList.contains(authBase.getAuthName())) {
                 return true;
             }
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
-                if (actionList.contains(authClass.getSimpleName())) {
-                    return true;
-                }
                 if (!authList.contains(authClass.getSimpleName())) {//防止回环
                     authList.add(authClass.getSimpleName());
                     return checkAuthList(authClass.getSimpleName(), authList, actionList);

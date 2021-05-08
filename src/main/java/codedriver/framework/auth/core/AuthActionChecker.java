@@ -7,7 +7,6 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
-import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -39,15 +38,16 @@ public class AuthActionChecker {
 
         if (userContext != null) {
             return checkByUserUuid(userContext.getUserUuid(), actionList);
-        }else{
+        } else {
             return false;
         }
     }
 
     /**
      * 穿透校验该用户是拥有在满足的权限
+     *
      * @param userUuid 当前登录人
-     * @param action 权限
+     * @param action   目标权限
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, String... action) {
@@ -55,44 +55,52 @@ public class AuthActionChecker {
             return false;
         }
         List<String> actionList = Arrays.asList(action);
-        return checkByUserUuid(userUuid,actionList);
+        return checkByUserUuid(userUuid, actionList);
     }
 
     /**
      * 穿透校验该用户是拥有在满足的权限
      * 1、递归获取该用户所有权限
      * 2、比对用户所有权限中是否包含需要检验的权限
-     * @param userUuid 当前登录人
-     * @param actionList 权限
+     *
+     * @param userUuid   当前登录人
+     * @param actionList 目标权限
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
-        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(new UserAuthVo(UserContext.get().getUserUuid(true)));
+        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(UserContext.get().getUserUuid(true)));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
-        for (int i = 0; i < userAuthList.size() ; i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
-            getAuthList(userAuthList.get(i), userAuthList);
+        for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
+            if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {
+                return true;
+            }
         }
-        List<String> existAuthList = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
-        return CollectionUtils.isNotEmpty(existAuthList);
+        return false;
     }
 
     /**
      * 递归获取权限
-     * @param auth 权限
+     *
+     * @param auth     权限
      * @param authList 当前登录人所有权限列表
+     * @param actionList  目标权限
+     * @return 存在权限 是：true 否：false
      */
-    private static void getAuthList(String auth, List<String> authList){
+    private static boolean checkAuthList(String auth, List<String> authList, List<String> actionList) {
         AuthBase authBase = AuthFactory.getAuthInstance(auth);
-        if(authBase != null){
+        if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
-            for(Class<? extends AuthBase> authClass : authClassList){
-                if(!authList.contains(authClass.getSimpleName())){
+            for (Class<? extends AuthBase> authClass : authClassList) {
+                if (actionList.contains(authClass.getSimpleName())) {
+                    return true;
+                }
+                if (!authList.contains(authClass.getSimpleName())) {//防止回环
                     authList.add(authClass.getSimpleName());
-                    if(!authList.contains(auth)) {//防止回环
-                        getAuthList(authClass.getSimpleName(), authList);
-                    }
+                    return checkAuthList(authClass.getSimpleName(), authList, actionList);
                 }
             }
         }
+        return false;
+
     }
 }

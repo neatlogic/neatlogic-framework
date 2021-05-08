@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
-    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
+    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"/>
+    <cache-ref namespace="codedriver.framework.dao.mapper.RoleMapper"/>
 
     <select id="checkUserAuthorityIsExists" resultType="int" useCache="true">
         SELECT COUNT(1) FROM (
@@ -318,6 +319,28 @@
 
     <select id="searchUserAllAuthByUserAuth" parameterType="codedriver.framework.dto.UserAuthVo"
             resultType="codedriver.framework.dto.UserAuthVo" useCache="false">
+        SELECT
+        ra.`auth_group` AS authGroup,
+        ra.`auth`
+        FROM `user_role` ur
+        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
+        WHERE ur.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND ra.`auth` = #{auth}
+        </if>
+        UNION
+        SELECT
+        `auth_group` AS authGroup,
+        `auth`
+        FROM `user_authority`
+        WHERE `user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
+    </select>
+
+    <select id="searchUserAllAuthByUserAuthCache" parameterType="codedriver.framework.dto.UserAuthVo"
+            resultType="codedriver.framework.dto.UserAuthVo" useCache="true">
         SELECT
         ra.`auth_group` AS authGroup,
         ra.`auth`

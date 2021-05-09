@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.util;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -64,7 +69,7 @@ public class AuditUtil {
         sb.append("\n");
         sb.append("result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         sb.append("\n");
-        String resultStr = null;
+        String resultStr;
         //System.out.println(vo.getResult());
         if (vo.getResult() != null && StringUtils.isNotBlank(resultStr = JSON.toJSON(vo.getResult()).toString())) {
             int offset = resultStr.getBytes(StandardCharsets.UTF_8).length;
@@ -84,7 +89,7 @@ public class AuditUtil {
         }
         sb.append("error<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         String fileHash = DigestUtils.md5DigestAsHex(sb.toString().getBytes());
-        String filePath = null;
+        String filePath;
         filePath = apiMapper.getAuditFileByHash(fileHash);
         /* 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
         if (StringUtils.isBlank(filePath)) {
@@ -92,7 +97,7 @@ public class AuditUtil {
             try {
                 filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
             } catch (Exception e) {
-                logger.error("Minio访问失败，自动切换成本地存储模式");
+                logger.warn("Minio访问失败，自动切换成本地存储模式");
                 try {
                     filePath = FileUtil.saveData(LocalFileSystemHandler.NAME, TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
                 } catch (Exception e1) {
@@ -136,7 +141,7 @@ public class AuditUtil {
                 /*
                  * 如果偏移量大于最大字节数限制，那么就只截取最大字节数长度的数据
                  */
-                int buffSize = 0;
+                int buffSize;
                 if (offset > maxFileSize) {
                     buffSize = (int) maxFileSize;
                 } else {
@@ -146,7 +151,7 @@ public class AuditUtil {
                 in.skip(startIndex);
                 byte[] buff = new byte[buffSize];
                 StringBuilder sb = new StringBuilder();
-                int len = 0;
+                int len;
                 long endPoint = 0;
                 while ((len = in.read(buff)) != -1) {
                     endPoint += len;
@@ -175,7 +180,7 @@ public class AuditUtil {
         return result;
     }
 
-    public static void downLoadAuditDetail(HttpServletRequest request, HttpServletResponse response, String filePath) throws IOException {
+    public static void downLoadAuditDetail(HttpServletRequest request, HttpServletResponse response, String filePath) {
         if (StringUtils.isBlank(filePath)) {
             throw new FilePathIllegalException("文件路径不能为空");
         }
@@ -203,7 +208,7 @@ public class AuditUtil {
                 OutputStream os = response.getOutputStream();
 
                 byte[] buff = new byte[(int) maxFileSize];
-                int len = 0;
+                int len;
                 long endPoint = 0;
                 while ((len = in.read(buff)) != -1) {
                     /*

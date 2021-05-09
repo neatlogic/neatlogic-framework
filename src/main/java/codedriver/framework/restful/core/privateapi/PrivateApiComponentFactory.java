@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -359,10 +359,10 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
     }
 
     /**
-     * @return
-     * @Time 2020年12月22日
-     * @Description: 补充注解提示，防止越权
-     * @Param
+     * 补充注解提示，防止越权
+     *
+     * @param component
+     * @param context
      */
     public void checkAnnotation(Object component, ApplicationContext context) {
         //TODO 后续master模块完善后放开
@@ -370,15 +370,15 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
             Class<?> clazz = AopUtils.getTargetClass(component);
             OperationType operationType = clazz.getAnnotation(OperationType.class);
             if (operationType == null) {
-                logger.error(clazz.getName() + "接口没有OperationType注解");
+                logger.warn(clazz.getName() + "接口没有OperationType注解");
             }
 
             //System.out.println(clazz.getSimpleName());
-            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant") ) {
+            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);
                 AuthActions authActions = clazz.getAnnotation(AuthActions.class);
                 if (authAction == null && authActions == null) {
-                    logger.error(clazz.getName() + "接口没有AuthAction注解");
+                    logger.warn(clazz.getName() + "接口没有AuthAction注解");
                 }
             }
         }

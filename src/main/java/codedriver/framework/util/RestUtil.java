@@ -91,7 +91,12 @@ public class RestUtil {
                 }
                 out.close();
                 // 处理返回值
-                InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+                InputStreamReader reader = null;
+                if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
+                    reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+                } else {
+                    reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
+                }
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(reader, writer);
                 result = writer.toString();

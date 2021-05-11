@@ -14,11 +14,8 @@ import java.util.List;
  **/
 public interface IEnum {
     /**
-     * @Description: 不同的枚举类，返回不同的枚举值，可自由组合成List<>或者JSONArray
-     * @Author: laiwt
-     * @Date: 2021/1/12 14:57
-     * @Params: []
-     * @Returns: java.util.List
+     * @description : 不同的枚举类，返回不同的枚举值，可自由组合成List<>或者JSONArray
+     * @return : java.util.List
     **/
     List getValueTextList();
 }

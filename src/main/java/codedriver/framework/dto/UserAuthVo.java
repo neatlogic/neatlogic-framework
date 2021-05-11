@@ -9,7 +9,11 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class UserAuthVo extends BasePageVo {
+import java.io.Serializable;
+
+public class UserAuthVo extends BasePageVo implements Serializable {
+    private static final long serialVersionUID = 6069104727643916207L;
+
     @EntityField(name = "用户Uuid", type = ApiParamType.STRING)
     private String userUuid;
     @EntityField(name = "权限", type = ApiParamType.STRING)

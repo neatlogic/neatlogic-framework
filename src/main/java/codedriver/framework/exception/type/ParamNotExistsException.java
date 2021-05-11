@@ -11,4 +11,11 @@ public class ParamNotExistsException extends ApiRuntimeException {
 	public ParamNotExistsException(String msg) {
 		super(msg);
 	}
+	public ParamNotExistsException(String paramNames, boolean b) {
+		super("参数：“" + paramNames + "”不能为空");
+	}
+
+	public ParamNotExistsException(String ... paramNames) {
+		super("参数：“" + String.join("、", paramNames) + "”不能同时为空");
+	}
 }

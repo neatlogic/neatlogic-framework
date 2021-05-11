@@ -11,4 +11,7 @@ public class ParamIrregularException extends ApiRuntimeException {
 	public ParamIrregularException(String msg) {
 		super(msg);
 	}
+	public ParamIrregularException(String paramName, boolean b) {
+		super("参数“" + paramName + "”不符合格式要求");
+	}
 }

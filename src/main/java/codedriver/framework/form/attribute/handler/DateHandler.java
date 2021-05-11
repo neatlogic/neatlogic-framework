@@ -66,8 +66,8 @@ public class DateHandler extends FormHandlerBase {
                         dateFormatter.parse(date);
                         return worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
                     } catch (DateTimeParseException ex) {
-                        String format = DATE_FORMAT.replace("-", styleType);
-                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+//                        String format = DATE_FORMAT.replace("-", styleType);
+                        throw new ParamIrregularException("data");
                     }
                 } else if (DATETIME_FORMAT.equals(showType)) {
                     String dateTime = data.replace(styleType, "-");
@@ -77,8 +77,8 @@ public class DateHandler extends FormHandlerBase {
                         long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
                         return worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
                     } catch (DateTimeParseException ex) {
-                        String format = DATETIME_FORMAT.replace("-", styleType);
-                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+//                        String format = DATETIME_FORMAT.replace("-", styleType);
+                        throw new ParamIrregularException("data");
                     }
                 }
             }

@@ -109,7 +109,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 				for (PatternVo patternVo : patternList) {
 					if (patternVo.getIsRequired() != null && patternVo.getIsRequired().equals(1)) {
 						if (!requestParamObj.containsKey(patternVo.getName())) {
-							throw new ParamNotExistsException("参数：“" + patternVo.getName() + "”不能为空");
+							throw new ParamNotExistsException(patternVo.getName());
 						}
 
 					}
@@ -121,7 +121,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 					if (paramValue != null) {
 						ParamValidatorBase validator = ParamValidatorFactory.getAuthInstance(paramType);
 						if (validator != null && !validator.validate(paramValue, null)) {
-							throw new ParamIrregularException("参数“" + patternVo.getName() + "”不符合格式要求");
+							throw new ParamIrregularException(patternVo.getName());
 						}
 					}
 				}

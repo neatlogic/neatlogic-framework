@@ -188,7 +188,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 binaryComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
-                restComponentVo.setToken(null);
+                restComponentVo.setToken(component.getToken());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);

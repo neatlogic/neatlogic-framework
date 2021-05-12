@@ -13,13 +13,20 @@ public abstract class FileTypeHandlerBase implements IFileTypeHandler {
 
     @Override
     public final void deleteFile(Long fileId) throws Exception {
-        myDeleteFile(fileId);
-        try {
-            FileManager.deleteFileById(fileId);
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        if (myDeleteFile(fileId)) {
+            try {
+                FileManager.deleteFileById(fileId);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 
-    protected abstract void myDeleteFile(Long fileId);
+    /**
+     * 各附件类型处理器执行自己的删除逻辑，通过返回值告诉框架是否允许真正删除附件
+     *
+     * @param fileId 附件id
+     * @return true：允许继续删除附件，false：不允许删除附件
+     */
+    protected abstract boolean myDeleteFile(Long fileId);
 }

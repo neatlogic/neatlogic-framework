@@ -188,7 +188,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -249,7 +249,7 @@ public class ApiDispatcher {
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
@@ -303,7 +303,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -356,10 +356,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -411,7 +408,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -463,6 +460,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -496,7 +494,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -528,7 +526,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -560,7 +558,7 @@ public class ApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }

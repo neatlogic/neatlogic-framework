@@ -5,9 +5,8 @@
 
 package codedriver.framework.file.core;
 
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.file.dto.FileVo;
+import com.alibaba.fastjson.JSONObject;
 
 public interface IFileTypeHandler {
     /**
@@ -25,6 +24,7 @@ public interface IFileTypeHandler {
     String getDisplayName();
 
     void deleteFile(Long fileId) throws Exception;
+
 
     void afterUpload(FileVo fileVo, JSONObject jsonObj);
 }

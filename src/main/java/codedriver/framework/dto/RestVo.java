@@ -27,7 +27,7 @@ public class RestVo {
 	List<String> paramNameList;
 	List<String> paramValueList;
 
-	private int timeout = 30;
+	private int timeout = 30000;//毫秒
 
 	private List<Object> paramList;
 	private Map<String, Object> paramMap;

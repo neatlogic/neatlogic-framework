@@ -152,6 +152,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 componentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getClassName());
+                restComponentVo.setToken(component.getToken());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
@@ -159,7 +160,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(component)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
             }
         }
 
@@ -169,6 +170,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 streamComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
+                restComponentVo.setToken(component.getToken());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
@@ -176,7 +178,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(component)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
             }
         }
 
@@ -186,6 +188,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 binaryComponentMap.put(component.getId(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
                 restComponentVo.setHandler(component.getId());
+                restComponentVo.setToken(null);
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
@@ -193,7 +196,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(component)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
             }
         }
 
@@ -222,11 +225,11 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
             ApiVo apiVo = new ApiVo();
             apiVo.setAuthtype("token");
             apiVo.setToken(token);
-            apiVo.setHandler(componentJson.getString("id"));
+            apiVo.setHandler(componentJson.getString("handler"));
             apiVo.setHandlerName(componentJson.getString("handler"));
             apiVo.setName(componentJson.getString("name"));
             apiVo.setIsActive(1);
-            apiVo.setNeedAudit(componentJson.getInteger("needAudit"));
+            apiVo.setNeedAudit(0);
             apiVo.setTimeout(0);// 0是default
             apiVo.setType(componentJson.getString("type"));
             apiVo.setModuleId(moduleId);

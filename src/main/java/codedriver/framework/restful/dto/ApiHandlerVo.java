@@ -1,9 +1,9 @@
 package codedriver.framework.restful.dto;
 
-import java.util.List;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+
+import java.util.List;
 
 public class ApiHandlerVo {
 	@EntityField(name = "处理器", type = ApiParamType.STRING)
@@ -20,6 +20,8 @@ public class ApiHandlerVo {
 	private boolean isPrivate;
 	@EntityField(name = "处理器类型", type = ApiParamType.STRING)
 	private String type;
+	@EntityField(name = "处理器token", type = ApiParamType.STRING)
+	private String token;
 	private List<ApiVo> interfaceList;
 
 	public String getConfig() {
@@ -84,5 +86,13 @@ public class ApiHandlerVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

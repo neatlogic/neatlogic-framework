@@ -67,7 +67,7 @@ public class DateHandler extends FormHandlerBase {
                         return worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
                     } catch (DateTimeParseException ex) {
                         String format = DATE_FORMAT.replace("-", styleType);
-                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+                        throw new ParamIrregularException("data", format);
                     }
                 } else if (DATETIME_FORMAT.equals(showType)) {
                     String dateTime = data.replace(styleType, "-");
@@ -78,7 +78,7 @@ public class DateHandler extends FormHandlerBase {
                         return worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
                     } catch (DateTimeParseException ex) {
                         String format = DATETIME_FORMAT.replace("-", styleType);
-                        throw new ParamIrregularException("参数“data”不符合“" + format + "”格式要求");
+                        throw new ParamIrregularException("data", format);
                     }
                 }
             }

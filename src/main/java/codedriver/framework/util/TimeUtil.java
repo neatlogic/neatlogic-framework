@@ -108,7 +108,7 @@ public class TimeUtil {
 			}
 			
 		}catch(ParseException e) {
-			throw new ParamIrregularException(hourMinute+"时间转换异常");
+			throw new ParamIrregularException(hourMinute);
 		}
     	Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR); 

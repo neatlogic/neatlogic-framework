@@ -318,7 +318,7 @@ public class ApiValidateAndHelpBase {
                     }
                     // 判断是否必填
                     if (p.isRequired() && !paramObj.containsKey(p.name())) {
-                        throw new ParamNotExistsException("参数：“" + p.name() + "”不能为空");
+                        throw new ParamNotExistsException(p.name());
                     }
 
                     // 判断最大长度
@@ -334,7 +334,7 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
-                        throw new ParamIrregularException("参数“" + p.desc() + "（" + p.name() + "）" + "”不符合格式要求");
+                        throw new ParamIrregularException(p.desc() + "（" + p.name() + "）");
                     }
                 }
             }

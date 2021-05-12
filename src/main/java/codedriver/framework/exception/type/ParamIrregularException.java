@@ -8,10 +8,10 @@ public class ParamIrregularException extends ApiRuntimeException {
 	*/
 	private static final long serialVersionUID = -6753541026185329206L;
 
-	public ParamIrregularException(String msg) {
-		super(msg);
-	}
-	public ParamIrregularException(String paramName, boolean b) {
+	public ParamIrregularException(String paramName) {
 		super("参数“" + paramName + "”不符合格式要求");
+	}
+	public ParamIrregularException(String paramName, String rule) {
+		super("参数“" + paramName + "”不符合格式要求， 格式为：" + rule);
 	}
 }

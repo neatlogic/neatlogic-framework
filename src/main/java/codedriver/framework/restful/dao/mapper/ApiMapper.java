@@ -42,8 +42,6 @@ public interface ApiMapper {
 
 	public int insertApiAudit(ApiAuditVo apiAudit);
 
-	public int updateApiComponentIdById(ApiVo apiVo);
-
 	public int batchUpdate(ApiVo apiVo);
 
 	/**

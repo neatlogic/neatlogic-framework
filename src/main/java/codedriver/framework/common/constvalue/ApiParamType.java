@@ -11,6 +11,7 @@ public enum ApiParamType {
 	IP("ip", "ip"),
 	EMAIL("email", "邮箱"),
 	REGEX("regex", "正则表达式"),
+	DOUBLE("double", "双精度浮点数"),
 	NOAUTH("noAuth", "无需校验");
 
 	private String name;

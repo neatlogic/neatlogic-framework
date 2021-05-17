@@ -224,7 +224,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 token = token.substring(0, token.length() - 1);
             }
             ApiVo apiVo = new ApiVo();
-            apiVo.setAuthtype("basic");
+            apiVo.setAuthtype(ApiVo.AuthenticateType.BASIC.getValue());
             apiVo.setUsername(Config.PUBLIC_API_AUTH_USERNAME());
             apiVo.setPassword(Config.PUBLIC_API_AUTH_PASSWORD());
             apiVo.setToken(token);

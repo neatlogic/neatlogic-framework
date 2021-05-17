@@ -63,8 +63,8 @@ public class Config {
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
-    private static String PUBLIC_API_AUTH_USERNAME;
-    private static String PUBLIC_API_AUTH_PASSWORD;
+    private static String PUBLIC_API_AUTH_USERNAME;//外部访问接口basic认证用户名
+    private static String PUBLIC_API_AUTH_PASSWORD;//外部访问接口basic认证密码
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");

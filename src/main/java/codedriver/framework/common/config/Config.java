@@ -271,7 +271,7 @@ public class Config {
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "techsure");
-            PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "techsure@2020");
+            PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "techsure@2021");
             //ES_CLUSTERS = new HashMap<>();
 
             /*for (Map.Entry<Object, Object> el : prop.entrySet()) {

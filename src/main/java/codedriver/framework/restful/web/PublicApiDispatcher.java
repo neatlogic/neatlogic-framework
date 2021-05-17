@@ -62,7 +62,7 @@ public class PublicApiDispatcher {
     public PublicApiDispatcher() {
         errorMap.put(408, "请求已超时");
         errorMap.put(400, "由于包含语法错误，当前请求无法被服务器理解");
-        errorMap.put(412, "头信息不符合要求");
+        errorMap.put(412, "请求头不符合要求");
         errorMap.put(410, "服务不可用");
         errorMap.put(401, "用户验证失败");
         errorMap.put(403, "禁止访问");
@@ -243,7 +243,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -295,7 +295,7 @@ public class PublicApiDispatcher {
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
@@ -344,7 +344,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -388,7 +388,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -431,7 +431,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -474,7 +474,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -502,7 +502,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -528,7 +528,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -554,7 +554,7 @@ public class PublicApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }

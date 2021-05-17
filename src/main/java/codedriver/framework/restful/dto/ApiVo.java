@@ -127,7 +127,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 	}
 	
 	public enum AuthenticateType implements IEnum {
-	    NOAUTH("-", "无需认证"), BASIC("basic", "Basic认证");
+	    BASIC("basic", "Basic认证");
 
 	    private String type;
 	    private String text;
@@ -154,9 +154,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 					{
 						this.put("value",type.getValue());
 						this.put("text",type.getText());
-						if(!type.getValue().equals(ApiVo.AuthenticateType.NOAUTH.getValue())){
-							this.put("help", ApiAuthFactory.getApiAuth(type.getValue()).help());
-						}
+						this.put("help", ApiAuthFactory.getApiAuth(type.getValue()).help());
 					}
 				});
 			}

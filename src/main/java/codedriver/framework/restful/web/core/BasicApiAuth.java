@@ -7,6 +7,7 @@ package codedriver.framework.restful.web.core;
 
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
 import org.springframework.stereotype.Service;
 
@@ -26,27 +27,32 @@ public class BasicApiAuth extends ApiAuthBase {
     @Override
     public int myAuth(ApiVo interfaceVo, JSONObject jsonParam, HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
-        authorization = authorization.replace("Basic ", "");
-        byte[] bytes = Base64.decodeBase64(authorization);
-        authorization = new String(bytes, StandardCharsets.UTF_8);
-        String[] as = authorization.split(":");
-        if (as.length == 2) {
-            String username = as[0];
-            String password = as[1];
-            if (interfaceVo.getUsername().equalsIgnoreCase(username) && interfaceVo.getPassword().equals(password)) {
-                if (interfaceVo.getTimeout() > 0) {
-                    long requestTime = Long.parseLong(request.getHeader("x-access-date"));
-                    long timeDiff = System.currentTimeMillis() - requestTime;
-                    if (timeDiff < 0 || timeDiff > 1000L * interfaceVo.getTimeout()) {
-                        return 408; //超時
+        if (StringUtils.isNotBlank(authorization)) {
+            authorization = authorization.replace("Basic ", "");
+            byte[] bytes = Base64.decodeBase64(authorization);
+            authorization = new String(bytes, StandardCharsets.UTF_8);
+            String[] as = authorization.split(":");
+            if (as.length == 2) {
+                String username = as[0];
+                String password = as[1];
+                if (interfaceVo.getUsername().equalsIgnoreCase(username) && interfaceVo.getPassword().equals(password)) {
+                    if (interfaceVo.getTimeout() > 0) {
+                        long requestTime = Long.parseLong(request.getHeader("x-access-date"));
+                        long timeDiff = System.currentTimeMillis() - requestTime;
+                        if (timeDiff < 0 || timeDiff > 1000L * interfaceVo.getTimeout()) {
+                            return 408; //超時
+                        }
                     }
+                } else {
+                    return 401;//用户验证失败
                 }
             } else {
                 return 401;//用户验证失败
             }
         } else {
-            return 401;//用户验证失败
+            return 412;// 请求头缺少认证信息
         }
+
         return 1;
     }
     

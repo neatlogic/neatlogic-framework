@@ -4,6 +4,7 @@ import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.restful.core.IApiComponent;
@@ -223,7 +224,9 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 token = token.substring(0, token.length() - 1);
             }
             ApiVo apiVo = new ApiVo();
-            apiVo.setAuthtype("-");
+            apiVo.setAuthtype("basic");
+            apiVo.setUsername(Config.PUBLIC_API_AUTH_USERNAME());
+            apiVo.setPassword(Config.PUBLIC_API_AUTH_PASSWORD());
             apiVo.setToken(token);
             apiVo.setHandler(componentJson.getString("handler"));
             apiVo.setHandlerName(componentJson.getString("handler"));

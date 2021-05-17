@@ -63,6 +63,9 @@ public class Config {
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
+    private static String PUBLIC_API_AUTH_USERNAME;
+    private static String PUBLIC_API_AUTH_PASSWORD;
+
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
         if (StringUtils.isBlank(CODEDRIVER_HOME)) {
@@ -202,6 +205,14 @@ public class Config {
         return ENABLE_GZIP;
     }
 
+    public static String PUBLIC_API_AUTH_USERNAME() {
+        return PUBLIC_API_AUTH_USERNAME;
+    }
+
+    public static String PUBLIC_API_AUTH_PASSWORD() {
+        return PUBLIC_API_AUTH_PASSWORD;
+    }
+
 
     public static int NEW_MESSAGE_EXPIRED_DAY() {
         return NEW_MESSAGE_EXPIRED_DAY;
@@ -259,6 +270,8 @@ public class Config {
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
+            PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username","techsure");
+            PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password","techsure@2020");
             //ES_CLUSTERS = new HashMap<>();
 
             /*for (Map.Entry<Object, Object> el : prop.entrySet()) {

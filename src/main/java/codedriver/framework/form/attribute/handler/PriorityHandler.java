@@ -77,7 +77,7 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public boolean isFilterable() {
-        return false;
+        return true;
     }
 
     @Override

@@ -4,9 +4,9 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.SystemUser;
+import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dao.mapper.UserMapper;
-import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.AuthenticateException;
@@ -97,7 +97,7 @@ public class PublicApiDispatcher {
 
         //初始化租户
         String tenant = request.getHeader("Tenant");
-        if (StringUtils.isBlank(tenant) || tenantMapper.checkTenantUuidIsExists(new TenantVo(tenant)) == 0) {
+        if (StringUtils.isBlank(tenant) || !TenantUtil.hasTenant(tenant)) {
             throw new TenantNotFoundException(tenant);
         }
 

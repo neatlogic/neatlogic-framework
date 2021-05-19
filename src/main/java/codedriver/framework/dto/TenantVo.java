@@ -1,12 +1,12 @@
 package codedriver.framework.dto;
 
-import java.util.Date;
-import java.util.List;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+
+import java.util.Date;
+import java.util.List;
 
 public class TenantVo extends BasePageVo {
 	public enum Status {
@@ -34,6 +34,10 @@ public class TenantVo extends BasePageVo {
 
 	public TenantVo() {
 		this.setPageSize(20);
+	}
+
+	public TenantVo(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getUuid() {

@@ -4,7 +4,9 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.SystemUser;
+import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.AuthenticateException;
@@ -28,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,10 +53,13 @@ import java.util.Map;
 public class PublicApiDispatcher {
     Logger logger = LoggerFactory.getLogger(PublicApiDispatcher.class);
 
-    @Autowired
+    @Resource
     private ApiMapper apiMapper;
 
-    @Autowired
+    @Resource
+    private TenantMapper tenantMapper;
+
+    @Resource
     UserMapper userMapper;
 
     private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
@@ -92,9 +97,10 @@ public class PublicApiDispatcher {
 
         //初始化租户
         String tenant = request.getHeader("Tenant");
-        if (StringUtils.isBlank(tenant)) {
+        if (StringUtils.isBlank(tenant) || tenantMapper.checkTenantUuidIsExists(new TenantVo(tenant)) == 0) {
             throw new TenantNotFoundException(tenant);
         }
+
         TenantContext.init();
         TenantContext.get().switchTenant(tenant);
 

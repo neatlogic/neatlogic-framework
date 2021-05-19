@@ -94,9 +94,6 @@
 		`tenant`
 		WHERE
 		uuid = #{uuid}
-		<if test="id != null">
-			AND id != #{id}
-		</if>
 	</select>
 
 	<select id="getTenantByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TenantVo">

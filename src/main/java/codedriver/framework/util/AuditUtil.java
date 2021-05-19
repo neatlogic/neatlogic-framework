@@ -204,7 +204,7 @@ public class AuditUtil {
                     fileNameEncode = new String(fileNameEncode.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
                 }
                 response.setContentType("aplication/x-msdownload;charset=utf-8");
-                response.setHeader("Content-Disposition", "attachment;fileName=\"" + fileNameEncode + "\"");
+                response.setHeader("Content-Disposition", " attachment; filename=\"" + fileNameEncode + "\"");
                 OutputStream os = response.getOutputStream();
 
                 byte[] buff = new byte[(int) maxFileSize];

@@ -203,7 +203,7 @@ public class AuditUtil {
                 } else {
                     fileNameEncode = new String(fileNameEncode.getBytes(StandardCharsets.UTF_8), "ISO8859-1");
                 }
-                response.setContentType("aplication/x-msdownload;charset=utf-8");
+                response.setContentType("application/x-msdownload;charset=utf-8");
                 response.setHeader("Content-Disposition", " attachment; filename=\"" + fileNameEncode + "\"");
                 OutputStream os = response.getOutputStream();
 

@@ -1,6 +1,7 @@
 package codedriver.framework.dto;
 
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.auth.core.AuthBase;
@@ -37,7 +38,14 @@ public class UserAuthVo extends BasePageVo implements Serializable {
 		this.auth = _auth;
    	}
 
-	public String getUserUuid() {
+    public UserAuthVo(AuthBase authInstance) {
+        this.userUuid = UserContext.get().getUserUuid();
+        this.auth = authInstance.getAuthName();
+        this.authGroup = authInstance.getAuthGroup();
+        this.authName = authInstance.getAuthDisplayName();
+    }
+
+    public String getUserUuid() {
         return userUuid;
     }
 

@@ -14,10 +14,7 @@ import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RootComponent
@@ -112,6 +109,30 @@ public class AuthActionChecker {
             }
         }
         return false;
+    }
+
+    /**
+     * 根据用户权限穿透获取所有权限
+     * @param userAuthList 未穿透的权限
+     */
+    public static void getAuthList(List<UserAuthVo> userAuthList){
+        for (int i = 0; i < userAuthList.size(); i++) {
+            AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
+            getAuthListByAuth(authBase,userAuthList);
+        }
+    }
+
+    private static void getAuthListByAuth(AuthBase authBase,List<UserAuthVo> userAuthList){
+        if(authBase != null) {
+            List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
+            for (Class<? extends AuthBase> authClass : authClassList) {
+                if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
+                    AuthBase auth =  AuthFactory.getAuthInstance(authClass.getSimpleName());
+                    userAuthList.add(new UserAuthVo(auth));
+                    getAuthListByAuth(auth,userAuthList);
+                }
+            }
+        }
     }
 
 }

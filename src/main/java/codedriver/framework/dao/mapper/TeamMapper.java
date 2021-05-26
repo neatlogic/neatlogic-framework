@@ -76,7 +76,7 @@ public interface TeamMapper {
     * 4.没有子节点的节点左编码比右编码小1
     * @return int 返回左右编码不正确的个数
      */
-    public int checkLeftRightCodeIsWrong();
+//    public int checkLeftRightCodeIsWrong();
 
     public List<String> getTeamUuidByName(String name);
 
@@ -84,7 +84,9 @@ public interface TeamMapper {
 
     public List<TeamVo> getRepeatTeamNameByNameList(List<String> list);
 
-	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+	List<String> getChildrenUuidListByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+//	public int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
 	public  int insertTeam(TeamVo teamVo);
 
@@ -100,12 +102,19 @@ public interface TeamMapper {
 
 	public int updateTeamUserTitle(TeamUserVo teamUserVo);
 
-	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
+//	public int batchUpdateTeamLeftCode(@Param("minCode")Integer minCode, @Param("step") int step);
 	
-	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
+//	public int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 
 	public int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
-	public int deleteTeamUser(TeamUserVo teamUserVo);
+	int deleteTeamUserByTeamUuid(String teamUuid);
 
+	int deleteTeamUserByTeamUuidList(List<String> teamUuidList);
+
+	int deleteTeamUserByTeamUuidAndUserUuidList(@Param("teamUuid") String teamUuid, @Param("userUuidList") List<String> userUuidList);
+
+	int deleteTeamByUuidList(List<String> uuidList);
+
+	int deleteTeamRoleByTeamUuidList(List<String> teamUuidList);
 }

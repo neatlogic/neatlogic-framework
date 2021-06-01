@@ -1,10 +1,11 @@
 package codedriver.framework.file.dto;
 
-import org.apache.commons.lang3.StringUtils;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Date;
 
 public class FileVo {
 	@EntityField(name = "附件id", type = ApiParamType.LONG)
@@ -18,7 +19,7 @@ public class FileVo {
 	@EntityField(name = "上传用户", type = ApiParamType.STRING)
 	private String userUuid;
 	@EntityField(name = "上传时间", type = ApiParamType.STRING)
-	private String uploadTime;
+	private Date uploadTime;
 	@EntityField(name = "附件归属", type = ApiParamType.STRING)
 	private String type;
 	@EntityField(name = "扩展名", type = ApiParamType.STRING)
@@ -71,11 +72,11 @@ public class FileVo {
 		this.userUuid = userUuid;
 	}
 
-	public String getUploadTime() {
+	public Date getUploadTime() {
 		return uploadTime;
 	}
 
-	public void setUploadTime(String uploadTime) {
+	public void setUploadTime(Date uploadTime) {
 		this.uploadTime = uploadTime;
 	}
 

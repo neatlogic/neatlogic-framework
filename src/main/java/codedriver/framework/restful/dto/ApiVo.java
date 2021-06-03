@@ -145,6 +145,15 @@ public class ApiVo extends BasePageVo implements Serializable {
 	        return this.text;
 	    }
 
+		public static AuthenticateType getAuthenticateType(String value){
+			for(AuthenticateType type : AuthenticateType.values()){
+				if(type.getValue().equals(value)){
+					return type;
+				}
+			}
+			return null;
+		}
+
 
 		@Override
 		public List getValueTextList() {

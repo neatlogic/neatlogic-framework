@@ -8,14 +8,16 @@ import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TeamVo extends BasePageVo {
+public class TeamVo extends BasePageVo implements Serializable {
 	
 	public static final String ROOT_PARENTUUID = "-1";
 	public static final String ROOT_UUID = "0";
+	private static final long serialVersionUID = -114822145668874331L;
 	@JSONField(serialize=false)
 	private transient String keyword;
 	@JSONField(serialize=false)

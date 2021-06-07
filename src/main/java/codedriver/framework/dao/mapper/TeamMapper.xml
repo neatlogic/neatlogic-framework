@@ -485,7 +485,7 @@
 		DELETE FROM `user_team`
 		WHERE `team_uuid` = #{teamUuid}
 		AND `user_uuid` IN
-		<foreach collection="list" item="userUuid" open="(" separator="," close=")">
+		<foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
 			#{userUuid}
 		</foreach>
 	</delete>

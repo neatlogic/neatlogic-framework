@@ -36,6 +36,7 @@ public class BasePageVo {
     private transient Set<String> keywordList;
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
     private transient Integer rowNum = 0;
+    private transient Integer pageSizePlus;
 
     public BasePageVo() {
     }
@@ -65,6 +66,11 @@ public class BasePageVo {
             this.pageSize = Math.min(100, pageSize);//pagesize最大100
         }
     }
+
+    public Integer getPageSizePlus() {
+        return this.getPageSize() + 1;
+    }
+
 
     public Integer getCurrentPage() {
         return currentPage;

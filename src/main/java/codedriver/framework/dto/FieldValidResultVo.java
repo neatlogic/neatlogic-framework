@@ -16,11 +16,14 @@ public class FieldValidResultVo {
     //错误信息
     private String msg;
 
+    private Object param;
+
     private ApiRuntimeException exception;
 
     public FieldValidResultVo(ApiRuntimeException exception) {
         this.msg = exception.getMessage();
         this.status = "ERROR";
+        this.param = exception.getParam();
     }
 
     public FieldValidResultVo() {
@@ -28,17 +31,24 @@ public class FieldValidResultVo {
     }
 
     public String getMsg() {
-        if(exception != null){
+        if (exception != null) {
             msg = exception.getMessage();
         }
         return msg;
     }
 
     public String getStatus() {
-        if(exception != null){
+        if (exception != null) {
             status = "ERROR";
         }
         return status;
+    }
+
+    public Object getParam() {
+        if (exception != null) {
+            param = exception.getParam();
+        }
+        return param;
     }
 
     public ApiRuntimeException getException() {

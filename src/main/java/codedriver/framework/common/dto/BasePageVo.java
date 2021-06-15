@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.fulltextindex.utils.FullTextIndexUtil;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,8 @@ public class BasePageVo {
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
     private transient Integer rowNum = 0;
     private transient Integer pageSizePlus;
+    @EntityField(name = "默认值", type = ApiParamType.JSONARRAY)
+    private transient JSONArray defaultValue;
 
     public BasePageVo() {
     }
@@ -58,6 +61,9 @@ public class BasePageVo {
     }
 
     public Integer getPageSize() {
+        if(!this.needPage){
+            pageSize = 100;
+        }
         return pageSize;
     }
 
@@ -122,5 +128,13 @@ public class BasePageVo {
         if (StringUtils.isNotBlank(keyword)) {
             this.keyword = keyword.trim();
         }
+    }
+
+    public JSONArray getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(JSONArray defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

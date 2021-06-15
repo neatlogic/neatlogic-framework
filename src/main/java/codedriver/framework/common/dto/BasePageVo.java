@@ -58,13 +58,13 @@ public class BasePageVo {
     }
 
     public Integer getPageSize() {
+        if(!this.needPage){
+            pageSize = 100;
+        }
         return pageSize;
     }
 
     public void setPageSize(Integer pageSize) {
-        if(!this.needPage){
-            pageSize = 100;
-        }
         if (pageSize != null) {
             this.pageSize = Math.min(100, pageSize);//pagesize最大100
         }

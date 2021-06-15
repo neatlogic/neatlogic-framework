@@ -58,6 +58,9 @@ public class BasePageVo {
     }
 
     public Integer getPageSize() {
+        if(!this.needPage){
+            pageSize = 100;
+        }
         return pageSize;
     }
 

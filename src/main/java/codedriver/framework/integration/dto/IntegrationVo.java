@@ -52,8 +52,6 @@ public class IntegrationVo extends BasePageVo {
 	private Date lcd;
 	@EntityField(name = "是否有帮助", type = ApiParamType.INTEGER)
 	private Integer hasHelp;
-	@EntityField(name = "回显值", type = ApiParamType.INTEGER)
-	private List<String> valueList;
 
 	@JSONField(serialize = false)
 	private transient String keyword;
@@ -232,14 +230,6 @@ public class IntegrationVo extends BasePageVo {
 
 	public void setHasHelp(Integer hasHelp) {
 		this.hasHelp = hasHelp;
-	}
-
-	public List<String> getValueList() {
-		return valueList;
-	}
-
-	public void setValueList(List<String> valueList) {
-		this.valueList = valueList;
 	}
 
 }

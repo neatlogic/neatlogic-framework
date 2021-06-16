@@ -1,6 +1,7 @@
 package codedriver.framework.dto;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * @Title: FieldValidResultVo
@@ -16,7 +17,7 @@ public class FieldValidResultVo {
     //错误信息
     private String msg;
 
-    private Object param;
+    private JSONObject param;
 
     private ApiRuntimeException exception;
 

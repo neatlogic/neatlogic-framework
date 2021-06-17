@@ -82,9 +82,9 @@
 			<if test="isActive != null">
 				AND is_active = #{isActive}
 			</if>
-			<if test="valueList != null and valueList.size() >0">
+			<if test="defaultValue != null and defaultValue.size() >0">
 				AND uuid in
-				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
+				<foreach collection="defaultValue" item="uuid" open="(" separator="," close=")">
 					#{uuid}
 				</foreach>
 			</if>
@@ -112,9 +112,9 @@
 			<if test="isActive != null">
 				AND is_active = #{isActive}
 			</if>
-			<if test="valueList != null and valueList.size() >0">
+			<if test="defaultValue != null and defaultValue.size() >0">
 				AND uuid in
-				<foreach collection="valueList" item="uuid" open="(" separator="," close=")">
+				<foreach collection="defaultValue" item="uuid" open="(" separator="," close=")">
 					#{uuid}
 				</foreach>
 			</if>

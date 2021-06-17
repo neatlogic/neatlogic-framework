@@ -80,6 +80,9 @@ public class ApiDispatcher {
             if (StringUtils.isNotBlank(validResultVo.getMsg())) {
                 response.setStatus(530);
                 returnObj.put("Message", validResultVo.getMsg());
+                if (validResultVo.getParam() != null) {
+                    returnObj.put("Param", validResultVo.getParam());
+                }
             }
             returnObj.put("Status", validResultVo.getStatus());
         } else {
@@ -179,6 +182,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
@@ -234,6 +240,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -287,6 +296,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -340,6 +352,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -392,6 +407,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -444,6 +462,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -485,6 +506,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
@@ -517,6 +541,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
@@ -549,6 +576,9 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {

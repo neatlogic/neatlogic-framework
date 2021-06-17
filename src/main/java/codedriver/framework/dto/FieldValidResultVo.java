@@ -1,6 +1,7 @@
 package codedriver.framework.dto;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * @Title: FieldValidResultVo
@@ -16,11 +17,14 @@ public class FieldValidResultVo {
     //错误信息
     private String msg;
 
+    private JSONObject param;
+
     private ApiRuntimeException exception;
 
     public FieldValidResultVo(ApiRuntimeException exception) {
         this.msg = exception.getMessage();
         this.status = "ERROR";
+        this.param = exception.getParam();
     }
 
     public FieldValidResultVo() {
@@ -28,17 +32,24 @@ public class FieldValidResultVo {
     }
 
     public String getMsg() {
-        if(exception != null){
+        if (exception != null) {
             msg = exception.getMessage();
         }
         return msg;
     }
 
     public String getStatus() {
-        if(exception != null){
+        if (exception != null) {
             status = "ERROR";
         }
         return status;
+    }
+
+    public Object getParam() {
+        if (exception != null) {
+            param = exception.getParam();
+        }
+        return param;
     }
 
     public ApiRuntimeException getException() {

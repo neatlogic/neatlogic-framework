@@ -1,30 +1,34 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core;
+
+import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.restful.dto.ApiVo;
-
 public interface IBinaryStreamApiComponent {
 
-	public String getId();
+	String getId();
 
-	public String getName();
+	String getName();
 
 	// true时返回格式不再包裹固定格式
-	public default boolean isRaw() {
+	default boolean isRaw() {
 		return false;
 	}
 
-	public String getConfig();
+	String getConfig();
 
-	public int needAudit();
+	int needAudit();
 
-	public Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
+	Object doService(ApiVo interfaceVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-	public JSONObject help();
+	JSONObject help();
 
 	/**
 	 * @Description: 是否支持匿名访问
@@ -33,7 +37,11 @@ public interface IBinaryStreamApiComponent {
 	 * @Params:[]
 	 * @Returns:boolean
 	 **/
-	public default boolean supportAnonymousAccess(){
+	default boolean supportAnonymousAccess() {
+		return false;
+	}
+
+	default boolean disableReturnCircularReferenceDetect() {
 		return false;
 	}
 }

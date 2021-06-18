@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core;
 
 import codedriver.framework.common.config.Config;
@@ -50,7 +55,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(validField)) {
                         isHasValid = true;
                         //特殊入参校验：重复、特殊规则等
-                        IValid validComponent = (IValid) method.invoke(target, null);
+                        IValid validComponent = (IValid) method.invoke(target, (Object) null);
                         resultVo = validComponent.valid(paramObj);
                         break;
                     }

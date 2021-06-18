@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core;
 
 import codedriver.framework.dto.FieldValidResultVo;
@@ -10,92 +15,88 @@ import javax.servlet.http.HttpServletResponse;
 public interface IApiComponent {
 
     /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 实现类全名
+     * 实现类全名
+     *
+     * @return 实现类全名
      */
-    public default String getClassName() {
+    default String getClassName() {
         return ClassUtils.getUserClass(this.getClass()).getName();
     }
 
     /**
-     * @param @return
-     * @return boolean
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: true时返回格式不再包裹固定格式，固定格式是:{Status:"OK",Return:{},Message:"error"}
+     * true时返回格式不再包裹固定格式，固定格式是:{Status:"OK",Return:{},Message:"error"}
+     *
+     * @return true false
      */
-    public default boolean isRaw() {
+    default boolean isRaw() {
         return false;
     }
 
     /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 接口中文名
+     * 接口中文名
+     *
+     * @return 中文名
      */
-    public String getName();
+    String getName();
 
     /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 额外配置
+     * 额外配置
+     *
+     * @return 配置json
      */
-    public String getConfig();
+    String getConfig();
 
     /**
-     * @param @return
-     * @return int
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 是否需要审计
+     * 是否需要审计
+     *
+     * @return true false
      */
-    public int needAudit();
+    int needAudit();
 
     /**
-     * @param @param  apiVo
-     * @param @param  jsonObj
-     * @param @return
-     * @param @throws Exception
-     * @return Object
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 服务主入口
+     * 服务主入口
+     *
+     * @param apiVo    api
+     * @param jsonObj  参数
+     * @param response response对象
+     * @return 返回值
+     * @throws Exception 异常
      */
-    public Object doService(ApiVo apiVo, JSONObject jsonObj, HttpServletResponse response) throws Exception;
+    Object doService(ApiVo apiVo, JSONObject jsonObj, HttpServletResponse response) throws Exception;
 
     /**
-     * @param @return
-     * @return JSONObject
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 获取帮助信息
+     * 获取帮助信息
+     *
+     * @return 帮助信息json
      */
-    public JSONObject help();
+    JSONObject help();
 
     /**
-     * @Description: 校验入参特殊规则，如：去重
-     * @Author: 89770
-     * @Date: 2021/2/20 16:09
-     * @Params: [interfaceVo, paramObj, validField]
-     * @Returns: void
-     **/
+     * 校验入参特殊规则，如：去重
+     *
+     * @param interfaceVo 接口
+     * @param paramObj    参数
+     * @param validField  校验字段
+     * @return 校验结果
+     * @throws Exception 异常
+     */
     FieldValidResultVo doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
 
     /**
-     * @Description: 是否支持匿名访问
-     * @Author: linbq
-     * @Date: 2021/3/11 18:37
-     * @Params:[]
-     * @Returns:boolean
-     **/
-    public default boolean supportAnonymousAccess(){
+     * 是否支持匿名访问
+     *
+     * @return true false
+     */
+    default boolean supportAnonymousAccess() {
+        return false;
+    }
+
+    /**
+     * 是否禁用返回值循环引用检查
+     *
+     * @return true false
+     */
+    default boolean disableReturnCircularReferenceDetect() {
         return false;
     }
 }

@@ -22,6 +22,7 @@ import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -99,8 +100,15 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
                         } else {
-                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV, SerializerFeature.DisableCircularReferenceDetect)));
+                            } else {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            }
                         }
                     } else {
                         returnObj.putAll(restComponent.help());
@@ -121,6 +129,9 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
                         } else {
                             returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                         }
@@ -143,6 +154,9 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
                         } else {
                             returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                         }
@@ -200,7 +214,12 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(returnObj);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj);
+            }
         }
     }
 
@@ -265,7 +284,12 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(returnObj);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
         }
 
     }
@@ -321,7 +345,12 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(returnObj.toJSONString());
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
         }
     }
 
@@ -377,7 +406,12 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(returnObj.toJSONString());
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
         }
     }
 
@@ -432,7 +466,12 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(returnObj.toJSONString());
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
         }
     }
 

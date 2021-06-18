@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core;
 
 import com.alibaba.fastjson.JSONObject;
@@ -7,31 +12,33 @@ import codedriver.framework.restful.dto.ApiVo;
 
 public interface IJsonStreamApiComponent {
 
-	public String getId();
+    String getId();
 
-	public String getName();
+    String getName();
 
-	public String getConfig();
+    String getConfig();
 
-	// true时返回格式不再包裹固定格式
-	public default boolean isRaw() {
-		return false;
-	}
+    // true时返回格式不再包裹固定格式
+    default boolean isRaw() {
+        return false;
+    }
 
-	public int needAudit();
+    int needAudit();
 
-	public Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception;
+    Object doService(ApiVo interfaceVo, JSONObject paramObj, JSONReader jsonReader) throws Exception;
 
-	public JSONObject help();
+    JSONObject help();
 
-	/**
-	 * @Description: 是否支持匿名访问
-	 * @Author: linbq
-	 * @Date: 2021/3/11 18:37
-	 * @Params:[]
-	 * @Returns:boolean
-	 **/
-	public default boolean supportAnonymousAccess(){
-		return false;
-	}
+    /**
+     * 是否支持匿名访问
+     *
+     * @return
+     */
+    default boolean supportAnonymousAccess() {
+        return false;
+    }
+
+    default boolean disableReturnCircularReferenceDetect() {
+        return false;
+    }
 }

@@ -32,28 +32,25 @@ import java.util.regex.Pattern;
 public class PrivateApiComponentFactory extends ApplicationListenerBase {
     static Logger logger = LoggerFactory.getLogger(PrivateApiComponentFactory.class);
 
-    private static Map<String, IApiComponent> componentMap = new HashMap<>();
-    private static List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
-    private static Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
-    private static List<ApiVo> apiList = new ArrayList<>();
-    private static Map<String, ApiVo> apiMap = new HashMap<>();
+    private static final Map<String, IApiComponent> componentMap = new HashMap<>();
+    private static final List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
+    private static final Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
+    private static final List<ApiVo> apiList = new ArrayList<>();
+    private static final Map<String, ApiVo> apiMap = new HashMap<>();
     // public static Map<String, RateLimiter> interfaceRateMap = new
     // ConcurrentHashMap<>();
-    private static Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
-    private static Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
+    private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
+    private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
     // 按照token表达式长度排序，最长匹配原则
-    private static Map<String, ApiVo> regexApiMap = new TreeMap<String, ApiVo>(new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            // 先按照长度排序，如果长度一样按照内容排序
-            if (o1.length() != o2.length()) {
-                return o1.length() - o2.length();
-            } else {
-                return o1.compareTo(o2);
-            }
+    private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
+        // 先按照长度排序，如果长度一样按照内容排序
+        if (o1.length() != o2.length()) {
+            return o1.length() - o2.length();
+        } else {
+            return o1.compareTo(o2);
         }
     });
-    private static Pattern p = Pattern.compile("\\{([^}]+)\\}");
+    private static final Pattern p = Pattern.compile("\\{([^}]+)}");
 
     public static IApiComponent getInstance(String componentId) {
         return componentMap.get(componentId);
@@ -70,9 +67,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
     public static ApiVo getApiByToken(String token) {
         ApiVo apiVo = apiMap.get(token);
         if (apiVo == null) {
-            Iterator<String> keys = regexApiMap.keySet().iterator();
-            while (keys.hasNext()) {
-                String regex = keys.next();
+            for (String regex : regexApiMap.keySet()) {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(token);
                 if (matcher.find()) {
@@ -112,14 +107,6 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         return componentMap;
     }
 
-    public static Map<String, IJsonStreamApiComponent> getStreamComponentMap() {
-        return streamComponentMap;
-    }
-
-    public static Map<String, IBinaryStreamApiComponent> getBinaryComponentMap() {
-        return binaryComponentMap;
-    }
-
     public static Map<String, ApiHandlerVo> getApiHandlerMap() {
         return apiHandlerMap;
     }
@@ -128,7 +115,6 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
         return apiMap;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext context = event.getApplicationContext();
@@ -178,17 +164,15 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
                     apiVo.setApiType(ApiVo.ApiType.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-                    if (token.indexOf("{") > -1) {
+                    if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
-                        int i = 0;
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
                             m.appendReplacement(temp, "([^\\/]+)");
-                            i++;
                         }
                         m.appendTail(temp);
-                        String regexToken = "^" + temp.toString() + "$";
+                        String regexToken = "^" + temp + "$";
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
@@ -253,17 +237,15 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
 
-                    if (token.indexOf("{") > -1) {
+                    if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
-                        int i = 0;
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
                             m.appendReplacement(temp, "([^\\/]+)");
-                            i++;
                         }
                         m.appendTail(temp);
-                        String regexToken = "^" + temp.toString() + "$";
+                        String regexToken = "^" + temp + "$";
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
@@ -327,17 +309,15 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
 
-                    if (token.indexOf("{") > -1) {
+                    if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
-                        int i = 0;
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
                             m.appendReplacement(temp, "([^\\/]+)");
-                            i++;
                         }
                         m.appendTail(temp);
-                        String regexToken = "^" + temp.toString() + "$";
+                        String regexToken = "^" + temp + "$";
                         if (!regexApiMap.containsKey(regexToken)) {
                             regexApiMap.put(regexToken, apiVo);
                         } else {
@@ -361,8 +341,8 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
     /**
      * 补充注解提示，防止越权
      *
-     * @param component
-     * @param context
+     * @param component 组件
+     * @param context   应用context
      */
     public void checkAnnotation(Object component, ApplicationContext context) {
         //TODO 后续master模块完善后放开

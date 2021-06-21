@@ -55,7 +55,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (method.getGenericReturnType().getTypeName().equals(IValid.class.getTypeName()) && method.getName().equals(validField)) {
                         isHasValid = true;
                         //特殊入参校验：重复、特殊规则等
-                        IValid validComponent = (IValid) method.invoke(target, (Object) null);
+                        IValid validComponent = (IValid) method.invoke(target);
                         resultVo = validComponent.valid(paramObj);
                         break;
                     }

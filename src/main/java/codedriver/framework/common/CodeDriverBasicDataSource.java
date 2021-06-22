@@ -23,8 +23,8 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
     public Connection getConnection() throws SQLException {
         Connection conn = super.getConnection();
         try (Statement statement = conn.createStatement()) {
-            //设置mysql join顺序优化器最大深度是10,避免大SQL分析时间过慢
-            statement.execute("SET SESSION optimizer_search_depth = 10");
+            //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
+            statement.execute("SET SESSION optimizer_search_depth = 5");
             if (UserContext.get() != null) {
                 String timezone = UserContext.get().getTimezone();
                 if (StringUtils.isNotBlank(timezone)) {

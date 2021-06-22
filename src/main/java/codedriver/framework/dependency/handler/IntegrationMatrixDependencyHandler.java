@@ -15,6 +15,8 @@ import codedriver.framework.matrix.dto.MatrixVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 矩阵引用集成处理器
@@ -58,6 +60,11 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
         return "matrix_uuid";
     }
 
+    @Override
+    protected List<String> getCallerFieldList() {
+        return null;
+    }
+
     /**
      * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
@@ -66,11 +73,13 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      */
     @Override
     protected ValueTextVo parse(Object caller) {
-        if (caller instanceof String) {
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid((String) caller);
+        if (caller instanceof Map) {
+            Map<String, Object> map = (Map)caller;
+            String matrixUuid =  (String) map.get("matrix_uuid");
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
             if (matrixVo != null) {
                 ValueTextVo valueTextVo = new ValueTextVo();
-                valueTextVo.setValue(caller);
+                valueTextVo.setValue(matrixUuid);
                 valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-external-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
                 return valueTextVo;
             }

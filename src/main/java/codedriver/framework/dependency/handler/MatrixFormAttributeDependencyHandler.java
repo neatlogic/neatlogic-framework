@@ -60,6 +60,11 @@ public class MatrixFormAttributeDependencyHandler extends DependencyHandlerBase 
         return "form_verison_uuid";
     }
 
+    @Override
+    protected List<String> getCallerFieldList() {
+        return null;
+    }
+
     /**
      * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *

@@ -5,10 +5,13 @@
 
 package codedriver.framework.dependency.dao.mapper;
 
+import com.alibaba.fastjson.JSONArray;
 import com.beust.jcommander.Parameter;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: linbq
@@ -16,10 +19,9 @@ import java.util.List;
  **/
 public interface DependencyMapper {
 
-    public List<Object> getCallerListByCallee(
+    public List<Map<String, Object>> getCallerListByCallee(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
-            @Param("callerField") String callerField,
             @Param("callee") Object callee,
             @Param("startNum") int startNum,
             @Param("pageSize") int pageSize);
@@ -35,6 +37,13 @@ public interface DependencyMapper {
             @Param("callerField") String callerField,
             @Param("callee") Object callee,
             @Param("caller") Object caller);
+
+    public int insertIgnoreDependency2(
+            @Param("tableName") String tableName,
+            @Param("calleeField") String calleeField,
+            @Param("callerFieldList") List<String> callerFieldList,
+            @Param("callee") Object callee,
+            @Param("callerArray") JSONArray callerArray);
 
     public int deleteDependencyByCaller(
             @Param("tableName") String tableName,

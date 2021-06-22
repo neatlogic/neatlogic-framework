@@ -7,6 +7,7 @@ package codedriver.framework.dependency.core;
 
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.dto.ValueTextVo;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -47,6 +48,18 @@ public class DependencyManager {
         return dependencyHandler.insert(callee, caller);
     }
 
+    /**
+     * 插入一条引用关系数据
+     *
+     * @param clazz  引用关系处理器类
+     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param callerArray 调用者值（如：服务uuid）
+     * @return
+     */
+    public static int insert(Class<? extends IDependencyHandler> clazz, Object callee, JSONArray callerArray) {
+        IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getName());
+        return dependencyHandler.insert(callee, callerArray);
+    }
     /**
      * 删除引用关系
      *

@@ -7,10 +7,12 @@ package codedriver.framework.dependency.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.dao.mapper.DependencyMapper;
+import com.alibaba.fastjson.JSONArray;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 依赖关系处理器基类
@@ -49,6 +51,13 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
     protected abstract String getCallerField();
 
     /**
+     * 调用者字段列表
+     *
+     * @return
+     */
+    protected abstract List<String> getCallerFieldList();
+
+    /**
      * 插入一条引用关系数据
      *
      * @param callee 被调用者值（如：服务时间窗口uuid）
@@ -57,7 +66,11 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int insert(Object callee, Object caller) {
-        return dependencyMapper.insertIgnoreDependency(getTableName(), getCalleeField(), getCallerField(), callee, caller);
+        if(caller instanceof JSONArray){
+            return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getCalleeField(), getCallerFieldList(), callee, (JSONArray) caller);
+        } else {
+            return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getCalleeField(), getCallerField(), callee, caller);
+        }
     }
 
     /**
@@ -82,7 +95,7 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
     @Override
     public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize) {
         List<ValueTextVo> resultList = new ArrayList<>();
-        List<Object> callerList = dependencyMapper.getCallerListByCallee(getTableName(), getCalleeField(), getCallerField(), callee, startNum, pageSize);
+        List<Map<String, Object>> callerList = dependencyMapper.getCallerListByCallee(getTableName(), getCalleeField(), callee, startNum, pageSize);
         for (Object caller : callerList) {
             ValueTextVo valueTextVo = parse(caller);
             if (valueTextVo != null) {

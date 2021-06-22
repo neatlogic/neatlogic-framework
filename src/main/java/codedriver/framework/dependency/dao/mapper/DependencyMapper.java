@@ -31,14 +31,14 @@ public interface DependencyMapper {
             @Param("calleeField") String calleeField,
             @Param("callee") Object callee);
 
-    public int insertIgnoreDependency(
+    public int insertIgnoreDependencyForCallerField(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callerField") String callerField,
             @Param("callee") Object callee,
             @Param("caller") Object caller);
 
-    public int insertIgnoreDependency2(
+    public int insertIgnoreDependencyForCallerFieldList(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callerFieldList") List<String> callerFieldList,

@@ -67,9 +67,9 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
     @Override
     public int insert(Object callee, Object caller) {
         if(caller instanceof JSONArray){
-            return dependencyMapper.insertIgnoreDependency2(getTableName(), getCalleeField(), getCallerFieldList(), callee, (JSONArray) caller);
+            return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getCalleeField(), getCallerFieldList(), callee, (JSONArray) caller);
         } else {
-            return dependencyMapper.insertIgnoreDependency(getTableName(), getCalleeField(), getCallerField(), callee, caller);
+            return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getCalleeField(), getCallerField(), callee, caller);
         }
     }
 

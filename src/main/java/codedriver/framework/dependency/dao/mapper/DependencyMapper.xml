@@ -19,12 +19,12 @@
         WHERE `${calleeField}` = #{callee}
     </select>
 
-    <insert id="insertIgnoreDependency">
+    <insert id="insertIgnoreDependencyForCallerField">
         INSERT IGNORE INTO `${tableName}` (`${callerField}`, `${calleeField}`)
         VALUES (#{caller}, #{callee})
     </insert>
 
-    <insert id="insertIgnoreDependency2">
+    <insert id="insertIgnoreDependencyForCallerFieldList">
         INSERT IGNORE INTO `${tableName}` (`${calleeField}`,
         <foreach collection="callerFieldList" item="callerField" separator=",">
             `${callerField}`

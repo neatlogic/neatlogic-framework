@@ -22,7 +22,7 @@ import java.util.Map;
 @RootConfiguration
 public class TenantContext implements Serializable {
     private static final long serialVersionUID = -5977938340288247600L;
-    private static final ThreadLocal<TenantContext> instance = new ThreadLocal<TenantContext>();
+    private static final ThreadLocal<TenantContext> instance = new ThreadLocal<>();
     private String tenantUuid;
     private Boolean useDefaultDatasource = false;
     private List<ModuleVo> activeModuleList;
@@ -107,7 +107,7 @@ public class TenantContext implements Serializable {
             // 使用master库
             this.setUseDefaultDatasource(true);
             //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
-            List<String> tenantModuleGroupList = new ArrayList<String>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
+            List<String> tenantModuleGroupList = new ArrayList<>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
             this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
             this.activeModuleGroupList = new ArrayList<>();
             for (String group : tenantModuleGroupList) {

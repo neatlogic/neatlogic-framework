@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nacos="http://nacos.io/schema/nacos"
@@ -96,24 +101,23 @@
 	<!-- 创建SqlSessionFactory，同时指定数据源 -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="configLocation" value="classpath:codedriver/framework/dao/config/mybatis-config.xml" />
-		<property name="dataSource" ref="dataSource" />
-		<property name="mapperLocations">
-			<list>
-				<value>classpath*:codedriver/framework/**/mapper/*.xml</value>
-			</list>
-		</property>
-	</bean>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:codedriver/framework/**/mapper/*.xml</value>
+            </list>
+        </property>
+    </bean>
 
-	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false" />
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
 
-	<bean id="DatasourceInitializer" class="codedriver.framework.startup.DatasourceInitializer"></bean>
+    <bean id="DatasourceInitializer" class="codedriver.framework.bootstrap.DatasourceInitializer"></bean>
 
-	<bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
+    <bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
 
-
-	<!-- <hdp:configuration id="hadoopConfiguration">
-		fs.defaultFS=${hadoop.url}
-	</hdp:configuration>
-	<hdp:file-system id="fileSystem" configuration-ref="hadoopConfiguration" user="root"></hdp:file-system> -->
+    <!-- <hdp:configuration id="hadoopConfiguration">
+        fs.defaultFS=${hadoop.url}
+    </hdp:configuration>
+    <hdp:file-system id="fileSystem" configuration-ref="hadoopConfiguration" user="root"></hdp:file-system> -->
 </beans>

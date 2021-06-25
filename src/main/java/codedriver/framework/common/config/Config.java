@@ -23,7 +23,7 @@ import java.util.concurrent.Executor;
 
 @RootConfiguration
 public class Config {
-    private static Logger logger = LoggerFactory.getLogger(Config.class);
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     @NacosInjected
     private ConfigService configService;
     private static final String CONFIG_FILE = "config.properties";

@@ -23,6 +23,11 @@ public abstract class CodeDriverThread implements Runnable {
         tenantContext = TenantContext.get();
     }
 
+    public CodeDriverThread(UserContext _userContext, TenantContext _tenantContext) {
+        userContext = _userContext;
+        tenantContext = _tenantContext;
+    }
+
     public CodeDriverThread(String _threadName) {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();

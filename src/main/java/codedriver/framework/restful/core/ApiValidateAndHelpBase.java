@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -317,8 +322,14 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     // 判断是否必填
-                    if (p.isRequired() && !paramObj.containsKey(p.name())) {
-                        throw new ParamNotExistsException(p.name());
+                    if (p.isRequired()) {
+                        if (!paramObj.containsKey(p.name())) {
+                            throw new ParamNotExistsException(p.name());
+                        } else {
+                            if (p.type().equals(ApiParamType.STRING) && paramValue != null && StringUtils.isBlank(paramValue.toString())) {
+                                throw new ParamNotExistsException(p.name());
+                            }
+                        }
                     }
 
                     // 判断最大长度
@@ -364,7 +375,7 @@ public class ApiValidateAndHelpBase {
                         if (genericType instanceof ParameterizedType) {
                             ParameterizedType parameterizedType = (ParameterizedType) genericType;
                             Type actualType = parameterizedType.getActualTypeArguments()[0];
-                            if(actualType instanceof  Class) { //如果不是class 则无需继续递归
+                            if (actualType instanceof Class) { //如果不是class 则无需继续递归
                                 Class<?> integerClass = (Class<?>) actualType;
                                 JSONArray subParamList = new JSONArray();
                                 for (Field subField : integerClass.getDeclaredFields()) {

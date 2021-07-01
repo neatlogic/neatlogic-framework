@@ -1,20 +1,18 @@
 package codedriver.framework.dto.condition;
 
+import codedriver.framework.exception.type.ParamIrregularException;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.exception.type.ParamIrregularException;
 
 public class ConditionGroupVo implements Serializable {
     private static final long serialVersionUID = 8392325201425982471L;
@@ -32,32 +30,35 @@ public class ConditionGroupVo implements Serializable {
     }
 
     public ConditionGroupVo(JSONObject jsonObj) {
-        this.uuid = jsonObj.getString("uuid");
-        JSONArray conditionArray = jsonObj.getJSONArray("conditionList");
-        if (conditionArray.size() == 0) {
-            throw new ParamIrregularException("conditionList");
-        }
-        JSONArray channelArray = jsonObj.getJSONArray("channelUuidList");
-        if (CollectionUtils.isNotEmpty(channelArray)) {
-            channelUuidList = JSONObject.parseArray(channelArray.toJSONString(), String.class);
-        }
-        conditionList = new ArrayList<ConditionVo>();
-        conditionMap = new HashMap<String, ConditionVo>();
-        for (int i = 0; i < conditionArray.size(); i++) {
-            JSONObject condition = conditionArray.getJSONObject(i);
-            ConditionVo conditionVo = new ConditionVo(condition);
-            conditionList.add(conditionVo);
-            conditionMap.put(conditionVo.getUuid(), conditionVo);
-        }
-        JSONArray conditionRelArray = jsonObj.getJSONArray("conditionRelList");
-        if (CollectionUtils.isNotEmpty(conditionRelArray)) {
-            conditionRelList = new ArrayList<ConditionRelVo>();
-            for (int i = 0; i < conditionRelArray.size(); i++) {
-                JSONObject conditionRel = conditionRelArray.getJSONObject(i);
-                conditionRelList.add(new ConditionRelVo(conditionRel));
+        try {
+            this.uuid = jsonObj.getString("uuid");
+            JSONArray conditionArray = jsonObj.getJSONArray("conditionList");
+            if (conditionArray.size() == 0) {
+                throw new ParamIrregularException("conditionList");
             }
+            JSONArray channelArray = jsonObj.getJSONArray("channelUuidList");
+            if (CollectionUtils.isNotEmpty(channelArray)) {
+                channelUuidList = JSONObject.parseArray(channelArray.toJSONString(), String.class);
+            }
+            conditionList = new ArrayList<ConditionVo>();
+            conditionMap = new HashMap<String, ConditionVo>();
+            for (int i = 0; i < conditionArray.size(); i++) {
+                JSONObject condition = conditionArray.getJSONObject(i);
+                ConditionVo conditionVo = new ConditionVo(condition);
+                conditionList.add(conditionVo);
+                conditionMap.put(conditionVo.getUuid(), conditionVo);
+            }
+            JSONArray conditionRelArray = jsonObj.getJSONArray("conditionRelList");
+            if (CollectionUtils.isNotEmpty(conditionRelArray)) {
+                conditionRelList = new ArrayList<ConditionRelVo>();
+                for (int i = 0; i < conditionRelArray.size(); i++) {
+                    JSONObject conditionRel = conditionRelArray.getJSONObject(i);
+                    conditionRelList.add(new ConditionRelVo(conditionRel));
+                }
+            }
+        }catch(Exception ex){
+            throw new ParamIrregularException("ConditionGroup");
         }
-
     }
 
     public void setUuid(String uuid) {

@@ -67,7 +67,7 @@ public class DivideHandler extends FormHandlerBase {
 
     @Override
     public boolean isShowable() {
-        return false;
+        return true;
     }
 
     @Override

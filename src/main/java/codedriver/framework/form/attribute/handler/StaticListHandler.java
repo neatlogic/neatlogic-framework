@@ -76,7 +76,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public boolean isValueable() {
-        return true;
+        return false;
     }
 
     @Override

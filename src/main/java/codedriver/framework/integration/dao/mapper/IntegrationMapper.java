@@ -23,6 +23,8 @@ public interface IntegrationMapper {
 
     int searchIntegrationCount(IntegrationVo integrationVo);
 
+    int checkNameIsRepeats(IntegrationVo integrationVo);
+
     List<String> checkUuidListExists(List<String> uuidList);
 
     int insertIntegration(IntegrationVo integrationVo);

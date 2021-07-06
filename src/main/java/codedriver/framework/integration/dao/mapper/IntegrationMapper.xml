@@ -144,6 +144,10 @@
 		</where>
 	</select>
 
+	<select id="checkNameIsRepeats" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="int">
+		select count(1) from `integration` where `name` = #{name} and `uuid` != #{uuid}
+	</select>
+
 	<select id="checkUuidListExists" parameterType="java.util.List" resultType="java.lang.String">
 		select `uuid` from `integration`
         where `uuid` in

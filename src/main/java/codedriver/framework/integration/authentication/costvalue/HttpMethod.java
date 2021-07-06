@@ -1,15 +1,26 @@
 package codedriver.framework.integration.authentication.costvalue;
 
+import java.util.Objects;
+
 public enum HttpMethod {
-	GET("get"), POST("post");
+    GET("get"), POST("post");
 
-	private String type;
+    private final String type;
 
-	private HttpMethod(String _type) {
-		this.type = _type;
-	}
+    HttpMethod(String _type) {
+        this.type = _type;
+    }
 
-	public String toString() {
-		return this.type;
-	}
+    public static HttpMethod getHttpMethod(String _value) {
+        for (HttpMethod method : HttpMethod.values()) {
+            if (Objects.equals(method.type, _value)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    public String toString() {
+        return this.type;
+    }
 }

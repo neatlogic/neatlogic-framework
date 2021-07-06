@@ -144,6 +144,14 @@
 		</where>
 	</select>
 
+	<select id="checkUuidListExists" parameterType="java.util.List" resultType="java.lang.String">
+		select `uuid` from `integration`
+        where `uuid` in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
 	<update id="updateIntegrationActive" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		UPDATE
 		`integration`

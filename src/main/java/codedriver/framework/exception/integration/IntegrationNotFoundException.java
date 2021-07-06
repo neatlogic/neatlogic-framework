@@ -14,6 +14,6 @@ public class IntegrationNotFoundException extends ApiRuntimeException {
     }
 
     public IntegrationNotFoundException(List<String> uuidList) {
-        super("找不到集成配置：" + StringUtils.join(",", uuidList));
+        super("找不到集成配置：" + StringUtils.join(uuidList));
     }
 }

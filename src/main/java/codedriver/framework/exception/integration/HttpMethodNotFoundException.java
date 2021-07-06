@@ -1,9 +1,6 @@
 package codedriver.framework.exception.integration;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 public class HttpMethodNotFoundException extends ApiRuntimeException {
 

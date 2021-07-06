@@ -1,5 +1,6 @@
 package codedriver.framework.integration.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,8 @@ import codedriver.framework.integration.core.IIntegrationHandler;
 import codedriver.framework.integration.core.IntegrationHandlerFactory;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class IntegrationVo extends BasePageVo {
+public class IntegrationVo extends BasePageVo implements Serializable {
+	private static final long serialVersionUID = 3921930881201126293L;
 	@EntityField(name = "uuid", type = ApiParamType.STRING)
 	private String uuid;
 	@EntityField(name = "名称", type = ApiParamType.STRING)

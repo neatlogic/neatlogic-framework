@@ -1,5 +1,6 @@
 package codedriver.framework.integration.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class PatternVo {
+public class PatternVo implements Serializable {
+
+	private static final long serialVersionUID = 8687343787716050495L;
 
 	public PatternVo() {
 

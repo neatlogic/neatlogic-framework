@@ -1,9 +1,9 @@
-package codedriver.framework.common.config;
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
 
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+package codedriver.framework.common.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,61 +18,71 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
 public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, PriorityOrdered {
-	static Logger logger = LoggerFactory.getLogger(LocalConfig.class);
-	private static final String CONFIG_FILE = "config.properties";
-	private Properties properties;
-	private ConfigurableEnvironment environment;
+    static Logger logger = LoggerFactory.getLogger(LocalConfig.class);
+    private static final String CONFIG_FILE = "config.properties";
+    private Properties properties;
+    private ConfigurableEnvironment environment;
 
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.environment = (ConfigurableEnvironment) environment;
-	}
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = (ConfigurableEnvironment) environment;
+    }
 
-	private synchronized String getProperty(String keyName, String defaultValue) {
-		if (properties == null) {
-			properties = new Properties();
-			InputStreamReader is = null;
-			try {
-				is = new InputStreamReader(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE), "UTF-8");
-				properties.load(is);
-				if (is != null) {
-					is.close();
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				logger.error("load " + CONFIG_FILE + " error: " + ex.getMessage(), ex);
-			}
-		}
-		String value = "";
-		if (properties != null) {
-			value = properties.getProperty(keyName, defaultValue);
-			if (StringUtils.isNotBlank(value)) {
-				value = value.trim();
-			}
-		}
+    private synchronized String getProperty(String keyName, String defaultValue) {
+        if (properties == null) {
+            properties = new Properties();
+            InputStreamReader is;
+            try {
+                is = new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8);
+                properties.load(is);
+                is.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                logger.error("load " + CONFIG_FILE + " error: " + ex.getMessage(), ex);
+            }
+        }
+        String value = "";
+        if (properties != null) {
+            value = properties.getProperty(keyName, defaultValue);
+            if (StringUtils.isNotBlank(value)) {
+                value = value.trim();
+            }
+        }
 
-		return value;
-	}
+        return value;
+    }
 
-	@Override
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		MutablePropertySources propertySources = environment.getPropertySources();
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("db.driverClassName", this.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
-		paramMap.put("db.url", this.getProperty("db.url", "jdbc:mysql://localhost:3306/codedriver?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
-		paramMap.put("db.username", this.getProperty("db.username", "root"));
-		paramMap.put("db.password", this.getProperty("db.password", "root"));
-		paramMap.put("conn.validationQuery", this.getProperty("conn.validationQuery", "select 1"));
-		paramMap.put("conn.testOnBorrow", this.getProperty("conn.testOnBorrow", "true"));
-		paramMap.put("conn.maxIdle", this.getProperty("conn.maxIdle", "16"));
-		paramMap.put("conn.initialSize", this.getProperty("conn.initialSize", "4"));
-		propertySources.addLast(new MapPropertySource("localconfig", paramMap));
-	}
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        MutablePropertySources propertySources = environment.getPropertySources();
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("db.driverClassName", this.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
+        paramMap.put("db.url", this.getProperty("db.url", "jdbc:mysql://localhost:3306/codedriver?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
+        paramMap.put("db.username", this.getProperty("db.username", "root"));
+        paramMap.put("db.password", this.getProperty("db.password", "root"));
+        paramMap.put("conn.validationQuery", this.getProperty("conn.validationQuery", "select 1"));
+        paramMap.put("conn.testOnBorrow", this.getProperty("conn.testOnBorrow", "true"));
+        paramMap.put("conn.maxIdle", this.getProperty("conn.maxIdle", "16"));
+        paramMap.put("conn.initialSize", this.getProperty("conn.initialSize", "4"));
+        paramMap.put("mongo.host", this.getProperty("mongo.host", "localhost"));
+        paramMap.put("mongo.port", this.getProperty("mongo.port", "27017"));
+        paramMap.put("mongo.username", this.getProperty("mongo.username", "root"));
+        paramMap.put("mongo.password", this.getProperty("mongo.password", "root"));
+        paramMap.put("mongo.database", this.getProperty("mongo.database", "admin"));
+        propertySources.addLast(new MapPropertySource("localconfig", paramMap));
+    }
 
-	@Override
-	public int getOrder() {
-		return PriorityOrdered.HIGHEST_PRECEDENCE;
-	}
+    @Override
+    public int getOrder() {
+        return PriorityOrdered.HIGHEST_PRECEDENCE;
+    }
 
 }

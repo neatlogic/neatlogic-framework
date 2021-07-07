@@ -47,6 +47,12 @@ public class Config {
     private static String HOME_URL;
     private static String USER_EXPIRETIME; // 会话超时时间
 
+    private static String MONGO_HOST;
+    private static int MONGO_PORT;
+    private static String MONGO_PASSWORD;
+    private static String MONGO_USERNAME;
+    private static String MONGO_DATABASE;
+
 
     private static String MINIO_URL;
     private static String MINIO_BUCKET;
@@ -144,6 +150,26 @@ public class Config {
 
     public static String DB_DRIVER() {
         return DB_DRIVER;
+    }
+
+    public static String MONGO_HOST() {
+        return MONGO_HOST;
+    }
+
+    public static String MONGO_PASSWORD() {
+        return MONGO_PASSWORD;
+    }
+
+    public static int MONGO_PORT() {
+        return MONGO_PORT;
+    }
+
+    public static String MONGO_DATABASE() {
+        return MONGO_DATABASE;
+    }
+
+    public static String MONGO_USERNAME() {
+        return MONGO_USERNAME;
     }
 
     public static String DATA_HOME() {
@@ -261,6 +287,13 @@ public class Config {
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
             DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
+
+            MONGO_HOST = prop.getProperty("mongo.host", "localhost");
+            MONGO_PORT = Integer.parseInt(prop.getProperty("mongo.port", "27017"));
+            MONGO_USERNAME = prop.getProperty("mongo.username", "root");
+            MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
+            MONGO_DATABASE = prop.getProperty("mongo.database", "codedriver");
+
             MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
@@ -272,29 +305,6 @@ public class Config {
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "techsure");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
-            //ES_CLUSTERS = new HashMap<>();
-
-            /*for (Map.Entry<Object, Object> el : prop.entrySet()) {
-                Object k = el.getKey();
-                Object v = el.getValue();
-
-                if (!(k instanceof String) || !(v instanceof String)) {
-                    continue;
-                }
-
-                String key = (String) k;
-                String value = (String) v;
-
-                final String keyPrefix = "es.cluster.";
-                if (!key.startsWith(keyPrefix)) {
-                    continue;
-                }
-                String clusterName = key.trim().substring(keyPrefix.length());
-                if (clusterName.isEmpty()) {
-                    continue;
-                }
-                ES_CLUSTERS.put(clusterName, value);
-            }*/
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

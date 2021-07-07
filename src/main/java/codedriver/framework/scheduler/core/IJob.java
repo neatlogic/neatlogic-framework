@@ -1,96 +1,88 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.scheduler.core;
 
-import java.util.List;
-import java.util.Map;
-
+import codedriver.framework.scheduler.annotation.Param;
+import codedriver.framework.scheduler.dto.JobObject;
+import codedriver.framework.scheduler.dto.JobPropVo;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.util.ClassUtils;
 
-import codedriver.framework.scheduler.annotation.Param;
-import codedriver.framework.scheduler.dto.JobObject;
-import codedriver.framework.scheduler.dto.JobPropVo;
+import java.util.List;
+import java.util.Map;
 
 public interface IJob extends Job {
 
-	public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
+    void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
 
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Dec 6, 2018
-	 * @Description: 模块全路径
-	 * @param @return
-	 * @return Integer
-	 */
-	public default String getClassName() {
-		return ClassUtils.getUserClass(this.getClass()).getName();
-	}
+    /**
+     * 模块全路径
+     *
+     * @return 类路径
+     */
+    default String getClassName() {
+        return ClassUtils.getUserClass(this.getClass()).getName();
+    }
 
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Feb 8, 2020
-	 * @param @return
-	 * @return IJob
-	 */
-	public default IJob getThis() {
-		return SchedulerManager.getHandler(this.getClassName());
-	}
+    default IJob getThis() {
+        return SchedulerManager.getHandler(this.getClassName());
+    }
 
-	/**
-	 * @Author: chenqiwei
-	 * @Time:Feb 8, 2020
-	 * @Description: 获取分组名称
-	 * @param @return
-	 * @return String
-	 */
-	public abstract String getGroupName();
+    /**
+     * 获取分组名称
+     *
+     * @return 分组名称
+     */
+    String getGroupName();
 
-	/**
-	 * @Description: 解析注解参数
-	 * @Param: []
-	 * @return: net.sf.json.JSONObject
-	 * @Author: lixs
-	 * @Date: 2019/1/18
-	 */
-	public abstract Map<String, Param> initProp();
+    /**
+     * 解析注解参数
+     *
+     * @return 注解map
+     */
+    Map<String, Param> initProp();
 
-	/**
-	 * @Description: 参数类型校验
-	 * @Param: [jobPropVoList]
-	 * @return: boolean
-	 * @Author: lixs
-	 * @Date: 2019/1/18
-	 */
-	public abstract boolean valid(List<JobPropVo> jobPropVoList);
+    /**
+     * 参数类型校验
+     *
+     * @param jobPropVoList 作业信息
+     * @return 是否通过校验
+     */
+    Boolean valid(List<JobPropVo> jobPropVoList);
 
-	public Boolean checkCronIsExpired(JobObject jobObject);
+    /**
+     * 检查作业表达式是否已经过时
+     *
+     * @param jobObject 作业信息
+     * @return 是或否
+     */
+    Boolean checkCronIsExpired(JobObject jobObject);
 
-	/**
-	 * 
-	 * @Time:Feb 4, 2020
-	 * @Description: 重新加载单个作业
-	 * @param @param jobObject
-	 * @return void
-	 */
-	public void reloadJob(JobObject jobObject);
+    /**
+     * 重新加载单个作业
+     *
+     * @param jobObject 作业信息
+     */
+    void reloadJob(JobObject jobObject);
 
-	/**
-	 * @Time:Feb 4, 2020
-	 * @Description: 加载当前类的租户作业
-	 * @param @param tenantUuid
-	 * @return void
-	 */
-	public void initJob(String tenantUuid);
-	
-	/**
-	* @Author 89770
-	* @Time 2020年10月29日  
-	* @Description: 是否启用审计，默认启用
-	* @Param 
-	* @return
-	 */
-	public default Boolean isAudit() {
-	    return true;
-	}
+    /**
+     * 加载当前类的租户作业
+     *
+     * @param tenantUuid 租户uuid
+     */
+    void initJob(String tenantUuid);
+
+    /**
+     * 是否启用审计，默认启用
+     *
+     * @return 是否需要审计
+     */
+    default Boolean isAudit() {
+        return true;
+    }
 }

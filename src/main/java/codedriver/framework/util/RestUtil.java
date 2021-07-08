@@ -80,7 +80,12 @@ public class RestUtil {
         return result;
     }
 
-    public static void sendGetRequest(RestVo restVo, HttpServletResponse response) {
+    /**
+     * 发送GET请求，并将返回值写入response
+     * @param restVo
+     * @param response
+     */
+    public static void sendGetRequestForStream(RestVo restVo, HttpServletResponse response) {
         HttpURLConnection connection = null;
         try {
             connection = getConnection(restVo, HttpMethod.GET);

@@ -43,6 +43,13 @@ public class RestVo {
 		this.payload = payload;
 	}
 
+	public RestVo(String url, String authType, String username, String password) {
+		this.url = url;
+		this.authType = authType;
+		this.username = username;
+		this.password = password;
+	}
+
 	public String getAuthType() {
 		return authType;
 	}

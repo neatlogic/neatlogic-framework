@@ -124,8 +124,13 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
 
             NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
             List<NotifyTreeVo> children = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerListForNotifyTree())) {
-                for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerListForNotifyTree()) {
+//            if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerListForNotifyTree())) {
+//                for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerListForNotifyTree()) {
+//                    children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));
+//                }
+//            }
+            if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerList())) {
+                for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerList()) {
                     children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));
                 }
             }

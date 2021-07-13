@@ -781,7 +781,7 @@
         where a.`user_uuid` = #{value}
     </select>
 
-    <select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String">
+    <select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String" useCache="false">
         SELECT `user_uuid`
         FROM `user_agent`
         WHERE `agent_uuid` = #{agentUuid}

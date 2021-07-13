@@ -132,7 +132,9 @@
 
     <!--ActiveMQ Artemis-->
     <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${jms.url}"/>
+        <property name="brokerURL">
+            <value>http://localhost:8161</value>
+        </property>
     </bean>
 
     <bean id="myCachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">

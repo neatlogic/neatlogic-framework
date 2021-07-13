@@ -1,6 +1,7 @@
 package codedriver.framework.util;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dto.condition.ConditionConfigVo;
 import codedriver.framework.dto.condition.ConditionGroupVo;
@@ -123,14 +124,14 @@ public class NotifyPolicyUtil {
                                         } else if (Objects.equals(paramMappingVo.getName(),
                                                 paramMappingVo.getValue())) {
                                             if (!templateParamData.containsKey(paramMappingVo.getValue())) {
-                                                logger.error("没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.error(TenantContext.get().getTenantUuid()+"-没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         } else {
                                             Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
                                             if (processFieldValue != null) {
                                                 notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
                                             } else {
-                                                logger.error("没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.error(TenantContext.get().getTenantUuid()+"-没有找到参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         }
                                     }

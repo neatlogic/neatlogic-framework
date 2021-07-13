@@ -16,6 +16,8 @@ public interface MqSubscribeMapper {
 
     int searchSubscribeCount(SubscribeVo subscriberVo);
 
+    void replaceSubscribe(SubscribeVo subscribeVo);
+
     void updateSubscribeServerId(SubscribeVo subscribeVo);
 
     void updateSubscribeError(SubscribeVo subscribeVo);

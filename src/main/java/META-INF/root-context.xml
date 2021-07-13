@@ -133,7 +133,7 @@
     <!--ActiveMQ Artemis-->
     <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
         <property name="brokerURL">
-            <value>http://localhost:8161</value>
+            <value>${jms.url}</value>
         </property>
     </bean>
 

@@ -39,8 +39,10 @@ public class SubscribeStartupComponent implements IStartup {
                             throw new SubscribeHandlerNotFoundException(subVo.getClassName());
                         }
                         SubscribeManager.create(subVo.getTopicName(), subVo.getName(), subVo.getIsDurable().equals(1), subscribeHandler);
+                        subVo.setError("");
                     } catch (Exception ex) {
                         subVo.setError(ex.getMessage());
+                    } finally {
                         mqSubscribeMapper.updateSubscribeError(subVo);
                     }
                 }

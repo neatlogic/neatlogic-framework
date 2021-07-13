@@ -55,6 +55,28 @@
         WHERE name = #{value}
     </select>
 
+    <insert id="replaceSubscribe" parameterType="codedriver.framework.mq.dto.SubscribeVo">
+        REPLACE INTO mq_subscribe
+        (name,
+         class_name,
+         topic_name,
+         is_durable,
+         description,
+         is_active,
+         error,
+         config,
+         server_id)
+        VALUES (#{name},
+                #{className},
+                #{topicName},
+                #{isDurable},
+                #{description},
+                #{isActive},
+                #{error},
+                #{configStr},
+                #{serverId})
+    </insert>
+
     <update id="updateSubscribeServerId" parameterType="codedriver.framework.mq.dto.SubscribeVo">
         UPDATE mq_subscribe
         SET server_id = #{serverId}

@@ -298,7 +298,7 @@ public class Config {
             MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
             MONGO_DATABASE = prop.getProperty("mongo.database", "codedriver");
 
-            JMS_URL = prop.getProperty("jms.url", "http://localhost:8161");
+            JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
 
             MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");

@@ -130,6 +130,28 @@
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>
 
+    <!--ActiveMQ Artemis-->
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${jms.url}"/>
+    </bean>
+
+    <bean id="myCachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+        <property name="sessionCacheSize" value="5"/>
+        <property name="reconnectOnException" value="true"/>
+    </bean>
+
+    <bean id="topicSendJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="myCachedConnectionFactory"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="deliveryPersistent" value="true"/>
+        <!-- 发送模式 DeliveryMode.NON_PERSISTENT=1:非持久 ; DeliveryMode.PERSISTENT=2:持久 -->
+        <property name="deliveryMode" value="2"/>
+        <property name="explicitQosEnabled" value="true"/>
+        <!--过期时间1天 -->
+        <property name="timeToLive" value="86400000"/>
+    </bean>
+
 
     <!-- <hdp:configuration id="hadoopConfiguration">
         fs.defaultFS=${hadoop.url}

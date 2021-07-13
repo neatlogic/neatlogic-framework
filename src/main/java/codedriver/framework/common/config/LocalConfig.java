@@ -77,6 +77,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
         paramMap.put("mongo.username", this.getProperty("mongo.username", "root"));
         paramMap.put("mongo.password", this.getProperty("mongo.password", "root"));
         paramMap.put("mongo.database", this.getProperty("mongo.database", "admin"));
+        paramMap.put("jms.url", this.getProperty("jms.url", "http://localhost:8161"));
         propertySources.addLast(new MapPropertySource("localconfig", paramMap));
     }
 

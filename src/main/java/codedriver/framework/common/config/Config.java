@@ -30,8 +30,6 @@ public class Config {
 
     public static final int SCHEDULE_SERVER_ID;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
-    public static final String RESPONSE_TYPE_HTML = "text/html;charset=UTF-8";
-    public static final String RESPONSE_TYPE_TEXT = "text/plain;charset=UTF-8";
     public static final String RC4KEY = "codedriver.key.20200101";
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
@@ -52,6 +50,8 @@ public class Config {
     private static String MONGO_PASSWORD;
     private static String MONGO_USERNAME;
     private static String MONGO_DATABASE;
+
+    private static String JMS_URL;
 
 
     private static String MINIO_URL;
@@ -170,6 +170,10 @@ public class Config {
 
     public static String MONGO_USERNAME() {
         return MONGO_USERNAME;
+    }
+
+    public static String JMS_URL() {
+        return JMS_URL;
     }
 
     public static String DATA_HOME() {
@@ -293,6 +297,8 @@ public class Config {
             MONGO_USERNAME = prop.getProperty("mongo.username", "root");
             MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
             MONGO_DATABASE = prop.getProperty("mongo.database", "codedriver");
+
+            JMS_URL = prop.getProperty("jms.url", "http://localhost:8161");
 
             MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");

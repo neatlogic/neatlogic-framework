@@ -3,9 +3,14 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.heartbeat.core;
+package codedriver.framework.mq.core;
 
-public interface IHeartbreakHandler {
+public interface ITopic<T> {
+    String getName();
 
-    void whenServerInactivated(Integer serverId);
+    String getLabel();
+
+    String getDescription();
+
+    void send(T content);
 }

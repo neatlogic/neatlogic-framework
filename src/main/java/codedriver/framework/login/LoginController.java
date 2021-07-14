@@ -12,9 +12,9 @@ import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
+import codedriver.framework.filter.core.LoginAuthHandlerBase;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
-import codedriver.framework.service.LoginService;
 import codedriver.framework.service.TenantService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -33,9 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/login/")
 public class LoginController {
     Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-    @Autowired
-    private LoginService loginService;
 
     @Autowired
     private UserMapper userMapper;
@@ -101,8 +98,8 @@ public class LoginController {
                 } else {
                     userMapper.insertUserSession(checkUserVo.getUuid());
                 }
-                JwtVo jwtVo = loginService.buildJwt(checkUserVo);
-                loginService.setResponseAuthCookie(response, request, tenant, jwtVo);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
+                LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
                 response.getWriter().print(returnObj);

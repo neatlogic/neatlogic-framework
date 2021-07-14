@@ -39,7 +39,7 @@ public class NotifyPolicyUtil {
      */
     public static void execute(String notifyPolicyHandler, INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
                                JSONObject templateParamData, JSONObject conditionParamData,
-                               Map<String, List<NotifyReceiverVo>> receiverMap) {
+                               Map<String, List<NotifyReceiverVo>> receiverMap) throws Exception {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/

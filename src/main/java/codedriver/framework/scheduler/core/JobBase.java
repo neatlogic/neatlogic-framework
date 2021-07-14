@@ -206,7 +206,7 @@ public abstract class JobBase implements IJob {
      * 主要定时方法实现区
      */
     @Override
-    public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
+    public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception;
 
     @Override
     public Boolean valid(List<JobPropVo> propVoList) {

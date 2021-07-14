@@ -37,7 +37,7 @@ public interface INotifyHandler {
 	 * @Param: [informVo]
 	 * @return: void
 	 */
-	public void execute(NotifyVo notifyVo);
+	public void execute(NotifyVo notifyVo) throws Exception;
 	
 	public String getType();
 

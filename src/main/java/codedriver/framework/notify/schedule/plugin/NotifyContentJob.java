@@ -14,7 +14,6 @@ import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,7 @@ public class NotifyContentJob extends JobBase {
 	}
 
 	@Override
-	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
+	public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
 		Long id = (Long) jobObject.getData("notifyContentJobId");
         NotifyJobVo job = notifyJobMapper.getJobBaseInfoById(id);
         INotifyContentHandler handler = NotifyContentHandlerFactory.getHandler(job.getHandler());

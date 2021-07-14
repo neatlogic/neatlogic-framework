@@ -1,20 +1,5 @@
 package codedriver.framework.notify.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.notify.dto.NotifyReceiverVo;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.mail.HtmlEmail;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import codedriver.framework.dao.mapper.MailServerMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.MailServerVo;
@@ -22,10 +7,20 @@ import codedriver.framework.dto.UserVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.notify.exception.EmailServerNotFoundException;
 import codedriver.framework.notify.exception.NotifyNoReceiverException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.mail.HtmlEmail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class NotifyHandlerBase implements INotifyHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(NotifyHandlerBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotifyHandlerBase.class);
 
     @Autowired
     private UserMapper userMapper;
@@ -34,7 +29,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
     private MailServerMapper mailServerMapper;
 
 
-    public final void execute(NotifyVo notifyVo) {
+    public final void execute(NotifyVo notifyVo) throws Exception {
 
         if (StringUtils.isNotBlank(notifyVo.getError())) {
             logger.error(notifyVo.getError());
@@ -45,7 +40,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 
     }
 
-    protected abstract void myExecute(NotifyVo notifyVo);
+    protected abstract void myExecute(NotifyVo notifyVo) throws Exception;
 
     protected void sendEmail(NotifyVo notifyVo, boolean isNormal) {
         Set<UserVo> toUserSet = new HashSet<>();

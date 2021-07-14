@@ -10,7 +10,6 @@ import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobPropVo;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.Map;
 
 public interface IJob extends Job {
 
-    void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException;
+    void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception;
 
     /**
      * 模块全路径

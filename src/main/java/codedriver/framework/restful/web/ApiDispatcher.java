@@ -55,7 +55,9 @@ public class ApiDispatcher {
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
-
+        if (paramObj == null) {
+            paramObj = new JSONObject();
+        }
         if (interfaceVo == null) {
             interfaceVo = apiMapper.getApiByToken(token);
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {

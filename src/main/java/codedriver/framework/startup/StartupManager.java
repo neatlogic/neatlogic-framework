@@ -54,10 +54,17 @@ public class StartupManager extends ApplicationListenerBase {
                                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
                                 for (IStartup startup : startupList) {
                                     try {
-                                        startup.execute();
+                                        startup.executeForTenant();
                                     } catch (Exception ex) {
                                         logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
                                     }
+                                }
+                            }
+                            for (IStartup startup : startupList) {
+                                try {
+                                    startup.executeForOnce();
+                                } catch (Exception ex) {
+                                    logger.error("启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
                                 }
                             }
                         }
@@ -76,7 +83,7 @@ public class StartupManager extends ApplicationListenerBase {
         TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
         for (IStartup startup : startupList) {
             try {
-                startup.execute();
+                startup.executeForTenant();
             } catch (Exception ex) {
                 logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
             }

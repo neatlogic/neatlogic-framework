@@ -1,5 +1,11 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.web;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
@@ -84,7 +90,7 @@ public class AnonymousApiDispatcher {
             if (apiType.equals(ApiVo.Type.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if(!restComponent.supportAnonymousAccess()){
+                    if (!restComponent.supportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -109,7 +115,7 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiVo.Type.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if(!restComponent.supportAnonymousAccess()){
+                    if (!restComponent.supportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -134,7 +140,7 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiVo.Type.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if(!restComponent.supportAnonymousAccess()){
+                    if (!restComponent.supportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -164,21 +170,22 @@ public class AnonymousApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         String decryptData = RC4Util.decrypt(token);
-        String[] split = decryptData.split("\\?",2);
+        String[] split = decryptData.split("\\?", 2);
         token = split[0].substring(0, split[0].lastIndexOf("/"));
         String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-        if(TenantUtil.hasTenant(tenant)){
+        if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
             UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
         }
         JSONObject paramObj = new JSONObject();
-        if(split.length == 2){
+        if (split.length == 2) {
             String[] params = split[1].split("&");
-            for(String param : params){
-                String[] array = param.split("=",2);
-                if(array.length == 2){
+            for (String param : params) {
+                String[] array = param.split("=", 2);
+                if (array.length == 2) {
                     paramObj.put(array[0], array[1]);
                 }
             }
@@ -189,13 +196,13 @@ public class AnonymousApiDispatcher {
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -207,25 +214,26 @@ public class AnonymousApiDispatcher {
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)
-    public void displatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         String decryptData = RC4Util.decrypt(token);
-        String[] split = decryptData.split("\\?",2);
+        String[] split = decryptData.split("\\?", 2);
         token = split[0].substring(0, split[0].lastIndexOf("/"));
         String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-        if(TenantUtil.hasTenant(tenant)){
+        if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
             UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
         }
 
         JSONObject paramObj = new JSONObject();
-        if(split.length == 2){
+        if (split.length == 2) {
             String[] params = split[1].split("&");
-            for(String param : params){
-                String[] array = param.split("=",2);
-                if(array.length == 2){
+            for (String param : params) {
+                String[] array = param.split("=", 2);
+                if (array.length == 2) {
                     paramObj.put(array[0], array[1]);
                 }
             }
@@ -233,20 +241,20 @@ public class AnonymousApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
         } catch (ResubmitException ex) {
             response.setStatus(524);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));

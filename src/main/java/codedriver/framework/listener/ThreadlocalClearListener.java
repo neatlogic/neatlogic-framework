@@ -5,6 +5,7 @@
 
 package codedriver.framework.listener;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.cache.threadlocal.CacheContext;
@@ -21,6 +22,9 @@ public class ThreadlocalClearListener implements ServletRequestListener {
         }
         if (UserContext.get() != null) {
             UserContext.get().release();
+        }
+        if (RequestContext.get() != null) {
+            RequestContext.get().release();
         }
         CacheContext.release();
     }

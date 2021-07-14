@@ -8,9 +8,8 @@ package codedriver.framework.mq.core;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.exception.mq.SubscribeTopicException;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.jms.listener.adapter.MessageListenerAdapter;
@@ -23,10 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RootComponent
 public final class SubscribeManager {
-    private final static Logger logger = LoggerFactory.getLogger(SubscribeManager.class);
-
     private static final Map<String, SimpleMessageListenerContainer> containerMap = new ConcurrentHashMap<>();
     private static ConnectionFactory connectionFactory;
+    public static final String SEPARATOR = "#";
+
+    public static Map<String, SimpleMessageListenerContainer> getListenerMap() {
+        return containerMap;
+    }
 
 
     @Autowired
@@ -44,8 +46,8 @@ public final class SubscribeManager {
     public static boolean start(String topicName, String clientName) {
         topicName = topicName.toLowerCase(Locale.ROOT);
         clientName = clientName.toLowerCase(Locale.ROOT);
-        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName)) {
-            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName);
+        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName)) {
+            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName);
             if (!container.isRunning()) {
                 container.start();
             }
@@ -64,8 +66,8 @@ public final class SubscribeManager {
     public static boolean stop(String topicName, String clientName) {
         topicName = topicName.toLowerCase(Locale.ROOT);
         clientName = clientName.toLowerCase(Locale.ROOT);
-        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName)) {
-            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName);
+        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName)) {
+            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName);
             if (container.isRunning()) {
                 container.stop();
             }
@@ -79,22 +81,19 @@ public final class SubscribeManager {
      *
      * @param topicName  主题名称
      * @param clientName 订阅名称
-     * @return 是否成功
      */
-    public static boolean destory(String topicName, String clientName) {
+    public static void destroy(String topicName, String clientName) {
         topicName = topicName.toLowerCase(Locale.ROOT);
         clientName = clientName.toLowerCase(Locale.ROOT);
-        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName)) {
-            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName);
+        if (containerMap.containsKey(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName)) {
+            SimpleMessageListenerContainer container = containerMap.get(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName);
             if (container.isRunning()) {
                 container.stop();
             }
             container.shutdown();
             container.destroy();
-            containerMap.remove(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName);
-            return true;
+            containerMap.remove(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName);
         }
-        return false;
     }
 
     /**
@@ -106,11 +105,10 @@ public final class SubscribeManager {
      * @param subscribeHandler 订阅处理器
      * @return 是否成功
      */
-    public static boolean create(String topicName, String clientName, boolean isDurable, ISubscribeHandler subscribeHandler) {
+    public static boolean create(String topicName, String clientName, boolean isDurable, ISubscribeHandler subscribeHandler) throws SubscribeTopicException {
         topicName = topicName.toLowerCase(Locale.ROOT);
         clientName = clientName.toLowerCase(Locale.ROOT);
-        if (!containerMap.containsKey(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName)) {
-
+        if (!containerMap.containsKey(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName)) {
             String finalClientName = clientName;
             String tenantUuid = TenantContext.get().getTenantUuid();
             String finalTopicName = topicName;
@@ -133,9 +131,13 @@ public final class SubscribeManager {
             container.setSubscriptionDurable(isDurable);
             container.setClientId(TenantContext.get().getTenantUuid() + "/" + clientName + "/" + Config.SCHEDULE_SERVER_ID);
             container.setMessageListener(messageAdapter);
-            container.setAutoStartup(true);
-            container.start();
-            containerMap.put(TenantContext.get().getTenantUuid() + "/" + topicName + "/" + clientName, container);
+            //container.setAutoStartup(true);
+            containerMap.put(TenantContext.get().getTenantUuid() + SEPARATOR + topicName + SEPARATOR + clientName, container);
+            try {
+                container.start();
+            } catch (Exception ex) {
+                throw new SubscribeTopicException(topicName, clientName, ex.getMessage());
+            }
         }
         return true;
     }

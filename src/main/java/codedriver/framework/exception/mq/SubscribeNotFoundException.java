@@ -7,8 +7,12 @@ package codedriver.framework.exception.mq;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class SubscribeHandlerNotFoundException extends ApiRuntimeException {
-    public SubscribeHandlerNotFoundException(String name) {
-        super("订阅处理器：" + name + "不存在");
+public class SubscribeNotFoundException extends ApiRuntimeException {
+    public SubscribeNotFoundException(String name) {
+        super("订阅：" + name + "不存在");
+    }
+
+    public SubscribeNotFoundException(Long id) {
+        super("订阅：" + id + "不存在");
     }
 }

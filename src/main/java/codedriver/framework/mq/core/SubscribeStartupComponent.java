@@ -5,18 +5,31 @@
 
 package codedriver.framework.mq.core;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.exception.mq.SubscribeHandlerNotFoundException;
 import codedriver.framework.mq.dao.mapper.MqSubscribeMapper;
 import codedriver.framework.mq.dto.SubscribeVo;
 import codedriver.framework.startup.IStartup;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SubscribeStartupComponent implements IStartup {
+    private final static Logger logger = LoggerFactory.getLogger(SubscribeStartupComponent.class);
+
     @Resource
     private MqSubscribeMapper mqSubscribeMapper;
 
@@ -26,7 +39,7 @@ public class SubscribeStartupComponent implements IStartup {
     }
 
     @Override
-    public void execute() {
+    public void executeForTenant() {
         SubscribeVo subscribeVo = new SubscribeVo();
         subscribeVo.setIsActive(1);
         List<SubscribeVo> subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
@@ -48,6 +61,41 @@ public class SubscribeStartupComponent implements IStartup {
                 }
             }
         }
+    }
+
+    @Override
+    public void executeForOnce() {
+        ScheduledExecutorService mqRestartService = Executors.newScheduledThreadPool(1, r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            t.setName("MQ-SUBSCRIBE-RECONNECT");
+            return t;
+        });
+        CodeDriverThread runnable = new CodeDriverThread() {
+            @Override
+            protected void execute() {
+                try {
+                    Map<String, SimpleMessageListenerContainer> containerMap = SubscribeManager.getListenerMap();
+                    if (MapUtils.isNotEmpty(containerMap)) {
+                        for (String key : containerMap.keySet()) {
+                            SimpleMessageListenerContainer container = containerMap.get(key);
+                            String[] keys = key.split(SubscribeManager.SEPARATOR);
+                            if (!container.isRunning()) {
+                                container.start();
+                                SubscribeVo subVo = new SubscribeVo();
+                                subVo.setName(keys[2]);
+                                subVo.setError("");
+                                TenantContext.get().switchTenant(keys[0]).setUseDefaultDatasource(false);
+                                mqSubscribeMapper.updateSubscribeError(subVo);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        };
+        mqRestartService.scheduleAtFixedRate(runnable, Config.MQ_SUBSCRIBE_RECONNECT_PERIOD(), Config.MQ_SUBSCRIBE_RECONNECT_PERIOD(), TimeUnit.MINUTES);
     }
 
     @Override

@@ -12,13 +12,21 @@ import java.util.List;
 public interface MqSubscribeMapper {
     List<SubscribeVo> searchSubscribe(SubscribeVo subscriberVo);
 
+    int checkSubscribeNameIsExists(SubscribeVo subscribeVo);
+
+    SubscribeVo getSubscribeById(Long id);
+
     SubscribeVo getSubscribeByName(String name);
 
     int searchSubscribeCount(SubscribeVo subscriberVo);
 
-    void replaceSubscribe(SubscribeVo subscribeVo);
+    void insertSubscribe(SubscribeVo subscribeVo);
+
+    void updateSubscribe(SubscribeVo subscribeVo);
 
     void updateSubscribeServerId(SubscribeVo subscribeVo);
 
     void updateSubscribeError(SubscribeVo subscribeVo);
+
+    void deleteSubscribeById(Long id);
 }

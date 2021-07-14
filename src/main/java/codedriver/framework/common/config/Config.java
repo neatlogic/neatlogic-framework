@@ -42,6 +42,7 @@ public class Config {
     private static String DATA_HOME;// 存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
+    private static int MQ_SUBSCRIBE_RECONNECT_PERIOD;//MQ连接重试间隔
     private static String HOME_URL;
     private static String USER_EXPIRETIME; // 会话超时时间
 
@@ -187,6 +188,10 @@ public class Config {
         return SERVER_HEARTBEAT_RATE;
     }
 
+    public static int MQ_SUBSCRIBE_RECONNECT_PERIOD() {
+        return MQ_SUBSCRIBE_RECONNECT_PERIOD;
+    }
+
     public static int SERVER_HEARTBEAT_THRESHOLD() {
         return SERVER_HEARTBEAT_THRESHOLD;
     }
@@ -285,6 +290,7 @@ public class Config {
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
+            MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "5"));
             HOME_URL = prop.getProperty("home.url");
             JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");

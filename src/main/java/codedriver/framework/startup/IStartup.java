@@ -14,9 +14,14 @@ public interface IStartup {
     String getName();
 
     /**
-     * 执行主体方法
+     * 每个租户分别执行
      */
-    void execute();
+    void executeForTenant();
+
+    /*
+    只执行一次，晚于executeForTenant执行
+     */
+    void executeForOnce();
 
     /**
      * 排序

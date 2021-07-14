@@ -9,10 +9,13 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 public class SubscribeVo extends BasePageVo {
+    @EntityField(name = "id", type = ApiParamType.LONG)
+    private Long id;
     @EntityField(name = "唯一标识", type = ApiParamType.STRING)
     private String name;
     @EntityField(name = "处理类名", type = ApiParamType.STRING)
@@ -44,6 +47,17 @@ public class SubscribeVo extends BasePageVo {
 
     public void setTopicName(String topicName) {
         this.topicName = topicName;
+    }
+
+    public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getServerId() {

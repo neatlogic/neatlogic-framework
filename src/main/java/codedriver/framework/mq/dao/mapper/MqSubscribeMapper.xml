@@ -6,6 +6,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.mq.dao.mapper.MqSubscribeMapper">
+
+    <select id="checkSubscribeNameIsExists" parameterType="codedriver.framework.mq.dto.SubscribeVo" resultType="int">
+        SELECT count(1)
+        FROM mq_subscribe
+        WHERE name = #{name}
+          AND id != #{id}
+    </select>
+
     <sql id="searchSubscribeCondition">
         <where>
             <if test="className != null and className != ''">
@@ -27,6 +35,7 @@
     <select id="searchSubscribe" parameterType="codedriver.framework.mq.dto.SubscribeVo"
             resultType="codedriver.framework.mq.dto.SubscribeVo">
         SELECT
+        id,
         name,
         class_name AS className,
         topic_name AS topicName,
@@ -42,7 +51,8 @@
 
     <select id="getSubscribeByName" parameterType="java.lang.String"
             resultType="codedriver.framework.mq.dto.SubscribeVo">
-        SELECT name,
+        SELECT id,
+               name,
                class_name AS className,
                topic_name AS topicName,
                is_durable AS isDurable,
@@ -55,9 +65,26 @@
         WHERE name = #{value}
     </select>
 
-    <insert id="replaceSubscribe" parameterType="codedriver.framework.mq.dto.SubscribeVo">
-        REPLACE INTO mq_subscribe
-        (name,
+    <select id="getSubscribeById" parameterType="java.lang.Long"
+            resultType="codedriver.framework.mq.dto.SubscribeVo">
+        SELECT id,
+               name,
+               class_name AS className,
+               topic_name AS topicName,
+               is_durable AS isDurable,
+               description,
+               is_active  AS isActive,
+               error,
+               config     AS configStr,
+               server_id  AS serverId
+        FROM mq_subscribe
+        WHERE id = #{value}
+    </select>
+
+    <insert id="insertSubscribe" parameterType="codedriver.framework.mq.dto.SubscribeVo">
+        INSERT INTO mq_subscribe
+        (id,
+         name,
          class_name,
          topic_name,
          is_durable,
@@ -66,7 +93,8 @@
          error,
          config,
          server_id)
-        VALUES (#{name},
+        VALUES (#{id},
+                #{name},
                 #{className},
                 #{topicName},
                 #{isDurable},
@@ -76,6 +104,18 @@
                 #{configStr},
                 #{serverId})
     </insert>
+
+    <update id="updateSubscribe" parameterType="codedriver.framework.mq.dto.SubscribeVo">
+        UPDATE mq_subscribe
+        SET class_name  = #{className},
+            is_durable  = #{isDurable},
+            description = #{description},
+            is_active   = #{isActive},
+            error       = #{error},
+            config      = #{configStr},
+            server_id   = #{serverId}
+        WHERE id = #{id}
+    </update>
 
     <update id="updateSubscribeServerId" parameterType="codedriver.framework.mq.dto.SubscribeVo">
         UPDATE mq_subscribe
@@ -88,5 +128,11 @@
         SET error = #{error}
         WHERE name = #{name}
     </update>
+
+    <delete id="deleteSubscribeById" parameterType="java.lang.Long">
+        DELETE
+        FROM mq_subscribe
+        WHERE id = #{value}
+    </delete>
 </mapper>
 

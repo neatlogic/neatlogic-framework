@@ -29,10 +29,12 @@ public abstract class SubscribeHandlerBase implements ISubscribeHandler {
         TenantContext.init();
         TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
         SubscribeVo subscribeVo = mqSubscribeMapper.getSubscribeByName(clientName);
-        if (subscribeVo.getIsActive().equals(1) && subscribeVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+        //如果订阅已经被删除或被禁用，则直接从删除订阅
+        if (subscribeVo != null && subscribeVo.getIsActive().equals(1) && subscribeVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+            //System.out.println(clientName);
             myOnMessage(m);
-        } else if (subscribeVo.getIsActive().equals(0)) {
-            SubscribeManager.destory(topicName, clientName);
+        } else if (subscribeVo == null || subscribeVo.getIsActive().equals(0)) {
+            SubscribeManager.destroy(topicName, clientName);
         }
     }
 

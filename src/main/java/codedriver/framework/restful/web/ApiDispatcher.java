@@ -5,6 +5,8 @@
 
 package codedriver.framework.restful.web;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -174,7 +176,7 @@ public class ApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -195,7 +197,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -205,9 +207,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -227,6 +229,7 @@ public class ApiDispatcher {
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             JSONObject paramObj;
@@ -252,16 +255,6 @@ public class ApiDispatcher {
             }
 
             doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            if (ex.getParam() != null) {
-                returnObj.put("Param", ex.getParam());
-            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -269,18 +262,29 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
@@ -298,7 +302,7 @@ public class ApiDispatcher {
     public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -313,16 +317,6 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            if (ex.getParam() != null) {
-                returnObj.put("Param", ex.getParam());
-            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -330,15 +324,25 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -358,7 +362,7 @@ public class ApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -374,16 +378,6 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            if (ex.getParam() != null) {
-                returnObj.put("Param", ex.getParam());
-            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -391,15 +385,25 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -419,7 +423,7 @@ public class ApiDispatcher {
     public void dispatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj;
         if (StringUtils.isNotBlank(jsonStr)) {
             try {
@@ -434,16 +438,6 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            if (ex.getParam() != null) {
-                returnObj.put("Param", ex.getParam());
-            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -451,15 +445,25 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -479,6 +483,7 @@ public class ApiDispatcher {
     public void dispatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -494,16 +499,6 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
-        } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            if (ex.getParam() != null) {
-                returnObj.put("Param", ex.getParam());
-            }
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -511,15 +506,25 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage(true));
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -534,7 +539,7 @@ public class ApiDispatcher {
     public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
@@ -544,7 +549,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -554,9 +559,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -569,7 +574,7 @@ public class ApiDispatcher {
     public void streamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
@@ -579,7 +584,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -589,9 +594,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -604,7 +609,7 @@ public class ApiDispatcher {
     public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
@@ -614,7 +619,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -624,9 +629,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));

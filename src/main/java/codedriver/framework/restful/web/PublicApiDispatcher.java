@@ -1,11 +1,16 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.web;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.common.util.TenantUtil;
-import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -44,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,13 +62,11 @@ public class PublicApiDispatcher {
     @Resource
     private ApiMapper apiMapper;
 
-    @Resource
-    private TenantMapper tenantMapper;
 
     @Resource
     UserMapper userMapper;
 
-    private static Map<Integer, String> errorMap = new HashMap<Integer, String>();
+    private static final Map<Integer, String> errorMap = new HashMap<>();
 
     public PublicApiDispatcher() {
         errorMap.put(408, "请求已超时");
@@ -89,11 +93,7 @@ public class PublicApiDispatcher {
         }
 
         //authorization
-        String authorization = null;
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getHeader("Authorization");
-        }
-
+        String authorization = request.getHeader("Authorization");
 
         //初始化租户
         String tenant = request.getHeader("Tenant");
@@ -119,7 +119,7 @@ public class PublicApiDispatcher {
 
         ApiVo interfaceVo = apiMapper.getApiByToken(token);
         String uri = request.getRequestURI();
-        /** 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
+        /* 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
         if (interfaceVo == null || (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
                 || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
             throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
@@ -135,7 +135,7 @@ public class PublicApiDispatcher {
             throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
         }
 
-        /**认证，如果是查看帮助接口，则不需要认证*/
+        /*认证，如果是查看帮助接口，则不需要认证*/
         if (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/"))) {
             IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
             if (apiAuth != null) {
@@ -150,7 +150,7 @@ public class PublicApiDispatcher {
             IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
-                    /** 统计接口访问次数 **/
+                    /* 统计接口访问次数 **/
                     ApiAccessCountUpdateThread.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, response);
@@ -172,10 +172,10 @@ public class PublicApiDispatcher {
             IJsonStreamApiComponent restComponent = PublicApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
-                    /** 统计接口访问次数 **/
+                    /* 统计接口访问次数 **/
                     ApiAccessCountUpdateThread.putToken(token);
                     Long starttime = System.currentTimeMillis();
-                    Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), "utf-8")));
+                    Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
                     Long endtime = System.currentTimeMillis();
                     if (!restComponent.isRaw()) {
                         returnObj.put("TimeCost", endtime - starttime);
@@ -194,7 +194,7 @@ public class PublicApiDispatcher {
             IBinaryStreamApiComponent restComponent = PublicApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
-                    /** 统计接口访问次数 **/
+                    /* 统计接口访问次数 **/
                     ApiAccessCountUpdateThread.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
@@ -219,7 +219,7 @@ public class PublicApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -237,17 +237,17 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -262,9 +262,10 @@ public class PublicApiDispatcher {
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            JSONObject paramObj = null;
+            JSONObject paramObj;
             if (StringUtils.isNotBlank(jsonStr)) {
                 try {
                     paramObj = JSONObject.parseObject(jsonStr);
@@ -290,20 +291,20 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
@@ -315,7 +316,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -333,7 +334,7 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (TenantNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             response.setStatus(521);
@@ -342,13 +343,13 @@ public class PublicApiDispatcher {
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -363,7 +364,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -382,17 +383,17 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -404,11 +405,11 @@ public class PublicApiDispatcher {
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.POST, consumes = "application/json")
-    public void displatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
-        JSONObject paramObj = null;
+        RequestContext.init(token);
+        JSONObject paramObj;
         if (StringUtils.isNotBlank(jsonStr)) {
             try {
                 paramObj = JSONObject.parseObject(jsonStr);
@@ -425,17 +426,17 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -447,9 +448,10 @@ public class PublicApiDispatcher {
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public void displatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void dispatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -468,17 +470,17 @@ public class PublicApiDispatcher {
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -493,20 +495,20 @@ public class PublicApiDispatcher {
     public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -516,23 +518,23 @@ public class PublicApiDispatcher {
     }
 
     @RequestMapping(value = "/help/stream/**", method = RequestMethod.GET)
-    public void steamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void streamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -545,20 +547,20 @@ public class PublicApiDispatcher {
     public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-
+        RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));

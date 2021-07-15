@@ -53,7 +53,7 @@
         FROM `${tableName}` a
         WHERE
         <choose>
-            <when test="parentIdValue == 0 or parentIdValue == null">
+            <when test="parentIdValue == null">
                 a.`${parentIdKey}` = 0 OR a.`${parentIdKey}` is null
             </when>
             <otherwise>a.`${parentIdKey}` = #{parentIdValue}</otherwise>

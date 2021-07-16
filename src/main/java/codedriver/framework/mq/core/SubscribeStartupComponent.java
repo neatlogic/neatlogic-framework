@@ -91,7 +91,7 @@ public class SubscribeStartupComponent implements IStartup {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                    logger.error("连接消息队列失败，异常：" + e.getMessage());
                 }
             }
         };

@@ -45,7 +45,11 @@ public abstract class TopicBase<T> implements ITopic<T> {
                     JSONObject contentObj = generateTopicContent(content);
                     if (MapUtils.isNotEmpty(contentObj)) {
                         String msg = contentObj.toString();
-                        jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, msg);
+                        try {
+                            jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, msg);
+                        } catch (Exception ex) {
+                            logger.error("发送消息到" + TenantContext.get().getTenantUuid() + "/" + topicName + "失败，异常：" + ex.getMessage());
+                        }
                         logger.info("send msg to topic[" + TenantContext.get().getTenantUuid() + "/" + topicName + "]" + msg);
                     }
                 }

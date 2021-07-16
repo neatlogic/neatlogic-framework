@@ -24,15 +24,15 @@ public class ApiRuntimeException extends RuntimeException {
     }
 
     public ApiRuntimeException(String message, Throwable ex) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + message, ex);
+        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message, ex);
     }
 
     public ApiRuntimeException(String message) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + message);
+        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message);
     }
 
     public ApiRuntimeException(String message, JSONObject param) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + message);
+        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message);
         this.param = param;
     }
 

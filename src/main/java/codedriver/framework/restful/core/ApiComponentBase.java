@@ -138,7 +138,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 }
             } catch (Exception ex) {
                 if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
-                    throw new ApiRuntimeException(ex.getCause().getMessage());
+                    throw new ApiRuntimeException(((ApiRuntimeException) ex.getCause()).getMessage(true));
                 } else {
                     throw ex;
                 }

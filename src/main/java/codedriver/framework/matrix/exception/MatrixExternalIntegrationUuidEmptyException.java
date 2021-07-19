@@ -6,7 +6,7 @@
 package codedriver.framework.matrix.exception;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-
+@Deprecated
 public class MatrixExternalIntegrationUuidEmptyException extends ApiRuntimeException {
 
     private static final long serialVersionUID = -6114648427319986274L;

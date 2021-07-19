@@ -7,11 +7,11 @@ import codedriver.framework.exception.core.ApiRuntimeException;
  * @description:
  * @create: 2020-04-01 17:38
  **/
-public class MatrixImportException extends ApiRuntimeException {
+public class MatrixNameDifferentImportFileNameException extends ApiRuntimeException {
 
     private static final long serialVersionUID = -4508274752209783532L;
 
-    public MatrixImportException(String msg) {
-        super(msg);
+    public MatrixNameDifferentImportFileNameException() {
+        super("矩阵名称与导入文件名不同，不能导入");
     }
 }

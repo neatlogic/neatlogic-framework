@@ -1,22 +1,18 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.transaction.core;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @Title: AfterTransactionCommit
- * @Package: codedriver.framework.transaction.util
- * @Description: 事务后作业控制器，保证所有逻辑在事务提交后执行
- * @author: chenqiwei
- * @date: 2021/1/73:33 下午
- * Copyright(c) 2021 TechSure Co.,Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class AfterTransactionJob<T> {
     private final ThreadLocal<Set<T>> THREADLOCAL = new ThreadLocal<>();
 
@@ -44,22 +40,35 @@ public class AfterTransactionJob<T> {
             if (tList == null) {
                 tList = new HashSet<>();
                 THREADLOCAL.set(tList);
-                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        Set<T> tList = (Set<T>) THREADLOCAL.get();
-                        CachedThreadPool.execute(new CodeDriverThread() {
-                            @Override
-                            protected void execute() {
-                                for (T t : tList) {
-                                    commited.execute(t);
+                        if (commited != null) {
+                            Set<T> tList = (Set<T>) THREADLOCAL.get();
+                            CachedThreadPool.execute(new CodeDriverThread() {
+                                @Override
+                                protected void execute() {
+                                    for (T t : tList) {
+                                        commited.execute(t);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
 
                     @Override
                     public void afterCompletion(int status) {
+                        if (completed != null) {
+                            Set<T> tList = (Set<T>) THREADLOCAL.get();
+                            CachedThreadPool.execute(new CodeDriverThread() {
+                                @Override
+                                protected void execute() {
+                                    for (T t : tList) {
+                                        completed.execute(t);
+                                    }
+                                }
+                            });
+                        }
                         THREADLOCAL.remove();
                     }
                 });

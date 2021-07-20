@@ -6,7 +6,7 @@
 package codedriver.framework.asynchronization.threadpool;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class TransactionSynchronizationPool {
             if (runnableList == null) {
                 runnableList = new ArrayList<>();
                 threadLocal.set(runnableList);
-                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     /**
                      * 当前事务提交成功，才执行此方法中的逻辑
                      */

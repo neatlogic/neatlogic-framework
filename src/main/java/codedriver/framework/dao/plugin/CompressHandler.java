@@ -20,7 +20,7 @@ public class CompressHandler implements TypeHandler<String> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        if (Config.ENABLE_GZIP() && StringUtils.isNotBlank(parameter) && parameter.length() > 150) {//大于150个字符才开始压缩
+        if (Config.ENABLE_GZIP() && StringUtils.isNotBlank(parameter) && parameter.length() > 500) {//大于500个字符才开始压缩
             parameter = "GZIP:" + GzipUtil.compress(parameter);
         }
         ps.setString(i, parameter);

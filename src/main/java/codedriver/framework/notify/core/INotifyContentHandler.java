@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.notify.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
@@ -9,29 +14,23 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 import java.util.Map;
 
-/**
- *@Title: 通知定时任务插件接口
- *@Package: codedriver.framework.notify.core
- *@Description:
- *@Author: laiwt
- *@Date: 2021/1/8 18:52
- *Copyright(c) ${YEAR} TechSure Co., Ltd. All Rights Reserved.
- *本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public interface INotifyContentHandler {
 
-	public enum Type{
-		STATIC("static","静态"),
-		DYNAMIC("dynamic","动态");//动态插件，通知消息接收人不可指定
-		private String value;
-		private String text;
-		private Type(String value, String text) {
+	public enum Type {
+		STATIC("static", "静态"),
+		DYNAMIC("dynamic", "动态");//动态插件，通知消息接收人不可指定
+		private final String value;
+		private final String text;
+
+		Type(String value, String text) {
 			this.value = value;
 			this.text = text;
 		}
+
 		public String getValue() {
 			return value;
 		}
+
 		public String getText() {
 			return text;
 		}

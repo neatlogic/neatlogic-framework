@@ -10,11 +10,8 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
-	<select id="getMatrixViewIsExists" parameterType="string" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM `matrix_view`
-		WHERE `matrix_uuid` = #{matrixUuid}
+	<select id="checkMatrixViewIsExists" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM `matrix_view` WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
 	<insert id="insertMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
@@ -33,7 +30,7 @@
 	<update id="updateMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
 		UPDATE `matrix_view` SET
 		 `file_id` = #{fileId},
-		 `config` = #{config},
+		 `config` = #{config}
 		 WHERE `matrix_uuid` = #{matrixUuid}
 	</update>
 

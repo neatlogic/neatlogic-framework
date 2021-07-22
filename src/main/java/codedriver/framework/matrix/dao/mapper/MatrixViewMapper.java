@@ -13,13 +13,13 @@ import codedriver.framework.matrix.dto.MatrixViewVo;
  **/
 public interface MatrixViewMapper {
 
+    public MatrixViewVo getMatrixViewByMatrixUuid(String matrixUuid);
+
+    public int checkMatrixViewIsExists(String matrixUuid);
+
     public void insertMatrixView(MatrixViewVo matrixViewVo);
 
     public void updateMatrixView(MatrixViewVo matrixViewVo);
 
     public void deleteMatrixViewByMatrixUuid(String matrixUuid);
-
-    public MatrixViewVo getMatrixViewByMatrixUuid(String matrixUuid);
-
-    public int getMatrixViewIsExists(String matrixUuid);
 }

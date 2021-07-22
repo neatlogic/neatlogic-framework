@@ -12,7 +12,6 @@ package codedriver.framework.matrix.dto;
 public class MatrixViewVo {
     private String matrixUuid;
     private Long fileId;
-//    private String viewXml;
     private String config;
     public String getMatrixUuid() {
         return matrixUuid;
@@ -29,14 +28,6 @@ public class MatrixViewVo {
     public void setFileId(Long fileId) {
         this.fileId = fileId;
     }
-
-//    public String getViewXml() {
-//        return viewXml;
-//    }
-//
-//    public void setViewXml(String viewXml) {
-//        this.viewXml = viewXml;
-//    }
 
     public String getConfig() {
         return config;

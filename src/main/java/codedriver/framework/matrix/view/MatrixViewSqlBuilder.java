@@ -83,7 +83,7 @@ public class MatrixViewSqlBuilder {
             Select selectStatement = (Select) stmt;
             PlainSelect select = (PlainSelect) selectStatement.getSelectBody();
             final boolean[] hasId = new boolean[1];
-            final boolean[] hasName = new boolean[1];
+            final boolean[] hasUuid = new boolean[1];
             Set<String> columnList = new HashSet<>();
             for (SelectItem selectItem : select.getSelectItems()) {
                 selectItem.accept(new SelectItemVisitor() {
@@ -105,19 +105,18 @@ public class MatrixViewSqlBuilder {
                         }
                         if (columnName.equalsIgnoreCase("id")) {
                             hasId[0] = true;
-                        } else if (columnName.equalsIgnoreCase("name")) {
-                            hasName[0] = true;
-                        } else {
-                            columnList.add(columnName);
+                        } else if (columnName.equalsIgnoreCase("uuid")) {
+                            hasUuid[0] = true;
                         }
+                        columnList.add(columnName);
                     }
                 });
             }
             if (!hasId[0]) {
                 throw new MatrixViewSqlFieldNotExistsException("id");
             }
-            if (!hasName[0]) {
-                throw new MatrixViewSqlFieldNotExistsException("name");
+            if (!hasUuid[0]) {
+                throw new MatrixViewSqlFieldNotExistsException("uuid");
             }
             if (CollectionUtils.isNotEmpty(columnList)) {
                 for (String attrName : attrMap.keySet()) {

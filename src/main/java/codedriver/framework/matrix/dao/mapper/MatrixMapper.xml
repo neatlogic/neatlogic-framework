@@ -73,13 +73,13 @@
 		WHERE `uuid` = #{uuid}
 	</select>
 
-	<select id="getMatrixByUuidForSelect" parameterType="String" resultType="codedriver.framework.common.dto.ValueTextVo">
+	<!--<select id="getMatrixByUuidForSelect" parameterType="String" resultType="codedriver.framework.common.dto.ValueTextVo">
 		SELECT
 		`uuid` as `value`,
 		`name` as `text`
 		FROM `matrix`
 		WHERE `uuid` = #{uuid}
-	</select>
+	</select>-->
 
 	<select id="searchMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultMap="matrixMap">
 			SELECT 
@@ -111,7 +111,7 @@
 			</if>
 	</select>
 
-	<select id="searchMatrixForSelect" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="codedriver.framework.common.dto.ValueTextVo">
+	<!--<select id="searchMatrixForSelect" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultType="codedriver.framework.common.dto.ValueTextVo">
 		SELECT
 		`uuid` as `value`,
 		`name` as `text`
@@ -128,7 +128,7 @@
 			LIMIT #{startNum}, #{pageSize}
 		</if>
 		ORDER BY `id` DESC
-	</select>
+	</select>-->
 	
 	<select id="checkMatrixIsExists" parameterType="java.lang.String" resultType="int">
 	SELECT COUNT(`uuid`) FROM `matrix` WHERE `uuid` = #{uuid}

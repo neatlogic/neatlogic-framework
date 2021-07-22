@@ -12,11 +12,11 @@ public interface MatrixMapper {
 
     public MatrixVo getMatrixByUuid(String uuid);
 
-    public ValueTextVo getMatrixByUuidForSelect(String uuid);
+//    public ValueTextVo getMatrixByUuidForSelect(String uuid);
 
     public List<MatrixVo> searchMatrix(MatrixVo matrixVo);
 
-    public List<ValueTextVo> searchMatrixForSelect(MatrixVo matrixVo);
+//    public List<ValueTextVo> searchMatrixForSelect(MatrixVo matrixVo);
 
     public int checkMatrixIsExists(String uuid);
 

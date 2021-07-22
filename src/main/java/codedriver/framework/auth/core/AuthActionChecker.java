@@ -27,6 +27,28 @@ public class AuthActionChecker {
         userMapper = _userMapper;
     }
 
+    @SafeVarargs
+    public static Boolean check(Class<? extends AuthBase>... actionClass) {
+        if (actionClass == null || actionClass.length == 0) {
+            return false;
+        }
+        UserContext userContext = UserContext.get();
+        List<String> actionList = new ArrayList<>();
+        for (Class<? extends AuthBase> action : actionClass) {
+            actionList.add(action.getSimpleName());
+        }
+        //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
+        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+            return true;
+        }
+
+        if (userContext != null) {
+            return checkByUserUuid(userContext.getUserUuid(), actionList);
+        } else {
+            return false;
+        }
+    }
+
     public static Boolean check(String... action) {
         if (action == null || action.length == 0) {
             return false;
@@ -74,7 +96,7 @@ public class AuthActionChecker {
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
         //判断从数据库查询的用户权限是否满足
         List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(contains)){
+        if (CollectionUtils.isNotEmpty(contains)) {
             return true;
         }
         //以上不满足，则遍历递归所有权限寻找
@@ -89,9 +111,9 @@ public class AuthActionChecker {
     /**
      * 递归获取权限
      *
-     * @param auth     权限
-     * @param authList 当前登录人所有权限列表
-     * @param actionList  目标权限
+     * @param auth       权限
+     * @param authList   当前登录人所有权限列表
+     * @param actionList 目标权限
      * @return 存在权限 是：true 否：false
      */
     private static boolean checkAuthList(String auth, List<String> authList, List<String> actionList) {
@@ -113,23 +135,24 @@ public class AuthActionChecker {
 
     /**
      * 根据用户权限穿透获取所有权限
+     *
      * @param userAuthList 未穿透的权限
      */
-    public static void getAuthList(List<UserAuthVo> userAuthList){
+    public static void getAuthList(List<UserAuthVo> userAuthList) {
         for (int i = 0; i < userAuthList.size(); i++) {
             AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
-            getAuthListByAuth(authBase,userAuthList);
+            getAuthListByAuth(authBase, userAuthList);
         }
     }
 
-    private static void getAuthListByAuth(AuthBase authBase,List<UserAuthVo> userAuthList){
-        if(authBase != null) {
+    private static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
+        if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
-                    AuthBase auth =  AuthFactory.getAuthInstance(authClass.getSimpleName());
+                    AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
                     userAuthList.add(new UserAuthVo(auth));
-                    getAuthListByAuth(auth,userAuthList);
+                    getAuthListByAuth(auth, userAuthList);
                 }
             }
         }

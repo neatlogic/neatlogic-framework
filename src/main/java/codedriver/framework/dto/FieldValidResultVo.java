@@ -22,7 +22,7 @@ public class FieldValidResultVo {
     private ApiRuntimeException exception;
 
     public FieldValidResultVo(ApiRuntimeException exception) {
-        this.msg = exception.getMessage();
+        this.msg = exception.getMessage(true);
         this.status = "ERROR";
         this.param = exception.getParam();
     }

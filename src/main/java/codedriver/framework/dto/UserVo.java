@@ -58,6 +58,9 @@ public class UserVo extends BasePageVo implements Serializable{
 	private String authGroup;
 	private JSONObject userInfoObj;
 
+	@EntityField(name = "是否已删除", type = ApiParamType.ENUM)
+	private Integer isDelete;
+
 	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
 	private String title;
 
@@ -340,6 +343,14 @@ public class UserVo extends BasePageVo implements Serializable{
 			userInfoObj = JSONObject.parseObject(userInfo);
 		}
 		return userInfoObj;
+	}
+
+	public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
 	}
 
 	public String getTitle() {

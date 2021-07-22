@@ -195,6 +195,9 @@
         <if test="isActive != null">
             AND a.`is_active` = #{isActive}
         </if>
+        <if test="isDelete != null">
+            AND a.`is_delete` = #{isDelete}
+        </if>
         <if test="teamUuid != null and teamUuid != ''">
             AND c.`team_uuid` = #{teamUuid}
         </if>
@@ -403,6 +406,10 @@
 
             <if test="isActive != null">
                 AND a.`is_active` = #{isActive}
+            </if>
+
+            <if test="isDelete != null">
+                AND a.`is_delete` = #{isDelete}
             </if>
 
             <if test="teamUuid != null and teamUuid != ''">

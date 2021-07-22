@@ -32,6 +32,9 @@
 			<if test="level != null and level != ''">
 				and `level` = #{level}
 			</if>
+			<if test="isDelete != null">
+				and `is_delete` = #{isDelete}
+			</if>
 		</where>
 		ORDER BY `lft`
 		<if test="needPage == true">
@@ -68,6 +71,9 @@
 		<if test="parentUuid != null and parentUuid != ''">
 			and parent_uuid = #{parentUuid}
 		</if>
+		<if test="isDelete != null">
+			and `is_delete` = #{isDelete}
+		</if>
 	</select>
 
 	<select id="searchTeamForSelect" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
@@ -84,6 +90,9 @@
 			</if>
 			<if test="level != null and level != ''">
 				and `level` = #{level}
+			</if>
+			<if test="isDelete != null">
+				and `is_delete` = #{isDelete}
 			</if>
 		</where>
 		ORDER BY `lft`
@@ -110,6 +119,9 @@
 			<if test="name != null and name != ''">
 				AND a.`name` = #{name}
 			</if>
+			<if test="isDelete != null">
+				and `is_delete` = #{isDelete}
+			</if>
 		</where>
 	</select>
 
@@ -123,6 +135,9 @@
 		<where>
 			<if test="uuid !=null and uuid != ''">
 				AND a.`uuid` = #{uuid}
+			</if>
+			<if test="isDelete != null">
+				and `is_delete` = #{isDelete}
 			</if>
 		</where>
 	</select>
@@ -308,7 +323,8 @@
 		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
 		LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
 		LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
-		WHERE a.`uuid` IN
+		WHERE c.`is_delete` != 1
+		and a.`uuid` IN
 		<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
 			#{teamUuid}
 		</foreach>

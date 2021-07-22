@@ -42,6 +42,8 @@ public class TeamVo extends BasePageVo implements Serializable {
 	private List<String> pathNameList;
 	@EntityField(name = "级别", type = ApiParamType.STRING)
 	private String level;
+	@EntityField(name = "是否已删除", type = ApiParamType.INTEGER)
+	private Integer isDelete;
 
 	@EntityField(name = "父分组名称", type = ApiParamType.STRING)
 	@JSONField(serialize = false)
@@ -192,6 +194,14 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setLevel(String level) {
 		this.level = level;
+	}
+
+	public Integer getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
 	}
 
 	public String getInitType() {

@@ -2,7 +2,6 @@ package codedriver.framework.notify.core;
 
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.notify.dto.NotifyPolicyHandlerVo;

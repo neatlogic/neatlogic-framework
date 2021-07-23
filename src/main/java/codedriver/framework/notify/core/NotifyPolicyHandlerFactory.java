@@ -2,9 +2,9 @@ package codedriver.framework.notify.core;
 
 import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
 import codedriver.framework.common.RootComponent;
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.notify.dto.NotifyPolicyHandlerVo;
 import codedriver.framework.notify.dto.NotifyTreeVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 @RootComponent
 public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
 
-    private static final List<ValueTextVo> notifyPolicyHandlerList = new ArrayList<>();
+    private static final List<NotifyPolicyHandlerVo> notifyPolicyHandlerList = new ArrayList<>();
 
     private static final Map<String, INotifyPolicyHandler> notifyPolicyHandlerMap = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
         return notifyPolicyHandlerMap.get(handler);
     }
 
-    public static List<ValueTextVo> getNotifyPolicyHandlerList() {
+    public static List<NotifyPolicyHandlerVo> getNotifyPolicyHandlerList() {
         return notifyPolicyHandlerList;
     }
 
@@ -101,12 +101,13 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext context = event.getApplicationContext();
+        ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
         Map<String, INotifyPolicyHandler> map = context.getBeansOfType(INotifyPolicyHandler.class);
         for (Entry<String, INotifyPolicyHandler> entry : map.entrySet()) {
             INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
             if(notifyPolicyHandler.isPublic()){
                 notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
-                notifyPolicyHandlerList.add(new ValueTextVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getGroup()));
 
                 INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
                 if (notifyPolicyHandlerGroup == null) {
@@ -135,7 +136,6 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
                 }
             }
             treeVo.setChildren(children);
-            ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
             NotifyTreeVo parentTreeVo = moduleTreeVoMap.get(moduleVo.getGroup());
             if (parentTreeVo == null) {
                 parentTreeVo = new NotifyTreeVo(moduleVo.getGroup(), moduleVo.getGroupName());

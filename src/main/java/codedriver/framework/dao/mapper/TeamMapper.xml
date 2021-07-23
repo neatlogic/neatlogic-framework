@@ -415,7 +415,8 @@
 		`parent_uuid`,
 		`lft`,
 		`rht`,
-		`level`
+		`level`,
+		`is_delete`
 		) VALUES (
 		#{id},
 		#{uuid},
@@ -423,7 +424,8 @@
 		#{parentUuid},
 		#{lft},
 		#{rht},
-		#{level}
+		#{level},
+		0
 		)
 	</insert>
 

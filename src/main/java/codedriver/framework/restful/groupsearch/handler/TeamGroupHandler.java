@@ -48,6 +48,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		teamVo.setPageSize(total);
 		teamVo.setCurrentPage(1);
 		teamVo.setKeyword(jsonObj.getString("keyword"));
+		teamVo.setIsDelete(0);
 		teamList = teamMapper.searchTeam(teamVo);
 		setFullPathAndParentName(teamList);
 		return (List<T>) teamList;

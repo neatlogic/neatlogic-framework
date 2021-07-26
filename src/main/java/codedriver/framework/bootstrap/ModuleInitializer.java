@@ -35,6 +35,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext context) throws ServletException {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         String moduleId = null;
+        System.out.println(" _____         _     ____                    ____          _      ____       _                \n" +
+                "|_   _|__  ___| |__ / ___| _   _ _ __ ___   / ___|___   __| | ___|  _ \\ _ __(_)_   _____ _ __ \n" +
+                "  | |/ _ \\/ __| '_ \\\\___ \\| | | | '__/ _ \\ | |   / _ \\ / _` |/ _ \\ | | | '__| \\ \\ / / _ \\ '__|\n" +
+                "  | |  __/ (__| | | |___) | |_| | | |  __/ | |__| (_) | (_| |  __/ |_| | |  | |\\ V /  __/ |   \n" +
+                "  |_|\\___|\\___|_| |_|____/ \\__,_|_|  \\___|  \\____\\___/ \\__,_|\\___|____/|_|  |_| \\_/ \\___|_|   \n" +
+                "===============================================================================================");
         try {
             Resource[] resources = resolver.getResources("classpath*:codedriver/**/*-servlet-context.xml");
             for (Resource resource : resources) {

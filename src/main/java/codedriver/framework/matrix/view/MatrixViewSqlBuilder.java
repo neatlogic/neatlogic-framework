@@ -7,20 +7,15 @@ package codedriver.framework.matrix.view;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.matrix.dto.AttrVo;
+import codedriver.framework.matrix.dto.MatrixViewAttributeVo;
 import codedriver.framework.matrix.exception.*;
-import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.jdbc.SqlBuilder;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -33,7 +28,7 @@ public class MatrixViewSqlBuilder {
     private final String sql;
     private String viewName;
     private final Map<String, String> attrMap = new HashMap<>();
-    private Map<String, Long> attrIdMap;
+//    private Map<String, Long> attrIdMap;
     private final String dataSchema = TenantContext.get().getDataDbName();
     private final String schema = TenantContext.get().getDbName();
 
@@ -69,9 +64,9 @@ public class MatrixViewSqlBuilder {
         }
     }
 
-    public void setAttrIdMap(Map<String, Long> _attrIdMap) {
-        this.attrIdMap = _attrIdMap;
-    }
+//    public void setAttrIdMap(Map<String, Long> _attrIdMap) {
+//        this.attrIdMap = _attrIdMap;
+//    }
 
     public void setViewName(String viewName) {
         this.viewName = viewName;
@@ -162,10 +157,10 @@ public class MatrixViewSqlBuilder {
      *
      * @return 列名列表
      */
-    public List<AttrVo> getAttrList() {
-        List<AttrVo> attrList = new ArrayList<>();
+    public List<MatrixViewAttributeVo> getAttrList() {
+        List<MatrixViewAttributeVo> attrList = new ArrayList<>();
         for (String attrName : attrMap.keySet()) {
-            AttrVo attrVo = new AttrVo();
+            MatrixViewAttributeVo attrVo = new MatrixViewAttributeVo();
             attrVo.setType("text");
 //            attrVo.setInputType(InputType.MT.getValue());
             attrVo.setName(attrName);
@@ -191,7 +186,7 @@ public class MatrixViewSqlBuilder {
             Statement stmt = CCJSqlParserUtil.parse(sql);
             Select selectStatement = (Select) stmt;
             fillUpSchema(selectStatement.getSelectBody());
-            fillUpAlias(selectStatement.getSelectBody());
+//            fillUpAlias(selectStatement.getSelectBody());
             return "CREATE OR REPLACE VIEW " + dataSchema + "." + viewName + " AS " + stmt;
 
         } catch (ApiRuntimeException ex) {
@@ -206,52 +201,52 @@ public class MatrixViewSqlBuilder {
      *
      * @param selectBody select主体
      */
-    private void fillUpAlias(SelectBody selectBody) {
-        PlainSelect select = (PlainSelect) selectBody;
-        List<SelectItem> newItemList = new ArrayList<>();
-        for (SelectItem selectItem : select.getSelectItems()) {
-            selectItem.accept(new SelectItemVisitor() {
-                @Override
-                public void visit(AllColumns allColumns) {
-                }
-
-                @Override
-                public void visit(AllTableColumns allTableColumns) {
-                }
-
-                @Override
-                public void visit(SelectExpressionItem selectExpressionItem) {
-                    //替换列名的别名为attrId
-                    if (MapUtils.isNotEmpty(attrIdMap)) {
-                        //原来已经有别名
-                        String alias;
-                        SelectExpressionItem selectItem = new SelectExpressionItem();
-                        if (selectExpressionItem.getAlias() != null) {
-                            selectItem.setExpression(new Column("md5(" + selectExpressionItem.getExpression() + ")"));
-                            alias = selectExpressionItem.getAlias().getName();
-                        } else {
-                            selectItem.setExpression(new Column("md5(" + selectExpressionItem + ")"));
-                            alias = selectExpressionItem.toString();
-                        }
-                        if (attrIdMap.containsKey(alias)) {
-                            selectItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "_hash`"));
-                            selectExpressionItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "`"));
-                            newItemList.add(selectItem);
-                        }
-                    }
-                }
-            });
-        }
-        //补充ci列
-//        SelectExpressionItem selectItem = new SelectExpressionItem();
-//        selectItem.setExpression(new StringValue(ciId.toString()));
-//        selectItem.setAlias(new Alias("ci_id"));
-//        newItemList.add(selectItem);
-//        if (CollectionUtils.isNotEmpty(newItemList)) {
-//            select.addSelectItems(newItemList);
+//    private void fillUpAlias(SelectBody selectBody) {
+//        PlainSelect select = (PlainSelect) selectBody;
+//        List<SelectItem> newItemList = new ArrayList<>();
+//        for (SelectItem selectItem : select.getSelectItems()) {
+//            selectItem.accept(new SelectItemVisitor() {
+//                @Override
+//                public void visit(AllColumns allColumns) {
+//                }
+//
+//                @Override
+//                public void visit(AllTableColumns allTableColumns) {
+//                }
+//
+//                @Override
+//                public void visit(SelectExpressionItem selectExpressionItem) {
+//                    //替换列名的别名为attrId
+//                    if (MapUtils.isNotEmpty(attrIdMap)) {
+//                        //原来已经有别名
+//                        String alias;
+//                        SelectExpressionItem selectItem = new SelectExpressionItem();
+//                        if (selectExpressionItem.getAlias() != null) {
+//                            selectItem.setExpression(new Column("md5(" + selectExpressionItem.getExpression() + ")"));
+//                            alias = selectExpressionItem.getAlias().getName();
+//                        } else {
+//                            selectItem.setExpression(new Column("md5(" + selectExpressionItem + ")"));
+//                            alias = selectExpressionItem.toString();
+//                        }
+//                        if (attrIdMap.containsKey(alias)) {
+//                            selectItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "_hash`"));
+//                            selectExpressionItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "`"));
+//                            newItemList.add(selectItem);
+//                        }
+//                    }
+//                }
+//            });
 //        }
-
-    }
+//        //补充ci列
+////        SelectExpressionItem selectItem = new SelectExpressionItem();
+////        selectItem.setExpression(new StringValue(ciId.toString()));
+////        selectItem.setAlias(new Alias("ci_id"));
+////        newItemList.add(selectItem);
+////        if (CollectionUtils.isNotEmpty(newItemList)) {
+////            select.addSelectItems(newItemList);
+////        }
+//
+//    }
 
     /**
      * 给SQL语句补充视图schema

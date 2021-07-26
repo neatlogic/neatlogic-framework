@@ -5,7 +5,7 @@
 
 package codedriver.framework.dao.mapper;
 
-import codedriver.framework.matrix.dto.AttrVo;
+import codedriver.framework.matrix.dto.MatrixViewAttributeVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,13 +21,13 @@ public interface SchemaMapper {
 
     int checkSchemaIsExists(String databaseName);
 
-    void insertAttrToCiTable(@Param("tableName") String tableName, @Param("attrVo") AttrVo attrVo);
+    void insertAttrToCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
 
     void insertCiTable(@Param("tableName") String tableName);
 
     void insertView(String sql);
 
-    void deleteAttrFromCiTable(@Param("tableName") String tableName, @Param("attrVo") AttrVo attrVo);
+    void deleteAttrFromCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
 
     void deleteTable(@Param("tableName") String tableName);
 

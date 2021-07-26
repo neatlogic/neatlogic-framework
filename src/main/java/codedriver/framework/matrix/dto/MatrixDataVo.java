@@ -12,7 +12,6 @@ import com.alibaba.fastjson.JSONArray;
  * @create: 2020-03-30 16:41
  **/
 public class MatrixDataVo extends BasePageVo {
-    private String keyword;
     private String matrixUuid;
     private List<String> columnList;
     private List<MatrixColumnVo> sourceColumnList;
@@ -31,14 +30,6 @@ public class MatrixDataVo extends BasePageVo {
 //    public void setTargetColumn(String targetColumn) {
 //        this.targetColumn = targetColumn;
 //    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
 
     public String getMatrixUuid() {
         return matrixUuid;

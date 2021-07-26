@@ -9,7 +9,7 @@ package codedriver.framework.matrix.dto;
  * @author linbq
  * @since 2021/7/18 11:51
  **/
-public class AttrVo {
+public class MatrixViewAttributeVo {
     private String name;
     private String label;
     private String type;

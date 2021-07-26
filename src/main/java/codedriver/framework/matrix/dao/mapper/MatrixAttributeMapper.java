@@ -12,7 +12,7 @@ public interface MatrixAttributeMapper {
 
     public void deleteAttributeByMatrixUuid(String matrixUuid);
 
-    public int checkMatrixAttributeTableExist(String tableName);
+//    public int checkMatrixAttributeTableExist(String tableName);
 
     public void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("tenantId") String tenantId);
 

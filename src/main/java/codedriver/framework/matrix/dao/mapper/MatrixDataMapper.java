@@ -29,7 +29,7 @@ public interface MatrixDataMapper {
 
     public int getDynamicTableDataByUuidCount(@Param("dataVo") MatrixDataVo dataVo, @Param("tenantId") String tenantId);
 
-    public List<String> getDynamicTableCellData(@Param("matrixUuid") String matrixUuid, @Param("sourceColumnVo") MatrixColumnVo sourceColumnVo, @Param("targetColumn") String targetColumn, @Param("tenantId") String tenantId);
+//    public List<String> getDynamicTableCellData(@Param("matrixUuid") String matrixUuid, @Param("sourceColumnVo") MatrixColumnVo sourceColumnVo, @Param("targetColumn") String targetColumn, @Param("tenantId") String tenantId);
 
     public List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values, @Param("tenantId") String tenantId);
 

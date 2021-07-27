@@ -15,12 +15,12 @@
         ORDER BY `sort`
     </select>
 
-    <select id="checkMatrixAttributeTableExist" parameterType="string" resultType="int">
+    <!--<select id="checkMatrixAttributeTableExist" parameterType="string" resultType="int">
         SELECT COUNT(`table_name`)
         FROM information_schema.TABLES
         WHERE table_name = #{tableName}
         limit 1
-    </select>
+    </select>-->
 
     <delete id="deleteAttributeByMatrixUuid" parameterType="string">
         DELETE

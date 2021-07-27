@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.matrix.dao.mapper.MatrixViewMapper">
+	<select id="getMatrixViewByMatrixUuid" parameterType="string" resultType="codedriver.framework.matrix.dto.MatrixViewVo">
+		SELECT
+		`matrix_uuid` AS matrixUuid, 
+		`file_id` AS fileId,
+		`config`
+		FROM `matrix_view`
+		WHERE `matrix_uuid` = #{matrixUuid}
+	</select>
+	
+	<select id="checkMatrixViewIsExists" parameterType="string" resultType="int">
+		SELECT COUNT(1) FROM `matrix_view` WHERE `matrix_uuid` = #{matrixUuid}
+	</select>
+	
+	<insert id="insertMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
+		INSERT INTO `matrix_view`(
+			`matrix_uuid`,
+			`file_id`,
+			`config`
+		) VALUES (
+			#{matrixUuid},
+			#{fileId},
+			#{config}
+		)
+
+	</insert>
+
+	<update id="updateMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
+		UPDATE `matrix_view` SET
+		 `file_id` = #{fileId},
+		 `config` = #{config}
+		 WHERE `matrix_uuid` = #{matrixUuid}
+	</update>
+
+	<delete id="deleteMatrixViewByMatrixUuid" parameterType="String">
+		DELETE FROM `matrix_view` WHERE `matrix_uuid` = #{matrixUuid}
+	</delete>
+
+</mapper>

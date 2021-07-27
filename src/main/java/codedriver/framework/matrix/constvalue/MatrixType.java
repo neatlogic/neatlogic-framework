@@ -7,7 +7,9 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 
 public enum MatrixType implements IEnum {
-    CUSTOM("custom", "自定义数据源"), EXTERNAL("external", "外部数据源");
+    CUSTOM("custom", "自定义数据源"),
+    EXTERNAL("external", "外部数据源"),
+    VIEW("view", "视图");
 
     private String value;
     private String name;

@@ -23,6 +23,7 @@ public class MongoDbManager {
     private MongoDbMapper mongoDbMapper;
 
     private static final Map<String, MongoClient> mongoDbMap = new HashMap<>();
+    private static final Map<String, String> mongoDatabaseMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -31,8 +32,13 @@ public class MongoDbManager {
             if (!mongoDbMap.containsKey(mongoDbVo.getTenantUuid())) {
                 MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + ":" + mongoDbVo.getPort() + "/" + mongoDbVo.getDatabase() + "?authSource=admin");
                 mongoDbMap.put(mongoDbVo.getTenantUuid(), client);
+                mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
             }
         }
+    }
+
+    public static String getDatabase(String tenantUuid) {
+        return mongoDatabaseMap.get(tenantUuid);
     }
 
     public static MongoClient getMongoClient(String tenantUuid) {

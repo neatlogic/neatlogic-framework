@@ -10,8 +10,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
-import java.util.Locale;
-
 //@Configuration
 public class CodedriverMongoDbFactory extends SimpleMongoClientDatabaseFactory {
     //@Autowired
@@ -27,7 +25,7 @@ public class CodedriverMongoDbFactory extends SimpleMongoClientDatabaseFactory {
 
     @Override
     protected MongoDatabase doGetMongoDatabase(String dbName) {
-        return MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid()).getDatabase("codedriver_" + TenantContext.get().getTenantUuid().toLowerCase(Locale.ROOT));
+        return MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid()).getDatabase(MongoDbManager.getDatabase(TenantContext.get().getTenantUuid()));
     }
 
 

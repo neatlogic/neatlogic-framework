@@ -1,531 +1,612 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TeamMapper">
-	<cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
-	<resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
-		<id property="uuid" column="uuid" />
-		<result property="id" column="id" />
-		<result property="name" column="name" />
-		<result property="parentUuid" column="parentUuid" />
-		<result property="level" column="level" />
-		<result property="lft" column="lft" />
-		<result property="rht" column="rht" />
-	</resultMap>
+    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
+    <resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
+        <id property="uuid" column="uuid"/>
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentUuid" column="parentUuid"/>
+        <result property="level" column="level"/>
+        <result property="lft" column="lft"/>
+        <result property="rht" column="rht"/>
+    </resultMap>
 
-	<select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
-		SELECT
-		`id`,
-		`uuid`,
-		`name`,
-		`lft`,
-		`rht`,
-		`parent_uuid` AS `parentUuid`,
-		`level`
-		FROM `team`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				and `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-			<if test="parentUuid != null and parentUuid != ''">
-				and `parent_uuid` = #{parentUuid}
-			</if>
-			<if test="level != null and level != ''">
-				and `level` = #{level}
-			</if>
-			<if test="isDelete != null">
-				and `is_delete` = #{isDelete}
-			</if>
-		</where>
-		ORDER BY `lft`
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
+    <select id="searchTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `lft`,
+        `rht`,
+        `parent_uuid` AS `parentUuid`,
+        `level`
+        FROM `team`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="parentUuid != null and parentUuid != ''">
+                and `parent_uuid` = #{parentUuid}
+            </if>
+            <if test="level != null and level != ''">
+                and `level` = #{level}
+            </if>
+            <if test="isDelete != null">
+                and `is_delete` = #{isDelete}
+            </if>
+        </where>
+        ORDER BY `lft`
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
 
-	<select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`lft`,
-		a.`rht`,
-		a.`parent_uuid` AS `parentUuid`,
-		a.`level`
-		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
-		AND a.`level` in
-		<foreach collection="list" item="level" separator="," open="(" close=")">
-			#{level}
-		</foreach>
-	</select>
+    <select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`lft`,
+        a.`rht`,
+        a.`parent_uuid` AS `parentUuid`,
+        a.`level`
+        FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
+        AND a.`level` in
+        <foreach collection="list" item="level" separator="," open="(" close=")">
+            #{level}
+        </foreach>
+    </select>
 
-	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
-		SELECT
-		COUNT(1)
-		FROM
-		`team`
-		WHERE
-		1=1
-		<if test="keyword != null and keyword != ''">
-			and name LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		<if test="parentUuid != null and parentUuid != ''">
-			and parent_uuid = #{parentUuid}
-		</if>
-		<if test="isDelete != null">
-			and `is_delete` = #{isDelete}
-		</if>
-	</select>
+    <select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
+        SELECT
+        COUNT(1)
+        FROM
+        `team`
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            and name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="parentUuid != null and parentUuid != ''">
+            and parent_uuid = #{parentUuid}
+        </if>
+        <if test="isDelete != null">
+            and `is_delete` = #{isDelete}
+        </if>
+    </select>
 
-	<select id="searchTeamForSelect" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
-		SELECT
-		CONCAT("team#",`uuid`) AS `value`,
-		`name` as `text`
-		FROM `team`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				and `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-			<if test="parentUuid != null and parentUuid != ''">
-				and `parent_uuid` = #{parentUuid}
-			</if>
-			<if test="level != null and level != ''">
-				and `level` = #{level}
-			</if>
-			<if test="isDelete != null">
-				and `is_delete` = #{isDelete}
-			</if>
-		</where>
-		ORDER BY `lft`
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
+    <select id="searchTeamForSelect" parameterType="codedriver.framework.dto.TeamVo"
+            resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
+        SELECT
+        CONCAT("team#",`uuid`) AS `value`,
+        `name` as `text`
+        FROM `team`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="parentUuid != null and parentUuid != ''">
+                and `parent_uuid` = #{parentUuid}
+            </if>
+            <if test="level != null and level != ''">
+                and `level` = #{level}
+            </if>
+            <if test="isDelete != null">
+                and `is_delete` = #{isDelete}
+            </if>
+        </where>
+        ORDER BY `lft`
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
 
-	<select id="getTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`lft`,
-		a.`rht`,
-		a.`parent_uuid` as `parentUuid`,
-		a.`level`
-		FROM
-		`team` a
-		<where>
-			<if test="uuid !=null and uuid != ''">
-				AND a.`uuid` = #{uuid}
-			</if>
-			<if test="name != null and name != ''">
-				AND a.`name` = #{name}
-			</if>
-			<if test="isDelete != null">
-				and `is_delete` = #{isDelete}
-			</if>
-		</where>
-	</select>
+    <select id="getTeam" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`lft`,
+        a.`rht`,
+        a.`parent_uuid` as `parentUuid`,
+        a.`level`
+        FROM
+        `team` a
+        <where>
+            <if test="uuid !=null and uuid != ''">
+                AND a.`uuid` = #{uuid}
+            </if>
+            <if test="name != null and name != ''">
+                AND a.`name` = #{name}
+            </if>
+            <if test="isDelete != null">
+                and `is_delete` = #{isDelete}
+            </if>
+        </where>
+    </select>
 
-	<select id="getTeamSimpleInfoByUuid" parameterType="codedriver.framework.dto.TeamVo" resultType="codedriver.framework.dto.TeamVo" useCache="true">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`
-		FROM
-		`team` a
-		<where>
-			<if test="uuid !=null and uuid != ''">
-				AND a.`uuid` = #{uuid}
-			</if>
-			<if test="isDelete != null">
-				and `is_delete` = #{isDelete}
-			</if>
-		</where>
-	</select>
+    <select id="getTeamSimpleInfoByUuid" parameterType="codedriver.framework.dto.TeamVo"
+            resultType="codedriver.framework.dto.TeamVo" useCache="true">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`
+        FROM
+        `team` a
+        <where>
+            <if test="uuid !=null and uuid != ''">
+                AND a.`uuid` = #{uuid}
+            </if>
+            <if test="isDelete != null">
+                and `is_delete` = #{isDelete}
+            </if>
+        </where>
+    </select>
 
-	<select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
-		a.`parent_uuid` as `parentUuid`,
-		a.`lft`,
-		a.`rht`,
-		a.`level`
-		FROM
-		`team` a
-		WHERE `uuid` = #{uuid}
-	</select>
+    <select id="getTeamByUuid" parameterType="string" resultType="codedriver.framework.dto.TeamVo" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`name`,
+               (SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
+               a.`parent_uuid`                                              as `parentUuid`,
+               a.`lft`,
+               a.`rht`,
+               a.`level`
+        FROM `team` a
+        WHERE `uuid` = #{uuid}
+    </select>
 
-	<select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
-		SELECT COUNT(`uuid`) FROM `team` WHERE `uuid` = #{uuid}
-	</select>
+    <select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
+        SELECT COUNT(`uuid`)
+        FROM `team`
+        WHERE `uuid` = #{uuid}
+    </select>
 
-	<select id="checkTeamUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
-		SELECT
-		distinct `uuid`
-		FROM `team`
-		WHERE
-		`uuid` in
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-	</select>
+    <select id="checkTeamUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
+        SELECT
+        distinct `uuid`
+        FROM `team`
+        WHERE
+        `uuid` in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 
-	<resultMap id="childrenTeamMap" type="codedriver.framework.dto.TeamVo">
-		<id property="uuid" column="uuid" />
-		<result property="id" column="id" />
-		<result property="name" column="name" />
-		<result property="parentUuid" column="parentUuid" />
-		<result property="lft" column="lft" />
-		<result property="rht" column="rht" />
-		<result property="level" column="level" />
-		<result property="childCount" column="childCount" />
-	</resultMap>
+    <resultMap id="childrenTeamMap" type="codedriver.framework.dto.TeamVo">
+        <id property="uuid" column="uuid"/>
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentUuid" column="parentUuid"/>
+        <result property="lft" column="lft"/>
+        <result property="rht" column="rht"/>
+        <result property="level" column="level"/>
+        <result property="childCount" column="childCount"/>
+    </resultMap>
 
-	<select id="getTeamByParentUuid" parameterType="java.lang.String" resultMap="childrenTeamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`parent_uuid` AS parentUuid,
-		a.`lft`,
-		a.`rht`,
-		a.`level`,
-		(SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
-		FROM `team` a
-		WHERE a.`parent_uuid` = #{value}
-		ORDER BY `lft` ASC
-	</select>
+    <select id="getTeamByParentUuid" parameterType="java.lang.String" resultMap="childrenTeamMap" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`name`,
+               a.`parent_uuid`                                              AS parentUuid,
+               a.`lft`,
+               a.`rht`,
+               a.`level`,
+               (SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
+        FROM `team` a
+        WHERE a.`parent_uuid` = #{value}
+        ORDER BY `lft` ASC
+    </select>
 
-	<select id="getDepartmentTeamUuidByTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`parent_uuid` AS parentUuid,
-		a.`lft`,
-		a.`rht`,
-		a.`level`
-		FROM `team` a
-		WHERE
-		 `level` = 'department'
-		and (
-		<foreach collection="list" item="team" separator=") or (" open="(" close=")">
-			a.`lft` &lt;= #{team.lft} and a.`rht` >= #{team.rht}
-		</foreach>
-		)
-	</select>
+    <select id="getDepartmentTeamUuidByTeamList" parameterType="codedriver.framework.dto.TeamVo"
+            resultMap="childrenTeamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`parent_uuid` AS parentUuid,
+        a.`lft`,
+        a.`rht`,
+        a.`level`
+        FROM `team` a
+        WHERE
+        `level` = 'department'
+        and (
+        <foreach collection="list" item="team" separator=") or (" open="(" close=")">
+            a.`lft` &lt;= #{team.lft} and a.`rht` >= #{team.rht}
+        </foreach>
+        )
+    </select>
 
-	<select id="getAllSonTeamByParentTeamList" parameterType="codedriver.framework.dto.TeamVo" resultMap="childrenTeamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`parent_uuid` AS parentUuid,
-		a.`lft`,
-		a.`rht`,
-		a.`level`
-		FROM `team` a
-		WHERE
-		<foreach collection="list" item="team" separator=") or (" open="(" close=")">
-			a.`lft` >= #{team.lft} and a.`rht` &lt;= #{team.rht}
-		</foreach>
-	</select>
+    <select id="getAllSonTeamByParentTeamList" parameterType="codedriver.framework.dto.TeamVo"
+            resultMap="childrenTeamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`parent_uuid` AS parentUuid,
+        a.`lft`,
+        a.`rht`,
+        a.`level`
+        FROM `team` a
+        WHERE
+        <foreach collection="list" item="team" separator=") or (" open="(" close=")">
+            a.`lft` >= #{team.lft} and a.`rht` &lt;= #{team.rht}
+        </foreach>
+    </select>
 
-	<select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int" useCache="false">
-		SELECT COUNT(1) FROM `user_team` WHERE `team_uuid` = #{value}
-	</select>
+    <select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `user_team`
+        WHERE `team_uuid` = #{value}
+    </select>
 
-	<select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT
-		`id`,
-		`uuid`,
-		`name`,
-		`parent_uuid` AS parentUuid,
-		`lft`,
-		`rht`
-		FROM `team`
-		WHERE `uuid` in
-		<foreach collection="list" item="item" separator="," open="(" close=")">
-			#{item}
-		</foreach>
-	</select>
+    <select id="getTeamByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `parent_uuid` AS parentUuid,
+        `lft`,
+        `rht`
+        FROM `team`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 
-	<select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="true">
-		SELECT
-		ut.`team_uuid`
-		FROM `user_team` ut
-		JOIN team t ON t.`uuid`=ut.`team_uuid`
-		WHERE ut.`user_uuid`=#{userUuid};
-	</select>
+    <select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="true">
+        SELECT ut.`team_uuid`
+        FROM `user_team` ut
+                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+        WHERE ut.`user_uuid` = #{userUuid};
+    </select>
 
-	<select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
-		SELECT `uuid` FROM `team` WHERE `uuid` = #{value} FOR UPDATE
-	</select>
+    <select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+        SELECT `uuid`
+        FROM `team`
+        WHERE `uuid` = #{value} FOR
+        UPDATE
+    </select>
 
-	<select id="getTeamByParentUuidAndStartNum" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`parent_uuid` AS parentUuid,
-		a.`lft`,
-		a.`rht`
-		FROM `team` a
-		WHERE a.`parent_uuid` = #{parentUuid}
-		ORDER BY a.`lft` ASC
-		limit #{startNum}, 1
-	</select>
+    <select id="getTeamByParentUuidAndStartNum" resultType="codedriver.framework.dto.TeamVo" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`name`,
+               a.`parent_uuid` AS parentUuid,
+               a.`lft`,
+               a.`rht`
+        FROM `team` a
+        WHERE a.`parent_uuid` = #{parentUuid}
+        ORDER BY a.`lft` ASC
+        limit #{startNum}, 1
+    </select>
 
-	<select id="checkTeamIsExistsByLeftRightCode" resultType="int" useCache="false">
-		SELECT COUNT(1) FROM `team` WHERE `uuid` = #{uuid} AND `lft` &gt; #{lft} AND `rht` &lt; #{rht}
-	</select>
+    <select id="checkTeamIsExistsByLeftRightCode" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `team`
+        WHERE `uuid` = #{uuid}
+          AND `lft` &gt; #{lft}
+          AND `rht` &lt; #{rht}
+    </select>
 
-	<select id="getTeamUserUuidListByLftRhtLevelTitle" resultType="java.lang.String" useCache="false">
-		SELECT b.`user_uuid` FROM `team` a
-		JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title`=#{title}
-		JOIN `user` c ON c.`uuid`=b.`user_uuid` AND c.`is_active`=1
-		WHERE a.`level` = #{level} AND a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` != 1
-	</select>
+    <select id="getTeamUserUuidListByLftRhtLevelTitle" resultType="java.lang.String" useCache="false">
+        SELECT b.`user_uuid`
+        FROM `team` a
+                 JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title` = #{title}
+                 JOIN `user` c ON c.`uuid` = b.`user_uuid` AND c.`is_active` = 1
+        WHERE a.`level` = #{level}
+          AND a.`lft` &lt;= #{lft}
+          AND a.`rht` &gt;= #{rht}
+          and a.`is_delete` != 1
+    </select>
 
-	<select id="getTeamUserUuidListByLftRhtTitle" resultType="java.lang.String" useCache="false">
-		SELECT b.`user_uuid` FROM `team` a
-		JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title`=#{title}
-		JOIN `user` c ON c.`uuid`=b.`user_uuid` AND c.`is_active`=1
-		WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` != 1
-	</select>
+    <select id="getTeamUserUuidListByLftRhtTitle" resultType="java.lang.String" useCache="false">
+        SELECT b.`user_uuid`
+        FROM `team` a
+                 JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title` = #{title}
+                 JOIN `user` c ON c.`uuid` = b.`user_uuid` AND c.`is_active` = 1
+        WHERE a.`lft` &lt;= #{lft}
+          AND a.`rht` &gt;= #{rht}
+          and a.`is_delete` != 1
+    </select>
 
-	<select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`parent_uuid` AS parentUuid,
-		a.`lft`,
-		a.`rht`,
-		a.`level`,
-		0 as `childCount`
-		FROM `team` a
-		WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` != 1
-		<if test="level != null and level != ''">
-			AND a.`level` = #{level}
-		</if>
-		ORDER BY `lft` ASC
-	</select>
+    <select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`parent_uuid` AS parentUuid,
+        a.`lft`,
+        a.`rht`,
+        a.`level`,
+        0 as `childCount`
+        FROM `team` a
+        WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` != 1
+        <if test="level != null and level != ''">
+            AND a.`level` = #{level}
+        </if>
+        ORDER BY `lft` ASC
+    </select>
 
-	<select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo" useCache="false">
-		SELECT
-		a.`uuid`,
-		COUNT(DISTINCT b.`user_uuid`) AS userCount,
-		COUNT(DISTINCT c.`uuid`) AS childCount
-		FROM `team` a
-		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
-		LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
-		LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
-		WHERE c.`is_delete` != 1
-		and a.`uuid` IN
-		<foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
-			#{teamUuid}
-		</foreach>
-		<if test="isActive != null">
-			and d.`is_active` = #{isActive}
-		</if>
-		GROUP BY a.`uuid`
-	</select>
+    <select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        a.`uuid`,
+        COUNT(DISTINCT b.`user_uuid`) AS userCount,
+        COUNT(DISTINCT c.`uuid`) AS childCount
+        FROM `team` a
+        LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
+        LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
+        LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
+        WHERE c.`is_delete` != 1
+        and a.`uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+        <if test="isActive != null">
+            and d.`is_active` = #{isActive}
+        </if>
+        GROUP BY a.`uuid`
+    </select>
 
-	<select id="getTeamUserListByTeamUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamUserVo" useCache="false">
-		SELECT
-		a.`team_uuid` AS teamUuid,
-		a.`user_uuid` AS userUuid,
-		a.`title`,
-		b.`user_id` AS userId,
-		b.`user_name` AS userName,
-		(SELECT `user_info` from `user` WHERE `uuid` = a.`user_uuid`) as userInfo,
-		(SELECT `vip_level` from `user` WHERE `uuid` = a.`user_uuid`) as userVipLevel
-		FROM `user_team` a
-		JOIN `user` b ON b.`uuid`=a.`user_uuid`
-		WHERE a.`team_uuid` = #{value}
-		ORDER BY a.`id`
-	</select>
+    <select id="getTeamUserListByTeamUuid" parameterType="java.lang.String"
+            resultType="codedriver.framework.dto.TeamUserVo" useCache="false">
+        SELECT a.`team_uuid`                                                 AS teamUuid,
+               a.`user_uuid`                                                 AS userUuid,
+               a.`title`,
+               b.`user_id`                                                   AS userId,
+               b.`user_name`                                                 AS userName,
+               (SELECT `user_info` from `user` WHERE `uuid` = a.`user_uuid`) as userInfo,
+               (SELECT `vip_level` from `user` WHERE `uuid` = a.`user_uuid`) as userVipLevel
+        FROM `user_team` a
+                 JOIN `user` b ON b.`uuid` = a.`user_uuid`
+        WHERE a.`team_uuid` = #{value}
+        ORDER BY a.`id`
+    </select>
 
-	<select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
-		SELECT MAX(`rht`) FROM `team`
-	</select>
+    <select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
+        SELECT MAX(`rht`)
+        FROM `team`
+    </select>
 
-	<select id="getTeamCount" resultType="int" useCache="false">
-		SELECT count(1) FROM `team`
-	</select>
+    <select id="getTeamCount" resultType="int" useCache="false">
+        SELECT count(1)
+        FROM `team`
+    </select>
 
-<!--	<select id="checkLeftRightCodeIsWrong" resultType="int" useCache="false">-->
-<!--		SELECT COUNT(a.`uuid`) FROM (-->
-<!--		(SELECT `uuid` FROM `team` WHERE `lft` IS NULL OR `rht` IS NULL limit 1)-->
-<!--		UNION-->
-<!--		(SELECT `uuid` FROM `team` WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1)-->
-<!--		UNION-->
-<!--		(SELECT parent.`uuid` FROM `team` parent-->
-<!--		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`) limit 1)-->
-<!--		UNION-->
-<!--		(SELECT parent.`uuid` FROM `team` parent-->
-<!--		LEFT JOIN `team` child ON child.`parent_uuid` = parent.`uuid`-->
-<!--		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1 limit 1)-->
-<!--		) a-->
-<!--	</select>-->
+    <!--	<select id="checkLeftRightCodeIsWrong" resultType="int" useCache="false">-->
+    <!--		SELECT COUNT(a.`uuid`) FROM (-->
+    <!--		(SELECT `uuid` FROM `team` WHERE `lft` IS NULL OR `rht` IS NULL limit 1)-->
+    <!--		UNION-->
+    <!--		(SELECT `uuid` FROM `team` WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1)-->
+    <!--		UNION-->
+    <!--		(SELECT parent.`uuid` FROM `team` parent-->
+    <!--		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`) limit 1)-->
+    <!--		UNION-->
+    <!--		(SELECT parent.`uuid` FROM `team` parent-->
+    <!--		LEFT JOIN `team` child ON child.`parent_uuid` = parent.`uuid`-->
+    <!--		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1 limit 1)-->
+    <!--		) a-->
+    <!--	</select>-->
 
-	<select id="getTeamUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
-		select
-		`uuid`
-		from `team`
-		where `name` = #{value}
-	</select>
+    <select id="getTeamUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
+        select `uuid`
+        from `team`
+        where `name` = #{value}
+    </select>
 
-	<select id="getTeamUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
-		SELECT
-		CONCAT('team#', `uuid`) as `value`,
-		`name` as `text`
-		FROM `team`
-		WHERE `name` in
-		<foreach collection="list" item="text" separator="," open="(" close=")">
-			#{text}
-		</foreach>
-	</select>
+    <select id="getTeamUuidAndNameMapList" resultType="codedriver.framework.common.dto.ValueTextVo">
+        SELECT
+        CONCAT('team#', `uuid`) as `value`,
+        `name` as `text`
+        FROM `team`
+        WHERE `name` in
+        <foreach collection="list" item="text" separator="," open="(" close=")">
+            #{text}
+        </foreach>
+    </select>
 
-	<select id="getRepeatTeamNameByNameList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo">
-		select
-		`name`,
-		count(1) as `nameRepeatCount`
-		from `team`
-		where `name` in
-		<foreach collection="list" item="item" separator="," open="(" close=")">
-			#{item}
-		</foreach>
-		group by `name`
-	</select>
+    <select id="getRepeatTeamNameByNameList" parameterType="java.util.List"
+            resultType="codedriver.framework.dto.TeamVo">
+        select
+        `name`,
+        count(1) as `nameRepeatCount`
+        from `team`
+        where `name` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        group by `name`
+    </select>
 
-	<select id="getChildrenUuidListByLeftRightCode" resultType="java.lang.String">
-		SELECT `uuid` FROM `team`
-		WHERE `lft` &gt; #{lft} AND `rht` &lt; #{rht}
-	</select>
+    <select id="getChildrenUuidListByLeftRightCode" resultType="java.lang.String">
+        SELECT `uuid`
+        FROM `team`
+        WHERE `lft` &gt; #{lft}
+          AND `rht` &lt; #{rht}
+    </select>
 
-	<insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
-		INSERT INTO `team` (
-		`id`,
-		`uuid`,
-		`name`,
-		`parent_uuid`,
-		`lft`,
-		`rht`,
-		`level`,
-		`is_delete`
-		) VALUES (
-		#{id},
-		#{uuid},
-		#{name},
-		#{parentUuid},
-		#{lft},
-		#{rht},
-		#{level},
-		0
-		)
-	</insert>
+    <resultMap id="teamUserTitleMap" type="codedriver.framework.dto.TeamUserTitleVo">
+        <result property="teamUuid" column="teamUuid"/>
+        <result property="title" column="title"/>
+        <collection property="userList" ofType="codedriver.framework.dto.UserVo">
+            <result property="userId" column="userId"/>
+            <result property="userName" column="userName"/>
+            <result property="userInfo" column="userInfo"/>
+        </collection>
+    </resultMap>
+    <select id="getTeamUserTitleListByTeamUuid" resultMap="teamUserTitleMap">
+        SELECT tut.`team_uuid` AS teamUuid,
+               u.`user_name`   AS userName,
+               u.`user_id`     AS userId,
+               u.`user_info`   AS userInfo,
+               ut.`name`       AS title
+        FROM `team_user_title` tut
+                 LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
+                 LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
+        where tut.`team_uuid` = #{value}
+    </select>
+    <select id="checkTitleIsReferenceByTitleId" resultType="java.lang.Integer">
+        select count(title_id) from `team_user_title` where `title_id` = #{value}
+    </select>
 
-	<insert id="insertTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
-		INSERT INTO `user_team` (
-		`team_uuid`,
-		`user_uuid`,
-		`title`
-		) VALUES (
-		#{teamUuid},
-		#{userUuid},
-		#{title}
-		)
-	</insert>
+    <insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
+        INSERT INTO `team` (`id`,
+                            `uuid`,
+                            `name`,
+                            `parent_uuid`,
+                            `lft`,
+                            `rht`,
+                            `level`,
+                            `is_delete`)
+        VALUES (#{id},
+                #{uuid},
+                #{name},
+                #{parentUuid},
+                #{lft},
+                #{rht},
+                #{level},
+                0)
+    </insert>
 
-	<update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team` SET
-		<if test="level != null and level != ''">
-			`level` = #{level},
-		</if>
-		`name` = #{name}
-		WHERE `uuid` = #{uuid}
-	</update>
+    <insert id="insertTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
+        INSERT INTO `user_team` (`team_uuid`,
+                                 `user_uuid`,
+                                 `title`)
+        VALUES (#{teamUuid},
+                #{userUuid},
+                #{title})
+    </insert>
+    <insert id="insertTeamUserTitle">
+        INSERT INTO `team_user_title` (
+            `team_uuid`,
+            `user_uuid`,
+            `title_id`
+        )
+        VALUES
+        (
+            #{teamUuid},
+            #{userUuid},
+            #{titleId}
+        ) ;
+    </insert>
 
-	<update id="updateTeamParentUuidByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team` SET `parent_uuid` = #{parentUuid} WHERE `uuid` = #{uuid}
-	</update>
+    <update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
+        UPDATE `team` SET
+        <if test="level != null and level != ''">
+            `level` = #{level},
+        </if>
+        `name` = #{name}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<update id="updateTeamParentUuidAndNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
-		UPDATE `team` SET `parent_uuid` = #{parentUuid},`name` = #{name}  WHERE `uuid` = #{uuid}
-	</update>
+    <update id="updateTeamParentUuidByUuid" parameterType="codedriver.framework.dto.TeamVo">
+        UPDATE `team`
+        SET `parent_uuid` = #{parentUuid}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<update id="updateTeamLeftRightCode">
-		UPDATE `team` SET `lft` = #{lft}, `rht` = #{rht} WHERE `uuid` = #{uuid}
-	</update>
+    <update id="updateTeamParentUuidAndNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
+        UPDATE `team`
+        SET `parent_uuid` = #{parentUuid},
+            `name`        = #{name}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<update id="batchUpdateTeamLeftCode">
-		UPDATE `team` set `lft` = `lft` + #{step} WHERE `lft` &gt;= #{minCode}
-	</update>
+    <update id="updateTeamLeftRightCode">
+        UPDATE `team`
+        SET `lft` = #{lft},
+            `rht` = #{rht}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<update id="batchUpdateTeamRightCode">
-		UPDATE `team` set `rht` = `rht` + #{step} WHERE `rht` &gt;= #{minCode}
-	</update>
+    <update id="batchUpdateTeamLeftCode">
+        UPDATE `team`
+        set `lft` = `lft` + #{step}
+        WHERE `lft` &gt;= #{minCode}
+    </update>
 
-	<update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
-		UPDATE `team` SET `lft` = `lft` + #{step}, `rht` = `rht` + #{step} WHERE `lft` &gt;= #{lft} AND `rht` &lt;= #{rht}
-	</update>
+    <update id="batchUpdateTeamRightCode">
+        UPDATE `team`
+        set `rht` = `rht` + #{step}
+        WHERE `rht` &gt;= #{minCode}
+    </update>
 
-	<update id="updateTeamUserTitle" parameterType="codedriver.framework.dto.TeamUserVo">
-		UPDATE `user_team`
-		SET `title` = #{title}
-		WHERE `team_uuid` = #{teamUuid}
-		AND `user_uuid` = #{userUuid}
-	</update>
+    <update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
+        UPDATE `team`
+        SET `lft` = `lft` + #{step},
+            `rht` = `rht` + #{step}
+        WHERE `lft` &gt;= #{lft}
+          AND `rht` &lt;= #{rht}
+    </update>
 
-<!--	<delete id="deleteTeamByLeftRightCode">-->
-<!--		DELETE a, b-->
-<!--		FROM `team` a-->
-<!--		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`-->
-<!--		WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}-->
-<!--	</delete>-->
+    <update id="updateTeamUserTitle" parameterType="codedriver.framework.dto.TeamUserVo">
+        UPDATE `user_team`
+        SET `title` = #{title}
+        WHERE `team_uuid` = #{teamUuid}
+          AND `user_uuid` = #{userUuid}
+    </update>
 
-	<delete id="deleteTeamUserByTeamUuid" parameterType="java.lang.String">
-		DELETE FROM `user_team` WHERE `team_uuid` = #{value}
-	</delete>
+    <!--	<delete id="deleteTeamByLeftRightCode">-->
+    <!--		DELETE a, b-->
+    <!--		FROM `team` a-->
+    <!--		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`-->
+    <!--		WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}-->
+    <!--	</delete>-->
 
-	<delete id="deleteTeamUserByTeamUuidList" parameterType="java.util.List">
-		DELETE FROM `user_team` WHERE `team_uuid` IN
-		<foreach collection="list" item="teamUuid" open="(" separator="," close=")">
-			#{teamUuid}
-		</foreach>
-	</delete>
+    <delete id="deleteTeamUserByTeamUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user_team`
+        WHERE `team_uuid` = #{value}
+    </delete>
 
-	<delete id="deleteTeamUserByTeamUuidAndUserUuidList">
-		DELETE FROM `user_team`
-		WHERE `team_uuid` = #{teamUuid}
-		AND `user_uuid` IN
-		<foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
-			#{userUuid}
-		</foreach>
-	</delete>
+    <delete id="deleteTeamUserByTeamUuidList" parameterType="java.util.List">
+        DELETE FROM `user_team` WHERE `team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+    </delete>
 
-	<delete id="deleteTeamByUuidList"  parameterType="java.util.List">
-		DELETE FROM `team` WHERE `uuid`  IN
-		<foreach collection="list" item="uuid" open="(" separator="," close=")">
-			#{uuid}
-		</foreach>
-	</delete>
+    <delete id="deleteTeamUserByTeamUuidAndUserUuidList">
+        DELETE FROM `user_team`
+        WHERE `team_uuid` = #{teamUuid}
+        AND `user_uuid` IN
+        <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+            #{userUuid}
+        </foreach>
+    </delete>
 
-	<delete id="deleteTeamRoleByTeamUuidList" parameterType="java.util.List">
-		DELETE FROM `team_role` WHERE `team_uuid` IN
-		<foreach collection="list" item="teamUuid" open="(" separator="," close=")">
-			#{teamUuid}
-		</foreach>
-	</delete>
-	<!--<delete id="deleteTeamByUuid" parameterType="java.lang.String"> -->
-	<!--DELETE a, b, c -->
-	<!--FROM `team` a -->
-	<!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid` -->
-	<!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid` -->
-	<!--WHERE a.`uuid` = #{uuid} -->
-	<!--</delete> -->
+    <delete id="deleteTeamByUuidList" parameterType="java.util.List">
+        DELETE FROM `team` WHERE `uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTeamRoleByTeamUuidList" parameterType="java.util.List">
+        DELETE FROM `team_role` WHERE `team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+    </delete>
+    <delete id="deleteTeamUserTitleByTeamUuidAndTitle">
+        DELETE
+        FROM
+            `team_user_title`
+        WHERE `team_uuid` = #{teamUuid}
+          AND `title_id` = #{titleId} ;
+    </delete>
+    <!--<delete id="deleteTeamByUuid" parameterType="java.lang.String"> -->
+    <!--DELETE a, b, c -->
+    <!--FROM `team` a -->
+    <!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid` -->
+    <!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid` -->
+    <!--WHERE a.`uuid` = #{uuid} -->
+    <!--</delete> -->
 </mapper>

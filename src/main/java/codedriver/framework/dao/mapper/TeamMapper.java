@@ -25,7 +25,9 @@ public interface TeamMapper {
 	public List<TeamVo> getAllSonTeamByParentTeamList(@Param("list")List<TeamVo> list);
 
 	public List<TeamVo> searchTeam(TeamVo teamVo);
-	
+
+	public List<TeamVo> searchTeamOrderByNameLengthForSelect(TeamVo teamVo);
+
 	public List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid,@Param("list") List<String> level);
 
 	public List<ValueTextVo> searchTeamForSelect(TeamVo teamVo);

@@ -1,7 +1,6 @@
 package codedriver.framework.dao.mapper;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dto.TeamUserTitleVo;
 import codedriver.framework.dto.TeamUserVo;
 import codedriver.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
@@ -25,9 +24,11 @@ public interface TeamMapper {
 
     List<TeamVo> getAllSonTeamByParentTeamList(@Param("list") List<TeamVo> list);
 
-    List<TeamVo> searchTeam(TeamVo teamVo);
+	List<TeamVo> searchTeam(TeamVo teamVo);
 
-    List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid, @Param("list") List<String> level);
+	List<TeamVo> searchTeamOrderByNameLengthForSelect(TeamVo teamVo);
+
+	List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid,@Param("list") List<String> level);
 
     List<ValueTextVo> searchTeamForSelect(TeamVo teamVo);
 
@@ -83,7 +84,7 @@ public interface TeamMapper {
 
     List<ValueTextVo> getTeamUuidAndNameMapList(List<String> list);
 
-    List<TeamVo> getRepeatTeamNameByNameList(List<String> list);
+    public List<TeamVo> getRepeatTeamNameByNameList(List<String> list);
 
     List<String> getChildrenUuidListByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 

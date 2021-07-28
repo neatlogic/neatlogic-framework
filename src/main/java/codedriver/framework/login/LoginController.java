@@ -107,7 +107,7 @@ public class LoginController {
                 throw new UserAuthFailedException();
             }
         } catch (UserAuthFailedException | TenantNotFoundException ex) {
-            ReturnJson.error(ex.getMessage(), response);
+            ReturnJson.error(ex.getMessage(true), response);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             ReturnJson.error(ex.getMessage(), response);

@@ -42,39 +42,71 @@
         </if>
     </select>
 
-    <select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
-        SELECT
-        a.`id`,
-        a.`uuid`,
-        a.`name`,
-        a.`lft`,
-        a.`rht`,
-        a.`parent_uuid` AS `parentUuid`,
-        a.`level`
-        FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
-        AND a.`level` in
-        <foreach collection="list" item="level" separator="," open="(" close=")">
-            #{level}
-        </foreach>
-    </select>
+	<select id="searchTeamOrderByNameLengthForSelect" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
+		SELECT
+		`id`,
+		`uuid`,
+		`name`,
+		`lft`,
+		`rht`,
+		`parent_uuid` AS `parentUuid`,
+		`level`
+		FROM `team`
+		<where>
+			<if test="keyword != null and keyword != ''">
+				and `name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="parentUuid != null and parentUuid != ''">
+				and `parent_uuid` = #{parentUuid}
+			</if>
+			<if test="level != null and level != ''">
+				and `level` = #{level}
+			</if>
+			<if test="isDelete != null">
+				and `is_delete` = #{isDelete}
+			</if>
+		</where>
+		ORDER BY LENGTH(`name`)
+		<if test="needPage == true">
+			LIMIT #{startNum}, #{pageSize}
+		</if>
+	</select>
 
-    <select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
-        SELECT
-        COUNT(1)
-        FROM
-        `team`
-        WHERE
-        1=1
-        <if test="keyword != null and keyword != ''">
-            and name LIKE CONCAT('%', #{keyword}, '%')
-        </if>
-        <if test="parentUuid != null and parentUuid != ''">
-            and parent_uuid = #{parentUuid}
-        </if>
-        <if test="isDelete != null">
-            and `is_delete` = #{isDelete}
-        </if>
-    </select>
+	<select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
+		SELECT
+		a.`id`,
+		a.`uuid`,
+		a.`name`,
+		a.`lft`,
+		a.`rht`,
+		a.`parent_uuid` AS `parentUuid`,
+		a.`level`
+		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
+		AND a.`level` in
+		<foreach collection="list" item="level" separator="," open="(" close=")">
+			#{level}
+		</foreach>
+	</select>
+	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
+		SELECT
+		COUNT(1)
+		FROM
+		`team`
+		WHERE
+		1=1
+		<if test="keyword != null and keyword != ''">
+			and name LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="parentUuid != null and parentUuid != ''">
+			and parent_uuid = #{parentUuid}
+		</if>
+		<if test="level != null and level != ''">
+			and `level` = #{level}
+		</if>
+		<if test="isDelete != null">
+			and `is_delete` = #{isDelete}
+		</if>
+	</select>
 
     <select id="searchTeamForSelect" parameterType="codedriver.framework.dto.TeamVo"
             resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">

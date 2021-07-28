@@ -14,11 +14,11 @@ public interface MatrixAttributeMapper {
 
 //    public int checkMatrixAttributeTableExist(String tableName);
 
-    public void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("tenantId") String tenantId);
+    public void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void dropMatrixDynamicTable(@Param("matrixUuid") String matrixUuid, @Param("tenantId") String tenantId);
+    public void dropMatrixDynamicTable(@Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("tenantId") String tenantId);
+    public void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("tenantId") String tenantId);
+    public void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 }

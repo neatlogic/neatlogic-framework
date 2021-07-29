@@ -467,7 +467,7 @@
     <resultMap id="teamUserTitleMap" type="codedriver.framework.dto.TeamUserTitleVo">
         <result property="teamUuid" column="teamUuid"/>
         <result property="title" column="title"/>
-        <collection property="userList" ofType="codedriver.framework.dto.UserVo">
+        <collection property="userVoList" ofType="codedriver.framework.dto.UserVo">
             <result property="userId" column="userId"/>
             <result property="userName" column="userName"/>
             <result property="userInfo" column="userInfo"/>
@@ -633,6 +633,12 @@
             `team_user_title`
         WHERE `team_uuid` = #{teamUuid}
           AND `title_id` = #{titleId} ;
+    </delete>
+    <delete id="deleteTeamUserTitleByTeamUuid">
+        DELETE
+        FROM
+            `team_user_title`
+        WHERE `team_uuid` = #{value}
     </delete>
     <!--<delete id="deleteTeamByUuid" parameterType="java.lang.String"> -->
     <!--DELETE a, b, c -->

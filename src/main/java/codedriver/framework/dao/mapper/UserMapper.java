@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface UserMapper {
 
-    public int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("authList") List<String> authList);
+    int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("authList") List<String> authList);
 
-    public int checkUserIsExists(String uuid);
+    int checkUserIsExists(String uuid);
 
-    public int checkUserIsInTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
+    int checkUserIsInTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
 
-    public UserVo getUserBaseInfoByUuid(String userUuid);
+    UserVo getUserBaseInfoByUuid(String userUuid);
 
     /**
      * @Description: 此sql与getUserBaseInfoByUuid一致，有些场景下，使用缓存可能会有问题
@@ -25,51 +25,51 @@ public interface UserMapper {
      * @Params: [userUuid]
      * @Returns: codedriver.framework.dto.UserVo
      **/
-    public UserVo getUserBaseInfoByUuidWithoutCache(String userUuid);
+    UserVo getUserBaseInfoByUuidWithoutCache(String userUuid);
 
-    public UserVo getUserByUserId(String userId);
+    UserVo getUserByUserId(String userId);
 
-    public UserVo getUserByUuid(String uuid);
+    UserVo getUserByUuid(String uuid);
 
-    public UserVo getUserSimpleInfoByUuid(String uuid);
+    UserVo getUserSimpleInfoByUuid(String uuid);
 
-    public List<UserVo> searchUser(UserVo userVo);
+    List<UserVo> searchUser(UserVo userVo);
 
-    public List<UserVo> searchUserForSelect(UserVo userVo);
+    List<UserVo> searchUserForSelect(UserVo userVo);
 
-    public List<UserVo> searchUserByAuth(String auth);
+    List<UserVo> searchUserByAuth(String auth);
 
-    public List<UserVo> searchRoleUserByAuth(String auth);
+    List<UserVo> searchRoleUserByAuth(String auth);
 
-    public List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
+    List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 
-    public List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
+    List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
 
-    public List<UserAuthVo> searchUserAllAuthByUserAuthCache(UserAuthVo userAuthVo);
+    List<UserAuthVo> searchUserAllAuthByUserAuthCache(UserAuthVo userAuthVo);
 
-    public List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
+    List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
 
-    public List<Long> getLimitUserPasswordIdList(String userUuid);
+    List<Long> getLimitUserPasswordIdList(String userUuid);
 
-    public int searchUserCount(UserVo userVo);
+    int searchUserCount(UserVo userVo);
 
-    public List<UserVo> getActiveUserByTeamId(String teamId);
+    List<UserVo> getActiveUserByTeamId(String teamId);
 
-    public List<UserVo> getActiveUserByRoleUuid(String roleUuid);
+    List<UserVo> getActiveUserByRoleUuid(String roleUuid);
 
-    public UserVo getUserByUserIdAndPassword(UserVo userVo);
+    UserVo getUserByUserIdAndPassword(UserVo userVo);
 
     UserVo getActiveUserByUserId(UserVo userVo);
 
-    public UserSessionVo getUserSessionByUserUuid(String userUuid);
+    UserSessionVo getUserSessionByUserUuid(String userUuid);
 
-    public List<UserVo> getUserByUserUuidList(List<String> userUuidList);
+    List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
-    public List<AuthVo> getUserCountByAuth();
+    List<AuthVo> getUserCountByAuth();
 
-    public List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
+    List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
-    public List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
+    List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
 
     /**
      * @Description: 根据分组uuid，找出所有用户uuid与其所在所有分组的uuid和角色uuid
@@ -77,60 +77,62 @@ public interface UserMapper {
      * @Date: 2021/3/12 15:15
      * @Params: [teamUuidList]
      * @Returns: java.util.List<codedriver.framework.dto.UserVo>
-    **/
-    public List<UserVo> getUserTeamRoleListByTeamUuidList(List<String> teamUuidList);
+     **/
+    List<UserVo> getUserTeamRoleListByTeamUuidList(List<String> teamUuidList);
 
-    public List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
+    List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
-    public List<String> getUserUuidListByUserName(String userName);
+    List<String> getUserUuidListByUserName(String userName);
 
-    public List<UserVo> getUserListByUserUuidList(@Param("list") List<String> userUuidList,@Param("isActive") Integer isActive);
+    List<UserVo> getUserListByUserUuidList(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
-    public List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList,@Param("isActive") Integer isActive);
+    List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
-    public UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
+    UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 
-    public List<String> getRoleUuidListByUserUuid(String userUuid);
+    List<String> getRoleUuidListByUserUuid(String userUuid);
 
-    public List<String> getTeamUuidListByUserUuid(String userUuid);
+    List<String> getTeamUuidListByUserUuid(String userUuid);
 
-    public List<UserVo> getUserByUserIdList(List<String> list);
+    List<UserVo> getUserByUserIdList(List<String> list);
 
-    public List<UserVo> getUserListByTeamUuid(String teamUuid);
+    List<UserVo> getUserListByTeamUuid(String teamUuid);
 
-    public int checkUserExistsInUserAgent(String userUuid);
+    UserTitleVo getUserTitleLockByName(String title);
 
-    public int checkAgentExistsInUserAgent(String agentUuid);
+    int checkUserExistsInUserAgent(String userUuid);
+
+    int checkAgentExistsInUserAgent(String agentUuid);
 
     /**
      * 检查是否存在循环代理，即A已经是B的代理人，则不允许A设置代理人为B
      */
-    public int checkExistsAgentLoop(@Param("agentUuid") String agentUuid, @Param("userUuid") String userUuid);
+    int checkExistsAgentLoop(@Param("agentUuid") String agentUuid, @Param("userUuid") String userUuid);
 
-    public UserVo getUserAgent(String userUuid);
+    UserVo getUserAgent(String userUuid);
 
-    public List<UserVo> getUserVip();
+    List<UserVo> getUserVip();
 
-    public String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
+    String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
 
-    public List<String> getUserUuidListByTeamUuid(String teamUuid);
+    List<String> getUserUuidListByTeamUuid(String teamUuid);
 
-    public List<String> getUserUuidListByRoleUuid(String teamUuid);
+    List<String> getUserUuidListByRoleUuid(String teamUuid);
 
-    public int checkUserIdIsIsRepeat(UserVo userVo);
+    int checkUserIdIsIsRepeat(UserVo userVo);
 
-    public List<UserVo> getUserListByUuidList(List<String> uuidList);
+    List<UserVo> getUserListByUuidList(List<String> uuidList);
 
-    public List<UserVo> getUserListByRoleUuid(String roleUuid);
+    List<UserVo> getUserListByRoleUuid(String roleUuid);
 
-    public int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
+    int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
             @Param("userUuidList") List<String> userUuidList,
             @Param("teamUuidList") List<String> teamUuidList,
             @Param("roleUuidList") List<String> roleUuidList,
             @Param("sessionTime") Date sessionTime
     );
 
-    public List<String> getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
+    List<String> getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
             @Param("userUuidList") List<String> userUuidList,
             @Param("teamUuidList") List<String> teamUuidList,
             @Param("roleUuidList") List<String> roleUuidList,
@@ -140,55 +142,59 @@ public interface UserMapper {
             @Param("pageSize") Integer pageSize
     );
 
-    public int getAllOnlineUserCount(Date sessionTime);
+    int getAllOnlineUserCount(Date sessionTime);
 
-    public List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime,@Param("startNum") Integer startNum,@Param("pageSize") Integer pageSize);
+    List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
 
-    public int insertUserAuth(UserAuthVo userAuthVo);
+    int insertUserAuth(UserAuthVo userAuthVo);
 
-    public int insertUser(UserVo userVo);
+    int insertUser(UserVo userVo);
 
-    public int insertUserPassword(UserVo userVo);
+    int insertUserPassword(UserVo userVo);
 
-    public int updateUserPasswordActive(String userUuid);
+    int updateUserPasswordActive(String userUuid);
 
-    public int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
+    int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
-    public int insertUserTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
+    int insertUserTeam(@Param("userUuid") String userUuid, @Param("teamUuid") String teamUuid);
 
-    public int insertUserProfile(UserProfileVo userProfileVo);
+    int insertUserProfile(UserProfileVo userProfileVo);
 
-    public int insertUserSession(String userUuid);
+    int insertUserSession(String userUuid);
 
-    public int insertUserData(UserDataVo userDataVo);
+    int insertUserData(UserDataVo userDataVo);
 
-    public int insertUserAgent(UserAgentVo userAgentVo);
+    int insertUserAgent(UserAgentVo userAgentVo);
 
-    public int updateUser(UserVo userVo);
+    int insertUserTitle(UserTitleVo userTitleVo);
 
-    public int updateUserActive(UserVo userVo);
+    int updateUser(UserVo userVo);
 
-    public int updateUserSession(String userUuid);
+    int updateUserActive(UserVo userVo);
 
-    public int updateUserData(UserDataVo userDataVo);
+    int updateUserSession(String userUuid);
 
-    public int updateUserInfo(UserVo userVo);
+    int updateUserData(UserDataVo userDataVo);
 
-    public int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
+    int updateUserInfo(UserVo userVo);
 
-    public int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
+    int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
 
-    public int deleteUserByUuid(String uuid);
+    int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
-    public int deleteUserRoleByUserUuid(String userUuid);
+    int deleteUserByUuid(String uuid);
 
-    public int deleteUserSessionByUserUuid(String userUuid);
+    int deleteUserRoleByUserUuid(String userUuid);
 
-    public int deleteUserTeamByUserUuid(String userUuid);
+    int deleteUserSessionByUserUuid(String userUuid);
 
-    public int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
+    int deleteUserTeamByUserUuid(String userUuid);
 
-    public int deleteUserAuth(UserAuthVo userAuthVo);
+    int deleteUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);
 
-    public int deleteUserAgent(String userUuid);
+    int deleteUserAuth(UserAuthVo userAuthVo);
+
+    int deleteUserAgent(String userUuid);
+
+    int deleteUserTitleByName(String name);
 }

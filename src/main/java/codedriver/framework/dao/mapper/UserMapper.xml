@@ -31,8 +31,7 @@
 
     <select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="true">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as userId,
                a.`user_name` as userName,
@@ -48,8 +47,7 @@
 
     <select id="getUserBaseInfoByUuidWithoutCache" parameterType="java.lang.String"
             resultType="codedriver.framework.dto.UserVo" useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as userId,
                a.`user_name` as userName,
@@ -65,8 +63,7 @@
 
     <select id="getUserByUserId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="true">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as userId,
                a.`user_name` as userName,
@@ -102,8 +99,7 @@
     </resultMap>
 
     <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   AS userId,
                a.`user_name` AS userName,
@@ -129,8 +125,7 @@
     </select>
 
     <select id="getUserSimpleInfoByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   AS userId,
                a.`user_info` AS userInfo,
@@ -141,8 +136,7 @@
     </select>
 
     <select id="getUserVip" resultType="codedriver.framework.dto.UserVo">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   AS userId,
                a.`user_name` AS userName,
@@ -153,7 +147,7 @@
                a.`user_info` AS userInfo,
                a.`vip_level` AS vipLevel
         FROM `user` a
-        WHERE a.`vip_level` !=  0
+        WHERE a.`vip_level` != 0
     </select>
 
     <select id="searchUser" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
@@ -274,8 +268,7 @@
     </select>
 
     <select id="searchUserByAuth" resultType="codedriver.framework.dto.UserVo" parameterType="string" useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as `userId`,
                a.`user_name` as `userName`,
@@ -292,8 +285,7 @@
     </select>
 
     <select id="searchRoleUserByAuth" parameterType="string" resultMap="userRoleMap" useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as `userId`,
                a.`user_name` as `userName`,
@@ -434,13 +426,13 @@
         SELECT `id`
         FROM `user_password`
         WHERE `user_uuid` = #{userUuid}
-        ORDER BY id DESC LIMIT 2
+        ORDER BY id DESC
+        LIMIT 2
     </select>
 
     <select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   as `userId`,
                a.`user_name` as `userName`,
@@ -457,8 +449,7 @@
 
     <select id="getActiveUserByRoleUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="false">
-        SELECT
-               `id`,
+        SELECT `id`,
                `uuid`,
                `user_id`   AS userId,
                `user_name` AS userName,
@@ -489,8 +480,7 @@
 
     <select id="getActiveUserByUserId" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap"
             useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   AS userId,
                a.`user_name` AS userName,
@@ -508,8 +498,7 @@
 
     <select id="getUserByUserIdAndPassword" parameterType="codedriver.framework.dto.UserVo" resultMap="userRoleMap"
             useCache="false">
-        SELECT
-               a.`id`,
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`   AS userId,
                a.`user_name` AS userName,
@@ -639,8 +628,7 @@
 
     <select id="getUserUuidListByUserName" parameterType="java.lang.String" resultType="java.lang.String"
             useCache="true">
-        SELECT
-        `uuid`
+        SELECT `uuid`
         FROM `user`
         WHERE `user_name` = #{value}
     </select>
@@ -760,12 +748,12 @@
         from (SELECT `user_uuid`
               FROM `user_agent`
               WHERE `user_uuid` = #{agentUuid}
-                and `agent_uuid` = #{userUuid} limit 1) a
+                and `agent_uuid` = #{userUuid}
+              limit 1) a
     </select>
 
     <select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
-        select
-               b.`id`,
+        select b.`id`,
                b.`uuid`,
                b.`user_id`   as `userId`,
                b.`user_name` as `userName`,
@@ -838,8 +826,7 @@
     </select>
 
     <select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
-        SELECT
-               k.`id`,
+        SELECT k.`id`,
                k.`uuid`,
                k.`user_id`   as `userId`,
                k.`user_name` as `userName`,
@@ -869,7 +856,8 @@
         order by g.`id`
     </select>
 
-    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount" resultType="int">
+    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount"
+            resultType="int">
         select
         count(1)
         from
@@ -913,7 +901,8 @@
         ) a
     </select>
 
-    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime" resultType="java.lang.String">
+    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime"
+            resultType="java.lang.String">
         select
         `uuid`
         from
@@ -961,19 +950,23 @@
     </select>
 
     <select id="getAllOnlineUserCount" parameterType="java.util.Date" resultType="int">
-		SELECT
-		count(1)
-		FROM `user` a
-		JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{value}
-	</select>
+        SELECT count(1)
+        FROM `user` a
+                 JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{value}
+    </select>
 
     <select id="getAllOnlineUser" resultType="java.lang.String">
-		SELECT
-		a.`uuid`
-		FROM `user` a
-		JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
-		limit #{startNum},#{pageSize}
-	</select>
+        SELECT a.`uuid`
+        FROM `user` a
+                 JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
+        limit #{startNum},#{pageSize}
+    </select>
+    <select id="getUserTitleLockByName" resultType="codedriver.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `name` = #{value} for
+        update
+    </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(`user_uuid`,
@@ -985,8 +978,7 @@
     </insert>
 
     <insert id="insertUser" parameterType="codedriver.framework.dto.UserVo">
-        INSERT INTO `user` (
-                            `id`,
+        INSERT INTO `user` (`id`,
                             `uuid`,
                             `user_id`,
                             `user_name`,
@@ -1033,8 +1025,9 @@
 
     <insert id="insertUserSession" parameterType="java.lang.String">
         INSERT INTO `user_session` (`user_uuid`, `visit_time`)
-        VALUES (#{userUuid}, NOW(3)) ON DUPLICATE KEY
-        UPDATE `visit_time` = NOW(3)
+        VALUES (#{userUuid}, NOW(3))
+        ON DUPLICATE KEY
+            UPDATE `visit_time` = NOW(3)
     </insert>
 
     <insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
@@ -1050,6 +1043,10 @@
     <insert id="insertUserAgent" parameterType="codedriver.framework.dto.UserAgentVo">
         INSERT INTO `user_agent` (`user_uuid`, `agent_uuid`, `func`)
         VALUES (#{userUuid}, #{agentUuid}, #{func})
+    </insert>
+    <insert id="insertUserTitle">
+        INSERT INTO `user_title` (`id`, `name`)
+        VALUES (#{id}, #{name});
     </insert>
 
     <update id="updateUser" parameterType="codedriver.framework.dto.UserVo">
@@ -1170,6 +1167,12 @@
         DELETE
         FROM `user_agent`
         WHERE `user_uuid` = #{value}
+    </delete>
+    <delete id="deleteUserTitleByName">
+        DELETE
+        FROM
+            `user_title`
+        WHERE `name` = #{value} ;
     </delete>
 </mapper>
 

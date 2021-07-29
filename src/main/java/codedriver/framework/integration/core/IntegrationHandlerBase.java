@@ -5,33 +5,6 @@
 
 package codedriver.framework.integration.core;
 
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
@@ -224,14 +197,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         if (connection != null) {
             // 转换输入参数
             // if (integrationVo.getMethod().equals(HttpMethod.POST.toString())) {
+            String inputParam = "{}";
             if (inputConfig != null) {
-                String content = inputConfig.getString("content");
+                inputParam = inputConfig.getString("content");
                 // 内容不为空代表需要通过freemarker转换
-                if (StringUtils.isNotBlank(content)) {
+                if (StringUtils.isNotBlank(inputParam)) {
                     try {
                         // content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
-                        content = JavascriptUtil.transform(integrationVo.getParamObj(), content);
-                        resultVo.setTransformedParam(content);
+                        inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
+                        resultVo.setTransformedParam(inputParam);
                     } catch (Exception ex) {
                         logger.error(ex.getMessage(), ex);
                         resultVo.appendError(ex.getMessage());
@@ -239,18 +213,20 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                         integrationAuditVo.setStatus("failed");
                     }
                 } else {
-                    content = integrationVo.getParamObj().toJSONString();
+                    inputParam = integrationVo.getParamObj().toJSONString();
                 }
-                try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                    out.write(content.getBytes(StandardCharsets.UTF_8));
-                    out.flush();
-                    // out.writeBytes(content);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    resultVo.appendError(e.getMessage());
-                    integrationAuditVo.appendError(e.getMessage());
-                    integrationAuditVo.setStatus("failed");
-                }
+            } else {
+                inputParam = integrationVo.getParamObj().toJSONString();
+            }
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                out.write(inputParam.getBytes(StandardCharsets.UTF_8));
+                out.flush();
+                // out.writeBytes(content);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                resultVo.appendError(e.getMessage());
+                integrationAuditVo.appendError(e.getMessage());
+                integrationAuditVo.setStatus("failed");
             }
             // }
 

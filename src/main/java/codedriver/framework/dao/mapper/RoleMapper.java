@@ -6,10 +6,7 @@
 package codedriver.framework.dao.mapper;
 
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dto.AuthVo;
-import codedriver.framework.dto.RoleAuthVo;
-import codedriver.framework.dto.RoleUserVo;
-import codedriver.framework.dto.RoleVo;
+import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -47,11 +44,15 @@ public interface RoleMapper {
 
     List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
+    List<String> getTeamUuidByRoleUuid(String roleUuid);
+
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     int insertRole(RoleVo roleVo);
 
     int insertRoleUser(RoleUserVo vo);
+
+    int insertRoleTeamList(List<RoleTeamVo> roleTeamList);
 
     int updateRole(RoleVo roleVo);
 
@@ -68,5 +69,4 @@ public interface RoleMapper {
     int deleteRoleAuthByAuth(String auth);
 
     int deleteRoleUser(RoleUserVo roleUserVo);
-
 }

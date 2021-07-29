@@ -192,6 +192,10 @@
         where `user_uuid` = #{value}
     </select>
 
+    <select id="getTeamUuidByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT `team_uuid` FROM `team_role` WHERE `role_uuid` = #{value}
+    </select>
+
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
         VALUES (#{id}, #{uuid}, #{name}, #{description})
@@ -200,6 +204,13 @@
     <insert id="insertRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
         INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
         VALUES (#{userUuid}, #{roleUuid})
+    </insert>
+
+    <insert id="insertRoleTeamList" parameterType="java.util.List">
+        INSERT INTO `team_role` (`team_uuid`, `role_uuid`) VALUES
+        <foreach collection="list" item="roleTeam" separator=",">
+            (#{roleTeam.teamUuid}, #{roleTeam.roleUuid})
+        </foreach>
     </insert>
 
     <insert id="insertRoleAuth" parameterType="codedriver.framework.dto.RoleAuthVo">

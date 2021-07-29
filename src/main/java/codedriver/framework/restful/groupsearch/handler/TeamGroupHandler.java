@@ -1,24 +1,22 @@
 package codedriver.framework.restful.groupsearch.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import codedriver.framework.common.constvalue.DeviceType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.util.CommonUtil;
+import codedriver.framework.dao.mapper.TeamMapper;
+import codedriver.framework.dto.TeamVo;
+import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.dao.mapper.TeamMapper;
-import codedriver.framework.dto.TeamVo;
-import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 @Service
 public class TeamGroupHandler implements IGroupSearchHandler {
 	@Autowired
@@ -125,6 +123,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 					}
 					if(CollectionUtils.isNotEmpty(pathNameList)){
 						team.setFullPath(String.join("->",pathNameList));
+						team.setParentPathList(pathNameList);
 					}
 				}
 				/** 如果有重名的分组，找出其父分组的名称 **/

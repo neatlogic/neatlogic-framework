@@ -86,6 +86,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 				teamTmp.put("text", ((TeamVo) team).getName());
 			}
 			teamTmp.put("fullPath",((TeamVo) team).getFullPath());
+			teamTmp.put("parentPathList",((TeamVo) team).getParentPathList());
 			teamArray.add(teamTmp);
 		}
 		teamObj.put("sort", getSort());

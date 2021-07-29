@@ -52,7 +52,7 @@ public class TeamVo extends BasePageVo implements Serializable {
 	@EntityField(name = "分组完整路径", type = ApiParamType.STRING)
 	private String fullPath;
 
-	@EntityField(name = "父分组路径List", type = ApiParamType.STRING)
+	@EntityField(name = "父分组路径List", type = ApiParamType.JSONARRAY)
 	private List<String> parentPathList;
 
 	@JSONField(serialize = false)

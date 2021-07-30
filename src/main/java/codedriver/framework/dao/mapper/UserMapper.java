@@ -148,6 +148,10 @@ public interface UserMapper {
 
     List<UserTitleVo> getUserTitleListLockByTitleNameList(@Param("titleNameList") List<String> titleList);
 
+    int searchUserTitleCount(UserTitleVo userTitleVo);
+
+    List<UserTitleVo> searchUserTitle(UserTitleVo userTitleVo);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);

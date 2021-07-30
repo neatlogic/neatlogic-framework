@@ -5,14 +5,22 @@
 
 package codedriver.framework.dto;
 
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+
+import java.io.Serializable;
 
 /**
  * @author lvzk
  * @since 2021/7/28 17:06
  **/
-public class UserTitleVo {
+public class UserTitleVo extends BasePageVo implements Serializable {
+    private static final long serialVersionUID = -8600460566163172405L;
+    @EntityField(name = "名称", type = ApiParamType.STRING)
     private String name;
+    @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
 
     public UserTitleVo(String title) {

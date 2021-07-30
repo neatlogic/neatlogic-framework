@@ -3,8 +3,8 @@ package codedriver.framework.message.login.handler;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
+import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
-import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.login.core.LoginPostProcessorBase;
 import codedriver.framework.message.core.MessageHandlerFactory;
 import codedriver.framework.message.dao.mapper.MessageMapper;
@@ -32,7 +32,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
     @Autowired
     private MessageMapper messageMapper;
     @Autowired
-    private UserMapper userMapper;
+    private RoleMapper roleMapper;
     @Autowired
     private TeamMapper teamMapper;
 
@@ -56,7 +56,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
         searchVo.setPageSize(1000);
         searchVo.setUserUuid(UserContext.get().getUserUuid(true));
-        searchVo.setRoleUuidList(userMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true)));
+        searchVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true)));
         searchVo.setTeamUuidList(teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true)));
 
         int rowNum = messageMapper.getMessagePullCount(searchVo);

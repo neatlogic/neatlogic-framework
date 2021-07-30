@@ -90,9 +90,9 @@ public interface UserMapper {
 
     UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 
-    List<String> getRoleUuidListByUserUuid(String userUuid);
+//    List<String> getRoleUuidListByUserUuid(String userUuid);
 
-    List<String> getTeamUuidListByUserUuid(String userUuid);
+//    List<String> getTeamUuidListByUserUuid(String userUuid);
 
     List<UserVo> getUserByUserIdList(List<String> list);
 

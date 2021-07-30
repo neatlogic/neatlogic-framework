@@ -377,14 +377,14 @@
         LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
         LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
         LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
-        WHERE c.`is_delete` != 1
+        <if test="isActive != null">
+            and d.`is_active` = #{isActive}
+        </if>
+        WHERE a.`is_delete` != 1
         and a.`uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
         </foreach>
-        <if test="isActive != null">
-            and d.`is_active` = #{isActive}
-        </if>
         GROUP BY a.`uuid`
     </select>
 

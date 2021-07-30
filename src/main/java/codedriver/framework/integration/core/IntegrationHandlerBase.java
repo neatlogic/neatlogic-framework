@@ -197,14 +197,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         if (connection != null) {
             // 转换输入参数
             // if (integrationVo.getMethod().equals(HttpMethod.POST.toString())) {
+            String inputParam = "{}";
             if (inputConfig != null) {
-                String content = inputConfig.getString("content");
+                inputParam = inputConfig.getString("content");
                 // 内容不为空代表需要通过freemarker转换
-                if (StringUtils.isNotBlank(content)) {
+                if (StringUtils.isNotBlank(inputParam)) {
                     try {
                         // content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
-                        content = JavascriptUtil.transform(integrationVo.getParamObj(), content);
-                        resultVo.setTransformedParam(content);
+                        inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
+                        resultVo.setTransformedParam(inputParam);
                     } catch (Exception ex) {
                         logger.error(ex.getMessage(), ex);
                         resultVo.appendError(ex.getMessage());
@@ -212,18 +213,20 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                         integrationAuditVo.setStatus("failed");
                     }
                 } else {
-                    content = integrationVo.getParamObj().toJSONString();
+                    inputParam = integrationVo.getParamObj().toJSONString();
                 }
-                try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                    out.write(content.getBytes(StandardCharsets.UTF_8));
-                    out.flush();
-                    // out.writeBytes(content);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    resultVo.appendError(e.getMessage());
-                    integrationAuditVo.appendError(e.getMessage());
-                    integrationAuditVo.setStatus("failed");
-                }
+            } else {
+                inputParam = integrationVo.getParamObj().toJSONString();
+            }
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                out.write(inputParam.getBytes(StandardCharsets.UTF_8));
+                out.flush();
+                // out.writeBytes(content);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                resultVo.appendError(e.getMessage());
+                integrationAuditVo.appendError(e.getMessage());
+                integrationAuditVo.setStatus("failed");
             }
             // }
 

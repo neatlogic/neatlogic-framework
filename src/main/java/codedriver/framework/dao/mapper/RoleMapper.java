@@ -44,7 +44,7 @@ public interface RoleMapper {
 
     List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
-    List<String> getTeamUuidByRoleUuid(String roleUuid);
+    List<String> getTeamUuidListByRoleUuid(String roleUuid);
 
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 

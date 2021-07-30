@@ -12,15 +12,24 @@ import java.util.List;
  * @since 2021/7/28 16:21
  **/
 public class TeamUserTitleVo {
-    private List<UserVo> userList;
+    private List<UserVo> userVoList;
+    private List<String> userList;
     private String teamUuid;
     private String title;
 
-    public List<UserVo> getUserList() {
+    public List<UserVo> getUserVoList() {
+        return userVoList;
+    }
+
+    public void setUserVoList(List<UserVo> userVoList) {
+        this.userVoList = userVoList;
+    }
+
+    public List<String> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<UserVo> userList) {
+    public void setUserList(List<String> userList) {
         this.userList = userList;
     }
 

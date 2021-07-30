@@ -91,6 +91,8 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByTeamUuid(String teamUuid);
 
+    int checkTitleIsReferenceByTitleId(Long id);
+
 //	 int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
     int insertTeam(TeamVo teamVo);
@@ -127,5 +129,5 @@ public interface TeamMapper {
 
     int deleteTeamUserTitleByTeamUuidAndTitle(@Param("teamUuid") String teamUuid, @Param("titleId") Long titleId);
 
-    int checkTitleIsReferenceByTitleId(Long id);
+    int deleteTeamUserTitleByTeamUuid(String uuid);
 }

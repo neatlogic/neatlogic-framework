@@ -5,6 +5,8 @@
 
 package codedriver.framework.matrix.dto;
 
+import codedriver.framework.file.dto.FileVo;
+
 /**
  * @author linbq
  * @since 2021/7/15 10:15
@@ -12,7 +14,8 @@ package codedriver.framework.matrix.dto;
 public class MatrixViewVo {
     private String matrixUuid;
     private Long fileId;
-    private String config;
+    private FileVo fileVo;
+    private transient String config;
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -27,6 +30,14 @@ public class MatrixViewVo {
 
     public void setFileId(Long fileId) {
         this.fileId = fileId;
+    }
+
+    public FileVo getFileVo() {
+        return fileVo;
+    }
+
+    public void setFileVo(FileVo fileVo) {
+        this.fileVo = fileVo;
     }
 
     public String getConfig() {

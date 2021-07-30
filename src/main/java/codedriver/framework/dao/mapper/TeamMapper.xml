@@ -42,71 +42,72 @@
         </if>
     </select>
 
-	<select id="searchTeamOrderByNameLengthForSelect" parameterType="codedriver.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
-		SELECT
-		`id`,
-		`uuid`,
-		`name`,
-		`lft`,
-		`rht`,
-		`parent_uuid` AS `parentUuid`,
-		`level`
-		FROM `team`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				and `name` LIKE CONCAT('%', #{keyword}, '%')
-			</if>
-			<if test="parentUuid != null and parentUuid != ''">
-				and `parent_uuid` = #{parentUuid}
-			</if>
-			<if test="level != null and level != ''">
-				and `level` = #{level}
-			</if>
-			<if test="isDelete != null">
-				and `is_delete` = #{isDelete}
-			</if>
-		</where>
-		ORDER BY LENGTH(`name`)
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
+    <select id="searchTeamOrderByNameLengthForSelect" parameterType="codedriver.framework.dto.TeamVo"
+            resultMap="teamMap" useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `lft`,
+        `rht`,
+        `parent_uuid` AS `parentUuid`,
+        `level`
+        FROM `team`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="parentUuid != null and parentUuid != ''">
+                and `parent_uuid` = #{parentUuid}
+            </if>
+            <if test="level != null and level != ''">
+                and `level` = #{level}
+            </if>
+            <if test="isDelete != null">
+                and `is_delete` = #{isDelete}
+            </if>
+        </where>
+        ORDER BY LENGTH(`name`)
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
 
-	<select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
-		SELECT
-		a.`id`,
-		a.`uuid`,
-		a.`name`,
-		a.`lft`,
-		a.`rht`,
-		a.`parent_uuid` AS `parentUuid`,
-		a.`level`
-		FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
-		AND a.`level` in
-		<foreach collection="list" item="level" separator="," open="(" close=")">
-			#{level}
-		</foreach>
-	</select>
-	<select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
-		SELECT
-		COUNT(1)
-		FROM
-		`team`
-		WHERE
-		1=1
-		<if test="keyword != null and keyword != ''">
-			and name LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		<if test="parentUuid != null and parentUuid != ''">
-			and parent_uuid = #{parentUuid}
-		</if>
-		<if test="level != null and level != ''">
-			and `level` = #{level}
-		</if>
-		<if test="isDelete != null">
-			and `is_delete` = #{isDelete}
-		</if>
-	</select>
+    <select id="searchTeamByUserUuidAndLevelList" parameterType="java.lang.String" resultMap="teamMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`lft`,
+        a.`rht`,
+        a.`parent_uuid` AS `parentUuid`,
+        a.`level`
+        FROM team a JOIN user_team b ON a.`uuid` = b.`team_uuid` AND b.`user_uuid` = #{userUuid}
+        AND a.`level` in
+        <foreach collection="list" item="level" separator="," open="(" close=")">
+            #{level}
+        </foreach>
+    </select>
+    <select id="searchTeamCount" parameterType="codedriver.framework.dto.TeamVo" resultType="int" useCache="false">
+        SELECT
+        COUNT(1)
+        FROM
+        `team`
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            and name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="parentUuid != null and parentUuid != ''">
+            and parent_uuid = #{parentUuid}
+        </if>
+        <if test="level != null and level != ''">
+            and `level` = #{level}
+        </if>
+        <if test="isDelete != null">
+            and `is_delete` = #{isDelete}
+        </if>
+    </select>
 
     <select id="searchTeamForSelect" parameterType="codedriver.framework.dto.TeamVo"
             resultType="codedriver.framework.common.dto.ValueTextVo" useCache="false">
@@ -467,8 +468,9 @@
     <resultMap id="teamUserTitleMap" type="codedriver.framework.dto.TeamUserTitleVo">
         <result property="teamUuid" column="teamUuid"/>
         <result property="title" column="title"/>
-        <collection property="userList" ofType="codedriver.framework.dto.UserVo">
+        <collection property="userVoList" ofType="codedriver.framework.dto.UserVo">
             <result property="userId" column="userId"/>
+            <result property="uuid" column="userUuId"/>
             <result property="userName" column="userName"/>
             <result property="userInfo" column="userInfo"/>
         </collection>
@@ -477,6 +479,7 @@
         SELECT tut.`team_uuid` AS teamUuid,
                u.`user_name`   AS userName,
                u.`user_id`     AS userId,
+               u.`uuid`        as userUuid,
                u.`user_info`   AS userInfo,
                ut.`name`       AS title
         FROM `team_user_title` tut
@@ -485,7 +488,9 @@
         where tut.`team_uuid` = #{value}
     </select>
     <select id="checkTitleIsReferenceByTitleId" resultType="java.lang.Integer">
-        select count(title_id) from `team_user_title` where `title_id` = #{value}
+        select count(title_id)
+        from `team_user_title`
+        where `title_id` = #{value}
     </select>
 
     <insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
@@ -516,17 +521,12 @@
                 #{title})
     </insert>
     <insert id="insertTeamUserTitle">
-        INSERT INTO `team_user_title` (
-            `team_uuid`,
-            `user_uuid`,
-            `title_id`
-        )
-        VALUES
-        (
-            #{teamUuid},
-            #{userUuid},
-            #{titleId}
-        ) ;
+        INSERT INTO `team_user_title` (`team_uuid`,
+                                       `user_uuid`,
+                                       `title_id`)
+        VALUES (#{teamUuid},
+                #{userUuid},
+                #{titleId});
     </insert>
 
     <update id="updateTeamNameByUuid" parameterType="codedriver.framework.dto.TeamVo">
@@ -629,10 +629,14 @@
     </delete>
     <delete id="deleteTeamUserTitleByTeamUuidAndTitle">
         DELETE
-        FROM
-            `team_user_title`
+        FROM `team_user_title`
         WHERE `team_uuid` = #{teamUuid}
-          AND `title_id` = #{titleId} ;
+          AND `title_id` = #{titleId};
+    </delete>
+    <delete id="deleteTeamUserTitleByTeamUuid">
+        DELETE
+        FROM `team_user_title`
+        WHERE `team_uuid` = #{value}
     </delete>
     <!--<delete id="deleteTeamByUuid" parameterType="java.lang.String"> -->
     <!--DELETE a, b, c -->

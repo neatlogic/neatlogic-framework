@@ -146,6 +146,12 @@ public interface UserMapper {
 
     List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
 
+    List<UserTitleVo> getUserTitleListLockByTitleNameList(@Param("titleNameList") List<String> titleList);
+
+    int searchUserTitleCount(UserTitleVo userTitleVo);
+
+    List<UserTitleVo> searchUserTitle(UserTitleVo userTitleVo);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);
@@ -197,4 +203,5 @@ public interface UserMapper {
     int deleteUserAgent(String userUuid);
 
     int deleteUserTitleByName(String name);
+
 }

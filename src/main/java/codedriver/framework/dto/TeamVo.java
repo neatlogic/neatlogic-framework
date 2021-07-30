@@ -52,6 +52,9 @@ public class TeamVo extends BasePageVo implements Serializable {
 	@EntityField(name = "分组完整路径", type = ApiParamType.STRING)
 	private String fullPath;
 
+	@EntityField(name = "父分组路径List", type = ApiParamType.JSONARRAY)
+	private List<String> parentPathList;
+
 	@JSONField(serialize = false)
 	private transient Integer nameRepeatCount;//重名的分组数量
 
@@ -60,6 +63,9 @@ public class TeamVo extends BasePageVo implements Serializable {
 	 */
 	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
 	private final String initType = GroupSearch.TEAM.getValue();
+
+	@EntityField(name = "分组领导", type = ApiParamType.JSONARRAY)
+	private List<TeamUserTitleVo> teamUserTitleList;
 
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
@@ -230,5 +236,21 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setNameRepeatCount(Integer nameRepeatCount) {
 		this.nameRepeatCount = nameRepeatCount;
+	}
+
+	public List<TeamUserTitleVo> getTeamUserTitleList() {
+		return teamUserTitleList;
+	}
+
+	public void setTeamUserTitleList(List<TeamUserTitleVo> teamUserTitleList) {
+		this.teamUserTitleList = teamUserTitleList;
+	}
+
+	public List<String> getParentPathList() {
+		return parentPathList;
+	}
+
+	public void setParentPathList(List<String> parentPathList) {
+		this.parentPathList = parentPathList;
 	}
 }

@@ -56,8 +56,15 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
         searchVo.setPageSize(1000);
         searchVo.setUserUuid(UserContext.get().getUserUuid(true));
-        searchVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true)));
-        searchVo.setTeamUuidList(teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true)));
+        List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true));
+        List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true));
+        List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
+        Set<String> roleUuidSet = new HashSet<>();
+        roleUuidSet.addAll(userRoleUuidList);
+        roleUuidSet.addAll(teamRoleUuidList);
+        List<String> roleUuidList = new ArrayList<>(roleUuidSet);
+        searchVo.setRoleUuidList(roleUuidList);
+        searchVo.setTeamUuidList(teamUuidList);
 
         int rowNum = messageMapper.getMessagePullCount(searchVo);
         if(rowNum > 0){

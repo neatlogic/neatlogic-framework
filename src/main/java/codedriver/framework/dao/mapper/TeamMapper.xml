@@ -514,11 +514,9 @@
 
     <insert id="insertTeamUser" parameterType="codedriver.framework.dto.TeamUserVo">
         INSERT INTO `user_team` (`team_uuid`,
-                                 `user_uuid`,
-                                 `title`)
+                                 `user_uuid`)
         VALUES (#{teamUuid},
-                #{userUuid},
-                #{title})
+                #{userUuid})
     </insert>
     <insert id="insertTeamUserTitle">
         INSERT INTO `team_user_title` (`team_uuid`,

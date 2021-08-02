@@ -3,8 +3,6 @@ package codedriver.framework.dto;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
-import codedriver.framework.common.constvalue.TeamUserTitle;
-
 public class TeamUserVo {
 	
 	private String teamUuid;
@@ -15,8 +13,7 @@ public class TeamUserVo {
 	private String userInfo;
 	private String userAvatar;
 	private Integer userVipLevel;
-	private String title;
-	private String titleText;
+
 	public TeamUserVo() {
 	}
 
@@ -27,12 +24,6 @@ public class TeamUserVo {
 	public TeamUserVo(String teamUuid, String userUuid) {
 		this.teamUuid = teamUuid;
 		this.userUuid = userUuid;
-	}
-
-	public TeamUserVo(String teamUuid, String userUuid, String title) {
-		this.teamUuid = teamUuid;
-		this.userUuid = userUuid;
-		this.title = title;
 	}
 
 	public String getTeamUuid() {
@@ -71,25 +62,6 @@ public class TeamUserVo {
 
 	public void setTeamName(String teamName) {
 		this.teamName = teamName;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getTitleText() {
-		if(StringUtils.isBlank(titleText) && StringUtils.isNotBlank(title)) {
-			titleText = TeamUserTitle.getText(title);
-		}
-		return titleText;
-	}
-
-	public void setTitleText(String titleText) {
-		this.titleText = titleText;
 	}
 
 	public String getUserInfo() {

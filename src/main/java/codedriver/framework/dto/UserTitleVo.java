@@ -23,6 +23,9 @@ public class UserTitleVo extends BasePageVo implements Serializable {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
 
+    public UserTitleVo() {
+    }
+
     public UserTitleVo(String title) {
         this.name = title;
     }

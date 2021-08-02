@@ -990,6 +990,7 @@
         <if test="needPage == true">
             limit #{startNum},#{pageSize}
         </if>
+        ORDER BY LENGTH(`name`) ASC
     </select>
     <select id="getUserTitleById" resultType="codedriver.framework.dto.UserTitleVo">
         select `id`, `name`

@@ -494,7 +494,7 @@
         from `team_user_title`
         where `title_id` = #{value}
     </select>
-    <select id="getTeamUserTitleListByTeamUuidList" resultType="codedriver.framework.dto.TeamUserTitleVo">
+    <select id="getTeamUserTitleListByTeamUuidList" resultMap="teamUserTitleMap">
         SELECT tut.`team_uuid` AS teamUuid,
                u.`user_name`   AS userName,
                u.`user_id`     AS userId,

@@ -467,6 +467,7 @@
 
     <resultMap id="teamUserTitleMap" type="codedriver.framework.dto.TeamUserTitleVo">
         <result property="teamUuid" column="teamUuid"/>
+        <result property="titleId" column="titleId"/>
         <result property="title" column="title"/>
         <collection property="userVoList" ofType="codedriver.framework.dto.UserVo">
             <result property="userId" column="userId"/>
@@ -481,6 +482,7 @@
                u.`user_id`     AS userId,
                u.`uuid`        as userUuid,
                u.`user_info`   AS userInfo,
+               ut.`id`       AS titleId,
                ut.`name`       AS title
         FROM `team_user_title` tut
                  LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
@@ -491,6 +493,21 @@
         select count(title_id)
         from `team_user_title`
         where `title_id` = #{value}
+    </select>
+    <select id="getTeamUserTitleListByTeamUuidList" resultType="codedriver.framework.dto.TeamUserTitleVo">
+        SELECT tut.`team_uuid` AS teamUuid,
+               u.`user_name`   AS userName,
+               u.`user_id`     AS userId,
+               u.`uuid`        as userUuid,
+               u.`user_info`   AS userInfo,
+               ut.`name`       AS title
+        FROM `team_user_title` tut
+                 LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
+                 LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
+        where tut.`team_uuid` in 
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
     </select>
 
     <insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">

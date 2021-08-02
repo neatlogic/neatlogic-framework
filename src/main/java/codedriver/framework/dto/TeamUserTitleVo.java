@@ -19,6 +19,7 @@ public class TeamUserTitleVo {
     private List<String> userList;
     private String teamUuid;
     private String title;
+    private Long titleId;
 
     public List<UserVo> getUserVoList() {
         return userVoList;
@@ -53,5 +54,13 @@ public class TeamUserTitleVo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Long getTitleId() {
+        return titleId;
+    }
+
+    public void setTitleId(Long titleId) {
+        this.titleId = titleId;
     }
 }

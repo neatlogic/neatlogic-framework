@@ -91,6 +91,8 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByTeamUuid(String teamUuid);
 
+    List<TeamUserTitleVo> getTeamUserTitleListByTeamUuidList(@Param("teamUuidList") List<String> teamUuidList);
+
     int checkTitleIsReferenceByTitleId(Long id);
 
 //	 int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);

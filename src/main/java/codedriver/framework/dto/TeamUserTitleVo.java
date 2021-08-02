@@ -5,7 +5,10 @@
 
 package codedriver.framework.dto;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author lvzk
@@ -26,6 +29,9 @@ public class TeamUserTitleVo {
     }
 
     public List<String> getUserList() {
+        if(CollectionUtils.isNotEmpty(userVoList)){
+            userList = userVoList.stream().map(UserVo::getUuid).collect(Collectors.toList());
+        }
         return userList;
     }
 

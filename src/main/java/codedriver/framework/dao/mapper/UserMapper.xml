@@ -991,6 +991,11 @@
             limit #{startNum},#{pageSize}
         </if>
     </select>
+    <select id="getUserTitleById" resultType="codedriver.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `id`  = #{value}
+    </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(`user_uuid`,

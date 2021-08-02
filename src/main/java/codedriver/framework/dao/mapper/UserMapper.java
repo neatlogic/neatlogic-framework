@@ -152,6 +152,8 @@ public interface UserMapper {
 
     List<UserTitleVo> searchUserTitle(UserTitleVo userTitleVo);
 
+    UserTitleVo getUserTitleById(Long id);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);

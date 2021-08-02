@@ -144,7 +144,7 @@ public class JobObject implements Serializable {
 			return this;
 		}
 
-		public JobObject build() {
+		public JobObject  build() {
 			return new JobObject(this);
 		}
 	}

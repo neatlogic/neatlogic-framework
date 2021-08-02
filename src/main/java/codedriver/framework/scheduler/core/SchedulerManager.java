@@ -134,20 +134,19 @@ public class SchedulerManager extends ApplicationListenerBase {
                 Class clazz = Class.forName(jobObject.getJobHandler());
                 JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
                 jobDetail.getJobDataMap().put("jobObject", jobObject);
-                Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
-                // 写入jobstatus
+                // 写入jobstatus (如果数据库不存在job，则需先insert job到数据库，再创建job,否则jobBase 先触发execute，会导致跳过第一次执行)
                 JobStatusVo jobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
                 if (jobStatusVo == null) {
                     jobStatusVo = new JobStatusVo();
                     jobStatusVo.setJobName(jobName);
                     jobStatusVo.setJobGroup(jobGroup);
                     jobStatusVo.setHandler(className);
-                    jobStatusVo.setNextFireTime(nextFireDate);
                     schedulerMapper.insertJobStatus(jobStatusVo);
-                } else {
-                    jobStatusVo.setNextFireTime(nextFireDate);
-                    schedulerMapper.updateJobNextFireTime(jobStatusVo);
                 }
+                Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
+                jobStatusVo.setNextFireTime(nextFireDate);
+                schedulerMapper.updateJobNextFireTime(jobStatusVo);
+
                 return nextFireDate;
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);

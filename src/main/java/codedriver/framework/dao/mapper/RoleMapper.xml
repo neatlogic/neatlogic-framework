@@ -196,6 +196,13 @@
         SELECT `team_uuid` FROM `team_role` WHERE `role_uuid` = #{value}
     </select>
 
+    <select id="getRoleUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String">
+        SELECT `role_uuid` FROM `team_role` WHERE `team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+    </select>
+
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
         VALUES (#{id}, #{uuid}, #{name}, #{description})

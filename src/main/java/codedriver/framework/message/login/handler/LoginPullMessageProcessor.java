@@ -3,17 +3,17 @@ package codedriver.framework.message.login.handler;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.PageUtil;
-import codedriver.framework.dao.mapper.RoleMapper;
-import codedriver.framework.dao.mapper.TeamMapper;
+import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.login.core.LoginPostProcessorBase;
 import codedriver.framework.message.core.MessageHandlerFactory;
 import codedriver.framework.message.dao.mapper.MessageMapper;
 import codedriver.framework.message.dto.MessageHandlerVo;
 import codedriver.framework.message.dto.MessageSearchVo;
+import codedriver.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,12 +29,10 @@ import java.util.stream.Collectors;
 @Service
 public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
-    @Autowired
+    @Resource
     private MessageMapper messageMapper;
-    @Autowired
-    private RoleMapper roleMapper;
-    @Autowired
-    private TeamMapper teamMapper;
+    @Resource
+    private AuthenticationInfoService authenticationInfoService;
 
     @Override
     protected void myLoginAfterInitialization() {
@@ -56,15 +54,9 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
         searchVo.setPageSize(1000);
         searchVo.setUserUuid(UserContext.get().getUserUuid(true));
-        List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true));
-        List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true));
-        List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
-        Set<String> roleUuidSet = new HashSet<>();
-        roleUuidSet.addAll(userRoleUuidList);
-        roleUuidSet.addAll(teamRoleUuidList);
-        List<String> roleUuidList = new ArrayList<>(roleUuidSet);
-        searchVo.setRoleUuidList(roleUuidList);
-        searchVo.setTeamUuidList(teamUuidList);
+        AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(UserContext.get().getUserUuid(true));
+        searchVo.setRoleUuidList(authenticationInfoVo.getRoleUuidList());
+        searchVo.setTeamUuidList(authenticationInfoVo.getTeamUuidList());
 
         int rowNum = messageMapper.getMessagePullCount(searchVo);
         if(rowNum > 0){

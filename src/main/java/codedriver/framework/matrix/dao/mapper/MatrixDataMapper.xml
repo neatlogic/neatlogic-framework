@@ -73,6 +73,16 @@
                 </choose>
             </foreach>
         </if>
+        <if test="filterList != null and filterList.size() > 0">
+            <foreach collection="filterList" item="filter" separator=" ">
+                <if test="filter.valueList != null and filter.valueList.size() > 0">
+                    and a.`${filter.uuid}` in
+                    <foreach collection="filter.valueList" item="value" open="(" separator="," close=")">
+                        '${value}'
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
     </sql>
 
     <select id="getDynamicTableDataByColumnList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"

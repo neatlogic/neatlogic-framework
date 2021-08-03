@@ -81,7 +81,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public boolean isFilterable() {
-        return false;
+        return true;
     }
 
     @Override

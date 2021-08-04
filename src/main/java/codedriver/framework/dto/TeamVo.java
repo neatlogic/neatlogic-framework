@@ -19,8 +19,6 @@ public class TeamVo extends BasePageVo implements Serializable {
 	public static final String ROOT_UUID = "0";
 	private static final long serialVersionUID = -114822145668874331L;
 	@JSONField(serialize=false)
-	private transient String keyword;
-	@JSONField(serialize=false)
 	private transient Boolean isAutoGenerateUuid = true;
 	private Long id;
 	@EntityField(name = "分组uuid", type = ApiParamType.STRING)
@@ -66,6 +64,9 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	@EntityField(name = "分组领导", type = ApiParamType.JSONARRAY)
 	private List<TeamUserTitleVo> teamUserTitleList;
+
+	private Integer checked;
+	private Integer checkedChildren;
 
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
@@ -115,14 +116,6 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
 	}
 
 	public String getParentUuid() {
@@ -252,5 +245,21 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setParentPathList(List<String> parentPathList) {
 		this.parentPathList = parentPathList;
+	}
+
+	public Integer getChecked() {
+		return checked;
+	}
+
+	public void setChecked(Integer checked) {
+		this.checked = checked;
+	}
+
+	public Integer getCheckedChildren() {
+		return checkedChildren;
+	}
+
+	public void setCheckedChildren(Integer checkedChildren) {
+		this.checkedChildren = checkedChildren;
 	}
 }

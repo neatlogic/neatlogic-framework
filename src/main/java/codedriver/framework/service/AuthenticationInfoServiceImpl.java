@@ -9,6 +9,7 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dto.AuthenticationInfoVo;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -42,10 +43,13 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         authenticationInfoVo.setTeamUuidList(teamUuidList);
         List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
-        List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
         Set<String> roleUuidSet = new HashSet<>();
         roleUuidSet.addAll(userRoleUuidList);
-        roleUuidSet.addAll(teamRoleUuidList);
+        if (CollectionUtils.isNotEmpty(teamUuidList)) {
+            // TODO 这里逻辑需要修改
+            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
+            roleUuidSet.addAll(teamRoleUuidList);
+        }
         List<String> roleUuidList = new ArrayList<>(roleUuidSet);
         authenticationInfoVo.setRoleUuidList(roleUuidList);
         return authenticationInfoVo;
@@ -61,9 +65,12 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
             List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
             teamUuidSet.addAll(teamUuidList);
             List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
-            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
             roleUuidSet.addAll(userRoleUuidList);
-            roleUuidSet.addAll(teamRoleUuidList);
+            if (CollectionUtils.isNotEmpty(teamUuidList)) {
+                // TODO 这里逻辑需要修改
+                List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
+                roleUuidSet.addAll(teamRoleUuidList);
+            }
         }
         authenticationInfoVo.setTeamUuidList(new ArrayList<>(teamUuidSet));
         authenticationInfoVo.setRoleUuidList(new ArrayList<>(roleUuidSet));

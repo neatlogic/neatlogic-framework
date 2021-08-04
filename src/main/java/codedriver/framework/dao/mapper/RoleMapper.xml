@@ -196,6 +196,20 @@
         SELECT `team_uuid` FROM `team_role` WHERE `role_uuid` = #{value}
     </select>
 
+    <select id="getRoleTeamListByRoleUuid" resultType="codedriver.framework.dto.RoleTeamVo">
+        SELECT
+               `team_uuid` AS teamUuid,
+               `checked_children` AS checkedChildren
+        FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+        <if test="teamUuidList != null and teamUuidList.size() > 0">
+            AND `team_uuid` IN
+            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                #{teamUuid}
+            </foreach>
+        </if>
+    </select>
+
     <select id="getRoleUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String">
         SELECT `role_uuid` FROM `team_role` WHERE `team_uuid` IN
         <foreach collection="list" item="teamUuid" open="(" separator="," close=")">
@@ -214,9 +228,9 @@
     </insert>
 
     <insert id="insertRoleTeamList" parameterType="java.util.List">
-        INSERT INTO `team_role` (`team_uuid`, `role_uuid`) VALUES
+        INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`) VALUES
         <foreach collection="list" item="roleTeam" separator=",">
-            (#{roleTeam.teamUuid}, #{roleTeam.roleUuid})
+            (#{roleTeam.teamUuid}, #{roleTeam.roleUuid}, #{roleTeam.checkedChildren})
         </foreach>
     </insert>
 
@@ -286,5 +300,14 @@
         <if test="userUuid != null and userUuid != ''">
             AND `user_uuid` = #{userUuid}
         </if>
+    </delete>
+
+    <delete id="deleteTeamRoleByRoleUuidAndTeamUuidList">
+        DELETE FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+        AND `team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
     </delete>
 </mapper>

@@ -12,6 +12,7 @@ package codedriver.framework.dto;
 public class RoleTeamVo {
     private String roleUuid;
     private String teamUuid;
+    private Integer checkedChildren;
 
     public RoleTeamVo() {
 
@@ -19,6 +20,12 @@ public class RoleTeamVo {
     public RoleTeamVo(String roleUuid, String teamUuid) {
         this.roleUuid = roleUuid;
         this.teamUuid = teamUuid;
+    }
+
+    public RoleTeamVo(String roleUuid, String teamUuid, Integer checkedChildren) {
+        this.roleUuid = roleUuid;
+        this.teamUuid = teamUuid;
+        this.checkedChildren = checkedChildren;
     }
 
     public String getRoleUuid() {
@@ -35,5 +42,13 @@ public class RoleTeamVo {
 
     public void setTeamUuid(String teamUuid) {
         this.teamUuid = teamUuid;
+    }
+
+    public Integer getCheckedChildren() {
+        return checkedChildren;
+    }
+
+    public void setCheckedChildren(Integer checkedChildren) {
+        this.checkedChildren = checkedChildren;
     }
 }

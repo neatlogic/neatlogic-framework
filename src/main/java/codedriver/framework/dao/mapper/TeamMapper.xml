@@ -367,6 +367,12 @@
         ORDER BY `lft` ASC
     </select>
 
+    <select id="getUpwardTeamNameListByLftRht" resultType="java.lang.String" useCache="false">
+        SELECT `name` FROM `team`
+        WHERE `lft` &lt;= #{lft} AND `rht` &gt;= #{rht} and `is_delete` = 0
+        ORDER BY `lft` ASC
+    </select>
+
     <select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo"
             useCache="false">
         SELECT

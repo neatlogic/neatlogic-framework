@@ -46,6 +46,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         Set<String> roleUuidSet = new HashSet<>();
         roleUuidSet.addAll(userRoleUuidList);
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
+            // TODO 这里逻辑需要修改
             List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
             roleUuidSet.addAll(teamRoleUuidList);
         }
@@ -66,6 +67,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
             List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
             roleUuidSet.addAll(userRoleUuidList);
             if (CollectionUtils.isNotEmpty(teamUuidList)) {
+                // TODO 这里逻辑需要修改
                 List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
                 roleUuidSet.addAll(teamRoleUuidList);
             }

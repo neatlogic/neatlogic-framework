@@ -210,7 +210,7 @@
         </if>
     </select>
 
-    <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String">
+    <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
         SELECT `role_uuid` FROM `team_role` WHERE `team_uuid` IN
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}

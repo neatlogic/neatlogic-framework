@@ -50,6 +50,21 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
             List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
             roleUuidSet.addAll(teamRoleUuidList);
+            Set<String> upwardUuidSet = new HashSet<>();
+            List<TeamVo> teamList =  teamMapper.getTeamByUuidList(teamUuidList);
+            for (TeamVo teamVo : teamList) {
+                String upwardUuidPath = teamVo.getUpwardUuidPath();
+                if (StringUtils.isNotBlank(upwardUuidPath)) {
+                    String[] upwardUuidArray = upwardUuidPath.split(",");
+                    for (String upwardUuid : upwardUuidArray) {
+                        if (!upwardUuid.equals(teamVo.getUuid())) {
+                            upwardUuidSet.add(upwardUuid);
+                        }
+                    }
+                }
+            }
+            teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
+            roleUuidSet.addAll(teamRoleUuidList);
         }
         List<String> roleUuidList = new ArrayList<>(roleUuidSet);
         authenticationInfoVo.setRoleUuidList(roleUuidList);

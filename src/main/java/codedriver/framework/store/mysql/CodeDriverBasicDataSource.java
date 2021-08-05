@@ -22,6 +22,7 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
     @Override
     public Connection getConnection() throws SQLException {
         Connection conn = super.getConnection();
+        conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         try (Statement statement = conn.createStatement()) {
             //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
             statement.execute("SET SESSION optimizer_search_depth = 5");

@@ -108,6 +108,6 @@ public class FormSelectCascadersHandler extends FormHandlerBase {
 
     @Override
     public int getSort() {
-        return 16;
+        return 17;
     }
 }

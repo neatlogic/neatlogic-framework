@@ -14,12 +14,14 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class Md5Handler implements TypeHandler<String> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
         if (StringUtils.isNotBlank(parameter)) {//大于150个字符才开始压缩
+            parameter = parameter.toLowerCase(Locale.ROOT);
             parameter = DigestUtils.md5DigestAsHex(parameter.getBytes());
         }
         ps.setString(i, parameter);

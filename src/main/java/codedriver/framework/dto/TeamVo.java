@@ -67,7 +67,9 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	private Integer checked;
 	private Integer checkedChildren;
-
+	private transient String upwardUuidPath;
+	@EntityField(name = "名称路径", type = ApiParamType.STRING)
+	private String upwardNamePath;
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
 	}
@@ -261,5 +263,21 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setCheckedChildren(Integer checkedChildren) {
 		this.checkedChildren = checkedChildren;
+	}
+
+	public String getUpwardUuidPath() {
+		return upwardUuidPath;
+	}
+
+	public void setUpwardUuidPath(String upwardUuidPath) {
+		this.upwardUuidPath = upwardUuidPath;
+	}
+
+	public String getUpwardNamePath() {
+		return upwardNamePath;
+	}
+
+	public void setUpwardNamePath(String upwardNamePath) {
+		this.upwardNamePath = upwardNamePath;
 	}
 }

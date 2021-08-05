@@ -9,7 +9,9 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dto.AuthenticationInfoVo;
+import codedriver.framework.dto.TeamVo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,8 +48,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         Set<String> roleUuidSet = new HashSet<>();
         roleUuidSet.addAll(userRoleUuidList);
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
-            // TODO 这里逻辑需要修改
-            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
+            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
             roleUuidSet.addAll(teamRoleUuidList);
         }
         List<String> roleUuidList = new ArrayList<>(roleUuidSet);
@@ -67,8 +68,22 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
             List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
             roleUuidSet.addAll(userRoleUuidList);
             if (CollectionUtils.isNotEmpty(teamUuidList)) {
-                // TODO 这里逻辑需要修改
-                List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidList(teamUuidList);
+                List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
+                roleUuidSet.addAll(teamRoleUuidList);
+                Set<String> upwardUuidSet = new HashSet<>();
+                List<TeamVo> teamList =  teamMapper.getTeamByUuidList(teamUuidList);
+                for (TeamVo teamVo : teamList) {
+                    String upwardUuidPath = teamVo.getUpwardUuidPath();
+                    if (StringUtils.isNotBlank(upwardUuidPath)) {
+                        String[] upwardUuidArray = upwardUuidPath.split(",");
+                        for (String upwardUuid : upwardUuidArray) {
+                            if (!upwardUuid.equals(teamVo.getUuid())) {
+                                upwardUuidSet.add(upwardUuid);
+                            }
+                        }
+                    }
+                }
+                teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
                 roleUuidSet.addAll(teamRoleUuidList);
             }
         }

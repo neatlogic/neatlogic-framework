@@ -63,8 +63,10 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                     }
                 }
             }
-            teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
-            roleUuidSet.addAll(teamRoleUuidList);
+            if (CollectionUtils.isNotEmpty(upwardUuidSet)) {
+                teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
+                roleUuidSet.addAll(teamRoleUuidList);
+            }
         }
         List<String> roleUuidList = new ArrayList<>(roleUuidSet);
         authenticationInfoVo.setRoleUuidList(roleUuidList);
@@ -98,8 +100,10 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                         }
                     }
                 }
-                teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
-                roleUuidSet.addAll(teamRoleUuidList);
+                if (CollectionUtils.isNotEmpty(upwardUuidSet)) {
+                    teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
+                    roleUuidSet.addAll(teamRoleUuidList);
+                }
             }
         }
         authenticationInfoVo.setTeamUuidList(new ArrayList<>(teamUuidSet));

@@ -60,7 +60,7 @@ public class LRCodeManager {
      * @Params: [tableName, idKey, parentIdKey, idValue, moveType, targetIdValue]
      * @Returns: void
      **/
-    public static void moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, MoveType moveType, Object targetIdValue) {
+    public static int[] moveTreeNode(String tableName, String idKey, String parentIdKey, Object idValue, MoveType moveType, Object targetIdValue) {
         initializeLRCode(tableName, idKey, parentIdKey);
         if (Objects.equals(idValue, targetIdValue)) {
             throw new MoveTargetNodeIllegalException();
@@ -105,7 +105,7 @@ public class LRCodeManager {
             parentIdValue = targetIdValue;
             if (Objects.equals(moveCatalog.getParentIdValue(), targetIdValue)) {
                 if (moveCatalog.getRht() + 1 == targetCatalog.getRht()) {
-                    return;
+                    return null;
                 }
             }
         } else {
@@ -113,13 +113,13 @@ public class LRCodeManager {
             if (MoveType.PREV == moveType) {
                 if (Objects.equals(moveCatalog.getParentIdValue(), parentIdValue)) {
                     if (moveCatalog.getRht() + 1 == targetCatalog.getLft()) {
-                        return;
+                        return null;
                     }
                 }
             } else {
                 if (Objects.equals(moveCatalog.getParentIdValue(), parentIdValue)) {
                     if (targetCatalog.getRht() + 1 == moveCatalog.getLft()) {
-                        return;
+                        return null;
                     }
                 }
             }
@@ -162,6 +162,10 @@ public class LRCodeManager {
 
         //更新被移动块中节点的左右编码值
         treeMapper.batchUpdateTreeNodeLeftRightCodeByLeftRightCode(tableName, moveCatalog.getLft() - moveCatalog.getRht(), 0, lft - moveCatalog.getLft() + moveCatalog.getRht());
+        int[] lftRht = new int[2];
+        lftRht[0] = lft;
+        lftRht[1] = lft + step - 1;
+        return lftRht;
     }
 
     /**

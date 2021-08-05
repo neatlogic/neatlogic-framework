@@ -143,7 +143,9 @@
         a.`lft`,
         a.`rht`,
         a.`parent_uuid` as `parentUuid`,
-        a.`level`
+        a.`level`,
+        a.`upward_uuid_path` AS upwardUuidPath,
+        a.`upward_name_path` AS upwardNamePath
         FROM
         `team` a
         <where>
@@ -284,7 +286,9 @@
         `name`,
         `parent_uuid` AS parentUuid,
         `lft`,
-        `rht`
+        `rht`,
+        `upward_uuid_path` AS upwardUuidPath,
+        `upward_name_path` AS upwardNamePath
         FROM `team`
         WHERE `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
@@ -524,7 +528,10 @@
                             `lft`,
                             `rht`,
                             `level`,
-                            `is_delete`)
+                            `upward_uuid_path`,
+                            `upward_name_path`,
+                            `is_delete`
+                            )
         VALUES (#{id},
                 #{uuid},
                 #{name},
@@ -532,6 +539,8 @@
                 #{lft},
                 #{rht},
                 #{level},
+                #{upwardUuidPath},
+                #{upwardNamePath},
                 0)
     </insert>
 
@@ -604,6 +613,36 @@
         SET `title` = #{title}
         WHERE `team_uuid` = #{teamUuid}
           AND `user_uuid` = #{userUuid}
+    </update>
+
+    <update id="updateUpwardUuidPathByLftRht">
+        UPDATE `team` a SET a.`upward_uuid_path` = (
+        SELECT GROUP_CONCAT(b.`uuid` ORDER BY b.`lft`) FROM `team` b
+        WHERE b.`lft` &lt;= a.`lft` AND b.`rht` &gt;= a.`rht` GROUP BY a.`uuid`
+        )
+        <where>
+            <if test="lft != null">
+                AND a.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND a.`rht` &lt;= #{rht}
+            </if>
+        </where>
+    </update>
+
+    <update id="updateUpwardNamePathByLftRht">
+        UPDATE `team` a SET a.`upward_name_path` = (
+        SELECT GROUP_CONCAT(b.`name` ORDER BY b.`lft` SEPARATOR '/') FROM `team` b
+        WHERE b.`lft` &lt;= a.`lft` AND b.`rht` &gt;= a.`rht` GROUP BY a.`uuid`
+        )
+        <where>
+            <if test="lft != null">
+                AND a.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND a.`rht` &lt;= #{rht}
+            </if>
+        </where>
     </update>
 
     <!--	<delete id="deleteTeamByLeftRightCode">-->

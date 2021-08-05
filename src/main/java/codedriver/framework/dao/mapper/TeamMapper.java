@@ -121,6 +121,10 @@ public interface TeamMapper {
 
     int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
+    int updateUpwardUuidPathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    int updateUpwardNamePathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
     int deleteTeamUserByTeamUuid(String teamUuid);
 
     int deleteTeamUserByTeamUuidList(List<String> teamUuidList);

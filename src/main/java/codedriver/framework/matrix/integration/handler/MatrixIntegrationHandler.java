@@ -18,6 +18,7 @@ import codedriver.framework.matrix.exception.MatrixExternalNoReturnException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.Api;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,10 @@ public class MatrixIntegrationHandler extends IntegrationHandlerBase {
         sourceColumnList.addChild(new PatternVo("expression", "input", ApiParamType.STRING, 0, "表达式"));
         sourceColumnList.addChild(new PatternVo("value", "input", ApiParamType.STRING, 0, "过滤参数值"));
         jsonList.add(sourceColumnList);
+        PatternVo filterList = new PatternVo("filterList", "input", ApiParamType.JSONARRAY, 0, "过滤参数列表2");
+        filterList.addChild(new PatternVo("uuid", "input", ApiParamType.STRING, 0, "过滤参数名称"));
+        filterList.addChild(new PatternVo("valueList", "input", ApiParamType.JSONARRAY, 0, "过滤参数值列表"));
+        jsonList.add(filterList);
         return jsonList;
     }
 

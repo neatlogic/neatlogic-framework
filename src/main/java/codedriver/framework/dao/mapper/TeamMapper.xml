@@ -377,7 +377,7 @@
         ORDER BY `lft` ASC
     </select>
 
-    <select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo"
+    <!--<select id="getTeamUserCountAndChildCountListByUuidList" resultType="codedriver.framework.dto.TeamVo"
             useCache="false">
         SELECT
         a.`uuid`,
@@ -390,6 +390,40 @@
         <if test="isActive != null">
             and d.`is_active` = #{isActive}
         </if>
+        WHERE a.`is_delete` != 1
+        and a.`uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+        GROUP BY a.`uuid`
+    </select>-->
+
+    <select id="getTeamUserCountListByUuidList" resultType="codedriver.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        a.`uuid`,
+        COUNT(b.`user_uuid`) AS userCount
+        FROM `team` a
+        LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
+        LEFT JOIN `user` c ON b.`user_uuid` = c.`uuid`
+        <if test="isActive != null">
+            and c.`is_active` = #{isActive}
+        </if>
+        WHERE a.`is_delete` != 1
+        and a.`uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+        GROUP BY a.`uuid`
+    </select>
+
+    <select id="getChildCountListByUuidList" parameterType="java.util.List" resultType="codedriver.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        a.`uuid`,
+        COUNT(DISTINCT b.`uuid`) AS childCount
+        FROM `team` a
+        LEFT JOIN `team` b ON b.`parent_uuid` = a.`uuid` and b.`is_delete` != 1
         WHERE a.`is_delete` != 1
         and a.`uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
@@ -588,17 +622,17 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="batchUpdateTeamLeftCode">
+    <!--<update id="batchUpdateTeamLeftCode">
         UPDATE `team`
         set `lft` = `lft` + #{step}
         WHERE `lft` &gt;= #{minCode}
-    </update>
+    </update>-->
 
-    <update id="batchUpdateTeamRightCode">
+    <!--<update id="batchUpdateTeamRightCode">
         UPDATE `team`
         set `rht` = `rht` + #{step}
         WHERE `rht` &gt;= #{minCode}
-    </update>
+    </update>-->
 
     <update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
         UPDATE `team`

@@ -33,6 +33,8 @@ public interface UserMapper {
 
     UserVo getUserSimpleInfoByUuid(String uuid);
 
+    List<UserVo> getUserByMail(String value);
+
     List<UserVo> searchUser(UserVo userVo);
 
     List<UserVo> searchUserForSelect(UserVo userVo);

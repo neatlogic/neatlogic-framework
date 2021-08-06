@@ -48,7 +48,7 @@ public interface RoleMapper {
 
     List<RoleTeamVo> getRoleTeamListByRoleUuid(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
 
-    List<String> getRoleUuidListByTeamUuidList(List<String> teamUuidList);
+    List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
 
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 

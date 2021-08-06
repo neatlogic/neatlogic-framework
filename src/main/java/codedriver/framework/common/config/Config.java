@@ -282,7 +282,7 @@ public class Config {
         try {
             Properties prop = new Properties();
             if (StringUtils.isNotBlank(configInfo)) {
-                prop.load(new ByteArrayInputStream(configInfo.getBytes()));
+                prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
             } else {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
@@ -347,6 +347,5 @@ public class Config {
     public static String getProperty(String configFile, String keyName, boolean isRequired) {
         return getProperty(configFile, keyName, "", isRequired);
     }
-
 
 }

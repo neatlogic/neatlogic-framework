@@ -5,6 +5,7 @@
 
 package codedriver.framework.asynchronization.thread;
 
+import codedriver.framework.asynchronization.threadlocal.InputFromContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.cache.threadlocal.CacheContext;
@@ -16,22 +17,26 @@ public abstract class CodeDriverThread implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(CodeDriverThread.class);
     protected UserContext userContext;
     protected TenantContext tenantContext;
+    protected InputFromContext inputFromContext;
     private String threadName;
 
     public CodeDriverThread() {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();
+        inputFromContext = InputFromContext.get();
     }
 
     public CodeDriverThread(UserContext _userContext, TenantContext _tenantContext) {
         userContext = _userContext;
         tenantContext = _tenantContext;
+        inputFromContext = InputFromContext.get();
     }
 
 
     public CodeDriverThread(String _threadName) {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();
+        inputFromContext = InputFromContext.get();
         this.threadName = _threadName;
     }
 
@@ -39,6 +44,7 @@ public abstract class CodeDriverThread implements Runnable {
     public final void run() {
         TenantContext.init(tenantContext);
         UserContext.init(userContext);
+        InputFromContext.init(inputFromContext);
         try {
             String oldThreadName = Thread.currentThread().getName();
             if (StringUtils.isNotBlank(threadName)) {
@@ -57,6 +63,9 @@ public abstract class CodeDriverThread implements Runnable {
             }
             if (UserContext.get() != null) {
                 UserContext.get().release();
+            }
+            if (InputFromContext.get() != null) {
+                InputFromContext.get().release();
             }
             CacheContext.release();
         }

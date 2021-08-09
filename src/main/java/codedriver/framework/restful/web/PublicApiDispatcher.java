@@ -5,10 +5,12 @@
 
 package codedriver.framework.restful.web;
 
+import codedriver.framework.asynchronization.threadlocal.InputFromContext;
 import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.InputFrom;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -80,7 +82,7 @@ public class PublicApiDispatcher {
     }
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
-
+        InputFromContext.init(InputFrom.RESTFUL);
         //初始化时区
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";

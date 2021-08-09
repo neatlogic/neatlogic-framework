@@ -15,7 +15,17 @@ import java.util.List;
  **/
 public interface AuthenticationInfoService {
 
+    /**
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     * @param userUuid
+     * @return
+     */
     AuthenticationInfoVo getAuthenticationInfo(String userUuid);
 
+    /**
+     * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     * @param userUuidList
+     * @return
+     */
     AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList);
 }

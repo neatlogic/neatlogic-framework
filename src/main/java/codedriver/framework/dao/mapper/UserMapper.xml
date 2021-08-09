@@ -124,6 +124,30 @@
         WHERE a.`uuid` = #{value}
     </select>
 
+    <select id="getUserByMail" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_name` AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` AS isActive,
+               a.`user_info` AS userInfo,
+               a.`vip_level` AS vipLevel,
+               b.`role_uuid` AS roleUuid,
+               r.`name`      AS roleName,
+               r.`description`,
+               c.`team_uuid` AS teamUuid,
+               d.`name`      AS teamName
+        FROM `user` a
+                 LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+                 LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
+                 LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+                 LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
+        WHERE a.`email` = #{value} and a.`is_active` = 1
+    </select>
+
     <select id="getUserSimpleInfoByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
         SELECT a.`id`,
                a.`uuid`,

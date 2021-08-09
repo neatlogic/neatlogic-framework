@@ -5,9 +5,11 @@
 
 package codedriver.framework.restful.web;
 
+import codedriver.framework.asynchronization.threadlocal.InputFromContext;
 import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.InputFrom;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.resubmit.ResubmitException;
@@ -54,6 +56,7 @@ public class ApiDispatcher {
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        InputFromContext.init(InputFrom.PAGE);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {
             paramObj = new JSONObject();

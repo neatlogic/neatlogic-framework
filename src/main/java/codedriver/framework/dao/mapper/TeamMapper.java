@@ -64,7 +64,11 @@ public interface TeamMapper {
 
     List<String> getUpwardTeamNameListByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
-    List<TeamVo> getTeamUserCountAndChildCountListByUuidList(@Param("list") List<String> teamUuidList, @Param("isActive") Integer isActive);
+//    List<TeamVo> getTeamUserCountAndChildCountListByUuidList(@Param("list") List<String> teamUuidList, @Param("isActive") Integer isActive);
+
+    List<TeamVo> getTeamUserCountListByUuidList(@Param("list") List<String> teamUuidList, @Param("isActive") Integer isActive);
+
+    List<TeamVo> getChildCountListByUuidList(List<String> teamUuidList);
 
     List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 

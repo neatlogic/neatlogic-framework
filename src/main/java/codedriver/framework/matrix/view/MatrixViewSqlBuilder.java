@@ -27,7 +27,7 @@ public class MatrixViewSqlBuilder {
 
     private final String sql;
     private String viewName;
-    private final Map<String, String> attrMap = new HashMap<>();
+    private final Map<String, String> attrMap = new LinkedHashMap<>();
 //    private Map<String, Long> attrIdMap;
     private final String dataSchema = TenantContext.get().getDataDbName();
     private final String schema = TenantContext.get().getDbName();

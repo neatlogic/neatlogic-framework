@@ -131,7 +131,6 @@
                a.`user_name` AS userName,
                a.`email`,
                a.`phone`,
-               e.`password`,
                a.`pinyin`,
                a.`is_active` AS isActive,
                a.`user_info` AS userInfo,
@@ -146,7 +145,6 @@
                  LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
                  LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
                  LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
-                 LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
         WHERE a.`email` = #{value} and a.`is_active` = 1
     </select>
 

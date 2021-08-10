@@ -5,9 +5,11 @@
 
 package codedriver.framework.scheduler.core;
 
+import codedriver.framework.asynchronization.threadlocal.InputFromContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.InputFrom;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.scheduler.annotation.Input;
@@ -103,6 +105,7 @@ public abstract class JobBase implements IJob {
 
     @Override
     public final void execute(JobExecutionContext context) throws JobExecutionException {
+        InputFromContext.init(InputFrom.CRON);
         Date fireTime = new Date();
         JobDetail jobDetail = context.getJobDetail();
         JobObject jobObject = (JobObject) jobDetail.getJobDataMap().get("jobObject");
@@ -195,7 +198,6 @@ public abstract class JobBase implements IJob {
             logger.error(ex.getMessage(), ex);
         } finally {
             // 恢复作业锁状态为等待中
-
             jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
             jobLockVo.setLock(JobLockVo.WAITING);
             updateJobLockAndStatus(jobLockVo, oldJobStatusVo);
@@ -277,7 +279,7 @@ public abstract class JobBase implements IJob {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return paramMap;
     }

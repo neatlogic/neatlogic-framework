@@ -13,7 +13,7 @@ import java.util.List;
 
 public enum InputFrom implements IEnum {
     PAGE("page", "页面"), IMPORT("import", "导入"), RESTFUL("restful", "接口"),
-    ITSM("itsm", "流程"), UNKNOWN("unknown", "未知");
+    ITSM("itsm", "流程"), UNKNOWN("unknown", "未知"), CRON("cron", "定时");
 
     private final String value;
     private final String text;

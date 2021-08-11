@@ -28,6 +28,7 @@ public class HtmlUtil {
             str = str.replace("&gt;", ">");
             str = str.replace("&lt;", "<");
             str = str.replace("&amp;", "&");
+            str = str.replace("&nbsp;", " ");
             return str;
         }
         return "";

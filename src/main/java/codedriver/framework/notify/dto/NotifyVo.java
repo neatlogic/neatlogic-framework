@@ -145,6 +145,9 @@ public class NotifyVo {
         private String notifyPolicyHandler;
         private Date fcd = new Date();
 
+        public Builder() {
+
+        }
         public Builder(INotifyTriggerType _triggerType) {
             this.triggerType = _triggerType;
         }

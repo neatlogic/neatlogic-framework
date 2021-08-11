@@ -46,7 +46,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "动态列表";
+        return "表格选择组件";
     }
 
     @Override

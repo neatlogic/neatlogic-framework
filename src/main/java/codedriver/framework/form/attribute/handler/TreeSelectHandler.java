@@ -20,15 +20,15 @@ import java.util.List;
  * @since 2021/8/3 18:39
  **/
 @Component
-public class FormSelectCascaderHandler extends FormHandlerBase {
+public class TreeSelectHandler extends FormHandlerBase {
     @Override
     public String getHandler() {
-        return "formselectcascader";
+        return "treeSelect";
     }
 
     @Override
     public String getHandlerName() {
-        return "多级下拉框";
+        return "下拉树组件";
     }
 
     @Override

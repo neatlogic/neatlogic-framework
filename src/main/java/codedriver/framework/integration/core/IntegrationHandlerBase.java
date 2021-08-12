@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
     static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
@@ -237,14 +238,17 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 /* 请求失败时，getInputStream方法会根据状态码抛出不同的异常，比如404时抛出FileNotFoundException
                   故只有请求成功时才能使用getInputStream，否则应该使用getErrorStream
                  */
+                InputStreamReader reader;
                 if (String.valueOf(code).startsWith("2")) {
-                    InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
-                    StringWriter writer = new StringWriter();
-                    IOUtils.copy(reader, writer);
-                    resultVo.appendResult(writer.toString());
+                    reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+                }else if(Objects.equals(String.valueOf(code),"520")){
+                    reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
                 } else {
                     throw new RuntimeException("HTTP code : " + code);
                 }
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(reader, writer);
+                resultVo.appendResult(writer.toString());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 resultVo.appendError("Connection failed\n" + e.getMessage());

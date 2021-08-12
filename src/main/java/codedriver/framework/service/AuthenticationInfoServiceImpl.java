@@ -38,6 +38,11 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         roleMapper = _roleMapper;
     }
 
+    /**
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     * @param userUuid
+     * @return
+     */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid){
         AuthenticationInfoVo authenticationInfoVo = new AuthenticationInfoVo();
@@ -73,6 +78,11 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         return authenticationInfoVo;
     }
 
+    /**
+     * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     * @param userUuidList
+     * @return
+     */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList){
         AuthenticationInfoVo authenticationInfoVo = new AuthenticationInfoVo();

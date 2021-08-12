@@ -19,7 +19,8 @@ import java.util.List;
  * @author linbq
  * @since 2021/8/3 18:39
  **/
-@Component
+//@Component
+@Deprecated
 public class FormSelectCascadersHandler extends FormHandlerBase {
     @Override
     public String getHandler() {

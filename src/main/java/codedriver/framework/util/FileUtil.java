@@ -5,7 +5,7 @@
 
 package codedriver.framework.util;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -68,5 +68,62 @@ public class FileUtil {
             fileName = new String(fileName.replace(" ", "").getBytes(StandardCharsets.UTF_8), "ISO8859-1");
         }
         return fileName;
+    }
+
+
+    /**
+     * 读取文件内容
+     *
+     * @param filePath 文件路径
+     * @return 文件内容
+     */
+    public static String getReadFileContent(String filePath) {
+        if (filePath == null || "".equals(filePath)) {
+            return null;
+        } else {
+            String result = "";
+            FileInputStream fr = null;
+            BufferedReader filebr = null;
+            InputStreamReader in = null;
+            File desFile = new File(filePath);
+            try {
+                if (desFile.isFile() && desFile.exists()) {
+                    StringBuilder str = new StringBuilder();
+                    fr = new FileInputStream(desFile);
+                    in = new InputStreamReader(fr, StandardCharsets.UTF_8);
+                    filebr = new BufferedReader(in);
+                    String inLine = "";
+                    while ((inLine = filebr.readLine()) != null) {
+                        str.append(inLine);
+                    }
+                    result = str.toString();
+                } else {
+                    result = "";
+                }
+            } catch (Exception ex) {
+                result = ex.getMessage();
+            } finally {
+                if (fr != null) {
+                    try {
+                        fr.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+                if (filebr != null) {
+                    try {
+                        filebr.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ignored) {
+
+                    }
+                }
+            }
+            return result;
+        }
     }
 }

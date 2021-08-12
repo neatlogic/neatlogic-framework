@@ -46,7 +46,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "静态列表";
+        return "表格输入组件";
     }
 
     @Override

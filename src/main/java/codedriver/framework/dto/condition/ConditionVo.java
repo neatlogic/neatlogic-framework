@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -150,8 +151,8 @@ public class ConditionVo implements Serializable{
 				}else if("form".equals(type)) {
 					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
 					if(conditionHandler != null) {
-						String formConfig = context.getFormConfig();
-						if(StringUtils.isNotBlank(formConfig)) {
+						JSONObject formConfig = context.getFormConfig();
+						if(MapUtils.isNotEmpty(formConfig)) {
 							JSONObject configObj = new JSONObject();
 							configObj.put("attributeUuid", name);
 							configObj.put("formConfig", formConfig);

@@ -23,7 +23,7 @@ import java.util.List;
 public class TreeSelectHandler extends FormHandlerBase {
     @Override
     public String getHandler() {
-        return "treeSelect";
+        return "formtreeselect";
     }
 
     @Override

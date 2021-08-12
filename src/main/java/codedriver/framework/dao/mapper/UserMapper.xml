@@ -135,7 +135,7 @@
                a.`is_active` AS isActive,
                a.`vip_level` AS vipLevel
         FROM `user` a
-        WHERE a.`email` = #{value} and a.`is_active` = 1
+        WHERE a.`email` like CONCAT(#{value}, '%') and a.`is_active` = 1
     </select>
 
     <select id="getUserSimpleInfoByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">

@@ -10,7 +10,7 @@ public class ConditionParamContext {
 	/** 参数数据**/
 	private JSONObject paramData = new JSONObject();
 	/** 表单配置信息**/
-	private String formConfig;
+	private JSONObject formConfig;
 	/** 是否需要将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
 	private boolean translate = false;
 	
@@ -43,11 +43,11 @@ public class ConditionParamContext {
 		return this;
 	}
 
-	public String getFormConfig() {
+	public JSONObject getFormConfig() {
 		return formConfig;
 	}
 
-	public ConditionParamContext setFormConfig(String formConfig) {
+	public ConditionParamContext setFormConfig(JSONObject formConfig) {
 		this.formConfig = formConfig;
 		return this;
 	}

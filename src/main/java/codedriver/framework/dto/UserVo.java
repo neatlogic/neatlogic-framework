@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
@@ -21,365 +26,358 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserVo extends BasePageVo implements Serializable{
+public class UserVo extends BasePageVo implements Serializable {
 
     private static final long serialVersionUID = 3670529362145832083L;
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     private transient String keyword;
 
     private Long id;
-	@EntityField(name = "用户uuid", type = ApiParamType.STRING)
-	private String uuid;
-	@EntityField(name = "用户id", type = ApiParamType.STRING)
-	private String userId;
-	@EntityField(name = "用户姓名", type = ApiParamType.STRING)
-	private String userName;
-	private String pinyin;
-	private String tenant;
-	@EntityField(name = "邮箱", type = ApiParamType.STRING)
-	private String email;
-	private String password;
-	private String roleUuid;
-	@EntityField(name = "是否激活(1:激活;0:未激活)", type = ApiParamType.INTEGER)
-	private Integer isActive;
-	@EntityField(name = "电话", type = ApiParamType.STRING)
-	private String phone;
-	private String dept;
-	private String company;
-	private String position;
-	@EntityField(name = "其他属性", type = ApiParamType.STRING)
-	private String userInfo;
-	@EntityField(name = "头像", type = ApiParamType.STRING)
-	private String avatar;
-	@EntityField(name = "VIP级别(0,1,2,3,4,5)", type = ApiParamType.ENUM)
-	private Integer vipLevel;
-	private String teamUuid;
-	private String auth;
-	private String authGroup;
-	private JSONObject userInfoObj;
+    @EntityField(name = "用户uuid", type = ApiParamType.STRING)
+    private String uuid;
+    @EntityField(name = "用户id", type = ApiParamType.STRING)
+    private String userId;
+    @EntityField(name = "用户姓名", type = ApiParamType.STRING)
+    private String userName;
+    private String pinyin;
+    private String tenant;
+    @EntityField(name = "邮箱", type = ApiParamType.STRING)
+    private String email;
+    private String password;
+    private String roleUuid;
+    @EntityField(name = "是否激活(1:激活;0:未激活)", type = ApiParamType.INTEGER)
+    private Integer isActive;
+    @EntityField(name = "电话", type = ApiParamType.STRING)
+    private String phone;
+    private String dept;
+    private String company;
+    private String position;
+    @EntityField(name = "其他属性", type = ApiParamType.STRING)
+    private String userInfo;
+    @EntityField(name = "头像", type = ApiParamType.STRING)
+    private String avatar;
+    @EntityField(name = "VIP级别(0,1,2,3,4,5)", type = ApiParamType.ENUM)
+    private Integer vipLevel;
+    private String teamUuid;
+    private String auth;
+    private String authGroup;
+    private JSONObject userInfoObj;
 
-	@EntityField(name = "是否已删除", type = ApiParamType.ENUM)
-	private Integer isDelete;
+    @EntityField(name = "是否已删除", type = ApiParamType.ENUM)
+    private Integer isDelete;
 
-	@EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
-	private String title;
+    @EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
+    private String title;
 
-	@EntityField(name = "用户所在组的头衔中文名", type = ApiParamType.ENUM)
-	private String titleText;
+    @EntityField(name = "用户所在组的头衔中文名", type = ApiParamType.ENUM)
+    private String titleText;
 
-	@EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
-	private List<String> teamUuidList = new ArrayList<>();
-	private List<String> teamNameList = new ArrayList<>();
-	
-	@EntityField(name = "用户角色uuid列表", type = ApiParamType.JSONARRAY)
-	private List<String> roleUuidList = new ArrayList<>();
-	//private List<String> roleNameList = new ArrayList<>();
-	
-	@EntityField(name = "用户角色信息列表", type = ApiParamType.JSONARRAY)
-	private List<RoleVo> roleList = new ArrayList<>();
-	@EntityField(name = "用户所在组信息列表", type = ApiParamType.JSONARRAY)
-	private List<TeamVo> teamList = new ArrayList<>();
-	@EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
-	private List<UserAuthVo> userAuthList = new ArrayList<>();
-	@JSONField(serialize=false)
-	private String cookieAuthorization;
-	@JSONField(serialize=false)
-	private String authorization;
-	
+    @EntityField(name = "用户所在组uuid列表", type = ApiParamType.JSONARRAY)
+    private List<String> teamUuidList = new ArrayList<>();
+    private List<String> teamNameList = new ArrayList<>();
 
-	/**
-	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
-	 */
-	@EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
-	private final String initType = GroupSearch.USER.getValue();
-	/***
-	 * 此字段专供前端使用，用于渲染用户插件
-	 */
-	@EntityField(name = "用户名(与userName取值相同)", type = ApiParamType.STRING)
-	private String name;
+    @EntityField(name = "用户角色uuid列表", type = ApiParamType.JSONARRAY)
+    private List<String> roleUuidList = new ArrayList<>();
+    //private List<String> roleNameList = new ArrayList<>();
 
-	public UserVo() {
+    @EntityField(name = "用户角色信息列表", type = ApiParamType.JSONARRAY)
+    private List<RoleVo> roleList = new ArrayList<>();
+    @EntityField(name = "用户所在组信息列表", type = ApiParamType.JSONARRAY)
+    private List<TeamVo> teamList = new ArrayList<>();
+    @EntityField(name = "用户权限信息列表", type = ApiParamType.JSONARRAY)
+    private List<UserAuthVo> userAuthList = new ArrayList<>();
+    @JSONField(serialize = false)
+    private String cookieAuthorization;
+    @JSONField(serialize = false)
+    private String authorization;
 
-	}
 
-	public UserVo(String uuid){
-		this.uuid = uuid;
-	}
+    /**
+     * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
+     */
+    @EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+    private final String initType = GroupSearch.USER.getValue();
+    /***
+     * 此字段专供前端使用，用于渲染用户插件
+     */
+    @EntityField(name = "用户名(与userName取值相同)", type = ApiParamType.STRING)
+    private String name;
 
-	public List<UserAuthVo> getUserAuthList() {
-		return userAuthList;
-	}
+    public UserVo() {
 
-	public void setUserAuthList(List<UserAuthVo> userAuthList) {
-		this.userAuthList = userAuthList;
-	}
+    }
 
-	public String getAuth() {
-		return auth;
-	}
+    public UserVo(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setAuth(String auth) {
-		this.auth = auth;
-	}
+    public List<UserAuthVo> getUserAuthList() {
+        return userAuthList;
+    }
 
-	public String getAuthGroup() {
-		return authGroup;
-	}
+    public void setUserAuthList(List<UserAuthVo> userAuthList) {
+        this.userAuthList = userAuthList;
+    }
 
-	public void setAuthGroup(String authGroup) {
-		this.authGroup = authGroup;
-	}
+    public String getAuth() {
+        return auth;
+    }
 
-	public Long getId() {
-		if (id == null) {
-			id = SnowflakeUtil.uniqueLong();
-		}
-		return id;
-	}
+    public void setAuth(String auth) {
+        this.auth = auth;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public String getAuthGroup() {
+        return authGroup;
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public void setAuthGroup(String authGroup) {
+        this.authGroup = authGroup;
+    }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+    public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
+        return id;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 
-	public String getUserName() {
-		return userName;
-	}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public String getPinyin() {
-		if (StringUtils.isBlank(this.pinyin)) {
-			// 新增或者编辑的情况，this.pinYin是为null的，需要对其进行处理，通过userName拿到拼音；不为空时直接返回this.pinYin
-			if (StringUtils.isNotBlank(this.userName)) {
-				HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-				format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-				format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);// 不带声调
-				format.setVCharType(HanyuPinyinVCharType.WITH_V);
-				char[] ch = this.userName.trim().toCharArray();
-				StringBuffer buffer = new StringBuffer("");
-				for (int i = 0; i < ch.length; i++) {
-					if (Character.toString(ch[i]).matches("[\u4e00-\u9fa5]")) {
-						String[] temp;
-						try {
-							temp = PinyinHelper.toHanyuPinyinStringArray(ch[i], format);
-							buffer.append(temp[0]);
-						} catch (BadHanyuPinyinOutputFormatCombination | NullPointerException e) {
-							// 无法翻译的生僻字，不必处理
-						}
-					} else {
-						buffer.append(Character.toString(ch[i]));
-					}
-				}
-				this.pinyin = buffer.toString();
-			} else {
-				this.pinyin = "";
-			}
-		}
-		return this.pinyin;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-	public List<String> getTeamNameList() {
-		if (CollectionUtils.isNotEmpty(teamList)){
-			List<String> arrayList = new ArrayList<>();
-			for (TeamVo teamVo : teamList){
-				arrayList.add(teamVo.getName());
-			}
-			return arrayList;
-		}
-		return teamNameList;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setTeamNameList(List<String> teamNameList) {
-		this.teamNameList = teamNameList;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setPinyin(String pinyin) {
-		this.pinyin = pinyin;
-	}
+    public String getPinyin() {
+        if (StringUtils.isBlank(this.pinyin)) {
+            // 新增或者编辑的情况，this.pinYin是为null的，需要对其进行处理，通过userName拿到拼音；不为空时直接返回this.pinYin
+            if (StringUtils.isNotBlank(this.userName)) {
+                HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+                format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+                format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);// 不带声调
+                format.setVCharType(HanyuPinyinVCharType.WITH_V);
+                char[] ch = this.userName.trim().toCharArray();
+                StringBuffer buffer = new StringBuffer("");
+                for (int i = 0; i < ch.length; i++) {
+                    if (Character.toString(ch[i]).matches("[\u4e00-\u9fa5]")) {
+                        String[] temp;
+                        try {
+                            temp = PinyinHelper.toHanyuPinyinStringArray(ch[i], format);
+                            buffer.append(temp[0]);
+                        } catch (BadHanyuPinyinOutputFormatCombination | NullPointerException e) {
+                            // 无法翻译的生僻字，不必处理
+                        }
+                    } else {
+                        buffer.append(Character.toString(ch[i]));
+                    }
+                }
+                this.pinyin = buffer.toString();
+            } else {
+                this.pinyin = "";
+            }
+        }
+        return this.pinyin;
+    }
 
-	public String getTenant() {
-		return tenant;
-	}
+    public List<String> getTeamNameList() {
+        if (CollectionUtils.isNotEmpty(teamList)) {
+            List<String> arrayList = new ArrayList<>();
+            for (TeamVo teamVo : teamList) {
+                arrayList.add(teamVo.getName());
+            }
+            return arrayList;
+        }
+        return teamNameList;
+    }
 
-	public void setTenant(String tenant) {
-		this.tenant = tenant;
-	}
+    public void setTeamNameList(List<String> teamNameList) {
+        this.teamNameList = teamNameList;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getTenant() {
+        return tenant;
+    }
 
-	public String getPassword() {
-		if (StringUtils.isNotBlank(password)) {
-			if (!password.startsWith("{MD5}")) {
-				password = DigestUtils.md5DigestAsHex(password.getBytes());
-				password = "{MD5}" + password;
-			}
-		}
-		return password;
-	}
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getTeamUuid() {
-		return teamUuid;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setTeamUuid(String teamUuid) {
-		this.teamUuid = teamUuid;
-	}
+    public String getPassword() {
+        if (StringUtils.isNotBlank(password)) {
+            if (!password.startsWith("{MD5}")) {
+                password = DigestUtils.md5DigestAsHex(password.getBytes());
+                password = "{MD5}" + password;
+            }
+        }
+        return password;
+    }
 
-	public String getRoleUuid() {
-		return roleUuid;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setRoleUuid(String roleUuid) {
-		this.roleUuid = roleUuid;
-	}
+    public String getTeamUuid() {
+        return teamUuid;
+    }
 
-	public String getPhone() {
-		return phone;
-	}
+    public void setTeamUuid(String teamUuid) {
+        this.teamUuid = teamUuid;
+    }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    public String getRoleUuid() {
+        return roleUuid;
+    }
 
-	public String getDept() {
-		return dept;
-	}
+    public void setRoleUuid(String roleUuid) {
+        this.roleUuid = roleUuid;
+    }
 
-	public void setDept(String dept) {
-		this.dept = dept;
-	}
+    public String getPhone() {
+        return phone;
+    }
 
-	public String getCompany() {
-		return company;
-	}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-	public void setCompany(String company) {
-		this.company = company;
-	}
+    public String getDept() {
+        return dept;
+    }
 
-	public String getPosition() {
-		return position;
-	}
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
 
-	public void setPosition(String position) {
-		this.position = position;
-	}
+    public String getCompany() {
+        return company;
+    }
 
-	public Integer getIsActive() {
-		return isActive;
-	}
+    public void setCompany(String company) {
+        this.company = company;
+    }
 
-	public void setIsActive(Integer isActive) {
-		this.isActive = isActive;
-	}
+    public String getPosition() {
+        return position;
+    }
 
-	public List<String> getTeamUuidList() {
-		if(CollectionUtils.isEmpty(teamUuidList) && CollectionUtils.isNotEmpty(teamList)){
-			for (TeamVo teamVo : teamList){
-				teamUuidList.add(teamVo.getUuid());
-			}
-		}
-		return teamUuidList;
-	}
+    public void setPosition(String position) {
+        this.position = position;
+    }
 
-	public void setTeamUuidList(List<String> teamUuidList) {
-		this.teamUuidList = teamUuidList;
-	}
+    public Integer getIsActive() {
+        return isActive;
+    }
 
-	public List<TeamVo> getTeamList() {
-		return teamList;
-	}
+    public void setIsActive(Integer isActive) {
+        this.isActive = isActive;
+    }
 
-	public void setTeamList(List<TeamVo> teamList) {
-		this.teamList = teamList;
-	}
+    public List<String> getTeamUuidList() {
+        if (CollectionUtils.isEmpty(teamUuidList) && CollectionUtils.isNotEmpty(teamList)) {
+            for (TeamVo teamVo : teamList) {
+                teamUuidList.add(teamVo.getUuid());
+            }
+        }
+        return teamUuidList;
+    }
 
-	public String getKeyword() {
-		return keyword;
-	}
+    public void setTeamUuidList(List<String> teamUuidList) {
+        this.teamUuidList = teamUuidList;
+    }
 
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
+    public List<TeamVo> getTeamList() {
+        return teamList;
+    }
 
-	public String getUserInfo() {
-		return userInfo;
-	}
+    public void setTeamList(List<TeamVo> teamList) {
+        this.teamList = teamList;
+    }
 
-	public void setUserInfo(String userInfo) {
-		this.userInfo = userInfo;
-	}
 
-	public JSONObject getUserInfoObj() {
-		if (userInfoObj == null && StringUtils.isNotBlank(userInfo)) {
-			userInfoObj = JSONObject.parseObject(userInfo);
-		}
-		return userInfoObj;
-	}
+    public String getUserInfo() {
+        return userInfo;
+    }
 
-	public Integer getIsDelete() {
-		return isDelete;
-	}
+    public void setUserInfo(String userInfo) {
+        this.userInfo = userInfo;
+    }
 
-	public void setIsDelete(Integer isDelete) {
-		this.isDelete = isDelete;
-	}
+    public JSONObject getUserInfoObj() {
+        if (userInfoObj == null && StringUtils.isNotBlank(userInfo)) {
+            userInfoObj = JSONObject.parseObject(userInfo);
+        }
+        return userInfoObj;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Integer getIsDelete() {
+        return isDelete;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
 
-	public String getAvatar() {
-		if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
-			JSONObject jsonObject = JSONObject.parseObject(userInfo);
-			avatar = jsonObject.getString("avatar");
-		}
-		return avatar;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public void setUserInfoObj(JSONObject userInfoObj) {
-		this.userInfoObj = userInfoObj;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public Integer getVipLevel() {
-		return vipLevel;
-	}
+    public String getAvatar() {
+        if (StringUtils.isBlank(avatar) && StringUtils.isNotBlank(userInfo)) {
+            JSONObject jsonObject = JSONObject.parseObject(userInfo);
+            avatar = jsonObject.getString("avatar");
+        }
+        return avatar;
+    }
 
-	public void setVipLevel(Integer vipLevel) {
-		this.vipLevel = vipLevel;
-	}
+    public void setUserInfoObj(JSONObject userInfoObj) {
+        this.userInfoObj = userInfoObj;
+    }
+
+    public Integer getVipLevel() {
+        return vipLevel;
+    }
+
+    public void setVipLevel(Integer vipLevel) {
+        this.vipLevel = vipLevel;
+    }
 
 	/*public List<String> getRoleDescriptionList() {
 		if(CollectionUtils.isEmpty(roleNameList) && CollectionUtils.isNotEmpty(roleList)) {
@@ -390,68 +388,68 @@ public class UserVo extends BasePageVo implements Serializable{
 		return roleNameList;
 	}*/
 
-	public List<String> getRoleUuidList() {
-		if(CollectionUtils.isEmpty(roleUuidList) && CollectionUtils.isNotEmpty(roleList)) {
-			for(RoleVo role : roleList) {
-				roleUuidList.add(role.getUuid());
-			}
-		}
-		return roleUuidList;
-	}
+    public List<String> getRoleUuidList() {
+        if (CollectionUtils.isEmpty(roleUuidList) && CollectionUtils.isNotEmpty(roleList)) {
+            for (RoleVo role : roleList) {
+                roleUuidList.add(role.getUuid());
+            }
+        }
+        return roleUuidList;
+    }
 
-	public String getInitType() {
-		return initType;
-	}
+    public String getInitType() {
+        return initType;
+    }
 
-	public String getName() {
-		name = userName;
-		return name;
-	}
+    public String getName() {
+        name = userName;
+        return name;
+    }
 
-	public void setRoleUuidList(List<String> roleUuidList) {
-		this.roleUuidList = roleUuidList;
-	}
+    public void setRoleUuidList(List<String> roleUuidList) {
+        this.roleUuidList = roleUuidList;
+    }
 
-	public List<RoleVo> getRoleList() {
-		return roleList;
-	}
+    public List<RoleVo> getRoleList() {
+        return roleList;
+    }
 
-	public void setRoleList(List<RoleVo> roleList) {
-		this.roleList = roleList;
-	}
+    public void setRoleList(List<RoleVo> roleList) {
+        this.roleList = roleList;
+    }
 
-	public String getTitleText() {
-		return titleText;
-	}
+    public String getTitleText() {
+        return titleText;
+    }
 
-	public void setTitleText(String titleText) {
-		this.titleText = titleText;
-	}
+    public void setTitleText(String titleText) {
+        this.titleText = titleText;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UserVo other = (UserVo) obj;
-		if (uuid == null) {
-			if (other.uuid != null)
-				return false;
-		} else if (!uuid.equals(other.uuid))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        UserVo other = (UserVo) obj;
+        if (uuid == null) {
+            if (other.uuid != null)
+                return false;
+        } else if (!uuid.equals(other.uuid))
+            return false;
+        return true;
+    }
 
 //	public List<String> getValueList() {
 //		if(CollectionUtils.isNotEmpty(valueList)) {
@@ -466,15 +464,15 @@ public class UserVo extends BasePageVo implements Serializable{
 //		this.valueList = valueList;
 //	}
 
-	public String getCookieAuthorization() {
-		return cookieAuthorization;
-	}
+    public String getCookieAuthorization() {
+        return cookieAuthorization;
+    }
 
-	public void setCookieAuthorization(String cookieAuthorization) {
-		this.cookieAuthorization = cookieAuthorization;
-	}
+    public void setCookieAuthorization(String cookieAuthorization) {
+        this.cookieAuthorization = cookieAuthorization;
+    }
 
-	public String getAuthorization() {
+    public String getAuthorization() {
         return authorization;
     }
 
@@ -482,5 +480,5 @@ public class UserVo extends BasePageVo implements Serializable{
         this.authorization = authorization;
     }
 
-    
+
 }

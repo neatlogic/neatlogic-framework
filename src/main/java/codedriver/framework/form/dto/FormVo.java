@@ -1,21 +1,19 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.form.dto;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
 
 public class FormVo extends BasePageVo implements Serializable {
 
@@ -99,14 +97,6 @@ public class FormVo extends BasePageVo implements Serializable {
 
     public void setCurrentVersionUuid(String currentVersionUuid) {
         this.currentVersionUuid = currentVersionUuid;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
     }
 
     public int getReferenceCount() {

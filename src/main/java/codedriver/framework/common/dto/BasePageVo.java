@@ -109,11 +109,11 @@ public class BasePageVo {
         this.pageCount = pageCount;
     }
 
-    public String getKeyword() {
+    public final String getKeyword() {
         return keyword;
     }
 
-    public Set<String> getKeywordList() {
+    public final Set<String> getKeywordList() {
         if (CollectionUtils.isEmpty(this.keywordList) && StringUtils.isNotBlank(keyword)) {
             try {
                 this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
@@ -124,7 +124,7 @@ public class BasePageVo {
     }
 
 
-    public void setKeyword(String keyword) {
+    public final void setKeyword(String keyword) {
         if (StringUtils.isNotBlank(keyword)) {
             this.keyword = keyword.trim();
         }

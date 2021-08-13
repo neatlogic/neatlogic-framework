@@ -1,23 +1,21 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.worktime.dto;
+
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.restful.annotation.EntityField;
 
 public class WorktimeVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = 3223914468345456530L;
@@ -108,14 +106,6 @@ public class WorktimeVo extends BasePageVo implements Serializable {
 
     public void setConfig(String config) {
         this.config = config;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
     }
 
     public List<Integer> getYearList() {

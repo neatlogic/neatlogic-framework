@@ -21,7 +21,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.XmlWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -69,7 +68,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     appContext.setId(moduleId);
                     // InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
 
-                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new DispatcherServlet(appContext));
+                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new CodedriverDispatcherServlet(appContext));
                     if (StringUtils.isNotBlank(urlMapping)) {
                         sr.addMapping(urlMapping);
                     }

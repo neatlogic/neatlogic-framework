@@ -55,7 +55,7 @@ public class AttributeDataVo {
                 return true;
             }
         } else if (dataObj instanceof JSONObject) {
-            if (MapUtils.isNotEmpty((JSONObject) dataObj)) {
+            if (MapUtils.isEmpty((JSONObject) dataObj)) {
                 return true;
             }
         } else if (dataObj instanceof String) {

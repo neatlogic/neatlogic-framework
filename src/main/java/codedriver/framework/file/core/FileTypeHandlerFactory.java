@@ -1,21 +1,24 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.file.core;
+
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
+import codedriver.framework.common.RootComponent;
+import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.file.dto.FileTypeVo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.RootComponent;
-import codedriver.framework.dto.ModuleVo;
-import codedriver.framework.file.dto.FileTypeVo;
-
 @RootComponent
-public class FileTypeHandlerFactory extends ApplicationListenerBase {
+public class FileTypeHandlerFactory extends ModuleInitializedListenerBase {
 
 	private static final Map<String, IFileTypeHandler> componentMap = new HashMap<>();
 	private static final List<FileTypeVo> fileTypeList = new ArrayList<>();
@@ -41,8 +44,7 @@ public class FileTypeHandlerFactory extends ApplicationListenerBase {
 	}
 
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		ApplicationContext context = event.getApplicationContext();
+	public void onInitialized(CodedriverWebApplicationContext context) {
 		Map<String, IFileTypeHandler> myMap = context.getBeansOfType(IFileTypeHandler.class);
 		for (Map.Entry<String, IFileTypeHandler> entry : myMap.entrySet()) {
 			IFileTypeHandler typeHandler = entry.getValue();

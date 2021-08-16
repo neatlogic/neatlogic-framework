@@ -5,16 +5,15 @@
 
 package codedriver.framework.mq.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.mq.dto.TopicVo;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.*;
 
 @RootComponent
-public class TopicFactory extends ApplicationListenerBase {
+public class TopicFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ITopic> componentMap = new HashMap<>();
     private static List<TopicVo> topicList = new ArrayList<>();
 
@@ -27,8 +26,7 @@ public class TopicFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, ITopic> myMap = context.getBeansOfType(ITopic.class);
         for (Map.Entry<String, ITopic> entry : myMap.entrySet()) {
             ITopic component = entry.getValue();

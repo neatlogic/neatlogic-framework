@@ -5,10 +5,9 @@
 
 package codedriver.framework.form.treeselect.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RootComponent
-public class TreeSelectDataSourceFactory extends ApplicationListenerBase {
+public class TreeSelectDataSourceFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ITreeSelectDataSourceHandler> handlerMap = new HashMap<>();
     private static final List<ITreeSelectDataSourceHandler> handlerList = new ArrayList<>();
 
@@ -29,8 +28,7 @@ public class TreeSelectDataSourceFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, ITreeSelectDataSourceHandler> myMap = context.getBeansOfType(ITreeSelectDataSourceHandler.class);
         for (Map.Entry<String, ITreeSelectDataSourceHandler> entry : myMap.entrySet()) {
             ITreeSelectDataSourceHandler handler = entry.getValue();

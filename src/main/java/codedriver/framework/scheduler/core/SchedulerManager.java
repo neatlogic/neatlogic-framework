@@ -5,10 +5,11 @@
 
 package codedriver.framework.scheduler.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
@@ -22,14 +23,12 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.*;
 
 @RootComponent
-public class SchedulerManager extends ApplicationListenerBase {
+public class SchedulerManager extends ModuleInitializedListenerBase {
     private final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
     private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
@@ -180,8 +179,7 @@ public class SchedulerManager extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IJob> myMap = context.getBeansOfType(IJob.class);
         List<IJob> tmpJobHandlerList = new ArrayList<>();
         for (Map.Entry<String, IJob> entry : myMap.entrySet()) {

@@ -5,19 +5,18 @@
 
 package codedriver.framework.startup;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.thread.ModuleInitApplicationListener;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @RootComponent
-public class StartupManager extends ApplicationListenerBase {
+public class StartupManager extends ModuleInitializedListenerBase {
     private final static Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
     private final static List<IStartup> startupList = new ArrayList<>();
@@ -35,8 +34,7 @@ public class StartupManager extends ApplicationListenerBase {
 
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IStartup> myMap = context.getBeansOfType(IStartup.class);
         for (Map.Entry<String, IStartup> entry : myMap.entrySet()) {
             startupList.add(entry.getValue());

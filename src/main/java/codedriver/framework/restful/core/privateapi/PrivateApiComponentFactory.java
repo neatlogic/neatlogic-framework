@@ -5,9 +5,10 @@
 
 package codedriver.framework.restful.core.privateapi;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActions;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.restful.annotation.OperationType;
 import codedriver.framework.restful.core.IApiComponent;
@@ -22,14 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RootComponent
-public class PrivateApiComponentFactory extends ApplicationListenerBase {
+public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     static Logger logger = LoggerFactory.getLogger(PrivateApiComponentFactory.class);
 
     private static final Map<String, IApiComponent> componentMap = new HashMap<>();
@@ -116,8 +116,7 @@ public class PrivateApiComponentFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IPrivateApiComponent> myMap = context.getBeansOfType(IPrivateApiComponent.class);
         Map<String, IPrivateJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPrivateJsonStreamApiComponent.class);
         Map<String, IPrivateBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPrivateBinaryStreamApiComponent.class);

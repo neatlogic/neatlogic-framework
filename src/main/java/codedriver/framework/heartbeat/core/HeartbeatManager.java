@@ -1,8 +1,14 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.heartbeat.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
@@ -12,8 +18,6 @@ import codedriver.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.TransactionStatus;
 
 import java.util.HashSet;
@@ -26,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @RootComponent
-public class HeartbeatManager extends ApplicationListenerBase {
+public class HeartbeatManager extends ModuleInitializedListenerBase {
     private final Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
     @Autowired
     private ServerMapper serverMapper;
@@ -105,8 +109,7 @@ public class HeartbeatManager extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         // 找出所有实现ServerObserver接口的类
         Map<String, IHeartbreakHandler> serverObserverMap = context.getBeansOfType(IHeartbreakHandler.class);
         for (Entry<String, IHeartbreakHandler> entry : serverObserverMap.entrySet()) {

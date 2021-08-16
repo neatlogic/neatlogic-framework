@@ -5,15 +5,14 @@
 
 package codedriver.framework.form.attribute.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.*;
 
 @RootComponent
-public class FormAttributeHandlerFactory extends ApplicationListenerBase {
+public class FormAttributeHandlerFactory extends ModuleInitializedListenerBase {
     private static final Map<String, IFormAttributeHandler> handlerMap = new HashMap<>();
     private static final List<IFormAttributeHandler> handlerList = new ArrayList<>();
 
@@ -27,8 +26,7 @@ public class FormAttributeHandlerFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IFormAttributeHandler> myMap = context.getBeansOfType(IFormAttributeHandler.class);
         for (Map.Entry<String, IFormAttributeHandler> entry : myMap.entrySet()) {
             IFormAttributeHandler handler = entry.getValue();

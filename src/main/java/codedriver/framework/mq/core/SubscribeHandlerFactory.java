@@ -5,14 +5,13 @@
 
 package codedriver.framework.mq.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.mq.dto.SubscribeHandlerVo;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RootComponent
-public class SubscribeHandlerFactory extends ApplicationListenerBase implements BeanFactoryPostProcessor {
+public class SubscribeHandlerFactory extends ModuleInitializedListenerBase implements BeanFactoryPostProcessor {
     private static final Map<String, ISubscribeHandler> componentMap = new HashMap<>();
 
     public static ISubscribeHandler getHandler(String handlerId) {
@@ -34,8 +33,7 @@ public class SubscribeHandlerFactory extends ApplicationListenerBase implements 
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, ISubscribeHandler> myMap = context.getBeansOfType(ISubscribeHandler.class);
         for (Map.Entry<String, ISubscribeHandler> entry : myMap.entrySet()) {
             ISubscribeHandler component = entry.getValue();

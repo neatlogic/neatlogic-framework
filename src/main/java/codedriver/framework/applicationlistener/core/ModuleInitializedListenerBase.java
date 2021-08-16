@@ -6,14 +6,16 @@
 package codedriver.framework.applicationlistener.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.dao.mapper.TenantMapper;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-public abstract class ApplicationListenerBase implements ApplicationListener<ContextRefreshedEvent> {
+public abstract class ModuleInitializedListenerBase implements ApplicationListener<ContextRefreshedEvent> {
     @Resource
     private TenantMapper tenantMapper;
 
@@ -26,6 +28,17 @@ public abstract class ApplicationListenerBase implements ApplicationListener<Con
         tenantContext.switchTenant(tenant);
         myInit();
     }
+
+    @Override
+    public final void onApplicationEvent(ContextRefreshedEvent event) {
+        ApplicationContext c = event.getApplicationContext();
+        if (c instanceof CodedriverWebApplicationContext) {
+            onInitialized((CodedriverWebApplicationContext) c);
+        }
+    }
+
+    protected abstract void onInitialized(CodedriverWebApplicationContext context);
+
 
     protected abstract void myInit();
 

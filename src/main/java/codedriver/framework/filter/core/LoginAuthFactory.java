@@ -5,16 +5,15 @@
 
 package codedriver.framework.filter.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RootComponent
-public class LoginAuthFactory extends ApplicationListenerBase {
+public class LoginAuthFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ILoginAuthHandler> loginAuthMap = new HashMap<>();
 
 
@@ -23,8 +22,7 @@ public class LoginAuthFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, ILoginAuthHandler> myMap = context.getBeansOfType(ILoginAuthHandler.class);
         for (Map.Entry<String, ILoginAuthHandler> entry : myMap.entrySet()) {
             ILoginAuthHandler authAuth = entry.getValue();

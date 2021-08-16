@@ -1,6 +1,12 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.notify.core;
 
-import codedriver.framework.applicationlistener.core.ApplicationListenerBase;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleVo;
@@ -8,8 +14,6 @@ import codedriver.framework.notify.dto.NotifyPolicyHandlerVo;
 import codedriver.framework.notify.dto.NotifyTreeVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @RootComponent
-public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
+public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final List<NotifyPolicyHandlerVo> notifyPolicyHandlerList = new ArrayList<>();
 
@@ -99,13 +103,12 @@ public class NotifyPolicyHandlerFactory extends ApplicationListenerBase {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         ModuleVo moduleVo = ModuleUtil.getModuleById(context.getId());
         Map<String, INotifyPolicyHandler> map = context.getBeansOfType(INotifyPolicyHandler.class);
         for (Entry<String, INotifyPolicyHandler> entry : map.entrySet()) {
             INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
-            if(notifyPolicyHandler.isPublic()){
+            if (notifyPolicyHandler.isPublic()) {
                 notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
                 notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getGroup()));
 

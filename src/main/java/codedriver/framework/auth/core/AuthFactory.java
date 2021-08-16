@@ -1,17 +1,17 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.auth.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.exception.auth.NoAuthGroupException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
 
-import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.exception.auth.NoAuthGroupException;
+import java.util.*;
 
 public class AuthFactory {
 	private static final Log logger = LogFactory.getLog(AuthFactory.class);
@@ -37,7 +37,6 @@ public class AuthFactory {
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
-				e.printStackTrace();
 			}
 		}
 	}

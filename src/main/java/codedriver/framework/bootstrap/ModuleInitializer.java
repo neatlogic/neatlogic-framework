@@ -20,7 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -63,11 +62,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 if (StringUtils.isNotBlank(moduleId)) {
                     System.out.println("start to initialize module " + moduleId + "...");
                     version = Config.getProperty("META-INF/maven/com.techsure/codedriver-" + moduleId + "/pom.properties", "version");
-                    XmlWebApplicationContext appContext = new XmlWebApplicationContext();
+                    //XmlWebApplicationContext appContext = new XmlWebApplicationContext();
+                    CodedriverWebApplicationContext appContext = new CodedriverWebApplicationContext();
                     appContext.setConfigLocation("classpath*:" + path);
                     appContext.setId(moduleId);
+                    appContext.setGroupName(groupName);
                     // InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
-
                     ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new CodedriverDispatcherServlet(appContext));
                     if (StringUtils.isNotBlank(urlMapping)) {
                         sr.addMapping(urlMapping);

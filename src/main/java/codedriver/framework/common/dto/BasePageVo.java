@@ -40,6 +40,8 @@ public class BasePageVo {
     private transient Integer pageSizePlus;
     @EntityField(name = "默认值", type = ApiParamType.JSONARRAY)
     private transient JSONArray defaultValue;
+    @JSONField(serialize = false)
+    private transient Long cacheFlushKey;//用于扰乱mybatis的Level 1 Cache
 
     public BasePageVo() {
     }
@@ -136,5 +138,13 @@ public class BasePageVo {
 
     public void setDefaultValue(JSONArray defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public final Long getCacheFlushKey() {
+        return cacheFlushKey;
+    }
+
+    public final void setCacheFlushKey(Long cacheFlushKey) {
+        this.cacheFlushKey = cacheFlushKey;
     }
 }

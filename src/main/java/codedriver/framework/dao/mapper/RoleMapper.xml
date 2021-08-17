@@ -231,7 +231,7 @@
     </insert>
 
     <insert id="insertRoleTeam" parameterType="codedriver.framework.dto.RoleTeamVo">
-        INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
+        INSERT IGNORE INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
         VALUES (#{teamUuid}, #{roleUuid}, #{checkedChildren})
     </insert>
 

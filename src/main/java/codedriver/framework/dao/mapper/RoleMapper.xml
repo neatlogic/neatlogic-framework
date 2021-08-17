@@ -230,6 +230,11 @@
         VALUES (#{userUuid}, #{roleUuid})
     </insert>
 
+    <insert id="insertRoleTeam" parameterType="codedriver.framework.dto.RoleTeamVo">
+        INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
+        VALUES (#{teamUuid}, #{roleUuid}, #{checkedChildren})
+    </insert>
+
     <insert id="insertRoleTeamList" parameterType="java.util.List">
         INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`) VALUES
         <foreach collection="list" item="roleTeam" separator=",">
@@ -251,6 +256,10 @@
         SET `name`        = #{name},
             `description` = #{description}
         WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateTeamRole" parameterType="codedriver.framework.dto.RoleTeamVo">
+        UPDATE `team_role` set `checked_children` = #{checkedChildren} WHERE `role_uuid` = #{roleUuid} AND `team_uuid` = #{teamUuid}
     </update>
 
     <delete id="deleteRoleByUuid" parameterType="java.lang.String">
@@ -312,5 +321,9 @@
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}
         </foreach>
+    </delete>
+
+    <delete id="deleteTeamRole" parameterType="codedriver.framework.dto.RoleTeamVo">
+        DELETE FROM `team_role` WHERE `role_uuid` = #{roleUuid} AND `team_uuid` = #{teamUuid}
     </delete>
 </mapper>

@@ -56,9 +56,13 @@ public interface RoleMapper {
 
     int insertRoleUser(RoleUserVo vo);
 
+    int insertRoleTeam(RoleTeamVo roleTeamVo);
+
     int insertRoleTeamList(List<RoleTeamVo> roleTeamList);
 
     int updateRole(RoleVo roleVo);
+
+    int updateTeamRole(RoleTeamVo roleTeamVo);
 
     int deleteRoleAuthByRoleUuid(String roleUuid);
 
@@ -75,4 +79,6 @@ public interface RoleMapper {
     int deleteRoleUser(RoleUserVo roleUserVo);
 
     int deleteTeamRoleByRoleUuidAndTeamUuidList(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
+
+    int deleteTeamRole(RoleTeamVo roleTeamVo);
 }

@@ -35,6 +35,12 @@ public class RestVo {
 	public RestVo() {
 	}
 
+	public RestVo(String url ,String authType, JSONObject payload) {
+		this.url = url;
+		this.authType = authType;
+		this.payload = payload;
+	}
+
 	public RestVo(String url ,String authType, String username, String password, JSONObject payload) {
 		this.url = url;
 		this.authType = authType;

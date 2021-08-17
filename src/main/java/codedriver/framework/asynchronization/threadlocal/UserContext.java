@@ -72,7 +72,7 @@ public class UserContext implements Serializable {
 		context.setUserUuid(userVo.getUuid());
 		context.setUserName(userVo.getUserName());
 		context.setTenant(userVo.getTenant());
-		context.setToken(userVo.getAuthorization());
+		context.setToken(StringUtils.isBlank(userVo.getAuthorization())?userVo.getCookieAuthorization():userVo.getAuthorization());
 		context.setRequest(request);
 		context.setResponse(response);
 		context.setTimezone(timezone);
@@ -89,7 +89,7 @@ public class UserContext implements Serializable {
 		context.setUserUuid(userVo.getUuid());
 		context.setUserName(userVo.getUserName());
 		context.setTenant(userVo.getTenant());
-		context.setToken(userVo.getAuthorization());
+		context.setToken(StringUtils.isBlank(userVo.getAuthorization())?userVo.getCookieAuthorization():userVo.getAuthorization());
 		context.setTimezone(timezone);
 		for(String roleUuid : userVo.getRoleUuidList()){
 			context.addRole(roleUuid);

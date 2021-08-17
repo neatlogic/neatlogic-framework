@@ -192,10 +192,6 @@
         where `user_uuid` = #{value}
     </select>
 
-    <select id="getTeamUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT `team_uuid` FROM `team_role` WHERE `role_uuid` = #{value}
-    </select>
-
     <select id="getRoleTeamListByRoleUuid" resultType="codedriver.framework.dto.RoleTeamVo">
         SELECT
                `team_uuid` AS teamUuid,

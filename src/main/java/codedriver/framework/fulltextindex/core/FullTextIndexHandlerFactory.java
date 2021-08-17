@@ -1,9 +1,13 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.fulltextindex.core;
 
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RootComponent
-public class FullTextIndexHandlerFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
     private static final Map<IFullTextIndexType, IFullTextIndexHandler> componentMap = new HashMap<>();
     private static final List<IFullTextIndexType> typeList = new ArrayList<>();
 
@@ -28,8 +32,7 @@ public class FullTextIndexHandlerFactory implements ApplicationListener<ContextR
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    public void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IFullTextIndexHandler> myMap = context.getBeansOfType(IFullTextIndexHandler.class);
         for (Map.Entry<String, IFullTextIndexHandler> entry : myMap.entrySet()) {
             IFullTextIndexHandler component = entry.getValue();
@@ -40,5 +43,10 @@ public class FullTextIndexHandlerFactory implements ApplicationListener<ContextR
                 }
             }
         }
+    }
+
+    @Override
+    protected void myInit() {
+
     }
 }

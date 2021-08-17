@@ -1,6 +1,6 @@
 package codedriver.framework.util;
 
-import codedriver.framework.file.core.MinioFileSystemHandler;
+import codedriver.module.framework.file.handler.MinioFileSystemHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

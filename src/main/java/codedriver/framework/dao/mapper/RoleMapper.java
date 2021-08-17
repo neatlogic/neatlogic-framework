@@ -44,8 +44,6 @@ public interface RoleMapper {
 
     List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
-    List<String> getTeamUuidListByRoleUuid(String roleUuid);
-
     List<RoleTeamVo> getRoleTeamListByRoleUuid(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
 
     List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);

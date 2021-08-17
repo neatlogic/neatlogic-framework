@@ -192,10 +192,6 @@
         where `user_uuid` = #{value}
     </select>
 
-    <select id="getTeamUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT `team_uuid` FROM `team_role` WHERE `role_uuid` = #{value}
-    </select>
-
     <select id="getRoleTeamListByRoleUuid" resultType="codedriver.framework.dto.RoleTeamVo">
         SELECT
                `team_uuid` AS teamUuid,
@@ -231,7 +227,7 @@
     </insert>
 
     <insert id="insertRoleTeam" parameterType="codedriver.framework.dto.RoleTeamVo">
-        INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
+        INSERT IGNORE INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
         VALUES (#{teamUuid}, #{roleUuid}, #{checkedChildren})
     </insert>
 

@@ -4,7 +4,6 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
@@ -42,7 +41,7 @@ public class MessageVo {
     public MessageVo(NotifyVo notifyVo) {
         this.title = notifyVo.getTitle();
         this.content = notifyVo.getContent();
-        this.handler = notifyVo.getMessageHandlerClass().getName();
+        this.handler = notifyVo.getMessageHandlerClass().getSimpleName();
         this.fcd = notifyVo.getFcd();
         this.trigger = notifyVo.getTriggerType().getTrigger();
         this.notifyPolicyHandler = notifyVo.getNotifyPolicyHandler();

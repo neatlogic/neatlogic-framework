@@ -1,20 +1,19 @@
-package codedriver.framework.notify.handler;
+/*
+ * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.mail.HtmlEmail;
+package codedriver.module.framework.notify.handler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import codedriver.framework.dao.mapper.MailServerMapper;
-import codedriver.framework.dto.MailServerVo;
-import codedriver.framework.dto.UserVo;
 import codedriver.framework.notify.core.NotifyHandlerBase;
 import codedriver.framework.notify.core.NotifyHandlerType;
 import codedriver.framework.notify.dto.NotifyVo;
-import codedriver.framework.notify.exception.EmailServerNotFoundException;
 
 /**
  * @program: codedriver

@@ -25,7 +25,7 @@ import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
-    protected Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
+    Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
 
     public abstract String getType();
 

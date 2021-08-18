@@ -97,6 +97,8 @@
 
     <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
 
+    <context:component-scan base-package="codedriver.framework" />
+
     <!-- scan for mappers and let them be autowired -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="codedriver.framework.**.mapper"/>
@@ -113,8 +115,6 @@
     </bean>
 
     <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
-
-    <context:component-scan base-package="codedriver.framework" />
 
     <!--<bean id="DatasourceManager" class="codedriver.framework.datasource.DatasourceManagerbean>-->
     <!--<bean id="MongoDbManager" class="codedriver.framework.mongodb.MongoDbManagerbean>-->

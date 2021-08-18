@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="false" xmlns="http://www.springframework.org/schema/beans"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:codedriver="http://codedriver.techsure.com/schema/codedriver"
-       xsi:schemaLocation="http://www.springframework.org/schema/aop
+<beans default-lazy-init="false" xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:util="http://www.springframework.org/schema/util" xmlns:codedriver="http://codedriver.techsure.com/schema/codedriver"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop.xsd 
 		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd 
@@ -21,38 +15,32 @@
 		http://codedriver.techsure.com/schema/codedriver
 		http://codedriver.techsure.com/schema/codedriver.xsd">
 
-    <codedriver:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99"
-                       groupDescription="挖掘更多强大的配置功能"/>
+	<codedriver:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99" groupDescription="挖掘更多强大的配置功能" />
+
+	<context:component-scan base-package="codedriver.framework" />
+
+	<!-- TODO 临时后端测试页面试用 start -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<mvc:resources mapping="/resources/**" location="classpath:/override_resources/, classpath:/META-INF/override_resources/,  /resources/" />
+	<mvc:resources mapping="/WEB-INF/views/commons/**" location="classpath:/resources/WEB-INF/views/commons/" />
+	<!-- TODO 临时后端测试页面试用 end -->
+
+	<!-- enable autowire -->
+	<context:annotation-config />
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- <aop:config proxy-target-class="true" /> -->
+	<!-- 启动expost-proxy,expose proxy在threadlocal -->
+	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false" />
+	<mvc:annotation-driven />
 
 
-    <!-- enable autowire -->
-    <context:annotation-config/>
 
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <!-- <aop:config proxy-target-class="true" /> -->
-    <!-- 启动expost-proxy,expose proxy在threadlocal -->
-    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
-    <mvc:annotation-driven/>
-
-    <context:component-scan base-package="codedriver.module.framework"/>
-
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="codedriver.module.framework.dao.mapper"/>
-    </bean>
-
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="configLocation" value="classpath:codedriver/framework/dao/config/mybatis-config.xml"/>
-        <property name="dataSource" ref="dataSource"/>
-        <property name="mapperLocations">
-            <list>
-                <value>
-                    classpath:codedriver/module/framework/dao/mapper/**/*.xml
-                </value>
-            </list>
-        </property>
-    </bean>
-
-    <!-- 启动Api方法拦截器 -->
-    <!-- <bean id="AuthApiInterceptor" class="codedriver.framework.auth.core.AuthInterceptor"/> <aop:config proxy-target-class="true"> <aop:pointcut id="apiAction" expression="execution(* codedriver.**.myDoService(..))"/> <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/> </aop:config> -->
+	<!-- 启动Api方法拦截器 -->
+	<!-- <bean id="AuthApiInterceptor" class="codedriver.framework.auth.core.AuthInterceptor"/> <aop:config proxy-target-class="true"> <aop:pointcut id="apiAction" expression="execution(* codedriver.**.myDoService(..))"/> <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/> </aop:config> -->
 </beans>

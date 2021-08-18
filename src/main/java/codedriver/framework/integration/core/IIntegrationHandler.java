@@ -1,20 +1,19 @@
 package codedriver.framework.integration.core;
 
-import java.util.List;
-
 import codedriver.framework.exception.core.ApiRuntimeException;
-import org.springframework.util.ClassUtils;
-
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
+import org.springframework.util.ClassUtils;
+
+import java.util.List;
 
 public interface IIntegrationHandler {
 
 	public String getName();
 
 	public default String getHandler() {
-		return ClassUtils.getUserClass(this.getClass()).getName();
+		return ClassUtils.getUserClass(this.getClass()).getSimpleName();
 	}
 
 	public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);

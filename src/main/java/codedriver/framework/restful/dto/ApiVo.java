@@ -14,7 +14,7 @@ import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 
-import codedriver.framework.restful.web.core.ApiAuthFactory;
+import codedriver.framework.restful.auth.core.ApiAuthFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;

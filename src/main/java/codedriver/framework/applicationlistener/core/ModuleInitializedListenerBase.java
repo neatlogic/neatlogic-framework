@@ -7,18 +7,13 @@ package codedriver.framework.applicationlistener.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
-import codedriver.framework.dao.mapper.TenantMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 public abstract class ModuleInitializedListenerBase implements ApplicationListener<ContextRefreshedEvent> {
-    @Resource
-    private TenantMapper tenantMapper;
-
 
     @PostConstruct
     public final void init() {

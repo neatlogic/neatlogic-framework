@@ -6,6 +6,5 @@
 package codedriver.framework.heartbeat.core;
 
 public interface IHeartbreakHandler {
-
     void whenServerInactivated(Integer serverId);
 }

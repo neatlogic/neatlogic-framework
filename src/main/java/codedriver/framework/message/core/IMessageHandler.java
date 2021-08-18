@@ -33,7 +33,7 @@ public interface IMessageHandler {
      * @Returns:java.lang.String
      **/
     public default String getHandler() {
-        return ClassUtils.getUserClass(this.getClass()).getName();
+        return ClassUtils.getUserClass(this.getClass()).getSimpleName();
     }
 
     /**

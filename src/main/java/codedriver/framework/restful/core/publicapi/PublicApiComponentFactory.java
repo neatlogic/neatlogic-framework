@@ -1,8 +1,15 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.core.publicapi;
 
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.TenantMapper;
@@ -18,9 +25,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -28,7 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RootComponent
-public class PublicApiComponentFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
     static Logger logger = LoggerFactory.getLogger(PublicApiComponentFactory.class);
     @Resource
     private TenantMapper tenantMapper;
@@ -48,15 +52,12 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
     private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
     private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
     // 按照token表达式长度排序，最长匹配原则
-    private static final Map<String, ApiVo> regexApiMap = new TreeMap<String, ApiVo>(new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            // 先按照长度排序，如果长度一样按照内容排序
-            if (o1.length() != o2.length()) {
-                return o1.length() - o2.length();
-            } else {
-                return o1.compareTo(o2);
-            }
+    private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
+        // 先按照长度排序，如果长度一样按照内容排序
+        if (o1.length() != o2.length()) {
+            return o1.length() - o2.length();
+        } else {
+            return o1.compareTo(o2);
         }
     });
 
@@ -75,15 +76,13 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
     public static ApiVo getApiByToken(String token) {
         ApiVo apiVo = apiMap.get(token);
         if (apiVo == null) {
-            Iterator<String> keys = regexApiMap.keySet().iterator();
-            while (keys.hasNext()) {
-                String regex = keys.next();
+            for (String regex : regexApiMap.keySet()) {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(token);
                 if (matcher.find()) {
                     apiVo = regexApiMap.get(regex);
                     if (apiVo.getPathVariableList() != null
-                        && apiVo.getPathVariableList().size() == matcher.groupCount()) {
+                            && apiVo.getPathVariableList().size() == matcher.groupCount()) {
                         JSONObject pathVariableObj = new JSONObject();
                         for (int i = 0; i < apiVo.getPathVariableList().size(); i++) {
                             try {
@@ -141,9 +140,9 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
         return apiTokenMap;
     }
 
+
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+    protected void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IPublicApiComponent> myMap = context.getBeansOfType(IPublicApiComponent.class);
         Map<String, IPublicJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPublicJsonStreamApiComponent.class);
         Map<String, IPublicBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPublicBinaryStreamApiComponent.class);
@@ -161,7 +160,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -179,7 +178,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -197,7 +196,7 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
                 restComponentVo.setType(ApiVo.Type.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)),context.getId());
+                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -208,13 +207,19 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
         }
     }
 
-    private static Pattern p = Pattern.compile("\\{([^}]+)\\}");
+    @Override
+    protected void myInit() {
+
+    }
+
+    private static final Pattern p = Pattern.compile("\\{([^}]+)\\}");
 
     /**
      * 初始化apiTokenList apiMap
+     *
      * @param componentJson component入参
      */
-    private void initApiTokenList(JSONObject componentJson,String moduleId){
+    private void initApiTokenList(JSONObject componentJson, String moduleId) {
         String token = componentJson.getString("token");
         if (StringUtils.isNotBlank(token)) {
             if (token.startsWith("/")) {
@@ -242,14 +247,12 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
             if (token.contains("{")) {
                 Matcher m = p.matcher(token);
                 StringBuffer temp = new StringBuffer();
-                int i = 0;
                 while (m.find()) {
                     apiVo.addPathVariable(m.group(1));
                     m.appendReplacement(temp, "([^\\/]+)");
-                    i++;
                 }
                 m.appendTail(temp);
-                String regexToken = "^" + temp.toString() + "$";
+                String regexToken = "^" + temp + "$";
                 if (!regexApiMap.containsKey(regexToken)) {
                     regexApiMap.put(regexToken, apiVo);
                 } else {
@@ -268,12 +271,13 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
     }
 
     /**
-     *  线程类
-     *  初始化
+     * 线程类
+     * 初始化
      */
     class InsertPublicTokenApiRunner extends CodeDriverThread {
         private final String tenantUuid;
-        public InsertPublicTokenApiRunner(String tenantUuid){
+
+        public InsertPublicTokenApiRunner(String tenantUuid) {
             this.tenantUuid = tenantUuid;
         }
 
@@ -282,11 +286,11 @@ public class PublicApiComponentFactory implements ApplicationListener<ContextRef
             Thread.currentThread().setName("PUBLIC-TOKEN-API-INIT-" + tenantUuid);
             // 切换租户数据源
             TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
-            for (ApiVo apiVo :apiTokenList){
-               ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
-               if(api == null){
-                   apiMapper.replaceApi(apiVo);
-               }
+            for (ApiVo apiVo : apiTokenList) {
+                ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
+                if (api == null) {
+                    apiMapper.replaceApi(apiVo);
+                }
             }
         }
     }

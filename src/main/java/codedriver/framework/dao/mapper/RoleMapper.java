@@ -44,8 +44,6 @@ public interface RoleMapper {
 
     List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
-    List<String> getTeamUuidListByRoleUuid(String roleUuid);
-
     List<RoleTeamVo> getRoleTeamListByRoleUuid(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
 
     List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
@@ -56,9 +54,13 @@ public interface RoleMapper {
 
     int insertRoleUser(RoleUserVo vo);
 
+    int insertRoleTeam(RoleTeamVo roleTeamVo);
+
     int insertRoleTeamList(List<RoleTeamVo> roleTeamList);
 
     int updateRole(RoleVo roleVo);
+
+    int updateTeamRole(RoleTeamVo roleTeamVo);
 
     int deleteRoleAuthByRoleUuid(String roleUuid);
 
@@ -75,4 +77,6 @@ public interface RoleMapper {
     int deleteRoleUser(RoleUserVo roleUserVo);
 
     int deleteTeamRoleByRoleUuidAndTeamUuidList(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
+
+    int deleteTeamRole(RoleTeamVo roleTeamVo);
 }

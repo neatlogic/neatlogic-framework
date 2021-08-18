@@ -1,37 +1,41 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.integration.core;
 
-import java.util.ArrayList;
+import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
+import codedriver.framework.common.RootComponent;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-
-import codedriver.framework.common.RootComponent;
-import codedriver.framework.integration.dto.IntegrationHandlerVo;
-
 @RootComponent
-public class IntegrationInvokerFactory implements ApplicationListener<ContextRefreshedEvent> {
+public class IntegrationInvokerFactory extends ModuleInitializedListenerBase {
 
-	private static Map<String, IntegrationInvokerBase> componentMap = new HashMap<>();
+    private static final Map<String, IntegrationInvokerBase> componentMap = new HashMap<>();
 
 
-	public static IntegrationInvokerBase getHandler(IntegrationInvokerBase handler) {
-		return componentMap.get(handler.getHandler());
-	}
+    public static IntegrationInvokerBase getHandler(IntegrationInvokerBase handler) {
+        return componentMap.get(handler.getHandler());
+    }
 
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		ApplicationContext context = event.getApplicationContext();
-		Map<String, IntegrationInvokerBase> myMap = context.getBeansOfType(IntegrationInvokerBase.class);
-		for (Map.Entry<String, IntegrationInvokerBase> entry : myMap.entrySet()) {
-			IntegrationInvokerBase component = entry.getValue();
-			if (component.getHandler() != null) {
-				componentMap.put(component.getHandler(), component);
-			}
-		}
 
-	}
+    @Override
+    protected void onInitialized(CodedriverWebApplicationContext context) {
+        Map<String, IntegrationInvokerBase> myMap = context.getBeansOfType(IntegrationInvokerBase.class);
+        for (Map.Entry<String, IntegrationInvokerBase> entry : myMap.entrySet()) {
+            IntegrationInvokerBase component = entry.getValue();
+            if (component.getHandler() != null) {
+                componentMap.put(component.getHandler(), component);
+            }
+        }
+    }
+
+    @Override
+    protected void myInit() {
+
+    }
 }

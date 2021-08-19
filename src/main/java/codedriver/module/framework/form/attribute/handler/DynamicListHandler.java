@@ -60,8 +60,8 @@ public class DynamicListHandler extends FormHandlerBase {
             resultObj.put("selectUuidList", selectUuidList);
             JSONObject table = dataObj.getJSONObject("table");
             if (MapUtils.isNotEmpty(table)) {
-                resultObj.put("tbodyList", table.getJSONObject("tbodyList"));
-                resultObj.put("theadList", table.getJSONObject("theadList"));
+                resultObj.put("tbodyList", table.getJSONArray("tbodyList"));
+                resultObj.put("theadList", table.getJSONArray("theadList"));
             }
             return resultObj;
         } else if ("dialog".equals(mode)) {

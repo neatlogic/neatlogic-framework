@@ -40,6 +40,11 @@ public class StaticListHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }

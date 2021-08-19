@@ -77,6 +77,11 @@ public class UserSelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return valueConversionText(attributeDataVo, configObj);
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         if (CollectionUtils.isNotEmpty(values)) {
             boolean isMultiple = config.getBooleanValue("isMultiple");

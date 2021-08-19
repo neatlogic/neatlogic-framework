@@ -54,6 +54,11 @@ public class RadioHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return valueConversionText(attributeDataVo, configObj);
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         Object result = null;
         if (CollectionUtils.isNotEmpty(values)) {

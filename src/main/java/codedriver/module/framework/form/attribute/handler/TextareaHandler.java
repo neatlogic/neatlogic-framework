@@ -53,6 +53,11 @@ public class TextareaHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return attributeDataVo.getData();
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         if (CollectionUtils.isNotEmpty(values)) {
             return values.get(0);

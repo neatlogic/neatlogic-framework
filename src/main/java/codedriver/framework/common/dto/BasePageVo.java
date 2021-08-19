@@ -15,9 +15,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Set;
 
-public class BasePageVo {
+public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private transient Boolean needPage = true;
     @JSONField(serialize = false)

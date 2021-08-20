@@ -70,6 +70,14 @@ public class TeamVo extends BasePageVo implements Serializable {
 	private transient String upwardUuidPath;
 	@EntityField(name = "名称路径", type = ApiParamType.STRING)
 	private String upwardNamePath;
+	@JSONField(serialize = false)
+	private transient List<String> parentTeamUuidList;
+	@JSONField(serialize = false)
+	private transient List<String> rangeList;
+	@JSONField(serialize = false)
+	private transient List<String> teamUuidList;
+
+
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
 	}
@@ -279,5 +287,29 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setUpwardNamePath(String upwardNamePath) {
 		this.upwardNamePath = upwardNamePath;
+	}
+
+	public List<String> getParentTeamUuidList() {
+		return parentTeamUuidList;
+	}
+
+	public void setParentTeamUuidList(List<String> parentTeamUuidList) {
+		this.parentTeamUuidList = parentTeamUuidList;
+	}
+
+	public List<String> getRangeList() {
+		return rangeList;
+	}
+
+	public void setRangeList(List<String> rangeList) {
+		this.rangeList = rangeList;
+	}
+
+	public List<String> getTeamUuidList() {
+		return teamUuidList;
+	}
+
+	public void setTeamUuidList(List<String> teamUuidList) {
+		this.teamUuidList = teamUuidList;
 	}
 }

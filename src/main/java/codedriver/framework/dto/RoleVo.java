@@ -39,6 +39,8 @@ public class RoleVo extends BasePageVo implements Serializable {
     private String auth;
     private List<String> userUuidList;
     private List<RoleAuthVo> roleAuthList;
+    @JSONField(serialize = false)
+    private transient List<String> roleUuidList;
 
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
@@ -131,8 +133,15 @@ public class RoleVo extends BasePageVo implements Serializable {
         this.userCount = userCount;
     }
 
-
     public String getInitType() {
         return initType;
+    }
+
+    public List<String> getRoleUuidList() {
+        return roleUuidList;
+    }
+
+    public void setRoleUuidList(List<String> roleUuidList) {
+        this.roleUuidList = roleUuidList;
     }
 }

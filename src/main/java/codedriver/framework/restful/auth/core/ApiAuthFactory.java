@@ -20,7 +20,7 @@ public class ApiAuthFactory extends ModuleInitializedListenerBase {
         return apiAuthMap;
     }
 
-    public static final IApiAuth getApiAuth(String type) {
+    public static IApiAuth getApiAuth(String type) {
         return apiAuthMap.get(type.toUpperCase());
     }
 

@@ -17,7 +17,7 @@ public class AttributeDataVo {
     private String attributeUuid;
     private transient String data;
     private Object dataObj;
-
+    private Integer isMultiple;
     public String getAttributeUuid() {
         return attributeUuid;
     }
@@ -52,6 +52,14 @@ public class AttributeDataVo {
 
     public void setDataObj(Object dataObj) {
         this.dataObj = dataObj;
+    }
+
+    public Integer getIsMultiple() {
+        return isMultiple;
+    }
+
+    public void setIsMultiple(Integer isMultiple) {
+        this.isMultiple = isMultiple;
     }
 
     public boolean dataIsEmpty() {

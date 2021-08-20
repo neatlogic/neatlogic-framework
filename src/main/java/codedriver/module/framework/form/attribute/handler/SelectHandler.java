@@ -57,6 +57,7 @@ public class SelectHandler extends FormHandlerBase {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
+            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
             String dataSource = configObj.getString("dataSource");
             if ("static".equals(dataSource)) {
                 List<ValueTextVo> dataList =

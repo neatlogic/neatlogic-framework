@@ -56,6 +56,7 @@ public class UserSelectHandler extends FormHandlerBase {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
+            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
             if (isMultiple) {
                 List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
                 if (CollectionUtils.isNotEmpty(valueList)) {

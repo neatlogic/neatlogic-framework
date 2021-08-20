@@ -219,15 +219,6 @@
             <if test="roleUuid != null and roleUuid != ''">
                 AND b.`role_uuid` = #{roleUuid}
             </if>
-            <if test="keyword !=null and keyword != ''">
-                ORDER BY(
-                CASE
-                WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
-                WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
-                ELSE 4
-                END
-                )
-            </if>
             <if test="rangeList != null and rangeList.size()>0">
                 and (
                     <if test="userUuidList != null and userUuidList.size()>0">
@@ -256,6 +247,15 @@
                 )
             </if>
         </where>
+        <if test="keyword !=null and keyword != ''">
+            ORDER BY(
+            CASE
+            WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
+            WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+            ELSE 4
+            END
+            )
+        </if>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -81,12 +82,22 @@ public class StaticListHandler extends FormHandlerBase {
                             String text = "";
                             if (StringUtils.isNotBlank(value)) {
                                 JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
-                                JSONArray dataList = attrConfig.getJSONArray("dataList");
-                                for (int k = 0; k < dataList.size(); k++) {
-                                    JSONObject data = dataList.getJSONObject(k);
-                                    String dataValue = data.getString("value");
-                                    if (dataValue.equals(value)) {
-                                        text = data.getString("text");
+                                String dataSource = attrConfig.getString("dataSource");
+                                if ("static".equals(dataSource)) {
+                                    JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                    for (int k = 0; k < dataList.size(); k++) {
+                                        JSONObject data = dataList.getJSONObject(k);
+                                        String dataValue = data.getString("value");
+                                        if (dataValue.equals(value)) {
+                                            text = data.getString("text");
+                                        }
+                                    }
+                                } else if ("matrix".equals(dataSource)) {
+                                    String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                    if (split.length == 2) {
+                                        text = split[1];
+                                    } else {
+                                        text = value;
                                     }
                                 }
                             }
@@ -100,12 +111,22 @@ public class StaticListHandler extends FormHandlerBase {
                                     String text = "";
                                     if (StringUtils.isNotBlank(value)) {
                                         JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
-                                        JSONArray dataList = attrConfig.getJSONArray("dataList");
-                                        for (int k = 0; k < dataList.size(); k++) {
-                                            JSONObject data = dataList.getJSONObject(k);
-                                            String dataValue = data.getString("value");
-                                            if (dataValue.equals(value)) {
-                                                text = data.getString("text");
+                                        String dataSource = attrConfig.getString("dataSource");
+                                        if ("static".equals(dataSource)) {
+                                            JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                            for (int k = 0; k < dataList.size(); k++) {
+                                                JSONObject data = dataList.getJSONObject(k);
+                                                String dataValue = data.getString("value");
+                                                if (dataValue.equals(value)) {
+                                                    text = data.getString("text");
+                                                }
+                                            }
+                                        } else if ("matrix".equals(dataSource)) {
+                                            String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                            if (split.length == 2) {
+                                                text = split[1];
+                                            } else {
+                                                text = value;
                                             }
                                         }
                                     }
@@ -119,12 +140,22 @@ public class StaticListHandler extends FormHandlerBase {
                             String text = "";
                             if (StringUtils.isNotBlank(value)) {
                                 JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
-                                JSONArray dataList = attrConfig.getJSONArray("dataList");
-                                for (int k = 0; k < dataList.size(); k++) {
-                                    JSONObject data = dataList.getJSONObject(k);
-                                    String dataValue = data.getString("value");
-                                    if (dataValue.equals(value)) {
-                                        text = data.getString("text");
+                                String dataSource = attrConfig.getString("dataSource");
+                                if ("static".equals(dataSource)) {
+                                    JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                    for (int k = 0; k < dataList.size(); k++) {
+                                        JSONObject data = dataList.getJSONObject(k);
+                                        String dataValue = data.getString("value");
+                                        if (dataValue.equals(value)) {
+                                            text = data.getString("text");
+                                        }
+                                    }
+                                } else if ("matrix".equals(dataSource)) {
+                                    String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                    if (split.length == 2) {
+                                        text = split[1];
+                                    } else {
+                                        text = value;
                                     }
                                 }
                             }
@@ -138,12 +169,22 @@ public class StaticListHandler extends FormHandlerBase {
                                     String text = "";
                                     if (StringUtils.isNotBlank(value)) {
                                         JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
-                                        JSONArray dataList = attrConfig.getJSONArray("dataList");
-                                        for (int k = 0; k < dataList.size(); k++) {
-                                            JSONObject data = dataList.getJSONObject(k);
-                                            String dataValue = data.getString("value");
-                                            if (dataValue.equals(value)) {
-                                                text = data.getString("text");
+                                        String dataSource = attrConfig.getString("dataSource");
+                                        if ("static".equals(dataSource)) {
+                                            JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                            for (int k = 0; k < dataList.size(); k++) {
+                                                JSONObject data = dataList.getJSONObject(k);
+                                                String dataValue = data.getString("value");
+                                                if (dataValue.equals(value)) {
+                                                    text = data.getString("text");
+                                                }
+                                            }
+                                        } else if ("matrix".equals(dataSource)) {
+                                            String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                            if (split.length == 2) {
+                                                text = split[1];
+                                            } else {
+                                                text = value;
                                             }
                                         }
                                     }

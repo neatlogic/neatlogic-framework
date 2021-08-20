@@ -182,6 +182,14 @@ public interface IFormAttributeHandler {
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj);
 
     /**
+     * 数据转换，用于邮件模板展示表单信息
+     * @param attributeDataVo
+     * @param configObj
+     * @return
+     */
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj);
+
+    /**
      * @Description: 将text转换成表单属性值，暂时用于批量导入工单
      * @Author: laiwt
      * @Date: 2021/1/28 17:06

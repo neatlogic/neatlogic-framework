@@ -52,8 +52,7 @@ public class NotifyPolicyUtil {
                 if (CollectionUtils.isNotEmpty(notifyList)) {
                     /** 模板列表 **/
                     List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
-                    Map<Long, NotifyTemplateVo> templateMap =
-                            templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
+                    Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
                     for (NotifyTriggerNotifyVo notifyObj : notifyList) {
                         /** 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
                         ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
@@ -124,14 +123,14 @@ public class NotifyPolicyUtil {
                                         } else if (Objects.equals(paramMappingVo.getName(),
                                                 paramMappingVo.getValue())) {
                                             if (!templateParamData.containsKey(paramMappingVo.getValue())) {
-                                                logger.error(TenantContext.get().getTenantUuid()+"-没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.warn(TenantContext.get().getTenantUuid()+"-没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         } else {
                                             Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
                                             if (processFieldValue != null) {
                                                 notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
                                             } else {
-                                                logger.error(TenantContext.get().getTenantUuid()+"-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.warn(TenantContext.get().getTenantUuid()+"-没有找到参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         }
                                     }

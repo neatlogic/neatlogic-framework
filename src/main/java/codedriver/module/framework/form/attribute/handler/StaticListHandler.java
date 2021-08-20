@@ -5,7 +5,11 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -37,6 +41,177 @@ public class StaticListHandler extends FormHandlerBase {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONArray dataObj = (JSONArray) attributeDataVo.getDataObj();
+        if (CollectionUtils.isNotEmpty(dataObj)) {
+            JSONArray attributeList = configObj.getJSONArray("attributeList");
+            if (CollectionUtils.isNotEmpty(attributeList)) {
+                JSONArray theadList = new JSONArray();
+                for (int i = 0; i < attributeList.size(); i++) {
+                    JSONObject attributeObj = attributeList.getJSONObject(i);
+                    String attribute = attributeObj.getString("attribute");
+                    JSONObject theadObj = new JSONObject();
+                    theadObj.put("title", attribute);
+                    theadObj.put("key", attribute);
+                    theadList.add(theadObj);
+                }
+                JSONArray tbodyList = new JSONArray();
+                for (int i = 0; i < dataObj.size(); i++) {
+                    JSONObject tbodyObj = new JSONObject();
+                    JSONArray rowData = dataObj.getJSONArray(i);
+                    for (int j = 0; j < rowData.size(); j++) {
+                        JSONObject cellObj = new JSONObject();
+                        JSONObject attributeObj = attributeList.getJSONObject(j);
+                        String attribute = attributeObj.getString("attribute");
+                        String type = attributeObj.getString("type");
+                        cellObj.put("type", type);
+                        if ("text".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            cellObj.put("text", value);
+                        } else if ("textarea".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            cellObj.put("text", value);
+                        } else if ("select".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            String text = "";
+                            if (StringUtils.isNotBlank(value)) {
+                                JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                                String dataSource = attrConfig.getString("dataSource");
+                                if ("static".equals(dataSource)) {
+                                    JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                    for (int k = 0; k < dataList.size(); k++) {
+                                        JSONObject data = dataList.getJSONObject(k);
+                                        String dataValue = data.getString("value");
+                                        if (dataValue.equals(value)) {
+                                            text = data.getString("text");
+                                        }
+                                    }
+                                } else if ("matrix".equals(dataSource)) {
+                                    String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                    if (split.length == 2) {
+                                        text = split[1];
+                                    } else {
+                                        text = value;
+                                    }
+                                }
+                            }
+                            cellObj.put("text", text);
+                        } else if ("selects".equals(type)) {
+                            JSONArray valueList = rowData.getJSONArray(j);
+                            cellObj.put("value", valueList);
+                            JSONArray textList = new JSONArray();
+                            if (CollectionUtils.isNotEmpty(valueList)) {
+                                for (String value : valueList.toJavaList(String.class) ) {
+                                    String text = "";
+                                    if (StringUtils.isNotBlank(value)) {
+                                        JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                                        String dataSource = attrConfig.getString("dataSource");
+                                        if ("static".equals(dataSource)) {
+                                            JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                            for (int k = 0; k < dataList.size(); k++) {
+                                                JSONObject data = dataList.getJSONObject(k);
+                                                String dataValue = data.getString("value");
+                                                if (dataValue.equals(value)) {
+                                                    text = data.getString("text");
+                                                }
+                                            }
+                                        } else if ("matrix".equals(dataSource)) {
+                                            String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                            if (split.length == 2) {
+                                                text = split[1];
+                                            } else {
+                                                text = value;
+                                            }
+                                        }
+                                    }
+                                    textList.add(text);
+                                }
+                            }
+                            cellObj.put("text", textList);
+                        } else if ("radio".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            String text = "";
+                            if (StringUtils.isNotBlank(value)) {
+                                JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                                String dataSource = attrConfig.getString("dataSource");
+                                if ("static".equals(dataSource)) {
+                                    JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                    for (int k = 0; k < dataList.size(); k++) {
+                                        JSONObject data = dataList.getJSONObject(k);
+                                        String dataValue = data.getString("value");
+                                        if (dataValue.equals(value)) {
+                                            text = data.getString("text");
+                                        }
+                                    }
+                                } else if ("matrix".equals(dataSource)) {
+                                    String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                    if (split.length == 2) {
+                                        text = split[1];
+                                    } else {
+                                        text = value;
+                                    }
+                                }
+                            }
+                            cellObj.put("text", text);
+                        } else if ("checkbox".equals(type)) {
+                            JSONArray valueList = rowData.getJSONArray(j);
+                            cellObj.put("value", valueList);
+                            JSONArray textList = new JSONArray();
+                            if (CollectionUtils.isNotEmpty(valueList)) {
+                                for (String value : valueList.toJavaList(String.class) ) {
+                                    String text = "";
+                                    if (StringUtils.isNotBlank(value)) {
+                                        JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                                        String dataSource = attrConfig.getString("dataSource");
+                                        if ("static".equals(dataSource)) {
+                                            JSONArray dataList = attrConfig.getJSONArray("dataList");
+                                            for (int k = 0; k < dataList.size(); k++) {
+                                                JSONObject data = dataList.getJSONObject(k);
+                                                String dataValue = data.getString("value");
+                                                if (dataValue.equals(value)) {
+                                                    text = data.getString("text");
+                                                }
+                                            }
+                                        } else if ("matrix".equals(dataSource)) {
+                                            String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
+                                            if (split.length == 2) {
+                                                text = split[1];
+                                            } else {
+                                                text = value;
+                                            }
+                                        }
+                                    }
+                                    textList.add(text);
+                                }
+                            }
+                            cellObj.put("text", textList);
+                        } else if ("date".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            cellObj.put("text", value);
+                        } else if ("time".equals(type)) {
+                            String value = rowData.getString(j);
+                            cellObj.put("value", value);
+                            cellObj.put("text", value);
+                        }
+                        tbodyObj.put(attribute, cellObj);
+                    }
+                    tbodyList.add(tbodyObj);
+                }
+                JSONObject resutlObj = new JSONObject();
+                resutlObj.put("theadList", theadList);
+                resutlObj.put("tbodyList", tbodyList);
+                return resutlObj;
+            }
+        }
+        return null;
     }
 
     @Override

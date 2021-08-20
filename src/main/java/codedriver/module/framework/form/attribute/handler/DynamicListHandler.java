@@ -6,6 +6,15 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.restful.core.MyApiComponent;
+import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
+import codedriver.framework.restful.dto.ApiVo;
+import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -15,11 +24,13 @@ import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class DynamicListHandler extends FormHandlerBase {
 
+    private final static Logger logger = LoggerFactory.getLogger(DynamicListHandler.class);
     @Override
     public String getHandler() {
         return "formdynamiclist";
@@ -37,6 +48,62 @@ public class DynamicListHandler extends FormHandlerBase {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        String mode = configObj.getString("mode");
+        if ("normal".equals(mode)) {
+            JSONObject resultObj = new JSONObject();
+            JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+            JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+            resultObj.put("selectUuidList", selectUuidList);
+            JSONObject table = dataObj.getJSONObject("table");
+            if (MapUtils.isNotEmpty(table)) {
+                resultObj.put("tbodyList", table.getJSONArray("tbodyList"));
+                resultObj.put("theadList", table.getJSONArray("theadList"));
+            }
+            return resultObj;
+        } else if ("dialog".equals(mode)) {
+            JSONArray dataObj = (JSONArray) attributeDataVo.getDataObj();
+            if (CollectionUtils.isNotEmpty(dataObj)) {
+                String matrixUuid = configObj.getString("matrixUuid");
+                String uuidColumn = configObj.getString("uuidColumn");
+                List<String> columnList = new ArrayList<>();
+                JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+                if (CollectionUtils.isNotEmpty(columnHeadList)) {
+                    for (int i = 0; i < columnHeadList.size(); i++) {
+                        JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+                        String uuid = columnHeadObj.getString("uuid");
+                        if (StringUtils.isNotBlank(uuid)) {
+                            columnList.add(uuid);
+                        }
+                    }
+                }
+                ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/init/fortable");
+                if (api != null) {
+                    MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
+                    if (restComponent != null) {
+                        JSONObject paramObj = new JSONObject();
+                        paramObj.put("matrixUuid", matrixUuid);
+                        paramObj.put("columnList", columnList);
+                        paramObj.put("uuidList", dataObj);
+                        paramObj.put("uuidColumn", uuidColumn);
+                        paramObj.put("needPage", false);
+                        try {
+                            JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
+                            if (MapUtils.isNotEmpty(resultObj)) {
+                                resultObj.put("selectUuidList", dataObj);
+                            }
+                            return resultObj;
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override

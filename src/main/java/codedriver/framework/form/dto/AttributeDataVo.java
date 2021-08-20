@@ -15,8 +15,9 @@ import com.alibaba.fastjson.JSONObject;
 
 public class AttributeDataVo {
     private String attributeUuid;
-    private String data;
-
+    private transient String data;
+    private Object dataObj;
+    private Integer isMultiple;
     public String getAttributeUuid() {
         return attributeUuid;
     }
@@ -34,6 +35,9 @@ public class AttributeDataVo {
     }
 
     public Object getDataObj() {
+        if (dataObj != null) {
+            return dataObj;
+        }
         if (data == null) {
             return null;
         }
@@ -44,6 +48,18 @@ public class AttributeDataVo {
         } else {
             return data;
         }
+    }
+
+    public void setDataObj(Object dataObj) {
+        this.dataObj = dataObj;
+    }
+
+    public Integer getIsMultiple() {
+        return isMultiple;
+    }
+
+    public void setIsMultiple(Integer isMultiple) {
+        this.isMultiple = isMultiple;
     }
 
     public boolean dataIsEmpty() {

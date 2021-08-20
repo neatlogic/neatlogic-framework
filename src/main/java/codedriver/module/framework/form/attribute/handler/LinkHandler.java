@@ -36,6 +36,11 @@ public class LinkHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return attributeDataVo.getData();
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }

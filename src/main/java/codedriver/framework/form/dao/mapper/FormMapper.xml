@@ -285,7 +285,7 @@
     </insert>
 
     <insert id="insertFormAttributeMatrix" parameterType="codedriver.framework.form.dto.FormAttributeMatrixVo">
-        INSERT INTO `form_attribute_matrix` (
+        INSERT IGNORE INTO `form_attribute_matrix` (
             `form_version_uuid`,
             `matrix_uuid`,
             `form_attribute_uuid`,

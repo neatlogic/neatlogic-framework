@@ -36,6 +36,11 @@ public class PriorityHandler extends ControlHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return attributeDataVo.getData();
+    }
+
+    @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }

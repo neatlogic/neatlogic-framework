@@ -5,19 +5,19 @@
 
 package codedriver.module.framework.groupsearch.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class RoleGroupHandler implements IGroupSearchHandler {
 	@Autowired
@@ -48,6 +48,17 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 		roleVo.setPageSize(total);
 		roleVo.setCurrentPage(1);
 		roleVo.setKeyword(jsonObj.getString("keyword"));
+		//如果存在rangeList 则需要过滤option
+		List<Object> rangeList = jsonObj.getJSONArray("rangeList");
+		if(CollectionUtils.isNotEmpty(rangeList)){
+			List<String> roleUuidList = new ArrayList<>();
+			rangeList.forEach(r->{
+				if(r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())) {
+					roleUuidList.add(GroupSearch.removePrefix(r.toString()));
+				}
+			});
+			roleVo.setRoleUuidList(roleUuidList);
+		}
 		roleList = roleMapper.searchRole(roleVo);
 		return (List<T>) roleList;
 	}

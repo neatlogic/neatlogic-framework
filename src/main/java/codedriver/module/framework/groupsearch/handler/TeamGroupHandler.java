@@ -8,7 +8,9 @@ package codedriver.module.framework.groupsearch.handler;
 import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.util.CommonUtil;
+import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
+import codedriver.framework.dto.RoleTeamVo;
 import codedriver.framework.dto.TeamVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
 import com.alibaba.fastjson.JSONArray;
@@ -18,14 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 @Service
 public class TeamGroupHandler implements IGroupSearchHandler {
 	@Autowired
 	private TeamMapper teamMapper;
+	@Autowired
+	private RoleMapper roleMapper;
 	
 	@Override
 	public String getName() {
@@ -52,6 +54,33 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 		teamVo.setCurrentPage(1);
 		teamVo.setKeyword(jsonObj.getString("keyword"));
 		teamVo.setIsDelete(0);
+		//如果存在rangeList 则需要过滤option
+		List<Object> rangeList = jsonObj.getJSONArray("rangeList");
+		if(CollectionUtils.isNotEmpty(rangeList)){
+			List<String> roleList = new ArrayList<>();
+			Set<String> teamSet = new HashSet<>();
+			Set<String> parentTeamSet = new HashSet<>();
+			rangeList.forEach(r->{
+				if(r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())){
+					roleList.add(GroupSearch.removePrefix(r.toString()));
+				} else if(r.toString().startsWith(GroupSearch.TEAM.getValuePlugin())){
+					teamSet.add(GroupSearch.removePrefix(r.toString()));
+				}
+			});
+			if(CollectionUtils.isNotEmpty(roleList)) {
+				List<RoleTeamVo> roleTeamVoList = roleMapper.getRoleTeamListByRoleUuidList(roleList);
+				roleTeamVoList.forEach(rt->{
+					if(rt.getCheckedChildren() == 1){//如果组穿透
+						parentTeamSet.add(rt.getTeamUuid());
+					}else{
+						teamSet.add(rt.getTeamUuid());
+					}
+				});
+			}
+			teamVo.setTeamUuidList(new ArrayList<>(teamSet));
+			teamVo.setParentTeamUuidList(new ArrayList<>(parentTeamSet));
+			teamVo.setRangeList(rangeList.stream().map(Object::toString).collect(Collectors.toList()));
+		}
 		teamList = teamMapper.searchTeam(teamVo);
 		setFullPathAndParentName(teamList);
 		return (List<T>) teamList;

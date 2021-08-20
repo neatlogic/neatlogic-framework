@@ -40,17 +40,23 @@
         FROM `role` a
         LEFT JOIN `user_role` b ON a.`uuid` = b.`role_uuid`
         LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
-        WHERE
-        1=1
-        <if test="keyword != null and keyword != ''">
-            AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
-        </if>
-        <if test="authGroup != null and authGroup != ''">
-            AND c.`auth_group` = #{authGroup}
-        </if>
-        <if test="auth != null and auth != ''">
-            AND c.`auth` = #{auth}
-        </if>
+       <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
+            </if>
+            <if test="authGroup != null and authGroup != ''">
+                AND c.`auth_group` = #{authGroup}
+            </if>
+            <if test="auth != null and auth != ''">
+                AND c.`auth` = #{auth}
+            </if>
+           <if test="roleUuidList != null and roleUuidList.size()>0">
+               and uuid in
+               <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                   #{roleUuid}
+               </foreach>
+           </if>
+       </where>
         GROUP BY a.`uuid`
         ORDER BY a.`id` DESC
         <if test="needPage == true">
@@ -194,8 +200,8 @@
 
     <select id="getRoleTeamListByRoleUuid" resultType="codedriver.framework.dto.RoleTeamVo">
         SELECT
-               `team_uuid` AS teamUuid,
-               `checked_children` AS checkedChildren
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
         FROM `team_role`
         WHERE `role_uuid` = #{roleUuid}
         <if test="teamUuidList != null and teamUuidList.size() > 0">
@@ -204,6 +210,27 @@
                 #{teamUuid}
             </foreach>
         </if>
+    </select>
+
+    <select id="getRoleTeamListByRoleUuidList" resultType="codedriver.framework.dto.RoleTeamVo" useCache="false">
+        SELECT
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
+        FROM `team_role`
+        WHERE `role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
+    </select>
+
+    <select id="getRoleUserListByRoleUuidList" resultType="codedriver.framework.dto.RoleUserVo" useCache="false">
+        SELECT
+        `user_uuid` AS userUuid
+        FROM `user_role`
+        WHERE `role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
     </select>
 
     <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
@@ -255,7 +282,10 @@
     </update>
 
     <update id="updateTeamRole" parameterType="codedriver.framework.dto.RoleTeamVo">
-        UPDATE `team_role` set `checked_children` = #{checkedChildren} WHERE `role_uuid` = #{roleUuid} AND `team_uuid` = #{teamUuid}
+        UPDATE `team_role`
+        set `checked_children` = #{checkedChildren}
+        WHERE `role_uuid` = #{roleUuid}
+          AND `team_uuid` = #{teamUuid}
     </update>
 
     <delete id="deleteRoleByUuid" parameterType="java.lang.String">
@@ -320,6 +350,9 @@
     </delete>
 
     <delete id="deleteTeamRole" parameterType="codedriver.framework.dto.RoleTeamVo">
-        DELETE FROM `team_role` WHERE `role_uuid` = #{roleUuid} AND `team_uuid` = #{teamUuid}
+        DELETE
+        FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+          AND `team_uuid` = #{teamUuid}
     </delete>
 </mapper>

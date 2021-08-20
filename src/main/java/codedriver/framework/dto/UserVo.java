@@ -29,9 +29,6 @@ import java.util.List;
 public class UserVo extends BasePageVo implements Serializable {
 
     private static final long serialVersionUID = 3670529362145832083L;
-    @JSONField(serialize = false)
-    private transient String keyword;
-
     private Long id;
     @EntityField(name = "用户uuid", type = ApiParamType.STRING)
     private String uuid;
@@ -90,7 +87,12 @@ public class UserVo extends BasePageVo implements Serializable {
     private String cookieAuthorization;
     @JSONField(serialize = false)
     private String authorization;
-
+    @JSONField(serialize = false)
+    private transient List<String> userUuidList;
+    @JSONField(serialize = false)
+    private transient List<String> parentTeamUuidList;
+    @JSONField(serialize = false)
+    private transient List<String> rangeList;
 
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
@@ -480,5 +482,27 @@ public class UserVo extends BasePageVo implements Serializable {
         this.authorization = authorization;
     }
 
+    public List<String> getUserUuidList() {
+        return userUuidList;
+    }
 
+    public void setUserUuidList(List<String> userUuidList) {
+        this.userUuidList = userUuidList;
+    }
+
+    public List<String> getParentTeamUuidList() {
+        return parentTeamUuidList;
+    }
+
+    public void setParentTeamUuidList(List<String> parentTeamUuidList) {
+        this.parentTeamUuidList = parentTeamUuidList;
+    }
+
+    public List<String> getRangeList() {
+        return rangeList;
+    }
+
+    public void setRangeList(List<String> rangeList) {
+        this.rangeList = rangeList;
+    }
 }

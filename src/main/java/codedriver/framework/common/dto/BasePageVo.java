@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
-    private transient Boolean needPage = true;
+    private transient boolean needPage = true;
     @JSONField(serialize = false)
     @EntityField(name = "每页条数", type = ApiParamType.INTEGER)
     private transient Integer pageSize = 20;

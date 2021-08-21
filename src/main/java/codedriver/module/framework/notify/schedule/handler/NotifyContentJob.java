@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -35,15 +35,15 @@ public class NotifyContentJob extends JobBase {
     private NotifyJobMapper notifyJobMapper;
 
 	@Override
-	public Boolean checkCronIsExpired(JobObject jobObject) {
-		NotifyJobVo jobVo = notifyJobMapper.getJobBaseInfoById(Long.valueOf(jobObject.getJobName()));
-		if (jobVo != null) {
-			if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public Boolean isHealthy(JobObject jobObject) {
+        NotifyJobVo jobVo = notifyJobMapper.getJobBaseInfoById(Long.valueOf(jobObject.getJobName()));
+        if (jobVo != null) {
+            if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	@Override
 	public void reloadJob(JobObject jobObject) {

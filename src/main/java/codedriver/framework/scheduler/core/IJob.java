@@ -55,12 +55,12 @@ public interface IJob extends Job {
     Boolean valid(List<JobPropVo> jobPropVoList);
 
     /**
-     * 检查作业表达式是否已经过时
+     * 检查作业是否正常，不正常的作业需要重新加载
      *
      * @param jobObject 作业信息
      * @return 是或否
      */
-    Boolean checkCronIsExpired(JobObject jobObject);
+    Boolean isHealthy(JobObject jobObject);
 
     /**
      * 重新加载单个作业

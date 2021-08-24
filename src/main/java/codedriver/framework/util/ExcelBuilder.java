@@ -24,6 +24,8 @@ public class ExcelBuilder {
     private List<Map<String, Object>> dataList;
     private HSSFColor.HSSFColorPredefined headBgColor;
     private HSSFColor.HSSFColorPredefined headFontColor;
+    private HSSFColor.HSSFColorPredefined borderColor;
+    private Integer columnWidth;
 
     public ExcelBuilder(Class<? extends Workbook> workbookClass) {
         this.workbookClass = workbookClass;
@@ -36,6 +38,11 @@ public class ExcelBuilder {
 
     public ExcelBuilder withSheet(Sheet sheet) {
         this.sheet = sheet;
+        return this;
+    }
+
+    public ExcelBuilder withColumnWidth(Integer columnWidth) {
+        this.columnWidth = columnWidth;
         return this;
     }
 
@@ -69,9 +76,20 @@ public class ExcelBuilder {
         return this;
     }
 
+    public ExcelBuilder withBorderColor(HSSFColor.HSSFColorPredefined color) {
+        this.borderColor = color;
+        return this;
+    }
+
     private void makeupBody(Cell cell) {
         if (workbook != null) {
             CellStyle style = workbook.createCellStyle();
+            if (this.borderColor != null) {
+                style.setBottomBorderColor(borderColor.getIndex());
+                style.setTopBorderColor(borderColor.getIndex());
+                style.setLeftBorderColor(borderColor.getIndex());
+                style.setRightBorderColor(borderColor.getIndex());
+            }
             style.setBorderBottom(BorderStyle.THIN);
             style.setBorderLeft(BorderStyle.THIN);
             style.setBorderRight(BorderStyle.THIN);
@@ -93,6 +111,13 @@ public class ExcelBuilder {
                 font.setColor(headFontColor.getIndex());
                 style.setFont(font);
             }
+            if (this.borderColor != null) {
+                style.setBottomBorderColor(borderColor.getIndex());
+                style.setTopBorderColor(borderColor.getIndex());
+                style.setLeftBorderColor(borderColor.getIndex());
+                style.setRightBorderColor(borderColor.getIndex());
+            }
+            style.setAlignment(HorizontalAlignment.CENTER);
             style.setBorderBottom(BorderStyle.THIN);
             style.setBorderLeft(BorderStyle.THIN);
             style.setBorderRight(BorderStyle.THIN);
@@ -118,6 +143,14 @@ public class ExcelBuilder {
             } else {
                 this.sheet = this.workbook.createSheet();
             }
+        }
+        //设置列宽
+        if (this.columnWidth != null && CollectionUtils.isNotEmpty(columnList)) {
+            for (int i = 0; i < columnList.size(); i++) {
+                this.sheet.setColumnWidth(i, this.columnWidth * 256);
+            }
+        } else {
+            this.sheet.setDefaultColumnWidth(15);
         }
         //生成标题行
         if (CollectionUtils.isNotEmpty(headerList)) {

@@ -102,6 +102,8 @@ public interface UserMapper {
 
     UserTitleVo getUserTitleLockByName(String title);
 
+    UserTitleVo getUserTitleByName(String title);
+
     int checkUserExistsInUserAgent(String userUuid);
 
     int checkAgentExistsInUserAgent(String agentUuid);

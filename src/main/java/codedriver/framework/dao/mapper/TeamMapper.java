@@ -25,11 +25,11 @@ public interface TeamMapper {
 
     List<TeamVo> getAllSonTeamByParentTeamList(@Param("list") List<TeamVo> list);
 
-	List<TeamVo> searchTeam(TeamVo teamVo);
+    List<TeamVo> searchTeam(TeamVo teamVo);
 
-	List<TeamVo> searchTeamOrderByNameLengthForSelect(TeamVo teamVo);
+    List<TeamVo> searchTeamOrderByNameLengthForSelect(TeamVo teamVo);
 
-	List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid,@Param("list") List<String> level);
+    List<TeamVo> searchTeamByUserUuidAndLevelList(@Param("userUuid") String userUuid, @Param("list") List<String> level);
 
     List<ValueTextVo> searchTeamForSelect(TeamVo teamVo);
 
@@ -40,6 +40,8 @@ public interface TeamMapper {
     List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
 
     List<String> getTeamUuidListByUserUuid(String userUuid);
+
+    List<TeamVo> getTeamListByUserUuid(String userUuid);
 
     String getTeamLockByUuid(String uuid);
 
@@ -99,6 +101,8 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByTeamUuidList(@Param("teamUuidList") List<String> teamUuidList);
 
+    List<TeamUserTitleVo> getTeamUserTitleListByTeamlrAndTitleId(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("titleId") Long titleId);
+
     int checkTitleIsReferenceByTitleId(Long id);
 
 //	 int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
@@ -142,4 +146,5 @@ public interface TeamMapper {
     int deleteTeamUserTitleByTeamUuidAndTitle(@Param("teamUuid") String teamUuid, @Param("titleId") Long titleId);
 
     int deleteTeamUserTitleByTeamUuid(String uuid);
+
 }

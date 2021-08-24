@@ -190,7 +190,7 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-formlist";
+        return "tsfont-formcascadelist";
     }
 
     @Override

@@ -61,7 +61,7 @@ public class TextHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-textmodule";
+        return "tsfont-forminput";
     }
 
     @Override

@@ -37,7 +37,10 @@ public class LinkHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
+        String value = configObj.getString("value");
+        String text = configObj.getString("text");
+        String target = configObj.getString("target");
+        return "<a href='" + value + "' target='"+ target +"'>" + text + "</a>";
     }
 
     @Override
@@ -52,7 +55,7 @@ public class LinkHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-textmodule";
+        return "tsfont-formlink";
     }
 
     @Override

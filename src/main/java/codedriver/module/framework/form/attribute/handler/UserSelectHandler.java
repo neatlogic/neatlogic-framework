@@ -200,7 +200,7 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-user";
+        return "tsfont-userinfo";
     }
 
     @Override

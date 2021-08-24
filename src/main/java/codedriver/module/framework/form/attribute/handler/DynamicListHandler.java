@@ -115,7 +115,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-viewlist";
+        return "tsfont-formdynamiclist";
     }
 
     @Override

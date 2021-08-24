@@ -61,7 +61,7 @@ public class TimeHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-timer";
+        return "tsfont-formtime";
     }
 
     @Override

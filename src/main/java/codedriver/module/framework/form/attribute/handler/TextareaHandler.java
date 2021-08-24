@@ -31,7 +31,7 @@ public class TextareaHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-text";
+        return "tsfont-formtextarea";
     }
 
     @Override

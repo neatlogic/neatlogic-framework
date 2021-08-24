@@ -233,7 +233,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-list";
+        return "tsfont-formstaticlist";
     }
 
     @Override

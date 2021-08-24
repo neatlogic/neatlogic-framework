@@ -200,6 +200,14 @@ public class StaticListHandler extends FormHandlerBase {
                             String value = rowData.getString(j);
                             cellObj.put("value", value);
                             cellObj.put("text", value);
+                        } else if ("table".equals(type)) {
+                            JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                            JSONArray valueList = rowData.getJSONArray(j);
+                            AttributeDataVo attributeData = new AttributeDataVo();
+                            attributeData.setDataObj(valueList);
+                            Object tableData = dataTransformationForEmail(attributeData, attrConfig);
+                            cellObj.put("value", valueList);
+                            cellObj.put("text", tableData);
                         }
                         tbodyObj.put(attribute, cellObj);
                     }

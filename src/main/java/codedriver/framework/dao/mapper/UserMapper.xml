@@ -221,29 +221,29 @@
             </if>
             <if test="rangeList != null and rangeList.size()>0">
                 and (
+                <if test="userUuidList != null and userUuidList.size()>0">
+                    a.uuid in
+                    <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                        #{userUuid}
+                    </foreach>
+                </if>
+                <if test="teamUuidList != null and teamUuidList.size()>0">
                     <if test="userUuidList != null and userUuidList.size()>0">
-                        a.uuid in
-                        <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
-                            #{userUuid}
-                        </foreach>
-                    </if>
-                    <if test="teamUuidList != null and teamUuidList.size()>0">
-                        <if test="userUuidList != null and userUuidList.size()>0">
                         or
-                        </if>
-                        d.uuid in
-                        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                            #{teamUuid}
-                        </foreach>
                     </if>
-                    <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
-                        <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
-                            or
-                        </if>
-                        <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
-                            d.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
-                        </foreach>
+                    d.uuid in
+                    <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                </if>
+                <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
+                    <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
+                        or
                     </if>
+                    <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
+                        d.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                    </foreach>
+                </if>
                 )
             </if>
         </where>
@@ -1009,6 +1009,11 @@
         from `user_title`
         where `name` = #{value} for
         update
+    </select>
+    <select id="getUserTitleByName" resultType="codedriver.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `name` = #{value}
     </select>
     <select id="getUserTitleListLockByTitleNameList" resultType="codedriver.framework.dto.UserTitleVo">
         select `id`, `name`

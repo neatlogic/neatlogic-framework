@@ -37,20 +37,20 @@
             </if>
             <if test="rangeList != null and rangeList.size()>0">
                 and (
+                <if test="teamUuidList != null and teamUuidList.size()>0">
+                    uuid in
+                    <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                </if>
+                <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
                     <if test="teamUuidList != null and teamUuidList.size()>0">
-                        uuid in
-                        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                            #{teamUuid}
-                        </foreach>
+                        or
                     </if>
-                    <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
-                        <if test="teamUuidList != null and teamUuidList.size()>0">
-                            or
-                        </if>
-                        <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
-                            `upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
-                        </foreach>
-                    </if>
+                    <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
+                        `upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                    </foreach>
+                </if>
                 )
             </if>
         </where>
@@ -322,6 +322,14 @@
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
 
+    <select id="getTeamListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamVo"
+            useCache="true">
+        SELECT t.uuid, t.name, t.lft, t.rht
+        FROM `user_team` ut
+                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+        WHERE ut.`user_uuid` = #{userUuid};
+    </select>
+
     <select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
         SELECT `uuid`
         FROM `team`
@@ -390,8 +398,11 @@
     </select>
 
     <select id="getUpwardTeamNameListByLftRht" resultType="java.lang.String" useCache="false">
-        SELECT `name` FROM `team`
-        WHERE `lft` &lt;= #{lft} AND `rht` &gt;= #{rht} and `is_delete` = 0
+        SELECT `name`
+        FROM `team`
+        WHERE `lft` &lt;= #{lft}
+          AND `rht` &gt;= #{rht}
+          and `is_delete` = 0
         ORDER BY `lft` ASC
     </select>
 
@@ -544,7 +555,7 @@
                u.`user_id`     AS userId,
                u.`uuid`        as userUuid,
                u.`user_info`   AS userInfo,
-               ut.`id`       AS titleId,
+               ut.`id`         AS titleId,
                ut.`name`       AS title
         FROM `team_user_title` tut
                  LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
@@ -558,18 +569,35 @@
     </select>
     <select id="getTeamUserTitleListByTeamUuidList" resultMap="teamUserTitleMap">
         SELECT tut.`team_uuid` AS teamUuid,
-               u.`user_name`   AS userName,
-               u.`user_id`     AS userId,
-               u.`uuid`        as userUuid,
-               u.`user_info`   AS userInfo,
-               ut.`name`       AS title
+        u.`user_name` AS userName,
+        u.`user_id` AS userId,
+        u.`uuid` as userUuid,
+        u.`user_info` AS userInfo,
+        ut.`name` AS title
         FROM `team_user_title` tut
-                 LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
-                 LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
-        where tut.`team_uuid` in 
+        LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
+        LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
+        where tut.`team_uuid` in
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}
         </foreach>
+    </select>
+    <select id="getTeamUserTitleListByTeamlrAndTitleId" resultMap="teamUserTitleMap">
+        SELECT tut.`team_uuid` AS teamUuid,
+               u.`user_name`   AS userName,
+               u.`user_id`     AS userId,
+               u.`uuid`        AS userUuid,
+               u.`user_info`   AS userInfo,
+               ut.`id`         AS titleId,
+               ut.`name`       AS title
+        FROM `team` t
+                 LEFT JOIN team_user_title tut ON t.`uuid` = tut.`team_uuid`
+                 LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
+                 LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
+        WHERE tut.`title_id` = #{titleId}
+          AND t.`lft` &lt;= #{lft}
+          AND t.`rht` >= #{rht}
+        ORDER BY t.lft DESC
     </select>
 
     <insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
@@ -582,8 +610,7 @@
                             `level`,
                             `upward_uuid_path`,
                             `upward_name_path`,
-                            `is_delete`
-                            )
+                            `is_delete`)
         VALUES (#{id},
                 #{uuid},
                 #{name},
@@ -603,9 +630,9 @@
                 #{userUuid})
     </insert>
     <insert id="insertTeamUserTitle">
-        INSERT INTO `team_user_title` (`team_uuid`,
-                                       `user_uuid`,
-                                       `title_id`)
+        INSERT ignore INTO `team_user_title` (`team_uuid`,
+                                              `user_uuid`,
+                                              `title_id`)
         VALUES (#{teamUuid},
                 #{userUuid},
                 #{titleId});

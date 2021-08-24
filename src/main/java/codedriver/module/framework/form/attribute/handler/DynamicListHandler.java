@@ -52,9 +52,9 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
         String mode = configObj.getString("mode");
         if ("normal".equals(mode)) {
-            JSONObject resultObj = new JSONObject();
             JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
             JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
             resultObj.put("selectUuidList", selectUuidList);
@@ -63,7 +63,6 @@ public class DynamicListHandler extends FormHandlerBase {
                 resultObj.put("tbodyList", table.getJSONArray("tbodyList"));
                 resultObj.put("theadList", table.getJSONArray("theadList"));
             }
-            return resultObj;
         } else if ("dialog".equals(mode)) {
             JSONArray dataObj = (JSONArray) attributeDataVo.getDataObj();
             if (CollectionUtils.isNotEmpty(dataObj)) {
@@ -91,11 +90,9 @@ public class DynamicListHandler extends FormHandlerBase {
                         paramObj.put("uuidColumn", uuidColumn);
                         paramObj.put("needPage", false);
                         try {
-                            JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
                             if (MapUtils.isNotEmpty(resultObj)) {
                                 resultObj.put("selectUuidList", dataObj);
                             }
-                            return resultObj;
                         } catch (Exception e) {
                             logger.error(e.getMessage(), e);
                         }
@@ -103,7 +100,7 @@ public class DynamicListHandler extends FormHandlerBase {
                 }
             }
         }
-        return null;
+        return resultObj;
     }
 
     @Override

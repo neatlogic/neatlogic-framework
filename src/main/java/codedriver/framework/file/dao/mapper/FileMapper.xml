@@ -44,9 +44,9 @@
 	</select>
     <select id="getFileListByProcessTaskId" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
 		SELECT
-			a.`id`,
-			a.`name`,
-			a.`size`,
+		    a.`id`,
+		    a.`name`,
+		    a.`size`,
 		    a.`user_uuid` as userUuid,
 		    a.`upload_time` as uploadTime,
 		    a.`type`,

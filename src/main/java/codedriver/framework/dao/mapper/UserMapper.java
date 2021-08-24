@@ -156,6 +156,8 @@ public interface UserMapper {
 
     UserTitleVo getUserTitleById(Long id);
 
+    List<UserTitleVo> getUserTitleListByUserUuid(String userUuid);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);

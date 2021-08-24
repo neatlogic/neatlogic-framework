@@ -1040,6 +1040,16 @@
         from `user_title`
         where `id` = #{value}
     </select>
+    <select id="getUserTitleListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserTitleVo">
+        select
+            a.`id`,
+            a.`name`
+        from
+            `user_title` a
+            join `team_user_title` b
+            on a.`id` = b.`title_id`
+        where b.`user_uuid` = #{value}
+    </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         INSERT INTO `user_authority`(`user_uuid`,

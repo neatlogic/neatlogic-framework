@@ -53,10 +53,10 @@
 		    a.`content_type` as contentType,
 		    a.`path`
 		FROM
-			`file` a
-			JOIN `processtask_file` b ON a.`id` = b.`file_id`
+		    `file` a
+		    JOIN `processtask_file` b ON a.`id` = b.`file_id`
 		WHERE
-			`processtask_id` = #{value}
+		    `processtask_id` = #{value}
 	</select>
 
 	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">

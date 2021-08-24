@@ -6,13 +6,15 @@ import codedriver.framework.file.dto.FileTypeVo;
 import codedriver.framework.file.dto.FileVo;
 
 public interface FileMapper {
-	public FileVo getFileById(Long id);
+	FileVo getFileById(Long id);
 
-	public FileTypeVo getFileTypeConfigByType(String name);
+	FileTypeVo getFileTypeConfigByType(String name);
 
-	public List<FileVo> getFileListByIdList(List<Long> idList);
+	List<FileVo> getFileListByIdList(List<Long> idList);
 
-	public int insertFile(FileVo fileVo);
+	List<FileVo> getFileListByProcessTaskId(Long processTaskId);
 
-	public void deleteFile(Long fileId);
+	int insertFile(FileVo fileVo);
+
+	void deleteFile(Long fileId);
 }

@@ -42,6 +42,22 @@
 		#{id}
 		</foreach>
 	</select>
+    <select id="getFileListByProcessTaskId" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
+		SELECT
+			a.`id`,
+			a.`name`,
+			a.`size`,
+		    a.`user_uuid` as userUuid,
+		    a.`upload_time` as uploadTime,
+		    a.`type`,
+		    a.`content_type` as contentType,
+		    a.`path`
+		FROM
+			`file` a
+			JOIN `processtask_file` b ON a.`id` = b.`file_id`
+		WHERE
+			`processtask_id` = #{value}
+	</select>
 
 	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
 		INSERT INTO `file` (

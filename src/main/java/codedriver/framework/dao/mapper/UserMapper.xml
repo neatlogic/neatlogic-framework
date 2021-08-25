@@ -560,11 +560,11 @@
           AND a.`is_active` = 1
     </select>
 
-    <select id="getUserSessionByUserUuid" parameterType="java.lang.String"
+    <select id="getUserSessionLockByUserUuid" parameterType="java.lang.String"
             resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
         SELECT `user_uuid` as userUuid, `visit_time` as sessionTime
         FROM `user_session`
-        WHERE `user_uuid` = #{value}
+        WHERE `user_uuid` = #{value} for update
     </select>
 
     <select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"

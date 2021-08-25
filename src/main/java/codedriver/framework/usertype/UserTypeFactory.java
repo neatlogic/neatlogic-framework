@@ -5,13 +5,13 @@
 
 package codedriver.framework.usertype;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.constvalue.IUserType;
+import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.UserTypeVo;
 import org.reflections.Reflections;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class UserTypeFactory {
 	private static final Map<String, UserTypeVo> userTypeMap = new HashMap<>();
@@ -30,6 +30,13 @@ public class UserTypeFactory {
 		}
 	}
 	public static Map<String,UserTypeVo> getUserTypeMap() {
+		List<ModuleGroupVo> groupVoList = TenantContext.get().getActiveModuleGroupList();
+		for (Map.Entry<String, UserTypeVo> entry : userTypeMap.entrySet()) {
+			String moduleGroup = entry.getKey();
+			if (groupVoList.stream().noneMatch(o -> Objects.equals(moduleGroup, o.getGroup()))) {
+				userTypeMap.remove(moduleGroup);
+			}
+		}
 		return userTypeMap;
 	}
 	

@@ -21,12 +21,14 @@ import codedriver.framework.filter.core.LoginAuthHandlerBase;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.TenantService;
+import codedriver.framework.transaction.util.TransactionUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,11 +100,13 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
-                if (userMapper.getUserSessionByUserUuid(checkUserVo.getUuid()) != null) {
+                TransactionStatus transactionStatus =TransactionUtil.openTx();
+                if (userMapper.getUserSessionLockByUserUuid(checkUserVo.getUuid()) != null) {
                     userMapper.updateUserSession(checkUserVo.getUuid());
                 } else {
                     userMapper.insertUserSession(checkUserVo.getUuid());
                 }
+                TransactionUtil.commitTx(transactionStatus);
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");

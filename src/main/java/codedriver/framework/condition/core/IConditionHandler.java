@@ -1,12 +1,8 @@
 package codedriver.framework.condition.core;
 
-import java.util.List;
-
-import codedriver.framework.form.constvalue.FormConditionModel;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.constvalue.FormConditionModel;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
@@ -105,4 +101,5 @@ public interface IConditionHandler {
         }
         return null;
     }
+
 }

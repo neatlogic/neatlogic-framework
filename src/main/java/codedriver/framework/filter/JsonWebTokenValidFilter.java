@@ -140,7 +140,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         String userUuid = UserContext.get().getUserUuid();
         String tenant = TenantContext.get().getTenantUuid();
         if (UserSessionCache.getItem(tenant, userUuid) == null) {
-            UserSessionVo userSessionVo = userMapper.getUserSessionByUserUuid(userUuid);
+            UserSessionVo userSessionVo = userMapper.getUserSessionLockByUserUuid(userUuid);
             if (null != userSessionVo) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();

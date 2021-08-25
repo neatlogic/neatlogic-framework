@@ -45,6 +45,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resutlObj = new JSONObject();
         JSONArray dataObj = (JSONArray) attributeDataVo.getDataObj();
         if (CollectionUtils.isNotEmpty(dataObj)) {
             JSONArray attributeList = configObj.getJSONArray("attributeList");
@@ -213,13 +214,11 @@ public class StaticListHandler extends FormHandlerBase {
                     }
                     tbodyList.add(tbodyObj);
                 }
-                JSONObject resutlObj = new JSONObject();
                 resutlObj.put("theadList", theadList);
                 resutlObj.put("tbodyList", tbodyList);
-                return resutlObj;
             }
         }
-        return null;
+        return resutlObj;
     }
 
     @Override
@@ -234,7 +233,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-list";
+        return "tsfont-formstaticlist";
     }
 
     @Override

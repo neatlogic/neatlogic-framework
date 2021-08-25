@@ -52,7 +52,7 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-user";
+        return "tsfont-urgency";
     }
 
     @Override

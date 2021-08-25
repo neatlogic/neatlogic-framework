@@ -44,7 +44,7 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public String getIcon() {
-        return "ts-sitemap";
+        return "tsfont-formselect";
     }
 
     @Override

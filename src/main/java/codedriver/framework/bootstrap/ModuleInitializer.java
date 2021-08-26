@@ -66,7 +66,19 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     appContext.setConfigLocation("classpath*:" + path);
                     appContext.setId(moduleId);
                     appContext.setGroupName(groupName);
-                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new CodedriverDispatcherServlet(appContext));
+                    
+                    ModuleVo moduleVo = new ModuleVo();
+                    moduleVo.setId(moduleId);
+                    moduleVo.setName(moduleName);
+                    moduleVo.setDescription(moduleDescription);
+                    moduleVo.setVersion(version);
+                    moduleVo.setGroup(group);
+                    moduleVo.setGroupName(groupName);
+                    moduleVo.setGroupSort(Integer.parseInt(groupSort));
+                    moduleVo.setGroupDescription(groupDescription);
+                    ModuleUtil.addModule(moduleVo);
+
+                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new CodedriverDispatcherServlet(moduleVo, appContext));
                     if (StringUtils.isNotBlank(urlMapping)) {
                         sr.addMapping(urlMapping);
                     }
@@ -80,16 +92,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                         sr.setLoadOnStartup(2);
                     }
 
-                    ModuleVo moduleVo = new ModuleVo();
-                    moduleVo.setId(moduleId);
-                    moduleVo.setName(moduleName);
-                    moduleVo.setDescription(moduleDescription);
-                    moduleVo.setVersion(version);
-                    moduleVo.setGroup(group);
-                    moduleVo.setGroupName(groupName);
-                    moduleVo.setGroupSort(Integer.parseInt(groupSort));
-                    moduleVo.setGroupDescription(groupDescription);
-                    ModuleUtil.addModule(moduleVo);
+
                 }
             }
         } catch (IOException | DocumentException ex) {

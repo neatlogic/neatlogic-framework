@@ -73,6 +73,8 @@ public interface UserMapper {
 
     List<String> getUserUuidListByTeamUuidList(List<String> teamUuidList);
 
+    List<String> getUserUuidListByTeamUuidListLimitTwo(List<String> teamUuidList);
+
     /**
      * @Description: 根据分组uuid，找出所有用户uuid与其所在所有分组的uuid和角色uuid
      * @Author: laiwt

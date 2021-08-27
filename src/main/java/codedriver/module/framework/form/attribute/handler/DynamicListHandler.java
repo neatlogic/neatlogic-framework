@@ -90,6 +90,7 @@ public class DynamicListHandler extends FormHandlerBase {
                         paramObj.put("uuidColumn", uuidColumn);
                         paramObj.put("needPage", false);
                         try {
+                            resultObj = (JSONObject) restComponent.myDoService(paramObj);
                             if (MapUtils.isNotEmpty(resultObj)) {
                                 resultObj.put("selectUuidList", dataObj);
                             }

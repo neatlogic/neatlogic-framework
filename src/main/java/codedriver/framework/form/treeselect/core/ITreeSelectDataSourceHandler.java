@@ -29,4 +29,6 @@ public interface ITreeSelectDataSourceHandler {
      * @return 配置
      */
     JSONObject getConfig();
+
+    String valueConversionTextPath(Object value);
 }

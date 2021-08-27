@@ -51,6 +51,8 @@ public class FreemarkerUtil {
 				out.flush();
 			}
 		} catch (Exception ex) {
+			logger.error("freeMarker Code：" + content);
+			logger.error("JSON Code：" + dataObj.toJSONString());
 			throw new FreemarkerTransformException(ex.getMessage());
 		}
 		return resultStr;

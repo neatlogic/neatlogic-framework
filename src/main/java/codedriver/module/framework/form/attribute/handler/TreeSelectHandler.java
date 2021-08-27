@@ -10,7 +10,10 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
+import codedriver.framework.form.treeselect.core.ITreeSelectDataSourceHandler;
+import codedriver.framework.form.treeselect.core.TreeSelectDataSourceFactory;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -103,7 +106,17 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        String data = attributeDataVo.getData();
+        if (StringUtils.isNotBlank(data)) {
+            String dataSource = configObj.getString("dataSource");
+            if (StringUtils.isNotBlank(dataSource)) {
+                ITreeSelectDataSourceHandler handler = TreeSelectDataSourceFactory.getHandler(dataSource);
+                if (handler != null) {
+                    return handler.valueConversionTextPath(data);
+                }
+            }
+        }
+        return data;
     }
 
     @Override

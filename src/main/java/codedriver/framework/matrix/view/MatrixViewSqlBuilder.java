@@ -183,11 +183,11 @@ public class MatrixViewSqlBuilder {
             if (StringUtils.isBlank(viewName)) {
                 throw new MatrixViewNameEmptyException();
             }
-            Statement stmt = CCJSqlParserUtil.parse(sql);
-            Select selectStatement = (Select) stmt;
-            fillUpSchema(selectStatement.getSelectBody());
+//            Statement stmt = CCJSqlParserUtil.parse(sql);
+//            Select selectStatement = (Select) stmt;
+//            fillUpSchema(selectStatement.getSelectBody());
 //            fillUpAlias(selectStatement.getSelectBody());
-            return "CREATE OR REPLACE VIEW " + dataSchema + "." + viewName + " AS " + stmt;
+            return "CREATE OR REPLACE VIEW " + dataSchema + "." + viewName + " AS " + sql;
 
         } catch (ApiRuntimeException ex) {
             throw ex;

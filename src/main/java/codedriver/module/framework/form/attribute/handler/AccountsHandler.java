@@ -10,9 +10,12 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import java.util.List;
 
 /**
@@ -21,6 +24,35 @@ import java.util.List;
  **/
 @Component
 public class AccountsHandler extends FormHandlerBase {
+
+    private final static JSONArray theadList = new JSONArray();
+    static {
+        JSONObject name = new JSONObject();
+        name.put("title", "资产名");
+        name.put("key", "name");
+        theadList.add(name);
+        JSONObject ip = new JSONObject();
+        ip.put("title", "资产IP");
+        ip.put("key", "ip");
+        theadList.add(ip);
+        JSONObject accountName = new JSONObject();
+        accountName.put("title", "账号名称");
+        accountName.put("key", "accountName");
+        theadList.add(accountName);
+        JSONObject account = new JSONObject();
+        account.put("title", "用户名");
+        account.put("key", "account");
+        theadList.add(account);
+        JSONObject protocol = new JSONObject();
+        protocol.put("title", "连接协议");
+        protocol.put("key", "protocol");
+        theadList.add(protocol);
+        JSONObject port = new JSONObject();
+        port.put("title", "端口");
+        port.put("key", "port");
+        theadList.add(port);
+    }
+
     @Override
     public String getHandler() {
         return "formaccounts";
@@ -103,7 +135,13 @@ public class AccountsHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject tableObj = new JSONObject();
+        JSONArray tbodyList = (JSONArray) attributeDataVo.getDataObj();
+        if (CollectionUtils.isNotEmpty(tbodyList)) {
+            tableObj.put("theadList", theadList);
+            tableObj.put("tbodyList", tbodyList);
+        }
+        return tableObj;
     }
 
     @Override

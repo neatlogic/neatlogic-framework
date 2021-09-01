@@ -6,30 +6,26 @@
 package codedriver.module.framework.groupsearch.handler;
 
 import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
-import codedriver.framework.dto.RoleTeamVo;
-import codedriver.framework.dto.RoleUserVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
+import codedriver.framework.service.UserService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserGroupHandler implements IGroupSearchHandler {
-	@Autowired
+	@Resource
 	private UserMapper userMapper;
-	@Autowired
-	private RoleMapper roleMapper;
+	@Resource
+	UserService userService;
 	
 	@Override
 	public String getName() {
@@ -57,39 +53,9 @@ public class UserGroupHandler implements IGroupSearchHandler {
 		userVo.setIsActive(1);
 		userVo.setKeyword(jsonObj.getString("keyword"));
 		//如果存在rangeList 则需要过滤option
-		List<Object> rangeList = jsonObj.getJSONArray("rangeList");
+		JSONArray rangeList = jsonObj.getJSONArray("rangeList");
 		if(CollectionUtils.isNotEmpty(rangeList)){
-			List<String> roleList = new ArrayList<>();
-			Set<String> teamSet = new HashSet<>();
-			Set<String> parentTeamSet = new HashSet<>();
-			Set<String> userSet = new HashSet<>();
-			rangeList.forEach(r->{
-				if(r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())){
-					roleList.add(GroupSearch.removePrefix(r.toString()));
-				} else if(r.toString().startsWith(GroupSearch.TEAM.getValuePlugin())){
-					teamSet.add(GroupSearch.removePrefix(r.toString()));
-				}else if(r.toString().startsWith(GroupSearch.USER.getValuePlugin())){
-					userSet.add(GroupSearch.removePrefix(r.toString()));
-				}
-			});
-			if(CollectionUtils.isNotEmpty(roleList)) {
-				List<RoleTeamVo> roleTeamVoList = roleMapper.getRoleTeamListByRoleUuidList(roleList);
-				roleTeamVoList.forEach(rt->{
-					if(rt.getCheckedChildren() == 1){//如果组穿透
-						parentTeamSet.add(rt.getTeamUuid());
-					}else{
-						teamSet.add(rt.getTeamUuid());
-					}
-				});
-				List<RoleUserVo> roleUserVoList = roleMapper.getRoleUserListByRoleUuidList(roleList);
-				roleUserVoList.forEach(ru->{
-					userSet.add(ru.getUserUuid());
-				});
-			}
-			userVo.setRangeList(rangeList.stream().map(Object::toString).collect(Collectors.toList()));
-			userVo.setUserUuidList(new ArrayList<>(userSet));
-			userVo.setTeamUuidList(new ArrayList<>(teamSet));
-			userVo.setParentTeamUuidList(new ArrayList<>(parentTeamSet));
+			userService.getUserByRangeList(userVo,rangeList.stream().map(Object::toString).collect(Collectors.toList()));
 		}
 		userList = userMapper.searchUser(userVo);
 		return (List<T>) userList;

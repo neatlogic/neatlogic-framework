@@ -162,6 +162,8 @@ public interface UserMapper {
 
     List<UserTitleVo> getUserTitleListByUserUuid(String userUuid);
 
+    List<String> checkUserInRangeList(@Param("userUuidList") List<String> userUuidList, @Param("user") UserVo userVo);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);

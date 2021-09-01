@@ -564,7 +564,8 @@
             resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
         SELECT `user_uuid` as userUuid, `visit_time` as sessionTime
         FROM `user_session`
-        WHERE `user_uuid` = #{value} for update
+        WHERE `user_uuid` = #{value} for
+        update
     </select>
 
     <select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
@@ -1058,15 +1059,58 @@
         from `user_title`
         where `id` = #{value}
     </select>
-    <select id="getUserTitleListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserTitleVo">
-        select
-            a.`id`,
-            a.`name`
-        from
-            `user_title` a
-            join `team_user_title` b
-            on a.`id` = b.`title_id`
+    <select id="getUserTitleListByUserUuid" parameterType="java.lang.String"
+            resultType="codedriver.framework.dto.UserTitleVo">
+        select a.`id`,
+               a.`name`
+        from `user_title` a
+                 join `team_user_title` b
+                      on a.`id` = b.`title_id`
         where b.`user_uuid` = #{value}
+    </select>
+    <select id="checkUserInRangeList" resultType="java.lang.String">
+        SELECT
+        distinct(a.uuid)
+        FROM
+        `user` a
+        LEFT JOIN user_team c ON a.uuid = c.user_uuid
+        LEFT JOIN team d ON c.team_uuid = d.uuid
+        <where>
+            a.`is_active` = #{user.isActive}
+            AND a.`is_delete` = #{user.isDelete}
+            AND a.uuid in
+            <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                #{userUuid}
+            </foreach>
+            <if test="user.rangeList != null and user.rangeList.size()>0">
+                and (
+                <if test="user.userUuidList != null and user.userUuidList.size()>0">
+                    a.uuid in
+                    <foreach collection="user.userUuidList" item="userUuid" open="(" separator="," close=")">
+                        #{userUuid}
+                    </foreach>
+                </if>
+                <if test="user.teamUuidList != null and user.teamUuidList.size()>0">
+                    <if test="user.userUuidList != null and user.userUuidList.size()>0">
+                        or
+                    </if>
+                    d.uuid in
+                    <foreach collection="user.teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                </if>
+                <if test="user.parentTeamUuidList != null and user.parentTeamUuidList.size()>0">
+                    <if test="user.userUuidList != null and user.userUuidList.size()>0 or user.teamUuidList != null and user.teamUuidList.size()>0">
+                        or
+                    </if>
+                    <foreach collection="user.parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or "
+                             close=")">
+                        d.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                    </foreach>
+                </if>
+                )
+            </if>
+        </where>
     </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">

@@ -15,7 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class AttributeDataVo {
     private String attributeUuid;
-    private transient String data;
+    private String data;
     private Object dataObj;
     private Integer isMultiple;
     public String getAttributeUuid() {

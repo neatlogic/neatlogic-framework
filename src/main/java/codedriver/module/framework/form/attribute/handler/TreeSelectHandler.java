@@ -101,12 +101,7 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
-    }
-
-    @Override
-    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        String data = attributeDataVo.getData();
+        String data = (String) attributeDataVo.getDataObj();
         if (StringUtils.isNotBlank(data)) {
             String dataSource = configObj.getString("dataSource");
             if (StringUtils.isNotBlank(dataSource)) {
@@ -117,6 +112,11 @@ public class TreeSelectHandler extends FormHandlerBase {
             }
         }
         return data;
+    }
+
+    @Override
+    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return valueConversionText(attributeDataVo, configObj);
     }
 
     @Override

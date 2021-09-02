@@ -184,14 +184,9 @@
         j.`name` as `teamName`
         FROM (
         SELECT
-        DISTINCT (a.`uuid`) AS `uuid`,a.user_id,a.user_name
+        a.`uuid`
         FROM
         `user` a
-        LEFT JOIN user_role b ON a.uuid = b.user_uuid
-        LEFT JOIN user_team c ON a.uuid = c.user_uuid
-        LEFT JOIN team d ON c.team_uuid = d.uuid
-        LEFT JOIN `user_authority` f ON a.`uuid` = f.`user_uuid`
-        LEFT JOIN `role_authority` l ON b.`role_uuid` = l.`role_uuid`
         <where>
             <if test="keyword !=null and keyword != ''">
                 AND
@@ -208,16 +203,21 @@
                 AND a.`is_delete` = #{isDelete}
             </if>
             <if test="teamUuid != null and teamUuid != ''">
-                AND c.`team_uuid` = #{teamUuid}
+                AND EXISTS (select 1 from `user_team` where `user_uuid` = a.`uuid` and `team_uuid` = #{teamUuid})
             </if>
             <if test="authGroup != null and authGroup != ''">
-                AND f.`auth_group` = #{authGroup}
+                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth_group` = #{authGroup})
             </if>
             <if test="auth != null and auth != ''">
-                AND f.`auth` = #{auth} OR l.`auth` = #{auth}
+                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth` = #{auth})
+                or
+                EXISTS (
+                    select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` = `user_role`.`role_uuid`
+                    where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
+                )
             </if>
             <if test="roleUuid != null and roleUuid != ''">
-                AND b.`role_uuid` = #{roleUuid}
+                AND EXISTS (select 1 from `user_role` where `user_uuid` = a.`uuid` and `role_uuid` = #{roleUuid})
             </if>
             <if test="rangeList != null and rangeList.size()>0">
                 and (
@@ -231,30 +231,33 @@
                     <if test="userUuidList != null and userUuidList.size()>0">
                         or
                     </if>
-                    d.uuid in
+                    EXISTS (
+                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                    where `user_team`.`user_uuid` = a.`uuid`
+                    and `team`.`uuid` in
                     <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
                         #{teamUuid}
                     </foreach>
+                    )
                 </if>
                 <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
                     <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
                         or
                     </if>
+                    EXISTS (
+                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                    where `user_team`.`user_uuid` = a.`uuid`
+                    and
                     <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
-                        d.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                        `team`.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
                     </foreach>
+                    )
                 </if>
                 )
             </if>
         </where>
         <if test="keyword !=null and keyword != ''">
-            ORDER BY(
-            CASE
-            WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
-            WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
-            ELSE 4
-            END
-            )
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc
         </if>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -267,13 +270,7 @@
         LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
         ORDER BY
         <if test="keyword !=null and keyword != ''">
-            (
-            CASE
-            WHEN k.`user_id` = #{keyword} OR k.`user_name` = #{keyword} THEN 1
-            WHEN k.`user_id` LIKE CONCAT(#{keyword},'%') OR k.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
-            ELSE 4
-            END
-            ),
+            length(k.`user_id`) asc, length(k.`user_name`) asc,
         </if>
         k.`id` DESC
     </select>

@@ -49,12 +49,12 @@ public class TextareaHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
+        return attributeDataVo.getDataObj();
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
+        return attributeDataVo.getDataObj();
     }
 
     @Override

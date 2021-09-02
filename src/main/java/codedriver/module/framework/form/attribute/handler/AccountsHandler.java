@@ -85,7 +85,7 @@ public class AccountsHandler extends FormHandlerBase {
 
     @Override
     public boolean isAudit() {
-        return false;
+        return true;
     }
 
     @Override
@@ -130,7 +130,7 @@ public class AccountsHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        return "已更新";
     }
 
     @Override

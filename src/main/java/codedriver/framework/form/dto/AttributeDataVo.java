@@ -87,7 +87,8 @@ public class AttributeDataVo {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((attributeUuid == null) ? 0 : attributeUuid.hashCode());
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        dataObj = getDataObj();
+        result = prime * result + ((dataObj == null) ? 0 : dataObj.hashCode());
         return result;
     }
 
@@ -110,10 +111,12 @@ public class AttributeDataVo {
         } else if (!attributeUuid.equals(other.attributeUuid)) {
             return false;
         }
-        if (data == null) {
-            return other.data == null;
+        dataObj = getDataObj();
+        Object otherDataObj = other.getDataObj();
+        if (dataObj == null) {
+            return otherDataObj == null;
         } else {
-            return data.equals(other.data);
+            return dataObj.equals(otherDataObj);
         }
     }
 }

@@ -257,13 +257,7 @@
             </if>
         </where>
         <if test="keyword !=null and keyword != ''">
-            ORDER BY(
-            CASE
-            WHEN a.`user_id` = #{keyword} OR a.`user_name` = #{keyword} THEN 1
-            WHEN a.`user_id` LIKE CONCAT(#{keyword},'%') OR a.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
-            ELSE 4
-            END
-            )
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc
         </if>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -276,13 +270,7 @@
         LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
         ORDER BY
         <if test="keyword !=null and keyword != ''">
-            (
-            CASE
-            WHEN k.`user_id` = #{keyword} OR k.`user_name` = #{keyword} THEN 1
-            WHEN k.`user_id` LIKE CONCAT(#{keyword},'%') OR k.`user_name` LIKE CONCAT(#{keyword},'%') THEN 2
-            ELSE 4
-            END
-            ),
+            length(k.`user_id`) asc, length(k.`user_name`) asc,
         </if>
         k.`id` DESC
     </select>

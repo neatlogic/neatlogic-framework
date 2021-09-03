@@ -1,7 +1,12 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.message.delay;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.notify.dto.NotifyVo;
 
 import java.util.Arrays;
@@ -10,15 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * @Title: Test
- * @Package codedriver.framework.message.delay
- * @Description: 消息缓存压测类
- * @Author: linbq
- * @Date: 2021/1/12 7:29
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class Test {
 
     /**
@@ -49,10 +45,10 @@ public class Test {
             Thread.sleep(1);
             String tenantUuid = tenantUuidList.get(i % tenantUuidList.size());
             TenantContext.init(tenantUuid);
-            CommonThreadPool.execute(new MessageProducerThread());
+            CachedThreadPool.execute(new MessageProducerThread());
         }
         while (true) {
-            if (CommonThreadPool.getThreadActiveCount() == 0) {
+            if (CachedThreadPool.getThreadActiveCount() == 0) {
                 break;
             }
         }

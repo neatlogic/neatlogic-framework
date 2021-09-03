@@ -7,7 +7,7 @@ package codedriver.framework.restful.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.common.config.Config;
@@ -66,7 +66,7 @@ public class ApiValidateAndHelpBase {
         if (result != null) {
             audit.setResult(JSON.toJSONString(result));
         }
-        CommonThreadPool.execute(new ApiAuditSaveThread(audit));
+        CachedThreadPool.execute(new ApiAuditSaveThread(audit));
     }
 
     private static void escapeXss(JSONObject paramObj, String key) {

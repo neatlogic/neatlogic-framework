@@ -7,7 +7,7 @@ package codedriver.framework.integration.core;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
@@ -286,7 +286,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         integrationAuditVo.setEndTime(new Date());
         CodeDriverThread thread = new IntegrationAuditSaveThread(integrationAuditVo);
         thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
-        CommonThreadPool.execute(thread);
+        CachedThreadPool.execute(thread);
 
         // connection.disconnect(); //Indicates that other requests to the
         // server are unlikely in the near future. Calling disconnect() should

@@ -1,7 +1,12 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.message.delay;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadpool.CommonThreadPool;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.notify.dto.NotifyVo;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,25 +16,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @Title: MessageCache
- * @Package codedriver.framework.message.delay
- * @Description: 消息缓存对象
- * @Author: linbq
- * @Date: 2021/1/10 16:23
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class MessageCache {
-    /** 缓存集合 **/
+    /**
+     * 缓存集合
+     **/
     private ConcurrentMap<NotifyVo, Object> notifyVoMap = new ConcurrentHashMap<>();
-    /** 最大缓存持续时间，5分钟 **/
+    /**
+     * 最大缓存持续时间，5分钟
+     **/
     private final long maxDelayDuration = TimeUnit.MINUTES.toMillis(5);
-    /** 最小缓存持续时间，15秒 **/
+    /**
+     * 最小缓存持续时间，15秒
+     **/
     private final long minDelayDuration = TimeUnit.SECONDS.toMillis(15);
-    /** 最大缓存时间点，缓存对象创建时就确定了，不会变 **/
+    /**
+     * 最大缓存时间点，缓存对象创建时就确定了，不会变
+     **/
     private final long maxDelayTime;
-    /** 最小缓存时间点，每次加入缓存数据都会改变这个值，新值 minDelayTime = System.currentTimeMillis() + minDelayDuration **/
+    /**
+     * 最小缓存时间点，每次加入缓存数据都会改变这个值，新值 minDelayTime = System.currentTimeMillis() + minDelayDuration
+     **/
     private AtomicLong minDelayTime;
 
     /**
@@ -50,8 +56,8 @@ public class MessageCache {
         this.maxDelayTime = currentTimeMillis + maxDelayDuration;
         this.minDelayTime = new AtomicLong(currentTimeMillis + minDelayDuration);
         this.notifyVoMap.put(notifyVo, NOT_NULL);
-        /** 每次创建缓存对象时，创建一个任务监听缓存对象 **/
-        CommonThreadPool.execute(new MessageSendThread(this));
+        /* 每次创建缓存对象时，创建一个任务监听缓存对象 **/
+        CachedThreadPool.execute(new MessageSendThread(this));
     }
 
     public ConcurrentMap<NotifyVo, Object> getNotifyVoMap() {
@@ -89,6 +95,7 @@ public class MessageCache {
     private final static Object NOT_NULL = new Object();
 
     private final static ConcurrentMap<String, MessageCache> messageCacheMap = new ConcurrentHashMap<>();
+
     /**
      * @Description: 向缓存对象中添加数据
      * @Author: linbq
@@ -110,9 +117,9 @@ public class MessageCache {
         }
         try {
             messageCache.writingDataThreadNum.incrementAndGet();
-            if(messageCache.expired.get()){
+            if (messageCache.expired.get()) {
                 MessageCache.add(notifyVo);
-            }else{
+            } else {
                 /** 更新最小缓存时间点 **/
                 messageCache.updateMinDelayTime();
                 /** 将数据存放到缓存对象 **/
@@ -129,6 +136,7 @@ public class MessageCache {
             }
         }
     }
+
     /**
      * @Description: 当缓存对象失效时调用，清除当前租户消息缓存
      * @Author: linbq

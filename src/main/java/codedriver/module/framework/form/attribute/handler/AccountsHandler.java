@@ -13,6 +13,7 @@ import codedriver.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -136,10 +137,13 @@ public class AccountsHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
-        JSONArray tbodyList = (JSONArray) attributeDataVo.getDataObj();
-        if (CollectionUtils.isNotEmpty(tbodyList)) {
-            tableObj.put("theadList", theadList);
-            tableObj.put("tbodyList", tbodyList);
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray tbodyList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                tableObj.put("theadList", theadList);
+                tableObj.put("tbodyList", tbodyList);
+            }
         }
         return tableObj;
     }

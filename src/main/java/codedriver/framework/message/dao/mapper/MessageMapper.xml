@@ -304,7 +304,7 @@
     </insert>
 
     <insert id="insertMessageUser" parameterType="codedriver.framework.message.dto.MessageSearchVo">
-        INSERT ignore INTO `message_user` (
+        INSERT IGNORE INTO `message_user` (
         `message_id`,
         `user_uuid`
         )

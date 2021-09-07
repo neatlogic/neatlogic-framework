@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class ApiAccessCountUpdateThread extends CodeDriverThread {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiAccessCountUpdateThread.class);
     /**
      * 统计延迟对象，默认初始化一个失效的延迟对象
      **/
@@ -35,7 +35,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
     /**
      * 延迟队列
      **/
-    private volatile static DelayQueue<DelayedItem> delayQueue = new DelayQueue<>();
+    private static final DelayQueue<DelayedItem> delayQueue = new DelayQueue<>();
 
     private static ApiService apiService;
 
@@ -50,7 +50,7 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
 
     public static void putToken(String token) {
         try {
-            /** 判断延迟对象是否失效 **/
+            /* 判断延迟对象是否失效 **/
             if (delayedItem.isExpired()) {
 //				Thread.sleep(1);//测试时使用
                 /* 初始化延迟对象时，必须加锁，否则会出现多个线程相互覆盖情况 **/
@@ -77,13 +77,13 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
         try {
             DelayedItem take = delayQueue.take();
 //			Thread.sleep(1);//测试时使用
-            /** 从延迟队列取出延迟对象后，将延迟对象设置为失效，通知其他线程不要再往该对象写数据了 **/
+            /* 从延迟队列取出延迟对象后，将延迟对象设置为失效，通知其他线程不要再往该对象写数据了 **/
             take.setExpired(true);
 //			Thread.sleep(1);//测试时使用
             while (take.getWritingDataThreadNum() > 0) {
-                /** 如果还有线程正在往当前延迟对象中写数据 **/
+                /* 如果还有线程正在往当前延迟对象中写数据 **/
                 synchronized (take.getLock()) {
-                    /** 等待所有正在往当前延迟对象中写数据的线程完成后，唤醒当前线程 **/
+                    /* 等待所有正在往当前延迟对象中写数据的线程完成后，唤醒当前线程 **/
                     take.getLock().wait();
                 }
             }

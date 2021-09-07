@@ -23,20 +23,30 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DelayedItem implements Delayed {
 	private static final Logger logger = LoggerFactory.getLogger(DelayedItem.class);
-	/** 延迟5分钟 **/
+	/**
+	 * 延迟5分钟
+	 **/
 	private final long delayTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
 	/* 延迟10毫秒，测试时使用**/
 //	private long delayTime = System.currentTimeMillis() + TimeUnit.MILLISECONDS.toMillis(10);
 
-	/** 缓存租户访问记录 **/
-	private ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> tenantAccessTokenMap = new ConcurrentHashMap<>();
-	/** 标记正在往当前延迟对象的缓存tenantAccessTokenMap中写数据的线程数 **/
+	/**
+	 * 缓存租户访问记录
+	 **/
+	private final ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> tenantAccessTokenMap = new ConcurrentHashMap<>();
+	/**
+	 * 标记正在往当前延迟对象的缓存tenantAccessTokenMap中写数据的线程数
+	 **/
 	private final AtomicInteger writingDataThreadNum = new AtomicInteger();
-	/** 延迟对象是否失效，未放进延迟队列或已从延迟队列取出的延迟对象会被标记为true **/
+	/**
+	 * 延迟对象是否失效，未放进延迟队列或已从延迟队列取出的延迟对象会被标记为true
+	 **/
 	private final AtomicBoolean expired = new AtomicBoolean();
-	/** 等待延迟对象收集数据完毕锁 **/
+	/**
+	 * 等待延迟对象收集数据完毕锁
+	 **/
 	private final Object lock = new Object();
-	
+
 	public DelayedItem() {
 
 	}

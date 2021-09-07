@@ -15,7 +15,7 @@ import java.util.*;
 @RootComponent
 public class TopicFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ITopic> componentMap = new HashMap<>();
-    private static List<TopicVo> topicList = new ArrayList<>();
+    private static final List<TopicVo> topicList = new ArrayList<>();
 
     public static ITopic getTopic(String topicName) {
         return componentMap.get(topicName);

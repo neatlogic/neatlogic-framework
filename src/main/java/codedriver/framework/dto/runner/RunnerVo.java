@@ -19,7 +19,7 @@ import java.util.List;
 public class RunnerVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = -5118893385455680746L;
     @EntityField(name = "id", type = ApiParamType.LONG)
-    private Integer id;
+    private Long id;
     @EntityField(name = "代理分组id",type = ApiParamType.LONG)
     private Long groupId;
     @EntityField(name = "runner 名", type = ApiParamType.STRING)
@@ -36,18 +36,18 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private String publicKey;
     @EntityField(name = "ssh私钥", type = ApiParamType.STRING)
     private String privateKey;
-    @EntityField(name = "runner 分组", type = ApiParamType.STRING)
+    @EntityField(name = "runner 分组", type = ApiParamType.JSONARRAY)
     private List<RunnerGroupVo> proxyGroupVoList;
     @EntityField(name = "NettyIp",type = ApiParamType.STRING)
     private String nettyIp;
     @EntityField(name = "Netty端口",type = ApiParamType.INTEGER)
     private String nettyPort;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

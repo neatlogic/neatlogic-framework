@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.filter;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
@@ -17,7 +22,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,14 +50,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+            throws IOException {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
         boolean isAuth = false;
         boolean isUnExpired = false;
         boolean hasTenant = false;
         UserVo userVo = null;
-        JSONObject redirectObj = null;
+        JSONObject redirectObj = new JSONObject();
         ILoginAuthHandler loginAuth = null;
         String authType = null;
         //获取时区
@@ -96,7 +100,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             if (hasTenant && isAuth && isUnExpired) {
                 filterChain.doFilter(request, response);
             } else {
-                redirectObj = new JSONObject();
                 if (!hasTenant) {
                     response.setStatus(521);
                     redirectObj.put("Status", "FAILED");
@@ -110,7 +113,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "没有找到认证信息，请登录");
                     redirectObj.put("directUrl", loginAuth.directUrl());
-                } else if (isAuth && !isUnExpired) {
+                } else if (isAuth) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
@@ -129,7 +132,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setStatus(522);
             redirectObj.put("Status", "FAILED");
             redirectObj.put("Message", "认证失败，具体异常请查看日志");
-            redirectObj.put("directUrl", loginAuth.directUrl());
+            if (loginAuth != null) {
+                redirectObj.put("directUrl", loginAuth.directUrl());
+            }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
@@ -145,7 +150,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();
                 int expire = Config.USER_EXPIRETIME();
-                Long expireTime = expire * 60 * 1000 + visitTime.getTime();
+                long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
                     userMapper.updateUserSession(userUuid);
                     UserSessionCache.addItem(tenant, userUuid);

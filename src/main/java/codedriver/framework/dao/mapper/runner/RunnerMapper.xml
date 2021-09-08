@@ -93,5 +93,110 @@
         INSERT IGNORE INTO `runner_map` (`id`, `runner_id`)
         VALUES (#{runnerMapId}, #{id});
     </insert>
+
+    <select id="checkGroupNameIsRepeats" resultType="int"
+            parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
+        select COUNT(1)
+        from runnergroup
+        where `id` != #{id}
+          and `name` = #{name}
+    </select>
+
+    <update id="updateRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
+        update runnergroup
+        set `name`=#{name}
+        where `id` = #{id}
+    </update>
+
+    <insert id="insertRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
+        insert runnergroup(`id`, `name`)
+        VALUES (#{id},
+                #{name})
+    </insert>
+
+    <delete id="deleteGroupNetWork">
+        delete
+        from runnergroup_network
+        where `group_id` = #{id}
+    </delete>
+
+    <insert id="insertNetwork" parameterType="codedriver.framework.dto.runner.GroupNetworkVo">
+        INSERT INTO runnergroup_network(group_id, network_ip, mask)
+        VALUES (#{groupId},
+                #{networkIp},
+                #{mask})
+    </insert>
+
+    <select id="checkRunnerGroupIdIsExist" resultType="int">
+        select count(`id`)
+        from runnergroup
+        where `id` = #{id}
+    </select>
+
+    <delete id="deleteRunnerGroupById">
+        delete
+        from runnergroup
+        where `id` = #{id}
+    </delete>
+
+    <select id="checkRunnerNameIsExist" resultType="int" parameterType="codedriver.framework.dto.runner.RunnerVo">
+        select count(1)
+        from runner
+        where `id` != #{id}
+          and `name` = #{name};
+    </select>
+
+    <select id="checkRunnerNameIsExistByName" resultType="int">
+        select count(1)
+        from runner
+        where `name` = #{name};
+    </select>
+
+    <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
+        UPDATE runner
+        SET name = #{name},
+        url = #{url},
+        access_key = #{accessKey},
+        access_secret = #{accessSecret},
+        <if test="nettyIp != null and nettyIp !='' ">
+            `netty_ip` = #{nettyIp},
+        </if>
+        <if test="nettyPort != null and nettyPort !='' ">
+            `netty_port` = #{nettyPort},
+        </if>
+        <if test="publicKey != null and publicKey !='' ">
+            `public_key` = #{publicKey},
+        </if>
+        <if test="privateKey != null and privateKey !='' ">
+            `private_key` = #{privateKey},
+        </if>
+        `auth_type` = #{authType}
+        WHERE `id` = #{id}
+    </update>
+
+    <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
+        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO runner(
+        `name`, url, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `group_id`,`public_key`,`private_key`
+        ) VALUES(
+        #{name}, #{url}, #{accessKey}, #{accessSecret}, #{authType}, #{nettyIp},
+        #{nettyPort},#{groupId},#{publicKey},#{privateKey}
+        )
+    </insert>
+
+    <select id="checkRunnerIdIsExist" resultType="int">
+        select count(1)
+        from runner
+        where `id` = #{id}
+    </select>
+
+    <delete id="deleteRunnerById">
+        delete
+        from runner
+        where `id` = #{id}
+    </delete>
 </mapper>
 

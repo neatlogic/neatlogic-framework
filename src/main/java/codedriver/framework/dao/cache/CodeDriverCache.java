@@ -1,14 +1,18 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dao.cache;
-
-import java.util.concurrent.locks.ReadWriteLock;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.cache.Cache;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.cache.Cache;
+
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class CodeDriverCache implements Cache {
 	/**
@@ -76,6 +80,7 @@ public class CodeDriverCache implements Cache {
 		if (cachedElement == null) {
 			return null;
 		}
+		//System.out.println(cachedElement.getObjectValue());
 		return cachedElement.getObjectValue();
 	}
 
@@ -92,7 +97,6 @@ public class CodeDriverCache implements Cache {
 	 */
 	@Override
 	public void putObject(Object key, Object value) {
-		
 		getCache().put(new Element(key, value));
 	}
 

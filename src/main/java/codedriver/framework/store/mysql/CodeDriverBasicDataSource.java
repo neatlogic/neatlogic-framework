@@ -26,6 +26,8 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
         try (Statement statement = conn.createStatement()) {
             //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
             statement.execute("SET SESSION optimizer_search_depth = 5");
+            //设置join_buffer为16M，提升BNL性能
+            statement.execute("SET SESSION join_buffer_size = 16777216");
             if (UserContext.get() != null) {
                 String timezone = UserContext.get().getTimezone();
                 if (StringUtils.isNotBlank(timezone)) {

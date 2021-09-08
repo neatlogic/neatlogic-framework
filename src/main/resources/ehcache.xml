@@ -5,7 +5,7 @@
   -->
 
 <!-- 这个name和updateCheck 都按这样配置最好，不然启动时会在前台报错403，IOException -->
-<ehcache name="ehcache" updateCheck="false" maxBytesLocalHeap="500M">
+<ehcache name="ehcache" updateCheck="false">
     <!-- 缓存位置 java.io.tmpdir:Java临时目录 -->
     <diskStore path="java.io.tmpdir/ehcache"/>
 

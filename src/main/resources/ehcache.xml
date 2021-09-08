@@ -7,10 +7,10 @@
 <!-- 这个name和updateCheck 都按这样配置最好，不然启动时会在前台报错403，IOException -->
 <ehcache name="ehcache" updateCheck="false">
     <!-- 缓存位置 java.io.tmpdir:Java临时目录 -->
-    <diskStore path="java.io.tmpdir/ehcache"/>
+    <diskStore path="java.io.tmpdir/ehcache" maxBytesLocalHeap="500M"/>
 
     <!-- 默认缓存 -->
-    <defaultCache maxEntriesLocalHeap="1000" eternal="false" overflowToDisk="false" timeToIdleSeconds="30"
+    <defaultCache eternal="false" overflowToDisk="false" timeToIdleSeconds="30"
                   timeToLiveSeconds="30" diskPersistent="false" copyOnRead="true"
                   copyOnWrite="true" maxEntriesLocalDisk="10000"
                   diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">

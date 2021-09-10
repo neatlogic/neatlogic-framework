@@ -32,7 +32,7 @@ public class JobClassVo extends BasePageVo {
             type = ApiParamType.STRING)
     private String moduleName;
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
 
     public JobClassVo() {
         this.setPageSize(20);

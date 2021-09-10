@@ -88,11 +88,11 @@ public class UserVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private String authorization;
     @JSONField(serialize = false)
-    private transient List<String> userUuidList;
+    private List<String> userUuidList;
     @JSONField(serialize = false)
-    private transient List<String> parentTeamUuidList;
+    private List<String> parentTeamUuidList;
     @JSONField(serialize = false)
-    private transient List<String> rangeList;
+    private List<String> rangeList;
 
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]

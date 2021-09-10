@@ -98,9 +98,9 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "时间跨度单位(day|month)", type = ApiParamType.STRING)
 	private String timeUnit;
 	@JSONField(serialize=false)
-	private transient String logPath;
+	private String logPath;
 	@JSONField(serialize=false)
-	private transient String tenant;
+	private String tenant;
 
 	public ApiAuditVo() {
 		this.setPageSize(20);

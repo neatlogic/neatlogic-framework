@@ -23,7 +23,7 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "请求来源", type = ApiParamType.STRING)
 	private String requestFrom;
 	@JSONField(serialize = false)
-	private transient Integer serverId;
+	private Integer serverId;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
 	private Date startTime;
 	@EntityField(name = "结束时间", type = ApiParamType.LONG)

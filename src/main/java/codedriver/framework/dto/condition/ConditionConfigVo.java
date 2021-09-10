@@ -20,7 +20,7 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
 
     protected List<ConditionGroupVo> conditionGroupList = new ArrayList<ConditionGroupVo>();;
     @JSONField(serialize = false)
-    private transient Map<String, ConditionGroupVo> conditionGroupMap ;
+    private Map<String, ConditionGroupVo> conditionGroupMap ;
     protected List<ConditionGroupRelVo> conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();;
 
     public ConditionConfigVo() {}

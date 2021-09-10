@@ -49,7 +49,7 @@ public class WorktimeVo extends BasePageVo implements Serializable {
     @EntityField(name = "工作时段列表", type = ApiParamType.JSONARRAY)
     private Set<String> workingHoursSet;
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
 
     @EntityField(name = "被引用的次数", type = ApiParamType.INTEGER)
     private int referenceCount;

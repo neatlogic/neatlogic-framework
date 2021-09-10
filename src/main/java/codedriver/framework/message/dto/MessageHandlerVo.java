@@ -2,6 +2,7 @@ package codedriver.framework.message.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Date;
 
@@ -30,9 +31,12 @@ public class MessageHandlerVo implements Cloneable {
     @EntityField(name = "弹框方式", type = ApiParamType.STRING)
     private String popUp;
 
-    private transient Date fcd;
-    private transient String userUuid;
-    private transient boolean isPublic;
+    @JSONField(serialize = false)
+    private Date fcd;
+    @JSONField(serialize = false)
+    private String userUuid;
+    @JSONField(serialize = false)
+    private boolean isPublic;
     public String getModuleId() {
         return moduleId;
     }

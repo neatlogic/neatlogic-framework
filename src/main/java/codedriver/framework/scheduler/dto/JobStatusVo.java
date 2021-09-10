@@ -32,7 +32,7 @@ public class JobStatusVo {
 	private Integer execCount = 0;
 
 	@JSONField(serialize = false)
-	private transient Integer needAudit;
+	private Integer needAudit;
 
 	public JobStatusVo() {
 	}

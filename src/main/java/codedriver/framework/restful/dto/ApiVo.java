@@ -233,13 +233,13 @@ public class ApiVo extends BasePageVo implements Serializable {
     @EntityField(name = "模块group名称", type = ApiParamType.STRING)
     private String moduleGroupName;
     @JSONField(serialize = false)
-    private transient JSONObject pathVariableObj;
+    private JSONObject pathVariableObj;
     @JSONField(serialize = false)
-    private transient List<String> pathVariableList;
+    private List<String> pathVariableList;
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
     @JSONField(serialize = false)
-    private transient List<String> tokenList;
+    private List<String> tokenList;
     //	private Long totalDataSize = 0l;
 //	private String totalDataSizeText;
     @JSONField(serialize = false)

@@ -8,9 +8,11 @@ package codedriver.framework.scheduler.core;
 import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
@@ -219,6 +221,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 Thread.currentThread().setName("SCHEDULE-JOB-LOADER-" + tenantUuid);
                 // 切换租户数据源
                 TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
+                UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);
                 }

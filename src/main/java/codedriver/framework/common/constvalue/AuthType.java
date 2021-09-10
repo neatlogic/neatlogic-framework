@@ -11,16 +11,16 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 
 
-public enum GroupSearch implements IEnum {
-    USER("user", "用户类型"),
-    TEAM("team", "组类型"),
-    ROLE("role", "角色类型"),
-    COMMON("common", "公共类型");
+public enum AuthType implements IEnum {
+    USER("user", "用户"),
+    TEAM("team", "组"),
+    ROLE("role", "角色"),
+    COMMON("common", "内置");
 
     private final String value;
     private final String text;
 
-    private GroupSearch(String value, String text) {
+    AuthType(String value, String text) {
         this.value = value;
         this.text = text;
     }
@@ -38,7 +38,7 @@ public enum GroupSearch implements IEnum {
     }
 
     public static String getValue(String _value) {
-        for (GroupSearch gs : GroupSearch.values()) {
+        for (AuthType gs : AuthType.values()) {
             if (gs.value.equals(_value)) {
                 return gs.value;
             }
@@ -46,8 +46,8 @@ public enum GroupSearch implements IEnum {
         return null;
     }
 
-    public static GroupSearch getGroupSearch(String _value) {
-        for (GroupSearch gs : GroupSearch.values()) {
+    public static AuthType getGroupSearch(String _value) {
+        for (AuthType gs : AuthType.values()) {
             if (gs.value.equals(_value)) {
                 return gs;
             }
@@ -56,7 +56,7 @@ public enum GroupSearch implements IEnum {
     }
 
     public static String removePrefix(String _value) {
-        for (GroupSearch gs : GroupSearch.values()) {
+        for (AuthType gs : AuthType.values()) {
             if (_value.startsWith(gs.getValuePlugin())) {
                 return _value.substring(gs.getValuePlugin().length());
             }
@@ -68,7 +68,7 @@ public enum GroupSearch implements IEnum {
     @Override
     public List getValueTextList() {
         JSONArray array = new JSONArray();
-        for (GroupSearch groupSearch : GroupSearch.values()) {
+        for (AuthType groupSearch : AuthType.values()) {
             array.add(new JSONObject() {
                 {
                     this.put("value", groupSearch.getValue());

@@ -21,7 +21,7 @@ import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.PatternVo;
 import codedriver.framework.param.validate.core.ParamValidatorBase;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
-import codedriver.framework.util.JavascriptUtil;
+import codedriver.framework.util.javascript.JavascriptUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;

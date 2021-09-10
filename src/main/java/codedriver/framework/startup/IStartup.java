@@ -16,12 +16,12 @@ public interface IStartup {
     /**
      * 每个租户分别执行
      */
-    void executeForTenant();
+    void executeForCurrentTenant();
 
     /*
     只执行一次，晚于executeForTenant执行
      */
-    void executeForOnce();
+    void executeForAllTenant();
 
     /**
      * 排序

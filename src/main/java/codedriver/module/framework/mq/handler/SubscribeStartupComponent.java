@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -42,7 +42,7 @@ public class SubscribeStartupComponent implements IStartup {
     }
 
     @Override
-    public void executeForTenant() {
+    public void executeForCurrentTenant() {
         SubscribeVo subscribeVo = new SubscribeVo();
         subscribeVo.setIsActive(1);
         List<SubscribeVo> subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
@@ -67,7 +67,7 @@ public class SubscribeStartupComponent implements IStartup {
     }
 
     @Override
-    public void executeForOnce() {
+    public void executeForAllTenant() {
         ScheduledExecutorService mqRestartService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);

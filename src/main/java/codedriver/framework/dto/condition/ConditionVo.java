@@ -1,14 +1,9 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dto.condition;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.common.constvalue.Expression;
@@ -16,10 +11,18 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.condition.core.ConditionHandlerFactory;
 import codedriver.framework.condition.core.IConditionHandler;
 import codedriver.framework.util.ConditionUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConditionVo implements Serializable{
 	private static final long serialVersionUID = -776692828809703841L;
-	
+
 	private String uuid;
 	private String name;
 	private String type;
@@ -28,10 +31,11 @@ public class ConditionVo implements Serializable{
 	private Integer isShowConditionValue;
 	private Object valueList;
 	private Boolean result;
+
 	public ConditionVo() {
 		super();
 	}
-	
+
 	public ConditionVo(JSONObject jsonObj) {
 		this.uuid = jsonObj.getString("uuid");
 		this.name = jsonObj.getString("name");
@@ -46,7 +50,7 @@ public class ConditionVo implements Serializable{
 			}else {
 				this.valueList = values;
 			}
-		}				
+		}
 	}
 
 	public String getUuid() {
@@ -109,50 +113,50 @@ public class ConditionVo implements Serializable{
 		result = false;
 		ConditionParamContext context = ConditionParamContext.get();
 		if(context != null) {
-			List<String> curentValueList = new ArrayList<>();
+			List<String> currentValueList = new ArrayList<>();
 			JSONObject paramData = context.getParamData();
 			Object paramValue = paramData.get(this.name);
 			if(paramValue != null) {
 				if(paramValue instanceof String) {
-					curentValueList.add(GroupSearch.removePrefix((String)paramValue));
+					currentValueList.add(GroupSearch.removePrefix((String) paramValue));
 				}else if(paramValue instanceof List) {
 					List<String> values = JSON.parseArray(JSON.toJSONString(paramValue), String.class);
 					for(String value : values) {
-						curentValueList.add(GroupSearch.removePrefix(value));
+						currentValueList.add(GroupSearch.removePrefix(value));
 					}
 				}else {
-				    curentValueList.add(GroupSearch.removePrefix(paramValue.toString()));
+					currentValueList.add(GroupSearch.removePrefix(paramValue.toString()));
 				}
 			}
-			
+
 			List<String> targetValueList = new ArrayList<>();
 			if(valueList != null) {
-				if(valueList instanceof String) {
-					targetValueList.add(GroupSearch.removePrefix((String)valueList));
-				}else if(valueList instanceof List){
+				if (valueList instanceof String) {
+					targetValueList.add(GroupSearch.removePrefix((String) valueList));
+				} else if (valueList instanceof List) {
 					List<String> values = JSON.parseArray(JSON.toJSONString(valueList), String.class);
-					for(String value : values) {
+					for (String value : values) {
 						targetValueList.add(GroupSearch.removePrefix(value));
 					}
-				}else {
-				    targetValueList.add(GroupSearch.removePrefix(valueList.toString()));
-                }
+				} else {
+					targetValueList.add(GroupSearch.removePrefix(valueList.toString()));
+				}
 			}
-			
-			result = ConditionUtil.predicate(curentValueList, this.expression, targetValueList);
-			/** 将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
-			if(context.isTranslate()) {
-				if("common".equals(type)) {
+
+			result = ConditionUtil.predicate(currentValueList, this.expression, targetValueList);
+			/* 将参数名称、表达式、值的value翻译成对应text，目前条件步骤生成活动时用到**/
+			if (context.isTranslate()) {
+				if ("common".equals(type)) {
 					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler(name);
-					if(conditionHandler != null) {
+					if (conditionHandler != null) {
 						valueList = conditionHandler.valueConversionText(valueList, null);
 						name = conditionHandler.getDisplayName();
 					}
-				}else if("form".equals(type)) {
+				} else if ("form".equals(type)) {
 					IConditionHandler conditionHandler = ConditionHandlerFactory.getHandler("form");
-					if(conditionHandler != null) {
+					if (conditionHandler != null) {
 						JSONObject formConfig = context.getFormConfig();
-						if(MapUtils.isNotEmpty(formConfig)) {
+						if (MapUtils.isNotEmpty(formConfig)) {
 							JSONObject configObj = new JSONObject();
 							configObj.put("attributeUuid", name);
 							configObj.put("formConfig", formConfig);
@@ -162,14 +166,14 @@ public class ConditionVo implements Serializable{
 					}
 				}
 				this.expression = Expression.getExpressionName(this.expression);
-			}			
+			}
 		}
-		
+
 		return result;
 	}
 
 	public Boolean getResult() {
 		return result;
 	}
-	
+
 }

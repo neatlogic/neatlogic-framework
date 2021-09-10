@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dto.condition;
 
 import codedriver.framework.exception.type.ParamIrregularException;
@@ -40,8 +45,8 @@ public class ConditionGroupVo implements Serializable {
             if (CollectionUtils.isNotEmpty(channelArray)) {
                 channelUuidList = JSONObject.parseArray(channelArray.toJSONString(), String.class);
             }
-            conditionList = new ArrayList<ConditionVo>();
-            conditionMap = new HashMap<String, ConditionVo>();
+            conditionList = new ArrayList<>();
+            conditionMap = new HashMap<>();
             for (int i = 0; i < conditionArray.size(); i++) {
                 JSONObject condition = conditionArray.getJSONObject(i);
                 ConditionVo conditionVo = new ConditionVo(condition);
@@ -50,7 +55,7 @@ public class ConditionGroupVo implements Serializable {
             }
             JSONArray conditionRelArray = jsonObj.getJSONArray("conditionRelList");
             if (CollectionUtils.isNotEmpty(conditionRelArray)) {
-                conditionRelList = new ArrayList<ConditionRelVo>();
+                conditionRelList = new ArrayList<>();
                 for (int i = 0; i < conditionRelArray.size(); i++) {
                     JSONObject conditionRel = conditionRelArray.getJSONObject(i);
                     conditionRelList.add(new ConditionRelVo(conditionRel));
@@ -95,7 +100,7 @@ public class ConditionGroupVo implements Serializable {
 
     public Map<String, ConditionVo> getConditionMap() {
         if (MapUtils.isEmpty(conditionMap) && CollectionUtils.isNotEmpty(conditionList)) {
-            conditionMap = conditionList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+            conditionMap = conditionList.stream().collect(Collectors.toMap(ConditionVo::getUuid, e -> e));
         }
         return conditionMap;
     }

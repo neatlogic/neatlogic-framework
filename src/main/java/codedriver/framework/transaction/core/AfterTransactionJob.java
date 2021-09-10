@@ -30,10 +30,20 @@ public class AfterTransactionJob<T> {
     public synchronized void execute(T t, ICommitted<T> commited, ICompleted<T> completed) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             if (commited != null) {
-                commited.execute(t);
+                CachedThreadPool.execute(new CodeDriverThread() {
+                    @Override
+                    protected void execute() {
+                        commited.execute(t);
+                    }
+                });
             }
             if (completed != null) {
-                completed.execute(t);
+                CachedThreadPool.execute(new CodeDriverThread() {
+                    @Override
+                    protected void execute() {
+                        completed.execute(t);
+                    }
+                });
             }
         } else {
             Set<T> tList = THREADLOCAL.get();
@@ -44,7 +54,7 @@ public class AfterTransactionJob<T> {
                     @Override
                     public void afterCommit() {
                         if (commited != null) {
-                            Set<T> tList = (Set<T>) THREADLOCAL.get();
+                            Set<T> tList = THREADLOCAL.get();
                             CachedThreadPool.execute(new CodeDriverThread() {
                                 @Override
                                 protected void execute() {
@@ -59,7 +69,7 @@ public class AfterTransactionJob<T> {
                     @Override
                     public void afterCompletion(int status) {
                         if (completed != null) {
-                            Set<T> tList = (Set<T>) THREADLOCAL.get();
+                            Set<T> tList = THREADLOCAL.get();
                             CachedThreadPool.execute(new CodeDriverThread() {
                                 @Override
                                 protected void execute() {

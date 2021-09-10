@@ -35,6 +35,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {
+        //先收集所有启动作业
         Map<String, IStartup> myMap = context.getBeansOfType(IStartup.class);
         for (Map.Entry<String, IStartup> entry : myMap.entrySet()) {
             startupList.add(entry.getValue());
@@ -52,7 +53,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
                                 for (IStartup startup : startupList) {
                                     try {
-                                        startup.executeForTenant();
+                                        startup.executeForCurrentTenant();
                                     } catch (Exception ex) {
                                         logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
                                     }
@@ -60,7 +61,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                             for (IStartup startup : startupList) {
                                 try {
-                                    startup.executeForOnce();
+                                    startup.executeForAllTenant();
                                 } catch (Exception ex) {
                                     logger.error("启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
                                 }
@@ -81,7 +82,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
         TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
         for (IStartup startup : startupList) {
             try {
-                startup.executeForTenant();
+                startup.executeForCurrentTenant();
             } catch (Exception ex) {
                 logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
             }

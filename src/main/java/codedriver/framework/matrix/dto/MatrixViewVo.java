@@ -6,6 +6,7 @@
 package codedriver.framework.matrix.dto;
 
 import codedriver.framework.file.dto.FileVo;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author linbq
@@ -15,7 +16,8 @@ public class MatrixViewVo {
     private String matrixUuid;
     private Long fileId;
     private FileVo fileVo;
-    private transient String config;
+    @JSONField(serialize = false)
+    private String config;
     public String getMatrixUuid() {
         return matrixUuid;
     }

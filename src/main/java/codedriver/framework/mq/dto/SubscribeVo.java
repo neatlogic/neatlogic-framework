@@ -37,9 +37,9 @@ public class SubscribeVo extends BasePageVo {
     @EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
     @JSONField(serialize = false)
-    private transient String configStr;
+    private String configStr;
     @JSONField(serialize = false)
-    private transient Integer serverId;
+    private Integer serverId;
 
     public String getTopicName() {
         return topicName;

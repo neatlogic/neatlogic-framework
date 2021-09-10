@@ -5,6 +5,7 @@
 
 package codedriver.framework.form.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,8 @@ import com.alibaba.fastjson.JSONObject;
 
 public class AttributeDataVo {
     private String attributeUuid;
-    private transient String data;
+    @JSONField(serialize = false)
+    private String data;
     private Object dataObj;
     private Integer isMultiple;
     public String getAttributeUuid() {

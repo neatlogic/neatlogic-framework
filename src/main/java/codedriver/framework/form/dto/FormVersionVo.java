@@ -35,9 +35,9 @@ public class FormVersionVo extends BasePageVo implements Serializable {
     private String editor;
     private Date editTime;
     @JSONField(serialize = false)
-    private transient List<FormAttributeVo> formAttributeList;
+    private List<FormAttributeVo> formAttributeList;
     @JSONField(serialize = false)
-    private transient List<FormAttributeMatrixVo> processMatrixFormComponentList;
+    private List<FormAttributeMatrixVo> processMatrixFormComponentList;
 
     public synchronized String getUuid() {
         if (StringUtils.isBlank(uuid)) {

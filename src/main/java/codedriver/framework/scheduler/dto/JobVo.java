@@ -47,7 +47,7 @@ public class JobVo extends BasePageVo {
             type = ApiParamType.LONG)
     private Date endTime;
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
 
     private JobStatusVo jobStatus;
 

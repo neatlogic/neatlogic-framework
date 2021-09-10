@@ -19,7 +19,7 @@ public class TeamVo extends BasePageVo implements Serializable {
 	public static final String ROOT_UUID = "0";
 	private static final long serialVersionUID = -114822145668874331L;
 	@JSONField(serialize=false)
-	private transient Boolean isAutoGenerateUuid = true;
+	private Boolean isAutoGenerateUuid = true;
 	private Long id;
 	@EntityField(name = "分组uuid", type = ApiParamType.STRING)
 	private String uuid;
@@ -45,7 +45,7 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	@EntityField(name = "父分组名称", type = ApiParamType.STRING)
 	@JSONField(serialize = false)
-	private transient String parentName;
+	private String parentName;
 
 	@EntityField(name = "分组完整路径", type = ApiParamType.STRING)
 	private String fullPath;
@@ -54,7 +54,7 @@ public class TeamVo extends BasePageVo implements Serializable {
 	private List<String> parentPathList;
 
 	@JSONField(serialize = false)
-	private transient Integer nameRepeatCount;//重名的分组数量
+	private Integer nameRepeatCount;//重名的分组数量
 
 	/**
 	 * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
@@ -67,15 +67,16 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	private Integer checked;
 	private Integer checkedChildren;
-	private transient String upwardUuidPath;
+	@JSONField(serialize = false)
+	private String upwardUuidPath;
 	@EntityField(name = "名称路径", type = ApiParamType.STRING)
 	private String upwardNamePath;
 	@JSONField(serialize = false)
-	private transient List<String> parentTeamUuidList;
+	private List<String> parentTeamUuidList;
 	@JSONField(serialize = false)
-	private transient List<String> rangeList;
+	private List<String> rangeList;
 	@JSONField(serialize = false)
-	private transient List<String> teamUuidList;
+	private List<String> teamUuidList;
 
 
 	public TeamVo(String uuid) {
@@ -176,7 +177,7 @@ public class TeamVo extends BasePageVo implements Serializable {
 		this.rht = rht;
 	}
 	@JSONField(serialize=false)
-	private transient TeamVo parent;
+	private TeamVo parent;
 	
 	private List<TeamVo> children = new ArrayList<>();
 

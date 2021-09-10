@@ -46,7 +46,7 @@ public class IntegrationVo extends BasePageVo implements Serializable {
     private int referenceCount;
     // 请求参数
     @JSONField(serialize = false)
-    private transient JSONObject paramObj = new JSONObject();
+    private JSONObject paramObj = new JSONObject();
     @EntityField(name = "创建人", type = ApiParamType.STRING)
     private String fcu;
     @EntityField(name = "创建时间", type = ApiParamType.INTEGER)
@@ -59,7 +59,7 @@ public class IntegrationVo extends BasePageVo implements Serializable {
     private Integer hasHelp;
 
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
 
     public String getUrl() {
         return url;

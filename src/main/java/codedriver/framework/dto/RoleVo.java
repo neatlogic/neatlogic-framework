@@ -23,7 +23,7 @@ public class RoleVo extends BasePageVo implements Serializable {
 
     public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
     private Long id;
     @EntityField(name = "角色uuid",
             type = ApiParamType.STRING)
@@ -40,7 +40,7 @@ public class RoleVo extends BasePageVo implements Serializable {
     private List<String> userUuidList;
     private List<RoleAuthVo> roleAuthList;
     @JSONField(serialize = false)
-    private transient List<String> roleUuidList;
+    private List<String> roleUuidList;
 
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]

@@ -20,29 +20,32 @@ import java.util.Set;
 
 public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
-    private transient boolean needPage = true;
+    private boolean needPage = true;
     @JSONField(serialize = false)
     @EntityField(name = "每页条数", type = ApiParamType.INTEGER)
-    private transient Integer pageSize = 20;
+    private Integer pageSize = 20;
     @JSONField(serialize = false)
     @EntityField(name = "当前页数", type = ApiParamType.INTEGER)
-    private transient Integer currentPage = 1;
+    private Integer currentPage = 1;
     @JSONField(serialize = false)
     @EntityField(name = "页数", type = ApiParamType.INTEGER)
-    private transient Integer pageCount = 0;
+    private Integer pageCount = 0;
     @JSONField(serialize = false)
-    private transient Integer startNum;
+    private Integer startNum;
     @JSONField(serialize = false)
-    private transient String keyword;
+    private String keyword;
     @JSONField(serialize = false)
-    private transient Set<String> keywordList;
+    private Set<String> keywordList;
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
-    private transient Integer rowNum = 0;
-    private transient Integer pageSizePlus;
-    @EntityField(name = "默认值", type = ApiParamType.JSONARRAY)
-    private transient JSONArray defaultValue;
     @JSONField(serialize = false)
-    private transient Long cacheFlushKey;//用于扰乱mybatis的Level 1 Cache
+    private Integer rowNum = 0;
+    @JSONField(serialize = false)
+    private Integer pageSizePlus;
+    @EntityField(name = "默认值", type = ApiParamType.JSONARRAY)
+    @JSONField(serialize = false)
+    private JSONArray defaultValue;
+    @JSONField(serialize = false)
+    private Long cacheFlushKey;//用于扰乱mybatis的Level 1 Cache
 
     public BasePageVo() {
     }

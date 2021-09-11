@@ -55,7 +55,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                                     try {
                                         startup.executeForCurrentTenant();
                                     } catch (Exception ex) {
-                                        logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
+                                        logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
                                     }
                                 }
                             }
@@ -63,7 +63,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                                 try {
                                     startup.executeForAllTenant();
                                 } catch (Exception ex) {
-                                    logger.error("启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
+                                    logger.error("启动作业“" + startup.getName() + "“执行失败：" + ex.getMessage(), ex);
                                 }
                             }
                         }

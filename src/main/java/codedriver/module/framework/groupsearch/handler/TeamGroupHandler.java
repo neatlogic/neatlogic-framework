@@ -177,4 +177,11 @@ public class TeamGroupHandler implements IGroupSearchHandler {
             }
         }
     }
+
+    public static void main(String[] args) {
+        TeamVo a = new TeamVo();
+        a.setName("test");
+        List<TeamVo> teamList = Arrays.asList(a);
+        Map<String, Integer> map = teamList.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getNameRepeatCount));
+    }
 }

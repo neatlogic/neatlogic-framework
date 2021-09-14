@@ -41,8 +41,6 @@ public interface UserMapper {
 
     List<UserVo> searchUserByAuth(String auth);
 
-    List<UserVo> searchRoleUserByAuth(String auth);
-
     List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 
     List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
@@ -216,4 +214,7 @@ public interface UserMapper {
 
     int deleteUserTitleByName(String name);
 
+    int searchRoleUserAndUserCountByAuth(UserVo vo);
+
+    List<String> searchUserUuIdByUser(UserVo vo);
 }

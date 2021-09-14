@@ -41,8 +41,6 @@ public interface UserMapper {
 
     List<UserVo> searchUserByAuth(String auth);
 
-    List<UserVo> searchRoleUserAndUserByAuth(UserVo userVo);
-
     List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 
     List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);

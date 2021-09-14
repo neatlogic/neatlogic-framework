@@ -19,6 +19,7 @@ public abstract class CodeDriverThread implements Runnable {
     protected TenantContext tenantContext;
     protected InputFromContext inputFromContext;
     private String threadName;
+    private boolean isUnique = false;
 
     public CodeDriverThread() {
         userContext = UserContext.get();
@@ -38,6 +39,14 @@ public abstract class CodeDriverThread implements Runnable {
         tenantContext = TenantContext.get();
         inputFromContext = InputFromContext.get();
         this.threadName = _threadName;
+    }
+
+    public CodeDriverThread(String _threadName, boolean _isUnique) {
+        userContext = UserContext.get();
+        tenantContext = TenantContext.get();
+        inputFromContext = InputFromContext.get();
+        this.threadName = _threadName;
+        this.isUnique = _isUnique;
     }
 
     @Override
@@ -73,9 +82,19 @@ public abstract class CodeDriverThread implements Runnable {
 
     protected abstract void execute();
 
+    public void setUnique(boolean unique) {
+        isUnique = unique;
+    }
+
+    public boolean isUnique() {
+        return isUnique;
+    }
 
     public void setThreadName(String threadName) {
         this.threadName = threadName;
     }
 
+    public String getThreadName() {
+        return threadName;
+    }
 }

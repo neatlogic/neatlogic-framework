@@ -6,9 +6,11 @@
 package codedriver.framework.asynchronization.threadpool;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Set;
 import java.util.concurrent.*;
 
 public class CachedThreadPool {
@@ -30,7 +32,21 @@ public class CachedThreadPool {
 
     public static void execute(CodeDriverThread command) {
         try {
-            mainThreadPool.execute(command);
+            boolean isExists = false;
+            if (command.isUnique() && StringUtils.isNotBlank(command.getThreadName())) {
+                Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+                for (Thread t : threadSet) {
+                    if (t.getName().equalsIgnoreCase(command.getThreadName())) {
+                        isExists = true;
+                        break;
+                    }
+                }
+            }
+            if (!isExists) {
+                mainThreadPool.execute(command);
+            } else {
+                logger.warn(command.getThreadName() + " is running");
+            }
         } catch (RejectedExecutionException ex) {
             logger.error(ex.getMessage(), ex);
         }

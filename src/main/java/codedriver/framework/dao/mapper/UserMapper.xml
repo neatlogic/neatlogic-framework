@@ -879,7 +879,7 @@
         </foreach>
     </select>
 
-    <select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+    <select id="getUserListByRoleUuid" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
         SELECT k.`id`,
                k.`uuid`,
                k.`user_id`   as `userId`,
@@ -899,8 +899,13 @@
                  SELECT DISTINCT (a.`uuid`) AS `uuid`,
                                  b.`id`
                  FROM `user` a
-                          LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                 WHERE b.`role_uuid` = #{value}
+                              LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+                           WHERE b.`role_uuid` = #{roleUuid}
+                             <if test="keyword != null and keyword != ''">
+                              and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+                              or a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+                             </if>
+                              LIMIT #{startNum}, #{pageSize}
              ) g
                  JOIN `user` k ON g.`uuid` = k.`uuid`
                  LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`

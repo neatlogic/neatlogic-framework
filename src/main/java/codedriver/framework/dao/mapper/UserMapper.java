@@ -129,7 +129,7 @@ public interface UserMapper {
 
     List<UserVo> getUserListByUuidList(List<String> uuidList);
 
-    List<UserVo> getUserListByRoleUuid(String roleUuid);
+    List<UserVo> getUserListByRoleUuid(UserVo userVo);
 
     int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
             @Param("userUuidList") List<String> userUuidList,

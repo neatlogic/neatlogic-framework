@@ -212,8 +212,9 @@
                 AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth` = #{auth})
                 or
                 EXISTS (
-                    select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` = `user_role`.`role_uuid`
-                    where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
+                select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` =
+                `user_role`.`role_uuid`
+                where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
                 )
             </if>
             <if test="roleUuid != null and roleUuid != ''">
@@ -716,6 +717,7 @@
         <if test="isActive != null">
             and a.`is_active` = #{isActive}
         </if>
+        limit 100
     </select>
 
     <select id="checkUserUuidListIsExists" resultType="java.lang.String" useCache="false">
@@ -879,7 +881,7 @@
         </foreach>
     </select>
 
-    <select id="getUserListByRoleUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+    <select id="getUserListByRoleUuid" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
         SELECT k.`id`,
                k.`uuid`,
                k.`user_id`   as `userId`,
@@ -900,14 +902,19 @@
                                  b.`id`
                  FROM `user` a
                           LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                 WHERE b.`role_uuid` = #{value}
+                 WHERE b.`role_uuid` = #{roleUuid}
              ) g
                  JOIN `user` k ON g.`uuid` = k.`uuid`
                  LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
                  LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
                  LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
                  LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        <if test="keyword != null and keyword != ''">
+            where(k.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+            or k.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
         order by g.`id`
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount"

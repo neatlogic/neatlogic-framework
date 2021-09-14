@@ -29,7 +29,7 @@ public class TenantContext implements Serializable {
     private List<ModuleGroupVo> activeModuleGroupList;
     private Map<String, ModuleVo> activeModuleMap;
     private Boolean isData = false;
-    private String dataDbName = "";
+    private final String dataDbName = "";
 
     private static ModuleMapper moduleMapper;
 

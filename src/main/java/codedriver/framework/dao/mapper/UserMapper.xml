@@ -904,8 +904,8 @@
                              <if test="keyword != null and keyword != ''">
                               and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
                               or a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
-                              LIMIT #{startNum}, #{pageSize}
                              </if>
+                              LIMIT #{startNum}, #{pageSize}
              ) g
                  JOIN `user` k ON g.`uuid` = k.`uuid`
                  LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`

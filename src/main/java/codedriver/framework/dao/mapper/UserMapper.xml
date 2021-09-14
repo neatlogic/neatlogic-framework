@@ -899,20 +899,20 @@
                  SELECT DISTINCT (a.`uuid`) AS `uuid`,
                                  b.`id`
                  FROM `user` a
-                          LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                 WHERE b.`role_uuid` = #{roleUuid}
+                              LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+                           WHERE b.`role_uuid` = #{roleUuid}
+                             <if test="keyword != null and keyword != ''">
+                              and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+                              or a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+                              LIMIT #{startNum}, #{pageSize}
+                             </if>
              ) g
                  JOIN `user` k ON g.`uuid` = k.`uuid`
                  LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
                  LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
                  LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
                  LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
-        <if test="keyword != null and keyword != ''">
-            where(k.`user_id` LIKE CONCAT('%', #{keyword}, '%')
-            or k.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
-        </if>
         order by g.`id`
-        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount"

@@ -25,6 +25,7 @@ import codedriver.framework.util.Md5Util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ApiValidateAndHelpBase {
             audit.setError(error);
         }
         if (result != null) {
-            audit.setResult(JSON.toJSONString(result));
+            audit.setResult(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
         }
         CachedThreadPool.execute(new ApiAuditSaveThread(audit));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -24,11 +24,14 @@ import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.util.mongodb.IJsonSerializer;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -45,14 +48,32 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/api/")
 public class ApiDispatcher {
-    Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
+    static Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
 
     @Resource
     private ApiMapper apiMapper;
+
+    /*
+      给fastJson加载自定义序列化配置，序列化json时返回正确格式
+     */
+    static {
+        Reflections reflections = new Reflections("codedriver");
+        Set<Class<? extends IJsonSerializer>> enumClasses = reflections.getSubTypesOf(IJsonSerializer.class);
+        for (Class<? extends IJsonSerializer> c : enumClasses) {
+            try {
+                SerializeConfig serializeConfig = SerializeConfig.getGlobalInstance();
+                IJsonSerializer serializer = c.newInstance();
+                serializeConfig.put(serializer.getType(), serializer);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {

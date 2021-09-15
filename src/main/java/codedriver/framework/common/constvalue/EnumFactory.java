@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.common.constvalue;
 
 import org.reflections.Reflections;
@@ -7,17 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 
-/**
- * @Title: EnumFactory
- * @Package: codedriver.framework.common.constvalue
- * @Description: 枚举工厂，将实现了IEnum接口的枚举纳入工厂
- * @Author: laiwt
- * @Date: 2021/1/11 19:03
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class EnumFactory{
-    private static Map<String, Class<? extends IEnum>> enumMap = new HashMap<>();
+    private static final Map<String, Class<? extends IEnum>> enumMap = new HashMap<>();
 
     static {
         Reflections reflections = new Reflections("codedriver");

@@ -26,6 +26,10 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private String name;
     @EntityField(name = "runner url", type = ApiParamType.STRING)
     private String url;
+    @EntityField(name = "runner host", type = ApiParamType.STRING)
+    private String host;
+    @EntityField(name = "runner port", type = ApiParamType.INTEGER)
+    private Integer port;
     @EntityField(name = "runner 授权key", type = ApiParamType.STRING)
     private String accessKey;
     @EntityField(name = "runner 授权密码", type = ApiParamType.STRING)
@@ -137,5 +141,21 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setNettyPort(String nettyPort) {
         this.nettyPort = nettyPort;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 }

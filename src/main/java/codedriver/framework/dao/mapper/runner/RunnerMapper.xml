@@ -104,14 +104,16 @@
 
     <update id="updateRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
         update runnergroup
-        set `name`=#{name}
+        set `name`=#{name},
+        `description` =#{description}
         where `id` = #{id}
     </update>
 
     <insert id="insertRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
-        insert runnergroup(`id`, `name`)
+        insert runnergroup(`id`, `name`,`description`)
         VALUES (#{id},
-                #{name})
+                #{name},
+                #{description})
     </insert>
 
     <delete id="deleteGroupNetWork">

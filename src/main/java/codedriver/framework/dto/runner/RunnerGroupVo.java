@@ -21,6 +21,8 @@ public class RunnerGroupVo extends BasePageVo {
     private Long id;
     @EntityField(name = "runner 分组名", type = ApiParamType.STRING)
     private String name;
+    @EntityField(name = "描述", type = ApiParamType.STRING)
+    private String description;
     @EntityField(name = "授权类型", type = ApiParamType.STRING)
     private String authType;
     @EntityField(name = "runner名称", type = ApiParamType.STRING)
@@ -53,6 +55,15 @@ public class RunnerGroupVo extends BasePageVo {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 
     public List<GroupNetworkVo> getNetworkList() {
         return networkList;

@@ -249,7 +249,7 @@
     </insert>
 
     <insert id="insertRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
-        INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
+        REPLACE INTO `user_role` (`user_uuid`, `role_uuid`)
         VALUES (#{userUuid}, #{roleUuid})
     </insert>
 

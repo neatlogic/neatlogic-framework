@@ -1097,7 +1097,7 @@
     </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
-        INSERT INTO `user_authority`(`user_uuid`,
+        REPLACE INTO `user_authority`(`user_uuid`,
                                      `auth_group`,
                                      `auth`)
         VALUES (#{userUuid},
@@ -1302,49 +1302,22 @@
         WHERE `name` = #{value};
     </delete>
 
-    <select id="searchRoleUserAndUserCountByAuth" resultType="int" parameterType="codedriver.framework.dto.UserVo">
-        SELECT COUNT(1) FROM(
+    <select id="searchUserCountByAuth" resultType="int" parameterType="codedriver.framework.dto.UserVo">
         SELECT
-        a.`uuid`
-        FROM `user` a
-        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `role_authority` c ON b.`role_uuid` = c.`role_uuid`
-        WHERE c.`auth` = #{auth}
-        <if test="keyword != null and keyword != ''">
-            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
-            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
-        </if>
-        UNION
-        SELECT
-        a.`uuid`
+        COUNT(distinct  a.`uuid`)
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
         WHERE  b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
             or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
-        </if>)a
-
+        </if>
     </select>
 
     <select id="searchUserUuIdByUser" resultType="string" parameterType="codedriver.framework.dto.UserVo">
-        SELECT
-        a.`uuid`
-        FROM `user` a
-        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `role_authority` c ON b.`role_uuid` = c.`role_uuid`
-        WHERE c.`auth` = #{auth}
-        <if test="keyword != null and keyword != ''">
-            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
-            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
-        </if>
-        UNION
-        SELECT
-        a.`uuid`
+        SELECT distinct a.`uuid`
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
         WHERE b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')

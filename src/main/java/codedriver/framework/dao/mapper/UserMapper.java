@@ -214,7 +214,7 @@ public interface UserMapper {
 
     int deleteUserTitleByName(String name);
 
-    int searchRoleUserAndUserCountByAuth(UserVo vo);
+    int searchUserCountByAuth(UserVo vo);
 
     List<String> searchUserUuIdByUser(UserVo vo);
 }

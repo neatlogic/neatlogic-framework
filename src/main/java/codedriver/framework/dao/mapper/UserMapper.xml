@@ -1320,7 +1320,7 @@
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
         LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
-        WHERE a.`uuid` =#{uuid}
+        WHERE  b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
             or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
@@ -1345,7 +1345,7 @@
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
         LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
-        WHERE a.`uuid` =#{uuid}
+        WHERE b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
             or a.`user_name` LIKE CONCAT(#{keyword}, '%'))

@@ -1097,7 +1097,7 @@
     </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
-        INSERT INTO `user_authority`(`user_uuid`,
+        REPLACE INTO `user_authority`(`user_uuid`,
                                      `auth_group`,
                                      `auth`)
         VALUES (#{userUuid},

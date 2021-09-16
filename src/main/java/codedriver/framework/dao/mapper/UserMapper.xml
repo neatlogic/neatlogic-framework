@@ -1307,7 +1307,6 @@
         COUNT(distinct  a.`uuid`)
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
         WHERE  b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
@@ -1319,7 +1318,6 @@
         SELECT distinct a.`uuid`
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `user_role` c ON a.`uuid` = c.`user_uuid`
         WHERE b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')

@@ -567,21 +567,12 @@
     </select>
 
     <select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo" useCache="false">
-        SELECT f.`auth`                     as `name`,
-               COUNT(DISTINCT (f.`userId`)) as `userCount`
-        FROM (
-                 SELECT b.`user_id` as `userId`,
-                        a.`auth`
+                 SELECT
+                        a.`auth`  as `name`,
+                        COUNT(DISTINCT (a.`user_uuid`)) as `userCount`
                  FROM `user_authority` a
                           LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
-                 UNION
-                 SELECT e.`user_id` as `userId`,
-                        c.`auth`
-                 FROM `role_authority` c
-                          LEFT JOIN `user_role` d ON c.`role_uuid` = d.`role_uuid`
-                          LEFT JOIN `user` e ON d.`user_uuid` = e.`uuid`
-             ) f
-        GROUP BY f.`auth`
+        GROUP BY a.`auth`
     </select>
 
     <select id="getUserProfileByUserUuidAndModuleId" parameterType="java.lang.String"

@@ -70,7 +70,7 @@
                ar.`group_id`                           AS groupId,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
-                 LEFT JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+        JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
     </select>
 
     <select id="getRunnerById" resultType="codedriver.framework.dto.runner.RunnerVo">

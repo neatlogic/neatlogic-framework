@@ -99,13 +99,16 @@ public class RestUtil {
             DataInputStream input = null;
             OutputStream os = null;
             try {
-                input = new DataInputStream(connection.getInputStream());
+                if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
+                    input = new DataInputStream(connection.getInputStream());
+                }else{
+                    input = new DataInputStream(connection.getErrorStream());
+                }
                 os = response.getOutputStream();
                 IOUtils.copy(input, os);
                 os.flush();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                result = e.getMessage();
             } finally {
                 try {
                     if (os != null) {

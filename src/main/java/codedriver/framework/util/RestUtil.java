@@ -82,15 +82,18 @@ public class RestUtil {
 
     /**
      * 发送GET请求，并将返回值写入response
+     *
      * @param restVo
      * @param response
      */
-    public static void sendGetRequestForStream(RestVo restVo, HttpServletResponse response) {
+    public static String sendGetRequestForStream(RestVo restVo, HttpServletResponse response) {
         HttpURLConnection connection = null;
+        String result = "";
         try {
             connection = getConnection(restVo, HttpMethod.GET);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+            result = e.getMessage();
         }
         if (connection != null) {
             DataInputStream input = null;
@@ -102,6 +105,7 @@ public class RestUtil {
                 os.flush();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                result = e.getMessage();
             } finally {
                 try {
                     if (os != null) {
@@ -116,6 +120,7 @@ public class RestUtil {
                 connection.disconnect();
             }
         }
+        return result;
     }
 
     private static HttpURLConnection getConnection(RestVo restVo, HttpMethod method) throws Exception {

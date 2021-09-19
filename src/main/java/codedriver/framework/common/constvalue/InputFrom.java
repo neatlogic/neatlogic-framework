@@ -12,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public enum InputFrom implements IEnum {
-    PAGE("page", "页面"), IMPORT("import", "导入"), RESTFUL("restful", "接口"),
-    ITSM("itsm", "流程"), UNKNOWN("unknown", "未知"), CRON("cron", "定时");
+    PAGE("page", "页面操作"), IMPORT("import", "excel导入"), RESTFUL("restful", "接口同步"),
+    ITSM("itsm", "流程修改"), UNKNOWN("unknown", "未知"), CRON("cron", "定时任务"), AUTOEXEC("autoexec", "自动采集");
 
     private final String value;
     private final String text;
@@ -64,10 +64,12 @@ public enum InputFrom implements IEnum {
     public List getValueTextList() {
         JSONArray returnList = new JSONArray();
         for (InputFrom input : InputFrom.values()) {
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put("value", input.getValue());
-            jsonObj.put("text", input.getText());
-            returnList.add(jsonObj);
+            if (input != InputFrom.UNKNOWN) {
+                JSONObject jsonObj = new JSONObject();
+                jsonObj.put("value", input.getValue());
+                jsonObj.put("text", input.getText());
+                returnList.add(jsonObj);
+            }
         }
         return returnList;
     }

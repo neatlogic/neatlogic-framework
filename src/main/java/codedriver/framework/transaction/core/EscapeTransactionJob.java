@@ -40,6 +40,7 @@ public class EscapeTransactionJob {
     public static class State {
         private boolean isSucceed = false;
         private String error;
+        private RuntimeException exception;
 
         public boolean isSucceed() {
             return isSucceed;
@@ -55,6 +56,14 @@ public class EscapeTransactionJob {
 
         public void setError(String error) {
             this.error = error;
+        }
+
+        public RuntimeException getException() {
+            return exception;
+        }
+
+        public void setException(RuntimeException exception) {
+            this.exception = exception;
         }
     }
 
@@ -79,6 +88,7 @@ public class EscapeTransactionJob {
                 state.setError(ex.getMessage());
                 if (!(ex instanceof ApiRuntimeException)) {
                     logger.error(ex.getMessage(), ex);
+                    state.setException(new RuntimeException(ex));
                 }
             } finally {
                 latch.countDown();

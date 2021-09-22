@@ -26,8 +26,8 @@ public class PriorityHandler extends ControlHandlerBase {
     }
 
     @Override
-    public boolean valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
-        return true;
+    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
+        return null;
     }
 
     @Override

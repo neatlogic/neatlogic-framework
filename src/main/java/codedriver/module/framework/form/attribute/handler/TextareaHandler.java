@@ -43,8 +43,8 @@ public class TextareaHandler extends FormHandlerBase {
     }
 
     @Override
-    public boolean valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
-        return false;
+    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
+        return null;
     }
 
     @Override

@@ -75,7 +75,7 @@ public class MongoDbVo {
         if (StringUtils.isBlank(passwordPlain)) {
             if (StringUtils.isNotBlank(passwordCipher)) {
                 if (passwordCipher.startsWith("RC4:")) {
-                    this.passwordPlain = RC4Util.decrypt(Config.RC4KEY, this.passwordCipher.substring(4));
+                    this.passwordPlain = RC4Util.decrypt(this.passwordCipher.substring(4));
                 } else {
                     this.passwordPlain = this.passwordCipher;
                 }
@@ -91,7 +91,7 @@ public class MongoDbVo {
     public String getPasswordCipher() {
         if (StringUtils.isBlank(passwordCipher)) {
             if (StringUtils.isNotBlank(passwordPlain)) {
-                this.passwordCipher = "RC4:" + RC4Util.encrypt(Config.RC4KEY, passwordPlain);
+                this.passwordCipher = "RC4:" + RC4Util.encrypt(passwordPlain);
             }
         }
         return passwordCipher;

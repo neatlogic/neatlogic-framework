@@ -42,7 +42,7 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
 
     @Override
     public void setPassword(String password) {
-        String prefix = "{ENCRYPTED}";
+        String prefix = "RC4:";
         if (password.startsWith(prefix)) {
             password = password.substring(prefix.length());
             password = RC4Util.decrypt(password);

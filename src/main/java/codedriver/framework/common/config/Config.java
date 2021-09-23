@@ -30,7 +30,6 @@ public class Config {
 
     public static final int SCHEDULE_SERVER_ID;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
-    public static final String RC4KEY = "codedriver.key.20200101";
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
     private static String CODEDRIVER_HOME;

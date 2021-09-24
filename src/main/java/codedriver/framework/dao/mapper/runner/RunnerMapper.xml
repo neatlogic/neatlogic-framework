@@ -200,5 +200,37 @@
         from runner
         where `id` = #{id}
     </delete>
+
+    <select id="getRunnerByIp" parameterType="java.lang.String" resultType="codedriver.framework.dto.runner.RunnerVo"
+            useCache="false">
+        SELECT `id`            AS id,
+               `name`          AS name,
+               `url`           AS url,
+               `access_key`    AS accessKey,
+               `access_secret` AS accessSecret,
+               `auth_type`     AS authType,
+               `group_id`      AS groupId,
+               `host`,
+               `port`
+        FROM runner p
+        WHERE p.host = #{value}
+    </select>
+
+    <select id="getRunnerByGroupId" parameterType="java.lang.Long"
+            resultType="codedriver.framework.dto.runner.RunnerVo" useCache="true">
+        SELECT r.id            AS id,
+               r.name          AS name,
+               r.url           AS url,
+               r.access_key    AS accessKey,
+               r.access_secret AS accessSecret,
+               r.auth_type     AS authType,
+               r.group_id      AS groupId,
+               r.host,
+               r.port
+        FROM runner r
+        WHERE r.group_id = #{value}
+        ORDER BY id
+    </select>
+
 </mapper>
 

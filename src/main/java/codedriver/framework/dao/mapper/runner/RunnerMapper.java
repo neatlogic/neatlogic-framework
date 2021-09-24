@@ -50,4 +50,8 @@ public interface RunnerMapper {
     void deleteRunnerById(Long id);
 
     int checkRunnerNameIsExistByName(RunnerVo runnerVo);
+
+    RunnerVo getRunnerByIp(String requestIp);
+
+    List<RunnerVo> getRunnerByGroupId(Long runnerGroupId);
 }

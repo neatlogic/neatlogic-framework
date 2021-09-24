@@ -51,7 +51,9 @@ public class DateHandler extends FormHandlerBase {
     }
 
     @Override
-    public boolean valid(AttributeDataVo attributeDataVo, JSONObject jsonObj) throws AttributeValidException {
+    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject jsonObj) throws AttributeValidException {
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("result", true);
         JSONObject configObj = jsonObj.getJSONObject("attributeConfig");
         List<String> validTypeList = JSON.parseArray(configObj.getString("validType"), String.class);
         if (CollectionUtils.isNotEmpty(validTypeList)) {
@@ -64,7 +66,9 @@ public class DateHandler extends FormHandlerBase {
                     String date = data.replace(styleType, "-");
                     try {
                         dateFormatter.parse(date);
-                        return worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
+                        boolean result = worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
+                        resultObj.put("result", result);
+                        return resultObj;
                     } catch (DateTimeParseException ex) {
                         String format = DATE_FORMAT.replace("-", styleType);
                         throw new ParamIrregularException("data", format);
@@ -75,7 +79,9 @@ public class DateHandler extends FormHandlerBase {
                         TemporalAccessor temporalAccessor = dateTimeFormatter.parse(dateTime);
                         LocalDateTime endLocalDateTime = LocalDateTime.from(temporalAccessor);
                         long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
-                        return worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
+                        boolean result = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
+                        resultObj.put("result", result);
+                        return resultObj;
                     } catch (DateTimeParseException ex) {
                         String format = DATETIME_FORMAT.replace("-", styleType);
                         throw new ParamIrregularException("data", format);
@@ -83,7 +89,7 @@ public class DateHandler extends FormHandlerBase {
                 }
             }
         }
-        return true;
+        return resultObj;
     }
 
     @Override

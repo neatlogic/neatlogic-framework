@@ -170,7 +170,7 @@ public interface IFormAttributeHandler {
      * @Time:2020年11月19日
      * @Description: 验证组件数据完整性
      */
-    public boolean valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException;
+    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException;
 
     /**
      * @param attributeDataVo

@@ -33,6 +33,13 @@ public class IpUtil {
 		return ip;
 	}
 
+	/**
+	 * 判断ip是否属于某个网段
+	 * @param ip 判断ip
+	 * @param targetIp 网段ip
+	 * @param subnetMask 掩码
+	 * @return boolean
+	 */
 	public static boolean isBelongSegment(String ip, String targetIp, int subnetMask) {
 		if (StringUtils.isEmpty(ip)) {
 			return false;

@@ -49,7 +49,7 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             dataList = resultObj.getJSONArray("dataList");
             if (excludeList != null && !excludeList.isEmpty()) {
                 for (Object exclude : excludeList) {
-                    dataList = dataList.stream().filter(data -> !((JSONObject) data).getString("value").equalsIgnoreCase(exclude.toString())).collect(Collectors.toList());
+                    dataList = dataList.stream().filter(data -> !(JSONObject.parseObject(JSONObject.toJSONString(data)).getString("value").equalsIgnoreCase(exclude.toString()))).collect(Collectors.toList());
                 }
             }
 

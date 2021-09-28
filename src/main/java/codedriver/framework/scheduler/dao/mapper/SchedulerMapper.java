@@ -1,80 +1,82 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.scheduler.dao.mapper;
+
+import codedriver.framework.scheduler.dto.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
-import codedriver.framework.scheduler.dto.JobAuditVo;
-import codedriver.framework.scheduler.dto.JobLockVo;
-import codedriver.framework.scheduler.dto.JobPropVo;
-import codedriver.framework.scheduler.dto.JobStatusVo;
-import codedriver.framework.scheduler.dto.JobVo;
-
 public interface SchedulerMapper {
-	// SELECT
-	public JobVo getJobByUuid(String uuid);
+    // SELECT
+    public JobVo getJobByUuid(String uuid);
 
-	public JobVo getJobBaseInfoByUuid(String uuid);
+    public JobVo getJobBaseInfoByUuid(String uuid);
 
-	public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-	public List<JobVo> getJobByHandler(String handler);
+    public List<JobVo> getJobByHandler(String handler);
 
-	public int searchJobCount(JobVo jobVo);
+    public int searchJobCount(JobVo jobVo);
 
-	public List<JobVo> searchJob(JobVo jobVo);
+    public List<JobVo> searchJob(JobVo jobVo);
 
-	public int searchJobAuditCount(JobAuditVo jobAuditVo);
+    public int searchJobAuditCount(JobAuditVo jobAuditVo);
 
-	public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
+    public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
 
-	public JobAuditVo getJobAuditById(Long auditId);
-	
-	public List<JobAuditVo> getJobAuditByUuid(String uuid);
+    public JobAuditVo getJobAuditById(Long auditId);
 
-	public JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    public List<JobAuditVo> getJobAuditByUuid(String uuid);
 
-	public List<JobLockVo> getJobLockByServerId(Integer serverId);
+    public JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-	public int checkJobNameIsExists(JobVo job);
+    public List<JobLockVo> getJobLockByServerId(Integer serverId);
 
-	// UPDATE
-	public int updateJob(JobVo jobVo);
+    public int checkJobNameIsExists(JobVo job);
 
-	public int resetJobLockByServerId(Integer serverId);
+    // UPDATE
+    public int updateJob(JobVo jobVo);
 
-	public int updateJobStatus(JobStatusVo jobStatus);
+    public int resetJobLockByServerId(Integer serverId);
 
-	public int updateJobNextFireTime(JobStatusVo jobStatus);
+    public int updateJobStatus(JobStatusVo jobStatus);
 
-	public int updateJobAudit(JobAuditVo scheduleJobAudit);
+    public int updateJobNextFireTime(JobStatusVo jobStatus);
 
-	public int updateJobLock(JobLockVo jobLock);
+    public int updateJobAudit(JobAuditVo scheduleJobAudit);
 
-	public int updateJobLockByServerId(JobLockVo jobLock);
+    public int updateJobLock(JobLockVo jobLock);
 
-	// INSERT
-	public int insertJob(JobVo job);
+    public int updateJobLockByServerId(JobLockVo jobLock);
 
-	public int insertJobStatus(JobStatusVo jobStatus);
+    // INSERT
+    public int insertJob(JobVo job);
 
-	public int insertJobProp(JobPropVo jobProp);
+    public int insertJobStatus(JobStatusVo jobStatus);
 
-	public int insertJobAudit(JobAuditVo scheduleJobAudit);
+    public int insertJobProp(JobPropVo jobProp);
 
-	public int insertJobLock(JobLockVo jobLock);
+    public int insertJobAudit(JobAuditVo scheduleJobAudit);
 
-	public int replaceJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
+    public int insertJobLock(JobLockVo jobLock);
 
-	// DELETE
-	public int deleteJobByUuid(String uuid);
+    public int replaceJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-	public int deleteJobPropByJobUuid(String jobUuid);
+    // DELETE
+    public int deleteJobByUuid(String uuid);
 
-	public int deleteJobAuditByJobUuid(String jobUuid);
+    public int deleteJobPropByJobUuid(String jobUuid);
 
-	public int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    public int deleteJobAuditByJobUuid(String jobUuid);
 
-	public int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    public int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
+    public int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
+    void deleteUnusedJobStatus();
 
 }

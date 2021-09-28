@@ -3,13 +3,10 @@ package codedriver.framework.matrix.dao.mapper;
 import codedriver.framework.matrix.dto.MatrixExternalVo;
 
 public interface MatrixExternalMapper {
-    public void insertMatrixExternal(MatrixExternalVo matrixExternalVo);
 
-    public void updateMatrixExternal(MatrixExternalVo externalVo);
+    MatrixExternalVo getMatrixExternalByMatrixUuid(String matrixUuid);
 
-    public void deleteMatrixExternalByMatrixUuid(String matrixUuid);
+    int replaceMatrixExternal(MatrixExternalVo matrixExternalVo);
 
-    public MatrixExternalVo getMatrixExternalByMatrixUuid(String matrixUuid);
-
-	public int getMatrixExternalIsExists(String matrixUuid);
+    int deleteMatrixExternalByMatrixUuid(String matrixUuid);
 }

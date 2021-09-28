@@ -22,6 +22,17 @@ public class TableResultUtil {
         return returnObj;
     }
 
+    public static JSONObject getResult(List theadList, List tbodyList, BasePageVo vo) {
+        JSONObject returnObj = new JSONObject();
+        returnObj.put("pageSize", vo.getPageSize());
+        returnObj.put("pageCount", vo.getPageCount());
+        returnObj.put("rowNum", vo.getRowNum());
+        returnObj.put("currentPage", vo.getCurrentPage());
+        returnObj.put("theadList", theadList);
+        returnObj.put("tbodyList", tbodyList);
+        return returnObj;
+    }
+
     public static JSONObject getResult(JSONArray resultList, BasePageVo vo) {
         JSONObject returnObj = new JSONObject();
         returnObj.put("pageSize", vo.getPageSize());

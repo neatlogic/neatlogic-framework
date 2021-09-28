@@ -6,19 +6,18 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface MatrixAttributeMapper {
-    public int insertMatrixAttribute(MatrixAttributeVo matrixAttributeVo);
 
-    public List<MatrixAttributeVo> getMatrixAttributeByMatrixUuid(String matrixUuid);
+    List<MatrixAttributeVo> getMatrixAttributeByMatrixUuid(String matrixUuid);
 
-    public void deleteAttributeByMatrixUuid(String matrixUuid);
+    int insertMatrixAttribute(MatrixAttributeVo matrixAttributeVo);
 
-//    public int checkMatrixAttributeTableExist(String tableName);
+    void deleteAttributeByMatrixUuid(String matrixUuid);
 
-    public void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void dropMatrixDynamicTable(@Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void dropMatrixDynamicTable(@Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 }

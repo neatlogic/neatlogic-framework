@@ -9,15 +9,8 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
-	<select id="getMatrixExternalIsExists" parameterType="string" resultType="int">
-		SELECT
-		COUNT(`matrix_uuid`) 
-		FROM `matrix_external`
-		WHERE `matrix_uuid` = #{matrixUuid}
-	</select>
-	
-	<insert id="insertMatrixExternal" parameterType="codedriver.framework.matrix.dto.MatrixExternalVo">
-		INSERT INTO
+	<insert id="replaceMatrixExternal" parameterType="codedriver.framework.matrix.dto.MatrixExternalVo">
+		REPLACE INTO
 		`matrix_external`(
 			`matrix_uuid`,
 			`integration_uuid`
@@ -27,12 +20,6 @@
 		)
 
 	</insert>
-
-	<update id="updateMatrixExternal" parameterType="codedriver.framework.matrix.dto.MatrixExternalVo">
-		UPDATE `matrix_external` SET
-		 `integration_uuid` = #{integrationUuid}
-		 WHERE `matrix_uuid` = #{matrixUuid}
-	</update>
 
 	<delete id="deleteMatrixExternalByMatrixUuid" parameterType="String">
 		DELETE FROM `matrix_external` WHERE `matrix_uuid` = #{matrixUuid}

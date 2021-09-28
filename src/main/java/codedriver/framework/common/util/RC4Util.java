@@ -17,11 +17,11 @@ public class RC4Util {
         return new String(decrypt(RC4_KEY.getBytes(), hexStr2Bytes(ciphertext)));
     }
 
-//    public static String encrypt(final String key, final String plaintext) {
+//    private static String encrypt(final String key, final String plaintext) {
 //        return byte2HexStr(encrypt(key.getBytes(), plaintext.getBytes()));
 //    }
 //
-//    public static String decrypt(final String key, final String ciphertext) {
+//    private static String decrypt(final String key, final String ciphertext) {
 //        return new String(decrypt(key.getBytes(), hexStr2Bytes(ciphertext)));
 //    }
 

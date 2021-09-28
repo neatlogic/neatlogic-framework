@@ -225,6 +225,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);
                 }
+                schedulerMapper.deleteUnusedJobStatus();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             } finally {

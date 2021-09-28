@@ -231,12 +231,6 @@
         </where>
     </select>
 
-    <!--<select id="getDynamicTableCellData" resultType="java.lang.String">
-        SELECT `${targetColumn}`
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        WHERE `${sourceColumnVo.column}` = #{sourceColumnVo.value}
-    </select>-->
-
     <select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT
         `${targetColumn}` as `value`,

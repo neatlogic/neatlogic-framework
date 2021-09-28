@@ -6,25 +6,23 @@ import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 
 public interface MatrixMapper {
-    public int insertMatrix(MatrixVo matrixVo);
+    int insertMatrix(MatrixVo matrixVo);
 
-    public int searchMatrixCount(MatrixVo matrixVo);
+    int searchMatrixCount(MatrixVo matrixVo);
 
-    public MatrixVo getMatrixByUuid(String uuid);
+    MatrixVo getMatrixByUuid(String uuid);
 
-//    public ValueTextVo getMatrixByUuidForSelect(String uuid);
+    List<MatrixVo> getMatrixListByUuidList(List<String> uuidList);
 
-    public List<MatrixVo> searchMatrix(MatrixVo matrixVo);
+    List<MatrixVo> searchMatrix(MatrixVo matrixVo);
 
-//    public List<ValueTextVo> searchMatrixForSelect(MatrixVo matrixVo);
+    int checkMatrixIsExists(String uuid);
 
-    public int checkMatrixIsExists(String uuid);
+    int checkMatrixNameIsRepeat(MatrixVo matrixVo);
 
-    public int checkMatrixNameIsRepeat(MatrixVo matrixVo);
+    int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
 
-    public int checkMatrixLabelIsRepeat(MatrixVo matrixVo);
+    int deleteMatrixByUuid(String uuid);
 
-    public int deleteMatrixByUuid(String uuid);
-
-    public int updateMatrixNameAndLcu(MatrixVo matrixVo);
+    int updateMatrixNameAndLcu(MatrixVo matrixVo);
 }

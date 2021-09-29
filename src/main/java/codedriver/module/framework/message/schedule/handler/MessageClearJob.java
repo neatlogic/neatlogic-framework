@@ -10,7 +10,6 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.message.dao.mapper.MessageMapper;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
-import codedriver.framework.util.UuidUtil;
 import org.quartz.CronExpression;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -58,14 +57,14 @@ public class MessageClearJob extends JobBase {
 
     @Override
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException {
-        /** 删除message_recipient表数据 **/
+        /* 删除message_recipient表数据 **/
         Long messageId = getMaxMessageId(Config.NEW_MESSAGE_EXPIRED_DAY());
-        if(messageId != null){
+        if (messageId != null) {
             messageMapper.deleteMessageRecipientByLessThanOrEqualMessageId(messageId);
         }
-        /** 删除message和message_user表数据 **/
+        /* 删除message和message_user表数据 **/
         messageId = getMaxMessageId(Config.HISTORY_MESSAGE_EXPIRED_DAY());
-        if(messageId != null){
+        if (messageId != null) {
             messageMapper.deleteMessageUserByLessThanOrEqualMessageId(messageId);
             messageMapper.deleteMessageByLessThanOrEqualId(messageId);
         }
@@ -75,8 +74,6 @@ public class MessageClearJob extends JobBase {
      * @Description: 根据时效天数计算出时效时间点，再根据时效时间点查出需要删除数据中的最大messageId，如果messageId为null,则无需删除
      * @Author: linbq
      * @Date: 2021/1/20 11:32
-     * @Params:[expiredDay]
-     * @Returns:java.lang.Long
      **/
     private Long getMaxMessageId(int expiredDay) {
         Calendar calendar = Calendar.getInstance();

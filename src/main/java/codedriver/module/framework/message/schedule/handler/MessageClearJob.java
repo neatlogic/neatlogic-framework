@@ -51,7 +51,7 @@ public class MessageClearJob extends JobBase {
 
     @Override
     public void initJob(String tenantUuid) {
-        JobObject.Builder jobObjectBuilder = new JobObject.Builder(UuidUtil.randomUuid(), this.getGroupName(), this.getClassName(), TenantContext.get().getTenantUuid());
+        JobObject.Builder jobObjectBuilder = new JobObject.Builder(this.getGroupName(), this.getGroupName(), this.getClassName(), TenantContext.get().getTenantUuid());
         JobObject jobObject = jobObjectBuilder.build();
         this.reloadJob(jobObject);
     }

@@ -10,12 +10,8 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 	
-	<select id="checkMatrixViewIsExists" parameterType="string" resultType="int">
-		SELECT COUNT(1) FROM `matrix_view` WHERE `matrix_uuid` = #{matrixUuid}
-	</select>
-	
-	<insert id="insertMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
-		INSERT INTO `matrix_view`(
+	<insert id="replaceMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
+		REPLACE INTO `matrix_view`(
 			`matrix_uuid`,
 			`file_id`,
 			`config`
@@ -26,13 +22,6 @@
 		)
 
 	</insert>
-
-	<update id="updateMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
-		UPDATE `matrix_view` SET
-		 `file_id` = #{fileId},
-		 `config` = #{config}
-		 WHERE `matrix_uuid` = #{matrixUuid}
-	</update>
 
 	<delete id="deleteMatrixViewByMatrixUuid" parameterType="String">
 		DELETE FROM `matrix_view` WHERE `matrix_uuid` = #{matrixUuid}

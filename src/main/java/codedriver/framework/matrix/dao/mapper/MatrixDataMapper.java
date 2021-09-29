@@ -9,37 +9,35 @@ import java.util.List;
 import java.util.Map;
 
 public interface MatrixDataMapper {
-    public int insertDynamicTableData(@Param("rowData") List<MatrixColumnVo> rowData, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    int insertDynamicTableData(@Param("rowData") List<MatrixColumnVo> rowData, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public int updateDynamicTableDataByUuid(@Param("rowData") List<MatrixColumnVo> rowData, @Param("uuidColumn") MatrixColumnVo uuidColumn, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    int updateDynamicTableDataByUuid(@Param("rowData") List<MatrixColumnVo> rowData, @Param("uuidColumn") MatrixColumnVo uuidColumn, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public int deleteDynamicTableDataByUuid(@Param("matrixUuid") String matrixUuid, @Param("uuid") String uuid, @Param("schemaName") String schemaName);
+    int deleteDynamicTableDataByUuid(@Param("matrixUuid") String matrixUuid, @Param("uuid") String uuid, @Param("schemaName") String schemaName);
 
-    public int getDynamicTableDataCount(MatrixDataVo dataVo);
+    int getDynamicTableDataCount(MatrixDataVo dataVo);
 
-    public int getDynamicTableDataCountByUuid(@Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    int getDynamicTableDataCountByUuid(@Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
-    public List<Map<String, String>> searchDynamicTableData(MatrixDataVo dataVo);
+    List<Map<String, String>> searchDynamicTableData(MatrixDataVo dataVo);
 
-    public List<Map<String, String>> getDynamicTableDataByColumnList(MatrixDataVo dataVo);
+    List<Map<String, String>> getDynamicTableDataByColumnList(MatrixDataVo dataVo);
 
-    public List<Map<String, String>> getDynamicTableDataByUuidList(MatrixDataVo dataVo);
+    List<Map<String, String>> getDynamicTableDataByUuidList(MatrixDataVo dataVo);
 
-    public int getDynamicTableDataByColumnCount(MatrixDataVo dataVo);
+    int getDynamicTableDataByColumnCount(MatrixDataVo dataVo);
 
-    public int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
+    int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
 
-//    public List<String> getDynamicTableCellData(@Param("matrixUuid") String matrixUuid, @Param("sourceColumnVo") MatrixColumnVo sourceColumnVo, @Param("targetColumn") String targetColumn, @@Param("schemaName") String schemaName);
+    List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values, @Param("schemaName") String schemaName);
 
-    public List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values, @Param("schemaName") String schemaName);
+    List<Map<String, String>> getDynamicTableDataByColumnList2(MatrixDataVo dataVo);
 
-    public List<Map<String, String>> getDynamicTableDataByColumnList2(MatrixDataVo dataVo);
+    Map<String, String> getDynamicRowDataByUuid(MatrixDataVo dataVo);
 
-    public Map<String, String> getDynamicRowDataByUuid(MatrixDataVo dataVo);
+    Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList, @Param("schemaName") String schemaName);
 
-    public Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList, @Param("schemaName") String schemaName);
-
-    public int insertDynamicTableDataForCopy(
+    int insertDynamicTableDataForCopy(
             @Param("sourceMatrixUuid") String sourceMatrixUuid,
             @Param("sourceColumnList") List<String> sourceColumnList,
             @Param("targetMatrixUuid") String targetMatrixUuid,

@@ -127,22 +127,22 @@
             <foreach collection="columnList" item="column" separator="AND">
                 a.`${column}` IS NOT NULL
             </foreach>
-            <choose>
-                <when test="attrType == 'input' or attrType == 'select' or attrType == 'date'">
-                    <if test="keyword != null and keyword != ''">
-                        and `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
-                    </if>
-                </when>
-                <when test="attrType == 'user'">
-                    and b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
-                </when>
-                <when test="attrType == 'team'">
-                    and c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%')
-                </when>
-                <when test="attrType == 'role'">
-                    and d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%')
-                </when>
-            </choose>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="attrType == 'input' or attrType == 'date'">
+                            and `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="attrType == 'user'">
+                        and b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="attrType == 'team'">
+                        and c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                    <when test="attrType == 'role'">
+                        and d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%')
+                    </when>
+                </choose>
+            </if>
             <if test="sourceColumnList != null and sourceColumnList.size() > 0">
                 <foreach collection="sourceColumnList" item="sourceColumn">
                     <choose>
@@ -230,12 +230,6 @@
             </if>
         </where>
     </select>
-
-    <!--<select id="getDynamicTableCellData" resultType="java.lang.String">
-        SELECT `${targetColumn}`
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        WHERE `${sourceColumnVo.column}` = #{sourceColumnVo.value}
-    </select>-->
 
     <select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT

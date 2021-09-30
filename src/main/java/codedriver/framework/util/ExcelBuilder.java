@@ -181,6 +181,24 @@ public class ExcelBuilder {
         return this.workbook;
     }
 
+    public void addRow(Map<String, Object> dataMap) {
+        if (this.workbook == null) {
+            this.build();
+        }
+        if (this.workbook != null && CollectionUtils.isNotEmpty(columnList)) {
+            int lastRowNum = sheet.getLastRowNum();
+            lastRowNum++;
+            Row row = sheet.createRow(lastRowNum);
+            int j = 0;
+            for (String column : columnList) {
+                Cell cell = row.createCell(j);
+                makeupBody(cell);
+                cell.setCellValue(dataMap.get(column) == null ? null : dataMap.get(column).toString());
+                j++;
+            }
+        }
+    }
+
     public static void main(String[] a) {
         ExcelBuilder builder = new ExcelBuilder(HSSFWorkbook.class);
         builder.build();

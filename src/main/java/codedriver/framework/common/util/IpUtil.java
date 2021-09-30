@@ -1,11 +1,9 @@
 package codedriver.framework.common.util;
 
-import codedriver.framework.dto.runner.GroupNetworkVo;
 import codedriver.framework.exception.util.IpSubnetMaskException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class IpUtil {
@@ -64,12 +62,12 @@ public class IpUtil {
         }
     }
 
-    public static boolean isIp(String param) {
+    public static boolean checkIp(String param) {
         Pattern pattern = Pattern.compile("^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]" + "|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$");
         return pattern.matcher(param).matches();
     }
 
-    public static boolean isMask(int mask) {
+    public static boolean checkMask(int mask) {
         if (mask > 0 && mask <= 32) {
             return true;
         }

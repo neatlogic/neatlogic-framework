@@ -4,6 +4,7 @@ import codedriver.framework.exception.util.IpSubnetMaskException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Pattern;
 
 public class IpUtil {
     private IpUtil() {
@@ -59,6 +60,18 @@ public class IpUtil {
         } catch (Exception ex) {
             throw new IpSubnetMaskException(ip + " " + targetIp + " " + subnetMask);
         }
+    }
+
+    public static boolean checkIp(String param) {
+        Pattern pattern = Pattern.compile("^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]" + "|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$");
+        return pattern.matcher(param).matches();
+    }
+
+    public static boolean checkMask(int mask) {
+        if (mask > 0 && mask <= 32) {
+            return true;
+        }
+        return false;
     }
 
 }

@@ -33,6 +33,8 @@ public class DocumentVo extends BasePageVo {
     private String type;
     @EntityField(name = "类型名称", type = ApiParamType.STRING)
     private String typeText;
+    @EntityField(name = "目标链接", type = ApiParamType.STRING)
+    private String targetUrl;
     @JSONField(serialize = false)//查询条件：类型列表
     private List<String> typeList;
     @JSONField(serialize = false)//查询条件：文档所属模块
@@ -145,6 +147,14 @@ public class DocumentVo extends BasePageVo {
 
     public void setFullTextIndexWordList(List<FullTextIndexWordVo> fullTextIndexWordList) {
         this.fullTextIndexWordList = fullTextIndexWordList;
+    }
+
+    public String getTargetUrl() {
+        return targetUrl;
+    }
+
+    public void setTargetUrl(String targetUrl) {
+        this.targetUrl = targetUrl;
     }
 
     public Boolean getCanRead() {

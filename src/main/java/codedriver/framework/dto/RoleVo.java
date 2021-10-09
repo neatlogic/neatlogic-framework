@@ -22,8 +22,6 @@ public class RoleVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = -8007028390813552667L;
 
     public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
-    @JSONField(serialize = false)
-    private String keyword;
     private Long id;
     @EntityField(name = "角色uuid",
             type = ApiParamType.STRING)

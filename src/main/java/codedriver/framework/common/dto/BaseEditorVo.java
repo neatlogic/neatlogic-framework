@@ -60,14 +60,14 @@ public class BaseEditorVo extends BasePageVo {
     }
 
 
-    public String getFcu() {
+    public final String getFcu() {
         if (StringUtils.isBlank(fcu)) {
             fcu = UserContext.get().getUserUuid();
         }
         return fcu;
     }
 
-    public void setFcu(String fcu) {
+    public final void setFcu(String fcu) {
         this.fcu = fcu;
     }
 
@@ -79,22 +79,22 @@ public class BaseEditorVo extends BasePageVo {
         this.fcuName = fcuName;
     }
 
-    public Date getFcd() {
+    public final Date getFcd() {
         return fcd;
     }
 
-    public void setFcd(Date fcd) {
+    public final void setFcd(Date fcd) {
         this.fcd = fcd;
     }
 
-    public String getLcu() {
+    public final String getLcu() {
         if (StringUtils.isBlank(lcu)) {
             lcu = UserContext.get().getUserUuid();
         }
         return lcu;
     }
 
-    public void setLcu(String lcu) {
+    public final void setLcu(String lcu) {
         this.lcu = lcu;
     }
 
@@ -106,11 +106,11 @@ public class BaseEditorVo extends BasePageVo {
         this.lcuName = lcuName;
     }
 
-    public Date getLcd() {
+    public final Date getLcd() {
         return lcd;
     }
 
-    public void setLcd(Date lcd) {
+    public final void setLcd(Date lcd) {
         this.lcd = lcd;
     }
 

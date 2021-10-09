@@ -31,8 +31,6 @@ public class JobClassVo extends BasePageVo {
     @EntityField(name = "定时作业组件所属模块名称",
             type = ApiParamType.STRING)
     private String moduleName;
-    @JSONField(serialize = false)
-    private String keyword;
 
     public JobClassVo() {
         this.setPageSize(20);

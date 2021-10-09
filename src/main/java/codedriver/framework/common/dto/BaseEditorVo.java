@@ -10,11 +10,11 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.annotation.EntityField;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class BaseEditorVo extends BasePageVo {
     @EntityField(name = "创建者", type = ApiParamType.STRING)
@@ -29,18 +29,18 @@ public class BaseEditorVo extends BasePageVo {
     private String lcuName;
     @EntityField(name = "修改日期", type = ApiParamType.STRING)
     private Date lcd;
-    @EntityField(name = "创建者额外属性", type = ApiParamType.STRING)
-    private String fcuInfo;
-    @EntityField(name = "创建者头像", type = ApiParamType.STRING)
-    private String fcuAvatar;
-    @EntityField(name = "创建者VIP等级", type = ApiParamType.INTEGER)
-    private Integer fcuVipLevel;
-    @EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
-    private String lcuInfo;
-    @EntityField(name = "修改者头像", type = ApiParamType.STRING)
-    private String lcuAvatar;
-    @EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
-    private Integer lcuVipLevel;
+//    @EntityField(name = "创建者额外属性", type = ApiParamType.STRING)
+//    private String fcuInfo;
+//    @EntityField(name = "创建者头像", type = ApiParamType.STRING)
+//    private String fcuAvatar;
+//    @EntityField(name = "创建者VIP等级", type = ApiParamType.INTEGER)
+//    private Integer fcuVipLevel;
+//    @EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
+//    private String lcuInfo;
+//    @EntityField(name = "修改者头像", type = ApiParamType.STRING)
+//    private String lcuAvatar;
+//    @EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
+//    private Integer lcuVipLevel;
     @JSONField(serialize = false)
     public String tenantUuid;//当前租户uuid
 
@@ -48,6 +48,9 @@ public class BaseEditorVo extends BasePageVo {
     private UserVo fcuVo;
     @EntityField(name = "修改者VO")
     private UserVo lcuVo;
+
+    @EntityField(name = "操作类型，创建或修改")
+    private String actionType;
 
     public BaseEditorVo() {
     }
@@ -57,14 +60,14 @@ public class BaseEditorVo extends BasePageVo {
     }
 
 
-    public String getFcu() {
+    public final String getFcu() {
         if (StringUtils.isBlank(fcu)) {
             fcu = UserContext.get().getUserUuid();
         }
         return fcu;
     }
 
-    public void setFcu(String fcu) {
+    public final void setFcu(String fcu) {
         this.fcu = fcu;
     }
 
@@ -76,22 +79,22 @@ public class BaseEditorVo extends BasePageVo {
         this.fcuName = fcuName;
     }
 
-    public Date getFcd() {
+    public final Date getFcd() {
         return fcd;
     }
 
-    public void setFcd(Date fcd) {
+    public final void setFcd(Date fcd) {
         this.fcd = fcd;
     }
 
-    public String getLcu() {
+    public final String getLcu() {
         if (StringUtils.isBlank(lcu)) {
             lcu = UserContext.get().getUserUuid();
         }
         return lcu;
     }
 
-    public void setLcu(String lcu) {
+    public final void setLcu(String lcu) {
         this.lcu = lcu;
     }
 
@@ -103,75 +106,90 @@ public class BaseEditorVo extends BasePageVo {
         this.lcuName = lcuName;
     }
 
-    public Date getLcd() {
+    public final Date getLcd() {
         return lcd;
     }
 
-    public void setLcd(Date lcd) {
+    public final void setLcd(Date lcd) {
         this.lcd = lcd;
     }
 
-    public String getFcuInfo() {
-        return fcuInfo;
-    }
+//    public String getFcuInfo() {
+//        return fcuInfo;
+//    }
+//
+//    public void setFcuInfo(String fcuInfo) {
+//        this.fcuInfo = fcuInfo;
+//    }
 
-    public void setFcuInfo(String fcuInfo) {
-        this.fcuInfo = fcuInfo;
-    }
+//    public String getFcuAvatar() {
+//        if (StringUtils.isBlank(fcuAvatar) && StringUtils.isNotBlank(fcuInfo)) {
+//            JSONObject jsonObject = JSONObject.parseObject(fcuInfo);
+//            fcuAvatar = jsonObject.getString("avatar");
+//        }
+//        return fcuAvatar;
+//    }
+//
+//    public String getLcuInfo() {
+//        return lcuInfo;
+//    }
+//
+//    public void setLcuInfo(String lcuInfo) {
+//        this.lcuInfo = lcuInfo;
+//    }
+//
+//    public String getLcuAvatar() {
+//        if (StringUtils.isBlank(lcuAvatar) && StringUtils.isNotBlank(lcuInfo)) {
+//            JSONObject jsonObject = JSONObject.parseObject(lcuInfo);
+//            lcuAvatar = jsonObject.getString("avatar");
+//        }
+//        return lcuAvatar;
+//    }
+//
+//    public Integer getFcuVipLevel() {
+//        return fcuVipLevel;
+//    }
+//
+//    public void setFcuVipLevel(Integer fcuVipLevel) {
+//        this.fcuVipLevel = fcuVipLevel;
+//    }
+//
+//    public Integer getLcuVipLevel() {
+//        return lcuVipLevel;
+//    }
+//
+//    public void setLcuVipLevel(Integer lcuVipLevel) {
+//        this.lcuVipLevel = lcuVipLevel;
+//    }
 
-    public String getFcuAvatar() {
-        if (StringUtils.isBlank(fcuAvatar) && StringUtils.isNotBlank(fcuInfo)) {
-            JSONObject jsonObject = JSONObject.parseObject(fcuInfo);
-            fcuAvatar = jsonObject.getString("avatar");
+    public final UserVo getFcuVo() {
+        if (fcuVo == null && StringUtils.isNotBlank(fcu)) {
+            fcuVo = new UserVo(fcu);
         }
-        return fcuAvatar;
-    }
-
-    public String getLcuInfo() {
-        return lcuInfo;
-    }
-
-    public void setLcuInfo(String lcuInfo) {
-        this.lcuInfo = lcuInfo;
-    }
-
-    public String getLcuAvatar() {
-        if (StringUtils.isBlank(lcuAvatar) && StringUtils.isNotBlank(lcuInfo)) {
-            JSONObject jsonObject = JSONObject.parseObject(lcuInfo);
-            lcuAvatar = jsonObject.getString("avatar");
-        }
-        return lcuAvatar;
-    }
-
-    public Integer getFcuVipLevel() {
-        return fcuVipLevel;
-    }
-
-    public void setFcuVipLevel(Integer fcuVipLevel) {
-        this.fcuVipLevel = fcuVipLevel;
-    }
-
-    public Integer getLcuVipLevel() {
-        return lcuVipLevel;
-    }
-
-    public void setLcuVipLevel(Integer lcuVipLevel) {
-        this.lcuVipLevel = lcuVipLevel;
-    }
-
-    public UserVo getFcuVo() {
         return fcuVo;
     }
 
-    public void setFcuVo(UserVo fcuVo) {
-        this.fcuVo = fcuVo;
-    }
+//    public void setFcuVo(UserVo fcuVo) {
+//        this.fcuVo = fcuVo;
+//    }
 
-    public UserVo getLcuVo() {
+    public final UserVo getLcuVo() {
+        if (lcuVo == null && StringUtils.isNotBlank(lcu)) {
+            lcuVo = new UserVo(lcu);
+        }
         return lcuVo;
     }
 
-    public void setLcuVo(UserVo lcuVo) {
-        this.lcuVo = lcuVo;
+//    public void setLcuVo(UserVo lcuVo) {
+//        this.lcuVo = lcuVo;
+//    }
+
+    public final String getActionType() {
+        if (Objects.equals(fcd, lcd)) {
+            actionType = "创建";
+        } else {
+            actionType = "修改";
+        }
+        return actionType;
     }
 }

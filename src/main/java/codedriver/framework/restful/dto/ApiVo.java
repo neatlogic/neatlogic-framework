@@ -237,8 +237,6 @@ public class ApiVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private List<String> pathVariableList;
     @JSONField(serialize = false)
-    private String keyword;
-    @JSONField(serialize = false)
     private List<String> tokenList;
     //	private Long totalDataSize = 0l;
 //	private String totalDataSizeText;

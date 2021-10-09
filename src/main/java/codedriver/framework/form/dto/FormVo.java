@@ -37,8 +37,6 @@ public class FormVo extends BasePageVo implements Serializable {
 
     @EntityField(name = "版本信息列表", type = ApiParamType.JSONARRAY)
     private List<FormVersionVo> versionList;
-    @JSONField(serialize = false)
-    private String keyword;
 
     public synchronized String getUuid() {
         if (StringUtils.isBlank(uuid)) {

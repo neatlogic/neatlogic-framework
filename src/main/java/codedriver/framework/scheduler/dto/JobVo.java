@@ -46,8 +46,6 @@ public class JobVo extends BasePageVo {
     @EntityField(name = "结束时间",
             type = ApiParamType.LONG)
     private Date endTime;
-    @JSONField(serialize = false)
-    private String keyword;
 
     private JobStatusVo jobStatus;
 

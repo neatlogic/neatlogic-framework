@@ -1,4 +1,9 @@
-package codedriver.framework.fulltextindex.dto;
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
+package codedriver.framework.fulltextindex.dto.fulltextindex;
 
 import codedriver.framework.fulltextindex.utils.FullTextIndexUtil;
 import codedriver.framework.util.HtmlUtil;
@@ -12,23 +17,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * @Title: FullTextIndexFieldVo
- * @Package: codedriver.framework.fulltextindex.dto
- * @Description:
- * @author: chenqiwei
- * @date: 2021/2/2610:11 上午
- * Copyright(c) 2021 TechSure Co.,Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class FullTextIndexVo {
     private final static Logger logger = LoggerFactory.getLogger(FullTextIndexVo.class);
-
     private Long targetId;
     private String targetType;
     private String targetField;
     private List<FullTextIndexWordOffsetVo> wordOffsetVoList;
-    private Map<String, WordVo> fieldContentMap = new HashMap<>();
+    private final Map<String, WordVo> fieldContentMap = new HashMap<>();
     private Map<String, List<FullTextIndexWordOffsetVo>> wordOffsetMap = new HashMap<>();
 
     public FullTextIndexVo() {

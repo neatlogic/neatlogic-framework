@@ -7,21 +7,36 @@ package codedriver.framework.fulltextindex.core;
 
 import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexMapper;
 import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper;
-import codedriver.framework.fulltextindex.dto.*;
+import codedriver.framework.fulltextindex.dto.fulltextindex.*;
+import codedriver.framework.fulltextindex.dto.globalsearch.DocumentVo;
 import codedriver.framework.transaction.core.AfterTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.*;
+import org.dom4j.tree.DefaultText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.tidy.Tidy;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.*;
 
 public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler {
     private final static Logger logger = LoggerFactory.getLogger(FullTextIndexHandlerBase.class);
+    static Tidy tidy = new Tidy();
 
+    static {
+        tidy.setPrintBodyOnly(true);
+        tidy.setXmlOut(true);
+        tidy.setFixBackslash(true);
+        tidy.setQuoteNbsp(true);
+        tidy.setShowWarnings(false);
+        // tidy.setUpperCaseAttrs(true);
+        // tidy.setUpperCaseTags(true);
+        tidy.setRawOut(true);
+    }
 
     @Resource
     private FullTextIndexWordMapper fullTextIndexWordMapper;
@@ -42,7 +57,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     public void deleteIndex(Long targetId) {
        /* //设置threadlocal告诉拦截器分配到哪个表
         FullTextIndexModuleContainer.set(this.getModuleId());*/
-        fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()),this.getModuleId());
+        fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), this.getModuleId());
     }
 
 
@@ -107,4 +122,92 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     }
 
     protected abstract void myCreateIndex(FullTextIndexVo fullTextIndexVo);
+
+    private static void replaceKeyword(Element fatherElement, List<FullTextIndexWordVo> wordList) {
+        List<Node> contentList = fatherElement.content();
+        String mergeText = "";
+        List<Node> newContentList = new ArrayList<>();
+        for (Node node : contentList) {
+            if (node instanceof Text) {
+                Text text = (Text) node;
+                mergeText += text.getText();
+            } else if (node instanceof Element) {
+                if (StringUtils.isNotEmpty(mergeText)) {
+                    Text t = new DefaultText(mergeText);
+                    newContentList.add(t);
+                    mergeText = "";
+                }
+                Element element = (Element) node;
+                replaceKeyword(element, wordList);
+                newContentList.add(element);
+            }
+        }
+        if (StringUtils.isNotEmpty(mergeText)) {
+            Text t = new DefaultText(mergeText);
+            newContentList.add(t);
+            mergeText = "";
+        }
+
+        for (FullTextIndexWordVo w : wordList) {
+            List<Node> finalContentList = new ArrayList<>();
+            for (Node content : newContentList) {
+                if (content instanceof Text) {
+                    Text text = (Text) content;
+                    String c = text.getText();
+
+                    while (c.toLowerCase().contains(w.getWord().toLowerCase())) {
+                        // 关键字在开头
+                        if (c.toLowerCase().indexOf(w.getWord().toLowerCase()) == 0) {
+                            Element hlElement = DocumentHelper.createElement("span");
+                            hlElement.addAttribute("class", "highlight");
+                            hlElement.addText(c.substring(0, w.getWord().length()));
+                            finalContentList.add(hlElement);
+                            c = c.substring(w.getWord().length());
+                        } else {// 关键字在中间
+                            finalContentList.add(new DefaultText(c.substring(0, c.toLowerCase().indexOf(w.getWord().toLowerCase()))));
+                            c = c.substring(c.toLowerCase().indexOf(w.getWord().toLowerCase()));
+                        }
+                    }
+                    // 处理剩下的文本
+                    if (StringUtils.isNotEmpty(c)) {
+                        finalContentList.add(new DefaultText(c));
+                    }
+
+                } else {
+                    finalContentList.add(content);
+                }
+            }
+            // 利用新的contentList重新计算关键字位置
+            newContentList = finalContentList;
+        }
+        fatherElement.setContent(newContentList);
+    }
+
+    @Override
+    public final void makeupDocument(DocumentVo documentVo) {
+        myMakeupDocument(documentVo);
+        if (StringUtils.isNotBlank(documentVo.getContent())) {
+            StringWriter sw = new StringWriter();
+            tidy.parseDOM(new StringReader(documentVo.getContent()), sw);
+            String content = sw.toString();
+            content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<content>\n" + content + "\n</content>";
+            Document document;
+            try {
+                document = DocumentHelper.parseText(content);
+                Element rootElement = document.getRootElement();
+                documentVo.getFullTextIndexWordList().sort((o1, o2) -> {
+                    /* 关键字从长到短排序 **/
+                    return o2.getWord().length() - o1.getWord().length();
+                });
+                replaceKeyword(rootElement, documentVo.getFullTextIndexWordList());
+                content = rootElement.asXML();
+                content = content.replace("\n", "").replace("<content>", "").replace("</content>", "");
+                documentVo.setHighlightContent(content);
+            } catch (DocumentException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    protected abstract void myMakeupDocument(DocumentVo documentVo);
 }

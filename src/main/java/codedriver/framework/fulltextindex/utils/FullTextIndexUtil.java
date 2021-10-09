@@ -1,6 +1,11 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.fulltextindex.utils;
 
-import codedriver.framework.fulltextindex.dto.FullTextIndexWordOffsetVo;
+import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordOffsetVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -20,21 +25,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @Title: FullIndexManager
- * @Package: codedriver.framework.fullindex.core
- * @Description: TODO
- * @author: chenqiwei
- * @date: 2021/1/72:07 下午
- * Copyright(c) 2021 TechSure Co.,Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class FullTextIndexUtil {
     private static final Analyzer indexAnalyzer = new IKAnalyzer(false);//分词细一点
     private static final Analyzer searchAnalyzer = new IKAnalyzer(true);//分词粗一点
     private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
-
+    /**
+     * 对搜索关键字进行分词
+     *
+     * @param keyword 搜索关键字
+     * @return 分词结果
+     * @throws IOException 异常
+     */
     public static Set<String> sliceKeyword(String keyword) throws IOException {
         Set<String> wordList = new HashSet<>();
         /*
@@ -70,12 +72,19 @@ public class FullTextIndexUtil {
                 stream.close();
             }
         }
-        if(CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(keyword)){
+        if (CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(keyword)) {
             wordList.add(keyword);
         }
         return wordList;
     }
 
+    /**
+     * 对原始文本进行分词，用于创建索引
+     *
+     * @param content 原始文本
+     * @return 分词结果
+     * @throws IOException 异常
+     */
     public static List<FullTextIndexWordOffsetVo> sliceWord(String content) throws IOException {
         List<FullTextIndexWordOffsetVo> wordList = new ArrayList<>();
         if (StringUtils.isNotBlank(content)) {
@@ -101,7 +110,7 @@ public class FullTextIndexUtil {
      * @Params: [keywordStartIndex, maxWord, contentParam]
      * @Returns: java.lang.String
      **/
-    public static String getShortcut(int keywordStartIndex,int keywordEndIndex, int maxWord, String contentParam) {
+    public static String getShortcut(int keywordStartIndex, int keywordEndIndex, int maxWord, String contentParam) {
         String content = StringUtils.EMPTY;
         //计算截取下标
         int startIndex = 0;

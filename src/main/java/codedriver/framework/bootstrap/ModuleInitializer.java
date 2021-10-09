@@ -65,8 +65,10 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     CodedriverWebApplicationContext appContext = new CodedriverWebApplicationContext();
                     appContext.setConfigLocation("classpath*:" + path);
                     appContext.setId(moduleId);
+                    appContext.setModuleId(moduleId);
+                    appContext.setModuleName(moduleName);
                     appContext.setGroupName(groupName);
-                    
+
                     ModuleVo moduleVo = new ModuleVo();
                     moduleVo.setId(moduleId);
                     moduleVo.setName(moduleName);

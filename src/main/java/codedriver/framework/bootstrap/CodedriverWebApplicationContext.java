@@ -8,7 +8,9 @@ package codedriver.framework.bootstrap;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 public class CodedriverWebApplicationContext extends XmlWebApplicationContext {
+    private String moduleId;
     private String groupName;
+    private String moduleName;
 
     public String getGroupName() {
         return groupName;
@@ -16,5 +18,21 @@ public class CodedriverWebApplicationContext extends XmlWebApplicationContext {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 }

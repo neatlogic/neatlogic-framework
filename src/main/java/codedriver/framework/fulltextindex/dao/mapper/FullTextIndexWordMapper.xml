@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper">
     <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="10"></cache>
 
     <select id="getWordByWord" parameterType="java.lang.String"
-            resultType="codedriver.framework.fulltextindex.dto.FullTextIndexWordVo">
+            resultType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
         SELECT id, word, type
         FROM `fulltextindex_word`
         WHERE word = #{value}
     </select>
 
 
-    <insert id="insertWord" parameterType="codedriver.framework.fulltextindex.dto.FullTextIndexWordVo">
+    <insert id="insertWord" parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
         INSERT IGNORE
         INTO `fulltextindex_word` (id, word, type)
         VALUES (#{id}, #{word},

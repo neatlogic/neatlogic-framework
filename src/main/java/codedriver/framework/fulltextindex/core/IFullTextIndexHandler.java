@@ -5,6 +5,9 @@
 
 package codedriver.framework.fulltextindex.core;
 
+
+import codedriver.framework.fulltextindex.dto.globalsearch.DocumentVo;
+
 public interface IFullTextIndexHandler {
 
     IFullTextIndexType getType();
@@ -36,4 +39,11 @@ public interface IFullTextIndexHandler {
      * @Returns: void
      **/
     void rebuildIndex(Boolean isRebuildAll);
+
+    /**
+     * 格式化搜索中心搜索结果
+     *
+     * @param documentVo 原始搜索结果
+     */
+    void makeupDocument(DocumentVo documentVo);
 }

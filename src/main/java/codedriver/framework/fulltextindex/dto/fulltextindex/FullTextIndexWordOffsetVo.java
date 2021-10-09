@@ -1,23 +1,20 @@
-package codedriver.framework.fulltextindex.dto;
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
+package codedriver.framework.fulltextindex.dto.fulltextindex;
 
 import java.util.Locale;
 
-/**
- * @Title: FullTextIndexWordOffsetVo
- * @Package: codedriver.framework.fulltextindex.dto
- * @Description: TODO
- * @author: chenqiwei
- * @date: 2021/2/2610:30 上午
- * Copyright(c) 2021 TechSure Co.,Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class FullTextIndexWordOffsetVo {
     private String word;
     private String type;
     private int start;
     private int end;
 
-    public FullTextIndexWordOffsetVo(){}
+    public FullTextIndexWordOffsetVo() {
+    }
 
     public FullTextIndexWordOffsetVo(String _word, String _type, int _start, int _end) {
         word = _word.toLowerCase(Locale.ROOT);

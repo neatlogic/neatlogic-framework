@@ -1,4 +1,9 @@
-package codedriver.framework.fulltextindex.dto;
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
+package codedriver.framework.fulltextindex.dto.fulltextindex;
 
 import codedriver.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -7,15 +12,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * @Title: FullTextIndexFieldVo
- * @Package: codedriver.framework.fulltextindex.dto
- * @Description: 索引字段实体类
- * @author: chenqiwei
- * @date: 2021/2/255:47 下午
- * Copyright(c) 2021 TechSure Co.,Ltd. All Rights Reserved.
- * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
- **/
 public class FullTextIndexFieldWordVo {
     private Long id;
     private Long wordId;

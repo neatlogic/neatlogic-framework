@@ -58,9 +58,6 @@ public class IntegrationVo extends BasePageVo implements Serializable {
     @EntityField(name = "是否有帮助", type = ApiParamType.INTEGER)
     private Integer hasHelp;
 
-    @JSONField(serialize = false)
-    private String keyword;
-
     public String getUrl() {
         return url;
     }

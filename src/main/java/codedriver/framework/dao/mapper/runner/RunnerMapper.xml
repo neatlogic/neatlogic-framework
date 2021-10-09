@@ -17,7 +17,7 @@
 
     <resultMap id="runnerGroupMap" type="codedriver.framework.dto.runner.RunnerGroupVo">
         <id column="id" property="id"/>
-        <result column="groupName" property="name"/>
+        <result column="name" property="name"/>
         <collection property="networkList" ofType="codedriver.framework.dto.runner.GroupNetworkVo">
             <id column="networkId" property="id"/>
             <result column="groupId" property="groupId"/>
@@ -36,20 +36,20 @@
     </resultMap>
 
     <select id="getRunnerGroupById" resultMap="runnerGroupMap">
-        SELECT a.id                                  id,
-               a.name                                groupName,
-               c.id                               AS runnerId,
-               IF(d.`id` IS NULL, c.`id`, d.`id`) AS runnerMapId,
-               c.`auth_type`                      AS authType,
-               c.`access_key`                     AS accessKey,
+        SELECT a.id              id,
+               a.name            name,
+               c.id           AS runnerId,
+               d.`id`         AS runnerMapId,
+               c.`auth_type`  AS authType,
+               c.`access_key` AS accessKey,
                c.`access_secret`
-                                                  AS accessSecret,
-               c.`url`                            AS url,
-               c.`name`                           AS runnerName,
-               b.id                                  networkId,
-               b.group_id                            groupId,
-               b.network_ip                          networkIp,
-               b.mask                                mask
+                              AS accessSecret,
+               c.`url`        AS url,
+               c.`name`       AS runnerName,
+               b.id              networkId,
+               b.group_id        groupId,
+               b.network_ip      networkIp,
+               b.mask            mask
         FROM `runnergroup` a
                  LEFT JOIN `runnergroup_network` b ON a.id = b.group_id
                  LEFT JOIN `runner` c ON a.id = c.group_id
@@ -70,7 +70,7 @@
                ar.`group_id`                           AS groupId,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
-        JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+                 JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
     </select>
 
     <select id="getRunnerById" resultType="codedriver.framework.dto.runner.RunnerVo">
@@ -105,12 +105,12 @@
     <update id="updateRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
         update runnergroup
         set `name`=#{name},
-        `description` =#{description}
+            `description` =#{description}
         where `id` = #{id}
     </update>
 
     <insert id="insertRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
-        insert runnergroup(`id`, `name`,`description`)
+        insert runnergroup(`id`, `name`, `description`)
         VALUES (#{id},
                 #{name},
                 #{description})

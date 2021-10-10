@@ -210,6 +210,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         private final List<IJob> jobHandlerList;
 
         public ScheduleLoadJobRunner(String _tenantUuid, List<IJob> _jobHandlerList) {
+            super("SCHEDULE-JOB-LOADER-" + _tenantUuid);
             tenantUuid = _tenantUuid;
             jobHandlerList = _jobHandlerList;
         }
@@ -218,7 +219,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         protected void execute() {
             String oldThreadName = Thread.currentThread().getName();
             try {
-                Thread.currentThread().setName("SCHEDULE-JOB-LOADER-" + tenantUuid);
                 // 切换租户数据源
                 TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
                 UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());

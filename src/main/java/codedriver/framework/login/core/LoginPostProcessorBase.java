@@ -21,9 +21,9 @@ public abstract class LoginPostProcessorBase implements ILoginPostProcessor {
 
         private LoginPostProcessorBase loginPostProcessor;
 
-        public LoginPostProcessorThread(LoginPostProcessorBase loginPostProcessor){
+        public LoginPostProcessorThread(LoginPostProcessorBase loginPostProcessor) {
+            super("LOGIN-POST-PROCESSOR-" + UserContext.get().getUserUuid(true));
             this.loginPostProcessor = loginPostProcessor;
-            this.setThreadName("LOGIN-POST-PROCESSOR-" + UserContext.get().getUserUuid(true));
         }
 
         @Override

@@ -44,7 +44,7 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
     public void onInitialized(CodedriverWebApplicationContext context) {
         String moduleId = context.getId();
         if (FULLTEXTINDEX_MODULE_MAP.contains(moduleId)) {
-            CachedThreadPool.execute(new CodeDriverThread() {
+            CachedThreadPool.execute(new CodeDriverThread("FULLTEXTINDEX-SCHEMA-BUILDER") {
                 @Override
                 protected void execute() {
                     for (TenantVo tenantVo : tenantList) {

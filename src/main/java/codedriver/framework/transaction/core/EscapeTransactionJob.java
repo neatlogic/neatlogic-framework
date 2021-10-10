@@ -73,6 +73,7 @@ public class EscapeTransactionJob {
         private final State state;
 
         public EscapeHandler(CountDownLatch _latch, IEscapeTransaction _thread, State _state) {
+            super("ESCAPE-TRANSACTION-HANDLER");
             thread = _thread;
             latch = _latch;
             state = _state;

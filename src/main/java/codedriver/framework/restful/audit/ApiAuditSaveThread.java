@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.audit;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
@@ -10,29 +15,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiAuditSaveThread extends CodeDriverThread {
 
-	private static ApiMapper apiMapper;
+    private static ApiMapper apiMapper;
 
-	@Autowired
-	public void setApiMapper(ApiMapper _apiMapper) {
-		apiMapper = _apiMapper;
-	}
+    @Autowired
+    public void setApiMapper(ApiMapper _apiMapper) {
+        apiMapper = _apiMapper;
+    }
 
-	private ApiAuditVo apiAuditVo;
+    private ApiAuditVo apiAuditVo;
 
-	public ApiAuditSaveThread(ApiAuditVo _apiAuditVo) {
-		apiAuditVo = _apiAuditVo;
-	}
+    public ApiAuditSaveThread(ApiAuditVo _apiAuditVo) {
+        super("API-AUDIT-SAVER");
+        apiAuditVo = _apiAuditVo;
+    }
 
-	public ApiAuditSaveThread() {
+    public ApiAuditSaveThread() {
+        super("API-AUDIT-SAVER");
+    }
 
-	}
-
-	@Override
-	protected void execute() {
-		if (apiAuditVo != null) {
-			AuditUtil.saveAuditDetail(apiAuditVo,"api_audit");
-			apiMapper.insertApiAudit(apiAuditVo);
-		}
-	}
+    @Override
+    protected void execute() {
+        if (apiAuditVo != null) {
+            AuditUtil.saveAuditDetail(apiAuditVo, "api_audit");
+            apiMapper.insertApiAudit(apiAuditVo);
+        }
+    }
 
 }

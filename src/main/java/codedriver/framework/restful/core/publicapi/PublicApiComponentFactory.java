@@ -278,12 +278,12 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
         private final String tenantUuid;
 
         public InsertPublicTokenApiRunner(String tenantUuid) {
+            super("PUBLIC-TOKEN-API-INIT-" + tenantUuid);
             this.tenantUuid = tenantUuid;
         }
 
         @Override
         protected void execute() {
-            Thread.currentThread().setName("PUBLIC-TOKEN-API-INIT-" + tenantUuid);
             // 切换租户数据源
             TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
             for (ApiVo apiVo : apiTokenList) {

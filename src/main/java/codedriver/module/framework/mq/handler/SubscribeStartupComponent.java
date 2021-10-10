@@ -71,10 +71,9 @@ public class SubscribeStartupComponent implements IStartup {
         ScheduledExecutorService mqRestartService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
-            t.setName("MQ-SUBSCRIBE-RECONNECT");
             return t;
         });
-        CodeDriverThread runnable = new CodeDriverThread() {
+        Runnable runnable = new CodeDriverThread("MQ-SUBSCRIBE-RECONNECT") {
             @Override
             protected void execute() {
                 try {

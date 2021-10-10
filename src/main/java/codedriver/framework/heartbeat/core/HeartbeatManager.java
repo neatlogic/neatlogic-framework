@@ -49,10 +49,9 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
-            t.setName("HEARTBEAT");
             return t;
         });
-        CodeDriverThread runnable = new CodeDriverThread() {
+        CodeDriverThread runnable = new CodeDriverThread("HEARTBEAT") {
             @Override
             protected void execute() {
                 try {

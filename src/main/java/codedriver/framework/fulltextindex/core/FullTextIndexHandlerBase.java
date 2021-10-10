@@ -236,6 +236,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         private final boolean isRebuildAll;
 
         public RebuildRunner(FullTextIndexRebuildAuditVo _auditVo, boolean _isRebuildAll) {
+            super("FULLTEXTINDEX-REBUILDER");
             auditVo = _auditVo;
             isRebuildAll = _isRebuildAll;
         }

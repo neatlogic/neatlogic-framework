@@ -45,8 +45,9 @@ public class ApiAccessCountUpdateThread extends CodeDriverThread {
     }
 
     public ApiAccessCountUpdateThread() {
-        super.setThreadName("API-ACCESS-COUNT-UPDATE");
+        super("API-ACCESS-COUNT-UPDATER");
     }
+
 
     public static void putToken(String token) {
         try {

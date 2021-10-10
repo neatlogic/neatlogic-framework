@@ -21,11 +21,11 @@ public abstract class CodeDriverThread implements Runnable {
     private String threadName;
     private boolean isUnique = false;
 
-    public CodeDriverThread() {
+    /*public CodeDriverThread() {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();
         inputFromContext = InputFromContext.get();
-    }
+    }*/
 
     public CodeDriverThread(UserContext _userContext, TenantContext _tenantContext) {
         userContext = _userContext;

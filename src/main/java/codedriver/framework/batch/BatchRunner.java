@@ -52,8 +52,8 @@ public class BatchRunner<T> {
      * @param parallel 并发度（多少个线程）
      * @param job      执行函数
      */
-    public State execute(List<T> itemList, int parallel, BatchJob<T> job) {
-        return execute(itemList, parallel, false, job);
+    public State execute(List<T> itemList, int parallel, BatchJob<T> job, String threadName) {
+        return execute(itemList, parallel, false, job, threadName);
     }
 
     /**
@@ -62,7 +62,7 @@ public class BatchRunner<T> {
      * @param needTransaction 每个对象的执行过程是否需要启用事务
      * @param job             执行函数
      */
-    public State execute(List<T> itemList, int parallel, boolean needTransaction, BatchJob<T> job) {
+    public State execute(List<T> itemList, int parallel, boolean needTransaction, BatchJob<T> job, String threadName) {
         State state = new State();
         if (CollectionUtils.isNotEmpty(itemList)) {
             //状态默认是成功状态，任意线程出现异常则置为失败
@@ -71,7 +71,7 @@ public class BatchRunner<T> {
             CountDownLatch latch = new CountDownLatch(parallel);
 
             for (int i = 0; i < parallel; i++) {
-                Runner<T> runner = new Runner<>(i, parallel, needTransaction, itemList, job, latch, state);
+                Runner<T> runner = new Runner<>(threadName, i, parallel, needTransaction, itemList, job, latch, state);
                 CachedThreadPool.execute(runner);
             }
             try {
@@ -92,7 +92,8 @@ public class BatchRunner<T> {
         boolean needTransaction;
         State state;
 
-        public Runner(int _index, int _parallel, boolean _needTransaction, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch, State _state) {
+        public Runner(String _threadName, int _index, int _parallel, boolean _needTransaction, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch, State _state) {
+            super(_threadName);
             index = _index;
             parallel = _parallel;
             itemList = _itemList;

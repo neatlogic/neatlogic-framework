@@ -30,7 +30,7 @@ public class AfterTransactionJob<T> {
     public synchronized void execute(T t, ICommitted<T> commited, ICompleted<T> completed) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             if (commited != null) {
-                CachedThreadPool.execute(new CodeDriverThread() {
+                CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMMITER") {
                     @Override
                     protected void execute() {
                         commited.execute(t);
@@ -38,7 +38,7 @@ public class AfterTransactionJob<T> {
                 });
             }
             if (completed != null) {
-                CachedThreadPool.execute(new CodeDriverThread() {
+                CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMPLETER") {
                     @Override
                     protected void execute() {
                         completed.execute(t);
@@ -55,7 +55,7 @@ public class AfterTransactionJob<T> {
                     public void afterCommit() {
                         if (commited != null) {
                             Set<T> tList = THREADLOCAL.get();
-                            CachedThreadPool.execute(new CodeDriverThread() {
+                            CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMMITER") {
                                 @Override
                                 protected void execute() {
                                     for (T t : tList) {
@@ -70,7 +70,7 @@ public class AfterTransactionJob<T> {
                     public void afterCompletion(int status) {
                         if (completed != null) {
                             Set<T> tList = THREADLOCAL.get();
-                            CachedThreadPool.execute(new CodeDriverThread() {
+                            CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMPLETER") {
                                 @Override
                                 protected void execute() {
                                     for (T t : tList) {

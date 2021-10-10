@@ -5,13 +5,20 @@
 
 package codedriver.framework.fulltextindex.core;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexMapper;
+import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper;
 import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper;
 import codedriver.framework.fulltextindex.dto.fulltextindex.*;
 import codedriver.framework.fulltextindex.dto.globalsearch.DocumentVo;
+import codedriver.framework.fulltextindex.enums.Status;
 import codedriver.framework.transaction.core.AfterTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.*;
 import org.dom4j.tree.DefaultText;
 import org.slf4j.Logger;
@@ -43,6 +50,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     @Resource
     private FullTextIndexMapper fullTextIndexMapper;
+
+    @Resource
+    private FullTextIndexRebuildAuditMapper fullTextIndexRebuildAuditMapper;
 
     /*
      * @Description: 返回模块名，mybatis拦截器需要根据模块名自动选择合适表，要注意编写的正确性
@@ -210,4 +220,41 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     }
 
     protected abstract void myMakeupDocument(DocumentVo documentVo);
+
+    public final void rebuildIndex(String type, Boolean isRebuildAll) {
+        FullTextIndexRebuildAuditVo auditVo = new FullTextIndexRebuildAuditVo();
+        auditVo.setType(type);
+        auditVo.setEditor(UserContext.get().getUserUuid(true));
+        auditVo.setStatus(Status.DOING.getValue());
+        fullTextIndexRebuildAuditMapper.insertFullTextIndexRebuildAudit(auditVo);
+        CachedThreadPool.execute(new RebuildRunner(auditVo, isRebuildAll));
+
+    }
+
+    class RebuildRunner extends CodeDriverThread {
+        private final FullTextIndexRebuildAuditVo auditVo;
+        private final boolean isRebuildAll;
+
+        public RebuildRunner(FullTextIndexRebuildAuditVo _auditVo, boolean _isRebuildAll) {
+            auditVo = _auditVo;
+            isRebuildAll = _isRebuildAll;
+        }
+
+        @Override
+        protected void execute() {
+            try {
+                myRebuildIndex(auditVo.getType(), isRebuildAll);
+            } catch (Exception ex) {
+                if (ex instanceof ApiRuntimeException) {
+                    auditVo.setError(((ApiRuntimeException) ex).getMessage(true));
+                } else {
+                    auditVo.setError(ExceptionUtils.getStackTrace(ex));
+                }
+            }
+            auditVo.setStatus(Status.DONE.getValue());
+            fullTextIndexRebuildAuditMapper.updateFullTextIndexRebuildAuditStatus(auditVo);
+        }
+    }
+
+    protected abstract void myRebuildIndex(String type, Boolean isRebuildAll);
 }

@@ -38,7 +38,7 @@ public interface IFullTextIndexHandler {
      * @Params: [isRebuildAll]
      * @Returns: void
      **/
-    void rebuildIndex(Boolean isRebuildAll);
+    void rebuildIndex(String type, Boolean isRebuildAll);
 
     /**
      * 格式化搜索中心搜索结果

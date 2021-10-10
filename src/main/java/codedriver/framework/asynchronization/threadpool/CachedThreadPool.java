@@ -56,7 +56,11 @@ public class CachedThreadPool {
     static class CodedriverRejectHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            logger.warn("Main ThreadPool Is Full, Using Backup ThreadPool.");
+            if (r instanceof CodeDriverThread) {
+                logger.warn("main thread pool is full, thread:" + ((CodeDriverThread) r).getThreadName() + " will running by backup thread pool.");
+            } else {
+                logger.warn("main threadPool is full, backup thread pool will take over the thread.");
+            }
             backupThreadPool.execute(r);
         }
     }

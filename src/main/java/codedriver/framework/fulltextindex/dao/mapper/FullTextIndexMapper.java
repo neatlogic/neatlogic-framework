@@ -5,26 +5,31 @@
 
 package codedriver.framework.fulltextindex.dao.mapper;
 
-import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexContentVo;
-import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexFieldWordVo;
-import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexOffsetVo;
-import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexVo;
+import codedriver.framework.fulltextindex.dto.fulltextindex.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface FullTextIndexMapper {
+    int getFullTextIndexCountByType(FullTextIndexTypeVo fullTextIndexTypeVo);
+
     List<FullTextIndexVo> getFullTextIndexListByKeywordListAndTargetList(@Param("keywordList") List<String> keywordList, @Param("targetIdList") List<Long> targetIdList, @Param("moduleId") String moduleId);
 
     FullTextIndexContentVo getContentByTargetId(@Param("targetId") Long targetId, @Param("moduleId") String moduleId);
 
     List<FullTextIndexContentVo> getContentByTargetIdList(@Param("targetIdList") List<Long> targetIdList, @Param("moduleId") String moduleId);
 
+    void updateTargetError(FullTextIndexTargetVo fullTextIndexTargetVo);
+
     void insertField(@Param("fieldVo") FullTextIndexFieldWordVo fieldVo, @Param("moduleId") String moduleId);
 
     void insertFieldOffset(@Param("offsetVo") FullTextIndexOffsetVo offsetVo, @Param("moduleId") String moduleId);
 
+    void insertTarget(FullTextIndexTargetVo fullTextIndexTargetVo);
+
     void insertContent(@Param("contentVo") FullTextIndexContentVo contentVo, @Param("moduleId") String moduleId);
+
+    void deleteFullTextIndexByType(FullTextIndexTypeVo fullTextIndexTypeVo);
 
     void deleteFullTextIndexByTargetIdAndType(@Param("fullTextIndexVo") FullTextIndexVo fullTextIndexVo, @Param("moduleId") String moduleId);
 }

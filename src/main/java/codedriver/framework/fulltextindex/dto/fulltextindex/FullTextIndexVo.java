@@ -5,7 +5,9 @@
 
 package codedriver.framework.fulltextindex.dto.fulltextindex;
 
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.fulltextindex.utils.FullTextIndexUtil;
+import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.HtmlUtil;
 import codedriver.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,8 +21,11 @@ import java.util.*;
 
 public class FullTextIndexVo {
     private final static Logger logger = LoggerFactory.getLogger(FullTextIndexVo.class);
+    @EntityField(name = "目标id", type = ApiParamType.LONG)
     private Long targetId;
+    @EntityField(name = "目标类型", type = ApiParamType.STRING)
     private String targetType;
+    @EntityField(name = "字段名", type = ApiParamType.STRING)
     private String targetField;
     private List<FullTextIndexWordOffsetVo> wordOffsetVoList;
     private final Map<String, WordVo> fieldContentMap = new HashMap<>();
@@ -75,11 +80,11 @@ public class FullTextIndexVo {
             for (String field : fieldContentMap.keySet()) {
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
-                        if(fieldContentMap.get(field).getNeedSliceWord()) {
+                        if (fieldContentMap.get(field).getNeedSliceWord()) {
                             wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
-                        }else{
+                        } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length()-1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }
@@ -104,11 +109,11 @@ public class FullTextIndexVo {
             for (String field : fieldContentMap.keySet()) {
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
-                        if(fieldContentMap.get(field).getNeedSliceWord()) {
+                        if (fieldContentMap.get(field).getNeedSliceWord()) {
                             wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
-                        }else{
+                        } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length()-1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }
@@ -180,13 +185,14 @@ public class FullTextIndexVo {
         return fieldContentMap;
     }
 
-    public static class WordVo{
+    public static class WordVo {
         private Boolean isNeedSliceWord = true;
         private String content;
 
-        public WordVo(){
+        public WordVo() {
 
         }
+
         public WordVo(String content) {
             this.content = content;
         }

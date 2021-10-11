@@ -70,23 +70,32 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), this.getModuleId());
     }
 
-
-    @Override
-    public final void createIndex(Long targetId) {
+    /**
+     * 给重建索引使用的方法，以同步方式执行索引创建
+     *
+     * @param targetId 目标id
+     * @param isSync   是否同步
+     */
+    protected final void createIndex(Long targetId, boolean isSync) {
         AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>();
         String moduleId = this.getModuleId();
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> {
-            /*
-            //设置threadlocal告诉拦截器分配到哪个表
-            FullTextIndexModuleContainer.set(moduleId);*/
             String oldName = Thread.currentThread().getName();
             Thread.currentThread().setName("FULLTEXTINDEX-CREATE-" + fullTextIndexVo.getTargetType().toUpperCase(Locale.ROOT) + "-" + fullTextIndexVo.getTargetId());
+            //删除索引
+            fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
+
+            //写入目标表
+            FullTextIndexTargetVo fullTextIndexTargetVo = new FullTextIndexTargetVo();
+            fullTextIndexTargetVo.setModuleId(this.getModuleId());
+            fullTextIndexTargetVo.setTargetId(targetId);
+            fullTextIndexTargetVo.setTargetType(this.getType().getType());
+            fullTextIndexMapper.insertTarget(fullTextIndexTargetVo);
             try {
                 myCreateIndex(fullTextIndexVo);
+
                 // 一定要在这里设置，不然后面都取不到targetType
                 fullTextIndexVo.setTargetType(fullTextIndexVo.getTargetType());
-                //删除索引
-                fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
 
                 //写入分词表
                 List<FullTextIndexWordVo> wordList = fullTextIndexVo.getWordList();
@@ -125,10 +134,21 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                 }
             } catch (Throwable ex) {
                 logger.error(ex.getMessage(), ex);
+                if (ex instanceof ApiRuntimeException) {
+                    fullTextIndexTargetVo.setError(((ApiRuntimeException) ex).getMessage(true));
+                } else {
+                    fullTextIndexTargetVo.setError(ex.getMessage());
+                }
+                fullTextIndexMapper.updateTargetError(fullTextIndexTargetVo);
             } finally {
                 Thread.currentThread().setName(oldName);
             }
-        });
+        }, isSync);
+    }
+
+    @Override
+    public final void createIndex(Long targetId) {
+        createIndex(targetId, false);
     }
 
     protected abstract void myCreateIndex(FullTextIndexVo fullTextIndexVo);
@@ -222,29 +242,34 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     protected abstract void myMakeupDocument(DocumentVo documentVo);
 
     public final void rebuildIndex(String type, Boolean isRebuildAll) {
+        FullTextIndexTypeVo fullTextIndexTypeVo = FullTextIndexHandlerFactory.getTypeByName(type);
         FullTextIndexRebuildAuditVo auditVo = new FullTextIndexRebuildAuditVo();
         auditVo.setType(type);
         auditVo.setEditor(UserContext.get().getUserUuid(true));
         auditVo.setStatus(Status.DOING.getValue());
         fullTextIndexRebuildAuditMapper.insertFullTextIndexRebuildAudit(auditVo);
-        CachedThreadPool.execute(new RebuildRunner(auditVo, isRebuildAll));
 
+        if (isRebuildAll) {
+            //删除所有已经创建的索引
+            fullTextIndexMapper.deleteFullTextIndexByType(fullTextIndexTypeVo);
+        }
+        CachedThreadPool.execute(new RebuildRunner(fullTextIndexTypeVo, auditVo));
     }
 
     class RebuildRunner extends CodeDriverThread {
         private final FullTextIndexRebuildAuditVo auditVo;
-        private final boolean isRebuildAll;
+        private final FullTextIndexTypeVo fullTextIndexTypeVo;
 
-        public RebuildRunner(FullTextIndexRebuildAuditVo _auditVo, boolean _isRebuildAll) {
+        public RebuildRunner(FullTextIndexTypeVo _fullTextIndexTypeVo, FullTextIndexRebuildAuditVo _auditVo) {
             super("FULLTEXTINDEX-REBUILDER");
             auditVo = _auditVo;
-            isRebuildAll = _isRebuildAll;
+            fullTextIndexTypeVo = _fullTextIndexTypeVo;
         }
 
         @Override
         protected void execute() {
             try {
-                myRebuildIndex(auditVo.getType(), isRebuildAll);
+                myRebuildIndex(fullTextIndexTypeVo);
             } catch (Exception ex) {
                 if (ex instanceof ApiRuntimeException) {
                     auditVo.setError(((ApiRuntimeException) ex).getMessage(true));
@@ -257,5 +282,5 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         }
     }
 
-    protected abstract void myRebuildIndex(String type, Boolean isRebuildAll);
+    protected abstract void myRebuildIndex(FullTextIndexTypeVo fullTextIndexTypeVo);
 }

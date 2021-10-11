@@ -9,9 +9,11 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.fulltextindex.enums.Status;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 public class FullTextIndexRebuildAuditVo {
     @EntityField(name = "类型", type = ApiParamType.STRING)
@@ -32,6 +34,10 @@ public class FullTextIndexRebuildAuditVo {
     private String editor;
     @EntityField(name = "异常", type = ApiParamType.STRING)
     private String error;
+    @EntityField(name = "索引数量", type = ApiParamType.INTEGER)
+    private Integer indexCount;
+    @JSONField(serialize = false)
+    private List<String> typeList;//用于搜索条件，精确查询某些类型
 
     public String getType() {
         return type;
@@ -39,6 +45,14 @@ public class FullTextIndexRebuildAuditVo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<String> getTypeList() {
+        return typeList;
+    }
+
+    public void setTypeList(List<String> typeList) {
+        this.typeList = typeList;
     }
 
     public String getTypeName() {
@@ -63,6 +77,14 @@ public class FullTextIndexRebuildAuditVo {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Integer getIndexCount() {
+        return indexCount;
+    }
+
+    public void setIndexCount(Integer indexCount) {
+        this.indexCount = indexCount;
     }
 
     public Integer getServerId() {

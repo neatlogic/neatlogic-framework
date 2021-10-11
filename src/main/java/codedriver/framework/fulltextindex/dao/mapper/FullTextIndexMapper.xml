@@ -6,6 +6,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.fulltextindex.dao.mapper.FullTextIndexMapper">
+
+    <select id="getFullTextIndexCountByType"
+            parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo" resultType="int">
+        select count(1)
+        from fulltextindex_target_${moduleId}
+        where target_type = #{type}
+    </select>
+
     <resultMap id="fullTextIndexMap" type="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexVo">
         <id column="target_id" property="targetId"/>
         <id column="target_field" property="targetField"/>
@@ -51,6 +59,13 @@
         </foreach>
     </select>
 
+    <update id="updateTargetError"
+            parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexTargetVo">
+        UPDATE `fulltextindex_target_${moduleId}`
+        set error = #{error,typeHandler=CompressHandler}
+        where target_id = #{targetId}
+    </update>
+
     <insert id="insertField">
         INSERT INTO `fulltextindex_field_${moduleId}` (`id`,
                                                        `word_id`,
@@ -69,6 +84,12 @@
         VALUES (#{offsetVo.fieldId}, #{offsetVo.start}, #{offsetVo.end})
     </insert>
 
+    <insert id="insertTarget"
+            parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexTargetVo">
+        INSERT IGNORE INTO `fulltextindex_target_${moduleId}` (`target_id`, `target_type`, `hit_count`, `click_count`, `error`)
+        values (#{targetId}, #{targetType}, #{hitCount}, #{clickCount}, #{error,typeHandler=CompressHandler})
+    </insert>
+
     <insert id="insertContent">
         INSERT INTO `fulltextindex_content_${moduleId}` (`target_id`,
                                                          `target_field`,
@@ -79,11 +100,21 @@
         ON DUPLICATE KEY UPDATE `content` = #{contentVo.content,typeHandler=CompressHandler}
     </insert>
 
+    <delete id="deleteFullTextIndexByType"
+            parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
+        DELETE a,b,c,d
+        FROM fulltextindex_target_${moduleId} a
+                 LEFT JOIN fulltextindex_field_${moduleId} b ON a.target_id = b.target_id
+                 LEFT JOIN fulltextindex_offset_${moduleId} c ON b.`id` = c.field_id
+                 LEFT JOIN fulltextindex_content_${moduleId} d ON a.target_id = d.target_id
+        WHERE a.`target_type` = #{type}
+    </delete>
+
     <delete id="deleteFullTextIndexByTargetIdAndType">
         DELETE a,b,c,d
         FROM fulltextindex_target_${moduleId} a
                  LEFT JOIN fulltextindex_field_${moduleId} b ON a.target_id = b.target_id
-                 LEFT JOIN fulltextindex_offset_${moduleId} c ON b.`id` = b.field_id
+                 LEFT JOIN fulltextindex_offset_${moduleId} c ON b.`id` = c.field_id
                  LEFT JOIN fulltextindex_content_${moduleId} d ON a.target_id = d.target_id
         WHERE a.`target_id` = #{fullTextIndexVo.targetId}
           and a.`target_type` = #{fullTextIndexVo.targetType}

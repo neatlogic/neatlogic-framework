@@ -57,9 +57,9 @@ public class CachedThreadPool {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
             if (r instanceof CodeDriverThread) {
-                logger.warn("main thread pool is full, thread:" + ((CodeDriverThread) r).getThreadName() + " will running by backup thread pool.");
+                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, " + ((CodeDriverThread) r).getThreadName() + " is taking over by backup thread pool(size:" + cpu + ").");
             } else {
-                logger.warn("main threadPool is full, backup thread pool will take over the thread.");
+                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, unknown thread is taking over by backup thread pool(size:" + cpu + ").");
             }
             backupThreadPool.execute(r);
         }

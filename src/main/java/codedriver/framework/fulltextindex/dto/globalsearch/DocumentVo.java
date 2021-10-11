@@ -45,8 +45,9 @@ public class DocumentVo extends BasePageVo {
     private Set<String> wordList;
     @EntityField(name = "是否有权限查看", type = ApiParamType.BOOLEAN)
     private Boolean canRead = true;
-
+    @EntityField(name = "搜索命中次数", type = ApiParamType.INTEGER)
     private int hitCount = 0;
+    @EntityField(name = "用户点击次数", type = ApiParamType.INTEGER)
     private int clickCount = 0;
 
     public Long getTargetId() {

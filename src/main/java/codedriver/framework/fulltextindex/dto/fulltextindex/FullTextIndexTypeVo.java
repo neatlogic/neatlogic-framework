@@ -6,9 +6,10 @@
 package codedriver.framework.fulltextindex.dto.fulltextindex;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class FullTextIndexTypeVo {
+public class FullTextIndexTypeVo extends BasePageVo {
     @EntityField(name = "模块id", type = ApiParamType.STRING)
     private String moduleId;
     @EntityField(name = "类型", type = ApiParamType.STRING)

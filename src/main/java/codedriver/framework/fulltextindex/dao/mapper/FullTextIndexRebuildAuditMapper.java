@@ -10,7 +10,7 @@ import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuild
 import java.util.List;
 
 public interface FullTextIndexRebuildAuditMapper {
-    List<FullTextIndexRebuildAuditVo> searchFullTextIndexRebuildAudit();
+    List<FullTextIndexRebuildAuditVo> searchFullTextIndexRebuildAudit(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);
 
     void updateFullTextIndexRebuildAuditStatus(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);
 

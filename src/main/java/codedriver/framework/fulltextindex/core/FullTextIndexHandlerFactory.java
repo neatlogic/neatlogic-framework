@@ -10,6 +10,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.exception.fulltextindex.FullTextIndexTypeNotFoundException;
 import codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo;
 
 import java.util.*;
@@ -58,6 +59,21 @@ public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
             returnTypeList.addAll(fullTextIndexTypeList.stream().filter(type -> type.getModuleId().equals(moduleVo.getId())).collect(Collectors.toList()));
         }
         return returnTypeList;
+    }
+
+    /**
+     * 根据名字返回类型信息
+     *
+     * @param type 类型名称
+     * @return 类型对象
+     */
+    public static FullTextIndexTypeVo getTypeByName(String type) {
+        Optional<FullTextIndexTypeVo> op = fullTextIndexTypeList.stream().filter(d -> d.getType().equals(type)).findFirst();
+        if (op.isPresent()) {
+            return op.get();
+        } else {
+            throw new FullTextIndexTypeNotFoundException(type);
+        }
     }
 
     public static IFullTextIndexHandler getHandler(IFullTextIndexType type) {

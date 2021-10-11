@@ -14,38 +14,39 @@ import org.reflections.Reflections;
 import java.util.*;
 
 public class AuthFactory {
-	private static final Log logger = LogFactory.getLog(AuthFactory.class);
-	private static Map<String, AuthBase> authMap = new HashMap<String, AuthBase>();
-	private static Map<String, List<AuthBase>> authGroupMap = new HashMap<>();
-	static {
-		Reflections reflections = new Reflections("codedriver");
-		Set<Class<? extends AuthBase>> authClass = reflections.getSubTypesOf(AuthBase.class);
+    private static final Log logger = LogFactory.getLog(AuthFactory.class);
+    private static final Map<String, AuthBase> authMap = new HashMap<>();
+    private static final Map<String, List<AuthBase>> authGroupMap = new HashMap<>();
 
-		for (Class<? extends AuthBase> c : authClass) {
-			try {
-				AuthBase authIns = c.newInstance();
-				authMap.put(authIns.getAuthName(), authIns);
-				if(ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null) {
-					throw new NoAuthGroupException(authIns.getAuthGroup());
-				}
-				if (authGroupMap.containsKey(authIns.getAuthGroup())){
-					authGroupMap.get(authIns.getAuthGroup()).add(authIns);
-				}else {
-					List<AuthBase> authList = new ArrayList<>();
-					authList.add(authIns);
-					authGroupMap.put(authIns.getAuthGroup(), authList);
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-	}
+    static {
+        Reflections reflections = new Reflections("codedriver");
+        Set<Class<? extends AuthBase>> authClass = reflections.getSubTypesOf(AuthBase.class);
 
-	public static AuthBase getAuthInstance(String authName) {
-		return authMap.get(authName);
-	}
+        for (Class<? extends AuthBase> c : authClass) {
+            try {
+                AuthBase authIns = c.newInstance();
+                authMap.put(authIns.getAuthName(), authIns);
+                if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null) {
+                    throw new NoAuthGroupException(authIns.getAuthGroup());
+                }
+                if (authGroupMap.containsKey(authIns.getAuthGroup())) {
+                    authGroupMap.get(authIns.getAuthGroup()).add(authIns);
+                } else {
+                    List<AuthBase> authList = new ArrayList<>();
+                    authList.add(authIns);
+                    authGroupMap.put(authIns.getAuthGroup(), authList);
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
 
-	public static Map<String, List<AuthBase>> getAuthGroupMap(){
-		return authGroupMap;
-	}
+    public static AuthBase getAuthInstance(String authName) {
+        return authMap.get(authName);
+    }
+
+    public static Map<String, List<AuthBase>> getAuthGroupMap() {
+        return authGroupMap;
+    }
 }

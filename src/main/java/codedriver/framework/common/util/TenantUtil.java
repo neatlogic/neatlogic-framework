@@ -1,12 +1,12 @@
 package codedriver.framework.common.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class TenantUtil {
-	private static Set<String> tenantSet = new HashSet<>();
+	private static final Set<String> tenantSet = new HashSet<>();
 
 	public static boolean hasTenant(String tenant) {
 		if (StringUtils.isNotBlank(tenant)) {

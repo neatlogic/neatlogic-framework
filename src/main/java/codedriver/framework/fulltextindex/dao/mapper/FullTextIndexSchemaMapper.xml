@@ -24,7 +24,7 @@
             `target_type` varchar(50) NOT NULL COMMENT '目标类型',
             `hit_count`   int(10) COMMENT '命中次数',
             `click_count` int(10) COMMENT '点击次数',
-            `error`       varchar(500) DEFAULT NULL COMMENT '索引异常',
+            `error`       mediumtext DEFAULT NULL COMMENT '索引异常',
             PRIMARY KEY (`target_id`),
             KEY `idx_type` (`target_type`) USING HASH
         ) ENGINE = InnoDB

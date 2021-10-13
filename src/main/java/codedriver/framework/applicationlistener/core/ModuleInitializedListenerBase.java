@@ -32,9 +32,16 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
         }
     }
 
+    /**
+     * 整个应用启动完后执行的操作
+     *
+     * @param context spring applicationContext
+     */
     protected abstract void onInitialized(CodedriverWebApplicationContext context);
 
-
+    /**
+     * 当前类初始化完执行的操作
+     **/
     protected abstract void myInit();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -75,8 +75,8 @@ public class BasicApiAuth extends ApiAuthBase {
         helpJson.put("title", "Basic认证");
         List<String> detailList = new ArrayList<>();
         helpJson.put("detailList", detailList);
-        detailList.add("request header需要包含键值对Authorization:Basic xxx");
-        detailList.add("（xxx是 '用户名:密码' 的base64编码）。");
+        detailList.add("request header需要包含键值对：Authorization:Basic xxx");
+        detailList.add("xxx是\"用户名:密码\"的BASE64编码");
         return helpJson;
     }
 

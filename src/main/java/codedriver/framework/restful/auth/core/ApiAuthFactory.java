@@ -31,7 +31,6 @@ public class ApiAuthFactory extends ModuleInitializedListenerBase {
             IApiAuth apiAuth = entry.getValue();
             apiAuthMap.put(apiAuth.getType().toUpperCase(), apiAuth);
         }
-
     }
 
     @Override

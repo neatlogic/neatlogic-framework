@@ -31,11 +31,12 @@ public class EmailUtil {
 
     /**
      * 发送带附件的邮件
-     * @param title 邮件标题
-     * @param content 邮件正文
+     *
+     * @param title         邮件标题
+     * @param content       邮件正文
      * @param attachmentMap 附件(key:文件名;value:流)
-     * @param to 收件人
-     * @param cc 抄送人
+     * @param to            收件人
+     * @param cc            抄送人
      */
     public static void sendEmail(String title, String content, Map<String, InputStream> attachmentMap, String to, String cc) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
@@ -52,13 +53,13 @@ public class EmailUtil {
             });
 
             MimeMessage msg = new MimeMessage(session);
-            if(StringUtils.isNotBlank(mailServerVo.getFromAddress())){
+            if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
                 msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
             }
             /** 设置收件人 */
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
             /** 设置抄送人 */
-            if(StringUtils.isNotBlank(cc)){
+            if (StringUtils.isNotBlank(cc)) {
                 msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc, false));
             }
             /** 设置邮件标题 */
@@ -67,13 +68,13 @@ public class EmailUtil {
 
             MimeMultipart multipart = new MimeMultipart();
             /** 设置邮件正文 */
-            if(StringUtils.isNotBlank(content)){
+            if (StringUtils.isNotBlank(content)) {
                 MimeBodyPart text = new MimeBodyPart();
                 text.setContent(content, "text/plain;charset=UTF-8");
                 multipart.addBodyPart(text);
             }
             /** 设置附件 */
-            if(MapUtils.isNotEmpty(attachmentMap)){
+            if (MapUtils.isNotEmpty(attachmentMap)) {
                 for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {
                     MimeBodyPart messageBodyPart = new MimeBodyPart();
                     DataSource dataSource = new ByteArrayDataSource(entry.getValue(), "application/pdf");

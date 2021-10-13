@@ -2,7 +2,7 @@ package codedriver.framework.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
-
+@Deprecated
 public class UserAgentVo {
     @EntityField(name = "用户uuid", type = ApiParamType.STRING)
     private String userUuid;

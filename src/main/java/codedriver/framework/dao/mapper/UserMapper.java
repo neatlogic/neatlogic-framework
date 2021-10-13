@@ -104,20 +104,20 @@ public interface UserMapper {
 
     UserTitleVo getUserTitleByName(String title);
 
-    int checkUserExistsInUserAgent(String userUuid);
+//    int checkUserExistsInUserAgent(String userUuid);
 
-    int checkAgentExistsInUserAgent(String agentUuid);
+//    int checkAgentExistsInUserAgent(String agentUuid);
 
     /**
      * 检查是否存在循环代理，即A已经是B的代理人，则不允许A设置代理人为B
      */
-    int checkExistsAgentLoop(@Param("agentUuid") String agentUuid, @Param("userUuid") String userUuid);
+//    int checkExistsAgentLoop(@Param("agentUuid") String agentUuid, @Param("userUuid") String userUuid);
 
-    UserVo getUserAgent(String userUuid);
+//    UserVo getUserAgent(String userUuid);
 
     List<UserVo> getUserVip();
 
-    String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
+//    String getUserUuidByAgentUuidAndFunc(@Param("agentUuid") String agentUuid, @Param("func") String func);
 
     List<String> getUserUuidListByTeamUuid(String teamUuid);
 
@@ -180,7 +180,7 @@ public interface UserMapper {
 
     int insertUserData(UserDataVo userDataVo);
 
-    int insertUserAgent(UserAgentVo userAgentVo);
+//    int insertUserAgent(UserAgentVo userAgentVo);
 
     int insertUserTitle(UserTitleVo userTitleVo);
 
@@ -210,7 +210,7 @@ public interface UserMapper {
 
     int deleteUserAuth(UserAuthVo userAuthVo);
 
-    int deleteUserAgent(String userUuid);
+//    int deleteUserAgent(String userUuid);
 
     int deleteUserTitleByName(String name);
 

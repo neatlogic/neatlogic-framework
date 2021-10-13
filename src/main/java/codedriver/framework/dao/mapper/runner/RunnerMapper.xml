@@ -232,5 +232,22 @@
         ORDER BY id
     </select>
 
+    <select id="getRunnerByIpAndPort" resultType="codedriver.framework.dto.runner.RunnerVo">
+        SELECT `id`,
+               `name`,
+               `url`,
+               `host`,
+               `port`,
+               `access_key`    as accessKey,
+               `access_secret` as accessSecret,
+               `auth_type`     as authType,
+               `public_key`    as publicKey,
+               `private_key`   as privateKey,
+               `group_id`      as groupId
+        FROM `runner`
+        WHERE `host` = #{host}
+          and `port` = #{port}
+    </select>
+
 </mapper>
 

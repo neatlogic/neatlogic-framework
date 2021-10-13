@@ -759,26 +759,26 @@
         ORDER BY a.`id`
     </select>
 
-    <select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+    <!--<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
         select count(a.`user_uuid`)
         from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
-    </select>
+    </select>-->
 
-    <select id="checkAgentExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+    <!--<select id="checkAgentExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
         select count(a.`user_uuid`)
         from (SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{value} limit 1) a
-    </select>
+    </select>-->
 
-    <select id="checkExistsAgentLoop" parameterType="java.lang.String" resultType="int" useCache="false">
+    <!--<select id="checkExistsAgentLoop" parameterType="java.lang.String" resultType="int" useCache="false">
         select count(a.`user_uuid`)
         from (SELECT `user_uuid`
               FROM `user_agent`
               WHERE `user_uuid` = #{agentUuid}
                 and `agent_uuid` = #{userUuid}
               limit 1) a
-    </select>
+    </select>-->
 
-    <select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+    <!--<select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
         select b.`id`,
                b.`uuid`,
                b.`user_id`   as `userId`,
@@ -800,14 +800,14 @@
                  left join `user_team` e on e.`user_uuid` = b.`uuid`
                  left join `team` f on f.`uuid` = e.`team_uuid`
         where a.`user_uuid` = #{value}
-    </select>
+    </select>-->
 
-    <select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String" useCache="false">
+    <!--<select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String" useCache="false">
         SELECT `user_uuid`
         FROM `user_agent`
         WHERE `agent_uuid` = #{agentUuid}
           AND `func` = #{func}
-    </select>
+    </select>-->
 
     <select id="getUserUuidListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String"
             useCache="false">
@@ -1159,10 +1159,10 @@
         VALUES (#{userUuid}, #{data}, #{type})
     </insert>
 
-    <insert id="insertUserAgent" parameterType="codedriver.framework.dto.UserAgentVo">
+    <!--<insert id="insertUserAgent" parameterType="codedriver.framework.dto.UserAgentVo">
         INSERT INTO `user_agent` (`user_uuid`, `agent_uuid`, `func`)
         VALUES (#{userUuid}, #{agentUuid}, #{func})
-    </insert>
+    </insert>-->
     <insert id="insertUserTitle">
         INSERT INTO `user_title` (`id`, `name`)
         VALUES (#{id}, #{name});
@@ -1282,11 +1282,11 @@
         </where>
     </delete>
 
-    <delete id="deleteUserAgent" parameterType="java.lang.String">
+   <!-- <delete id="deleteUserAgent" parameterType="java.lang.String">
         DELETE
         FROM `user_agent`
         WHERE `user_uuid` = #{value}
-    </delete>
+    </delete>-->
     <delete id="deleteUserTitleByName">
         DELETE
         FROM `user_title`

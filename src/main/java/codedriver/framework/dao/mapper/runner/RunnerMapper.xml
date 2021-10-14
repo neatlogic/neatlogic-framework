@@ -252,7 +252,7 @@
           and `port` = #{port}
     </select>
 
-    <select id="getRunnerByRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+    <select id="searchRunnerByRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
             resultType="codedriver.framework.dto.runner.RunnerVo">
         SELECT r.id AS id,
         r.name AS name,
@@ -273,7 +273,7 @@
         </if>
     </select>
 
-    <select id="searchRunnerCountByGroupId" resultType="int">
+    <select id="searchRunnerCount" resultType="int">
         select count(`id`)
         from runner
         where `group_id` = #{id}

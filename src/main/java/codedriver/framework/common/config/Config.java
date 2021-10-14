@@ -72,7 +72,7 @@ public class Config {
     private static String PUBLIC_API_AUTH_USERNAME;//外部访问接口basic认证用户名
     private static String PUBLIC_API_AUTH_PASSWORD;//外部访问接口basic认证密码
 
-    private static String RUNNER_ADDRESS;//runner地址
+    private static String RUNNER_CONTEXT;//runner地址
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -251,7 +251,7 @@ public class Config {
 
 
     public static String RUNNER_ADDRESS() {
-        return RUNNER_ADDRESS;
+        return RUNNER_CONTEXT;
     }
 
     public static int NEW_MESSAGE_EXPIRED_DAY() {
@@ -322,7 +322,7 @@ public class Config {
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "techsure");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
-            RUNNER_ADDRESS = prop.getProperty("runner.context", "/autoexecrunner");
+            RUNNER_CONTEXT = prop.getProperty("runner.context", "/autoexecrunner");
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

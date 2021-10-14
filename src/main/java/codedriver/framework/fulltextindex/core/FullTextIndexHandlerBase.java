@@ -132,7 +132,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                         }
                     }
                 }
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
                 if (ex instanceof ApiRuntimeException) {
                     fullTextIndexTargetVo.setError(((ApiRuntimeException) ex).getMessage(true));

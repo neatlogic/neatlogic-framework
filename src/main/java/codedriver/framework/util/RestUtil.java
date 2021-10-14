@@ -86,11 +86,11 @@ public class RestUtil {
      * @param restVo
      * @param response
      */
-    public static String sendGetRequestForStream(RestVo restVo, HttpServletResponse response) {
+    public static String sendPostRequestForStream(RestVo restVo, HttpServletResponse response) {
         HttpURLConnection connection = null;
         String result = "";
         try {
-            connection = getConnection(restVo, HttpMethod.GET);
+            connection = getConnection(restVo, HttpMethod.POST);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             result = e.getMessage();
@@ -98,7 +98,12 @@ public class RestUtil {
         if (connection != null) {
             DataInputStream input = null;
             OutputStream os = null;
-            try {
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())){
+                if (restVo.getPayload() != null) {
+                    out.write(restVo.getPayload().toJSONString().getBytes(StandardCharsets.UTF_8));
+                    out.flush();
+                }
+                out.close();
                 if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
                     input = new DataInputStream(connection.getInputStream());
                 }else{

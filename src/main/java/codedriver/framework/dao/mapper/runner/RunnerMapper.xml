@@ -156,12 +156,15 @@
 
     <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
-        SET name = #{name},
-        url = #{url},
-        access_key = #{accessKey},
-        access_secret = #{accessSecret},
-        <if test="nettyIp != null and nettyIp !='' ">
-            `netty_ip` = #{nettyIp},
+        SET `name` = #{name},
+        `host`=#{host},
+        `port`=#{port},
+        `protocol`=#{protocol},
+        `url` = #{url},
+        `access_key` = #{accessKey},
+        `access_secret` = #{accessSecret},
+        <if test="host != null and host !='' ">
+            `netty_ip` = #{host},
         </if>
         <if test="nettyPort != null and nettyPort !='' ">
             `netty_port` = #{nettyPort},
@@ -181,10 +184,10 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         INSERT INTO runner(
-        `name`, url, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `name`,`host`,`port` ,`protocol`,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{url}, #{accessKey}, #{accessSecret}, #{authType}, #{nettyIp},
+        #{name}, #{host},#{port},#{protocol},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
         #{nettyPort},#{groupId},#{publicKey},#{privateKey}
         )
     </insert>
@@ -248,6 +251,34 @@
         WHERE `host` = #{host}
           and `port` = #{port}
     </select>
+
+    <select id="searchRunnerByRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+            resultType="codedriver.framework.dto.runner.RunnerVo">
+        SELECT r.id AS id,
+        r.name AS name,
+        r.url AS url,
+        r.protocol AS protocol,
+        r.port AS port,
+        r.access_key AS accessKey,
+        r.access_secret AS accessSecret,
+        r.auth_type AS authType,
+        r.group_id AS groupId,
+        r.host,
+        r.port
+        FROM runner r
+        WHERE r.group_id = #{id}
+        ORDER BY id DESC
+        <if test="needPage == true">
+            LIMIT #{startNum},#{pageSize}
+        </if>
+    </select>
+
+    <select id="searchRunnerCount" resultType="int">
+        select count(`id`)
+        from runner
+        where `group_id` = #{id}
+    </select>
+
 
 </mapper>
 

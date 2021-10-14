@@ -26,6 +26,8 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private String name;
     @EntityField(name = "runner url", type = ApiParamType.STRING)
     private String url;
+    @EntityField(name = "协议", type = ApiParamType.STRING)
+    private String protocol;
     @EntityField(name = "runner host", type = ApiParamType.STRING)
     private String host;
     @EntityField(name = "runner port", type = ApiParamType.INTEGER)
@@ -61,6 +63,14 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public String getUrl() {

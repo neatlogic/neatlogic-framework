@@ -252,5 +252,33 @@
           and `port` = #{port}
     </select>
 
+    <select id="getRunnerByRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+            resultType="codedriver.framework.dto.runner.RunnerVo">
+        SELECT r.id AS id,
+        r.name AS name,
+        r.url AS url,
+        r.protocol AS protocol,
+        r.port AS port,
+        r.access_key AS accessKey,
+        r.access_secret AS accessSecret,
+        r.auth_type AS authType,
+        r.group_id AS groupId,
+        r.host,
+        r.port
+        FROM runner r
+        WHERE r.group_id = #{id}
+        ORDER BY id DESC
+        <if test="needPage == true">
+            LIMIT #{startNum},#{pageSize}
+        </if>
+    </select>
+
+    <select id="searchRunnerCountByGroupId" resultType="int">
+        select count(`id`)
+        from runner
+        where `group_id` = #{id}
+    </select>
+
+
 </mapper>
 

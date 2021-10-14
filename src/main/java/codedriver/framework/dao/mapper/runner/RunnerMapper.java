@@ -56,4 +56,8 @@ public interface RunnerMapper {
     List<RunnerVo> getRunnerByGroupId(Long runnerGroupId);
 
     RunnerVo getRunnerByIpAndPort(String host, String port);
+
+    List<RunnerVo> getRunnerByRunnerGroup(RunnerGroupVo runnerGroupVo);
+
+    int searchRunnerCountByGroupId(Long id);
 }

@@ -7,6 +7,7 @@ package codedriver.framework.batch;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.transaction.util.TransactionUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -125,9 +126,26 @@ public class BatchRunner<T> {
                         }
                     }
                 }
+            } catch (Exception ex) {
+                if (!(ex instanceof ApiRuntimeException)) {
+                    logger.error(ex.getMessage(), ex);
+                }
             } finally {
                 latch.countDown();
             }
         }
     }
+
+   /* public static void main(String[] a) {
+        ModuleInitApplicationListener.getModuleinitphaser().register();
+        ModuleInitApplicationListener.getModuleinitphaser().arrive();
+        BatchRunner<Integer> runner = new BatchRunner<>();
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i <= 10; i++) {
+            list.add(i);
+        }
+        int parallel = 4;
+        runner.execute(list, parallel, System.out::println, "A");
+        System.out.println("done");
+    }*/
 }

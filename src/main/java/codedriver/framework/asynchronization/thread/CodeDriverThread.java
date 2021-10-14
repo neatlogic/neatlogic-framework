@@ -59,7 +59,7 @@ public abstract class CodeDriverThread implements Runnable {
             if (StringUtils.isNotBlank(threadName)) {
                 Thread.currentThread().setName(threadName);
             }
-            /* 等待所有模块加载完成 **/
+            /* 等待所有模块加载完成后，phaser将会变成1，线程才开始执行 **/
             ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
             execute();
             Thread.currentThread().setName(oldThreadName);

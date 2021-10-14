@@ -156,12 +156,15 @@
 
     <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
-        SET name = #{name},
-        url = #{url},
-        access_key = #{accessKey},
-        access_secret = #{accessSecret},
-        <if test="nettyIp != null and nettyIp !='' ">
-            `netty_ip` = #{nettyIp},
+        SET `name` = #{name},
+        `host`=#{host},
+        `port`=#{port},
+        `protocol`=#{protocol},
+        `url` = #{url},
+        `access_key` = #{accessKey},
+        `access_secret` = #{accessSecret},
+        <if test="host != null and host !='' ">
+            `netty_ip` = #{host},
         </if>
         <if test="nettyPort != null and nettyPort !='' ">
             `netty_port` = #{nettyPort},
@@ -181,10 +184,10 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         INSERT INTO runner(
-        `name`, url, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `name`,`host`,`port` ,`protocol`,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{url}, #{accessKey}, #{accessSecret}, #{authType}, #{nettyIp},
+        #{name}, #{host},#{port},#{protocol},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
         #{nettyPort},#{groupId},#{publicKey},#{privateKey}
         )
     </insert>

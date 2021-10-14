@@ -250,7 +250,7 @@ public class Config {
     }
 
 
-    public static String RUNNER_ADDRESS() {
+    public static String RUNNER_CONTEXT() {
         return RUNNER_CONTEXT;
     }
 

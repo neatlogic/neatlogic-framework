@@ -8,8 +8,11 @@ package codedriver.framework.dto.runner;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.HttpProtocol;
+import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -82,7 +85,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getUrl() {
-        if (StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
+        if (StringUtils.isBlank(url) && StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
             this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
         }
         return url;
@@ -178,5 +181,39 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public enum HttpProtocol implements IEnum {
+        HTTP("http", "http"),
+        HTTPS("https", "https");
+        private final String value;
+        private final String text;
+
+        HttpProtocol(String value, String text) {
+            this.value = value;
+            this.text = text;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        @Override
+        public List getValueTextList() {
+            JSONArray array = new JSONArray();
+            for (HttpProtocol type : values()) {
+                array.add(new JSONObject() {
+                    {
+                        this.put("value", type.getValue());
+                        this.put("text", type.getText());
+                    }
+                });
+            }
+            return array;
+        }
     }
 }

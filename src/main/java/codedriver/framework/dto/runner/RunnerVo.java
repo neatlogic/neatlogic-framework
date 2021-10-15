@@ -7,7 +7,6 @@ package codedriver.framework.dto.runner;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.constvalue.HttpProtocol;
 import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;

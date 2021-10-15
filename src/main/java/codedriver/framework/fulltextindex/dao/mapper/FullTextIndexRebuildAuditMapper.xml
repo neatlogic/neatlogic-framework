@@ -19,6 +19,12 @@
         </where>
     </select>
 
+    <update id="resetFullTextIndexRebuildAuditStatus">
+        update fulltextindex_rebuild_audit
+        set status = 'done'
+        where status = 'doing'
+    </update>
+
     <update id="updateFullTextIndexRebuildAuditStatus"
             parameterType="codedriver.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
         update fulltextindex_rebuild_audit

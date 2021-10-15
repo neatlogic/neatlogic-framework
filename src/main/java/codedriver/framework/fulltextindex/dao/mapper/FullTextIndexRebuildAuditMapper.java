@@ -14,5 +14,7 @@ public interface FullTextIndexRebuildAuditMapper {
 
     void updateFullTextIndexRebuildAuditStatus(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);
 
+    void resetFullTextIndexRebuildAuditStatus();
+
     void insertFullTextIndexRebuildAudit(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);
 }

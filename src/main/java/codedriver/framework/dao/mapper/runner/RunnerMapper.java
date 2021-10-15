@@ -17,47 +17,48 @@ public interface RunnerMapper {
 
     List<GroupNetworkVo> getAllNetworkMask();
 
-    RunnerGroupVo getRunnerGroupById(Long groupId);
-
     List<RunnerMapVo> getAllRunnerMap();
-
-    RunnerVo getRunnerById(Long runnerId);
-
-    Integer insertRunnerMap(RunnerMapVo runnerMapVo);
-
-    int checkGroupNameIsRepeats(RunnerGroupVo runnerGroupVo);
-
-    void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
-
-    void insertRunnerGroup(RunnerGroupVo runnerGroupVo);
-
-    void deleteGroupNetWork(Long id);
-
-    void insertNetwork(GroupNetworkVo networkVo);
-
-    int checkRunnerGroupIdIsExist(Long id);
-
-    void deleteRunnerGroupById(Long id);
-
-    int checkRunnerNameIsExist(RunnerVo runnerVo);
-
-    void updateRunner(RunnerVo runnerVo);
-
-    void insertRunner(RunnerVo runnerVo);
-
-    int checkRunnerIdIsExist(Long id);
-
-    void deleteRunnerById(Long id);
-
-    int checkRunnerNameIsExistByName(RunnerVo runnerVo);
-
-    RunnerVo getRunnerByIp(String requestIp);
 
     List<RunnerVo> getRunnerByGroupId(Long runnerGroupId);
 
+    RunnerGroupVo getRunnerGroupById(Long groupId);
+
+    RunnerVo getRunnerByIp(String requestIp);
+
     RunnerVo getRunnerByIpAndPort(String host, String port);
 
-    List<RunnerVo> searchRunnerByRunnerGroup(RunnerGroupVo runnerGroupVo);
+    RunnerVo getRunnerById(Long runnerId);
+
+    List<RunnerVo> searchRunner(RunnerGroupVo runnerGroupVo);
 
     int searchRunnerCount(Long id);
+
+    int checkGroupNameIsRepeats(RunnerGroupVo runnerGroupVo);
+
+    int checkRunnerIdIsExist(Long id);
+
+    int checkRunnerGroupIdIsExist(Long id);
+
+    int checkRunnerNameIsExistByName(RunnerVo runnerVo);
+
+    int checkRunnerNameIsExist(RunnerVo runnerVo);
+
+    Integer insertRunnerMap(RunnerMapVo runnerMapVo);
+
+    void insertRunnerGroup(RunnerGroupVo runnerGroupVo);
+
+    void insertNetwork(GroupNetworkVo networkVo);
+
+    void insertRunner(RunnerVo runnerVo);
+
+    void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
+
+    void updateRunner(RunnerVo runnerVo);
+
+    void deleteGroupNetWork(Long id);
+
+    void deleteRunnerGroupById(Long id);
+
+    void deleteRunnerById(Long id);
+
 }

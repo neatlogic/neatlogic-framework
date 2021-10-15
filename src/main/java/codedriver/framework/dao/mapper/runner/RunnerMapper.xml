@@ -159,8 +159,7 @@
         SET `name` = #{name},
         `host`=#{host},
         `port`=#{port},
-        `protocol`=#{protocol},
-        `url` = #{url},
+            `url` = #{url},
         `access_key` = #{accessKey},
         `access_secret` = #{accessSecret},
         <if test="host != null and host !='' ">
@@ -184,10 +183,10 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         INSERT INTO runner(
-        `name`,`host`,`port` ,`protocol`,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `name`,`host`,`port` ,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{host},#{port},#{protocol},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
+        #{name}, #{host},#{port},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
         #{nettyPort},#{groupId},#{publicKey},#{privateKey}
         )
     </insert>
@@ -252,13 +251,12 @@
           and `port` = #{port}
     </select>
 
-    <select id="searchRunnerByRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+    <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
             resultType="codedriver.framework.dto.runner.RunnerVo">
         SELECT r.id AS id,
         r.name AS name,
         r.url AS url,
-        r.protocol AS protocol,
-        r.port AS port,
+        r.netty_port AS nettyPort,
         r.access_key AS accessKey,
         r.access_secret AS accessSecret,
         r.auth_type AS authType,

@@ -33,14 +33,6 @@ public interface RunnerMapper {
 
     int searchRunnerCount(Long id);
 
-    Integer insertRunnerMap(RunnerMapVo runnerMapVo);
-
-    void insertRunnerGroup(RunnerGroupVo runnerGroupVo);
-
-    void insertNetwork(GroupNetworkVo networkVo);
-
-    void insertRunner(RunnerVo runnerVo);
-
     int checkGroupNameIsRepeats(RunnerGroupVo runnerGroupVo);
 
     int checkRunnerIdIsExist(Long id);
@@ -50,6 +42,14 @@ public interface RunnerMapper {
     int checkRunnerNameIsExistByName(RunnerVo runnerVo);
 
     int checkRunnerNameIsExist(RunnerVo runnerVo);
+
+    Integer insertRunnerMap(RunnerMapVo runnerMapVo);
+
+    void insertRunnerGroup(RunnerGroupVo runnerGroupVo);
+
+    void insertNetwork(GroupNetworkVo networkVo);
+
+    void insertRunner(RunnerVo runnerVo);
 
     void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
 

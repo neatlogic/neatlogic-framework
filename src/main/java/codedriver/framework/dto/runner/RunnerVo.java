@@ -5,9 +5,12 @@
 
 package codedriver.framework.dto.runner;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.HttpProtocol;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,7 +23,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = -5118893385455680746L;
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
-    @EntityField(name = "代理分组id",type = ApiParamType.LONG)
+    @EntityField(name = "代理分组id", type = ApiParamType.LONG)
     private Long groupId;
     @EntityField(name = "runner 名", type = ApiParamType.STRING)
     private String name;
@@ -44,9 +47,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private String privateKey;
     @EntityField(name = "runner 分组", type = ApiParamType.JSONARRAY)
     private List<RunnerGroupVo> proxyGroupVoList;
-    @EntityField(name = "NettyIp",type = ApiParamType.STRING)
+    @EntityField(name = "NettyIp", type = ApiParamType.STRING)
     private String nettyIp;
-    @EntityField(name = "Netty端口",type = ApiParamType.INTEGER)
+    @EntityField(name = "Netty端口", type = ApiParamType.INTEGER)
     private String nettyPort;
 
     public Long getId() {
@@ -66,6 +69,11 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getProtocol() {
+        if (url.startsWith(HttpProtocol.HTTPS.getValue())) {
+            protocol = HttpProtocol.HTTPS.getValue();
+        } else if (url.startsWith(HttpProtocol.HTTP.getValue())) {
+            protocol = HttpProtocol.HTTP.getValue();
+        }
         return protocol;
     }
 
@@ -74,6 +82,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getUrl() {
+        if (StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
+            this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
+        }
         return url;
     }
 

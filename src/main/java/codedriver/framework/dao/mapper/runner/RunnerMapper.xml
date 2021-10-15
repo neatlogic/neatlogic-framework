@@ -159,7 +159,7 @@
         SET `name` = #{name},
         `host`=#{host},
         `port`=#{port},
-            `url` = #{url},
+        `url` = #{url},
         `access_key` = #{accessKey},
         `access_secret` = #{accessSecret},
         <if test="host != null and host !='' ">
@@ -227,6 +227,8 @@
                r.access_secret AS accessSecret,
                r.auth_type     AS authType,
                r.group_id      AS groupId,
+               r.netty_ip      as nettyIp,
+               r.netty_port    as nettyPort,
                r.host,
                r.port
         FROM runner r

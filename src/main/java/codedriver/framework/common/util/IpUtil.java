@@ -39,16 +39,16 @@ public class IpUtil {
      * 判断ip是否属于某个网段
      *
      * @param ip         判断ip
-     * @param targetIp   网段ip
+     * @param networkIp   网段ip
      * @param subnetMask 掩码
      * @return boolean
      */
-    public static boolean isBelongSegment(String ip, String targetIp, int subnetMask) throws IpSubnetMaskException {
+    public static boolean isBelongSegment(String ip, String networkIp, int subnetMask) throws IpSubnetMaskException {
         if (StringUtils.isEmpty(ip)) {
             return false;
         }
         try {
-            String cidr = targetIp + "/" + subnetMask;
+            String cidr = networkIp + "/" + subnetMask;
             String[] ips = ip.split("\\.");
             int ipAddr = (Integer.parseInt(ips[0]) << 24) | (Integer.parseInt(ips[1]) << 16) | (Integer.parseInt(ips[2]) << 8) | Integer.parseInt(ips[3]);
             int type = Integer.parseInt(cidr.replaceAll(".*/", ""));
@@ -58,7 +58,7 @@ public class IpUtil {
             int cidrIpAddr = (Integer.parseInt(cidrIps[0]) << 24) | (Integer.parseInt(cidrIps[1]) << 16) | (Integer.parseInt(cidrIps[2]) << 8) | Integer.parseInt(cidrIps[3]);
             return (ipAddr & mask) == (cidrIpAddr & mask);
         } catch (Exception ex) {
-            throw new IpSubnetMaskException(ip + " " + targetIp + " " + subnetMask);
+            throw new IpSubnetMaskException(ip + " " + networkIp + " " + subnetMask);
         }
     }
 

@@ -20,8 +20,6 @@ public interface INotifyPolicyHandler {
 
     List<NotifyTriggerVo> getNotifyTriggerList();
 
-    List<NotifyTriggerVo> getNotifyTriggerListForNotifyTree();
-
     /**
      * 获取通知触发点模版列表
      */
@@ -30,6 +28,8 @@ public interface INotifyPolicyHandler {
     List<ValueTextVo> getParamTypeList();
 
     List<ConditionParamVo> getSystemParamList();
+
+    List<String> getParamNameList();
 
     List<ConditionParamVo> getSystemConditionOptionList();
 

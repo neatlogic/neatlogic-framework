@@ -25,18 +25,13 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 		return myNotifyTriggerList();
 	}
 
-	@Override
-	public List<NotifyTriggerVo> getNotifyTriggerListForNotifyTree() {
-		return myNotifyTriggerList();
-	}
+	protected abstract List<NotifyTriggerVo> myNotifyTriggerList();
 
 	/** 获取通知触发点模版列表 */
 	@Override
 	public List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type) {
 		return myNotifyTriggerTemplateList(type);
 	}
-
-	protected abstract List<NotifyTriggerVo> myNotifyTriggerList();
 
 	protected abstract List<NotifyTriggerTemplateVo> myNotifyTriggerTemplateList(NotifyHandlerType type);
 
@@ -78,10 +73,18 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	
 	protected abstract List<ConditionParamVo> mySystemParamList();
 
+	@Override
+	public final List<String> getParamNameList() {
+		return getMyParamNameList();
+	}
+
+	protected abstract List<String> getMyParamNameList();
+
     @Override
     public List<ConditionParamVo> getSystemConditionOptionList() {
         return mySystemConditionOptionList();
     }
+
     protected abstract List<ConditionParamVo> mySystemConditionOptionList();
     
 	@Override

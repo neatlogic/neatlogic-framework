@@ -3,19 +3,20 @@ package codedriver.framework.util;
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.dto.condition.ConditionConfigVo;
 import codedriver.framework.dto.condition.ConditionGroupVo;
 import codedriver.framework.message.core.IMessageHandler;
-import codedriver.framework.notify.core.INotifyHandler;
-import codedriver.framework.notify.core.INotifyTriggerType;
-import codedriver.framework.notify.core.NotifyHandlerFactory;
+import codedriver.framework.notify.core.*;
 import codedriver.framework.notify.dto.*;
 import codedriver.framework.notify.exception.NotifyHandlerNotFoundException;
+import codedriver.framework.notify.exception.NotifyPolicyNotFoundException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class NotifyPolicyUtil {
      */
     public static void execute(String notifyPolicyHandler, INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
                                JSONObject templateParamData, JSONObject conditionParamData,
-                               Map<String, List<NotifyReceiverVo>> receiverMap) throws Exception {
+                               Map<String, List<NotifyReceiverVo>> receiverMap, Object callerData) throws Exception {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
@@ -93,6 +94,10 @@ public class NotifyPolicyUtil {
                                 if (handler == null) {
                                     throw new NotifyHandlerNotFoundException(notifyHandler);
                                 }
+                                INotifyPolicyHandler policyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyHandler);
+                                if (policyHandler == null) {
+                                    throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
+                                }
                                 NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
                                 /** 设置异常通知接收人 **/
                                 if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
@@ -107,7 +112,9 @@ public class NotifyPolicyUtil {
                                         notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
                                     }
                                 }
+                                List<String> paramNameList = policyHandler.getParamNameList();
                                 /** 注入流程作业信息 不够将来再补充 **/
+                                templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
                                 notifyBuilder.addAllData(templateParamData);
                                 notifyBuilder.addData("notifyTriggerType", notifyTriggerType.getText());
                                 /** 参数映射 **/

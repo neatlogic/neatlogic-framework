@@ -313,7 +313,8 @@
         where `group_id` = #{id}
     </select>
 
-    <select id="searchRunnerAuthList" resultType="list" parameterType="codedriver.framework.dto.runner.RunnerAuthVo">
+    <select id="searchRunnerAuthList" parameterType="java.lang.Long"
+            resultType="codedriver.framework.dto.runner.RunnerAuthVo">
         select `id`            as id,
                `runner_id`     as runnerId,
                `auth_type`     as authType,

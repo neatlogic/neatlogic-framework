@@ -26,7 +26,7 @@ public class OperatorParamHandler implements INotifyParamHandler {
     public Object getText(Object object) {
         UserContext userContext = UserContext.get();
         if (userContext != null) {
-            userContext.getUserName();
+            return userContext.getUserName();
         }
         return null;
     }

@@ -3,6 +3,7 @@ package codedriver.framework.notify.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.notify.constvalue.CommonNotifyParam;
 import codedriver.framework.notify.dto.NotifyTriggerTemplateVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,7 +67,7 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	    }	    
 	    List<ConditionParamVo> mySystemParamList = mySystemParamList();
 	    if(CollectionUtils.isNotEmpty(mySystemParamList)) {
-	        resultList .addAll(mySystemParamList);
+	        resultList.addAll(mySystemParamList);
 	    }
 		return resultList;
 	}
@@ -75,7 +76,15 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 
 	@Override
 	public final List<String> getParamNameList() {
-		return getMyParamNameList();
+		List<String> resultList = new ArrayList<>();
+		for (CommonNotifyParam param : CommonNotifyParam.values()) {
+			resultList.add(param.getValue());
+		}
+		List<String> myParamNameList = getMyParamNameList();
+		if (CollectionUtils.isNotEmpty(myParamNameList)) {
+			resultList.addAll(myParamNameList);
+		}
+		return resultList;
 	}
 
 	protected abstract List<String> getMyParamNameList();

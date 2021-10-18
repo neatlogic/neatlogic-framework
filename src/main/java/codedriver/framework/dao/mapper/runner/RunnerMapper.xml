@@ -44,7 +44,6 @@
         <result column="host" property="host"/>
         <result column="port" property="port"/>
         <collection property="runnerAuthList" ofType="codedriver.framework.dto.runner.RunnerAuthVo">
-            <id column="runnerAuthId" property="id"/>
             <result column="authType" property="authType"/>
             <result column="accessKey" property="accessKey"/>
             <result column="accessSecret" property="accessSecret"/>
@@ -203,13 +202,13 @@
         </selectKey>
         INSERT INTO runner(
         `name`,`host`,`port` ,`url`,
-        <if test="accessKey != null and accessKey !='' ">
+        <if test="accessKey != null and accessKey !='' and isAuth ==1">
             `access_key`,
         </if>
-        <if test="accessSecret != null and accessSecret !='' ">
+        <if test="accessSecret != null and accessSecret !='' and isAuth ==1">
             `access_secret`,
         </if>
-        <if test="authType != null and authType !='' ">
+        <if test="authType != null and authType !='' and isAuth ==1 ">
             `auth_type`,
         </if>
         `netty_ip`, `netty_port`,

@@ -172,6 +172,13 @@
           and `name` = #{name};
     </select>
 
+    <select id="checkRunnerNameIsExistByName" resultType="int">
+        select count(1)
+        from runner
+        where `name` = #{name};
+    </select>
+
+
     <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
         SET `name` = #{name},

@@ -36,6 +36,8 @@ public interface RunnerMapper {
 
     int checkRunnerGroupIdIsExist(Long id);
 
+    int checkRunnerNameIsExistByName(RunnerVo runnerVo);
+
     int checkRunnerNameIsExist(RunnerVo runnerVo);
 
     Integer insertRunnerMap(RunnerMapVo runnerMapVo);

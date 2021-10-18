@@ -32,6 +32,7 @@ public class ExportUtil {
         if (StringUtils.isNotBlank(completedHtml)) {
             html = completedHtml;
         }
+        html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");// 过滤掉XML的无效字符
         Document doc = Jsoup.parse(html);
         doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
         savePdf(xhtml2word(doc, landscape), os);

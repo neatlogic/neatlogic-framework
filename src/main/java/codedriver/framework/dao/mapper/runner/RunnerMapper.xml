@@ -147,13 +147,6 @@
         where `group_id` = #{id}
     </delete>
 
-    <delete id="deleteRunnerAuthListByRunnerId">
-        delete
-        from runner_auth
-        where `runner_id` = #{value}
-    </delete>
-
-
     <insert id="insertNetwork" parameterType="codedriver.framework.dto.runner.GroupNetworkVo">
         INSERT INTO runnergroup_network(group_id, network_ip, mask)
         VALUES (#{groupId},
@@ -180,12 +173,6 @@
           and `name` = #{name};
     </select>
 
-    <select id="checkRunnerNameIsExistByName" resultType="int">
-        select count(1)
-        from runner
-        where `name` = #{name};
-    </select>
-
     <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
         SET `name` = #{name},
@@ -200,7 +187,7 @@
         <if test="nettyPort != null and nettyPort !='' ">
             `netty_port` = #{nettyPort},
         </if>
-        <if test="publicKey != null and publicKey !='' ">
+        <if test="accessKey != null and accessKey !='' ">
             `public_key` = #{publicKey},
         </if>
         <if test="privateKey != null and privateKey !='' ">
@@ -215,10 +202,30 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         INSERT INTO runner(
-        `name`,`host`,`port` ,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `name`,`host`,`port` ,`url`,
+        <if test="accessKey != null and accessKey !='' ">
+            `access_key`,
+        </if>
+        <if test="accessSecret != null and accessSecret !='' ">
+            `access_secret`,
+        </if>
+        <if test="authType != null and authType !='' ">
+            `auth_type`,
+        </if>
+        `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{host},#{port},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
+        #{name}, #{host},#{port},#{url},
+        <if test="accessKey != null and accessKey !='' ">
+            #{accessKey},
+        </if>
+        <if test="accessSecret != null and accessSecret !='' ">
+            #{accessSecret},
+        </if>
+        <if test="authType != null and authType !='' ">
+            #{authType},
+        </if>
+        #{host},
         #{nettyPort},#{groupId},#{publicKey},#{privateKey}
         )
     </insert>
@@ -291,7 +298,6 @@
         r.name AS name,
         r.url AS url,
         r.netty_port AS nettyPort,
-        ra.id AS runnerAuthId,
         r.access_key AS accessKey,
         r.access_secret AS accessSecret,
         r.auth_type AS authType,
@@ -299,7 +305,6 @@
         r.host,
         r.port
         FROM runner r
-        LEFT JOIN `runner_auth` ra ON ra.`runner_id` = r.`id`
         WHERE r.group_id = #{id}
         ORDER BY id DESC
         <if test="needPage == true">
@@ -312,19 +317,6 @@
         from runner
         where `group_id` = #{id}
     </select>
-
-    <select id="searchRunnerAuthList" parameterType="java.lang.Long"
-            resultType="codedriver.framework.dto.runner.RunnerAuthVo">
-        select `id`            as id,
-               `runner_id`     as runnerId,
-               `auth_type`     as authType,
-               `access_key`    as accessKey,
-               `access_secret` as accessSecret
-        from runner_auth
-        where runner_id = #{id}
-    </select>
-
-
 
 </mapper>
 

@@ -28,8 +28,6 @@ public interface RunnerMapper {
 
     List<RunnerVo> searchRunner(RunnerGroupVo runnerGroupVo);
 
-    List<RunnerAuthVo> searchRunnerAuthList(Long id);
-
     int searchRunnerCount(Long id);
 
     int checkGroupNameIsRepeats(RunnerGroupVo runnerGroupVo);
@@ -37,8 +35,6 @@ public interface RunnerMapper {
     int checkRunnerIdIsExist(Long id);
 
     int checkRunnerGroupIdIsExist(Long id);
-
-    int checkRunnerNameIsExistByName(RunnerVo runnerVo);
 
     int checkRunnerNameIsExist(RunnerVo runnerVo);
 
@@ -61,7 +57,5 @@ public interface RunnerMapper {
     void deleteRunnerGroupById(Long id);
 
     void deleteRunnerById(Long id);
-
-    void deleteRunnerAuthListByRunnerId(Long id);
 
 }

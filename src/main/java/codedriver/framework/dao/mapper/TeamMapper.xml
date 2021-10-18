@@ -600,6 +600,15 @@
         ORDER BY t.lft DESC
     </select>
 
+    <select id="getTeamUserTitleListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamUserTitleVo">
+        SELECT
+            `team_uuid` AS teamUuid,
+            `user_uuid` AS userUuid,
+            `title_id` AS titleId
+        FROM `team_user_title`
+        WHERE `user_uuid` = #{value}
+    </select>
+
     <insert id="insertTeam" parameterType="codedriver.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,
                             `uuid`,

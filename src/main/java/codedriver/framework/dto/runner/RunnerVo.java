@@ -54,6 +54,8 @@ public class RunnerVo extends BasePageVo implements Serializable {
     @EntityField(name = "Netty端口", type = ApiParamType.INTEGER)
     private String nettyPort;
 
+    private List<RunnerAuthVo> runnerAuthList;
+
     public Long getId() {
         return id;
     }
@@ -180,6 +182,14 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public List<RunnerAuthVo> getRunnerAuthList() {
+        return runnerAuthList;
+    }
+
+    public void setRunnerAuthList(List<RunnerAuthVo> runnerAuthList) {
+        this.runnerAuthList = runnerAuthList;
     }
 
     public enum HttpProtocol implements IEnum {

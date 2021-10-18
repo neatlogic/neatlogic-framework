@@ -35,6 +35,22 @@
         </collection>
     </resultMap>
 
+    <resultMap id="runnerMap" type="codedriver.framework.dto.runner.RunnerVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="nettyPort" property="nettyPort"/>
+        <result column="groupId" property="groupId"/>
+        <result column="host" property="host"/>
+        <result column="port" property="port"/>
+        <collection property="runnerAuthList" ofType="codedriver.framework.dto.runner.RunnerAuthVo">
+            <id column="runnerAuthId" property="id"/>
+            <result column="authType" property="authType"/>
+            <result column="accessKey" property="accessKey"/>
+            <result column="accessSecret" property="accessSecret"/>
+        </collection>
+    </resultMap>
+
     <select id="getRunnerGroupById" resultMap="runnerGroupMap">
         SELECT a.id              id,
                a.name            name,
@@ -116,11 +132,27 @@
                 #{description})
     </insert>
 
+    <insert id="insertRunnerAuthList">
+        insert into `runner_auth` (`id`, `runner_id`, `auth_type`, `access_key`, `access_secret`)
+        values
+        <foreach collection="list" item="runnerAuth" separator=",">
+            (#{runnerAuth.id}, #{runnerAuth.runnerId}, #{runnerAuth.authType}, #{runnerAuth.accessKey},
+            #{runnerAuth.accessSecret})
+        </foreach>
+    </insert>
+
     <delete id="deleteGroupNetWork">
         delete
         from runnergroup_network
         where `group_id` = #{id}
     </delete>
+
+    <delete id="deleteRunnerAuthListByRunnerId">
+        delete
+        from runner_auth
+        where `runner_id` = #{value}
+    </delete>
+
 
     <insert id="insertNetwork" parameterType="codedriver.framework.dto.runner.GroupNetworkVo">
         INSERT INTO runnergroup_network(group_id, network_ip, mask)
@@ -254,11 +286,12 @@
     </select>
 
     <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
-            resultType="codedriver.framework.dto.runner.RunnerVo">
+            resultMap="runnerMap">
         SELECT r.id AS id,
         r.name AS name,
         r.url AS url,
         r.netty_port AS nettyPort,
+        ra.id AS runnerAuthId,
         r.access_key AS accessKey,
         r.access_secret AS accessSecret,
         r.auth_type AS authType,
@@ -266,6 +299,7 @@
         r.host,
         r.port
         FROM runner r
+        LEFT JOIN `runner_auth` ra ON ra.`runner_id` = r.`id`
         WHERE r.group_id = #{id}
         ORDER BY id DESC
         <if test="needPage == true">
@@ -278,6 +312,17 @@
         from runner
         where `group_id` = #{id}
     </select>
+
+    <select id="searchRunnerAuthList" resultType="list" parameterType="codedriver.framework.dto.runner.RunnerAuthVo">
+        select `id`            as id,
+               `runner_id`     as runnerId,
+               `auth_type`     as authType,
+               `access_key`    as accessKey,
+               `access_secret` as accessSecret
+        from runner_auth
+        where runner_id = #{id}
+    </select>
+
 
 
 </mapper>

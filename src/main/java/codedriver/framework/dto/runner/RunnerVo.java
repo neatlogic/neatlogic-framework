@@ -12,6 +12,7 @@ import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -53,6 +54,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private String nettyIp;
     @EntityField(name = "Netty端口", type = ApiParamType.INTEGER)
     private String nettyPort;
+    @EntityField(name = "是否认证", type = ApiParamType.INTEGER)
+    private Integer isAuth;
+    private List<RunnerAuthVo> runnerAuthList;
 
     public Long getId() {
         return id;
@@ -95,6 +99,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getAccessKey() {
+        if (CollectionUtils.isNotEmpty(runnerAuthList)) {
+            return runnerAuthList.get(0).getAccessKey();
+        }
         return accessKey;
     }
 
@@ -103,6 +110,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getAccessSecret() {
+        if (CollectionUtils.isNotEmpty(runnerAuthList)) {
+            return runnerAuthList.get(0).getAccessSecret();
+        }
         return accessSecret;
     }
 
@@ -111,6 +121,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getAuthType() {
+        if (CollectionUtils.isNotEmpty(runnerAuthList)) {
+            return runnerAuthList.get(0).getAuthType();
+        }
         return authType;
     }
 
@@ -180,6 +193,25 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public List<RunnerAuthVo> getRunnerAuthList() {
+        return runnerAuthList;
+    }
+
+    public void setRunnerAuthList(List<RunnerAuthVo> runnerAuthList) {
+        this.runnerAuthList = runnerAuthList;
+    }
+
+    public Integer getIsAuth() {
+        if (CollectionUtils.isNotEmpty(runnerAuthList)) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public void setIsAuth(Integer isAuth) {
+        this.isAuth = isAuth;
     }
 
     public enum HttpProtocol implements IEnum {

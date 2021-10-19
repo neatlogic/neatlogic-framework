@@ -30,7 +30,6 @@ public class NotifyPolicyUtil {
      * @param policyConfig       通知策略配置信息
      * @param paramMappingList   引用通知策略时参数映射
      * @param notifyTriggerType  触发类型
-     * @param templateParamData  模板参数数据
      * @param conditionParamData 条件参数数据
      * @param receiverMap        可能用到的通知接收对象集合
      * @return void
@@ -38,9 +37,16 @@ public class NotifyPolicyUtil {
      * @Time:2020年7月2日
      * @Description: 执行通知策略
      */
-    public static void execute(String notifyPolicyHandler, INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
-                               JSONObject templateParamData, JSONObject conditionParamData,
-                               Map<String, List<NotifyReceiverVo>> receiverMap, Object callerData) throws Exception {
+    public static void execute(
+            String notifyPolicyHandler,
+            INotifyTriggerType notifyTriggerType,
+            Class<? extends IMessageHandler> newsHandlerClass,
+            NotifyPolicyConfigVo policyConfig,
+            List<ParamMappingVo> paramMappingList,
+            JSONObject conditionParamData,
+            Map<String, List<NotifyReceiverVo>> receiverMap,
+            Object callerData
+    ) throws Exception {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
@@ -114,7 +120,7 @@ public class NotifyPolicyUtil {
                                 }
                                 List<String> paramNameList = policyHandler.getParamNameList();
                                 /** 注入流程作业信息 不够将来再补充 **/
-                                templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
+                                JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
                                 notifyBuilder.addAllData(templateParamData);
                                 notifyBuilder.addData("notifyTriggerType", notifyTriggerType.getText());
                                 /** 参数映射 **/

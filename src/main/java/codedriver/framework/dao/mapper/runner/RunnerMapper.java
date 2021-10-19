@@ -6,10 +6,7 @@
 package codedriver.framework.dao.mapper.runner;
 
 
-import codedriver.framework.dto.runner.GroupNetworkVo;
-import codedriver.framework.dto.runner.RunnerGroupVo;
-import codedriver.framework.dto.runner.RunnerMapVo;
-import codedriver.framework.dto.runner.RunnerVo;
+import codedriver.framework.dto.runner.*;
 
 import java.util.List;
 
@@ -50,6 +47,8 @@ public interface RunnerMapper {
     void insertNetwork(GroupNetworkVo networkVo);
 
     void insertRunner(RunnerVo runnerVo);
+
+    void insertRunnerAuthList(List<RunnerAuthVo> runnerAuthList);
 
     void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
 

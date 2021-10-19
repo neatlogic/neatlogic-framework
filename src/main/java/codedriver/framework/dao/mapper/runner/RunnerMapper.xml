@@ -35,6 +35,21 @@
         </collection>
     </resultMap>
 
+    <resultMap id="runnerMap" type="codedriver.framework.dto.runner.RunnerVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="nettyPort" property="nettyPort"/>
+        <result column="groupId" property="groupId"/>
+        <result column="host" property="host"/>
+        <result column="port" property="port"/>
+        <collection property="runnerAuthList" ofType="codedriver.framework.dto.runner.RunnerAuthVo">
+            <result column="authType" property="authType"/>
+            <result column="accessKey" property="accessKey"/>
+            <result column="accessSecret" property="accessSecret"/>
+        </collection>
+    </resultMap>
+
     <select id="getRunnerGroupById" resultMap="runnerGroupMap">
         SELECT a.id              id,
                a.name            name,
@@ -116,6 +131,15 @@
                 #{description})
     </insert>
 
+    <insert id="insertRunnerAuthList">
+        insert into `runner_auth` (`id`, `runner_id`, `auth_type`, `access_key`, `access_secret`)
+        values
+        <foreach collection="list" item="runnerAuth" separator=",">
+            (#{runnerAuth.id}, #{runnerAuth.runnerId}, #{runnerAuth.authType}, #{runnerAuth.accessKey},
+            #{runnerAuth.accessSecret})
+        </foreach>
+    </insert>
+
     <delete id="deleteGroupNetWork">
         delete
         from runnergroup_network
@@ -154,6 +178,7 @@
         where `name` = #{name};
     </select>
 
+
     <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
         SET `name` = #{name},
@@ -168,7 +193,7 @@
         <if test="nettyPort != null and nettyPort !='' ">
             `netty_port` = #{nettyPort},
         </if>
-        <if test="publicKey != null and publicKey !='' ">
+        <if test="accessKey != null and accessKey !='' ">
             `public_key` = #{publicKey},
         </if>
         <if test="privateKey != null and privateKey !='' ">
@@ -183,10 +208,30 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         INSERT INTO runner(
-        `name`,`host`,`port` ,`url`, access_key, access_secret, auth_type, `netty_ip`, `netty_port`,
+        `name`,`host`,`port` ,`url`,
+        <if test="accessKey != null and accessKey !='' and isAuth ==1">
+            `access_key`,
+        </if>
+        <if test="accessSecret != null and accessSecret !='' and isAuth ==1">
+            `access_secret`,
+        </if>
+        <if test="authType != null and authType !='' and isAuth ==1 ">
+            `auth_type`,
+        </if>
+        `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{host},#{port},#{url}, #{accessKey}, #{accessSecret}, #{authType}, #{host},
+        #{name}, #{host},#{port},#{url},
+        <if test="accessKey != null and accessKey !='' ">
+            #{accessKey},
+        </if>
+        <if test="accessSecret != null and accessSecret !='' ">
+            #{accessSecret},
+        </if>
+        <if test="authType != null and authType !='' ">
+            #{authType},
+        </if>
+        #{host},
         #{nettyPort},#{groupId},#{publicKey},#{privateKey}
         )
     </insert>
@@ -254,7 +299,7 @@
     </select>
 
     <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
-            resultType="codedriver.framework.dto.runner.RunnerVo">
+            resultMap="runnerMap">
         SELECT r.id AS id,
         r.name AS name,
         r.url AS url,
@@ -278,7 +323,6 @@
         from runner
         where `group_id` = #{id}
     </select>
-
 
 </mapper>
 

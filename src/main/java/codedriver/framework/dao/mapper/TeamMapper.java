@@ -103,6 +103,8 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByTeamlrAndTitleId(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("titleId") Long titleId);
 
+    List<TeamUserTitleVo> getTeamUserTitleListByUserUuid(String userUuid);
+
     int checkTitleIsReferenceByTitleId(Long id);
 
 //	 int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);

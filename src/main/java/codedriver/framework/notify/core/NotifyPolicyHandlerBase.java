@@ -3,15 +3,14 @@ package codedriver.framework.notify.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import codedriver.framework.notify.constvalue.CommonNotifyParam;
 import codedriver.framework.notify.dto.NotifyTriggerTemplateVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
@@ -25,18 +24,13 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 		return myNotifyTriggerList();
 	}
 
-	@Override
-	public List<NotifyTriggerVo> getNotifyTriggerListForNotifyTree() {
-		return myNotifyTriggerList();
-	}
+	protected abstract List<NotifyTriggerVo> myNotifyTriggerList();
 
 	/** 获取通知触发点模版列表 */
 	@Override
 	public List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type) {
 		return myNotifyTriggerTemplateList(type);
 	}
-
-	protected abstract List<NotifyTriggerVo> myNotifyTriggerList();
 
 	protected abstract List<NotifyTriggerTemplateVo> myNotifyTriggerTemplateList(NotifyHandlerType type);
 
@@ -52,26 +46,44 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	@Override
 	public List<ConditionParamVo> getSystemParamList() {
 	    List<ConditionParamVo> resultList = new ArrayList<>();
-	    if(StringUtils.isNotBlank(Config.HOME_URL())) {
-	        ConditionParamVo param = new ConditionParamVo();
-	        param.setName("homeUrl");
-	        param.setLabel("域名");
-	        param.setController("input");
+		for (CommonNotifyParam param : CommonNotifyParam.values()) {
+			ConditionParamVo paramVo = new ConditionParamVo();
+			paramVo.setName(param.getValue());
+			paramVo.setLabel(param.getText());
+			paramVo.setController("input");
 
-	        param.setType("common");
-	        param.setParamType(ParamType.STRING.getName());
-	        param.setParamTypeName(ParamType.STRING.getText());
-	        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
-	        for(Expression expression : ParamType.STRING.getExpressionList()) {
-	            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
-	        }        
-	        param.setIsEditable(0);
-	        param.setFreemarkerTemplate("<a href=\"${homeUrl}\" target=\"_blank\"></a>");
-	        resultList.add(param);
-	    }	    
+			paramVo.setType("common");
+			ParamType paramType = param.getParamType();
+			paramVo.setParamType(paramType.getName());
+			paramVo.setParamTypeName(paramType.getText());
+//			paramVo.setDefaultExpression(paramType.getDefaultExpression().getExpression());
+//			for(Expression expression : paramType.getExpressionList()) {
+//				paramVo.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
+//			}
+			paramVo.setIsEditable(0);
+			paramVo.setFreemarkerTemplate(param.getFreemarkerTemplate());
+			resultList.add(paramVo);
+		}
+//	    if(StringUtils.isNotBlank(Config.HOME_URL())) {
+//	        ConditionParamVo param = new ConditionParamVo();
+//	        param.setName("homeUrl");
+//	        param.setLabel("域名");
+//	        param.setController("input");
+//
+//	        param.setType("common");
+//	        param.setParamType(ParamType.STRING.getName());
+//	        param.setParamTypeName(ParamType.STRING.getText());
+//	        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
+//	        for(Expression expression : ParamType.STRING.getExpressionList()) {
+//	            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
+//	        }
+//	        param.setIsEditable(0);
+//	        param.setFreemarkerTemplate("<a href=\"${homeUrl}\" target=\"_blank\"></a>");
+//	        resultList.add(param);
+//	    }
 	    List<ConditionParamVo> mySystemParamList = mySystemParamList();
 	    if(CollectionUtils.isNotEmpty(mySystemParamList)) {
-	        resultList .addAll(mySystemParamList);
+	        resultList.addAll(mySystemParamList);
 	    }
 		return resultList;
 	}
@@ -82,6 +94,7 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
     public List<ConditionParamVo> getSystemConditionOptionList() {
         return mySystemConditionOptionList();
     }
+
     protected abstract List<ConditionParamVo> mySystemConditionOptionList();
     
 	@Override

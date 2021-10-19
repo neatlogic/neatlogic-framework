@@ -3,14 +3,14 @@ package codedriver.framework.util;
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.dto.condition.ConditionConfigVo;
 import codedriver.framework.dto.condition.ConditionGroupVo;
 import codedriver.framework.message.core.IMessageHandler;
-import codedriver.framework.notify.core.INotifyHandler;
-import codedriver.framework.notify.core.INotifyTriggerType;
-import codedriver.framework.notify.core.NotifyHandlerFactory;
+import codedriver.framework.notify.core.*;
 import codedriver.framework.notify.dto.*;
 import codedriver.framework.notify.exception.NotifyHandlerNotFoundException;
+import codedriver.framework.notify.exception.NotifyPolicyNotFoundException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -29,7 +29,6 @@ public class NotifyPolicyUtil {
      * @param policyConfig       通知策略配置信息
      * @param paramMappingList   引用通知策略时参数映射
      * @param notifyTriggerType  触发类型
-     * @param templateParamData  模板参数数据
      * @param conditionParamData 条件参数数据
      * @param receiverMap        可能用到的通知接收对象集合
      * @return void
@@ -37,9 +36,16 @@ public class NotifyPolicyUtil {
      * @Time:2020年7月2日
      * @Description: 执行通知策略
      */
-    public static void execute(String notifyPolicyHandler, INotifyTriggerType notifyTriggerType, Class<? extends IMessageHandler> newsHandlerClass, NotifyPolicyConfigVo policyConfig, List<ParamMappingVo> paramMappingList,
-                               JSONObject templateParamData, JSONObject conditionParamData,
-                               Map<String, List<NotifyReceiverVo>> receiverMap) throws Exception {
+    public static void execute(
+            String notifyPolicyHandler,
+            INotifyTriggerType notifyTriggerType,
+            Class<? extends IMessageHandler> newsHandlerClass,
+            NotifyPolicyConfigVo policyConfig,
+            List<ParamMappingVo> paramMappingList,
+            JSONObject conditionParamData,
+            Map<String, List<NotifyReceiverVo>> receiverMap,
+            Object callerData
+    ) throws Exception {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
@@ -93,6 +99,10 @@ public class NotifyPolicyUtil {
                                 if (handler == null) {
                                     throw new NotifyHandlerNotFoundException(notifyHandler);
                                 }
+                                INotifyPolicyHandler policyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyHandler);
+                                if (policyHandler == null) {
+                                    throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
+                                }
                                 NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
                                 /** 设置异常通知接收人 **/
                                 if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
@@ -107,7 +117,10 @@ public class NotifyPolicyUtil {
                                         notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
                                     }
                                 }
+                                List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
+                                List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
                                 /** 注入流程作业信息 不够将来再补充 **/
+                                JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
                                 notifyBuilder.addAllData(templateParamData);
                                 notifyBuilder.addData("notifyTriggerType", notifyTriggerType.getText());
                                 /** 参数映射 **/

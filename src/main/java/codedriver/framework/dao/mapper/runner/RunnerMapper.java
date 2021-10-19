@@ -48,8 +48,6 @@ public interface RunnerMapper {
 
     void insertRunner(RunnerVo runnerVo);
 
-    void insertRunnerAuthList(List<RunnerAuthVo> runnerAuthList);
-
     void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
 
     void updateRunner(RunnerVo runnerVo);

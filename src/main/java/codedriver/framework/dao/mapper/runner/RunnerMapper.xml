@@ -131,15 +131,6 @@
                 #{description})
     </insert>
 
-    <insert id="insertRunnerAuthList">
-        insert into `runner_auth` (`id`, `runner_id`, `auth_type`, `access_key`, `access_secret`)
-        values
-        <foreach collection="list" item="runnerAuth" separator=",">
-            (#{runnerAuth.id}, #{runnerAuth.runnerId}, #{runnerAuth.authType}, #{runnerAuth.accessKey},
-            #{runnerAuth.accessSecret})
-        </foreach>
-    </insert>
-
     <delete id="deleteGroupNetWork">
         delete
         from runnergroup_network

@@ -16,7 +16,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -118,7 +117,8 @@ public class NotifyPolicyUtil {
                                         notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
                                     }
                                 }
-                                List<String> paramNameList = policyHandler.getParamNameList();
+                                List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
+                                List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
                                 /** 注入流程作业信息 不够将来再补充 **/
                                 JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
                                 notifyBuilder.addAllData(templateParamData);

@@ -7,12 +7,10 @@ import codedriver.framework.notify.constvalue.CommonNotifyParam;
 import codedriver.framework.notify.dto.NotifyTriggerTemplateVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 
 import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
@@ -48,23 +46,41 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	@Override
 	public List<ConditionParamVo> getSystemParamList() {
 	    List<ConditionParamVo> resultList = new ArrayList<>();
-	    if(StringUtils.isNotBlank(Config.HOME_URL())) {
-	        ConditionParamVo param = new ConditionParamVo();
-	        param.setName("homeUrl");
-	        param.setLabel("域名");
-	        param.setController("input");
+		for (CommonNotifyParam param : CommonNotifyParam.values()) {
+			ConditionParamVo paramVo = new ConditionParamVo();
+			paramVo.setName(param.getValue());
+			paramVo.setLabel(param.getText());
+			paramVo.setController("input");
 
-	        param.setType("common");
-	        param.setParamType(ParamType.STRING.getName());
-	        param.setParamTypeName(ParamType.STRING.getText());
-	        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
-	        for(Expression expression : ParamType.STRING.getExpressionList()) {
-	            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
-	        }        
-	        param.setIsEditable(0);
-	        param.setFreemarkerTemplate("<a href=\"${homeUrl}\" target=\"_blank\"></a>");
-	        resultList.add(param);
-	    }	    
+			paramVo.setType("common");
+			ParamType paramType = param.getParamType();
+			paramVo.setParamType(paramType.getName());
+			paramVo.setParamTypeName(paramType.getText());
+//			paramVo.setDefaultExpression(paramType.getDefaultExpression().getExpression());
+//			for(Expression expression : paramType.getExpressionList()) {
+//				paramVo.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
+//			}
+			paramVo.setIsEditable(0);
+			paramVo.setFreemarkerTemplate(param.getFreemarkerTemplate());
+			resultList.add(paramVo);
+		}
+//	    if(StringUtils.isNotBlank(Config.HOME_URL())) {
+//	        ConditionParamVo param = new ConditionParamVo();
+//	        param.setName("homeUrl");
+//	        param.setLabel("域名");
+//	        param.setController("input");
+//
+//	        param.setType("common");
+//	        param.setParamType(ParamType.STRING.getName());
+//	        param.setParamTypeName(ParamType.STRING.getText());
+//	        param.setDefaultExpression(ParamType.STRING.getDefaultExpression().getExpression());
+//	        for(Expression expression : ParamType.STRING.getExpressionList()) {
+//	            param.getExpressionList().add(new ExpressionVo(expression.getExpression(), expression.getExpressionName()));
+//	        }
+//	        param.setIsEditable(0);
+//	        param.setFreemarkerTemplate("<a href=\"${homeUrl}\" target=\"_blank\"></a>");
+//	        resultList.add(param);
+//	    }
 	    List<ConditionParamVo> mySystemParamList = mySystemParamList();
 	    if(CollectionUtils.isNotEmpty(mySystemParamList)) {
 	        resultList.addAll(mySystemParamList);
@@ -73,21 +89,6 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	}
 	
 	protected abstract List<ConditionParamVo> mySystemParamList();
-
-	@Override
-	public final List<String> getParamNameList() {
-		List<String> resultList = new ArrayList<>();
-		for (CommonNotifyParam param : CommonNotifyParam.values()) {
-			resultList.add(param.getValue());
-		}
-		List<String> myParamNameList = getMyParamNameList();
-		if (CollectionUtils.isNotEmpty(myParamNameList)) {
-			resultList.addAll(myParamNameList);
-		}
-		return resultList;
-	}
-
-	protected abstract List<String> getMyParamNameList();
 
     @Override
     public List<ConditionParamVo> getSystemConditionOptionList() {

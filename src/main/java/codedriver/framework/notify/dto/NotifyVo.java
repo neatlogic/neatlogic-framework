@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.message.core.IMessageHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -156,6 +157,7 @@ public class NotifyVo {
         public Builder() {
 
         }
+
         public Builder(INotifyTriggerType _triggerType) {
             this.triggerType = _triggerType;
         }
@@ -225,7 +227,9 @@ public class NotifyVo {
         }
 
         public Builder addFileList(List<FileVo> fileList) {
-            this.fileList.addAll(fileList);
+            if (CollectionUtils.isNotEmpty(fileList)) {
+                this.fileList.addAll(fileList);
+            }
             return this;
         }
 

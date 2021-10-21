@@ -143,7 +143,7 @@
 		#{isActive},
 		now(3),
 		#{fcu},
-		#{lcu},
+		#{fcu},
 		now(3)
 		)
 	</insert>

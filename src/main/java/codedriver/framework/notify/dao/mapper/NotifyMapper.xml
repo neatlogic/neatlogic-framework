@@ -73,8 +73,8 @@
 	</select>
 	
 	<insert id="insertNotifyPolicy">
-	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`) 
-	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3))
+	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
+	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))
 	</insert>
 
 	<update id="updateNotifyPolicyById">

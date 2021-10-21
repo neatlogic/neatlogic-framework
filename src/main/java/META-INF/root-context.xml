@@ -114,20 +114,15 @@
 
     <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
 
-    <context:component-scan base-package="codedriver.framework" />
+    <context:component-scan base-package="codedriver.framework"/>
 
-    <!--<bean id="DatasourceManager" class="codedriver.framework.datasource.DatasourceManagerbean>-->
-    <!--<bean id="MongoDbManager" class="codedriver.framework.mongodb.MongoDbManagerbean>-->
     <bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
 
-    <mongo:mongo-client id="mongoClient" host="${mongo.host}" port="${mongo.port}"
-                        credential="${mongo.username}:${mongo.password}@admin">
-    </mongo:mongo-client>
-
+    <!--mongoDb-->
     <bean id="mongoDbFactory" class="codedriver.framework.store.mongodb.CodedriverMongoDbFactory">
-        <constructor-arg name="mongoClient" ref="mongoClient"/>
-        <constructor-arg name="databaseName" value="codedriver"/>
+        <constructor-arg name="connectionString" value="${mongo.url}"/>
     </bean>
+
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>

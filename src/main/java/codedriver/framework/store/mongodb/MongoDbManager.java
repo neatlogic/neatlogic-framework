@@ -10,6 +10,7 @@ import codedriver.framework.dao.mapper.MongoDbMapper;
 import codedriver.framework.dto.MongoDbVo;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -30,7 +31,7 @@ public class MongoDbManager {
         List<MongoDbVo> mongoDbList = mongoDbMapper.getAllActiveTenantMongoDb();
         for (MongoDbVo mongoDbVo : mongoDbList) {
             if (!mongoDbMap.containsKey(mongoDbVo.getTenantUuid())) {
-                MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + ":" + mongoDbVo.getPort() + "/" + mongoDbVo.getDatabase() + "?authSource=admin");
+                MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + "/" + mongoDbVo.getDatabase() + (StringUtils.isNotBlank(mongoDbVo.getOption()) ? "?" + mongoDbVo.getOption() : ""));
                 mongoDbMap.put(mongoDbVo.getTenantUuid(), client);
                 mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
             }

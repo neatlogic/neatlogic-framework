@@ -348,6 +348,8 @@ public class ApiValidateAndHelpBase {
                     if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
                         throw new ParamIrregularException(p.desc() + "（" + p.name() + "）");
                     }
+                    //纠正参数值
+                    ParamValidatorFactory.getAuthInstance(p.type()).correctValue(paramObj, p.name(), paramValue);
                 }
             }
         }

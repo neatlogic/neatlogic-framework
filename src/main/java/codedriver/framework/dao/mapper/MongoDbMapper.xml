@@ -13,7 +13,7 @@
                username,
                `password`  AS passwordCipher,
                `host`,
-               `port`
+               `option`
         FROM mongodb a
                  JOIN `tenant` b
                       ON a.tenant_uuid = b.uuid

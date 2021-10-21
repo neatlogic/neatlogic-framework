@@ -23,6 +23,7 @@ public class CodedriverMongoDbFactory extends SimpleMongoClientDatabaseFactory {
         super(mongoClient, databaseName);
     }
 
+
     @Override
     protected MongoDatabase doGetMongoDatabase(String dbName) {
         return MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid()).getDatabase(MongoDbManager.getDatabase(TenantContext.get().getTenantUuid()));

@@ -6,21 +6,13 @@
 package codedriver.framework.store.mongodb;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
-//@Configuration
 public class CodedriverMongoDbFactory extends SimpleMongoClientDatabaseFactory {
-    //@Autowired
-    //MongoDataSources mongoDataSources;
 
-    /*public CodedriverMongoDbFactory(@Qualifier("getMongoClient") MongoClient mongoClient, String databaseName) {
-        super(mongoClient, databaseName);
-    }*/
-
-    public CodedriverMongoDbFactory(MongoClient mongoClient, String databaseName) {
-        super(mongoClient, databaseName);
+    public CodedriverMongoDbFactory(String connectionString) {
+        super(connectionString);
     }
 
 

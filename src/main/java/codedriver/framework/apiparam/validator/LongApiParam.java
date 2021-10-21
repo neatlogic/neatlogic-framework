@@ -33,7 +33,8 @@ public class LongApiParam extends ApiParamValidatorBase {
 
     @Override
     public void correctValue(JSONObject paramObj, String name, Object param) {
-        if (StringUtils.isBlank(param.toString())) {
+        //将值null或为空字符串的入参删掉
+        if (param == null || StringUtils.isBlank(param.toString())) {
             paramObj.remove(name);
         }
     }

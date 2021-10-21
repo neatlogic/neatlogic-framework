@@ -15,11 +15,11 @@ public class MongoDbVo {
     private Long tenantId;
     private String tenantUuid;
     private String host;
-    private int port;
     private String database;
     private String username;
     private String passwordPlain;
     private String passwordCipher;
+    private String option;
 
     public MongoDbVo() {
 
@@ -41,6 +41,14 @@ public class MongoDbVo {
             }
             this.passwordPlain = password.toString();
         }
+    }
+
+    public String getOption() {
+        return option;
+    }
+
+    public void setOption(String option) {
+        this.option = option;
     }
 
     public String getDatabase() {
@@ -121,12 +129,5 @@ public class MongoDbVo {
         this.host = host;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 
 }

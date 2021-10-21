@@ -16,6 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.Objects;
 
+/**
+ * BaseEditorVo类的fcu、fcd、lcu、lcd字段，分别对应数据库表的fcu、fcd、lcu、lcd字段，建议fcu、lcu设置为必填。
+ * 建议首次插入一条数据时，同时插入fcu、fcd、lcu、lcd四个字段值，其中fcu与lcu值相等，fcd与lcd值相等。
+ * 之后修改数据时只需更新lcu与lcd字段值，fcu与fcd字段值不变。
+ */
 public class BaseEditorVo extends BasePageVo {
     @EntityField(name = "创建者", type = ApiParamType.STRING)
     private String fcu;

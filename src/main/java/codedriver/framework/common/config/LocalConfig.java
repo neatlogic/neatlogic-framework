@@ -5,6 +5,7 @@
 
 package codedriver.framework.common.config;
 
+import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
     private Properties properties;
     private ConfigurableEnvironment environment;
 
+
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = (ConfigurableEnvironment) environment;
@@ -39,13 +41,12 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
     private synchronized String getProperty(String keyName, String defaultValue) {
         if (properties == null) {
             properties = new Properties();
-            InputStreamReader is;
+            //加载本地配置
             try {
-                is = new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8);
+                InputStreamReader is = new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8);
                 properties.load(is);
                 is.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
                 logger.error("load " + CONFIG_FILE + " error: " + ex.getMessage(), ex);
             }
         }
@@ -66,17 +67,20 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("db.driverClassName", this.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
         paramMap.put("db.url", this.getProperty("db.url", "jdbc:mysql://localhost:3306/codedriver?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
-        paramMap.put("db.username", this.getProperty("db.username", "root"));
-        paramMap.put("db.password", this.getProperty("db.password", "root"));
+        paramMap.put("db.username", this.getProperty("db.username", "username"));
+        paramMap.put("db.password", this.getProperty("db.password", "password"));
         paramMap.put("conn.validationQuery", this.getProperty("conn.validationQuery", "select 1"));
         paramMap.put("conn.testOnBorrow", this.getProperty("conn.testOnBorrow", "true"));
         paramMap.put("conn.maxIdle", this.getProperty("conn.maxIdle", "16"));
         paramMap.put("conn.initialSize", this.getProperty("conn.initialSize", "4"));
-        paramMap.put("mongo.host", this.getProperty("mongo.host", "localhost"));
-        paramMap.put("mongo.port", this.getProperty("mongo.port", "27017"));
-        paramMap.put("mongo.username", this.getProperty("mongo.username", "root"));
-        paramMap.put("mongo.password", this.getProperty("mongo.password", "root"));
-        paramMap.put("mongo.database", this.getProperty("mongo.database", "admin"));
+        String mongoHost = this.getProperty("mongo.host", "localhost:27017");
+        String mongoUser = this.getProperty("mongo.username", "root");
+        String mongoPwd = this.getProperty("mongo.password", "root");
+        String mongoDb = this.getProperty("mongo.database", "admin");
+        if (mongoPwd.startsWith("RC4:")) {
+            mongoPwd = RC4Util.decrypt(mongoPwd.substring(4));
+        }
+        paramMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
         paramMap.put("jms.url", this.getProperty("jms.url", "tcp://localhost:8161"));
         propertySources.addLast(new MapPropertySource("localconfig", paramMap));
     }

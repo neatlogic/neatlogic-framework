@@ -33,7 +33,7 @@
 		#{type},
 		#{fcu},
 		NOW(3),
-		#{lcu},
+		#{fcu},
 		NOW(3)
 		)
 	</insert>

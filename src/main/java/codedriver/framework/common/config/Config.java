@@ -46,7 +46,6 @@ public class Config {
     private static String USER_EXPIRETIME; // 会话超时时间
 
     private static String MONGO_HOST;
-    private static int MONGO_PORT;
     private static String MONGO_PASSWORD;
     private static String MONGO_USERNAME;
     private static String MONGO_DATABASE;
@@ -154,16 +153,13 @@ public class Config {
         return DB_DRIVER;
     }
 
+
     public static String MONGO_HOST() {
         return MONGO_HOST;
     }
 
     public static String MONGO_PASSWORD() {
         return MONGO_PASSWORD;
-    }
-
-    public static int MONGO_PORT() {
-        return MONGO_PORT;
     }
 
     public static String MONGO_DATABASE() {
@@ -303,8 +299,7 @@ public class Config {
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
             DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
 
-            MONGO_HOST = prop.getProperty("mongo.host", "localhost");
-            MONGO_PORT = Integer.parseInt(prop.getProperty("mongo.port", "27017"));
+            MONGO_HOST = prop.getProperty("mongo.host", "localhost:27017");
             MONGO_USERNAME = prop.getProperty("mongo.username", "root");
             MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
             MONGO_DATABASE = prop.getProperty("mongo.database", "codedriver");

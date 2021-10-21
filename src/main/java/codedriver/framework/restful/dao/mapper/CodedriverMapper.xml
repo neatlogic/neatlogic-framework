@@ -3,13 +3,13 @@
 <mapper namespace="codedriver.framework.restful.dao.mapper.CodedriverMapper">
 	<select id="getMongodbByTenant" resultType="codedriver.framework.dto.MongoDbVo">
 		SELECT
-			`tenant_id` as tenantId,
-			`tenant_uuid` as tenantUuid,
+			`tenant_id` AS tenantId,
+			`tenant_uuid` AS tenantUuid,
 			`database`,
 			`username`,
-			`password` as passwordPlain,
+			`password` AS passwordPlain,
 			`host`,
-			`port`
+			`option`
 		FROM
 			`mongodb`
 		where `tenant_uuid` = #{value}

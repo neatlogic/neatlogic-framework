@@ -32,6 +32,7 @@ public class NotifyPolicyUtil {
      * @param notifyTriggerType  触发类型
      * @param conditionParamData 条件参数数据
      * @param receiverMap        可能用到的通知接收对象集合
+     * @param fileList           可能存在的文件列表
      * @return void
      * @Author: linbq
      * @Time:2020年7月2日

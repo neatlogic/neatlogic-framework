@@ -255,12 +255,16 @@
                                     `form_uuid`,
                                     `form_config`,
                                     `fcd`,
-                                    `fcu`)
+                                    `fcu`,
+                                    `lcd`,
+                                    `lcu`)
         VALUES (#{uuid},
                 #{version},
                 #{isActive},
                 #{formUuid},
                 #{formConfig},
+                NOW(3),
+                #{editor},
                 NOW(3),
                 #{editor})
     </insert>

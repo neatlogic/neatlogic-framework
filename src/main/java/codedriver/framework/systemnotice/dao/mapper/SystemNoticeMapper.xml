@@ -517,7 +517,7 @@
         now(3),
         #{fcu},
         now(3),
-        #{lcu}
+        #{fcu}
         )
     </insert>
 

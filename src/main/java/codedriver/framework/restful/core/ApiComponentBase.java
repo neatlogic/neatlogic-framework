@@ -5,6 +5,7 @@
 
 package codedriver.framework.restful.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.dto.api.CacheControlVo;
@@ -145,6 +146,9 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
+            if( TenantContext.get() != null){
+                TenantContext.get().setUseDefaultDatasource(false);//防止上游异常导致后续审计没有还原原来的租户
+            }
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
             while (target instanceof InvocationTargetException) {
                 target = ((InvocationTargetException) target).getTargetException();

@@ -47,7 +47,6 @@ public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {
         String tenant = TenantContext.get().getTenantUuid();
         TenantContext.get().setUseDefaultDatasource(true);
         MongoDbVo mongodbVo = codedriverMapper.getMongodbByTenant(tenant);
-        TenantContext.get().switchTenant(tenant);
         TenantContext.get().setUseDefaultDatasource(false);
         return mongodbVo;
     }

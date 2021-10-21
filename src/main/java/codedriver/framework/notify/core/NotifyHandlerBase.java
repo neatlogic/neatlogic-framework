@@ -1,22 +1,27 @@
 package codedriver.framework.notify.core;
 
+import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.dao.mapper.MailServerMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.MailServerVo;
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.notify.exception.EmailServerNotFoundException;
 import codedriver.framework.notify.exception.NotifyNoReceiverException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.mail.HtmlEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.InputStream;
+import java.util.*;
 
 public abstract class NotifyHandlerBase implements INotifyHandler {
 
@@ -80,40 +85,71 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
             try {
                 MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
                 if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
-                    HtmlEmail se = new HtmlEmail();
-                    se.setHostName(mailServerVo.getHost());
-                    se.setSmtpPort(mailServerVo.getPort());
-                    if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
-                        se.setAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
-                    }
-                    if (StringUtils.isNotBlank(notifyVo.getFromUserEmail())) {
-                        se.setFrom(notifyVo.getFromUserEmail(), notifyVo.getFromUser());
-                    } else {
-                        if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
-                            se.setFrom(mailServerVo.getFromAddress(), mailServerVo.getName());
-                        }
-                    }
-
-                    se.setSubject(isNormal ? clearStringHTML(notifyVo.getTitle()) : "通知发送异常");
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<html>");
-                    sb.append("<head>");
-                    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-                    sb.append("<style type=\"text/css\">");
-                    sb.append("</style>");
-                    sb.append("</head><body>");
-                    sb.append(isNormal ? notifyVo.getContent() : notifyVo.getError());
-                    sb.append("</body></html>");
-                    se.addPart(sb.toString(), "text/html;charset=utf-8");
                     boolean isSend = false;
+                    List<String> toEmailList = new ArrayList<>();
                     for (UserVo user : toUserSet) {
                         if (StringUtils.isNotBlank(user.getEmail())) {
                             isSend = true;
-                            se.addTo(user.getEmail());
+                            toEmailList.add(user.getEmail());
                         }
                     }
                     if (isSend) {
-                        se.send();
+                        /** 开启邮箱服务器连接会话 */
+                        Properties props = new Properties();
+                        props.setProperty("mail.smtp.host", mailServerVo.getHost());
+                        props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
+                        props.put("mail.smtp.auth", "true");
+                        Session session = Session.getInstance(props, new Authenticator() {
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                            }
+                        });
+
+                        MimeMessage msg = new MimeMessage(session);
+                        if (StringUtils.isNotBlank(notifyVo.getFromUserEmail())) {
+                            msg.setFrom(new InternetAddress(notifyVo.getFromUserEmail(), notifyVo.getFromUser()));
+                        } else if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
+                            msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
+                        }
+
+                        /** 设置收件人 */
+                        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", toEmailList), false));
+                        /** 设置邮件标题 */
+                        msg.setSubject(isNormal ? clearStringHTML(notifyVo.getTitle()) : "通知发送异常");
+                        msg.setSentDate(new Date());
+
+                        MimeMultipart multipart = new MimeMultipart();
+                        /** 设置邮件正文 */
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("<html>");
+                        sb.append("<head>");
+                        sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+                        sb.append("<style type=\"text/css\">");
+                        sb.append("</style>");
+                        sb.append("</head><body>");
+                        sb.append(isNormal ? notifyVo.getContent() : notifyVo.getError());
+                        sb.append("</body></html>");
+                        MimeBodyPart text = new MimeBodyPart();
+                        text.setContent(sb.toString(), "text/html;charset=UTF-8");
+                        multipart.addBodyPart(text);
+                        /** 设置附件 */
+                        List<FileVo> fileList = notifyVo.getFileList();
+                        if (CollectionUtils.isNotEmpty(fileList)) {
+                            for (FileVo vo : fileList) {
+                                InputStream stream = FileUtil.getData(vo.getPath());
+                                if (stream != null) {
+                                    MimeBodyPart messageBodyPart = new MimeBodyPart();
+                                    DataSource dataSource = new ByteArrayDataSource(stream, "application/octet-stream");
+                                    DataHandler dataHandler = new DataHandler(dataSource);
+                                    messageBodyPart.setDataHandler(dataHandler);
+                                    messageBodyPart.setFileName(MimeUtility.encodeText(vo.getName()));
+                                    multipart.addBodyPart(messageBodyPart);
+                                }
+                            }
+                        }
+                        msg.setContent(multipart);
+                        /** 发送邮件 */
+                        Transport.send(msg);
                     } else {
                         throw new NotifyNoReceiverException();
                     }

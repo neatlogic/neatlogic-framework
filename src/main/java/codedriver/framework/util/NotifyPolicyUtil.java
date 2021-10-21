@@ -6,6 +6,7 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.dto.condition.ConditionConfigVo;
 import codedriver.framework.dto.condition.ConditionGroupVo;
+import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.message.core.IMessageHandler;
 import codedriver.framework.notify.core.*;
 import codedriver.framework.notify.dto.*;
@@ -44,7 +45,8 @@ public class NotifyPolicyUtil {
             List<ParamMappingVo> paramMappingList,
             JSONObject conditionParamData,
             Map<String, List<NotifyReceiverVo>> receiverMap,
-            Object callerData
+            Object callerData,
+            List<FileVo> fileList
     ) throws Exception {
         /** 异常通知用户uuid列表 **/
         List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
@@ -136,14 +138,14 @@ public class NotifyPolicyUtil {
                                         } else if (Objects.equals(paramMappingVo.getName(),
                                                 paramMappingVo.getValue())) {
                                             if (!templateParamData.containsKey(paramMappingVo.getValue())) {
-                                                logger.warn(TenantContext.get().getTenantUuid()+"-没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.warn(TenantContext.get().getTenantUuid() + "-没有找到工单参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         } else {
                                             Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
                                             if (processFieldValue != null) {
                                                 notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
                                             } else {
-                                                logger.warn(TenantContext.get().getTenantUuid()+"-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                                logger.warn(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
                                             }
                                         }
                                     }
@@ -176,7 +178,7 @@ public class NotifyPolicyUtil {
                                         }
                                     }
                                 }
-
+                                notifyBuilder.addFileList(fileList);
                                 NotifyVo notifyVo = notifyBuilder.build();
                                 /** 发送通知 **/
                                 handler.execute(notifyVo);

@@ -68,7 +68,7 @@ public class IpUtil {
     }
 
     public static boolean checkMask(int mask) {
-        if (mask > 0 && mask <= 32) {
+        if (mask >= 0 && mask <= 32) {
             return true;
         }
         return false;

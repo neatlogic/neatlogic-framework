@@ -7,6 +7,7 @@ package codedriver.framework.dao.mapper.runner;
 
 
 import codedriver.framework.dto.runner.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface RunnerMapper {
 
     RunnerVo getRunnerByIp(String requestIp);
 
-    RunnerVo getRunnerByIpAndPort(String host, String port);
+    RunnerVo getRunnerByIpAndPort(@Param("host") String host, @Param("port") String port);
 
     RunnerVo getRunnerById(Long runnerId);
 

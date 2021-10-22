@@ -35,7 +35,7 @@ public class IntegrationVo extends BasePageVo implements Serializable {
     @EntityField(name = "请求方法", type = ApiParamType.STRING)
     private String method;
     @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
-    private Integer isActive = 1;
+    private Integer isActive;
     @EntityField(name = "输入参数模板", type = ApiParamType.JSONARRAY)
     private List<PatternVo> inputPatternList = new ArrayList<>();
     @EntityField(name = "输出参数模板", type = ApiParamType.JSONARRAY)

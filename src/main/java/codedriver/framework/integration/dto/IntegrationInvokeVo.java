@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.integration.core.IntegrationInvokerBase;
 import codedriver.framework.integration.core.IntegrationInvokerFactory;
 import codedriver.framework.util.Md5Util;
-
+@Deprecated
 public class IntegrationInvokeVo {
 	private String integrationUuid;
 	private IntegrationInvokerBase invoker;

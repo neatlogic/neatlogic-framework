@@ -2,7 +2,6 @@ package codedriver.framework.integration.dao.mapper;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.integration.dto.IntegrationAuditVo;
-import codedriver.framework.integration.dto.IntegrationInvokeVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 
 import java.util.List;
@@ -19,6 +18,8 @@ public interface IntegrationMapper {
 
     List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);
 
+    List<IntegrationVo> getIntegrationListByUuidList(List<String> uuidList);
+
     List<ValueTextVo> searchIntegrationForSelect(IntegrationVo integrationVo);
 
     int searchIntegrationCount(IntegrationVo integrationVo);
@@ -33,10 +34,9 @@ public interface IntegrationMapper {
 
     int updateIntegrationActive(IntegrationVo integrationVo);
 
-    int replaceIntegrationInvoke(IntegrationInvokeVo integrationInvokeVo);
+//    int replaceIntegrationInvoke(IntegrationInvokeVo integrationInvokeVo);
 
     int deleteIntegrationByUuid(String uuid);
 
     int insertIntegrationAudit(IntegrationAuditVo integrationAuditVo);
-
 }

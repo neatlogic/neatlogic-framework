@@ -38,7 +38,7 @@ public class EmailUtil {
      * @param to            收件人
      * @param cc            抄送人
      */
-    public static void sendEmail(String title, String content, Map<String, InputStream> attachmentMap, String to, String cc) throws MessagingException, IOException {
+    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
         if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
             /** 开启邮箱服务器连接会话 */
@@ -77,12 +77,56 @@ public class EmailUtil {
             if (MapUtils.isNotEmpty(attachmentMap)) {
                 for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {
                     MimeBodyPart messageBodyPart = new MimeBodyPart();
-                    DataSource dataSource = new ByteArrayDataSource(entry.getValue(), "application/pdf");
+                    DataSource dataSource = new ByteArrayDataSource(entry.getValue(), "application/octet-stream");
                     DataHandler dataHandler = new DataHandler(dataSource);
                     messageBodyPart.setDataHandler(dataHandler);
-                    messageBodyPart.setFileName(MimeUtility.encodeText(entry.getKey() + ".pdf"));
+                    messageBodyPart.setFileName(MimeUtility.encodeText(entry.getKey()));
                     multipart.addBodyPart(messageBodyPart);
                 }
+            }
+            msg.setContent(multipart);
+//                msg.saveChanges();
+            /** 发送邮件 */
+            Transport.send(msg);
+        } else {
+            throw new EmailServerNotFoundException();
+        }
+    }
+
+    public static void sendHtmlEmail(String title, String content, String to, String cc) throws MessagingException, IOException {
+        MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
+        if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
+            /** 开启邮箱服务器连接会话 */
+            Properties props = new Properties();
+            props.setProperty("mail.smtp.host", mailServerVo.getHost());
+            props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
+            props.put("mail.smtp.auth", "true");
+            Session session = Session.getInstance(props, new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                }
+            });
+
+            MimeMessage msg = new MimeMessage(session);
+            if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
+                msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
+            }
+            /** 设置收件人 */
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+            /** 设置抄送人 */
+            if (StringUtils.isNotBlank(cc)) {
+                msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc, false));
+            }
+            /** 设置邮件标题 */
+            msg.setSubject(title);
+            msg.setSentDate(new Date());
+
+            MimeMultipart multipart = new MimeMultipart();
+            /** 设置邮件正文 */
+            if (StringUtils.isNotBlank(content)) {
+                MimeBodyPart text = new MimeBodyPart();
+                text.setContent(content, "text/html;charset=UTF-8");
+                multipart.addBodyPart(text);
             }
             msg.setContent(multipart);
 //                msg.saveChanges();

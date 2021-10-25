@@ -6,16 +6,14 @@
 package codedriver.framework.restful.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
-
-import codedriver.framework.restful.auth.core.ApiAuthFactory;
-import com.alibaba.fastjson.JSONArray;
+import codedriver.framework.restful.enums.ApiType;
+import codedriver.framework.restful.enums.PublicApiAuthType;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
@@ -29,152 +27,6 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     private static final long serialVersionUID = 3689437871016436622L;
 
-    public enum Type {
-        OBJECT("object", "对象模式", "rest/"), STREAM("stream", "json流模式", "stream/"), BINARY("binary", "字节流模式", "binary/");
-
-        private String name;
-        private String text;
-        private String urlPre;
-
-        private Type(String _name, String _text, String _urlPre) {
-            this.name = _name;
-            this.text = _text;
-            this.urlPre = _urlPre;
-        }
-
-        public String getValue() {
-            return name;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public String getUrlPre() {
-            return urlPre;
-        }
-
-        public static String getText(String name) {
-            for (Type s : Type.values()) {
-                if (s.getValue().equals(name)) {
-                    return s.getText();
-                }
-            }
-            return "";
-        }
-
-        public static String getUrlPre(String name) {
-            for (Type s : Type.values()) {
-                if (s.getValue().equals(name)) {
-                    return s.getUrlPre();
-                }
-            }
-            return "";
-        }
-    }
-
-    public enum ApiType {
-        SYSTEM("system", "系统接口"), CUSTOM("custom", "自定义接口");
-
-        private String name;
-        private String text;
-
-        private ApiType(String _name, String _text) {
-            this.name = _name;
-            this.text = _text;
-        }
-
-        public String getValue() {
-            return name;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public static String getText(String name) {
-            for (ApiType s : ApiType.values()) {
-                if (s.getValue().equals(name)) {
-                    return s.getText();
-                }
-            }
-            return "";
-        }
-    }
-
-    public enum TreeMenuType {
-        SYSTEM("system", "系统接口目录"), CUSTOM("custom", "自定义接口目录"), AUDIT("audit", "操作审计目录");
-
-        private String name;
-        private String text;
-
-        private TreeMenuType(String _name, String _text) {
-            this.name = _name;
-            this.text = _text;
-        }
-
-        public String getValue() {
-            return name;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public static String getText(String name) {
-            for (TreeMenuType s : TreeMenuType.values()) {
-                if (s.getValue().equals(name)) {
-                    return s.getText();
-                }
-            }
-            return "";
-        }
-    }
-
-    public enum AuthenticateType implements IEnum {
-        BASIC("basic", "Basic认证");
-
-        private String type;
-        private String text;
-
-        private AuthenticateType(String _type, String _text) {
-            this.type = _type;
-            this.text = _text;
-        }
-
-        public String getValue() {
-            return this.type;
-        }
-
-        public String getText() {
-            return this.text;
-        }
-
-        public static AuthenticateType getAuthenticateType(String value) {
-            for (AuthenticateType type : AuthenticateType.values()) {
-                if (type.getValue().equals(value)) {
-                    return type;
-                }
-            }
-            return null;
-        }
-
-
-        @Override
-        public List getValueTextList() {
-            JSONArray array = new JSONArray();
-            for (ApiVo.AuthenticateType type : ApiVo.AuthenticateType.values()) {
-                array.add(new JSONObject() {
-                    {
-                        this.put("value", type.getValue());
-                        this.put("text", type.getText());
-                        this.put("help", ApiAuthFactory.getApiAuth(type.getValue()).help());
-                    }
-                });
-            }
-            return array;
-        }
-    }
 
     @EntityField(name = "名称", type = ApiParamType.STRING)
     private String name;
@@ -202,6 +54,8 @@ public class ApiVo extends BasePageVo implements Serializable {
     private String password;
     @EntityField(name = "认证方式", type = ApiParamType.STRING)
     private String authtype = "";
+    @EntityField(name = "认证方式名称", type = ApiParamType.STRING)
+    private String authtypeName = "";
     @EntityField(name = "请求时效", type = ApiParamType.INTEGER)
     private Integer timeout = 0;
     @EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
@@ -257,6 +111,16 @@ public class ApiVo extends BasePageVo implements Serializable {
         this.setPageSize(20);
     }
 
+    public String getAuthtypeName() {
+        if (StringUtils.isBlank(authtypeName) && StringUtils.isNotBlank(authtype)) {
+            authtypeName = PublicApiAuthType.getText(authtype);
+        }
+        return authtypeName;
+    }
+
+    public void setAuthtypeName(String authtypeName) {
+        this.authtypeName = authtypeName;
+    }
 
     public List<String> getTokenList() {
         return tokenList;
@@ -268,7 +132,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     public String getTypeText() {
         if (getType() != null) {
-            typeText = Type.getText(type);
+            typeText = ApiParamType.getText(type);
         }
         return typeText;
     }
@@ -715,7 +579,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     public String getUrl() {
         if (StringUtils.isBlank(url) && StringUtils.isNotBlank(type) && StringUtils.isNotBlank(token) && isPrivate != null) {
-            url = "api/" + Type.getUrlPre(type) + token;
+            url = "api/" + ApiType.getUrlPre(type) + token;
             if (!isPrivate) {
                 this.url = "public/" + url;
             }
@@ -725,7 +589,7 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     public String getHelpUrl() {
         if (StringUtils.isBlank(helpUrl) && StringUtils.isNotBlank(type) && StringUtils.isNotBlank(token) && isPrivate != null) {
-            helpUrl = "api/help/" + Type.getUrlPre(type) + token;
+            helpUrl = "api/help/" + ApiType.getUrlPre(type) + token;
             if (!isPrivate) {
                 helpUrl = "public/" + helpUrl;
             }

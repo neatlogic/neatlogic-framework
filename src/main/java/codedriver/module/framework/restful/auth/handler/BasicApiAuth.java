@@ -7,6 +7,7 @@ package codedriver.module.framework.restful.auth.handler;
 
 import codedriver.framework.restful.auth.core.ApiAuthBase;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.enums.PublicApiAuthType;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
@@ -22,7 +23,7 @@ public class BasicApiAuth extends ApiAuthBase {
 
     @Override
     public String getType() {
-        return ApiVo.AuthenticateType.BASIC.getValue();
+        return PublicApiAuthType.BASIC.getValue();
     }
 
     @Override
@@ -53,7 +54,6 @@ public class BasicApiAuth extends ApiAuthBase {
         } else {
             return 412;// 请求头缺少认证信息
         }
-
         return 1;
     }
     
@@ -78,6 +78,19 @@ public class BasicApiAuth extends ApiAuthBase {
         detailList.add("request header需要包含键值对：Authorization:Basic xxx");
         detailList.add("xxx是\"用户名:密码\"的BASE64编码");
         return helpJson;
+    }
+
+    @Override
+    public JSONObject createHeader(JSONObject jsonObj) {
+        JSONObject returnObj = new JSONObject();
+        String username = jsonObj.getString("username");
+        String password = jsonObj.getString("password");
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            String token = Base64.encodeBase64String((username + ":" + password).getBytes());
+            returnObj.put("Authorization", "Basic " + token);
+
+        }
+        return returnObj;
     }
 
 }

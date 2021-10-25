@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -21,6 +21,8 @@ import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
 import codedriver.framework.exception.type.PermissionDeniedException;
+import codedriver.framework.restful.auth.core.ApiAuthFactory;
+import codedriver.framework.restful.auth.core.IApiAuth;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
 import codedriver.framework.restful.core.IJsonStreamApiComponent;
@@ -29,8 +31,7 @@ import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
-import codedriver.framework.restful.auth.core.ApiAuthFactory;
-import codedriver.framework.restful.auth.core.IApiAuth;
+import codedriver.framework.restful.enums.ApiType;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +82,7 @@ public class PublicApiDispatcher {
         errorMap.put(521, "访问频率过高，请稍后访问");
     }
 
-    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         InputFromContext.init(InputFrom.RESTFUL);
         //初始化时区
         Cookie[] cookies = request.getCookies();
@@ -148,7 +149,7 @@ public class PublicApiDispatcher {
             }
         }
 
-        if (apiType.equals(ApiVo.Type.OBJECT)) {
+        if (apiType.equals(ApiType.OBJECT)) {
             IApiComponent restComponent = PublicApiComponentFactory.getInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
@@ -170,7 +171,7 @@ public class PublicApiDispatcher {
             } else {
                 throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
             }
-        } else if (apiType.equals(ApiVo.Type.STREAM)) {
+        } else if (apiType.equals(ApiType.STREAM)) {
             IJsonStreamApiComponent restComponent = PublicApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
@@ -192,7 +193,7 @@ public class PublicApiDispatcher {
             } else {
                 throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
             }
-        } else if (apiType.equals(ApiVo.Type.BINARY)) {
+        } else if (apiType.equals(ApiType.BINARY)) {
             IBinaryStreamApiComponent restComponent = PublicApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
             if (restComponent != null) {
                 if (action.equals("doservice")) {
@@ -235,7 +236,7 @@ public class PublicApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -289,7 +290,7 @@ public class PublicApiDispatcher {
                 }
             }
 
-            doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -332,7 +333,7 @@ public class PublicApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.STREAM, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -381,7 +382,7 @@ public class PublicApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -424,7 +425,7 @@ public class PublicApiDispatcher {
 
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -468,7 +469,7 @@ public class PublicApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (AuthenticateException ex) {
             response.setStatus(525);
             returnObj.put("Status", "ERROR");
@@ -500,7 +501,7 @@ public class PublicApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
+            doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
@@ -526,7 +527,7 @@ public class PublicApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
+            doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
@@ -552,7 +553,7 @@ public class PublicApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
+            doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");

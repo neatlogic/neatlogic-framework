@@ -20,6 +20,9 @@ import codedriver.framework.restful.core.IJsonStreamApiComponent;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.enums.ApiType;
+import codedriver.framework.restful.enums.ApiKind;
+import codedriver.framework.restful.enums.PublicApiAuthType;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -157,7 +160,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
                 restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiVo.Type.OBJECT.getValue());
+                restComponentVo.setType(ApiType.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
                 initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
@@ -175,7 +178,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
                 restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiVo.Type.STREAM.getValue());
+                restComponentVo.setType(ApiType.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
                 initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
@@ -193,7 +196,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(false);
                 restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiVo.Type.BINARY.getValue());
+                restComponentVo.setType(ApiType.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getId(), restComponentVo);
                 initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
@@ -229,7 +232,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 token = token.substring(0, token.length() - 1);
             }
             ApiVo apiVo = new ApiVo();
-            apiVo.setAuthtype(ApiVo.AuthenticateType.BASIC.getValue());
+            apiVo.setAuthtype(PublicApiAuthType.BASIC.getValue());
             apiVo.setUsername(Config.PUBLIC_API_AUTH_USERNAME());
             apiVo.setPassword(Config.PUBLIC_API_AUTH_PASSWORD());
             apiVo.setToken(token);
@@ -241,7 +244,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
             apiVo.setTimeout(0);// 0是default
             apiVo.setType(componentJson.getString("type"));
             apiVo.setModuleId(moduleId);
-            apiVo.setApiType(ApiVo.ApiType.CUSTOM.getValue());
+            apiVo.setApiType(ApiKind.CUSTOM.getValue());
             apiVo.setIsDeletable(0);// 不能删除
             apiVo.setIsPrivate(false);
             if (token.contains("{")) {

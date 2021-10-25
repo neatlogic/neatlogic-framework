@@ -24,6 +24,7 @@ import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.enums.ApiType;
 import codedriver.framework.util.mongodb.IJsonSerializer;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
@@ -76,7 +77,7 @@ public class ApiDispatcher {
     }
 
 
-    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         InputFromContext.init(InputFrom.PAGE);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {
@@ -115,7 +116,7 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", validResultVo.getStatus());
         } else {
-            if (apiType.equals(ApiVo.Type.OBJECT)) {
+            if (apiType.equals(ApiType.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (action.equals("doservice")) {
@@ -144,7 +145,7 @@ public class ApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else if (apiType.equals(ApiVo.Type.STREAM)) {
+            } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (action.equals("doservice")) {
@@ -169,7 +170,7 @@ public class ApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else if (apiType.equals(ApiVo.Type.BINARY)) {
+            } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (action.equals("doservice")) {
@@ -216,7 +217,7 @@ public class ApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -280,7 +281,7 @@ public class ApiDispatcher {
                 }
             }
 
-            doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -342,7 +343,7 @@ public class ApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.STREAM, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.STREAM, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -403,7 +404,7 @@ public class ApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -463,7 +464,7 @@ public class ApiDispatcher {
 
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -524,7 +525,7 @@ public class ApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -568,7 +569,7 @@ public class ApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.OBJECT, null, returnObj, "help");
+            doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -603,7 +604,7 @@ public class ApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.STREAM, null, returnObj, "help");
+            doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -638,7 +639,7 @@ public class ApiDispatcher {
         RequestContext.init(token);
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, null, returnObj, "help");
+            doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {

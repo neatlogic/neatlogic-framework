@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -27,6 +27,7 @@ import codedriver.framework.restful.counter.ApiAccessCountUpdateThread;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.restful.enums.ApiType;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ public class AnonymousApiDispatcher {
     @Resource
     private ApiMapper apiMapper;
 
-    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiVo.Type apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
 
         if (interfaceVo == null) {
@@ -87,7 +88,7 @@ public class AnonymousApiDispatcher {
             }
             returnObj.put("Status", validResultVo.getStatus());
         } else {
-            if (apiType.equals(ApiVo.Type.OBJECT)) {
+            if (apiType.equals(ApiType.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess()) {
@@ -112,7 +113,7 @@ public class AnonymousApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else if (apiType.equals(ApiVo.Type.STREAM)) {
+            } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess()) {
@@ -137,7 +138,7 @@ public class AnonymousApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else if (apiType.equals(ApiVo.Type.BINARY)) {
+            } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess()) {
@@ -192,7 +193,7 @@ public class AnonymousApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
@@ -240,7 +241,7 @@ public class AnonymousApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiVo.Type.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             returnObj.put("Status", "ERROR");

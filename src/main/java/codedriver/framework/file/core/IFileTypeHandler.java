@@ -36,7 +36,9 @@ public interface IFileTypeHandler {
 
     void afterUpload(FileVo fileVo, JSONObject jsonObj);
 
-    default boolean afterDelete(JSONObject jsonObj) {
+    default void afterDelete(FileVo fileVo){}
+
+    default boolean beforeDelete(FileVo fileVo) {
         return true;
     }
 }

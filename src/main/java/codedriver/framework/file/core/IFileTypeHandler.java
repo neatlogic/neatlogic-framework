@@ -25,6 +25,14 @@ public interface IFileTypeHandler {
 
     void deleteFile(Long fileId) throws Exception;
 
+    /**
+     * 上传前校验
+     *
+     * @param jsonObj 上传参数
+     */
+    default boolean beforeUpload(JSONObject jsonObj) {
+        return true;
+    }
 
     void afterUpload(FileVo fileVo, JSONObject jsonObj);
 }

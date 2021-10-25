@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.integration.authtication.handler;
 
 import java.io.ByteArrayInputStream;
@@ -14,7 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.exception.integration.AuthenticateException;
-import codedriver.framework.integration.authentication.costvalue.AuthenticateType;
+import codedriver.framework.integration.authentication.enums.AuthenticateType;
 import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

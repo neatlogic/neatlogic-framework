@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.message.core.IMessageHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -18,6 +20,7 @@ public class NotifyVo {
     private String notifyPolicyHandler;
     private String title;
     private String content;
+    private List<FileVo> fileList;
     private String fromUser;
     private String fromUserEmail;
     private JSONObject data;
@@ -33,6 +36,7 @@ public class NotifyVo {
         this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
         this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
         this.fcd = builder.fcd;
+        this.fileList = builder.fileList;
         try {
             title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
         } catch (Exception e) {
@@ -51,6 +55,10 @@ public class NotifyVo {
 
     public String getContent() {
         return content;
+    }
+
+    public List<FileVo> getFileList() {
+        return fileList;
     }
 
     public String getFromUser() {
@@ -134,6 +142,7 @@ public class NotifyVo {
         private String templateContent;
         private String templateTitle;
         private JSONObject data = new JSONObject();
+        private List<FileVo> fileList = new ArrayList<>();
         private List<String> toUserUuidList = new ArrayList<>();
         private List<String> toTeamUuidList = new ArrayList<>();
         private List<String> toRoleUuidList = new ArrayList<>();
@@ -148,6 +157,7 @@ public class NotifyVo {
         public Builder() {
 
         }
+
         public Builder(INotifyTriggerType _triggerType) {
             this.triggerType = _triggerType;
         }
@@ -212,6 +222,13 @@ public class NotifyVo {
         public Builder addRoleUuid(String roleUuid) {
             if (!toRoleUuidList.contains(roleUuid)) {
                 toRoleUuidList.add(roleUuid);
+            }
+            return this;
+        }
+
+        public Builder addFileList(List<FileVo> fileList) {
+            if (CollectionUtils.isNotEmpty(fileList)) {
+                this.fileList.addAll(fileList);
             }
             return this;
         }

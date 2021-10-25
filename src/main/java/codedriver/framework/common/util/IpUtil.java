@@ -47,6 +47,9 @@ public class IpUtil {
         if (StringUtils.isEmpty(ip)) {
             return false;
         }
+        if(subnetMask == 0){ //掩码为0则表示匹配所有ip -by波哥
+            return true;
+        }
         try {
             String cidr = networkIp + "/" + subnetMask;
             String[] ips = ip.split("\\.");
@@ -68,10 +71,7 @@ public class IpUtil {
     }
 
     public static boolean checkMask(int mask) {
-        if (mask >= 0 && mask <= 32) {
-            return true;
-        }
-        return false;
+        return mask >= 0 && mask <= 32;
     }
 
 }

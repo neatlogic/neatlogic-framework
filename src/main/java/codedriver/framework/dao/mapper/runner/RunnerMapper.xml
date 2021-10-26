@@ -19,20 +19,25 @@
     <resultMap id="runnerGroupMap" type="codedriver.framework.dto.runner.RunnerGroupVo">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
-        <collection property="networkList" ofType="codedriver.framework.dto.runner.GroupNetworkVo">
+        <result column="description" property="description"/>
+        <collection property="groupNetworkList" ofType="codedriver.framework.dto.runner.GroupNetworkVo">
             <id column="networkId" property="id"/>
             <result column="groupId" property="groupId"/>
             <result column="networkIp" property="networkIp"/>
             <result column="mask" property="mask"/>
         </collection>
-        <collection property="runnerMapList" ofType="codedriver.framework.dto.runner.RunnerMapVo">
+        <collection property="runnerList" ofType="codedriver.framework.dto.runner.RunnerVo">
             <id column="runnerId" property="id"/>
+            <result column="runnerGroupId" property="groupId"/>
             <result column="runnerName" property="name"/>
-            <result column="runnerMapId" property="runnerMapId"/>
+            <result column="protocol" property="protocol"/>
+            <result column="port" property="port"/>
             <result column="url" property="url"/>
             <result column="accessKey" property="accessKey"/>
             <result column="accessSecret" property="accessSecret"/>
-            <result column="authMode" property="authType"/>
+            <result column="authType" property="authType"/>
+            <result column="nettyIp" property="nettyIp"/>
+            <result column="nettyPort" property="nettyPort"/>
         </collection>
     </resultMap>
 

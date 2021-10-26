@@ -118,7 +118,7 @@
         from runnergroup
     </select>
 
-    <select id="searchRunnerGroup" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
+    <select id="searchRunnerGroupDetail" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
         SELECT
         g.`id` as id,
         g.`name` as name,

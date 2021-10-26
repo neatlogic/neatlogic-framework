@@ -187,20 +187,6 @@
 		WHERE `uuid` = #{uuid}
 	</update>
 
-	<!--<insert id="replaceIntegrationInvoke" parameterType="codedriver.framework.integration.dto.IntegrationInvokeVo">
-		REPLACE INTO `integration_invoke` (
-		`integration_uuid`,
-		`invoke_config`,
-		`invoke_hash`
-		)
-		VALUES
-		(
-		#{integrationUuid},
-		#{invokeConfigStr},
-		#{invokeHash}
-		)
-	</insert>-->
-
 	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		INSERT INTO `integration` (
 		`uuid`,

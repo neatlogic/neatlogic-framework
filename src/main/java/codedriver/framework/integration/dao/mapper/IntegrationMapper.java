@@ -34,8 +34,6 @@ public interface IntegrationMapper {
 
     int updateIntegrationActive(IntegrationVo integrationVo);
 
-//    int replaceIntegrationInvoke(IntegrationInvokeVo integrationInvokeVo);
-
     int deleteIntegrationByUuid(String uuid);
 
     int insertIntegrationAudit(IntegrationAuditVo integrationAuditVo);

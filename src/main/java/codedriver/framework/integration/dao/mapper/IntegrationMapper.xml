@@ -82,17 +82,26 @@
 			<if test="isActive != null">
 				AND is_active = #{isActive}
 			</if>
-			<if test="defaultValue != null and defaultValue.size() >0">
-				AND uuid in
-				<foreach collection="defaultValue" item="uuid" open="(" separator="," close=")">
-					#{uuid}
-				</foreach>
-			</if>
 		</where>
 		ORDER BY fcd DESC
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}
 		</if>
+	</select>
+	<select id="getIntegrationListByUuidList" parameterType="java.lang.String" resultType="codedriver.framework.integration.dto.IntegrationVo">
+		SELECT
+		`uuid`,
+		`name`,
+		`url`,
+		`handler`,
+		`method`,
+		`is_active` AS isActive,
+		`config`
+		FROM `integration`
+		WHERE `uuid` IN
+		<foreach collection="list" item="uuid" open="(" separator="," close=")">
+			#{uuid}
+		</foreach>
 	</select>
 
 	<select id="searchIntegrationForSelect" parameterType="codedriver.framework.integration.dto.IntegrationVo" resultType="codedriver.framework.common.dto.ValueTextVo">
@@ -177,20 +186,6 @@
 		`lcu` = #{lcu}
 		WHERE `uuid` = #{uuid}
 	</update>
-
-	<insert id="replaceIntegrationInvoke" parameterType="codedriver.framework.integration.dto.IntegrationInvokeVo">
-		REPLACE INTO `integration_invoke` (
-		`integration_uuid`,
-		`invoke_config`,
-		`invoke_hash`
-		)
-		VALUES
-		(
-		#{integrationUuid},
-		#{invokeConfigStr},
-		#{invokeHash}
-		)
-	</insert>
 
 	<insert id="insertIntegration" parameterType="codedriver.framework.integration.dto.IntegrationVo">
 		INSERT INTO `integration` (

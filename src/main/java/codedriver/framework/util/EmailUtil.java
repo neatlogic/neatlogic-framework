@@ -1,5 +1,6 @@
 package codedriver.framework.util;
 
+import codedriver.framework.common.constvalue.MimeType;
 import codedriver.framework.dao.mapper.MailServerMapper;
 import codedriver.framework.dto.MailServerVo;
 import codedriver.framework.notify.exception.EmailServerNotFoundException;
@@ -34,11 +35,12 @@ public class EmailUtil {
      *
      * @param title         邮件标题
      * @param content       邮件正文
-     * @param attachmentMap 附件(key:文件名;value:流)
      * @param to            收件人
      * @param cc            抄送人
+     * @param attachmentMap 附件(key:文件名;value:流)
+     * @param mimeType      MimeType
      */
-    public static void sendEmail(String title, String content, Map<String, InputStream> attachmentMap, String to, String cc) throws MessagingException, IOException {
+    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap, MimeType mimeType) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
         if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
             /** 开启邮箱服务器连接会话 */
@@ -70,26 +72,29 @@ public class EmailUtil {
             /** 设置邮件正文 */
             if (StringUtils.isNotBlank(content)) {
                 MimeBodyPart text = new MimeBodyPart();
-                text.setContent(content, "text/plain;charset=UTF-8");
+                text.setContent(content, "text/html;charset=UTF-8");
                 multipart.addBodyPart(text);
             }
             /** 设置附件 */
             if (MapUtils.isNotEmpty(attachmentMap)) {
                 for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {
                     MimeBodyPart messageBodyPart = new MimeBodyPart();
-                    DataSource dataSource = new ByteArrayDataSource(entry.getValue(), "application/pdf");
+                    DataSource dataSource = new ByteArrayDataSource(entry.getValue(), mimeType.getValue());
                     DataHandler dataHandler = new DataHandler(dataSource);
                     messageBodyPart.setDataHandler(dataHandler);
-                    messageBodyPart.setFileName(MimeUtility.encodeText(entry.getKey() + ".pdf"));
+                    messageBodyPart.setFileName(MimeUtility.encodeText(entry.getKey()) + mimeType.getSuffix());
                     multipart.addBodyPart(messageBodyPart);
                 }
             }
             msg.setContent(multipart);
-//                msg.saveChanges();
             /** 发送邮件 */
             Transport.send(msg);
         } else {
             throw new EmailServerNotFoundException();
         }
+    }
+
+    public static void sendHtmlEmail(String title, String content, String to, String cc) throws MessagingException, IOException {
+        sendEmailWithFile(title, content, to, cc, null, null);
     }
 }

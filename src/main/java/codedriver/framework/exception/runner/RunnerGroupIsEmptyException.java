@@ -5,7 +5,9 @@
 
 package codedriver.framework.exception.runner;
 
-public class RunnerGroupIsEmptyException extends RuntimeException {
+import codedriver.framework.exception.core.ApiRuntimeException;
+
+public class RunnerGroupIsEmptyException extends ApiRuntimeException {
     public RunnerGroupIsEmptyException(Long runnerGroupId) {
         super("runner组id为：" + "的runner组为空，请添加一个新的runner");
     }

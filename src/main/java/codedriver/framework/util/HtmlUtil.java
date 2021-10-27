@@ -1,6 +1,7 @@
 package codedriver.framework.util;
 
 import codedriver.framework.dto.UrlInfoVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -89,19 +90,22 @@ public class HtmlUtil {
         return srcList;
     }
 
-    public static List<UrlInfoVo> getUrlInfoList(String content, String prefix, String suffix){
+    public static List<UrlInfoVo> getUrlInfoList(String content, String prefix, String suffix) {
+        if (StringUtils.isBlank(content)) {
+            return null;
+        }
         List<UrlInfoVo> resultList = new ArrayList<>();
         int prefixIndex = -1;
         int suffixIndex = -1;
         int fromIndex = 0;
-        while(fromIndex < content.length()){
+        while (fromIndex < content.length()) {
             prefixIndex = content.indexOf(prefix, fromIndex);
-            if(prefixIndex == -1){
+            if (prefixIndex == -1) {
                 return resultList;
             }
             fromIndex = prefixIndex + prefix.length();
             suffixIndex = content.indexOf(suffix, fromIndex);
-            if(suffixIndex == -1){
+            if (suffixIndex == -1) {
                 return resultList;
             }
             int beginIndex = prefixIndex + prefix.length();
@@ -111,16 +115,19 @@ public class HtmlUtil {
         return resultList;
     }
 
-    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList){
+    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList) {
+        if (CollectionUtils.isEmpty(urlInfoVoList)) {
+            return null;
+        }
         int sourceTotalLength = 0;
         int targetTotalLength = 0;
-        for(UrlInfoVo urlInfo : urlInfoVoList){
+        for (UrlInfoVo urlInfo : urlInfoVoList) {
             sourceTotalLength += urlInfo.getSource().length();
             targetTotalLength += urlInfo.getTarget().length();
         }
         StringBuilder stringBuilder = new StringBuilder(content.length() + targetTotalLength - sourceTotalLength);
         int fromIndex = 0;
-        for(UrlInfoVo urlInfoVo : urlInfoVoList){
+        for (UrlInfoVo urlInfoVo : urlInfoVoList) {
             for (int i = fromIndex; i < urlInfoVo.getBeginIndex(); i++) {
                 stringBuilder.append(content.charAt(i));
             }

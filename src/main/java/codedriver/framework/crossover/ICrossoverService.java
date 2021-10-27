@@ -5,5 +5,8 @@
 
 package codedriver.framework.crossover;
 
+/**
+ * 本接口用于暴露某些service类的方法供其他模块使用
+ */
 public interface ICrossoverService {
 }

@@ -332,6 +332,24 @@ public class ApiValidateAndHelpBase {
                             }
                         }
                     }
+                    //设置默认值
+                    if (StringUtils.isNotBlank(p.defaultValue()) && !paramObj.containsKey(p.name())) {
+                        try {
+                            if (p.type().equals(ApiParamType.STRING)) {
+                                paramObj.put(p.name(), p.defaultValue());
+                            } else if (p.type().equals(ApiParamType.INTEGER)) {
+                                paramObj.put(p.name(), Integer.parseInt(p.defaultValue()));
+                            } else if (p.type().equals(ApiParamType.LONG)) {
+                                paramObj.put(p.name(), Long.parseLong(p.defaultValue()));
+                            } else if (p.type().equals(ApiParamType.JSONARRAY)) {
+                                paramObj.put(p.name(), JSONArray.parse(p.defaultValue()));
+                            } else if (p.type().equals(ApiParamType.JSONOBJECT)) {
+                                paramObj.put(p.name(), JSONObject.parse(p.defaultValue()));
+                            }
+                        } catch (Exception ex) {
+                            throw new ParamDefaultValueIrregularException(p.name(), p.defaultValue(), p.type());
+                        }
+                    }
 
                     // 判断最大长度
                     if (p.maxLength() > 0 && paramValue instanceof String) {

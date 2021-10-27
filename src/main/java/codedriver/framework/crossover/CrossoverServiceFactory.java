@@ -37,7 +37,6 @@ public class CrossoverServiceFactory extends ModuleInitializedListenerBase {
         for (Map.Entry<String, ICrossoverService> entry : myMap.entrySet()) {
             ICrossoverService component = entry.getValue();
             apiMap.put((Class<? extends ICrossoverService>) AopUtils.getTargetClass(component), component);
-
         }
     }
 

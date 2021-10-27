@@ -8,7 +8,6 @@ package codedriver.framework.exception.type;
 import codedriver.framework.exception.core.ApiRuntimeException;
 
 public class ParamNotExistsException extends ApiRuntimeException {
-    private static final long serialVersionUID = 9091220382590565470L;
 
     public ParamNotExistsException(String paramNames) {
         super("参数：“" + paramNames + "”不能为空");

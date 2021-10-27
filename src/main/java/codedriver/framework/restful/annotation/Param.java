@@ -1,34 +1,36 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import codedriver.framework.common.constvalue.ApiParamType;
+
+import java.lang.annotation.*;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Param {
 
-	String name() default "";
+    String name() default "";
 
-	ApiParamType type() default ApiParamType.STRING;
+    ApiParamType type() default ApiParamType.STRING;
 
-	boolean isRequired() default false;
+    boolean isRequired() default false;
 
-	String rule() default "";
+    String rule() default "";
 
-	String desc() default "";
-	
+    String desc() default "";
 
-	Class<?> explode() default NotDefined.class;
+    String defaultValue() default "";
 
-	boolean xss() default false;
+    Class<?> explode() default NotDefined.class;
 
-	int maxLength() default -1;
-	
-	int minLength() default -1;
+    boolean xss() default false;
+
+    int maxLength() default -1;
+
+    int minLength() default -1;
 }

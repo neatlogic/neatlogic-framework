@@ -96,7 +96,8 @@
     LEFT JOIN `runner` c ON a.id = c.group_id
     LEFT JOIN `runner_map` d ON c.id = d.`runner_id`
     WHERE a.id = #{id}
-
+    </select>
+    
     <select id="getRunnerGroupById" resultMap="runnerGroupMap" useCache="false">
         SELECT a.id              id,
                a.name            name,

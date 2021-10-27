@@ -19,6 +19,8 @@ public interface RunnerMapper {
 
     List<RunnerVo> getRunnerListByGroupId(Long runnerGroupId);
 
+    RunnerGroupVo getRunnerMapGroupById(Long groupId);
+
     RunnerGroupVo getRunnerGroupById(Long groupId);
 
     RunnerVo getRunnerByIp(String requestIp);

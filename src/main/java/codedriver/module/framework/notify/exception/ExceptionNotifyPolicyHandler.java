@@ -70,4 +70,9 @@ public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
     protected void myAuthorityConfig(JSONObject config) {
 
     }
+
+    @Override
+    public int isAllowMultiPolicy() {
+        return 0;
+    }
 }

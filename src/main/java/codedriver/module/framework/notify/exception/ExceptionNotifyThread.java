@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @Service
 public class ExceptionNotifyThread extends CodeDriverThread {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionNotifyThread.class);
@@ -45,15 +48,13 @@ public class ExceptionNotifyThread extends CodeDriverThread {
     @Override
     protected void execute() {
         try {
-            /**
-             * 1、找到通知异常的策略（唯一）
-             * 2、组装条件 todo 待定
-             * 3、组装参数映射 todo 待定
-             */
             NotifyPolicyVo notifyPolicyVo = notifyMapper.getNotifyPolicyByHandlerLimitOne(ExceptionNotifyPolicyHandler.class.getName());
             if (notifyPolicyVo != null) {
                 NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
                 if (policyConfig != null) {
+                    StringWriter writer = new StringWriter();
+                    exception.printStackTrace(new PrintWriter(writer, true));
+                    notifyVo.setException(writer.toString());
                     String notifyPolicyHandler = notifyPolicyVo.getHandler();
                     NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, policyConfig, null, null, null, notifyVo, null);
                 }

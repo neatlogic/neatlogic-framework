@@ -27,6 +27,7 @@ public class NotifyVo {
     private MessageHandlerAndRecipientVo messageHandlerAndRecipientVo;
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
+    private String exception;// 记录通知发生异常时的异常信息
     private Date fcd;
 
     private NotifyVo(Builder builder) {
@@ -111,6 +112,14 @@ public class NotifyVo {
             }
             errorBuilder.append(errorInfo);
         }
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
     }
 
     public INotifyTriggerType getTriggerType() {

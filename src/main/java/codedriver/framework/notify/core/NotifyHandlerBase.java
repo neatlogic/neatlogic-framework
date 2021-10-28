@@ -1,5 +1,6 @@
 package codedriver.framework.notify.core;
 
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.dao.mapper.MailServerMapper;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -9,6 +10,8 @@ import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.notify.exception.EmailServerNotFoundException;
 import codedriver.framework.notify.exception.NotifyNoReceiverException;
+import codedriver.module.framework.notify.exception.ExceptionNotifyThread;
+import codedriver.module.framework.notify.exception.ExceptionNotifyTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,7 +41,12 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 
         if (StringUtils.isNotBlank(notifyVo.getError())) {
             logger.error(notifyVo.getError());
-            sendEmail(notifyVo, false);
+            try {
+                sendEmail(notifyVo, false);
+            } catch (Exception e) {
+                CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+                throw e;
+            }
         } else {
             myExecute(notifyVo);
         }

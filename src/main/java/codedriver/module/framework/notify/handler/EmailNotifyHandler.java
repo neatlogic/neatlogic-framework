@@ -30,6 +30,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         try {
             sendEmail(notifyVo, true);
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
         }
 

@@ -5,15 +5,15 @@
 
 package codedriver.module.framework.notify.handler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import codedriver.framework.dao.mapper.MailServerMapper;
+import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.notify.core.NotifyHandlerBase;
 import codedriver.framework.notify.core.NotifyHandlerType;
 import codedriver.framework.notify.dto.NotifyVo;
+import codedriver.module.framework.notify.exception.ExceptionNotifyThread;
+import codedriver.module.framework.notify.exception.ExceptionNotifyTriggerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @program: codedriver
@@ -23,24 +23,26 @@ import codedriver.framework.notify.dto.NotifyVo;
 @Component
 public class EmailNotifyHandler extends NotifyHandlerBase {
 
-	private static Logger logger = LoggerFactory.getLogger(EmailNotifyHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(EmailNotifyHandler.class);
 
-	@Autowired
-	private MailServerMapper mailServerMapper;
+    @Override
+    public void myExecute(NotifyVo notifyVo) {
+        try {
+            sendEmail(notifyVo, true);
+        } catch (Exception e) {
+            CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+        }
 
-	@Override
-	public void myExecute(NotifyVo notifyVo) {
-		sendEmail(notifyVo, true);
-	}
+    }
 
-	@Override
-	public String getName() {
-		return NotifyHandlerType.EMAIL.getText();
-	}
+    @Override
+    public String getName() {
+        return NotifyHandlerType.EMAIL.getText();
+    }
 
 
-	@Override
-	public String getType() {
-		return NotifyHandlerType.EMAIL.getValue();
-	}
+    @Override
+    public String getType() {
+        return NotifyHandlerType.EMAIL.getValue();
+    }
 }

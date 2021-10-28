@@ -71,7 +71,21 @@
 	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
 	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
 	</select>
-	
+
+	<select id="getNotifyPolicyByHandlerLimitOne" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+		SELECT
+			`id`,
+			`name`,
+			`handler`,
+			`config`,
+			`fcd`,
+			`fcu`,
+			`lcd`,
+			`lcu`
+		FROM `notify_policy`
+		WHERE `handler` = #{value} limit 1
+	</select>
+
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
 	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))

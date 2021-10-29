@@ -28,6 +28,7 @@ public class NotifyVo {
     private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
     private String exception;// 记录通知发生异常时的异常信息
+    private Integer isSendExceptionNotify = 1;// 通知发生异常时是否需要发送通知
     private Date fcd;
 
     private NotifyVo(Builder builder) {
@@ -120,6 +121,14 @@ public class NotifyVo {
 
     public void setException(String exception) {
         this.exception = exception;
+    }
+
+    public Integer getIsSendExceptionNotify() {
+        return isSendExceptionNotify;
+    }
+
+    public void setIsSendExceptionNotify(Integer isSendExceptionNotify) {
+        this.isSendExceptionNotify = isSendExceptionNotify;
     }
 
     public INotifyTriggerType getTriggerType() {

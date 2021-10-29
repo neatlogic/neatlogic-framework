@@ -18,4 +18,6 @@ public interface IFileStorageHandler {
     void deleteData(String filePath) throws Exception;
 
     long getDataLength(String filePath) throws Exception;
+
+    boolean isExit(String filePath) throws Exception;
 }

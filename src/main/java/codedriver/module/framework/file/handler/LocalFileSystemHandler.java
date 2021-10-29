@@ -78,4 +78,10 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
         }
         return length;
     }
+
+    @Override
+    public boolean isExit(String filePath) throws Exception {
+        File file = new File(filePath.substring(5));
+        return file.exists();
+    }
 }

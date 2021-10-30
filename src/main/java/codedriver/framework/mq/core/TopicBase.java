@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public abstract class TopicBase<T> implements ITopic<T> {
     private static final Logger logger = LoggerFactory.getLogger(TopicBase.class);
@@ -41,7 +42,7 @@ public abstract class TopicBase<T> implements ITopic<T> {
             job.execute(content, t -> {
                 String topicName = this.getName().toLowerCase(Locale.ROOT);
                 TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);
-                if (topicVo == null || topicVo.getIsActive().equals(1)) {
+                if (topicVo == null || Objects.equals(topicVo.getIsActive(), 1)) {
                     JSONObject contentObj = generateTopicContent(content);
                     if (MapUtils.isNotEmpty(contentObj)) {
                         String msg = contentObj.toString();

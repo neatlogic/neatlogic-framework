@@ -46,7 +46,7 @@ public class DatasourceManager {
                 String url = datasourceVo.getUrl();
                 url = url.replace("{host}", datasourceVo.getHost());
                 url = url.replace("{port}", datasourceVo.getPort().toString());
-                url = url.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid());
+                url = url.replace("{dbname}", "codedriver_" + datasourceVo.getDatabase());
                 tenantDatasource.setUrl(url);
                 tenantDatasource.setDriverClassName(datasourceVo.getDriver());
                 tenantDatasource.setUsername(datasourceVo.getUsername());

@@ -14,4 +14,16 @@
 			`mongodb`
 		where `tenant_uuid` = #{value}
 	</select>
+    <select id="getMongodbList" resultType="codedriver.framework.dto.MongoDbVo">
+		SELECT
+			`tenant_id` AS tenantId,
+			`tenant_uuid` AS tenantUuid,
+			`database`,
+			`username`,
+			`password` AS passwordPlain,
+			`host`,
+			`option`
+		FROM
+			`mongodb`
+	</select>
 </mapper>

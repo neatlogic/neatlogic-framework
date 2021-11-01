@@ -246,15 +246,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 }
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(reader, writer);
-                if (String.valueOf(code).startsWith("2") || Objects.equals(String.valueOf(code), "520")) {
+                if (String.valueOf(code).startsWith("2") || String.valueOf(code).startsWith("52")) {
                     resultVo.appendResult(writer.toString());
                 } else {
                     throw new RuntimeException(writer.toString());
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                resultVo.appendError("Connection failed\n" + e.getMessage());
-                integrationAuditVo.appendError("Connection failed\n" + e.getMessage());
+                resultVo.appendError("failed\n" + e.getMessage());
+                integrationAuditVo.appendError("failed\n" + e.getMessage());
                 integrationAuditVo.setStatus("failed");
             }
             boolean hasTransfered = false;

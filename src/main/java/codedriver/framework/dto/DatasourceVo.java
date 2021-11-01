@@ -17,6 +17,7 @@ public class DatasourceVo {
     private String host;
     private Integer port;
     private String url;
+    private String database;
     private String username;
     private String passwordPlain;
     private String passwordCipher;
@@ -33,17 +34,24 @@ public class DatasourceVo {
         if (generatePwd) {
             // this.passwordPlain = "123456";
             Random rand = new Random();
-            String password = "";
+            StringBuilder password = new StringBuilder();
             String[] chars = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
             for (int i = 0; i < 6; i++) {
                 int randNumber = rand.nextInt(chars.length);
-                password += chars[randNumber];
+                password.append(chars[randNumber]);
             }
-            this.passwordPlain = password;
+            this.passwordPlain = password.toString();
         }
     }
 
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
+    }
 
     public String getTenantUuid() {
         return tenantUuid;

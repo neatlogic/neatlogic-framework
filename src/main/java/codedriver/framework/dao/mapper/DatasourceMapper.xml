@@ -1,51 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.DatasourceMapper">
 
-	<select id="getAllActiveTenantDatasource" resultType="codedriver.framework.dto.DatasourceVo">
-		SELECT
-		`tenant_uuid` AS tenantUuid,
-		`url`,
-		`username`,
-		`password` AS passwordCipher,
-		`driver`,
-		`host`,
-		`port`
-		FROM
-		`datasource` a
-		JOIN `tenant` b
-		ON a.tenant_uuid = b.uuid
-		AND b.is_active = 1
-	</select>
+    <select id="getAllActiveTenantDatasource" resultType="codedriver.framework.dto.DatasourceVo">
+        SELECT b.`uuid`        AS tenantUuid,
+               a.`tenant_uuid` AS `database`,
+               `url`,
+               `username`,
+               `password`      AS passwordCipher,
+               `driver`,
+               `host`,
+               `port`
+        FROM `datasource` a
+                 JOIN `tenant` b
+                      ON a.tenant_id = b.id
+                          AND b.is_active = 1
+    </select>
 
-	<insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
-		INSERT INTO `datasource` (
-		`tenant_id`,
-		`tenant_uuid`,
-		`url`,
-		`username`,
-		`password`,
-		`driver`,
-		`host`,
-		`port`
-		)
-		VALUES
-		(
-		#{tenantId},
-		#{tenantUuid},
-		#{url},
-		#{username},
-		#{passwordCipher},
-		#{driver},
-		#{host},
-		#{port}
-		)
-	</insert>
+    <insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+        INSERT INTO `datasource` (`tenant_id`,
+                                  `tenant_uuid`,
+                                  `url`,
+                                  `username`,
+                                  `password`,
+                                  `driver`,
+                                  `host`,
+                                  `port`)
+        VALUES (#{tenantId},
+                #{tenantUuid},
+                #{url},
+                #{username},
+                #{passwordCipher},
+                #{driver},
+                #{host},
+                #{port})
+    </insert>
 
-	<insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
-		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
-		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
-		CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_olap`;
-		GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_olap`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
-	</insert>
+    <insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
+        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
+        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_olap`;
+        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_olap`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+    </insert>
 </mapper>

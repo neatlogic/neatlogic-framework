@@ -6,4 +6,6 @@ public interface CodedriverMapper {
 
 	 MongoDbVo getMongodbByTenant(String tenantUuid);
 
+	 MongoDbVo getMongodbList();
+
 }

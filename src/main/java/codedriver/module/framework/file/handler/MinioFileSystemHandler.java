@@ -104,4 +104,13 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         }
         return minioClient.statObject(Config.MINIO_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
     }
+
+    @Override
+    public boolean isExit(String filePath) throws Exception {
+        if (minioClient == null) {
+            throw new FileStorageMediumHandlerNotFoundException("minio");
+        }
+        minioClient.statObject(Config.MINIO_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
+        return true;
+    }
 }

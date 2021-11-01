@@ -241,14 +241,16 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 InputStreamReader reader;
                 if (String.valueOf(code).startsWith("2")) {
                     reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
-                }else if(Objects.equals(String.valueOf(code),"520")){
-                    reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
                 } else {
-                    throw new RuntimeException("HTTP code : " + code);
+                    reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
                 }
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(reader, writer);
-                resultVo.appendResult(writer.toString());
+                if (String.valueOf(code).startsWith("2") || Objects.equals(String.valueOf(code), "520")) {
+                    resultVo.appendResult(writer.toString());
+                } else {
+                    throw new RuntimeException(writer.toString());
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 resultVo.appendError("Connection failed\n" + e.getMessage());

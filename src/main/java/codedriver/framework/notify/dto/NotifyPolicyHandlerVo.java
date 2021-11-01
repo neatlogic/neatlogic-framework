@@ -14,12 +14,14 @@ public class NotifyPolicyHandlerVo {
     private String name;
     private String moduleGroup;
     private String authName;
+    private Integer isAllowMultiPolicy;
 
-    public NotifyPolicyHandlerVo(String handler, String name, String authName, String moduleGroup) {
+    public NotifyPolicyHandlerVo(String handler, String name, String authName, String moduleGroup, Integer isAllowMultiPolicy) {
         this.handler = handler;
         this.name = name;
         this.authName = authName;
         this.moduleGroup = moduleGroup;
+        this.isAllowMultiPolicy = isAllowMultiPolicy;
     }
 
     public String getHandler() {
@@ -52,5 +54,13 @@ public class NotifyPolicyHandlerVo {
 
     public void setAuthName(String authName) {
         this.authName = authName;
+    }
+
+    public Integer getIsAllowMultiPolicy() {
+        return isAllowMultiPolicy;
+    }
+
+    public void setIsAllowMultiPolicy(Integer isAllowMultiPolicy) {
+        this.isAllowMultiPolicy = isAllowMultiPolicy;
     }
 }

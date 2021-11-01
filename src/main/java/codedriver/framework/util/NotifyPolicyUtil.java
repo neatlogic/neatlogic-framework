@@ -181,6 +181,10 @@ public class NotifyPolicyUtil {
                                 }
                                 notifyBuilder.addFileList(fileList);
                                 NotifyVo notifyVo = notifyBuilder.build();
+                                /** 通知出现异常时，防止循环调用本方法 */
+                                if (callerData instanceof NotifyVo) {
+                                    notifyVo.setIsSendExceptionNotify(((NotifyVo) callerData).getIsSendExceptionNotify());
+                                }
                                 /** 发送通知 **/
                                 handler.execute(notifyVo);
                             }

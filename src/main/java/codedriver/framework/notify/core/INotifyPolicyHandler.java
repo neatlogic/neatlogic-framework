@@ -52,4 +52,13 @@ public interface INotifyPolicyHandler {
     default boolean isPublic() {
         return true;
     }
+
+    /**
+     * 是否允许添加多个策略
+     *
+     * @return
+     */
+    default int isAllowMultiPolicy() {
+        return 1;
+    }
 }

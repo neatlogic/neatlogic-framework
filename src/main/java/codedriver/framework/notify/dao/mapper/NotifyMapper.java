@@ -5,24 +5,26 @@ import java.util.List;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.notify.dto.NotifyPolicyVo;
 
-public interface NotifyMapper {
+ public interface NotifyMapper {
 
-	public NotifyPolicyVo getNotifyPolicyById(Long id);
+	 NotifyPolicyVo getNotifyPolicyById(Long id);
 
-	public int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo);
+	 int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo);
 
-	public List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo);
+	 List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo);
 
-	public List<ValueTextVo> getNotifyPolicyListForSelect(NotifyPolicyVo notifyPolicyVo);
+	 List<ValueTextVo> getNotifyPolicyListForSelect(NotifyPolicyVo notifyPolicyVo);
 
-	public int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
+	 NotifyPolicyVo getNotifyPolicyByHandlerLimitOne(String handler);
 
-	public int checkNotifyPolicyIsExists(Long policyId);
+	 int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
 
-	public int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo);
+	 int checkNotifyPolicyIsExists(Long policyId);
 
-	public int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo);
+	 int insertNotifyPolicy(NotifyPolicyVo notifyPolicyVo);
 
-	public int deleteNotifyPolicyById(Long id);
+	 int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo);
+
+	 int deleteNotifyPolicyById(Long id);
 
 }

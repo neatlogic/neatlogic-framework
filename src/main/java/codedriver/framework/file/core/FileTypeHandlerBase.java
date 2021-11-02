@@ -5,6 +5,8 @@
 
 package codedriver.framework.file.core;
 
+import codedriver.framework.file.dto.FileVo;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,10 +14,10 @@ public abstract class FileTypeHandlerBase implements IFileTypeHandler {
     private final static Logger logger = LoggerFactory.getLogger(FileTypeHandlerBase.class);
 
     @Override
-    public final void deleteFile(Long fileId) throws Exception {
-        if (myDeleteFile(fileId)) {
+    public final void deleteFile(FileVo fileVo, JSONObject paramObj) throws Exception {
+        if (myDeleteFile(fileVo, paramObj)) {
             try {
-                FileManager.deleteFileById(fileId);
+                FileManager.deleteFileById(fileVo.getId());
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             }
@@ -28,5 +30,5 @@ public abstract class FileTypeHandlerBase implements IFileTypeHandler {
      * @param fileId 附件id
      * @return true：允许继续删除附件，false：不允许删除附件
      */
-    protected abstract boolean myDeleteFile(Long fileId);
+    protected abstract boolean myDeleteFile(FileVo fileVo, JSONObject paramObj);
 }

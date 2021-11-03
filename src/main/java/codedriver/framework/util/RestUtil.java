@@ -154,7 +154,7 @@ public class RestUtil {
         }
 
         // 设置超时时间
-        connection.setConnectTimeout(0);
+        connection.setConnectTimeout(5000);
         connection.setReadTimeout(restVo.getTimeout());
 
         // 设置默认header

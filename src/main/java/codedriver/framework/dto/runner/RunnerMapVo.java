@@ -12,12 +12,19 @@ package codedriver.framework.dto.runner;
 public class RunnerMapVo extends RunnerVo {
     private static final long serialVersionUID = 6043891449299751917L;
     private Long runnerMapId;
+
     public RunnerMapVo() {
 
     }
-    public RunnerMapVo(Long runnerMapId,Long runnerId) {
+
+    public RunnerMapVo(Long runnerMapId, Long runnerId) {
         this.runnerMapId = runnerMapId;
         super.setId(runnerId);
+    }
+
+    public RunnerMapVo(String runnerUrl, Long runnerMapId) {
+        this.runnerMapId = runnerMapId;
+        super.setUrl(runnerUrl);
     }
 
     public Long getRunnerMapId() {

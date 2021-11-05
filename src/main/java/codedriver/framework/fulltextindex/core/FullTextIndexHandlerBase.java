@@ -77,11 +77,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
      * @param isSync   是否同步
      */
     protected final void createIndex(Long targetId, boolean isSync) {
-        AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>();
+        AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>("FULLTEXTINDEX-CREATE-" + this.getType().getType().toUpperCase(Locale.ROOT) + "-" + targetId);
         String moduleId = this.getModuleId();
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> {
-            String oldName = Thread.currentThread().getName();
-            Thread.currentThread().setName("FULLTEXTINDEX-CREATE-" + fullTextIndexVo.getTargetType().toUpperCase(Locale.ROOT) + "-" + fullTextIndexVo.getTargetId());
             //删除索引
             fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
 
@@ -140,8 +138,6 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                     fullTextIndexTargetVo.setError(ex.getMessage());
                 }
                 fullTextIndexMapper.updateTargetError(fullTextIndexTargetVo);
-            } finally {
-                Thread.currentThread().setName(oldName);
             }
         }, isSync);
     }

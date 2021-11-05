@@ -8,6 +8,7 @@ package codedriver.framework.restful.dto;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.common.util.RC4Util;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.EntityField;
@@ -100,6 +101,11 @@ public class ApiVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private String timezone;
 
+    //明文
+    private String passwordPlain;
+    //密文
+    private String passwordCipher;
+
     public void addPathVariable(String para) {
         if (pathVariableList == null) {
             pathVariableList = new ArrayList<>();
@@ -185,10 +191,11 @@ public class ApiVo extends BasePageVo implements Serializable {
     }
 
     public String getPassword() {
-        return password;
+        return getPasswordPlain();
     }
 
     public void setPassword(String password) {
+        this.passwordPlain = password;
         this.password = password;
     }
 
@@ -600,6 +607,36 @@ public class ApiVo extends BasePageVo implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setPasswordPlain(String passwordPlain) {
+        this.passwordPlain = passwordPlain;
+    }
+
+    public String getPasswordPlain() {
+        if (StringUtils.isBlank(passwordPlain)) {
+            if (StringUtils.isNotBlank(passwordCipher)) {
+                if (passwordCipher.startsWith("RC4:")) {
+                    this.passwordPlain = RC4Util.decrypt(this.passwordCipher.substring(4));
+                } else {
+                    this.passwordPlain = this.passwordCipher;
+                }
+            }
+        }
+        return passwordPlain;
+    }
+
+    public String getPasswordCipher() {
+        if (StringUtils.isBlank(passwordCipher)) {
+            if (StringUtils.isNotBlank(passwordPlain)) {
+                this.passwordCipher = "RC4:" + RC4Util.encrypt(passwordPlain);
+            }
+        }
+        return passwordCipher;
+    }
+
+    public void setPasswordCipher(String passwordCipher) {
+        this.passwordCipher = passwordCipher;
     }
 
 

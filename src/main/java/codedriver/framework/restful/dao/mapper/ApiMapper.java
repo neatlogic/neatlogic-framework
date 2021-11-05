@@ -8,41 +8,41 @@ import java.util.List;
 
 public interface ApiMapper {
 
-	public ApiVo getApiByToken(String token);
+	ApiVo getApiByToken(String token);
 
-	public List<String> getApiTokenList(ApiVo apiVo);
+	List<String> getApiTokenList(ApiVo apiVo);
 
-	public List<ApiVo> getAllApi();
+	List<ApiVo> getAllApi();
 
-	public List<ApiVo> getApiListByTokenList(List<String> tokenList);
+	List<ApiVo> getApiListByTokenList(List<String> tokenList);
 
-	public int getApiAuditCount(ApiAuditVo apiAuditVo);
+	int getApiAuditCount(ApiAuditVo apiAuditVo);
 
-	public List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
+	List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
 
-	public List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
+	List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
 
-	public String getApiAuditDetailByHash(String hash);
+	String getApiAuditDetailByHash(String hash);
 
-	public List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
+	List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	public String getApiAccessCountLockByToken(String token);
+	String getApiAccessCountLockByToken(String token);
 
-	public List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
+	List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
 
-	public int searchApiAuditListCount(ApiAuditVo apiAuditVo);
+	int searchApiAuditListCount(ApiAuditVo apiAuditVo);
 
-	public List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
+	List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
 
-	public List<String> getDistinctTokenInApiAudit();
+	List<String> getDistinctTokenInApiAudit();
 
-	public String getAuditFileByHash(String hash);
+	String getAuditFileByHash(String hash);
 
-	public int replaceApi(ApiVo apiVo);
+	int replaceApi(ApiVo apiVo);
 
-	public int insertApiAudit(ApiAuditVo apiAudit);
+	int insertApiAudit(ApiAuditVo apiAudit);
 
-	public int batchUpdate(ApiVo apiVo);
+	int batchUpdate(ApiVo apiVo);
 
 	/**
 	 * 
@@ -52,9 +52,9 @@ public interface ApiMapper {
 	* @param count
 	* @return int
 	 */
-	public int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
-	public int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
+	int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
 
 	/**
 	 * 
@@ -64,8 +64,8 @@ public interface ApiMapper {
 	* @param visitTimes
 	* @return int
 	 */
-	public int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+	int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
-	public int deleteApiByToken(String token);
+	int deleteApiByToken(String token);
 
 }

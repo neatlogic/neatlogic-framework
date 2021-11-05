@@ -10,6 +10,7 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
+import codedriver.framework.auth.core.AuthFactory;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
@@ -36,6 +37,7 @@ import org.springframework.aop.framework.AopContext;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -258,6 +260,7 @@ public class ApiValidateAndHelpBase {
     protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
         // 获取目标类
         boolean isAuth = false;
+        List<String> authNameList = new ArrayList<>();
         if (apiClass != null) {
             //AuthAction action = apiClass.getAnnotation(AuthAction.class);
             AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
@@ -271,13 +274,14 @@ public class ApiValidateAndHelpBase {
                             break;
                         }
                     }
+                    authNameList.add(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName());
                 }
             } else {
                 isAuth = true;
             }
 
             if (!isAuth) {
-                throw new PermissionDeniedException();
+                throw new PermissionDeniedException(authNameList);
             }
             // 判断参数是否合法
             Method method = apiClass.getMethod("myDoService", classes);

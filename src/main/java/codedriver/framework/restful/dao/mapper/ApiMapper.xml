@@ -9,7 +9,7 @@
 		`module_id` AS moduleId,
 		`handler`,
 		`username`,
-		`password`,
+		`password` as passwordCipher,
 		`config`,
 		`is_active` AS isActive,
 		`token`,

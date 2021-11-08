@@ -41,6 +41,10 @@ public class ColumnVo extends BasePageVo {
 	private Integer isSearch;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
     private Integer primaryKey;
+    @EntityField( name = "表达式列表", type = ApiParamType.JSONARRAY)
+    private List<ExpressionVo> expressionList;
+    @EntityField( name = "默认表达式", type = ApiParamType.JSONOBJECT)
+    private ExpressionVo defaultExpression;
 
     public String getUuid() {
         return uuid;
@@ -113,4 +117,36 @@ public class ColumnVo extends BasePageVo {
     public void setPrimaryKey(Integer primaryKey) {
         this.primaryKey = primaryKey;
     }
+
+    public List<ExpressionVo> getExpressionList() {
+        if(expressionList == null && StringUtils.isNotBlank(type)) {
+            List<Expression> expressionEnumList = MatrixAttributeType.getExpressionList(type);
+            if(CollectionUtils.isNotEmpty(expressionEnumList)) {
+                expressionList = new ArrayList<>();
+                for(Expression expression : expressionEnumList) {
+                    expressionList.add(new ExpressionVo(expression));
+                }
+            }
+        }
+        return expressionList;
+    }
+
+    public void setExpressionList(List<ExpressionVo> expressionList) {
+        this.expressionList = expressionList;
+    }
+
+    public ExpressionVo getDefaultExpression() {
+        if(defaultExpression == null && StringUtils.isNotBlank(type)) {
+            Expression expressionEnum = MatrixAttributeType.getExpression(type);
+            if(expressionEnum != null) {
+                defaultExpression = new ExpressionVo(expressionEnum);
+            }
+        }
+        return defaultExpression;
+    }
+
+    public void setDefaultExpression(ExpressionVo defaultExpression) {
+        this.defaultExpression = defaultExpression;
+    }
+
 }

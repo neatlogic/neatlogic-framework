@@ -1,5 +1,6 @@
 package codedriver.framework.matrix.dto;
 
+import codedriver.framework.file.dto.FileVo;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.ApiParamType;
@@ -27,6 +28,12 @@ public class MatrixVo extends BaseEditorVo {
     private String typeName;
     @EntityField( name = "被引用次数", type = ApiParamType.INTEGER)
     private int referenceCount;
+    @EntityField( name = "集成设置uuid", type = ApiParamType.STRING)
+    private String integrationUuid;
+    @EntityField( name = "视图配置文件id", type = ApiParamType.LONG)
+    private Long fileId;
+    @EntityField( name = "视图配置文件信息", type = ApiParamType.JSONOBJECT)
+    private FileVo fileVo;
 
     public Long getId() {
         return id;
@@ -35,7 +42,10 @@ public class MatrixVo extends BaseEditorVo {
     public void setId(Long id) {
         this.id = id;
     }
-
+    // TODO linbq 临时兼容，后面要删掉
+    public String getMatrixUuid() {
+        return uuid;
+    }
     public String getUuid() {
         return uuid;
     }
@@ -86,5 +96,29 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setReferenceCount(int referenceCount) {
         this.referenceCount = referenceCount;
+    }
+
+    public String getIntegrationUuid() {
+        return integrationUuid;
+    }
+
+    public void setIntegrationUuid(String integrationUuid) {
+        this.integrationUuid = integrationUuid;
+    }
+
+    public Long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Long fileId) {
+        this.fileId = fileId;
+    }
+
+    public FileVo getFileVo() {
+        return fileVo;
+    }
+
+    public void setFileVo(FileVo fileVo) {
+        this.fileVo = fileVo;
     }
 }

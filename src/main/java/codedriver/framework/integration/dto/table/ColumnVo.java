@@ -37,7 +37,8 @@ public class ColumnVo extends BasePageVo {
     private String config;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
 	private Integer isSearchable = 1;
-
+    @EntityField(name = "是否搜索", type = ApiParamType.INTEGER)
+	private Integer isSearch;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
     private Integer primaryKey;
 
@@ -96,6 +97,14 @@ public class ColumnVo extends BasePageVo {
 	public void setIsSearchable(Integer isSearchable) {
 		this.isSearchable = isSearchable;
 	}
+
+    public Integer getIsSearch() {
+        return isSearch;
+    }
+
+    public void setIsSearch(Integer isSearch) {
+        this.isSearch = isSearch;
+    }
 
     public Integer getPrimaryKey() {
         return primaryKey;

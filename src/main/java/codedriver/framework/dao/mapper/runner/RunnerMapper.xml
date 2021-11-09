@@ -242,15 +242,15 @@
     </select>
     <select id="getRunnerByIp" parameterType="java.lang.String" resultType="codedriver.framework.dto.runner.RunnerVo"
             useCache="false">
-        SELECT `id`            AS id,
-               `name`          AS name,
-               `url`           AS url,
-               `access_key`    AS accessKey,
-               `access_secret` AS accessSecret,
-               `auth_type`     AS authType,
-               `group_id`      AS groupId,
-               `host`,
-               `port`
+        SELECT p.`id`            AS id,
+               p.`name`          AS name,
+               p.`url`           AS url,
+               p.`access_key`    AS accessKey,
+               p.`access_secret` AS accessSecret,
+               p.`auth_type`     AS authType,
+               p.`group_id`      AS groupId,
+               p.`host`,
+               p.`port`
         FROM runner p
         WHERE p.host = #{value}
     </select>
@@ -380,11 +380,8 @@
     </update>
 
     <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
-        <selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
         INSERT INTO runner(
-        `name`,`host`,`port` ,`url`,
+        `id`,`name`,`host`,`port` ,`url`,
         <if test="accessKey != null and accessKey !='' and isAuth ==1">
             `access_key`,
         </if>
@@ -397,7 +394,7 @@
         `netty_ip`, `netty_port`,
         `group_id`,`public_key`,`private_key`
         ) VALUES(
-        #{name}, #{host},#{port},#{url},
+        #{id},#{name}, #{host},#{port},#{url},
         <if test="accessKey != null and accessKey !='' ">
             #{accessKey},
         </if>

@@ -24,33 +24,110 @@ public interface IMatrixDataSourceHandler {
 
     String getHandler();
 
+    /**
+     * 保存矩阵信息
+     * @param matrixVo
+     * @return
+     * @throws Exception
+     */
     MatrixVo saveMatrix(MatrixVo matrixVo) throws Exception;
 
+    /**
+     * 查询矩阵信息
+     * @param Uuid
+     * @return
+     */
     MatrixVo getMatrix(String Uuid);
 
+    /**
+     * 删除矩阵信息
+     * @param uuid
+     */
     void deleteMatrix(String uuid);
 
+    /**
+     * 复制矩阵
+     * @param sourceUuid
+     * @param matrixVo
+     */
     void copyMatrix(String sourceUuid, MatrixVo matrixVo);
 
+    /**
+     * 导入矩阵
+     * @param matrixVo
+     * @param multipartFile
+     * @return
+     * @throws IOException
+     */
     JSONObject importMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException;
 
+    /**
+     * 导出矩阵
+     * @param matrixVo
+     * @return
+     */
     HSSFWorkbook exportMatrix(MatrixVo matrixVo);
 
+    /**
+     * 保存矩阵属性列表信息
+     * @param matrixUuid
+     * @param matrixAttributeList
+     */
     void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList);
 
+    /**
+     * 查询矩阵属性列表信息
+     * @param matrixVo
+     * @return
+     */
     List<MatrixAttributeVo> getAttributeList(MatrixVo matrixVo);
 
+    /**
+     * 导出模板
+     * @param matrixVo
+     * @return
+     */
     JSONObject exportAttribute(MatrixVo matrixVo);
 
+    /**
+     * 查询矩阵表格数据
+     * @param dataVo
+     * @return
+     */
     JSONObject getTableData(MatrixDataVo dataVo);
 
+    /**
+     * 查询矩阵表格数据
+     * @param dataVo
+     * @return
+     */
     JSONObject TableDataSearch(MatrixDataVo dataVo);
 
+    /**
+     * 查询矩阵表格某列数据
+     * @param dataVo
+     * @return
+     */
     List<Map<String, JSONObject>> TableColumnDataSearch(MatrixDataVo dataVo);
 
+    /**
+     * 保存矩阵表格一行数据
+     * @param matrixUuid
+     * @param rowData
+     */
     void saveTableRowData(String matrixUuid, JSONObject rowData);
 
+    /**
+     * 查询矩阵表格一行数据
+     * @param matrixDataVo
+     * @return
+     */
     Map<String, String> getTableRowData(MatrixDataVo matrixDataVo);
 
+    /**
+     * 删除矩阵表格多行数据
+     * @param matrixUuid
+     * @param uuidList
+     */
     void deleteTableRowData(String matrixUuid, List<String> uuidList);
 }

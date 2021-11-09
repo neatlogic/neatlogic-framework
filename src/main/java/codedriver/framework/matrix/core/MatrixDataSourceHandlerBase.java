@@ -38,12 +38,9 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
 
     @Override
     public MatrixVo saveMatrix(MatrixVo matrixVo) throws Exception {
-        String uuid = matrixVo.getUuid();
-        MatrixVo oldMatrixVo = matrixMapper.getMatrixByUuid(uuid);
-        if (oldMatrixVo == null) {
+        if (matrixMapper.checkMatrixIsExists(matrixVo.getUuid()) == 0) {
             matrixMapper.insertMatrix(matrixVo);
         } else {
-            matrixVo.setName(oldMatrixVo.getName());
             matrixMapper.updateMatrixNameAndLcu(matrixVo);
         }
         mySaveMatrix(matrixVo);

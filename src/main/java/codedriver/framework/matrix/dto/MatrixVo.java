@@ -42,10 +42,7 @@ public class MatrixVo extends BaseEditorVo {
     public void setId(Long id) {
         this.id = id;
     }
-    // TODO linbq 临时兼容，后面要删掉
-    public String getMatrixUuid() {
-        return uuid;
-    }
+
     public String getUuid() {
         return uuid;
     }

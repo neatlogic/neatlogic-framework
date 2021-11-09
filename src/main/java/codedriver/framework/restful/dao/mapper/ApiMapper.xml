@@ -372,7 +372,7 @@
 		#{description},
 		#{expire},
 		#{username},
-		#{password},
+		#{passwordCipher},
 		#{authtype},
 		#{type},
 		#{qps},

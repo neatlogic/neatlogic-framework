@@ -28,7 +28,7 @@ public class ColumnVo extends BasePageVo {
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
     @EntityField( name = "类型", type = ApiParamType.STRING)
-    private String type;
+    private String type = "input";
     @EntityField( name = "是否必填", type = ApiParamType.INTEGER)
     private Integer isRequired;
     @EntityField( name = "排序", type = ApiParamType.INTEGER)
@@ -119,14 +119,9 @@ public class ColumnVo extends BasePageVo {
     }
 
     public List<ExpressionVo> getExpressionList() {
-        if(expressionList == null && StringUtils.isNotBlank(type)) {
-            List<Expression> expressionEnumList = MatrixAttributeType.getExpressionList(type);
-            if(CollectionUtils.isNotEmpty(expressionEnumList)) {
-                expressionList = new ArrayList<>();
-                for(Expression expression : expressionEnumList) {
-                    expressionList.add(new ExpressionVo(expression));
-                }
-            }
+        if(expressionList == null) {
+            expressionList = new ArrayList<>();
+            expressionList.add(new ExpressionVo(Expression.EQUAL));
         }
         return expressionList;
     }
@@ -136,11 +131,8 @@ public class ColumnVo extends BasePageVo {
     }
 
     public ExpressionVo getDefaultExpression() {
-        if(defaultExpression == null && StringUtils.isNotBlank(type)) {
-            Expression expressionEnum = MatrixAttributeType.getExpression(type);
-            if(expressionEnum != null) {
-                defaultExpression = new ExpressionVo(expressionEnum);
-            }
+        if(defaultExpression == null) {
+            defaultExpression = new ExpressionVo(Expression.EQUAL);
         }
         return defaultExpression;
     }

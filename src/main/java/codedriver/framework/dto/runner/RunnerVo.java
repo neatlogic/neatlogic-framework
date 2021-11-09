@@ -10,6 +10,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -59,6 +60,9 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private List<RunnerAuthVo> runnerAuthList;
 
     public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
         return id;
     }
 

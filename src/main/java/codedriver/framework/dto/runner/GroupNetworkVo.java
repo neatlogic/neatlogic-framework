@@ -12,17 +12,13 @@ import codedriver.framework.restful.annotation.EntityField;
  * @author lvzk
  * @since 2021/4/12 14:54
  **/
-public class GroupNetworkVo {
+public class GroupNetworkVo extends NetworkVo{
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "runner id",type = ApiParamType.LONG)
     private Long runnerId;
     @EntityField(name = "runner 分组名", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "runner 分组网段", type = ApiParamType.STRING)
-    private String networkIp;
-    @EntityField(name = "runner 分组掩码", type = ApiParamType.INTEGER)
-    private Integer mask;
     @EntityField(name = "runner 组id", type = ApiParamType.LONG)
     private Long groupId;
 
@@ -48,22 +44,6 @@ public class GroupNetworkVo {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getNetworkIp() {
-        return networkIp;
-    }
-
-    public void setNetworkIp(String networkIp) {
-        this.networkIp = networkIp;
-    }
-
-    public Integer getMask() {
-        return mask;
-    }
-
-    public void setMask(Integer mask) {
-        this.mask = mask;
     }
 
     public Long getGroupId() {

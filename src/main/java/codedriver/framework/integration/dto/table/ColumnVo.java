@@ -28,7 +28,7 @@ public class ColumnVo extends BasePageVo {
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
     @EntityField( name = "类型", type = ApiParamType.STRING)
-    private String type;
+    private String type = "input";
     @EntityField( name = "是否必填", type = ApiParamType.INTEGER)
     private Integer isRequired;
     @EntityField( name = "排序", type = ApiParamType.INTEGER)
@@ -37,9 +37,14 @@ public class ColumnVo extends BasePageVo {
     private String config;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
 	private Integer isSearchable = 1;
-
+    @EntityField(name = "是否搜索", type = ApiParamType.INTEGER)
+	private Integer isSearch;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
     private Integer primaryKey;
+    @EntityField( name = "表达式列表", type = ApiParamType.JSONARRAY)
+    private List<ExpressionVo> expressionList;
+    @EntityField( name = "默认表达式", type = ApiParamType.JSONOBJECT)
+    private ExpressionVo defaultExpression;
 
     public String getUuid() {
         return uuid;
@@ -97,6 +102,14 @@ public class ColumnVo extends BasePageVo {
 		this.isSearchable = isSearchable;
 	}
 
+    public Integer getIsSearch() {
+        return isSearch;
+    }
+
+    public void setIsSearch(Integer isSearch) {
+        this.isSearch = isSearch;
+    }
+
     public Integer getPrimaryKey() {
         return primaryKey;
     }
@@ -104,4 +117,28 @@ public class ColumnVo extends BasePageVo {
     public void setPrimaryKey(Integer primaryKey) {
         this.primaryKey = primaryKey;
     }
+
+    public List<ExpressionVo> getExpressionList() {
+        if(expressionList == null) {
+            expressionList = new ArrayList<>();
+            expressionList.add(new ExpressionVo(Expression.EQUAL));
+        }
+        return expressionList;
+    }
+
+    public void setExpressionList(List<ExpressionVo> expressionList) {
+        this.expressionList = expressionList;
+    }
+
+    public ExpressionVo getDefaultExpression() {
+        if(defaultExpression == null) {
+            defaultExpression = new ExpressionVo(Expression.EQUAL);
+        }
+        return defaultExpression;
+    }
+
+    public void setDefaultExpression(ExpressionVo defaultExpression) {
+        this.defaultExpression = defaultExpression;
+    }
+
 }

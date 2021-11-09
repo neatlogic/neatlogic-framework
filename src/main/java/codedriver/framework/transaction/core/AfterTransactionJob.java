@@ -14,7 +14,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AfterTransactionJob<T> {
+    public enum EVENT {
+        COMMITED(), COMPLETED()
+    }
+
     private final ThreadLocal<Set<T>> THREADLOCAL = new ThreadLocal<>();
+    private final ThreadLocal<Set<CodeDriverThread>> T_THREADLOCAL = new ThreadLocal<>();
+    private final String threadName;
+
+    public AfterTransactionJob(String _threadName) {
+        threadName = _threadName;
+    }
+
 
     /**
      * 异步执行
@@ -25,6 +36,7 @@ public class AfterTransactionJob<T> {
     public void execute(T t, ICommitted<T> commited) {
         execute(t, commited, null, false);
     }
+
 
     /**
      * 异步执行
@@ -48,6 +60,56 @@ public class AfterTransactionJob<T> {
         execute(t, commited, null, isSync);
     }
 
+    /**
+     * 事务提交后执行线程
+     *
+     * @param t 线程
+     */
+    public void execute(CodeDriverThread t) {
+        execute(t, EVENT.COMMITED);
+    }
+
+    /**
+     * 事务提交或完成后执行线程
+     *
+     * @param t     线程
+     * @param event 事务时间，提交或完成
+     */
+    public void execute(CodeDriverThread t, EVENT event) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            CachedThreadPool.execute(t);
+        } else {
+            Set<CodeDriverThread> tList = T_THREADLOCAL.get();
+            if (tList == null) {
+                tList = new HashSet<>();
+                T_THREADLOCAL.set(tList);
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        if (event == EVENT.COMMITED) {
+                            Set<CodeDriverThread> tList = T_THREADLOCAL.get();
+                            for (CodeDriverThread t : tList) {
+                                CachedThreadPool.execute(t);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (event == EVENT.COMPLETED) {
+                            Set<CodeDriverThread> tList = T_THREADLOCAL.get();
+                            for (CodeDriverThread t : tList) {
+                                CachedThreadPool.execute(t);
+                            }
+                        }
+                    }
+                });
+            }
+            tList.add(t);
+        }
+    }
+
+
     /*
      * @Description:
      * @Author: chenqiwei
@@ -59,7 +121,7 @@ public class AfterTransactionJob<T> {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             if (commited != null) {
                 if (!isSync) {
-                    CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMMITER") {
+                    CachedThreadPool.execute(new CodeDriverThread(this.threadName + "-COMMITED") {
                         @Override
                         protected void execute() {
                             commited.execute(t);
@@ -71,7 +133,7 @@ public class AfterTransactionJob<T> {
             }
             if (completed != null) {
                 if (!isSync) {
-                    CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMPLETER") {
+                    CachedThreadPool.execute(new CodeDriverThread(this.threadName + "COMPLETED") {
                         @Override
                         protected void execute() {
                             completed.execute(t);
@@ -92,7 +154,7 @@ public class AfterTransactionJob<T> {
                         if (commited != null) {
                             Set<T> tList = THREADLOCAL.get();
                             if (!isSync) {
-                                CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMMITER") {
+                                CachedThreadPool.execute(new CodeDriverThread(threadName + "-COMMITED") {
                                     @Override
                                     protected void execute() {
                                         for (T t : tList) {
@@ -113,7 +175,7 @@ public class AfterTransactionJob<T> {
                         if (completed != null) {
                             Set<T> tList = THREADLOCAL.get();
                             if (commited != null) {
-                                CachedThreadPool.execute(new CodeDriverThread("AFTER-TRANSACTION-COMPLETER") {
+                                CachedThreadPool.execute(new CodeDriverThread(threadName + "COMPLETED") {
                                     @Override
                                     protected void execute() {
                                         for (T t : tList) {

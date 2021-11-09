@@ -17,12 +17,15 @@ public class MatrixDataVo extends BasePageVo {
     private List<String> columnList;
     private List<MatrixColumnVo> sourceColumnList;
     private List<String> uuidList;
+    private String uuidColumn;
+    private String keywordColumn;
     private String uuid;
     private String attrType;
     private List<String> attributeValueList;
     private String attributeUuid;
     private JSONArray filterList;
     private String schemaName = TenantContext.get().getDataDbName();
+    List<String> arrayColumnList;
 //    private String targetColumn;
 //
 //    public String getTargetColumn() {
@@ -65,7 +68,23 @@ public class MatrixDataVo extends BasePageVo {
 		this.uuidList = uuidList;
 	}
 
-	public String getUuid() {
+    public String getUuidColumn() {
+        return uuidColumn;
+    }
+
+    public void setUuidColumn(String uuidColumn) {
+        this.uuidColumn = uuidColumn;
+    }
+
+    public String getKeywordColumn() {
+        return keywordColumn;
+    }
+
+    public void setKeywordColumn(String keywordColumn) {
+        this.keywordColumn = keywordColumn;
+    }
+
+    public String getUuid() {
 		return uuid;
 	}
 
@@ -111,5 +130,13 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setSchemaName(String schemaName) {
         this.schemaName = schemaName;
+    }
+
+    public List<String> getArrayColumnList() {
+        return arrayColumnList;
+    }
+
+    public void setArrayColumnList(List<String> arrayColumnList) {
+        this.arrayColumnList = arrayColumnList;
     }
 }

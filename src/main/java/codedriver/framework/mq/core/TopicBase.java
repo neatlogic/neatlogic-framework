@@ -38,7 +38,7 @@ public abstract class TopicBase<T> implements ITopic<T> {
     @Override
     public final void send(T content) {
         if (content != null) {
-            AfterTransactionJob<T> job = new AfterTransactionJob<>();
+            AfterTransactionJob<T> job = new AfterTransactionJob<>("JMS-SENDER");
             job.execute(content, t -> {
                 String topicName = this.getName().toLowerCase(Locale.ROOT);
                 TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);

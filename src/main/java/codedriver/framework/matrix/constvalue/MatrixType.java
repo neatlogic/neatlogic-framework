@@ -7,16 +7,17 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 
 public enum MatrixType implements IEnum {
-    CUSTOM("custom", "自定义数据源"),
-    EXTERNAL("external", "外部数据源"),
-    VIEW("view", "视图");
+    CUSTOM("custom", "自定义数据源", "custom"),
+    EXTERNAL("external", "外部数据源", "integrationUuid"),
+    VIEW("view", "视图", "fileId");
 
     private String value;
     private String name;
-
-    private MatrixType(String _value, String _name) {
+    private String key;
+    MatrixType(String _value, String _name, String _key) {
         this.value = _value;
         this.name = _name;
+        this.key = _key;
     }
 
     public String getValue() {
@@ -25,6 +26,10 @@ public enum MatrixType implements IEnum {
 
     public String getName() {
         return name;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public static String getValue(String _value) {
@@ -54,6 +59,7 @@ public enum MatrixType implements IEnum {
                 {
                     this.put("value",type.getValue());
                     this.put("text",type.getName());
+                    this.put("key",type.getKey());
                 }
             });
         }

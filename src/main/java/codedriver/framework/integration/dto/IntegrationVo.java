@@ -6,6 +6,7 @@
 package codedriver.framework.integration.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BaseEditorVo;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.integration.core.IIntegrationHandler;
 import codedriver.framework.integration.core.IntegrationHandlerFactory;
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class IntegrationVo extends BasePageVo implements Serializable {
+public class IntegrationVo extends BaseEditorVo {
     private static final long serialVersionUID = 3921930881201126293L;
     @EntityField(name = "uuid", type = ApiParamType.STRING)
     private String uuid;
@@ -47,14 +48,6 @@ public class IntegrationVo extends BasePageVo implements Serializable {
     // 请求参数
     @JSONField(serialize = false)
     private JSONObject paramObj = new JSONObject();
-    @EntityField(name = "创建人", type = ApiParamType.STRING)
-    private String fcu;
-    @EntityField(name = "创建时间", type = ApiParamType.INTEGER)
-    private Date fcd;
-    @EntityField(name = "修改人", type = ApiParamType.STRING)
-    private String lcu;
-    @EntityField(name = "修改时间", type = ApiParamType.INTEGER)
-    private Date lcd;
     @EntityField(name = "是否有帮助", type = ApiParamType.INTEGER)
     private Integer hasHelp;
 
@@ -149,38 +142,6 @@ public class IntegrationVo extends BasePageVo implements Serializable {
 
     public void setParamObj(JSONObject paramObj) {
         this.paramObj = paramObj;
-    }
-
-    public String getFcu() {
-        return fcu;
-    }
-
-    public void setFcu(String fcu) {
-        this.fcu = fcu;
-    }
-
-    public Date getFcd() {
-        return fcd;
-    }
-
-    public void setFcd(Date fcd) {
-        this.fcd = fcd;
-    }
-
-    public String getLcu() {
-        return lcu;
-    }
-
-    public void setLcu(String lcu) {
-        this.lcu = lcu;
-    }
-
-    public Date getLcd() {
-        return lcd;
-    }
-
-    public void setLcd(Date lcd) {
-        this.lcd = lcd;
     }
 
     public List<PatternVo> getInputPatternList() {

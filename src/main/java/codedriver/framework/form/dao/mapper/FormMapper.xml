@@ -29,7 +29,11 @@
         f.`name`,
         f.`is_active` AS isActive,
         fv.`version` AS currentVersion,
-        fv.`uuid` AS currentVersionUuid
+        fv.`uuid` AS currentVersionUuid,
+        fv.`fcu`,
+        fv.`fcd`,
+        fv.`lcu`,
+        fv.`lcd`
         FROM `form` f
         JOIN `form_version` fv ON fv.`form_uuid`=f.`uuid` AND fv.`is_active` = 1
         WHERE 1=1
@@ -92,8 +96,10 @@
                `is_active`   AS isActive,
                `form_uuid`   AS formUuid,
                `form_config` AS formConfig,
-               `lcu`         AS editor,
-               `lcd`         AS editTime
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
         FROM `form_version`
         WHERE `uuid` = #{value}
     </select>
@@ -113,8 +119,10 @@
                `is_active`   AS isActive,
                `form_uuid`   AS formUuid,
                `form_config` AS formConfig,
-               `lcu`         AS editor,
-               `lcd`         AS editTime
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
         FROM `form_version`
         WHERE form_uuid = #{value}
         ORDER BY `version`
@@ -124,7 +132,11 @@
             resultType="codedriver.framework.form.dto.FormVersionVo">
         SELECT `uuid`,
                `version`,
-               `is_active` AS isActive
+               `is_active` AS isActive,
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
         FROM `form_version`
         WHERE form_uuid = #{value}
         ORDER BY `version`
@@ -215,7 +227,7 @@
             `form_config` = #{formConfig},
         </if>
         `lcd` = NOW(3),
-        `lcu` = #{editor}
+        `lcu` = #{lcu}
         WHERE `uuid` = #{uuid}
     </update>
 
@@ -264,9 +276,9 @@
                 #{formUuid},
                 #{formConfig},
                 NOW(3),
-                #{editor},
+                #{fcu},
                 NOW(3),
-                #{editor})
+                #{fcu})
     </insert>
 
     <insert id="insertFormAttribute" parameterType="codedriver.framework.form.dto.FormAttributeVo">

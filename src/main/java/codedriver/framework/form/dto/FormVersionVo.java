@@ -5,12 +5,11 @@
 
 package codedriver.framework.form.dto;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import codedriver.framework.common.dto.BaseEditorVo;
 import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -21,10 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
-import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.common.dto.BasePageVo;
-
-public class FormVersionVo extends BasePageVo implements Serializable {
+public class FormVersionVo extends BaseEditorVo {
     private static final long serialVersionUID = 8345592242508980127L;
     private String uuid;
     private String formName;
@@ -32,8 +28,8 @@ public class FormVersionVo extends BasePageVo implements Serializable {
     private Integer version;
     private Integer isActive;
     private String formConfig;
-    private String editor;
-    private Date editTime;
+//    private String editor;
+//    private Date editTime;
     @JSONField(serialize = false)
     private List<FormAttributeVo> formAttributeList;
     @JSONField(serialize = false)
@@ -74,24 +70,24 @@ public class FormVersionVo extends BasePageVo implements Serializable {
         this.formConfig = formConfig;
     }
 
-    public String getEditor() {
-        if (StringUtils.isBlank(editor)) {
-            editor = UserContext.get().getUserUuid();
-        }
-        return editor;
-    }
-
-    public void setEditor(String editor) {
-        this.editor = editor;
-    }
-
-    public Date getEditTime() {
-        return editTime;
-    }
-
-    public void setEditTime(Date editTime) {
-        this.editTime = editTime;
-    }
+//    public String getEditor() {
+//        if (StringUtils.isBlank(editor)) {
+//            editor = UserContext.get().getUserUuid();
+//        }
+//        return editor;
+//    }
+//
+//    public void setEditor(String editor) {
+//        this.editor = editor;
+//    }
+//
+//    public Date getEditTime() {
+//        return editTime;
+//    }
+//
+//    public void setEditTime(Date editTime) {
+//        this.editTime = editTime;
+//    }
 
     public Integer getVersion() {
         return version;
@@ -172,7 +168,7 @@ public class FormVersionVo extends BasePageVo implements Serializable {
 
     @Override
     public String toString() {
-        return "FormVersionVo [uuid=" + uuid + ", formName=" + formName + ", formUuid=" + formUuid + ", version=" + version + ", isActive=" + isActive + ", formConfig=" + formConfig + ", editor=" + editor + ", editTime=" + editTime + "]";
+        return "FormVersionVo [uuid=" + uuid + ", formName=" + formName + ", formUuid=" + formUuid + ", version=" + version + ", isActive=" + isActive + ", formConfig=" + formConfig + "]";
     }
 
 }

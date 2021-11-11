@@ -55,18 +55,18 @@ public class Cluster {
             this.id = _id;
         }
 
-        public Builder withLabel(String _label) {
+        public Cluster.Builder withLabel(String _label) {
             this.label = _label;
             return this;
         }
 
 
-        public Builder withStyle(String _style) {
+        public Cluster.Builder withStyle(String _style) {
             this.style = _style;
             return this;
         }
 
-        public Builder addNode(Node node) {
+        public Cluster.Builder addNode(Node node) {
             if (node != null) {
                 if (!nodeList.contains(node)) {
                     this.nodeList.add(node);

@@ -6,6 +6,7 @@
 package codedriver.framework.form.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BaseEditorVo;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -15,7 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-public class FormVo extends BasePageVo implements Serializable {
+public class FormVo extends BaseEditorVo {
 
     private static final long serialVersionUID = -2319081254327257337L;
 

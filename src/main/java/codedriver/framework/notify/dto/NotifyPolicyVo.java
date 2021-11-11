@@ -19,14 +19,14 @@ public class NotifyPolicyVo extends BaseEditorVo {
     private Long id;
     @EntityField(name = "策略名", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "操作用户", type = ApiParamType.STRING)
-    private String actionUser;
-    @EntityField(name = "操作时间", type = ApiParamType.LONG)
-    private Date actionTime;
-    @EntityField(name = "操作类型，create|update", type = ApiParamType.STRING)
-    private String action;
-    @EntityField(name = "操作类型名，创建|修改", type = ApiParamType.STRING)
-    private String actionName;
+//    @EntityField(name = "操作用户", type = ApiParamType.STRING)
+//    private String actionUser;
+//    @EntityField(name = "操作时间", type = ApiParamType.LONG)
+//    private Date actionTime;
+//    @EntityField(name = "操作类型，create|update", type = ApiParamType.STRING)
+//    private String action;
+//    @EntityField(name = "操作类型名，创建|修改", type = ApiParamType.STRING)
+//    private String actionName;
     @EntityField(name = "被引用次数", type = ApiParamType.INTEGER)
     private int referenceCount;
     @EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
@@ -62,65 +62,65 @@ public class NotifyPolicyVo extends BaseEditorVo {
         this.name = name;
     }
 
-    public String getActionUser() {
-        if (StringUtils.isBlank(actionUser)) {
-            if (StringUtils.isNotBlank(getLcuName())) {
-                actionUser = getLcuName();
-            } else if (StringUtils.isNotBlank(getFcuName())) {
-                actionUser = getFcuName();
-            }
-        }
-        return actionUser;
-    }
-
-    public void setActionUser(String actionUser) {
-        this.actionUser = actionUser;
-    }
-
-    public Date getActionTime() {
-        if (actionTime == null) {
-            if (getLcd() != null) {
-                actionTime = getLcd();
-            } else if (getFcd() != null) {
-                actionTime = getFcd();
-            }
-        }
-        return actionTime;
-    }
-
-    public void setActionTime(Date actionTime) {
-        this.actionTime = actionTime;
-    }
-
-    public String getAction() {
-        if (action == null) {
-            if (getLcuName() != null) {
-                action = ActionType.UPDATE.getValue();
-            } else if (getFcuName() != null) {
-                action = ActionType.CREATE.getValue();
-            }
-        }
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getActionName() {
-        if (actionName == null) {
-            if (getLcuName() != null) {
-                actionName = ActionType.UPDATE.getText();
-            } else if (getFcuName() != null) {
-                actionName = ActionType.CREATE.getText();
-            }
-        }
-        return actionName;
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
+//    public String getActionUser() {
+//        if (StringUtils.isBlank(actionUser)) {
+//            if (StringUtils.isNotBlank(getLcuName())) {
+//                actionUser = getLcuName();
+//            } else if (StringUtils.isNotBlank(getFcuName())) {
+//                actionUser = getFcuName();
+//            }
+//        }
+//        return actionUser;
+//    }
+//
+//    public void setActionUser(String actionUser) {
+//        this.actionUser = actionUser;
+//    }
+//
+//    public Date getActionTime() {
+//        if (actionTime == null) {
+//            if (getLcd() != null) {
+//                actionTime = getLcd();
+//            } else if (getFcd() != null) {
+//                actionTime = getFcd();
+//            }
+//        }
+//        return actionTime;
+//    }
+//
+//    public void setActionTime(Date actionTime) {
+//        this.actionTime = actionTime;
+//    }
+//
+//    public String getAction() {
+//        if (action == null) {
+//            if (getLcuName() != null) {
+//                action = ActionType.UPDATE.getValue();
+//            } else if (getFcuName() != null) {
+//                action = ActionType.CREATE.getValue();
+//            }
+//        }
+//        return action;
+//    }
+//
+//    public void setAction(String action) {
+//        this.action = action;
+//    }
+//
+//    public String getActionName() {
+//        if (actionName == null) {
+//            if (getLcuName() != null) {
+//                actionName = ActionType.UPDATE.getText();
+//            } else if (getFcuName() != null) {
+//                actionName = ActionType.CREATE.getText();
+//            }
+//        }
+//        return actionName;
+//    }
+//
+//    public void setActionName(String actionName) {
+//        this.actionName = actionName;
+//    }
 
     public int getReferenceCount() {
         return referenceCount;

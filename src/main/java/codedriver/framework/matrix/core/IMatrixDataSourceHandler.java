@@ -30,7 +30,7 @@ public interface IMatrixDataSourceHandler {
      * @return
      * @throws Exception
      */
-    MatrixVo saveMatrix(MatrixVo matrixVo) throws Exception;
+    void saveMatrix(MatrixVo matrixVo) throws Exception;
 
     /**
      * 查询矩阵信息

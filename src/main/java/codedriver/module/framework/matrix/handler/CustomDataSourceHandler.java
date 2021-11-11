@@ -62,10 +62,6 @@ import java.util.stream.Collectors;
 public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    /**
-     * 下拉列表value和text列的组合连接符
-     **/
-    private final static String SELECT_COMPOSE_JOINER = "&=&";
 
     @Resource
     private MatrixAttributeMapper attributeMapper;
@@ -91,7 +87,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected void mySaveMatrix(MatrixVo matrixVo) throws Exception {
+    protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
+        return true;
     }
 
     @Override
@@ -575,46 +572,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         for (String uuid : uuidList) {
             matrixDataMapper.deleteDynamicTableDataByUuid(matrixUuid, uuid, TenantContext.get().getDataDbName());
         }
-    }
-
-    private JSONArray getTheadList(List<MatrixAttributeVo> attributeList) {
-        JSONArray theadList = new JSONArray();
-        JSONObject selectionObj = new JSONObject();
-        selectionObj.put("key", "selection");
-        selectionObj.put("width", 60);
-        theadList.add(selectionObj);
-        for (MatrixAttributeVo attributeVo : attributeList) {
-            JSONObject columnObj = new JSONObject();
-            columnObj.put("title", attributeVo.getName());
-            columnObj.put("key", attributeVo.getUuid());
-            theadList.add(columnObj);
-        }
-        JSONObject actionObj = new JSONObject();
-        actionObj.put("title", "");
-        actionObj.put("key", "action");
-        actionObj.put("align", "right");
-        actionObj.put("width", 10);
-        theadList.add(actionObj);
-        return theadList;
-    }
-
-    private JSONArray getTheadList(String matrixUuid, List<MatrixAttributeVo> attributeList, List<String> columnList) {
-        Map<String, MatrixAttributeVo> attributeMap = new HashMap<>();
-        for (MatrixAttributeVo attribute : attributeList) {
-            attributeMap.put(attribute.getUuid(), attribute);
-        }
-        JSONArray theadList = new JSONArray();
-        for (String column : columnList) {
-            MatrixAttributeVo attribute = attributeMap.get(column);
-            if (attribute == null) {
-                throw new MatrixAttributeNotFoundException(matrixUuid, column);
-            }
-            JSONObject theadObj = new JSONObject();
-            theadObj.put("key", attribute.getUuid());
-            theadObj.put("title", attribute.getName());
-            theadList.add(theadObj);
-        }
-        return theadList;
     }
 
     private String getCellValue(Cell cell) {

@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class AttributeDataVo {
     private String attributeUuid;
+    private String attributeLabel;
     @JSONField(serialize = false)
     private String data;
     private Object dataObj;
@@ -26,6 +27,14 @@ public class AttributeDataVo {
 
     public void setAttributeUuid(String attributeUuid) {
         this.attributeUuid = attributeUuid;
+    }
+
+    public String getAttributeLabel() {
+        return attributeLabel;
+    }
+
+    public void setAttributeLabel(String attributeLabel) {
+        this.attributeLabel = attributeLabel;
     }
 
     public String getData() {

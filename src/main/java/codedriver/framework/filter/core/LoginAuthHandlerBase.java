@@ -5,7 +5,6 @@ import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.UserVo;
-import codedriver.framework.transaction.util.TransactionUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.transaction.TransactionStatus;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -61,13 +59,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
             userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
-            TransactionStatus transactionStatus = TransactionUtil.openTx();
             if (userMapper.getUserSessionLockByUserUuid(userVo.getUuid()) != null) {
                 userMapper.updateUserSession(userVo.getUuid());
             } else {
                 userMapper.insertUserSession(userVo.getUuid());
             }
-            TransactionUtil.commitTx(transactionStatus);
 
         }
         return userVo;

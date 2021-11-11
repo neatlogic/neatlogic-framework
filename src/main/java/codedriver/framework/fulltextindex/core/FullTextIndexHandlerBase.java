@@ -119,7 +119,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                             FullTextIndexWordVo wordVo = fullTextIndexWordMapper.getWordByWord(fieldVo.getWord());
                             if (wordVo != null) {
                                 fieldVo.setWordId(wordVo.getId());
-                                fullTextIndexMapper.insertField(fieldVo, moduleId);
+                                fullTextIndexMapper.replaceIntoField(fieldVo, moduleId);
                                 Set<FullTextIndexOffsetVo> offsetList = fieldVo.getOffsetList();
                                 if (CollectionUtils.isNotEmpty(offsetList)) {
                                     for (FullTextIndexOffsetVo offsetVo : offsetList) {

@@ -49,11 +49,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     private final static Logger logger = LoggerFactory.getLogger(ExternalDataSourceHandler.class);
 
-    /**
-     * 下拉列表value和text列的组合连接符
-     **/
-    private final static String SELECT_COMPOSE_JOINER = "&=&";
-
     @Resource
     private IntegrationMapper integrationMapper;
 
@@ -72,14 +67,21 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected void mySaveMatrix(MatrixVo matrixVo) throws Exception {
+    protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
         String integrationUuid = matrixVo.getIntegrationUuid();
         if (StringUtils.isBlank(integrationUuid)) {
             throw new ParamNotExistsException("integrationUuid");
         }
+        MatrixExternalVo oldExternalVo = externalMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
+        if (oldExternalVo != null) {
+            if (integrationUuid.equals(oldExternalVo.getIntegrationUuid())) {
+                return false;
+            }
+        }
         matrixService.validateMatrixExternalData(integrationUuid);
         MatrixExternalVo externalVo = new MatrixExternalVo(matrixVo.getUuid(), integrationUuid);
         externalMapper.replaceMatrixExternal(externalVo);
+        return true;
     }
 
     @Override
@@ -441,24 +443,5 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected void myDeleteTableRowData(String matrixUuid, List<String> uuidList) {
 
-    }
-
-    private JSONArray getTheadList(String matrixUuid, List<MatrixAttributeVo> attributeList, List<String> columnList) {
-        Map<String, MatrixAttributeVo> attributeMap = new HashMap<>();
-        for (MatrixAttributeVo attribute : attributeList) {
-            attributeMap.put(attribute.getUuid(), attribute);
-        }
-        JSONArray theadList = new JSONArray();
-        for (String column : columnList) {
-            MatrixAttributeVo attribute = attributeMap.get(column);
-            if (attribute == null) {
-                throw new MatrixAttributeNotFoundException(matrixUuid, column);
-            }
-            JSONObject theadObj = new JSONObject();
-            theadObj.put("key", attribute.getUuid());
-            theadObj.put("title", attribute.getName());
-            theadList.add(theadObj);
-        }
-        return theadList;
     }
 }

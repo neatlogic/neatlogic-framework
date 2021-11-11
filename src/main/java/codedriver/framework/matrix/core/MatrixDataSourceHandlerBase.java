@@ -12,14 +12,17 @@ import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
+import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
 import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedException;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,10 @@ import java.util.Map;
  * @since 2021/11/5 10:26
  **/
 public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHandler {
+    /**
+     * 下拉列表value和text列的组合连接符
+     **/
+    protected final static String SELECT_COMPOSE_JOINER = "&=&";
 
     protected static MatrixMapper matrixMapper;
 
@@ -37,17 +44,18 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     }
 
     @Override
-    public MatrixVo saveMatrix(MatrixVo matrixVo) throws Exception {
+    public void saveMatrix(MatrixVo matrixVo) throws Exception {
         if (matrixMapper.checkMatrixIsExists(matrixVo.getUuid()) == 0) {
             matrixMapper.insertMatrix(matrixVo);
+            mySaveMatrix(matrixVo);
         } else {
-            matrixMapper.updateMatrixNameAndLcu(matrixVo);
+            if (mySaveMatrix(matrixVo)) {
+                matrixMapper.updateMatrixNameAndLcu(matrixVo);
+            }
         }
-        mySaveMatrix(matrixVo);
-        return matrixVo;
     }
 
-    protected abstract void mySaveMatrix(MatrixVo matrixVo) throws Exception;
+    protected abstract boolean mySaveMatrix(MatrixVo matrixVo) throws Exception;
 
     @Override
     public MatrixVo getMatrix(String uuid) {
@@ -151,4 +159,46 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         myDeleteTableRowData(matrixUuid, uuidList);
     }
     protected abstract void myDeleteTableRowData(String matrixUuid, List<String> uuidList);
+
+
+
+    protected JSONArray getTheadList(List<MatrixAttributeVo> attributeList) {
+        JSONArray theadList = new JSONArray();
+        JSONObject selectionObj = new JSONObject();
+        selectionObj.put("key", "selection");
+        selectionObj.put("width", 60);
+        theadList.add(selectionObj);
+        for (MatrixAttributeVo attributeVo : attributeList) {
+            JSONObject columnObj = new JSONObject();
+            columnObj.put("title", attributeVo.getName());
+            columnObj.put("key", attributeVo.getUuid());
+            theadList.add(columnObj);
+        }
+        JSONObject actionObj = new JSONObject();
+        actionObj.put("title", "");
+        actionObj.put("key", "action");
+        actionObj.put("align", "right");
+        actionObj.put("width", 10);
+        theadList.add(actionObj);
+        return theadList;
+    }
+
+    protected JSONArray getTheadList(String matrixUuid, List<MatrixAttributeVo> attributeList, List<String> columnList) {
+        Map<String, MatrixAttributeVo> attributeMap = new HashMap<>();
+        for (MatrixAttributeVo attribute : attributeList) {
+            attributeMap.put(attribute.getUuid(), attribute);
+        }
+        JSONArray theadList = new JSONArray();
+        for (String column : columnList) {
+            MatrixAttributeVo attribute = attributeMap.get(column);
+            if (attribute == null) {
+                throw new MatrixAttributeNotFoundException(matrixUuid, column);
+            }
+            JSONObject theadObj = new JSONObject();
+            theadObj.put("key", attribute.getUuid());
+            theadObj.put("title", attribute.getName());
+            theadList.add(theadObj);
+        }
+        return theadList;
+    }
 }

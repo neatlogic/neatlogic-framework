@@ -66,8 +66,8 @@
         where target_id = #{targetId}
     </update>
 
-    <insert id="insertField">
-        INSERT INTO `fulltextindex_field_${moduleId}` (`id`,
+    <insert id="replaceIntoField">
+        REPLACE INTO `fulltextindex_field_${moduleId}` (`id`,
                                                        `word_id`,
                                                        `target_field`,
                                                        `target_id`,

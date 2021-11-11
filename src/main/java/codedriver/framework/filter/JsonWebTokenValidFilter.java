@@ -15,6 +15,8 @@ import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
+import codedriver.framework.login.core.ILoginPostProcessor;
+import codedriver.framework.login.core.LoginPostProcessorFactory;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(request, response);
+                            if (userVo != null) {
+                                UserContext.init(userVo, timezone, request, response);
+                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                                    loginPostProcessor.loginAfterInitialization();
+                                }
+                            }
+
                         }
                     } else {
                         loginAuth = null;

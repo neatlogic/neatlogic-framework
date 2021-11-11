@@ -1,6 +1,7 @@
 package codedriver.framework.filter.core;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.UserVo;
@@ -31,9 +32,16 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     protected static UserMapper userMapper;
 
+    protected static RoleMapper roleMapper;
+
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
+    }
+
+    @Autowired
+    public void setRoleMapper(RoleMapper _roleMapper) {
+        roleMapper = _roleMapper;
     }
 
     @Override
@@ -50,6 +58,13 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid()) && StringUtils.isBlank(userVo.getCookieAuthorization())) {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
+            userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
+            if (userMapper.getUserSessionLockByUserUuid(userVo.getUuid()) != null) {
+                userMapper.updateUserSession(userVo.getUuid());
+            } else {
+                userMapper.insertUserSession(userVo.getUuid());
+            }
+
         }
         return userVo;
     }
@@ -58,6 +73,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     /**
      * 生成jwt对象
+     *
      * @param checkUserVo 用户
      * @return jwt对象
      * @throws Exception 异常
@@ -105,13 +121,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     /**
      * 设置登录cookie
+     *
      * @param response 响应
-     * @param request 请求
-     * @param tenant 租户
-     * @param jwtVo jwt对象
+     * @param request  请求
+     * @param tenant   租户
+     * @param jwtVo    jwt对象
      */
-    public static void setResponseAuthCookie(HttpServletResponse response, HttpServletRequest request,String tenant, JwtVo jwtVo ) {
-        Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" +  jwtVo.getCc());
+    public static void setResponseAuthCookie(HttpServletResponse response, HttpServletRequest request, String tenant, JwtVo jwtVo) {
+        Cookie authCookie = new Cookie("codedriver_authorization", "GZIP_" + jwtVo.getCc());
         authCookie.setPath("/" + tenant);
         String domainName = request.getServerName();
         if (StringUtils.isNotBlank(domainName)) {

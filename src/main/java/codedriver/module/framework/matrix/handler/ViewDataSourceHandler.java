@@ -50,10 +50,6 @@ import java.util.stream.Collectors;
  **/
 @Component
 public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
-    /**
-     * 下拉列表value和text列的组合连接符
-     **/
-    private final static String SELECT_COMPOSE_JOINER = "&=&";
 
     @Resource
     private MatrixViewMapper viewMapper;
@@ -78,7 +74,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected void mySaveMatrix(MatrixVo matrixVo) throws Exception {
+    protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
         Long fileId = matrixVo.getFileId();
         if (fileId == null) {
             throw new ParamNotExistsException("fileId");
@@ -86,6 +82,12 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         FileVo fileVo = fileMapper.getFileById(fileId);
         if (fileVo == null) {
             throw new FileNotFoundException(fileId);
+        }
+        MatrixViewVo oldMatrixViewVo = viewMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
+        if (oldMatrixViewVo != null) {
+            if (fileId.equals(oldMatrixViewVo.getFileId())) {
+                return false;
+            }
         }
         String xml = IOUtils.toString(FileUtil.getData(fileVo.getPath()), StandardCharsets.UTF_8);
 //            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ci><attrs><attr name=\"uuid\" label=\"用户uuid\"/><attr name=\"user_id\" label=\"用户id\"/><attr name=\"user_name\" label=\"用户名\"/><attr name=\"teamName\" label=\"分组\"/><attr name=\"vipLevel\" label=\"是否VIP\"/><attr name=\"phone\" label=\"电话\"/><attr name=\"email\" label=\"邮件\"/></attrs><sql>SELECT `u`.`uuid` AS uuid, `u`.`id` AS id, `u`.`user_id` as user_id, `u`.`user_name` as user_name, u.email as email, u.phone as phone, if(u.vip_level=0,'否','是') as vipLevel, group_concat( `t`.`name`) AS teamName FROM `user` `u` LEFT JOIN `user_team` `ut` ON `u`.`uuid` = `ut`.`user_uuid` LEFT JOIN `team` `t` ON `t`.`uuid` = `ut`.`team_uuid` GROUP BY u.uuid </sql></ci>";
@@ -100,6 +102,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         config.put("attributeList", matrixAttributeVoList);
         matrixViewVo.setConfig(config.toJSONString());
         viewMapper.replaceMatrixView(matrixViewVo);
+        return true;
     }
 
     @Override
@@ -309,45 +312,5 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected void myDeleteTableRowData(String matrixUuid, List<String> uuidList) {
 
-    }
-
-    private JSONArray getTheadList(List<MatrixAttributeVo> attributeList) {
-        JSONArray theadList = new JSONArray();
-        JSONObject selectionObj = new JSONObject();
-        selectionObj.put("key", "selection");
-        selectionObj.put("width", 60);
-        theadList.add(selectionObj);
-        for (MatrixAttributeVo attributeVo : attributeList) {
-            JSONObject columnObj = new JSONObject();
-            columnObj.put("title", attributeVo.getName());
-            columnObj.put("key", attributeVo.getUuid());
-            theadList.add(columnObj);
-        }
-        JSONObject actionObj = new JSONObject();
-        actionObj.put("title", "");
-        actionObj.put("key", "action");
-        actionObj.put("align", "right");
-        actionObj.put("width", 10);
-        theadList.add(actionObj);
-        return theadList;
-    }
-
-    private JSONArray getTheadList(String matrixUuid, List<MatrixAttributeVo> attributeList, List<String> columnList) {
-        Map<String, MatrixAttributeVo> attributeMap = new HashMap<>();
-        for (MatrixAttributeVo attribute : attributeList) {
-            attributeMap.put(attribute.getUuid(), attribute);
-        }
-        JSONArray theadList = new JSONArray();
-        for (String column : columnList) {
-            MatrixAttributeVo attribute = attributeMap.get(column);
-            if (attribute == null) {
-                throw new MatrixAttributeNotFoundException(matrixUuid, column);
-            }
-            JSONObject theadObj = new JSONObject();
-            theadObj.put("key", attribute.getUuid());
-            theadObj.put("title", attribute.getName());
-            theadList.add(theadObj);
-        }
-        return theadList;
     }
 }

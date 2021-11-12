@@ -27,7 +27,7 @@ public interface MatrixDataMapper {
 
     int getDynamicTableDataByColumnCount(MatrixDataVo dataVo);
 
-    int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
+//    int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
 
     List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values, @Param("schemaName") String schemaName);
 

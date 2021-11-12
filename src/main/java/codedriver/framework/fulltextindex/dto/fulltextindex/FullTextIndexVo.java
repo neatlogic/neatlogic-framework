@@ -84,7 +84,7 @@ public class FullTextIndexVo {
                             wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
                         } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }
@@ -113,7 +113,7 @@ public class FullTextIndexVo {
                             wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
                         } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptBASE64(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }

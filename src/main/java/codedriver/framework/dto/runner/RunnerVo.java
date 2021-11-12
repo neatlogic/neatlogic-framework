@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author lvzk
@@ -50,13 +51,15 @@ public class RunnerVo extends BasePageVo implements Serializable {
     @EntityField(name = "ssh私钥", type = ApiParamType.STRING)
     private String privateKey;
     @EntityField(name = "runner 分组", type = ApiParamType.JSONARRAY)
-    private List<RunnerGroupVo> proxyGroupVoList;
+    private List<RunnerGroupVo> runnerGroupVoList;
     @EntityField(name = "NettyIp", type = ApiParamType.STRING)
     private String nettyIp;
     @EntityField(name = "Netty端口", type = ApiParamType.INTEGER)
     private String nettyPort;
     @EntityField(name = "是否认证", type = ApiParamType.INTEGER)
     private Integer isAuth;
+    @EntityField(name = "被runner组引用个数", type = ApiParamType.INTEGER)
+    private Integer usedCount = 0;
     private List<RunnerAuthVo> runnerAuthList;
 
     public Long getId() {
@@ -79,10 +82,12 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getProtocol() {
-        if (url.startsWith(HttpProtocol.HTTPS.getValue())) {
-            protocol = HttpProtocol.HTTPS.getValue();
-        } else if (url.startsWith(HttpProtocol.HTTP.getValue())) {
-            protocol = HttpProtocol.HTTP.getValue();
+        if (StringUtils.isNotBlank(url)) {
+            if (url.startsWith(HttpProtocol.HTTPS.getValue())) {
+                protocol = HttpProtocol.HTTPS.getValue();
+            } else if (url.startsWith(HttpProtocol.HTTP.getValue())) {
+                protocol = HttpProtocol.HTTP.getValue();
+            }
         }
         return protocol;
     }
@@ -98,7 +103,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
             } else {
                 this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
             }
-        }else{
+        } else if (StringUtils.isNotBlank(url)) {
             if (!this.url.endsWith("/")) {
                 this.url = this.url + "/";
             }
@@ -159,12 +164,12 @@ public class RunnerVo extends BasePageVo implements Serializable {
         this.privateKey = privateKey;
     }
 
-    public List<RunnerGroupVo> getProxyGroupVoList() {
-        return proxyGroupVoList;
+    public List<RunnerGroupVo> getRunnerGroupVoList() {
+        return runnerGroupVoList;
     }
 
-    public void setProxyGroupVoList(List<RunnerGroupVo> proxyGroupVoList) {
-        this.proxyGroupVoList = proxyGroupVoList;
+    public void setRunnerGroupVoList(List<RunnerGroupVo> runnerGroupVoList) {
+        this.runnerGroupVoList = runnerGroupVoList;
     }
 
     public Long getGroupId() {
@@ -224,6 +229,17 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setIsAuth(Integer isAuth) {
         this.isAuth = isAuth;
+    }
+
+    public Integer getUsedCount() {
+        if (usedCount == 0 && CollectionUtils.isNotEmpty(runnerGroupVoList)) {
+            return runnerGroupVoList.size();
+        }
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
     }
 
     public enum HttpProtocol implements IEnum {

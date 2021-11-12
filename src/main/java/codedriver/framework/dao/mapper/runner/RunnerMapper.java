@@ -21,21 +21,23 @@ public interface RunnerMapper {
 
     RunnerGroupVo getRunnerMapGroupById(Long groupId);
 
-    RunnerGroupVo getRunnerGroupById(Long groupId);
-
     RunnerVo getRunnerByIp(String requestIp);
 
     RunnerVo getRunnerByIpAndPort(@Param("host") String host, @Param("port") String port);
 
     RunnerVo getRunnerById(Long runnerId);
 
-    List<RunnerVo> searchRunner(RunnerGroupVo runnerGroupVo);
+    List<RunnerVo> searchRunner(RunnerVo runnerVo);
 
-    int searchRunnerGroupCount();
+    int searchRunnerGroupCount(RunnerGroupVo groupVo);
 
     List<RunnerGroupVo> searchRunnerGroupDetail(RunnerGroupVo groupVo);
 
-    int searchRunnerCount(Long id);
+    List<RunnerVo> searchRunnerVoListByIdList(@Param("list") List<Long> list, @Param("runnerVo") RunnerVo runnerVo);
+
+    int searchRunnerCountByGroupId(Long id);
+
+    int searchRunnerCount(RunnerVo runnerVo);
 
     int checkGroupNameIsRepeats(RunnerGroupVo runnerGroupVo);
 
@@ -43,9 +45,13 @@ public interface RunnerMapper {
 
     int checkRunnerGroupIdIsExist(Long id);
 
-    int checkRunnerNameIsExistByName(RunnerVo runnerVo);
+    int checkRunnerNameIsExistByName(String name);//待删
 
     int checkRunnerNameIsExist(RunnerVo runnerVo);
+
+    int checkRunnerIsExistByIpAndPort(@Param("host") String host, @Param("port") Integer port);
+
+    int checkRunnerIsUsed(Long id);
 
     Integer insertRunnerMap(RunnerMapVo runnerMapVo);
 
@@ -54,6 +60,8 @@ public interface RunnerMapper {
     void insertNetwork(GroupNetworkVo networkVo);
 
     void insertRunner(RunnerVo runnerVo);
+
+    void insertRunnerGroupRunnerByRunnerIdListAndGroupId(List<Long> runnerIdList, Long groupId);
 
     void updateRunnerGroup(RunnerGroupVo runnerGroupVo);
 
@@ -65,4 +73,7 @@ public interface RunnerMapper {
 
     void deleteRunnerById(Long id);
 
+    void deleteRunnerGroupRunnerByGroupId(Long groupId);
+
+    void deleteRunnerGroupRunnerByRunnerId(Long runnerId);
 }

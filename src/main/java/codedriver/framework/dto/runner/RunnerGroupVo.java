@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 
@@ -27,10 +28,12 @@ public class RunnerGroupVo extends BasePageVo {
     private String authType;
     @EntityField(name = "runner名称", type = ApiParamType.STRING)
     private String runnerName;
-    @EntityField(name = "网段列表",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "网段列表", type = ApiParamType.JSONARRAY)
     private List<GroupNetworkVo> groupNetworkList;
-    @EntityField(name = "runner列表",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "runner列表", type = ApiParamType.JSONARRAY)
     private List<RunnerVo> runnerList;
+    @EntityField(name = "组内runner个数", type = ApiParamType.INTEGER)
+    private Integer runnerCount = 0;
 
     private List<GroupNetworkVo> networkList;
 
@@ -111,5 +114,16 @@ public class RunnerGroupVo extends BasePageVo {
 
     public void setRunnerList(List<RunnerVo> runnerList) {
         this.runnerList = runnerList;
+    }
+
+    public Integer getRunnerCount() {
+        if (runnerCount == 0 && CollectionUtils.isNotEmpty(runnerList)) {
+            runnerCount = runnerList.size();
+        }
+        return runnerCount;
+    }
+
+    public void setRunnerCount(Integer runnerCount) {
+        this.runnerCount = runnerCount;
     }
 }

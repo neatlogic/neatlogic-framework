@@ -217,12 +217,6 @@
           and `name` = #{name};
     </select>
 
-    <select id="checkRunnerNameIsExistByName" resultType="int" useCache="false">
-        select count(1)
-        from runner
-        where `name` = #{name};
-    </select>
-
     <select id="checkRunnerIdIsExist" resultType="int" useCache="false">
         select count(1)
         from runner

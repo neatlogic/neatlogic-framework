@@ -45,8 +45,6 @@ public interface RunnerMapper {
 
     int checkRunnerGroupIdIsExist(Long id);
 
-    int checkRunnerNameIsExistByName(String name);//待删
-
     int checkRunnerNameIsExist(RunnerVo runnerVo);
 
     int checkRunnerIsExistByIpAndPort(@Param("host") String host, @Param("port") Integer port);

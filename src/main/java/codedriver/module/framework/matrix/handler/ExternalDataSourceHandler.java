@@ -241,15 +241,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         List<MatrixAttributeVo> matrixAttributeList = matrixService.getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
-            List<String> uuidList = null;
+            List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
             JSONArray dafaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
-                uuidList = dafaultValue.toJavaList(String.class);
-            } else {
-                uuidList = dataVo.getUuidList();
-            }
-            List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(uuidList)) {
 //                String uuidColumn = jsonObj.getString("uuidColumn");
                 String uuidColumn = dataVo.getUuidColumn();
                 boolean uuidColumnExist = false;
@@ -264,6 +258,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
                 MatrixColumnVo sourceColumnVo = new MatrixColumnVo();
                 sourceColumnVo.setColumn(uuidColumn);
+                List<String> uuidList = dafaultValue.toJavaList(String.class);
                 for (String uuidValue : uuidList) {
                     sourceColumnVo.setValue(uuidValue);
                     sourceColumnVo.setExpression(Expression.EQUAL.getExpression());

@@ -391,15 +391,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
                 dataVo.setRowNum(rowNum);
             }
-            List<String> uuidList = null;
             JSONArray dafaultValue = dataVo.getDefaultValue();
-            if (CollectionUtils.isNotEmpty(dafaultValue)) {
-                uuidList = dafaultValue.toJavaList(String.class);
-            } else {
-                uuidList = dataVo.getUuidList();
-            }
             List<Map<String, String>> dataMapList = null;
-            if (CollectionUtils.isNotEmpty(uuidList)) {
+            if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
                 dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);

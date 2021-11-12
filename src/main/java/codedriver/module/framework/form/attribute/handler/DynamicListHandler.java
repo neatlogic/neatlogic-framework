@@ -62,64 +62,207 @@ public class DynamicListHandler extends FormHandlerBase {
             return tableObj;
         }
         Boolean needPage = configObj.getBoolean("needPage");
-        if (Objects.equals(needPage, false)) {//不分页
-            tableObj.put("selectUuidList", selectUuidList);
-            JSONObject table = dataObj.getJSONObject("table");
-            if (MapUtils.isNotEmpty(table)) {
-                JSONArray theadList = table.getJSONArray("theadList");
-                JSONArray tbodyList = table.getJSONArray("tbodyList");
-                JSONArray attributeList = configObj.getJSONArray("attributeList");
-                if (CollectionUtils.isNotEmpty(attributeList)) {
-                    JSONObject valueObj = dataObj.getJSONObject("value");
-                    setExtAttributeData(theadList, tbodyList, configObj, valueObj);
-                }
-                tableObj.put("theadList", theadList);
-                tableObj.put("tbodyList", tbodyList);
+        String dataSource = configObj.getString("dataSource");
+        if ("matrix".equals(dataSource)) {
+            if (Objects.equals(needPage, false)) {//不分页
+                return matrixDataSourceNeedPage(dataObj, selectUuidList, configObj);
+            } else {//分页
+                return matrixDataSourceNoNeedPage(dataObj, selectUuidList, configObj);
             }
-        } else {//分页
-            List<String> columnList = new ArrayList<>();
-            JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
-            if (CollectionUtils.isNotEmpty(columnHeadList)) {
-                for (int i = 0; i < columnHeadList.size(); i++) {
-                    JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
-                    String uuid = columnHeadObj.getString("uuid");
-                    if (StringUtils.isNotBlank(uuid)) {
-                        columnList.add(uuid);
-                    }
+        } else if ("integration".equals(dataSource)) {
+            if (Objects.equals(needPage, false)) {//不分页
+                return integrationDataSourceNeedPage(dataObj, selectUuidList, configObj);
+            } else {//分页
+                return integrationDataSourceNoNeedPage(dataObj, selectUuidList, configObj);
+            }
+        }
+//        if (Objects.equals(needPage, false)) {//不分页
+//            tableObj.put("selectUuidList", selectUuidList);
+//            JSONObject table = dataObj.getJSONObject("table");
+//            if (MapUtils.isNotEmpty(table)) {
+//                JSONArray theadList = table.getJSONArray("theadList");
+//                JSONArray tbodyList = table.getJSONArray("tbodyList");
+//                JSONArray attributeList = configObj.getJSONArray("attributeList");
+//                if (CollectionUtils.isNotEmpty(attributeList)) {
+//                    JSONObject valueObj = dataObj.getJSONObject("value");
+//                    setExtAttributeData(theadList, tbodyList, configObj, valueObj);
+//                }
+//                tableObj.put("theadList", theadList);
+//                tableObj.put("tbodyList", tbodyList);
+//            }
+//        } else {//分页
+//            List<String> columnList = new ArrayList<>();
+//            JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+//            if (CollectionUtils.isNotEmpty(columnHeadList)) {
+//                for (int i = 0; i < columnHeadList.size(); i++) {
+//                    JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+//                    String uuid = columnHeadObj.getString("uuid");
+//                    if (StringUtils.isNotBlank(uuid)) {
+//                        columnList.add(uuid);
+//                    }
+//                }
+//            }
+//            ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/init/fortable");
+//            if (api != null) {
+//                MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
+//                if (restComponent != null) {
+//                    String matrixUuid = configObj.getString("matrixUuid");
+//                    String uuidColumn = configObj.getString("uuidColumn");
+//                    List<String> uuidList = selectUuidList.toJavaList(String.class);
+//                    JSONObject paramObj = new JSONObject();
+//                    paramObj.put("matrixUuid", matrixUuid);
+//                    paramObj.put("columnList", columnList);
+//                    paramObj.put("uuidList", uuidList);
+//                    paramObj.put("uuidColumn", uuidColumn);
+//                    paramObj.put("needPage", false);
+//                    try {
+//                        JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
+//                        if (MapUtils.isNotEmpty(resultObj)) {
+//                            JSONArray theadList = resultObj.getJSONArray("theadList");
+//                            JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+//                            JSONArray attributeList = configObj.getJSONArray("attributeList");
+//                            if (CollectionUtils.isNotEmpty(attributeList)) {
+//                                JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+//                                setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
+//                            }
+//                            tableObj.put("selectUuidList", selectUuidList);
+//                            tableObj.put("theadList", theadList);
+//                            tableObj.put("tbodyList", tbodyList);
+//                        }
+//                    } catch (Exception e) {
+//                        logger.error(e.getMessage(), e);
+//                    }
+//                }
+//            }
+//        }
+        return tableObj;
+    }
+
+    private JSONObject matrixDataSourceNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        List<String> columnList = new ArrayList<>();
+        JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isNotEmpty(columnHeadList)) {
+            for (int i = 0; i < columnHeadList.size(); i++) {
+                JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+                String uuid = columnHeadObj.getString("uuid");
+                if (StringUtils.isNotBlank(uuid)) {
+                    columnList.add(uuid);
                 }
             }
-            ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/init/fortable");
-            if (api != null) {
-                MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
-                if (restComponent != null) {
-                    String matrixUuid = configObj.getString("matrixUuid");
-                    String uuidColumn = configObj.getString("uuidColumn");
-                    List<String> uuidList = selectUuidList.toJavaList(String.class);
-                    JSONObject paramObj = new JSONObject();
-                    paramObj.put("matrixUuid", matrixUuid);
-                    paramObj.put("columnList", columnList);
-                    paramObj.put("uuidList", uuidList);
-                    paramObj.put("uuidColumn", uuidColumn);
-                    paramObj.put("needPage", false);
-                    try {
-                        JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
-                        if (MapUtils.isNotEmpty(resultObj)) {
-                            JSONArray theadList = resultObj.getJSONArray("theadList");
-                            JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
-                            JSONArray attributeList = configObj.getJSONArray("attributeList");
-                            if (CollectionUtils.isNotEmpty(attributeList)) {
-                                JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
-                                setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
-                            }
-                            tableObj.put("selectUuidList", selectUuidList);
-                            tableObj.put("theadList", theadList);
-                            tableObj.put("tbodyList", tbodyList);
+        }
+        ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/init/fortable");
+        if (api != null) {
+            MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
+            if (restComponent != null) {
+                String matrixUuid = configObj.getString("matrixUuid");
+                String uuidColumn = configObj.getString("uuidColumn");
+                List<String> uuidList = selectUuidList.toJavaList(String.class);
+                JSONObject paramObj = new JSONObject();
+                paramObj.put("matrixUuid", matrixUuid);
+                paramObj.put("columnList", columnList);
+                paramObj.put("uuidList", uuidList);
+                paramObj.put("uuidColumn", uuidColumn);
+                paramObj.put("needPage", false);
+                try {
+                    JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
+                    if (MapUtils.isNotEmpty(resultObj)) {
+                        JSONArray theadList = resultObj.getJSONArray("theadList");
+                        JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+                        JSONArray attributeList = configObj.getJSONArray("attributeList");
+                        if (CollectionUtils.isNotEmpty(attributeList)) {
+                            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+                            setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
                         }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
+                        tableObj.put("selectUuidList", selectUuidList);
+                        tableObj.put("theadList", theadList);
+                        tableObj.put("tbodyList", tbodyList);
                     }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
             }
+        }
+        return tableObj;
+    }
+    private JSONObject matrixDataSourceNoNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        tableObj.put("selectUuidList", selectUuidList);
+        JSONObject table = dataObj.getJSONObject("table");
+        if (MapUtils.isNotEmpty(table)) {
+            JSONArray theadList = table.getJSONArray("theadList");
+            JSONArray tbodyList = table.getJSONArray("tbodyList");
+            JSONArray attributeList = configObj.getJSONArray("attributeList");
+            if (CollectionUtils.isNotEmpty(attributeList)) {
+                JSONObject valueObj = dataObj.getJSONObject("value");
+                setExtAttributeData(theadList, tbodyList, configObj, valueObj);
+            }
+            tableObj.put("theadList", theadList);
+            tableObj.put("tbodyList", tbodyList);
+        }
+        return tableObj;
+    }
+    private JSONObject integrationDataSourceNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        List<String> columnList = new ArrayList<>();
+        JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isNotEmpty(columnHeadList)) {
+            for (int i = 0; i < columnHeadList.size(); i++) {
+                JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+                String uuid = columnHeadObj.getString("uuid");
+                if (StringUtils.isNotBlank(uuid)) {
+                    columnList.add(uuid);
+                }
+            }
+        }
+        ApiVo api = PrivateApiComponentFactory.getApiByToken("integration/table/data/search");
+        if (api != null) {
+            MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
+            if (restComponent != null) {
+                String matrixUuid = configObj.getString("matrixUuid");
+                String uuidColumn = configObj.getString("uuidColumn");
+                List<String> uuidList = selectUuidList.toJavaList(String.class);
+                JSONObject paramObj = new JSONObject();
+                paramObj.put("matrixUuid", matrixUuid);
+                paramObj.put("columnList", columnList);
+                paramObj.put("uuidList", uuidList);
+                paramObj.put("uuidColumn", uuidColumn);
+                paramObj.put("needPage", false);
+                try {
+                    JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
+                    if (MapUtils.isNotEmpty(resultObj)) {
+                        JSONArray theadList = resultObj.getJSONArray("theadList");
+                        JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+                        JSONArray attributeList = configObj.getJSONArray("attributeList");
+                        if (CollectionUtils.isNotEmpty(attributeList)) {
+                            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+                            setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
+                        }
+                        tableObj.put("selectUuidList", selectUuidList);
+                        tableObj.put("theadList", theadList);
+                        tableObj.put("tbodyList", tbodyList);
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+        return tableObj;
+    }
+    private JSONObject integrationDataSourceNoNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        tableObj.put("selectUuidList", selectUuidList);
+        JSONObject table = dataObj.getJSONObject("table");
+        if (MapUtils.isNotEmpty(table)) {
+            JSONArray theadList = table.getJSONArray("theadList");
+            JSONArray tbodyList = table.getJSONArray("tbodyList");
+            JSONArray attributeList = configObj.getJSONArray("attributeList");
+            if (CollectionUtils.isNotEmpty(attributeList)) {
+                JSONObject valueObj = dataObj.getJSONObject("value");
+                setExtAttributeData(theadList, tbodyList, configObj, valueObj);
+            }
+            tableObj.put("theadList", theadList);
+            tableObj.put("tbodyList", tbodyList);
         }
         return tableObj;
     }

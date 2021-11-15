@@ -172,7 +172,8 @@
 
     </select>
 
-    <select id="searchRunnerGroup" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
+    <select id="searchRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+            resultMap="runnerGroupMap" useCache="false">
         SELECT
         g.`id` as id,
         g.`name` as name,
@@ -212,7 +213,7 @@
         ) g
         LEFT JOIN runnergroup_network nk ON g.`id` = nk.`group_id`
         LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = g.`id`
-        LEFT JOIN runner r ON g.`id` = rgr.`runner_id`
+        LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
         ORDER BY g.`id` DESC, nk.`id` DESC
 
     </select>

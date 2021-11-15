@@ -127,8 +127,8 @@ public class RunnerGroupVo extends BasePageVo {
     }
 
     public Integer getRunnerCount() {
-        if (runnerCount == 0 && CollectionUtils.isNotEmpty(runnerList)) {
-            runnerCount = runnerList.size();
+        if (runnerCount == 0 && CollectionUtils.isNotEmpty(runnerIdList)) {
+            runnerCount = runnerIdList.size();
         }
         return runnerCount;
     }

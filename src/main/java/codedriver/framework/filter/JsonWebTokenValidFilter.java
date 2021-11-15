@@ -88,7 +88,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(request, response);
-                            if (userVo != null) {
+                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                                 UserContext.init(userVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                                     loginPostProcessor.loginAfterInitialization();

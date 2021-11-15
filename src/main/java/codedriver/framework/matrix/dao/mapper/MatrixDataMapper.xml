@@ -194,9 +194,9 @@
         </foreach>
         FROM `${schemaName}`.`matrix_${matrixUuid}`
         <where>
-            <if test="uuidList != null and uuidList.size() > 0">
+            <if test="defaultValue != null and defaultValue.size() > 0">
                 `uuid` in
-                <foreach collection="uuidList" open="(" close=")" item="uuid" separator=",">
+                <foreach collection="defaultValue" open="(" close=")" item="uuid" separator=",">
                     #{uuid}
                 </foreach>
             </if>
@@ -216,7 +216,7 @@
         </where>
     </select>
 
-    <select id="getDynamicTableDataByUuidCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <!--<select id="getDynamicTableDataByUuidCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
         COUNT(`id`)
@@ -229,7 +229,7 @@
                 </foreach>
             </if>
         </where>
-    </select>
+    </select>-->
 
     <select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT

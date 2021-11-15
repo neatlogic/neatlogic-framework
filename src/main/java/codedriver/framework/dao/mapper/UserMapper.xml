@@ -257,7 +257,7 @@
             </if>
         </where>
         <if test="keyword !=null and keyword != ''">
-            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
         </if>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}

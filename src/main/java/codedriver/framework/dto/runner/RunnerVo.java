@@ -97,11 +97,13 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getUrl() {
-        if (StringUtils.isBlank(url) && StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
-            if (Config.RUNNER_CONTEXT().startsWith("/")) {
-                this.url = protocol + "://" + host + ":" + port + Config.RUNNER_CONTEXT() + "/";
-            } else {
-                this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
+        if (StringUtils.isBlank(url) ) {
+            if(StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
+                if (Config.RUNNER_CONTEXT().startsWith("/")) {
+                    this.url = protocol + "://" + host + ":" + port + Config.RUNNER_CONTEXT() + "/";
+                } else {
+                    this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
+                }
             }
         } else if (StringUtils.isNotBlank(url)) {
             if (!this.url.endsWith("/")) {

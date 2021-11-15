@@ -32,6 +32,8 @@ public class RunnerGroupVo extends BasePageVo {
     private List<GroupNetworkVo> groupNetworkList;
     @EntityField(name = "runner列表", type = ApiParamType.JSONARRAY)
     private List<RunnerVo> runnerList;
+    @EntityField(name = "runner id 列表", type = ApiParamType.JSONARRAY)
+    private List<Long> runnerIdList;
     @EntityField(name = "组内runner个数", type = ApiParamType.INTEGER)
     private Integer runnerCount = 0;
 
@@ -114,6 +116,14 @@ public class RunnerGroupVo extends BasePageVo {
 
     public void setRunnerList(List<RunnerVo> runnerList) {
         this.runnerList = runnerList;
+    }
+
+    public List<Long> getRunnerIdList() {
+        return runnerIdList;
+    }
+
+    public void setRunnerIdList(List<Long> runnerIdList) {
+        this.runnerIdList = runnerIdList;
     }
 
     public Integer getRunnerCount() {

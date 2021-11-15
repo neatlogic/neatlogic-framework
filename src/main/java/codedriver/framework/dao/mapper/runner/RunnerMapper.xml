@@ -26,8 +26,8 @@
             <result column="networkIp" property="networkIp"/>
             <result column="mask" property="mask"/>
         </collection>
-        <collection property="runnerList" ofType="codedriver.framework.dto.runner.RunnerVo">
-            <id column="runnerId" property="id"/>
+        <collection property="runnerIdList" ofType="java.lang.Long">
+            <id column="runnerId"/>
         </collection>
     </resultMap>
 
@@ -171,37 +171,49 @@
 
     </select>
 
-    <select id="searchRunnerGroupDetail" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
-        SELECT DISTINCT
+    <select id="searchRunnerGroup" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
+        SELECT
+        g.`id` as id,
+        g.`name` as name,
+        g.`description`,
+        nk.`id` as networkId,
+        nk.`group_id` as groupId,
+        nk.`network_ip` as networkIp,
+        nk.`mask` as mask,
+        r.`id` as runnerId
+        FROM
+        (SELECT DISTINCT
         rg.`id`,
         rg.`name`,
-        rg.`description`,
-        c.`id` as networkId,
-        c.`group_id` as groupId,
-        c.`network_ip` as networkIp,
-        c.`mask` as mask,
-        rgr.`runner_id` as runnerId
+        rg.`description`
         FROM
         runnergroup rg
-        LEFT JOIN runnergroup_runner rgr ON rg.`id` = rgr.`runnergroup_id`
-        LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = rg.`id`
+        LEFT JOIN runner r ON rgr.`runner_id` = r.`id`
         LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
-        WHERE 1 = 1
-        <if test="keyword != null and keyword != ''">
-            AND (
-            rg.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
-            )
-        </if>
-        <if test="authType != null and authType != ''">
-            AND r.`auth_type` = #{authType}
-        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="authType != null and authType != ''">
+                AND r.`auth_type` = #{authType}
+            </if>
+        </where>
         ORDER BY rg.`id` DESC
         <if test="needPage == true">
             LIMIT #{startNum},#{pageSize}
         </if>
+        ) g
+        LEFT JOIN runnergroup_network nk ON g.`id` = nk.`group_id`
+        LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = g.`id`
+        LEFT JOIN runner r ON g.`id` = rgr.`runner_id`
+        ORDER BY g.`id` DESC, nk.`id` DESC
+
     </select>
 
     <select id="checkRunnerGroupIdIsExist" resultType="int" useCache="false">
@@ -277,7 +289,7 @@
     </select>
 
     <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerVo"
-            resultMap="runnerMap" useCache="false">#测试完成
+            resultMap="runnerMap" useCache="false">
         SELECT r.id AS id,
         r.name AS name,
         r.url AS url,
@@ -307,11 +319,11 @@
         </if>
     </select>
 
-    <select id="searchRunnerCountByGroupId" resultType="int" useCache="false"> #测试完成
-    select count(`id`)
-    from runner r
-             LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
-    where rgr.`runnergroup_id` = #{id}
+    <select id="searchRunnerCountByGroupId" resultType="int" useCache="false">
+        select count(`id`)
+        from runner r
+                 LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        where rgr.`runnergroup_id` = #{id}
     </select>
 
     <select id="searchRunnerCount" resultType="java.lang.Integer">
@@ -364,7 +376,7 @@
         where `id` = #{id}
     </delete>
 
-    <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">#测试完成
+    <update id="updateRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         UPDATE runner
         SET `name` = #{name},
         `host`=#{host},
@@ -401,25 +413,30 @@
           and port = #{port}
     </select>
 
-    <select id="searchRunnerVoListByIdList" resultType="codedriver.framework.dto.runner.RunnerVo">
-        select `id`, `name`, `host`, `port`, `url`, `access_key`, `access_secret`, `auth_type`, `public_key`,
-        `private_key`, `netty_ip`,
-        `netty_port`
-        from runner
-        <if test="list != null and list.size() > 0 ">
-            where `id` in
-            <foreach collection="list" item="value" open="(" close=")" separator=",">
-                #{value}
-            </foreach>
+    <select id="searchRunnerListByGroupVo" resultType="codedriver.framework.dto.runner.RunnerVo"
+            parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
+        select r.`id`, r.`name`, r.`host`, r.`port`, r.`url`, r.`auth_type`,
+        r.`netty_ip`,
+        r.`netty_port`
+        from runner r
+
+        <where>
+            <if test="runnerList != null and runnerList.size() > 0 ">
+                and r.`id` in
+                <foreach collection="runnerList" item="runnerVo" open="(" close=")" separator=",">
+                    #{runnerVo.id}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY r.`id` DESC
+        <if test="needPage == true">
+            limit #{startNum},#{pageSize}
         </if>
-        ORDER BY `id` DESC
-        <if test="runnerVo.needPage == true">
-            LIMIT #{runnerVo.startNum},#{runnerVo.pageSize}
-        </if>
+
     </select>
 
 
-    <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">#测试完成
+    <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         INSERT INTO runner(
         `id`,`name`,`host`,`port` ,`url`,
         <if test="accessKey != null and accessKey !='' and isAuth ==1">
@@ -452,13 +469,9 @@
     <insert id="insertRunnerGroupRunnerByRunnerIdListAndGroupId">
         insert into
         runnergroup_runner(runnergroup_id, runner_id) values
-        (
-        #{groupId},
-        <foreach collection="runnerIdList" item="runnerId" open="(" close=")" separator=",">
-            #{runnerId}
+        <foreach collection="runnerIdList" item="runnerId" separator=",">
+            ( #{groupId}, #{runnerId})
         </foreach>
-        )
-
     </insert>
 
     <delete id="deleteRunnerById">

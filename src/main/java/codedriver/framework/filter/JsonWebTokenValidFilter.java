@@ -76,16 +76,19 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             String tenant = request.getHeader("Tenant");
             if (TenantUtil.hasTenant(tenant)) {
                 hasTenant = true;
+                TenantContext.init();
+                TenantContext.get().switchTenant(tenant);
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 loginAuth = LoginAuthFactory.getLoginAuth("default");
                 userVo = loginAuth.auth(request, response);
                 if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
                     authType = request.getHeader("AuthType");
+                    logger.info("AuthType: "+ authType);
                     if (StringUtils.isNotBlank(authType)) {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(request, response);
-                            if (userVo != null) {
+                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                                 UserContext.init(userVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                                     loginPostProcessor.loginAfterInitialization();
@@ -99,8 +102,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 }
                 if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                     UserContext.init(userVo, timezone, request, response);
-                    TenantContext.init();
-                    TenantContext.get().switchTenant(tenant);
                     isUnExpired = userExpirationValid();
                     isAuth = true;
                 }

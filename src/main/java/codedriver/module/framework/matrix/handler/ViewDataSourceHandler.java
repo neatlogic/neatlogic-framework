@@ -198,15 +198,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
                 dataVo.setRowNum(rowNum);
             }
-            List<String> uuidList = null;
+            List<Map<String, String>> dataMapList = null;
             JSONArray dafaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
-                uuidList = dafaultValue.toJavaList(String.class);
-            } else {
-                uuidList = dataVo.getUuidList();
-            }
-            List<Map<String, String>> dataMapList = null;
-            if (CollectionUtils.isNotEmpty(uuidList)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
                 dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);

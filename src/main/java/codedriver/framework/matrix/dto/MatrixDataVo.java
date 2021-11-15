@@ -16,6 +16,9 @@ public class MatrixDataVo extends BasePageVo {
     private String matrixUuid;
     private List<String> columnList;
     private List<MatrixColumnVo> sourceColumnList;
+    /**
+     * 这个字段被super.defaultValue替代
+     */
     private List<String> uuidList;
     private String uuidColumn;
     private String keywordColumn;
@@ -60,10 +63,20 @@ public class MatrixDataVo extends BasePageVo {
         this.sourceColumnList = sourceColumnList;
     }
 
+    /**
+     * 这个方法被super.getDefaultValue()替代
+     * @return
+     */
+    @Deprecated
 	public List<String> getUuidList() {
 		return uuidList;
 	}
 
+    /**
+     * 这个方法被super.setDefaultValue()替代
+     * @param uuidList
+     */
+    @Deprecated
 	public void setUuidList(List<String> uuidList) {
 		this.uuidList = uuidList;
 	}

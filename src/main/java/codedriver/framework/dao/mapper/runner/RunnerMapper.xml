@@ -159,15 +159,16 @@
         LEFT JOIN runnergroup_runner rgr ON rg.`id` = rgr.`runnergroup_id`
         LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
-        WHERE 1 = 1
-        <if test="keyword != null and keyword != ''">
-            AND (
-            rg.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
-            )
-        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
 
     </select>
 
@@ -419,7 +420,6 @@
         r.`netty_ip`,
         r.`netty_port`
         from runner r
-
         <where>
             <if test="runnerList != null and runnerList.size() > 0 ">
                 and r.`id` in

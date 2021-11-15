@@ -151,7 +151,7 @@ public class DynamicListHandler extends FormHandlerBase {
                 }
             }
         }
-        ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/init/fortable");
+        ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/search/fortable");
         if (api != null) {
             MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
             if (restComponent != null) {

@@ -1,45 +1,43 @@
 package codedriver.framework.matrix.constvalue;
 
 import codedriver.framework.common.constvalue.IEnum;
+import codedriver.framework.matrix.core.IMatrixType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
-public enum MatrixType implements IEnum {
-    CUSTOM("custom", "自定义数据源", "custom"),
-    EXTERNAL("external", "外部数据源", "integrationUuid"),
-    VIEW("view", "视图", "fileId"),
-    CMDBCI("cmdbci", "cmdb模型", "ciId");
+public enum MatrixType implements IMatrixType, IEnum {
+    CUSTOM("custom", "自定义数据源", "custom", 1),
+    EXTERNAL("external", "外部数据源", "integrationUuid", 2),
+    VIEW("view", "视图", "fileId", 3);
 
     private String value;
     private String name;
     private String key;
-    MatrixType(String _value, String _name, String _key) {
+    private int sort;
+    MatrixType(String _value, String _name, String _key, int _sort) {
         this.value = _value;
         this.name = _name;
         this.key = _key;
+        this.sort = _sort;
     }
-
+    @Override
     public String getValue() {
         return value;
     }
-
+    @Override
     public String getName() {
         return name;
     }
-
+    @Override
     public String getKey() {
         return key;
     }
 
-    public static String getValue(String _value) {
-        for (MatrixType s : MatrixType.values()) {
-            if (s.getValue().equals(_value)) {
-                return s.getValue();
-            }
-        }
-        return null;
+    @Override
+    public int getSort() {
+        return sort;
     }
 
     public static String getName(String _value) {

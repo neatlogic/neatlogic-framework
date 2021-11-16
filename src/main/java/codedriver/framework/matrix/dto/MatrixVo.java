@@ -1,11 +1,11 @@
 package codedriver.framework.matrix.dto;
 
 import codedriver.framework.file.dto.FileVo;
+import codedriver.framework.matrix.core.MatrixTypeFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
-import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.restful.annotation.EntityField;
 
 /**
@@ -80,7 +80,7 @@ public class MatrixVo extends BaseEditorVo {
 
     public String getTypeName() {
         if (StringUtils.isNotBlank(type)){
-            return MatrixType.getName(type);
+            return MatrixTypeFactory.getName(type);
         }
         return typeName;
     }

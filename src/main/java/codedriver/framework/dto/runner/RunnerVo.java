@@ -60,7 +60,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
     @EntityField(name = "被runner组引用个数", type = ApiParamType.INTEGER)
     private Integer usedCount = 0;
     @EntityField(name = "是否为runner组", type = ApiParamType.INTEGER)
-    private Integer isGroup = 0;
+    private Integer isFilterGroup = 0;
     private List<RunnerAuthVo> runnerAuthList;
 
     public Long getId() {
@@ -245,12 +245,12 @@ public class RunnerVo extends BasePageVo implements Serializable {
         this.usedCount = usedCount;
     }
 
-    public Integer getIsGroup() {
-        return isGroup;
+    public Integer getIsFilterGroup() {
+        return isFilterGroup;
     }
 
-    public void setIsGroup(Integer isGroup) {
-        this.isGroup = isGroup;
+    public void setIsFilterGroup(Integer isFilterGroup) {
+        this.isFilterGroup = isFilterGroup;
     }
 
     public enum HttpProtocol implements IEnum {

@@ -159,17 +159,7 @@
         LEFT JOIN runnergroup_runner rgr ON rg.`id` = rgr.`runnergroup_id`
         LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
-        <where>
-            <if test="keyword != null and keyword != ''">
-                AND (
-                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
-                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
-                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
-                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
-                )
-            </if>
-        </where>
-
+        <include refid="searchRunnerGroup"></include>
     </select>
 
     <select id="searchRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
@@ -193,19 +183,7 @@
         LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = rg.`id`
         LEFT JOIN runner r ON rgr.`runner_id` = r.`id`
         LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
-        <where>
-            <if test="keyword != null and keyword != ''">
-                AND (
-                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
-                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
-                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
-                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
-                )
-            </if>
-            <if test="authType != null and authType != ''">
-                AND r.`auth_type` = #{authType}
-            </if>
-        </where>
+        <include refid="searchRunnerGroup"></include>
         ORDER BY rg.`id` DESC
         <if test="needPage == true">
             LIMIT #{startNum},#{pageSize}
@@ -318,11 +296,36 @@
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
+        <include refid="searchRunner"></include>
+        ORDER BY id DESC
+        <if test="needPage == true">
+            LIMIT #{startNum},#{pageSize}
+        </if>)g
+        LEFT JOIN runnergroup_runner rgr on g.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
+    </select>
+
+    <sql id="searchRunnerGroup">
         <where>
-            <if test="groupId != null and isGroup == 0">
+            <if test="keyword != null and keyword != ''">
+                AND (
+                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="authType != null and authType != ''">
+                AND r.`auth_type` = #{authType}
+            </if>
+        </where>
+    </sql>
+    <sql id="searchRunner">
+        <where>
+            <if test="groupId != null and isFilterGroup == 0">
                 AND rgr.`runnergroup_id` =#{groupId}
             </if>
-            <if test="groupId != null and isGroup == 1">
+            <if test="groupId != null and isFilterGroup == 1">
                 AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
                 a.id = r.id and b.runnergroup_id =#{groupId})
             </if>
@@ -331,13 +334,7 @@
                 OR r.`host` LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        ORDER BY id DESC
-        <if test="needPage == true">
-            LIMIT #{startNum},#{pageSize}
-        </if>)g
-        LEFT JOIN runnergroup_runner rgr on g.`id` = rgr.`runner_id`
-        LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
-    </select>
+    </sql>
 
     <select id="searchRunnerCountByGroupId" resultType="int" useCache="false">
         select count(`id`)
@@ -350,18 +347,7 @@
         select count(distinct `id`)
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
-        <where>
-            <if test="groupId != null and isGroup == 0">
-                AND rgr.`runnergroup_id` =#{groupId}
-            </if>
-            <if test="groupId != null and isGroup == 1">
-                AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
-                a.id = r.id and b.runnergroup_id =#{groupId})
-            </if>
-            <if test="keyword != null and keyword != '' ">
-                AND (`host` LIKE concat('%', #{keyword}, '%') OR `name` LIKE concat('%', #{keyword}, '%'))
-            </if>
-        </where>
+        <include refid="searchRunner"></include>
     </select>
 
     <update id="updateRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
@@ -430,8 +416,15 @@
 
     <select id="checkRunnerIsUsed" resultType="int">
         select count(1)
-        from runnergroup_runner
-        where runner_id = #{value}
+        from (
+            select rgr.runner_id
+              from runnergroup_runner rgr
+              where runner_id = #{id}
+              union
+              select rm.runner_id
+              from runner_map rm
+              where rm.`runner_id` = #{id}
+            )a
     </select>
 
     <select id="checkRunnerIsExistByIpAndPort" resultType="int">

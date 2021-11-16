@@ -17,7 +17,6 @@ import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerBase;
-import codedriver.framework.matrix.dao.mapper.MatrixExternalMapper;
 import codedriver.framework.matrix.dto.*;
 import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
 import codedriver.framework.matrix.exception.MatrixExternalAccessException;
@@ -53,12 +52,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     private IntegrationMapper integrationMapper;
 
     @Resource
-    private MatrixExternalMapper matrixExternalMapper;
-
-    @Resource
-    private MatrixExternalMapper externalMapper;
-
-    @Resource
     private MatrixService matrixService;
 
     @Override
@@ -72,7 +65,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (StringUtils.isBlank(integrationUuid)) {
             throw new ParamNotExistsException("integrationUuid");
         }
-        MatrixExternalVo oldExternalVo = externalMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
+        MatrixExternalVo oldExternalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (oldExternalVo != null) {
             if (integrationUuid.equals(oldExternalVo.getIntegrationUuid())) {
                 return false;
@@ -80,13 +73,13 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         matrixService.validateMatrixExternalData(integrationUuid);
         MatrixExternalVo externalVo = new MatrixExternalVo(matrixVo.getUuid(), integrationUuid);
-        externalMapper.replaceMatrixExternal(externalVo);
+        matrixMapper.replaceMatrixExternal(externalVo);
         return true;
     }
 
     @Override
     protected void myGetMatrix(MatrixVo matrixVo) {
-        MatrixExternalVo matrixExternalVo = externalMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
+        MatrixExternalVo matrixExternalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (matrixExternalVo == null) {
             throw new MatrixExternalNotFoundException(matrixVo.getName());
         }
@@ -95,7 +88,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected void myDeleteMatrix(String uuid) {
-        matrixExternalMapper.deleteMatrixExternalByMatrixUuid(uuid);
+        matrixMapper.deleteMatrixExternalByMatrixUuid(uuid);
     }
 
     @Override
@@ -111,7 +104,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected HSSFWorkbook myExportMatrix(MatrixVo matrixVo) {
         HSSFWorkbook workbook = null;
-        MatrixExternalVo externalVo = externalMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(matrixVo.getName());
         }
@@ -152,7 +145,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected List<MatrixAttributeVo> myGetAttributeList(MatrixVo matrixVo) {
-        MatrixExternalVo externalVo = matrixExternalMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(matrixVo.getName());
         }
@@ -175,7 +168,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myGetTableData(MatrixDataVo dataVo) {
 
-        MatrixExternalVo externalVo = externalMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
         }
@@ -227,7 +220,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         JSONObject returnObj = new JSONObject();
-        MatrixExternalVo externalVo = matrixExternalMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
         }
@@ -319,7 +312,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo) {
-        MatrixExternalVo externalVo = matrixExternalMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
         }

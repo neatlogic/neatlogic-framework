@@ -9,7 +9,8 @@ import java.util.List;
 public enum MatrixType implements IEnum {
     CUSTOM("custom", "自定义数据源", "custom"),
     EXTERNAL("external", "外部数据源", "integrationUuid"),
-    VIEW("view", "视图", "fileId");
+    VIEW("view", "视图", "fileId"),
+    CMDBCI("cmdbci", "cmdb模型", "ciId");
 
     private String value;
     private String name;

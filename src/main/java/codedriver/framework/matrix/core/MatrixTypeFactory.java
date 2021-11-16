@@ -20,31 +20,22 @@ import java.util.Set;
  * @since 2021/11/16 15:24
  **/
 public class MatrixTypeFactory implements IEnum {
-    private static volatile boolean isUninitialed = true;
 
     private static List<IMatrixType> list = new ArrayList<>();
 
-    public static List<IMatrixType> getMatrixTypeList() {
-        if (isUninitialed) {
-            synchronized (MatrixTypeFactory.class) {
-                if (isUninitialed) {
-                    Reflections reflections = new Reflections("codedriver");
-                    Set<Class<? extends IMatrixType>> classSet = reflections.getSubTypesOf(IMatrixType.class);
-                    for (Class<? extends IMatrixType> c : classSet) {
-                        for (IMatrixType obj : c.getEnumConstants()) {
-                            list.add(obj);
-                        }
-                    }
-                    list.sort(Comparator.comparingInt(IMatrixType::getSort));
-                    isUninitialed = false;
-                }
+    static {
+        Reflections reflections = new Reflections("codedriver");
+        Set<Class<? extends IMatrixType>> classSet = reflections.getSubTypesOf(IMatrixType.class);
+        for (Class<? extends IMatrixType> c : classSet) {
+            for (IMatrixType obj : c.getEnumConstants()) {
+                list.add(obj);
             }
         }
-        return list;
+        list.sort(Comparator.comparingInt(IMatrixType::getSort));
     }
 
     public static String getName(String _value) {
-        for (IMatrixType s : getMatrixTypeList()) {
+        for (IMatrixType s : list) {
             if (s.getValue().equals(_value)) {
                 return s.getName();
             }
@@ -55,7 +46,7 @@ public class MatrixTypeFactory implements IEnum {
     @Override
     public List getValueTextList() {
         JSONArray array = new JSONArray();
-        for(IMatrixType type : getMatrixTypeList()){
+        for(IMatrixType type : list){
             array.add(new JSONObject(){
                 {
                     this.put("value",type.getValue());

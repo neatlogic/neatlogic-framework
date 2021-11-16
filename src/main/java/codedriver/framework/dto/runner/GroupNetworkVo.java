@@ -7,15 +7,16 @@ package codedriver.framework.dto.runner;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.SnowflakeUtil;
 
 /**
  * @author lvzk
  * @since 2021/4/12 14:54
  **/
-public class GroupNetworkVo extends NetworkVo{
+public class GroupNetworkVo extends NetworkVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
-    @EntityField(name = "runner id",type = ApiParamType.LONG)
+    @EntityField(name = "runner id", type = ApiParamType.LONG)
     private Long runnerId;
     @EntityField(name = "runner 分组名", type = ApiParamType.STRING)
     private String name;
@@ -23,6 +24,9 @@ public class GroupNetworkVo extends NetworkVo{
     private Long groupId;
 
     public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
         return id;
     }
 

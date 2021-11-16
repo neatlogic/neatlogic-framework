@@ -8,7 +8,7 @@ package codedriver.framework.exception.runner;
 import codedriver.framework.exception.core.ApiRuntimeException;
 
 public class RunnerGroupNetworkSameException extends ApiRuntimeException {
-    public RunnerGroupNetworkSameException(String checkIpMask) {
-        super(checkIpMask + "的网段重复" + "请删除");
+    public RunnerGroupNetworkSameException() {
+        super("含有相同网段,请检查");
     }
 }

@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author lvzk
@@ -60,6 +59,8 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private Integer isAuth;
     @EntityField(name = "被runner组引用个数", type = ApiParamType.INTEGER)
     private Integer usedCount = 0;
+    @EntityField(name = "是否为runner组", type = ApiParamType.INTEGER)
+    private Integer isGroup = 0;
     private List<RunnerAuthVo> runnerAuthList;
 
     public Long getId() {
@@ -97,17 +98,17 @@ public class RunnerVo extends BasePageVo implements Serializable {
     }
 
     public String getUrl() {
-        if (StringUtils.isBlank(url) ) {
-            if(StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
+        if (StringUtils.isNotBlank(url)) {
+            if (!this.url.endsWith("/")) {
+                this.url = this.url + "/";
+            }
+        } else {
+            if (StringUtils.isNotBlank(protocol) && StringUtils.isNotBlank(host) && port != null) {
                 if (Config.RUNNER_CONTEXT().startsWith("/")) {
                     this.url = protocol + "://" + host + ":" + port + Config.RUNNER_CONTEXT() + "/";
                 } else {
                     this.url = protocol + "://" + host + ":" + port + "/" + Config.RUNNER_CONTEXT() + "/";
                 }
-            }
-        } else if (StringUtils.isNotBlank(url)) {
-            if (!this.url.endsWith("/")) {
-                this.url = this.url + "/";
             }
         }
         return url;
@@ -242,6 +243,14 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setUsedCount(Integer usedCount) {
         this.usedCount = usedCount;
+    }
+
+    public Integer getIsGroup() {
+        return isGroup;
+    }
+
+    public void setIsGroup(Integer isGroup) {
+        this.isGroup = isGroup;
     }
 
     public enum HttpProtocol implements IEnum {

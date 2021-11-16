@@ -292,23 +292,39 @@
 
     <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerVo"
             resultMap="runnerMap" useCache="false">
-        SELECT r.id AS id,
-        r.name AS name,
-        r.url AS url,
-        r.netty_port AS nettyPort,
-        r.access_key AS accessKey,
-        r.access_secret AS accessSecret,
-        r.auth_type AS authType,
+        SELECT
+        g.id AS id,
+        g.name AS name,
+        g.url AS url,
+        g.netty_port AS nettyPort,
+        g.access_key AS accessKey,
+        g.access_secret AS accessSecret,
+        g.auth_type AS authType,
         rgr.runnergroup_id AS groupId,
         rg.name AS groupName,
+        g.host,
+        g.port
+        from
+        (SELECT DISTINCT
+        r.id,
+        r.name,
+        r.url,
+        r.netty_port,
+        r.access_key,
+        r.access_secret,
+        r.auth_type,
         r.host,
         r.port
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
         <where>
-            <if test="groupId != null">
+            <if test="groupId != null and isGroup == 0">
                 AND rgr.`runnergroup_id` =#{groupId}
+            </if>
+            <if test="groupId != null and isGroup == 1">
+                AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
+                a.id = r.id and b.runnergroup_id =#{groupId})
             </if>
             <if test="keyword != null and keyword != ''">
                 AND ( r.`name` LIKE CONCAT('%', #{keyword}, '%')
@@ -318,7 +334,9 @@
         ORDER BY id DESC
         <if test="needPage == true">
             LIMIT #{startNum},#{pageSize}
-        </if>
+        </if>)g
+        LEFT JOIN runnergroup_runner rgr on g.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
     </select>
 
     <select id="searchRunnerCountByGroupId" resultType="int" useCache="false">
@@ -329,9 +347,17 @@
     </select>
 
     <select id="searchRunnerCount" resultType="java.lang.Integer">
-        select count(`id`)
-        from runner
+        select count(distinct `id`)
+        from runner r
+        LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         <where>
+            <if test="groupId != null and isGroup == 1">
+                AND rgr.`runnergroup_id` =#{groupId}
+            </if>
+            <if test="groupId != null and isGroup == 0">
+                AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
+                a.id = r.id and b.runnergroup_id =#{groupId})
+            </if>
             <if test="keyword != null and keyword != '' ">
                 AND (`host` LIKE concat('%', #{keyword}, '%') OR `name` LIKE concat('%', #{keyword}, '%'))
             </if>
@@ -414,28 +440,6 @@
         where host = #{host}
           and port = #{port}
     </select>
-
-    <select id="searchRunnerListByGroupVo" resultType="codedriver.framework.dto.runner.RunnerVo"
-            parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
-        select r.`id`, r.`name`, r.`host`, r.`port`, r.`url`, r.`auth_type`,
-        r.`netty_ip`,
-        r.`netty_port`
-        from runner r
-        <where>
-            <if test="runnerList != null and runnerList.size() > 0 ">
-                and r.`id` in
-                <foreach collection="runnerList" item="runnerVo" open="(" close=")" separator=",">
-                    #{runnerVo.id}
-                </foreach>
-            </if>
-        </where>
-        ORDER BY r.`id` DESC
-        <if test="needPage == true">
-            limit #{startNum},#{pageSize}
-        </if>
-
-    </select>
-
 
     <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         INSERT INTO runner(

@@ -417,21 +417,24 @@
     <select id="checkRunnerIsUsed" resultType="int">
         select count(1)
         from (
-            select rgr.runner_id
-              from runnergroup_runner rgr
-              where runner_id = #{id}
-              union
-              select rm.runner_id
-              from runner_map rm
-              where rm.`runner_id` = #{id}
-            )a
+                 select rgr.runner_id
+                 from runnergroup_runner rgr
+                 where runner_id = #{id}
+                 union
+                 select rm.runner_id
+                 from runner_map rm
+                 where rm.`runner_id` = #{id}
+             ) a
     </select>
 
-    <select id="checkRunnerIsExistByIpAndPort" resultType="int">
+    <select id="checkRunnerIsExistByIdAndIpAndPort" resultType="int">
         select count(1)
         from runner
         where host = #{host}
-          and port = #{port}
+        and port = #{port}
+        <if test="id != null">
+            and id != #{id}
+        </if>
     </select>
 
     <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">

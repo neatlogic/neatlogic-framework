@@ -59,7 +59,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private Integer isAuth;
     @EntityField(name = "被runner组引用个数", type = ApiParamType.INTEGER)
     private Integer usedCount = 0;
-    @EntityField(name = "是否为runner组", type = ApiParamType.INTEGER)
+    @EntityField(name = "是否过滤runner组", type = ApiParamType.INTEGER)
     private Integer isFilterGroup = 0;
     private List<RunnerAuthVo> runnerAuthList;
 

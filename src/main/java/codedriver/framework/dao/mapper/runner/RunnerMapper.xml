@@ -154,7 +154,7 @@
 
     <select id="searchRunnerGroupCount" resultType="int" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
             useCache="false">
-        select count(distinct rg.id)
+        select count(rg.id)
         from runnergroup rg
         LEFT JOIN runnergroup_runner rgr ON rg.`id` = rgr.`runnergroup_id`
         LEFT JOIN runner r ON r.`id` = rgr.`runner_id`

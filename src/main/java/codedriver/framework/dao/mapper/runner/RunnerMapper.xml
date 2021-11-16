@@ -351,10 +351,10 @@
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         <where>
-            <if test="groupId != null and isGroup == 1">
+            <if test="groupId != null and isGroup == 0">
                 AND rgr.`runnergroup_id` =#{groupId}
             </if>
-            <if test="groupId != null and isGroup == 0">
+            <if test="groupId != null and isGroup == 1">
                 AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
                 a.id = r.id and b.runnergroup_id =#{groupId})
             </if>

@@ -16,7 +16,6 @@ import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerBase;
 import codedriver.framework.matrix.dao.mapper.MatrixDataMapper;
-import codedriver.framework.matrix.dao.mapper.MatrixViewMapper;
 import codedriver.framework.matrix.dto.*;
 import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
 import codedriver.framework.matrix.exception.MatrixViewNotFoundException;
@@ -52,22 +51,17 @@ import java.util.stream.Collectors;
 public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
-    private MatrixViewMapper viewMapper;
-
-    @Resource
-    private MatrixService matrixService;
-
-    @Resource
     private FileMapper fileMapper;
-
-    @Resource
-    private MatrixViewMapper matrixViewMapper;
 
     @Resource
     private MatrixDataMapper matrixDataMapper;
 
     @Resource
+    private MatrixService matrixService;
+
+    @Resource
     private SchemaMapper schemaMapper;
+
     @Override
     public String getHandler() {
         return MatrixType.VIEW.getValue();
@@ -83,7 +77,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (fileVo == null) {
             throw new FileNotFoundException(fileId);
         }
-        MatrixViewVo oldMatrixViewVo = viewMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
+        MatrixViewVo oldMatrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
         if (oldMatrixViewVo != null) {
             if (fileId.equals(oldMatrixViewVo.getFileId())) {
                 return false;
@@ -101,13 +95,13 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         JSONObject config = new JSONObject();
         config.put("attributeList", matrixAttributeVoList);
         matrixViewVo.setConfig(config.toJSONString());
-        viewMapper.replaceMatrixView(matrixViewVo);
+        matrixMapper.replaceMatrixView(matrixViewVo);
         return true;
     }
 
     @Override
     protected void myGetMatrix(MatrixVo matrixVo) {
-        MatrixViewVo matrixViewVo = viewMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(matrixVo.getName());
         }
@@ -122,7 +116,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected void myDeleteMatrix(String uuid) {
-        matrixViewMapper.deleteMatrixViewByMatrixUuid(uuid);
+        matrixMapper.deleteMatrixViewByMatrixUuid(uuid);
         schemaMapper.deleteView(TenantContext.get().getDataDbName() + ".matrix_" + uuid);
     }
 
@@ -148,7 +142,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected List<MatrixAttributeVo> myGetAttributeList(MatrixVo matrixVo) {
-        MatrixViewVo matrixViewVo = matrixViewMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(matrixVo.getName());
         }
@@ -163,7 +157,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-        MatrixViewVo matrixViewVo = viewMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(dataVo.getMatrixUuid());
         }
@@ -187,7 +181,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         JSONObject returnObj = new JSONObject();
-        MatrixViewVo matrixViewVo = viewMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(dataVo.getUuid());
         }
@@ -216,7 +210,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
-        MatrixViewVo matrixViewVo = viewMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(dataVo.getMatrixUuid());
         }

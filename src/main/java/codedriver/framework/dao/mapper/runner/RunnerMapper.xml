@@ -26,18 +26,8 @@
             <result column="networkIp" property="networkIp"/>
             <result column="mask" property="mask"/>
         </collection>
-        <collection property="runnerList" ofType="codedriver.framework.dto.runner.RunnerVo">
-            <id column="runnerId" property="id"/>
-            <result column="runnerGroupId" property="groupId"/>
-            <result column="runnerName" property="name"/>
-            <result column="protocol" property="protocol"/>
-            <result column="port" property="port"/>
-            <result column="url" property="url"/>
-            <result column="accessKey" property="accessKey"/>
-            <result column="accessSecret" property="accessSecret"/>
-            <result column="authType" property="authType"/>
-            <result column="nettyIp" property="nettyIp"/>
-            <result column="nettyPort" property="nettyPort"/>
+        <collection property="runnerIdList" ofType="java.lang.Long">
+            <id column="runnerId"/>
         </collection>
     </resultMap>
 
@@ -66,9 +56,12 @@
         <result column="name" property="name"/>
         <result column="url" property="url"/>
         <result column="nettyPort" property="nettyPort"/>
-        <result column="groupId" property="groupId"/>
         <result column="host" property="host"/>
         <result column="port" property="port"/>
+        <collection property="runnerGroupVoList" ofType="codedriver.framework.dto.runner.RunnerGroupVo">
+            <id column="groupId" property="id"/>
+            <result column="groupName" property="name"/>
+        </collection>
         <collection property="runnerAuthList" ofType="codedriver.framework.dto.runner.RunnerAuthVo">
             <result column="authType" property="authType"/>
             <result column="accessKey" property="accessKey"/>
@@ -76,29 +69,24 @@
         </collection>
     </resultMap>
 
+    <resultMap id="runnerMapMap" type="codedriver.framework.dto.runner.RunnerMapVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="host" property="host"/>
+        <result column="port" property="port"/>
+        <result column="accessKey" property="accessKey"/>
+        <result column="accessSecret" property="accessSecret"/>
+        <result column="authType" property="authType"/>
+        <result column="runnerMapId" property="runnerMapId"/>
+        <result column="publicKey" property="publicKey"/>
+        <result column="privateKey" property="privateKey"/>
+        <collection property="runnerGroupVoList" ofType="codedriver.framework.dto.runner.RunnerGroupVo">
+            <result column="groupId" property="id"/>
+        </collection>
+    </resultMap>
+
     <select id="getRunnerMapGroupById" resultMap="runnerMapGroupMap" useCache="false">
-    SELECT a.id              id,
-    a.name            name,
-    c.id           AS runnerId,
-    d.`id`         AS runnerMapId,
-    c.`auth_type`  AS authType,
-    c.`access_key` AS accessKey,
-    c.`access_secret`
-    AS accessSecret,
-    c.`url`        AS url,
-    c.`name`       AS runnerName,
-    b.id              networkId,
-    b.group_id        groupId,
-    b.network_ip      networkIp,
-    b.mask            mask
-    FROM `runnergroup` a
-    LEFT JOIN `runnergroup_network` b ON a.id = b.group_id
-    LEFT JOIN `runner` c ON a.id = c.group_id
-    LEFT JOIN `runner_map` d ON c.id = d.`runner_id`
-    WHERE a.id = #{id}
-    </select>
-    
-    <select id="getRunnerGroupById" resultMap="runnerGroupMap" useCache="false">
         SELECT a.id              id,
                a.name            name,
                c.id           AS runnerId,
@@ -109,17 +97,19 @@
                               AS accessSecret,
                c.`url`        AS url,
                c.`name`       AS runnerName,
-               b.id              networkId,
-               b.group_id        groupId,
-               b.network_ip      networkIp,
-               b.mask            mask
+               b.`id`            networkId,
+               b.`group_id`      groupId,
+               b.`network_ip`    networkIp,
+               b.`mask`          mask
         FROM `runnergroup` a
-                 LEFT JOIN `runnergroup_network` b ON a.id = b.group_id
-                 LEFT JOIN `runner` c ON a.id = c.group_id
-                 LEFT JOIN `runner_map` d ON c.id = d.`runner_id`
-        WHERE a.id = #{id}
+                 LEFT JOIN `runnergroup_network` b ON a.`id` = b.`group_id`
+                 LEFT JOIN `runnergroup_runner` e ON e.`runnergroup_id` = a.`id`
+                 LEFT JOIN `runner` c ON c.`id` = e.`runner_id`
+                 LEFT JOIN `runner_map` d ON c.`id` = d.`runner_id`
+        WHERE a.`id` = #{id}
     </select>
-    <select id="getAllRunnerMap" resultType="codedriver.framework.dto.runner.RunnerMapVo" useCache="false">
+
+    <select id="getAllRunnerMap" resultMap="runnerMapMap" useCache="false">
         SELECT ar.`id`,
                ar.`name`,
                ar.`url`,
@@ -130,25 +120,27 @@
                ar.`auth_type`                          AS authType,
                ar.`public_key`                         AS publicKey,
                ar.`private_key`                        AS privateKey,
-               ar.`group_id`                           AS groupId,
+               rgr.`runnergroup_id`                    AS groupId,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
                  JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+                 LEFT JOIN `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
     </select>
 
-    <select id="getRunnerById" resultType="codedriver.framework.dto.runner.RunnerVo" useCache="false">
+    <select id="getRunnerById" resultMap="runnerMap" useCache="false">
         SELECT `id`,
                `name`,
                `url`,
                `host`,
                `port`,
-               `access_key`    as accessKey,
-               `access_secret` as accessSecret,
-               `auth_type`     as authType,
-               `public_key`    as publicKey,
-               `private_key`   as privateKey,
-               `group_id`      as groupId
-        FROM `runner`
+               `access_key`         as accessKey,
+               `access_secret`      as accessSecret,
+               `auth_type`          as authType,
+               `public_key`         as publicKey,
+               `private_key`        as privateKey,
+               rgr.`runnergroup_id` as groupId
+        FROM `runner` r
+                 LEFT JOIN runnergroup_runner rgr on r.id = rgr.runner_id
         WHERE `id` = #{value}
     </select>
 
@@ -160,12 +152,18 @@
           and `name` = #{name}
     </select>
 
-    <select id="searchRunnerGroupCount" resultType="int" useCache="false">
-        select count(1)
-        from runnergroup
+    <select id="searchRunnerGroupCount" resultType="int" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+            useCache="false">
+        select count(rg.id)
+        from runnergroup rg
+        LEFT JOIN runnergroup_runner rgr ON rg.`id` = rgr.`runnergroup_id`
+        LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
+        <include refid="searchRunnerGroup"></include>
     </select>
 
-    <select id="searchRunnerGroupDetail" parameterType="java.lang.String" resultMap="runnerGroupMap" useCache="false">
+    <select id="searchRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+            resultMap="runnerGroupMap" useCache="false">
         SELECT
         g.`id` as id,
         g.`name` as name,
@@ -174,17 +172,7 @@
         nk.`group_id` as groupId,
         nk.`network_ip` as networkIp,
         nk.`mask` as mask,
-        r.`id` as runnerId,
-        r.`group_id` as runnerGroupId,
-        r.`name` as runnerName,
-        r.`url` as url,
-        r.`host` as host,
-        r.`port`,
-        r.`netty_ip` as nettyIp,
-        r.`netty_port` as nettyPort,
-        r.`access_key` as accessKey,
-        r.`access_secret` as accessSecret,
-        r.`auth_type` as authType
+        r.`id` as runnerId
         FROM
         (SELECT DISTINCT
         rg.`id`,
@@ -192,28 +180,20 @@
         rg.`description`
         FROM
         runnergroup rg
-        LEFT JOIN runner r ON rg.`id` = r.`group_id`
+        LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = rg.`id`
+        LEFT JOIN runner r ON rgr.`runner_id` = r.`id`
         LEFT JOIN runnergroup_network c ON rg.`id` = c.`group_id`
-        WHERE 1 = 1
-        <if test="keyword != null and keyword != ''">
-            AND (
-            rg.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
-            OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
-            OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
-            )
-        </if>
-        <if test="authType != null and authType != ''">
-            AND r.`auth_type` = #{authType}
-        </if>
+        <include refid="searchRunnerGroup"></include>
         ORDER BY rg.`id` DESC
         <if test="needPage == true">
             LIMIT #{startNum},#{pageSize}
         </if>
         ) g
         LEFT JOIN runnergroup_network nk ON g.`id` = nk.`group_id`
-        LEFT JOIN runner r ON g.`id` = r.`group_id`
+        LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = g.`id`
+        LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
         ORDER BY g.`id` DESC, nk.`id` DESC
+
     </select>
 
     <select id="checkRunnerGroupIdIsExist" resultType="int" useCache="false">
@@ -229,91 +209,145 @@
           and `name` = #{name};
     </select>
 
-    <select id="checkRunnerNameIsExistByName" resultType="int" useCache="false">
-        select count(1)
-        from runner
-        where `name` = #{name};
-    </select>
-
     <select id="checkRunnerIdIsExist" resultType="int" useCache="false">
         select count(1)
         from runner
         where `id` = #{id}
     </select>
-    <select id="getRunnerByIp" parameterType="java.lang.String" resultType="codedriver.framework.dto.runner.RunnerVo"
+
+    <select id="getRunnerByIp" parameterType="java.lang.String" resultMap="runnerMap"
             useCache="false">
-        SELECT p.`id`            AS id,
-               p.`name`          AS name,
-               p.`url`           AS url,
-               p.`access_key`    AS accessKey,
-               p.`access_secret` AS accessSecret,
-               p.`auth_type`     AS authType,
-               p.`group_id`      AS groupId,
+        SELECT p.`id`               AS id,
+               p.`name`             AS name,
+               p.`url`              AS url,
+               p.`access_key`       AS accessKey,
+               p.`access_secret`    AS accessSecret,
+               p.`auth_type`        AS authType,
+               rgr.`runnergroup_id` AS groupId,
                p.`host`,
                p.`port`
         FROM runner p
+                 LEFT JOIN runnergroup_runner rgr on p.id = rgr.runner_id
         WHERE p.host = #{value}
     </select>
 
     <select id="getRunnerListByGroupId" parameterType="java.lang.Long"
-            resultType="codedriver.framework.dto.runner.RunnerVo" useCache="true">
-        SELECT r.id            AS id,
-               r.name          AS name,
-               r.url           AS url,
-               r.access_key    AS accessKey,
-               r.access_secret AS accessSecret,
-               r.auth_type     AS authType,
-               r.group_id      AS groupId,
-               r.netty_ip      as nettyIp,
-               r.netty_port    as nettyPort,
-               r.host,
-               r.port
+            resultMap="runnerMap" useCache="true">
+        SELECT r.`id`               AS id,
+               r.`name`             AS name,
+               r.`url`              AS url,
+               r.`access_key`       AS accessKey,
+               r.`access_secret`    AS accessSecret,
+               r.`auth_type`        AS authType,
+               rgr.`runnergroup_id` AS groupId,
+               r.`netty_ip`         as nettyIp,
+               r.`netty_port`       as nettyPort,
+               r.`host`,
+               r.`port`
         FROM runner r
-        WHERE r.group_id = #{value}
+                 LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        WHERE rgr.`runnergroup_id` = #{value}
         ORDER BY id
     </select>
 
-    <select id="getRunnerByIpAndPort" resultType="codedriver.framework.dto.runner.RunnerVo" useCache="false">
-        SELECT `id`,
-               `name`,
-               `url`,
-               `host`,
-               `port`,
-               `access_key`    as accessKey,
-               `access_secret` as accessSecret,
-               `auth_type`     as authType,
-               `public_key`    as publicKey,
-               `private_key`   as privateKey,
-               `group_id`      as groupId
-        FROM `runner`
-        WHERE `host` = #{host}
-          and `port` = #{port}
+    <select id="getRunnerByIpAndPort" resultMap="runnerMap" useCache="false">
+        SELECT r.`id`,
+               r.`name`,
+               r.`url`,
+               r.`host`,
+               r.`port`,
+               r.`access_key`       as accessKey,
+               r.`access_secret`    as accessSecret,
+               r.`auth_type`        as authType,
+               r.`public_key`       as publicKey,
+               r.`private_key`      as privateKey,
+               rgr.`runnergroup_id` as groupId
+        FROM `runner` r
+                 LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        WHERE r.`host` = #{host}
+          and r.`port` = #{port}
     </select>
 
-    <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerGroupVo"
+    <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerVo"
             resultMap="runnerMap" useCache="false">
-        SELECT r.id AS id,
-        r.name AS name,
-        r.url AS url,
-        r.netty_port AS nettyPort,
-        r.access_key AS accessKey,
-        r.access_secret AS accessSecret,
-        r.auth_type AS authType,
-        r.group_id AS groupId,
+        SELECT
+        g.id AS id,
+        g.name AS name,
+        g.url AS url,
+        g.netty_port AS nettyPort,
+        g.access_key AS accessKey,
+        g.access_secret AS accessSecret,
+        g.auth_type AS authType,
+        rgr.runnergroup_id AS groupId,
+        rg.name AS groupName,
+        g.host,
+        g.port
+        from
+        (SELECT DISTINCT
+        r.id,
+        r.name,
+        r.url,
+        r.netty_port,
+        r.access_key,
+        r.access_secret,
+        r.auth_type,
         r.host,
         r.port
-        FROM runner r
-        WHERE r.group_id = #{id}
+        from runner r
+        LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
+        <include refid="searchRunner"></include>
         ORDER BY id DESC
         <if test="needPage == true">
             LIMIT #{startNum},#{pageSize}
-        </if>
+        </if>)g
+        LEFT JOIN runnergroup_runner rgr on g.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
     </select>
 
-    <select id="searchRunnerCount" resultType="int" useCache="false">
+    <sql id="searchRunnerGroup">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                rg.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="authType != null and authType != ''">
+                AND r.`auth_type` = #{authType}
+            </if>
+        </where>
+    </sql>
+    <sql id="searchRunner">
+        <where>
+            <if test="groupId != null and isFilterGroup == 0">
+                AND rgr.`runnergroup_id` =#{groupId}
+            </if>
+            <if test="groupId != null and isFilterGroup == 1">
+                AND NOT EXISTS ( SELECT 1 FROM runner a LEFT JOIN runnergroup_runner b ON a.`id` = b.`runner_id` WHERE
+                a.id = r.id and b.runnergroup_id =#{groupId})
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND ( r.`name` LIKE CONCAT('%', #{keyword}, '%')
+                OR r.`host` LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchRunnerCountByGroupId" resultType="int" useCache="false">
         select count(`id`)
-        from runner
-        where `group_id` = #{id}
+        from runner r
+                 LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        where rgr.`runnergroup_id` = #{id}
+    </select>
+
+    <select id="searchRunnerCount" resultType="java.lang.Integer">
+        select count(distinct `id`)
+        from runner r
+        LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        <include refid="searchRunner"></include>
     </select>
 
     <update id="updateRunnerGroup" parameterType="codedriver.framework.dto.runner.RunnerGroupVo">
@@ -342,8 +376,9 @@
     </insert>
 
     <insert id="insertNetwork" parameterType="codedriver.framework.dto.runner.GroupNetworkVo">
-        INSERT INTO runnergroup_network(group_id, network_ip, mask)
-        VALUES (#{groupId},
+        INSERT INTO runnergroup_network(id, group_id, network_ip, mask)
+        VALUES (#{id},
+                #{groupId},
                 #{networkIp},
                 #{mask})
     </insert>
@@ -379,6 +414,29 @@
         WHERE `id` = #{id}
     </update>
 
+    <select id="checkRunnerIsUsed" resultType="int">
+        select count(1)
+        from (
+                 select rgr.runner_id
+                 from runnergroup_runner rgr
+                 where runner_id = #{id}
+                 union
+                 select rm.runner_id
+                 from runner_map rm
+                 where rm.`runner_id` = #{id}
+             ) a
+    </select>
+
+    <select id="checkRunnerIsExistByIdAndIpAndPort" resultType="int">
+        select count(1)
+        from runner
+        where host = #{host}
+        and port = #{port}
+        <if test="id != null">
+            and id != #{id}
+        </if>
+    </select>
+
     <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         INSERT INTO runner(
         `id`,`name`,`host`,`port` ,`url`,
@@ -392,7 +450,7 @@
             `auth_type`,
         </if>
         `netty_ip`, `netty_port`,
-        `group_id`,`public_key`,`private_key`
+        `public_key`,`private_key`
         ) VALUES(
         #{id},#{name}, #{host},#{port},#{url},
         <if test="accessKey != null and accessKey !='' ">
@@ -405,8 +463,16 @@
             #{authType},
         </if>
         #{host},
-        #{nettyPort},#{groupId},#{publicKey},#{privateKey}
+        #{nettyPort},#{publicKey},#{privateKey}
         )
+    </insert>
+
+    <insert id="insertRunnerGroupRunnerByRunnerIdListAndGroupId">
+        insert into
+        runnergroup_runner(runnergroup_id, runner_id) values
+        <foreach collection="runnerIdList" item="runnerId" separator=",">
+            ( #{groupId}, #{runnerId})
+        </foreach>
     </insert>
 
     <delete id="deleteRunnerById">
@@ -415,6 +481,17 @@
         where `id` = #{id}
     </delete>
 
+    <delete id="deleteRunnerGroupRunnerByGroupId">
+        delete
+        from runnergroup_runner
+        where `runnergroup_id` = #{groupId}
+    </delete>
+
+    <delete id="deleteRunnerGroupRunnerByRunnerId">
+        delete
+        from runnergroup_runner
+        where `runner_id` = #{runnerId}
+    </delete>
 
 </mapper>
 

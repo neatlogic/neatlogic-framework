@@ -1,11 +1,11 @@
 package codedriver.framework.matrix.dto;
 
 import codedriver.framework.file.dto.FileVo;
+import codedriver.framework.matrix.core.MatrixTypeFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
-import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.restful.annotation.EntityField;
 
 /**
@@ -34,6 +34,8 @@ public class MatrixVo extends BaseEditorVo {
     private Long fileId;
     @EntityField( name = "视图配置文件信息", type = ApiParamType.JSONOBJECT)
     private FileVo fileVo;
+    @EntityField( name = "ci模型id", type = ApiParamType.LONG)
+    private Long ciId;
 
     public Long getId() {
         return id;
@@ -78,7 +80,7 @@ public class MatrixVo extends BaseEditorVo {
 
     public String getTypeName() {
         if (StringUtils.isNotBlank(type)){
-            return MatrixType.getName(type);
+            return MatrixTypeFactory.getName(type);
         }
         return typeName;
     }
@@ -117,5 +119,13 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setFileVo(FileVo fileVo) {
         this.fileVo = fileVo;
+    }
+
+    public Long getCiId() {
+        return ciId;
+    }
+
+    public void setCiId(Long ciId) {
+        this.ciId = ciId;
     }
 }

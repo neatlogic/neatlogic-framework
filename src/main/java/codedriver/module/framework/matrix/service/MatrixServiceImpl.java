@@ -18,7 +18,6 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.database.DataBaseNotFoundException;
 import codedriver.framework.exception.integration.IntegrationHandlerNotFoundException;
 import codedriver.framework.exception.integration.IntegrationNotFoundException;
-import codedriver.framework.exception.util.FreemarkerTransformException;
 import codedriver.framework.integration.core.IIntegrationHandler;
 import codedriver.framework.integration.core.IntegrationHandlerFactory;
 import codedriver.framework.integration.dao.mapper.IntegrationMapper;

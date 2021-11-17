@@ -41,6 +41,9 @@ public class MatrixAttributeVo extends BasePageVo {
     private ExpressionVo defaultExpression;
     @EntityField(name = "是否能搜索", type = ApiParamType.INTEGER)
 	private Integer isSearchable = 1;
+	@EntityField(name = "是否是主键", type = ApiParamType.INTEGER)
+    private Integer primaryKey = 0;
+
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -142,5 +145,13 @@ public class MatrixAttributeVo extends BasePageVo {
 
 	public void setIsSearchable(Integer isSearchable) {
 		this.isSearchable = isSearchable;
+	}
+
+	public Integer getPrimaryKey() {
+		return primaryKey;
+	}
+
+	public void setPrimaryKey(Integer primaryKey) {
+		this.primaryKey = primaryKey;
 	}
 }

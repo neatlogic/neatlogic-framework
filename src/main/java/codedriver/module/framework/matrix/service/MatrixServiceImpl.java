@@ -107,6 +107,10 @@ public class MatrixServiceImpl implements MatrixService {
                                     matrixAttributeVo.setIsDeletable(0);
                                     matrixAttributeVo.setSort(i);
                                     matrixAttributeVo.setIsRequired(0);
+                                    Integer primaryKey = theadObj.getInteger("primaryKey");
+                                    if (Objects.equals(primaryKey, 1)) {
+                                        matrixAttributeVo.setPrimaryKey(1);
+                                    }
                                     Integer isSearchable = theadObj.getInteger("isSearchable");
                                     matrixAttributeVo.setIsSearchable((isSearchable == null || isSearchable.intValue() != 1) ? 0 : 1);
                                     matrixAttributeList.add(matrixAttributeVo);
@@ -335,7 +339,11 @@ public class MatrixServiceImpl implements MatrixService {
                 for (MatrixViewAttributeVo attrVo : attrList) {
                     MatrixAttributeVo matrixAttributeVo = new MatrixAttributeVo();
                     matrixAttributeVo.setMatrixUuid(matrixUuid);
-                    matrixAttributeVo.setUuid(attrVo.getName());
+                    String name = attrVo.getName();
+                    matrixAttributeVo.setUuid(name);
+                    if ("uuid".equals(name)) {
+                        matrixAttributeVo.setPrimaryKey(1);
+                    }
                     matrixAttributeVo.setName(attrVo.getLabel());
                     matrixAttributeVo.setType(MatrixAttributeType.INPUT.getValue());
                     matrixAttributeVo.setIsDeletable(0);

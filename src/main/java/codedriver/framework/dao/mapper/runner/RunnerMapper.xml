@@ -104,7 +104,7 @@
         FROM `runnergroup` a
                  LEFT JOIN `runnergroup_network` b ON a.`id` = b.`group_id`
                  LEFT JOIN `runnergroup_runner` e ON e.`runnergroup_id` = a.`id`
-                 LEFT JOIN `runner` c ON a.`id` = e.`runner_id`
+                 LEFT JOIN `runner` c ON c.`id` = e.`runner_id`
                  LEFT JOIN `runner_map` d ON c.`id` = d.`runner_id`
         WHERE a.`id` = #{id}
     </select>

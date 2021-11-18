@@ -1,22 +1,26 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.param.validate.core;
+
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.ParamType;
+import org.reflections.Reflections;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.reflections.Reflections;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.constvalue.ParamType;
-
 public class ParamValidatorFactory {
-	private static Map<ApiParamType, ApiParamValidatorBase> authParamMap = new HashMap<>();
-	private static Map<ParamType, ParamValidatorBase> authParamMap2 = new HashMap<>();
+	private static final Map<ApiParamType, ApiParamValidatorBase> authParamMap = new HashMap<>();
+	private static final Map<ParamType, ParamValidatorBase> authParamMap2 = new HashMap<>();
 
 	static {
 		Reflections reflections = new Reflections("codedriver");
 		Set<Class<? extends ApiParamValidatorBase>> authClass = reflections.getSubTypesOf(ApiParamValidatorBase.class);
-		for (Class<? extends ApiParamValidatorBase> c: authClass) {
+		for (Class<? extends ApiParamValidatorBase> c : authClass) {
 			try {
 				ApiParamValidatorBase authIns = c.newInstance();
 				authParamMap.put(authIns.getType(), authIns);

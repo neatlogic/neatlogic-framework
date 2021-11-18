@@ -61,19 +61,20 @@ public class DynamicListHandler extends FormHandlerBase {
         if (CollectionUtils.isEmpty(selectUuidList)) {
             return tableObj;
         }
+        String mode = configObj.getString("mode");
         Boolean needPage = configObj.getBoolean("needPage");
         String dataSource = configObj.getString("dataSource");
         if ("matrix".equals(dataSource)) {
-            if (Objects.equals(needPage, false)) {//不分页
-                return matrixDataSourceNeedPage(dataObj, selectUuidList, configObj);
-            } else {//分页
+            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
                 return matrixDataSourceNoNeedPage(dataObj, selectUuidList, configObj);
+            } else {//分页
+                return matrixDataSourceNeedPage(dataObj, selectUuidList, configObj);
             }
         } else if ("integration".equals(dataSource)) {
-            if (Objects.equals(needPage, false)) {//不分页
-                return integrationDataSourceNeedPage(dataObj, selectUuidList, configObj);
-            } else {//分页
+            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
                 return integrationDataSourceNoNeedPage(dataObj, selectUuidList, configObj);
+            } else {//分页
+                return integrationDataSourceNeedPage(dataObj, selectUuidList, configObj);
             }
         }
 //        if (Objects.equals(needPage, false)) {//不分页
@@ -157,6 +158,7 @@ public class DynamicListHandler extends FormHandlerBase {
             if (restComponent != null) {
                 String matrixUuid = configObj.getString("matrixUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
+                uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
                 List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("matrixUuid", matrixUuid);
@@ -194,7 +196,7 @@ public class DynamicListHandler extends FormHandlerBase {
             JSONArray tbodyList = table.getJSONArray("tbodyList");
             JSONArray attributeList = configObj.getJSONArray("attributeList");
             if (CollectionUtils.isNotEmpty(attributeList)) {
-                JSONObject valueObj = dataObj.getJSONObject("value");
+                JSONObject valueObj = dataObj.getJSONObject("extendedData");
                 setExtAttributeData(theadList, tbodyList, configObj, valueObj);
             }
             tableObj.put("theadList", theadList);
@@ -221,6 +223,7 @@ public class DynamicListHandler extends FormHandlerBase {
             if (restComponent != null) {
                 String matrixUuid = configObj.getString("matrixUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
+                uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
                 List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("matrixUuid", matrixUuid);
@@ -258,7 +261,7 @@ public class DynamicListHandler extends FormHandlerBase {
             JSONArray tbodyList = table.getJSONArray("tbodyList");
             JSONArray attributeList = configObj.getJSONArray("attributeList");
             if (CollectionUtils.isNotEmpty(attributeList)) {
-                JSONObject valueObj = dataObj.getJSONObject("value");
+                JSONObject valueObj = dataObj.getJSONObject("extendedData");
                 setExtAttributeData(theadList, tbodyList, configObj, valueObj);
             }
             tableObj.put("theadList", theadList);
@@ -292,6 +295,7 @@ public class DynamicListHandler extends FormHandlerBase {
             }
         }
         String uuidColumn = configObj.getString("uuidColumn");
+        uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
         for (int i = 0; i < tbodyList.size(); i++) {
             JSONObject tbodyObj = tbodyList.getJSONObject(i);
             JSONObject uuidColumnCellData = tbodyObj.getJSONObject(uuidColumn);

@@ -416,14 +416,14 @@
 
     <select id="checkRunnerIsUsedByJob" resultType="int">
         select count(1)
-        from runnergroup_runner rgr
-        where runner_id = #{id}
+        from runner_map rm
+        where rm.`runner_id` = #{id}
     </select>
 
     <select id="checkRunnerIsUsedByRunnerGroup" resultType="int">
         select count(1)
-        from runner_map rm
-        where rm.`runner_id` = #{id}
+        from runnergroup_runner rgr
+        where rgr.runner_id = #{id}
     </select>
 
     <select id="checkRunnerIsExistByIdAndIp" resultType="int">

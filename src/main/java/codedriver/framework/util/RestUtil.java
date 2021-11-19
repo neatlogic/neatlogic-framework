@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.util;
 
 import codedriver.framework.dto.RestVo;
@@ -98,7 +103,7 @@ public class RestUtil {
         if (connection != null) {
             DataInputStream input = null;
             OutputStream os = null;
-            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())){
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
                 if (restVo.getPayload() != null) {
                     out.write(restVo.getPayload().toJSONString().getBytes(StandardCharsets.UTF_8));
                     out.flush();
@@ -106,7 +111,7 @@ public class RestUtil {
                 out.close();
                 if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
                     input = new DataInputStream(connection.getInputStream());
-                }else{
+                } else {
                     input = new DataInputStream(connection.getErrorStream());
                 }
                 os = response.getOutputStream();
@@ -154,8 +159,8 @@ public class RestUtil {
         }
 
         // 设置超时时间
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(restVo.getTimeout());
+        connection.setConnectTimeout(restVo.getConnectTimeout());
+        connection.setReadTimeout(restVo.getReadTimeout());
 
         // 设置默认header
         connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");

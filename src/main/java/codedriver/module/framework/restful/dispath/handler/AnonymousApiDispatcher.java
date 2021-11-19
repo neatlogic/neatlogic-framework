@@ -171,7 +171,7 @@ public class AnonymousApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(token);
+        RequestContext.init(request, token);
         String decryptData = RC4Util.decrypt(token);
         String[] split = decryptData.split("\\?", 2);
         token = split[0].substring(0, split[0].lastIndexOf("/"));
@@ -218,7 +218,7 @@ public class AnonymousApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(token);
+        RequestContext.init(request, token);
         String decryptData = RC4Util.decrypt(token);
         String[] split = decryptData.split("\\?", 2);
         token = split[0].substring(0, split[0].lastIndexOf("/"));

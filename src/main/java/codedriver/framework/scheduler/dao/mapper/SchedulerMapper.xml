@@ -172,7 +172,13 @@
         FROM `schedule_job_audit`
         WHERE `job_uuid` = #{jobUuid}
         ORDER BY `id` DESC
-        LIMIT #{startNum}, #{pageSize}
+            LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="checkJobAuditDetailIsExists" parameterType="java.lang.String" resultType="int">
+        select count(1)
+        from schedule_job_audit_detail
+        where hash = #{value}
     </select>
 
     <select id="getJobAuditById" parameterType="java.lang.Long"
@@ -218,7 +224,7 @@
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
             FOR
-        UPDATE
+                UPDATE
     </select>
 
     <select id="getJobLockByServerId" parameterType="java.lang.Integer"
@@ -289,9 +295,11 @@
         WHERE `server_id` = #{serverId}
     </update>
 
-    <insert id="replaceJobAuditDetail">
-        REPLACE INTO schedule_job_audit_detail (hash, content)
-        values (#{hash}, #{content})
+    <insert id="insertJobAuditDetail">
+        INSERT
+        INTO schedule_job_audit_detail (hash, content)
+        values (#{hash},
+                #{content,typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertJob" parameterType="codedriver.framework.scheduler.dto.JobVo">
@@ -329,8 +337,13 @@
     </insert>
 
     <insert id="insertJobProp">
-        INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
-        VALUES (#{jobUuid}, #{name}, #{value})
+        INSERT
+        schedule_job_prop (job_uuid, prop_name, prop_value)
+        VALUES (
+        #{jobUuid},
+        #{name},
+        #{value}
+        )
     </insert>
 
     <insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">

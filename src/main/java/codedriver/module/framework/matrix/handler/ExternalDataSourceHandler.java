@@ -264,7 +264,17 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         throw new MatrixExternalAccessException();
                     }
                     handler.validate(resultVo);
-                    tbodyList.addAll(matrixService.getExternalDataTbodyList(resultVo, dataVo.getColumnList()));
+                    List<Map<String, JSONObject>> externalDataTbodyList = matrixService.getExternalDataTbodyList(resultVo, dataVo.getColumnList());
+                    for (Map<String, JSONObject> tbody : externalDataTbodyList) {
+                        JSONObject valueObj = tbody.get(uuidColumn);
+                        if (MapUtils.isNotEmpty(valueObj)) {
+                            String value = valueObj.getString("value");
+                            if (Objects.equals(value, uuidValue)) {
+                                tbodyList.add(tbody);
+                                break;
+                            }
+                        }
+                    }
                 }
                 returnObj.put("tbodyList", tbodyList);
             } else {

@@ -5,6 +5,7 @@
 
 package codedriver.framework.asynchronization.threadlocal;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 
 /**
@@ -13,6 +14,7 @@ import java.io.Serializable;
 public class RequestContext implements Serializable {
     private static final ThreadLocal<RequestContext> instance = new ThreadLocal<>();
     private String url;
+    private HttpServletRequest request;
 
     public String getUrl() {
         return url;
@@ -22,6 +24,13 @@ public class RequestContext implements Serializable {
         this.url = url;
     }
 
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
 
     public static RequestContext init(RequestContext _requestContext) {
         RequestContext context = new RequestContext();
@@ -32,8 +41,8 @@ public class RequestContext implements Serializable {
         return context;
     }
 
-    public static RequestContext init(String url) {
-        RequestContext context = new RequestContext(url);
+    public static RequestContext init(HttpServletRequest request, String url) {
+        RequestContext context = new RequestContext(request, url);
         instance.set(context);
         return context;
     }
@@ -42,8 +51,9 @@ public class RequestContext implements Serializable {
 
     }
 
-    private RequestContext(String url) {
+    private RequestContext(HttpServletRequest request, String url) {
         this.url = url;
+        this.request = request;
     }
 
     public static RequestContext get() {

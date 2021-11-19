@@ -7,7 +7,6 @@ package codedriver.framework.util;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ExcelBuilder {
-    private Class<? extends Workbook> workbookClass;
+    private final Class<? extends Workbook> workbookClass;
     private Workbook workbook;
     private Sheet sheet;
     private String sheetName;
@@ -199,8 +198,8 @@ public class ExcelBuilder {
         }
     }
 
-    public static void main(String[] a) {
+    /*public static void main(String[] a) {
         ExcelBuilder builder = new ExcelBuilder(HSSFWorkbook.class);
         builder.build();
-    }
+    }*/
 }

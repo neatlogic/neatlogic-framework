@@ -3,7 +3,9 @@ package codedriver.framework.dto.runner;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class RunnerAuthVo {
+import java.io.Serializable;
+
+public class RunnerAuthVo implements Serializable {
 
     private static final long serialVersionUID = -5318993385455680706L;
     @EntityField(name = "id", type = ApiParamType.LONG)

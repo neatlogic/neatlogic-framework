@@ -163,19 +163,65 @@ public abstract class JobBase implements IJob {
                 try {
                     jobHandler.executeInternal(context, jobObject);
                     auditVo.setStatus(JobAuditVo.Status.SUCCEED.getValue());
+                } catch (ApiRuntimeException ex) {
+                    auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
+                    auditVo.appendContent(ex.getMessage(true));
                 } catch (Exception ex) {
                     auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
                     auditVo.appendContent(ExceptionUtils.getStackTrace(ex));
-                    logger.error(ex.getMessage(), ex); //已记录到数据库，无需日志
+                    logger.error(ex.getMessage(), ex);
                 } finally {
-                    if (StringUtils.isNotBlank(auditVo.getContentHash())) {
-                        schedulerMapper.replaceJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());
+                    if (StringUtils.isNotBlank(auditVo.getContentHash()) && schedulerMapper.checkJobAuditDetailIsExists(auditVo.getContentHash()) == 0) {
+                        schedulerMapper.insertJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());
                     }
                     schedulerMapper.updateJobAudit(auditVo);
                 }
             } else {
                 jobHandler.executeInternal(context, jobObject);
             }
+/*
+  异步模式，如果事务hold住时间太长，可以考虑使用异步模式，但作业的执行时间需要手动处理
+
+            // 如果作业存在并且设置为需要审计
+            if (isAudit) {
+                JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
+                schedulerMapper.insertJobAudit(auditVo);
+                jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
+                CachedThreadPool.execute(new CodeDriverThread(jobObject.getJobName()) {
+                    @Override
+                    protected void execute() {
+                        try {
+                            jobHandler.executeInternal(context, jobObject);
+                            auditVo.setStatus(JobAuditVo.Status.SUCCEED.getValue());
+                        } catch (ApiRuntimeException ex) {
+                            auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
+                            auditVo.appendContent(ex.getMessage(true));
+                        } catch (Exception e) {
+                            auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
+                            auditVo.appendContent(ExceptionUtils.getStackTrace(e));
+                            logger.error(e.getMessage(), e);
+                        } finally {
+                            if (StringUtils.isNotBlank(auditVo.getContentHash())) {
+                                schedulerMapper.insertJobAuditDetail(auditVo.getContentHash(), auditVo.getContent());
+                            }
+                            schedulerMapper.updateJobAudit(auditVo);
+                        }
+                    }
+                });
+            } else {
+                CachedThreadPool.execute(new CodeDriverThread(jobObject.getJobName()) {
+                    @Override
+                    protected void execute() {
+                        try {
+                            jobHandler.executeInternal(context, jobObject);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                });
+            }
+ */
+
+
             // 执行完业务逻辑后，更新定时作业状态信息
 
             oldJobStatusVo.setLastFinishTime(new Date());

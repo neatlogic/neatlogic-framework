@@ -12,70 +12,72 @@ import java.util.List;
 
 public interface SchedulerMapper {
     // SELECT
-    public JobVo getJobByUuid(String uuid);
+    int checkJobAuditDetailIsExists(String hash);
 
-    public JobVo getJobBaseInfoByUuid(String uuid);
+    JobVo getJobByUuid(String uuid);
 
-    public JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    JobVo getJobBaseInfoByUuid(String uuid);
 
-    public List<JobVo> getJobByHandler(String handler);
+    JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-    public int searchJobCount(JobVo jobVo);
+    List<JobVo> getJobByHandler(String handler);
 
-    public List<JobVo> searchJob(JobVo jobVo);
+    int searchJobCount(JobVo jobVo);
 
-    public int searchJobAuditCount(JobAuditVo jobAuditVo);
+    List<JobVo> searchJob(JobVo jobVo);
 
-    public List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
+    int searchJobAuditCount(JobAuditVo jobAuditVo);
 
-    public JobAuditVo getJobAuditById(Long auditId);
+    List<JobAuditVo> searchJobAudit(JobAuditVo jobAuditVo);
 
-    public List<JobAuditVo> getJobAuditByUuid(String uuid);
+    JobAuditVo getJobAuditById(Long auditId);
 
-    public JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    List<JobAuditVo> getJobAuditByUuid(String uuid);
 
-    public List<JobLockVo> getJobLockByServerId(Integer serverId);
+    JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-    public int checkJobNameIsExists(JobVo job);
+    List<JobLockVo> getJobLockByServerId(Integer serverId);
+
+    int checkJobNameIsExists(JobVo job);
 
     // UPDATE
-    public int updateJob(JobVo jobVo);
+    int updateJob(JobVo jobVo);
 
-    public int resetJobLockByServerId(Integer serverId);
+    int resetJobLockByServerId(Integer serverId);
 
-    public int updateJobStatus(JobStatusVo jobStatus);
+    int updateJobStatus(JobStatusVo jobStatus);
 
-    public int updateJobNextFireTime(JobStatusVo jobStatus);
+    int updateJobNextFireTime(JobStatusVo jobStatus);
 
-    public int updateJobAudit(JobAuditVo scheduleJobAudit);
+    int updateJobAudit(JobAuditVo scheduleJobAudit);
 
-    public int updateJobLock(JobLockVo jobLock);
+    int updateJobLock(JobLockVo jobLock);
 
-    public int updateJobLockByServerId(JobLockVo jobLock);
+    int updateJobLockByServerId(JobLockVo jobLock);
 
     // INSERT
-    public int insertJob(JobVo job);
+    int insertJob(JobVo job);
 
-    public int insertJobStatus(JobStatusVo jobStatus);
+    int insertJobStatus(JobStatusVo jobStatus);
 
-    public int insertJobProp(JobPropVo jobProp);
+    int insertJobProp(JobPropVo jobProp);
 
-    public int insertJobAudit(JobAuditVo scheduleJobAudit);
+    int insertJobAudit(JobAuditVo scheduleJobAudit);
 
-    public int insertJobLock(JobLockVo jobLock);
+    int insertJobLock(JobLockVo jobLock);
 
-    public int replaceJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
+    int insertJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
     // DELETE
-    public int deleteJobByUuid(String uuid);
+    int deleteJobByUuid(String uuid);
 
-    public int deleteJobPropByJobUuid(String jobUuid);
+    int deleteJobPropByJobUuid(String jobUuid);
 
-    public int deleteJobAuditByJobUuid(String jobUuid);
+    int deleteJobAuditByJobUuid(String jobUuid);
 
-    public int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-    public int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     void deleteUnusedJobStatus();
 

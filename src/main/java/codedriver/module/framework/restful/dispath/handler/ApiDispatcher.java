@@ -461,7 +461,16 @@ public class ApiDispatcher {
         } else {
             paramObj = new JSONObject();
         }
-
+        Enumeration<String> paraNames = request.getParameterNames();
+        while (paraNames.hasMoreElements()) {
+            String p = paraNames.nextElement();
+            String[] vs = request.getParameterValues(p);
+            if (vs.length > 1) {
+                paramObj.put(p, vs);
+            } else {
+                paramObj.put(p, request.getParameter(p));
+            }
+        }
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");

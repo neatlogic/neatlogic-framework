@@ -414,24 +414,22 @@
         WHERE `id` = #{id}
     </update>
 
-    <select id="checkRunnerIsUsed" resultType="int">
+    <select id="checkRunnerIsUsedByJob" resultType="int">
         select count(1)
-        from (
-                 select rgr.runner_id
-                 from runnergroup_runner rgr
-                 where runner_id = #{id}
-                 union
-                 select rm.runner_id
-                 from runner_map rm
-                 where rm.`runner_id` = #{id}
-             ) a
+        from runnergroup_runner rgr
+        where runner_id = #{id}
     </select>
 
-    <select id="checkRunnerIsExistByIdAndIpAndPort" resultType="int">
+    <select id="checkRunnerIsUsedByRunnerGroup" resultType="int">
+        select count(1)
+        from runner_map rm
+        where rm.`runner_id` = #{id}
+    </select>
+
+    <select id="checkRunnerIsExistByIdAndIp" resultType="int">
         select count(1)
         from runner
         where host = #{host}
-        and port = #{port}
         <if test="id != null">
             and id != #{id}
         </if>

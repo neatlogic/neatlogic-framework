@@ -45,9 +45,11 @@ public interface RunnerMapper {
 
     int checkRunnerNameIsExist(RunnerVo runnerVo);
 
-    int checkRunnerIsExistByIdAndIpAndPort(@Param("id") Long id, @Param("host") String host, @Param("port") Integer port);
+    int checkRunnerIsExistByIdAndIp(@Param("id") Long id, @Param("host") String host);
 
-    int checkRunnerIsUsed(Long id);
+    int checkRunnerIsUsedByJob(Long id);
+
+    int checkRunnerIsUsedByRunnerGroup(Long id);
 
     Integer insertRunnerMap(RunnerMapVo runnerMapVo);
 

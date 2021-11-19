@@ -101,6 +101,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             ModuleInitApplicationListener.getModuleinitphaser().arrive();
             if (moduleId != null) {
                 logger.error("初始化模块：" + moduleId + "失败", ex);
+                System.out.println("failed to initialize module " + moduleId + ", please check error log");
             } else {
                 logger.error(ex.getMessage(), ex);
             }

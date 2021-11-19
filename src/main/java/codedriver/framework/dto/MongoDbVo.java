@@ -6,6 +6,7 @@
 package codedriver.framework.dto;
 
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -82,7 +83,7 @@ public class MongoDbVo {
     public String getPasswordPlain() {
         if (StringUtils.isBlank(passwordPlain)) {
             if (StringUtils.isNotBlank(passwordCipher)) {
-                if (passwordCipher.startsWith("RC4:")) {
+                if (passwordCipher.startsWith(CiphertextPrefix.RC4.getValue())) {
                     this.passwordPlain = RC4Util.decrypt(this.passwordCipher.substring(4));
                 } else {
                     this.passwordPlain = this.passwordCipher;
@@ -99,7 +100,7 @@ public class MongoDbVo {
     public String getPasswordCipher() {
         if (StringUtils.isBlank(passwordCipher)) {
             if (StringUtils.isNotBlank(passwordPlain)) {
-                this.passwordCipher = "RC4:" + RC4Util.encrypt(passwordPlain);
+                this.passwordCipher = CiphertextPrefix.RC4.getValue() + RC4Util.encrypt(passwordPlain);
             }
         }
         return passwordCipher;

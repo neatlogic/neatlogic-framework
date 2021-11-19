@@ -6,6 +6,7 @@
 package codedriver.framework.store.mysql;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +43,7 @@ public class CodeDriverBasicDataSource extends BasicDataSource {
 
     @Override
     public void setPassword(String password) {
-        String prefix = "RC4:";
+        String prefix = CiphertextPrefix.RC4.getValue();
         if (password.startsWith(prefix)) {
             password = password.substring(prefix.length());
             password = RC4Util.decrypt(password);

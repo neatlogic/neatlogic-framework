@@ -1,5 +1,12 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dao.plugin;
 
+import codedriver.framework.dto.healthcheck.SqlAuditVo;
+import codedriver.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -45,6 +52,10 @@ public class SqlCostInterceptor implements Interceptor {
             sqlSet.clear();
         }
 
+        public static List<String> getSqlIdList() {
+            return new ArrayList<>(sqlSet);
+        }
+
         public static boolean isExists(String id) {
             if (sqlSet.contains("*")) {
                 return true;
@@ -66,12 +77,14 @@ public class SqlCostInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         long starttime = 0;
+        SqlAuditVo sqlAuditVo = null;
         try {
             if (!SqlIdMap.isEmpty()) {
                 // Object target = invocation.getTarget();
                 MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
                 if (SqlIdMap.isExists(sqlId)) {
+                    sqlAuditVo = new SqlAuditVo();
                     starttime = System.currentTimeMillis();
                     Object parameter = null;
                     // 获取参数，if语句成立，表示sql语句有参数，参数格式是map形式
@@ -82,9 +95,13 @@ public class SqlCostInterceptor implements Interceptor {
                     BoundSql boundSql = mappedStatement.getBoundSql(parameter); // BoundSql就是封装myBatis最终产生的sql类
                     Configuration configuration = mappedStatement.getConfiguration(); // 获取节点的配置
                     String sql = getSql(configuration, boundSql, sqlId); // 获取到最终的sql语句
-                    System.out.println("#############################SQL INTERCEPTOR###############################");
-                    System.out.println("id:" + sqlId);
-                    System.out.println(sql);
+                    //System.out.println("#############################SQL INTERCEPTOR###############################");
+                    //System.out.println("id:" + sqlId);
+                    //System.out.println(sql);
+
+                    sqlAuditVo.setRunTime(new Date());
+                    sqlAuditVo.setSql(sql);
+                    sqlAuditVo.setId(sqlId);
                 }
             }
         } catch (Exception e) {
@@ -92,9 +109,11 @@ public class SqlCostInterceptor implements Interceptor {
         }
         // 执行完上面的任务后，不改变原有的sql执行过程
         Object val = invocation.proceed();
-        if (starttime > 0) {
-            System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
-            System.out.println("###########################################################################");
+        if (sqlAuditVo != null) {
+            sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
+            SqlAuditManager.addSqlAudit(sqlAuditVo);
+            //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
+            //System.out.println("###########################################################################");
         }
         return val;
     }

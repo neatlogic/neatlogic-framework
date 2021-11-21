@@ -99,7 +99,6 @@ public class SqlCostInterceptor implements Interceptor {
                     //System.out.println("id:" + sqlId);
                     //System.out.println(sql);
 
-                    sqlAuditVo.setRunTime(new Date());
                     sqlAuditVo.setSql(sql);
                     sqlAuditVo.setId(sqlId);
                 }
@@ -111,6 +110,7 @@ public class SqlCostInterceptor implements Interceptor {
         Object val = invocation.proceed();
         if (sqlAuditVo != null) {
             sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
+            sqlAuditVo.setRunTime(new Date());
             SqlAuditManager.addSqlAudit(sqlAuditVo);
             //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
             //System.out.println("###########################################################################");

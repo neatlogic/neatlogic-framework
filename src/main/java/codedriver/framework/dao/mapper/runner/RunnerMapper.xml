@@ -497,5 +497,12 @@
         where `runner_id` = #{runnerId}
     </delete>
 
+    <delete id="deleteRunnerGroupRunnerByGroupIdAndRunnerId">
+        delete
+        from runnergroup_runner
+        where `runnergroup_id` = #{groupId}
+          and `runner_id` = #{runnerId}
+    </delete>
+
 </mapper>
 

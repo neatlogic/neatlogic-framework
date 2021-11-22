@@ -58,6 +58,7 @@
         <result column="nettyPort" property="nettyPort"/>
         <result column="host" property="host"/>
         <result column="port" property="port"/>
+        <result column="isDelete" property="isDelete"/>
         <collection property="runnerGroupVoList" ofType="codedriver.framework.dto.runner.RunnerGroupVo">
             <id column="groupId" property="id"/>
             <result column="groupName" property="name"/>
@@ -224,6 +225,7 @@
                p.`access_secret`    AS accessSecret,
                p.`auth_type`        AS authType,
                rgr.`runnergroup_id` AS groupId,
+               p.is_delete AS isDelete,
                p.`host`,
                p.`port`
         FROM runner p
@@ -281,7 +283,8 @@
         rgr.runnergroup_id AS groupId,
         rg.name AS groupName,
         g.host,
-        g.port
+        g.port,
+        g.is_delete AS isDelete
         from
         (SELECT DISTINCT
         r.id,
@@ -292,7 +295,8 @@
         r.access_secret,
         r.auth_type,
         r.host,
-        r.port
+        r.port,
+        r.is_delete
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
@@ -318,6 +322,9 @@
             <if test="authType != null and authType != ''">
                 AND r.`auth_type` = #{authType}
             </if>
+            <if test="isRunnerDelete != null">
+                AND r.`is_delete` = #{isRunnerDelete}
+            </if>
         </where>
     </sql>
     <sql id="searchRunner">
@@ -332,6 +339,9 @@
             <if test="keyword != null and keyword != ''">
                 AND ( r.`name` LIKE CONCAT('%', #{keyword}, '%')
                 OR r.`host` LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="isDelete != null">
+                AND r.`is_delete` = #{isDelete}
             </if>
         </where>
     </sql>
@@ -410,6 +420,9 @@
         <if test="privateKey != null and privateKey !='' ">
             `private_key` = #{privateKey},
         </if>
+        <if test="isDelete != null">
+            `is_delete` = #{isDelete},
+        </if>
         `auth_type` = #{authType}
         WHERE `id` = #{id}
     </update>
@@ -435,8 +448,24 @@
         </if>
     </select>
 
-    <insert id="insertRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
-        INSERT INTO runner(
+    <select id="getRunnerByName" parameterType="java.lang.String" resultMap="runnerMap"
+            useCache="false">
+        SELECT p.`id`               AS id,
+               p.`name`             AS name,
+               p.`url`              AS url,
+               p.`access_key`       AS accessKey,
+               p.`access_secret`    AS accessSecret,
+               p.`auth_type`        AS authType,
+               rgr.`runnergroup_id` AS groupId,
+               p.`host`,
+               p.`port`
+        FROM runner p
+                 LEFT JOIN runnergroup_runner rgr on p.id = rgr.runner_id
+        WHERE p.`name` = #{name}
+    </select>
+
+    <insert id="replaceRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
+        REPLACE INTO runner(
         `id`,`name`,`host`,`port` ,`url`,
         <if test="accessKey != null and accessKey !='' and isAuth ==1">
             `access_key`,
@@ -448,7 +477,7 @@
             `auth_type`,
         </if>
         `netty_ip`, `netty_port`,
-        `public_key`,`private_key`
+        `public_key`,`private_key`,`is_delete`
         ) VALUES(
         #{id},#{name}, #{host},#{port},#{url},
         <if test="accessKey != null and accessKey !='' ">
@@ -461,8 +490,9 @@
             #{authType},
         </if>
         #{host},
-        #{nettyPort},#{publicKey},#{privateKey}
+        #{nettyPort},#{publicKey},#{privateKey},0
         )
+
     </insert>
 
     <insert id="insertRunnerGroupRunnerByRunnerIdListAndGroupId">
@@ -496,6 +526,12 @@
         from runnergroup_runner
         where `runnergroup_id` = #{groupId}
           and `runner_id` = #{runnerId}
+    </delete>
+
+    <delete id="deleteRuunerByName">
+        delete
+        from runner
+        where name = #{name}
     </delete>
 
 </mapper>

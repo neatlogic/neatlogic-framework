@@ -462,6 +462,7 @@
                p.`access_key`       AS accessKey,
                p.`access_secret`    AS accessSecret,
                p.`auth_type`        AS authType,
+               p.is_delete AS isDelete,
                rgr.`runnergroup_id` AS groupId,
                p.`host`,
                p.`port`

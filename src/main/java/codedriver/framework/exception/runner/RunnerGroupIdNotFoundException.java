@@ -13,6 +13,6 @@ public class RunnerGroupIdNotFoundException extends ApiRuntimeException {
     }
 
     public RunnerGroupIdNotFoundException(String agentIp) {
-        super("通过tagentIp" + agentIp + "并不能够查询到对应的runner组id");
+        super("通过tagentIp：" + agentIp + "找不到match network 的 runner组id");
     }
 }

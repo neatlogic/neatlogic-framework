@@ -252,7 +252,7 @@
         ORDER BY id
     </select>
 
-    <select id="getRunnerByIpAndPort" resultMap="runnerMap" useCache="false">
+    <select id="getRunnerByNettyIpAndNettyPort" resultMap="runnerMap" useCache="false">
         SELECT r.`id`,
                r.`name`,
                r.`url`,
@@ -266,8 +266,14 @@
                rgr.`runnergroup_id` as groupId
         FROM `runner` r
                  LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
-        WHERE r.`host` = #{host}
-          and r.`port` = #{port}
+        WHERE r.`netty_ip` = #{nettyIp}
+          <if test="nettyPort == null">
+            and r.`netty_port` is null
+          </if>
+        <if test="nettyPort != null">
+            and r.`netty_port` = #{nettyPort}
+        </if>
+
     </select>
 
     <select id="searchRunner" parameterType="codedriver.framework.dto.runner.RunnerVo"

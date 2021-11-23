@@ -23,7 +23,7 @@ public interface RunnerMapper {
 
     RunnerVo getRunnerByIp(String requestIp);
 
-    RunnerVo getRunnerByIpAndPort(@Param("host") String host, @Param("port") String port);
+    RunnerVo getRunnerByNettyIpAndNettyPort(@Param("nettyIp") String nettyIp, @Param("nettyPort") String nettyPort);
 
     RunnerVo getRunnerById(Long runnerId);
 

@@ -20,6 +20,8 @@ public class SqlAuditVo extends BasePageVo {
     private String sql;
     @EntityField(name = "执行时间", type = ApiParamType.STRING)
     private Date runTime;
+    @EntityField(name = "记录条数", type = ApiParamType.INTEGER)
+    private int recordCount = 0;
 
     public String getId() {
         return id;
@@ -51,5 +53,13 @@ public class SqlAuditVo extends BasePageVo {
 
     public void setRunTime(Date runTime) {
         this.runTime = runTime;
+    }
+
+    public int getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(int recordCount) {
+        this.recordCount = recordCount;
     }
 }

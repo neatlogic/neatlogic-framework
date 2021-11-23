@@ -111,6 +111,13 @@ public class SqlCostInterceptor implements Interceptor {
         if (sqlAuditVo != null) {
             sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
             sqlAuditVo.setRunTime(new Date());
+            if (val != null) {
+                if (val instanceof List) {
+                    sqlAuditVo.setRecordCount(((List) val).size());
+                } else {
+                    sqlAuditVo.setRecordCount(1);
+                }
+            }
             SqlAuditManager.addSqlAudit(sqlAuditVo);
             //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
             //System.out.println("###########################################################################");

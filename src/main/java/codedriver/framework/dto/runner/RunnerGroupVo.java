@@ -36,6 +36,8 @@ public class RunnerGroupVo extends BasePageVo {
     private List<Long> runnerIdList;
     @EntityField(name = "组内runner个数", type = ApiParamType.INTEGER)
     private Integer runnerCount = 0;
+    @EntityField(name = "runner是否已被删除", type = ApiParamType.INTEGER)
+    private Integer isRunnerDelete = 0;
 
     private List<GroupNetworkVo> networkList;
 
@@ -124,6 +126,14 @@ public class RunnerGroupVo extends BasePageVo {
 
     public void setRunnerIdList(List<Long> runnerIdList) {
         this.runnerIdList = runnerIdList;
+    }
+
+    public Integer getIsRunnerDelete() {
+        return isRunnerDelete;
+    }
+
+    public void setIsRunnerDelete(Integer isRunnerDelete) {
+        this.isRunnerDelete = isRunnerDelete;
     }
 
     public Integer getRunnerCount() {

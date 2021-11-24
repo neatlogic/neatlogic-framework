@@ -59,6 +59,8 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private Integer isAuth;
     @EntityField(name = "被runner组引用个数", type = ApiParamType.INTEGER)
     private Integer usedCount = 0;
+    @EntityField(name = "是否已删除", type = ApiParamType.INTEGER)
+    private Integer isDelete;
     @EntityField(name = "是否过滤runner组", type = ApiParamType.INTEGER)
     private Integer isFilterGroup = 0;
     private List<RunnerAuthVo> runnerAuthList;
@@ -243,6 +245,14 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setUsedCount(Integer usedCount) {
         this.usedCount = usedCount;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
     }
 
     public Integer getIsFilterGroup() {

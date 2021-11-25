@@ -107,7 +107,7 @@
                  LEFT JOIN `runnergroup_runner` e ON e.`runnergroup_id` = a.`id`
                  LEFT JOIN `runner` c ON c.`id` = e.`runner_id`
                  LEFT JOIN `runner_map` d ON c.`id` = d.`runner_id`
-        WHERE a.`id` = #{id}
+        WHERE a.`id` = #{id} and c.is_delete = 0
     </select>
 
     <select id="getAllRunnerMap" resultMap="runnerMapMap" useCache="false">
@@ -126,6 +126,7 @@
         FROM `runner` ar
                  JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
                  LEFT JOIN `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
+        where ar.is_delete = 0;
     </select>
 
     <select id="getRunnerById" resultMap="runnerMap" useCache="false">

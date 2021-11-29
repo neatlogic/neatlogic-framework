@@ -275,6 +275,9 @@ public class ApiVo extends BasePageVo implements Serializable {
     }
 
     public String getToken() {
+        if(token.startsWith("/")){
+            return token.substring(1);
+        }
         return token;
     }
 

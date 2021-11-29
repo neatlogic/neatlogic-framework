@@ -6,7 +6,7 @@
 package codedriver.framework.restful.enums;
 
 public enum ApiKind {
-    SYSTEM("system", "系统接口"), CUSTOM("custom", "自定义接口");
+    SYSTEM("system", "内部接口"), CUSTOM("custom", "外部接口");
 
     private final String name;
     private final String text;

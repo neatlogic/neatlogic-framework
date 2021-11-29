@@ -123,7 +123,7 @@ public abstract class JobBase implements IJob {
             throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
         }
         if (!jobHandler.isHealthy(jobObject)) {
-            jobHandler.reloadJob(jobObject);
+            schedulerManager.unloadJob(jobObject);
             return;
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间

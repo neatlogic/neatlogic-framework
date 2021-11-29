@@ -329,9 +329,6 @@
             <if test="authType != null and authType != ''">
                 AND r.`auth_type` = #{authType}
             </if>
-            <if test="isRunnerDelete != null">
-                AND r.`is_delete` = #{isRunnerDelete}
-            </if>
         </where>
     </sql>
     <sql id="searchRunner">

@@ -66,6 +66,7 @@ public interface ApiMapper {
 	 */
 	int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
-	int deleteApiByToken(String token);
+	int updateApiNeedAuditByToken(String token);
 
+	int deleteApiByToken(String token);
 }

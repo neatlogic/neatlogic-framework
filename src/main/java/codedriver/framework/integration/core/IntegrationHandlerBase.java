@@ -13,8 +13,8 @@ import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
-import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
-import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
+import codedriver.framework.integration.authentication.core.AuthenticateHandlerFactory;
+import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
 import codedriver.framework.integration.dto.IntegrationAuditVo;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
@@ -42,7 +42,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
     static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);

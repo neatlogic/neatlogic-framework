@@ -11,8 +11,8 @@ import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundExcep
 import codedriver.framework.file.core.FileStorageMediumFactory;
 import codedriver.framework.file.core.IFileStorageHandler;
 import codedriver.framework.file.dto.FileVo;
-import codedriver.framework.integration.authtication.core.AuthenticateHandlerFactory;
-import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
+import codedriver.framework.integration.authentication.core.AuthenticateHandlerFactory;
+import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -3,7 +3,7 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.integration.body.core;
+package codedriver.framework.integration.authentication.core;
 
 import org.reflections.Reflections;
 
@@ -11,14 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ContentTypeHandlerFactory {
-    private static final Map<String, IContentTypeHandler> handlerMap = new HashMap<>();
+public class AuthenticateHandlerFactory {
+    private static final Map<String, IAuthenticateHandler> handlerMap = new HashMap<>();
 
     static {
-        Reflections reflections = new Reflections("codedriver.framework.integration.body.handler");
-        Set<Class<? extends IContentTypeHandler>> modules = reflections.getSubTypesOf(IContentTypeHandler.class);
-        for (Class<? extends IContentTypeHandler> c : modules) {
-            IContentTypeHandler handler;
+        Reflections reflections = new Reflections("codedriver.framework.integration.authentication.handler");
+        Set<Class<? extends IAuthenticateHandler>> modules = reflections.getSubTypesOf(IAuthenticateHandler.class);
+        for (Class<? extends IAuthenticateHandler> c : modules) {
+            IAuthenticateHandler handler;
             try {
                 handler = c.newInstance();
                 handlerMap.put(handler.getType(), handler);
@@ -29,7 +29,7 @@ public class ContentTypeHandlerFactory {
         }
     }
 
-    public static IContentTypeHandler getHandler(String type) {
+    public static IAuthenticateHandler getHandler(String type) {
         return handlerMap.get(type);
     }
 }

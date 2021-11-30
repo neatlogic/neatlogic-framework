@@ -3,7 +3,17 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.integration.authtication.handler;
+package codedriver.framework.integration.authentication.handler;
+
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.exception.integration.AuthenticateException;
+import codedriver.framework.integration.authentication.enums.AuthenticateType;
+import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,27 +22,16 @@ import java.net.HttpURLConnection;
 import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.exception.integration.AuthenticateException;
-import codedriver.framework.integration.authentication.enums.AuthenticateType;
-import codedriver.framework.integration.authtication.core.IAuthenticateHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 
-	private final static Logger logger = LoggerFactory.getLogger(BuildinAuthenticateHandler.class);
-	@Override
-	public String getType() {
-		return AuthenticateType.BUILDIN.getValue();
-	}
+    private final static Logger logger = LoggerFactory.getLogger(BuildinAuthenticateHandler.class);
 
-	@Override
+    @Override
+    public String getType() {
+        return AuthenticateType.BUILDIN.getValue();
+    }
+
+    @Override
 	public void authenticate(HttpURLConnection connection, JSONObject config) {
 		UserContext context = UserContext.get();
 		String token = context.getToken();

@@ -41,9 +41,6 @@ public class DatasourceManager {
         return (CodeDriverBasicDataSource) (datasourceMap.get(TenantContext.get().getTenantUuid()));
     }
 
-    public static CodeDriverBasicDataSource getDatasourceForData() {
-        return (CodeDriverBasicDataSource) (datasourceMap.get(TenantContext.get().getTenantUuid() + "_DATA"));
-    }
 
     @PostConstruct
     public void init() {

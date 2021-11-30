@@ -5,6 +5,7 @@
 
 package codedriver.framework.store.mysql;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.mapper.DatasourceMapper;
@@ -35,6 +36,14 @@ public class DatasourceManager {
     private CodeDriverBasicDataSource masterDatasource;
 
     private static final Map<Object, Object> datasourceMap = new HashMap<>();
+
+    public static CodeDriverBasicDataSource getDatasource() {
+        return (CodeDriverBasicDataSource) (datasourceMap.get(TenantContext.get().getTenantUuid()));
+    }
+
+    public static CodeDriverBasicDataSource getDatasourceForData() {
+        return (CodeDriverBasicDataSource) (datasourceMap.get(TenantContext.get().getTenantUuid() + "_DATA"));
+    }
 
     @PostConstruct
     public void init() {
@@ -74,6 +83,9 @@ public class DatasourceManager {
                 tenantDatasource.addDataSourceProperty("maintainTimeStats", false);
 
                 datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
+
+                /*
+                一个数据源足够了，直接增加前缀来查data库
                 // 创建OLAP库
                 CodeDriverBasicDataSource tenantDatasourceData = new CodeDriverBasicDataSource();
                 String urlOlap = datasourceVo.getUrl();
@@ -103,7 +115,7 @@ public class DatasourceManager {
                 tenantDatasourceData.addDataSourceProperty("elideSetAutoCommits", true);
                 tenantDatasourceData.addDataSourceProperty("maintainTimeStats", false);
                 datasourceMap.put(datasourceVo.getTenantUuid() + "_DATA", tenantDatasourceData);
-
+                */
                 TenantUtil.addTenant(datasourceVo.getTenantUuid());
             }
         }

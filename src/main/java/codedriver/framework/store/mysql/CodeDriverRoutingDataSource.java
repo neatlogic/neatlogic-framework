@@ -16,7 +16,7 @@ public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
         if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
             String key = TenantContext.get().getTenantUuid();
             if (TenantContext.get().isData()) {
-                key += "_data";
+                key += "_DATA";
             }
             return key;
         } else {

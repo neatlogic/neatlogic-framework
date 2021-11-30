@@ -36,6 +36,8 @@ public class MatrixVo extends BaseEditorVo {
     private FileVo fileVo;
     @EntityField( name = "ci模型id", type = ApiParamType.LONG)
     private Long ciId;
+    @EntityField( name = "自定义视图id", type = ApiParamType.LONG)
+    private Long customViewId;
 
     public Long getId() {
         return id;
@@ -127,5 +129,13 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setCiId(Long ciId) {
         this.ciId = ciId;
+    }
+
+    public Long getCustomViewId() {
+        return customViewId;
+    }
+
+    public void setCustomViewId(Long customViewId) {
+        this.customViewId = customViewId;
     }
 }

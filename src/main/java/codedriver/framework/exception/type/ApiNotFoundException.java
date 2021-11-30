@@ -9,8 +9,7 @@ public class ApiNotFoundException extends ApiRuntimeException {
 	*/
 	private static final long serialVersionUID = -8529977350164125804L;
 
-	public ApiNotFoundException(String msg) {
-		super(msg);
+	public ApiNotFoundException(String token) {
+		super("token为“" + token + "”的接口不存在或已被禁用");
 	}
-
 }

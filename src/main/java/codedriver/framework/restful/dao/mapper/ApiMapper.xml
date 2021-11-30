@@ -343,6 +343,12 @@
 	UPDATE `api_access_count` SET `count` = `count` + #{count} WHERE `token` = #{token}
 	</update>
 
+	<update id="updateApiNeedAuditByToken" parameterType="java.lang.String">
+		UPDATE `api`
+		SET `need_audit` = 1 - `need_audit`
+		WHERE `token` = #{value}
+	</update>
+
 	<insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
 		REPLACE INTO `api`
 		(

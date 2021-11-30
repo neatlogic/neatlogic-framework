@@ -125,7 +125,7 @@ public class PublicApiDispatcher {
         /* 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
         if (interfaceVo == null || (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
                 || PublicApiComponentFactory.getApiHandlerByHandler(interfaceVo.getHandler()).isPrivate()) {
-            throw new ApiNotFoundException("token为 '" + token + "' 的自定义接口不存在或已被禁用");
+            throw new ApiNotFoundException(token);
         }
 
         // 判断是否master模块接口，如果是不允许访问

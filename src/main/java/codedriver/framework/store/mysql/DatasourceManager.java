@@ -22,10 +22,14 @@ public class DatasourceManager {
     @Autowired
     private DatasourceMapper datasourceMapper;
 
-    @Autowired
-    private CodeDriverRoutingDataSource datasource;
+    private static CodeDriverRoutingDataSource datasource;
 
-    private static CodeDriverRoutingDataSource instance;
+    @Resource
+    public void setDataSource(CodeDriverRoutingDataSource _datasource) {
+        datasource = _datasource;
+    }
+
+    //private static CodeDriverRoutingDataSource instance;
 
     @Resource(name = "dataSourceMaster")
     private CodeDriverBasicDataSource masterDatasource;
@@ -47,10 +51,28 @@ public class DatasourceManager {
                 url = url.replace("{host}", datasourceVo.getHost());
                 url = url.replace("{port}", datasourceVo.getPort().toString());
                 url = url.replace("{dbname}", "codedriver_" + datasourceVo.getDatabase());
-                tenantDatasource.setUrl(url);
+                //tenantDatasource.setUrl(url);
+                tenantDatasource.setJdbcUrl(url);
                 tenantDatasource.setDriverClassName(datasourceVo.getDriver());
                 tenantDatasource.setUsername(datasourceVo.getUsername());
                 tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
+                tenantDatasource.setPoolName("HikariCP_" + datasourceVo.getTenantUuid());
+                //以下是针对Mysql的参数优化
+                //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
+                tenantDatasource.addDataSourceProperty("prepStmtCacheSize", 250);
+                //This is the maximum length of a prepared SQL statement that the driver will cache. The MySQL default is 256. In our experience, especially with ORM frameworks like Hibernate, this default is well below the threshold of generated statement lengths. Our recommended setting is 2048.
+                tenantDatasource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+                //Neither of the above parameters have any effect if the cache is in fact disabled, as it is by default. You must set this parameter to true.
+                tenantDatasource.addDataSourceProperty("cachePrepStmts", true);
+                //Newer versions of MySQL support server-side prepared statements, this can provide a substantial performance boost. Set this property to true.
+                tenantDatasource.addDataSourceProperty("useServerPrepStmts", true);
+                tenantDatasource.addDataSourceProperty("useLocalSessionState", true);
+                tenantDatasource.addDataSourceProperty("rewriteBatchedStatements", true);
+                tenantDatasource.addDataSourceProperty("cacheResultSetMetadata", true);
+                tenantDatasource.addDataSourceProperty("cacheServerConfiguration", true);
+                tenantDatasource.addDataSourceProperty("elideSetAutoCommits", true);
+                tenantDatasource.addDataSourceProperty("maintainTimeStats", false);
+
                 datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
                 // 创建OLAP库
                 CodeDriverBasicDataSource tenantDatasourceData = new CodeDriverBasicDataSource();
@@ -58,18 +80,36 @@ public class DatasourceManager {
                 urlOlap = urlOlap.replace("{host}", datasourceVo.getHost());
                 urlOlap = urlOlap.replace("{port}", datasourceVo.getPort().toString());
                 urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_data");
-                tenantDatasourceData.setUrl(urlOlap);
+                //tenantDatasourceData.setUrl(urlOlap);
+                tenantDatasourceData.setJdbcUrl(urlOlap);
                 tenantDatasourceData.setDriverClassName(datasourceVo.getDriver());
                 tenantDatasourceData.setUsername(datasourceVo.getUsername());
                 tenantDatasourceData.setPassword(datasourceVo.getPasswordPlain());
+                tenantDatasourceData.setPoolName("HikariCP_DATA_" + datasourceVo.getTenantUuid());
+
+                //以下是针对Mysql的参数优化
+                //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
+                tenantDatasourceData.addDataSourceProperty("prepStmtCacheSize", 250);
+                //This is the maximum length of a prepared SQL statement that the driver will cache. The MySQL default is 256. In our experience, especially with ORM frameworks like Hibernate, this default is well below the threshold of generated statement lengths. Our recommended setting is 2048.
+                tenantDatasourceData.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+                //Neither of the above parameters have any effect if the cache is in fact disabled, as it is by default. You must set this parameter to true.
+                tenantDatasourceData.addDataSourceProperty("cachePrepStmts", true);
+                //Newer versions of MySQL support server-side prepared statements, this can provide a substantial performance boost. Set this property to true.
+                tenantDatasourceData.addDataSourceProperty("useServerPrepStmts", true);
+                tenantDatasourceData.addDataSourceProperty("useLocalSessionState", true);
+                tenantDatasourceData.addDataSourceProperty("rewriteBatchedStatements", true);
+                tenantDatasourceData.addDataSourceProperty("cacheResultSetMetadata", true);
+                tenantDatasourceData.addDataSourceProperty("cacheServerConfiguration", true);
+                tenantDatasourceData.addDataSourceProperty("elideSetAutoCommits", true);
+                tenantDatasourceData.addDataSourceProperty("maintainTimeStats", false);
                 datasourceMap.put(datasourceVo.getTenantUuid() + "_DATA", tenantDatasourceData);
 
                 TenantUtil.addTenant(datasourceVo.getTenantUuid());
             }
         }
-        if (instance == null && datasource != null) {
+        /*if (instance == null && datasource != null) {
             instance = datasource;
-        }
+        }*/
         if (!datasourceMap.isEmpty()) {
             datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
@@ -82,11 +122,14 @@ public class DatasourceManager {
     public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource) {
         if (!datasourceMap.containsKey(tenantUuid)) {
             datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
-            instance.setTargetDataSources(datasourceMap);
+            //instance.setTargetDataSources(datasourceMap);
+            datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
-                instance.setDefaultTargetDataSource(datasourceMap.get("master"));
+                //instance.setDefaultTargetDataSource(datasourceMap.get("master"));
+                datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
             }
-            instance.afterPropertiesSet();
+            //instance.afterPropertiesSet();
+            datasource.afterPropertiesSet();
         }
     }
 

@@ -8,7 +8,7 @@ package codedriver.framework.store.mysql;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CodeDriverBasicDataSource extends BasicDataSource {
+public class CodeDriverBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private final Logger logger = LoggerFactory.getLogger(CodeDriverBasicDataSource.class);
 
     @Override

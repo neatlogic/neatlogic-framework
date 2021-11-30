@@ -220,9 +220,7 @@ public class HttpRequestUtil {
     }
 
     /**
-     * 设置content-type，默认是appliactions/json
-     *
-     * @param contentType
+     * 设置content-type，默认是applications/json
      */
     public HttpRequestUtil setContentType(ContentType contentType) {
         this.contentType = contentType;

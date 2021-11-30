@@ -31,7 +31,7 @@
 
     <!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
     <!-- org.apache.commons.dbcp2.BasicDataSource -->
-    <bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
+    <!--<bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
         <property name="driverClassName">
             <value>${db.driverClassName}</value>
         </property>
@@ -53,6 +53,19 @@
         </property>
         <property name="initialSize">
             <value>${conn.initialSize}</value>
+        </property>
+    </bean>-->
+
+    <bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
+        <property name="driverClassName">
+            <value>${db.driverClassName}</value>
+        </property>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username">
+            <value>${db.username}</value>
+        </property>
+        <property name="password">
+            <value>${db.password}</value>
         </property>
     </bean>
 

@@ -331,7 +331,7 @@ public class ApiValidateAndHelpBase {
                         if (!paramObj.containsKey(p.name())) {
                             throw new ParamNotExistsException(p.name());
                         } else {
-                            if (p.type().equals(ApiParamType.STRING) && paramValue != null && StringUtils.isBlank(paramValue.toString())) {
+                            if (paramValue != null && StringUtils.isBlank(paramValue.toString())) {
                                 throw new ParamNotExistsException(p.name());
                             }
                         }

@@ -124,14 +124,6 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 
-	<select id="getMatrixCustomViewByMatrixUuid" parameterType="string" resultType="codedriver.framework.matrix.dto.MatrixCustomViewVo">
-		SELECT
-			`matrix_uuid` AS matrixUuid,
-			`customview_id` AS customViewId
-		FROM `matrix_customview`
-		WHERE `matrix_uuid` = #{matrixUuid}
-	</select>
-
 	<insert id="insertMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" >
 		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
 			select LAST_INSERT_ID() as id
@@ -190,16 +182,6 @@
 		)
 	</insert>
 
-	<insert id="replaceMatrixCustomView" parameterType="codedriver.framework.matrix.dto.MatrixCustomViewVo">
-		REPLACE INTO `matrix_customview`(
-			`matrix_uuid`,
-			`customview_id`
-		) VALUES (
-		#{matrixUuid},
-		#{customViewId}
-		)
-	</insert>
-
 	<update id="updateMatrixNameAndLcu" parameterType="codedriver.framework.matrix.dto.MatrixVo">
 		UPDATE `matrix` SET
 		 `name` = #{name},
@@ -222,8 +204,5 @@
 
 	<delete id="deleteMatrixCiByMatrixUuid" parameterType="String">
 		DELETE FROM `matrix_ci` WHERE `matrix_uuid` = #{value}
-	</delete>
-	<delete id="deleteMatrixCustomViewByMatrixUuid" parameterType="String">
-		DELETE FROM `matrix_customview` WHERE `matrix_uuid` = #{value}
 	</delete>
 </mapper>

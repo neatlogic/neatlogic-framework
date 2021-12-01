@@ -14,9 +14,6 @@ public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
     @Override
     protected Object determineCurrentLookupKey() {
         if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
-            /*if (TenantContext.get().isData()) {
-                key += "_DATA";
-            }*/
             return TenantContext.get().getTenantUuid();
         } else {
             return null;

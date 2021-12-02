@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
     private static final Analyzer indexAnalyzer = new IKAnalyzer(false);//分词细一点
-    private static final Analyzer searchAnalyzer = new IKAnalyzer(false);//分词粗一点
+    private static final Analyzer searchAnalyzer = new IKAnalyzer(true);//分词粗一点
     private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     /**

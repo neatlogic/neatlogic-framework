@@ -63,7 +63,7 @@ public class DatasourceManager {
                 tenantDatasource.setUsername(datasourceVo.getUsername());
                 tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
                 tenantDatasource.setPoolName("HikariCP_" + datasourceVo.getTenantUuid());
-                //tenantDatasource.setMaximumPoolSize(99);
+                tenantDatasource.setMaximumPoolSize(20);
                 //以下是针对Mysql的参数优化
                 //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
                 tenantDatasource.addDataSourceProperty("prepStmtCacheSize", 250);

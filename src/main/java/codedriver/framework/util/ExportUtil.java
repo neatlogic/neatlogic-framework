@@ -26,6 +26,15 @@ import java.util.List;
 
 public class ExportUtil {
 
+    /**
+     * 导出HTML为PDF
+     *
+     * @param html html
+     * @param os 输出流
+     * @param landscape
+     * @param isNeedCompletedHtml 是否需要补全HTML标签
+     * @throws Exception
+     */
     public static void getPdfFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
         if (isNeedCompletedHtml) {
@@ -40,6 +49,15 @@ public class ExportUtil {
         savePdf(xhtml2word(doc, landscape), os);
     }
 
+    /**
+     * 导出HTML为WORD
+     *
+     * @param html html
+     * @param os 输出流
+     * @param landscape
+     * @param isNeedCompletedHtml 是否需要补全HTML标签
+     * @throws Exception
+     */
     public static void getWordFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         // fixme --laiwt 有部分html经过tidy解析后，返回空串，暂不清楚是何原因
         if (isNeedCompletedHtml) {

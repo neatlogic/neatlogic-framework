@@ -291,9 +291,10 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
             TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
             for (ApiVo apiVo : apiTokenList) {
                 ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
-                if (api == null) {
-                    apiMapper.replaceApi(apiVo);
-                }
+                //if (api == null) {
+                //即使接口存在也可能需要更新模块、类型、描述等信息
+                apiMapper.replaceApi(apiVo);
+                // }
             }
         }
     }

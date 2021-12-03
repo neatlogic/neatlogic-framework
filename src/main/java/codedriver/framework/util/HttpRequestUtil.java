@@ -15,8 +15,8 @@ import codedriver.framework.integration.authentication.core.IAuthenticateHandler
 import codedriver.framework.integration.authentication.enums.AuthenticateType;
 import com.alibaba.fastjson.JSONObject;
 import com.uwyn.jhighlight.tools.ExceptionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,15 +29,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
@@ -374,82 +369,104 @@ public class HttpRequestUtil {
         return authConfig;
     }
 
-    private HttpURLConnection getConnection() throws NoSuchAlgorithmException, KeyManagementException, IOException {
-        HttpURLConnection connection;
-        HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
-        SSLContext sc = SSLContext.getInstance("TLSv1.2");
-        sc.init(null, trustAllCerts, new SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    private HttpURLConnection getConnection() {
+        try {
+            HttpURLConnection connection;
+            HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+            SSLContext sc = SSLContext.getInstance("TLSv1.2");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-        URL getUrl = new URL(this.url);
-        connection = (HttpURLConnection) getUrl.openConnection();
-        //设置连接参数
-        connection.setRequestMethod(method);
-        connection.setUseCaches(false);
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setConnectTimeout(this.connectTimeout);
-        connection.setReadTimeout(this.readTimeout);
-        // 设置默认头部
-        connection.setRequestProperty("Content-Type", this.contentType.getValue());
-        connection.setRequestProperty("Charset", String.valueOf(this.charset));
-        if (StringUtils.isNotBlank(this.tenant)) {
-            connection.setRequestProperty("Tenant", this.tenant);
-        }
-        //设置自定义头部
-        if (MapUtils.isNotEmpty(this.headerMap)) {
-            for (String key : this.headerMap.keySet()) {
-                connection.setRequestProperty(key, this.headerMap.get(key));
+            URL getUrl = new URL(this.url);
+            connection = (HttpURLConnection) getUrl.openConnection();
+            //设置连接参数
+            connection.setRequestMethod(method);
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setConnectTimeout(this.connectTimeout);
+            connection.setReadTimeout(this.readTimeout);
+            // 设置默认头部
+            connection.setRequestProperty("Content-Type", this.contentType.getValue());
+            connection.setRequestProperty("Charset", String.valueOf(this.charset));
+            if (StringUtils.isNotBlank(this.tenant)) {
+                connection.setRequestProperty("Tenant", this.tenant);
             }
-        }
-        // 设置验证
-        if (this.authType != null) {
-            IAuthenticateHandler handler = AuthenticateHandlerFactory.getHandler(this.authType.getValue());
-            if (handler != null) {
-                handler.authenticate(connection, this.getAuthConfig());
+            //设置自定义头部
+            if (MapUtils.isNotEmpty(this.headerMap)) {
+                for (String key : this.headerMap.keySet()) {
+                    connection.setRequestProperty(key, this.headerMap.get(key));
+                }
             }
+            // 设置验证
+            if (this.authType != null) {
+                IAuthenticateHandler handler = AuthenticateHandlerFactory.getHandler(this.authType.getValue());
+                if (handler != null) {
+                    handler.authenticate(connection, this.getAuthConfig());
+                }
+            }
+            connection.connect();
+            return connection;
+        } catch (Exception ex) {
+            this.errorList.add(ExceptionUtils.getExceptionStackTrace(ex));
         }
-        connection.connect();
-        return connection;
+        return null;
     }
 
     private String result;
 
-    public HttpRequestUtil sendRequest() throws Exception {
+    private List<String> errorList = new ArrayList<>();
+
+    public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
-        try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-            OutputStreamHandlerMap.get(this.contentType).execute(out, this);
-            out.flush();
-            out.close();
-            // 处理返回值
-            DataInputStream input = null;
-            if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
-                input = new DataInputStream(connection.getInputStream());
-            } else {
-                input = new DataInputStream(connection.getErrorStream());
+        if (connection != null) {
+            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                OutputStreamHandlerMap.get(this.contentType).execute(out, this);
+                out.flush();
+                out.close();
+                // 处理返回值
+                DataInputStream input = null;
+                if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
+                    input = new DataInputStream(connection.getInputStream());
+                } else {
+                    input = new DataInputStream(connection.getErrorStream());
+                }
+                if (this.outputStream == null) {
+                    StringWriter writer = new StringWriter();
+                    InputStreamReader reader = new InputStreamReader(input, this.charset);
+                    IOUtils.copy(reader, writer);
+                    result = writer.toString();
+                } else {
+                    IOUtils.copy(input, this.outputStream);
+                    this.outputStream.flush();
+                }
+            } catch (ApiRuntimeException e) {
+                this.errorList.add(e.getMessage(true));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                this.errorList.add(ExceptionUtils.getExceptionStackTrace(e));
+            } finally {
+                connection.disconnect();
             }
-            if (this.outputStream == null) {
-                StringWriter writer = new StringWriter();
-                InputStreamReader reader = new InputStreamReader(input, this.charset);
-                IOUtils.copy(reader, writer);
-                result = writer.toString();
-            } else {
-                IOUtils.copy(input, this.outputStream);
-                this.outputStream.flush();
-            }
-        } catch (ApiRuntimeException e) {
-            logger.error(e.getMessage(), e);
-            result = e.getMessage(true);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            result = ExceptionUtils.getExceptionStackTrace(e);
-        } finally {
-            connection.disconnect();
         }
         return this;
     }
 
+
     public String getResult() {
         return result;
+    }
+
+    public List<String> getError() {
+        return errorList;
+    }
+
+
+    public JSONObject getResultJson() {
+        if (StringUtils.isNotBlank(result)) {
+            return JSONObject.parseObject(result);
+        } else {
+            return null;
+        }
     }
 }

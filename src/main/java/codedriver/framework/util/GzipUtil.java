@@ -56,7 +56,6 @@ public class GzipUtil {
             logger.error(e.getMessage(), e);
             return compressedStr;
         }
-
     }
 
 }

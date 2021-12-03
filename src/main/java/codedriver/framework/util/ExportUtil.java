@@ -26,11 +26,13 @@ import java.util.List;
 
 public class ExportUtil {
 
-    public static void getPdfFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
+    public static void getPdfFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
-        String completedHtml = completeHtml(html);
-        if (StringUtils.isNotBlank(completedHtml)) {
-            html = completedHtml;
+        if (isNeedCompletedHtml) {
+            String completedHtml = completeHtml(html);
+            if (StringUtils.isNotBlank(completedHtml)) {
+                html = completedHtml;
+            }
         }
         html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");// 过滤掉XML的无效字符
         Document doc = Jsoup.parse(html);
@@ -38,11 +40,13 @@ public class ExportUtil {
         savePdf(xhtml2word(doc, landscape), os);
     }
 
-    public static void getWordFileByHtml(String html, boolean landscape, OutputStream os) throws Exception {
-        String completedHtml = completeHtml(html);
+    public static void getWordFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         // fixme --laiwt 有部分html经过tidy解析后，返回空串，暂不清楚是何原因
-        if (StringUtils.isNotBlank(completedHtml)) {
-            html = completedHtml;
+        if (isNeedCompletedHtml) {
+            String completedHtml = completeHtml(html);
+            if (StringUtils.isNotBlank(completedHtml)) {
+                html = completedHtml;
+            }
         }
         html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");// 过滤掉XML的无效字符
         Document doc = Jsoup.parse(html);

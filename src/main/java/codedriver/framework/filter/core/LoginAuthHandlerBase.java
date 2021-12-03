@@ -1,6 +1,5 @@
 package codedriver.framework.filter.core;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -59,8 +58,6 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid()) && StringUtils.isBlank(userVo.getCookieAuthorization())) {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            TenantContext.init();
-            TenantContext.get().switchTenant(tenant);
             userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
             if (userMapper.getUserSessionLockByUserUuid(userVo.getUuid()) != null) {
                 userMapper.updateUserSession(userVo.getUuid());

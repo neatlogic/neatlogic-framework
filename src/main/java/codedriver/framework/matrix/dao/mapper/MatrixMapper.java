@@ -1,9 +1,11 @@
 package codedriver.framework.matrix.dao.mapper;
 
-import java.util.List;
+import codedriver.framework.matrix.dto.MatrixCiVo;
+import codedriver.framework.matrix.dto.MatrixExternalVo;
+import codedriver.framework.matrix.dto.MatrixViewVo;
+import codedriver.framework.matrix.dto.MatrixVo;
 
-import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.matrix.dto.*;
+import java.util.List;
 
 public interface MatrixMapper {
 
@@ -27,8 +29,6 @@ public interface MatrixMapper {
 
     MatrixCiVo getMatrixCiByMatrixUuid(String matrixUuid);
 
-    MatrixCustomViewVo getMatrixCustomViewByMatrixUuid(String uuid);
-
     int insertMatrix(MatrixVo matrixVo);
 
     int replaceMatrixExternal(MatrixExternalVo matrixExternalVo);
@@ -36,8 +36,6 @@ public interface MatrixMapper {
     int replaceMatrixView(MatrixViewVo matrixViewVo);
 
     int replaceMatrixCi(MatrixCiVo matrixCiVo);
-
-    int replaceMatrixCustomView(MatrixCustomViewVo matrixCustomViewVo);
 
     int updateMatrixNameAndLcu(MatrixVo matrixVo);
 
@@ -48,6 +46,4 @@ public interface MatrixMapper {
     int deleteMatrixViewByMatrixUuid(String matrixUuid);
 
     int deleteMatrixCiByMatrixUuid(String matrixUuid);
-
-    void deleteMatrixCustomViewByMatrixUuid(String matrixUuid);
 }

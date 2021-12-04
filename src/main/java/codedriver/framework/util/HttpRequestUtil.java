@@ -415,7 +415,7 @@ public class HttpRequestUtil {
 
     private String result;
 
-    private List<String> errorList = new ArrayList<>();
+    private final List<String> errorList = new ArrayList<>();
 
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
@@ -425,20 +425,23 @@ public class HttpRequestUtil {
                 out.flush();
                 out.close();
                 // 处理返回值
-                DataInputStream input = null;
                 if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
-                    input = new DataInputStream(connection.getInputStream());
+                    DataInputStream input = new DataInputStream(connection.getInputStream());
+                    if (this.outputStream == null) {
+                        StringWriter writer = new StringWriter();
+                        InputStreamReader reader = new InputStreamReader(input, this.charset);
+                        IOUtils.copy(reader, writer);
+                        result = writer.toString();
+                    } else {
+                        IOUtils.copy(input, this.outputStream);
+                        this.outputStream.flush();
+                    }
                 } else {
-                    input = new DataInputStream(connection.getErrorStream());
-                }
-                if (this.outputStream == null) {
+                    DataInputStream input = new DataInputStream(connection.getErrorStream());
                     StringWriter writer = new StringWriter();
                     InputStreamReader reader = new InputStreamReader(input, this.charset);
                     IOUtils.copy(reader, writer);
-                    result = writer.toString();
-                } else {
-                    IOUtils.copy(input, this.outputStream);
-                    this.outputStream.flush();
+                    throw new ApiRuntimeException(writer.toString());
                 }
             } catch (ApiRuntimeException e) {
                 this.errorList.add(e.getMessage(true));

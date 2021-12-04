@@ -74,7 +74,7 @@ public class PublicApiDispatcher {
     public PublicApiDispatcher() {
         errorMap.put(408, "请求已超时");
         errorMap.put(400, "由于包含语法错误，当前请求无法被服务器理解");
-        errorMap.put(412, "请求头不符合要求");
+        errorMap.put(412, "请求头缺少认证信息");
         errorMap.put(410, "服务不可用");
         errorMap.put(401, "用户验证失败");
         errorMap.put(403, "禁止访问");

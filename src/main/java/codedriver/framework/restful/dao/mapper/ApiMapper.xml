@@ -101,6 +101,32 @@
         order by `create_time` desc
     </select>
 
+    <select id="getAllApiByModuleId" resultType="codedriver.framework.restful.dto.ApiVo" useCache="true">
+        SELECT `name`,
+        `module_id` AS moduleId,
+        `handler`,
+        `username`,
+        `password`,
+        `config`,
+        `is_active` AS isActive,
+        `token`,
+        `expire`,
+        `description`,
+        `authtype`,
+        `type`,
+        `qps`,
+        `timeout`,
+        `need_audit` AS needAudit
+        FROM `api`
+        <where>
+            <if test="moduleIdList != null and moduleIdList.size() > 0">
+                and module_id in
+                <foreach collection="moduleIdList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+        </where>
+        order by `create_time` desc
+    </select>
+
     <select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
             resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
         SELECT `id`,

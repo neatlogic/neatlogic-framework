@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.restful.dao.mapper;
 
 import codedriver.framework.restful.dto.ApiAuditVo;
@@ -8,65 +13,65 @@ import java.util.List;
 
 public interface ApiMapper {
 
-	ApiVo getApiByToken(String token);
+    ApiVo getApiByToken(String token);
 
-	List<String> getApiTokenList(ApiVo apiVo);
+    List<String> getApiTokenList(ApiVo apiVo);
 
-	List<ApiVo> getAllApi();
+    List<ApiVo> getAllApi();
 
-	List<ApiVo> getApiListByTokenList(List<String> tokenList);
+    List<ApiVo> getAllApiByModuleId(@Param("moduleIdList") List<String> moduleIdList);
 
-	int getApiAuditCount(ApiAuditVo apiAuditVo);
+    List<ApiVo> getApiListByTokenList(List<String> tokenList);
 
-	List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
+    int getApiAuditCount(ApiAuditVo apiAuditVo);
 
-	List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
+    List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
 
-	String getApiAuditDetailByHash(String hash);
+    List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
 
-	List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
+    String getApiAuditDetailByHash(String hash);
 
-	String getApiAccessCountLockByToken(String token);
+    List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-	List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
+    String getApiAccessCountLockByToken(String token);
 
-	int searchApiAuditListCount(ApiAuditVo apiAuditVo);
+    List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
 
-	List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
+    int searchApiAuditListCount(ApiAuditVo apiAuditVo);
 
-	List<String> getDistinctTokenInApiAudit();
+    List<ApiAuditVo> searchApiAuditForExport(ApiAuditVo apiAuditVo);
 
-	String getAuditFileByHash(String hash);
+    List<String> getDistinctTokenInApiAudit();
 
-	int replaceApi(ApiVo apiVo);
+    String getAuditFileByHash(String hash);
 
-	int insertApiAudit(ApiAuditVo apiAudit);
+    int replaceApi(ApiVo apiVo);
 
-	int batchUpdate(ApiVo apiVo);
+    int insertApiAudit(ApiAuditVo apiAudit);
 
-	/**
-	 * 
-	* @Time:2020年7月15日
-	* @Description: 插入接口访问次数
-	* @param token
-	* @param count
-	* @return int
-	 */
-	int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+    int batchUpdate(ApiVo apiVo);
 
-	int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
+    /**
+     * @param token
+     * @param count
+     * @return int
+     * @Time:2020年7月15日
+     * @Description: 插入接口访问次数
+     */
+    int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
-	/**
-	 * 
-	* @Time:2020年7月15日
-	* @Description: 增加接口访问次数 
-	* @param token
-	* @param visitTimes
-	* @return int
-	 */
-	int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+    int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
 
-	int updateApiNeedAuditByToken(String token);
+    /**
+     * @param token
+     * @param visitTimes
+     * @return int
+     * @Time:2020年7月15日
+     * @Description: 增加接口访问次数
+     */
+    int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
 
-	int deleteApiByToken(String token);
+    int updateApiNeedAuditByToken(String token);
+
+    int deleteApiByToken(String token);
 }

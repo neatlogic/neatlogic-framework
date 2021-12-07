@@ -38,10 +38,7 @@ public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
 
     public enum ContentType {
-        CONTENT_TYPE_APPLICATION_JSON("application/json"),
-        CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY),
-        CONTENT_TYPE_TEXT_HTML("text/html"),
-        CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded");
+        CONTENT_TYPE_APPLICATION_JSON("application/json"), CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY), CONTENT_TYPE_TEXT_HTML("text/html"), CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded");
         private final String value;
 
         ContentType(String value) {
@@ -408,14 +405,14 @@ public class HttpRequestUtil {
             connection.connect();
             return connection;
         } catch (Exception ex) {
-            this.errorList.add(ExceptionUtils.getExceptionStackTrace(ex));
+            this.error = ExceptionUtils.getExceptionStackTrace(ex);
         }
         return null;
     }
 
     private String result;
+    private String error;
 
-    private final List<String> errorList = new ArrayList<>();
 
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
@@ -444,10 +441,10 @@ public class HttpRequestUtil {
                     throw new ApiRuntimeException(writer.toString());
                 }
             } catch (ApiRuntimeException e) {
-                this.errorList.add(e.getMessage(true));
+                this.error = e.getMessage(true);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                this.errorList.add(ExceptionUtils.getExceptionStackTrace(e));
+                this.error = ExceptionUtils.getExceptionStackTrace(e);
             } finally {
                 connection.disconnect();
             }
@@ -460,8 +457,8 @@ public class HttpRequestUtil {
         return result;
     }
 
-    public List<String> getError() {
-        return errorList;
+    public String getError() {
+        return error;
     }
 
 

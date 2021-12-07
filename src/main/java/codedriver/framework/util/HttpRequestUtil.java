@@ -30,9 +30,11 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
@@ -55,7 +57,7 @@ public class HttpRequestUtil {
     //默认boundary
     private static final String FORM_DATA_BOUNDARY = "----MyFormBoundarySMFEtUYQG6r5B920";
     //连接地址
-    private String url;
+    private final String url;
     private String method;
     private ContentType contentType = ContentType.CONTENT_TYPE_APPLICATION_JSON;
     private Charset charset = StandardCharsets.UTF_8;
@@ -91,11 +93,11 @@ public class HttpRequestUtil {
 
     static TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
         }
 
         @Override
@@ -166,7 +168,7 @@ public class HttpRequestUtil {
                     out.write(dataBuilder.toString().getBytes(_this.charset));
                     // 开始写文件
                     DataInputStream in = new DataInputStream(handler.getData(fileVo.getPath()));
-                    int bytes = 0;
+                    int bytes;
                     byte[] bufferOut = new byte[1024 * 5];
                     while ((bytes = in.read(bufferOut)) != -1) {
                         out.write(bufferOut, 0, bytes);
@@ -412,6 +414,7 @@ public class HttpRequestUtil {
 
     private String result;
     private String error;
+    private int responseCode;
 
 
     public HttpRequestUtil sendRequest() {
@@ -422,7 +425,8 @@ public class HttpRequestUtil {
                 out.flush();
                 out.close();
                 // 处理返回值
-                if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
+                this.responseCode = connection.getResponseCode();
+                if (100 <= this.responseCode && this.responseCode <= 399) {
                     DataInputStream input = new DataInputStream(connection.getInputStream());
                     if (this.outputStream == null) {
                         StringWriter writer = new StringWriter();
@@ -459,6 +463,10 @@ public class HttpRequestUtil {
 
     public String getError() {
         return error;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 
 

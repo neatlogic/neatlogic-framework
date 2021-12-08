@@ -137,8 +137,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (StringUtils.isNotBlank(originalFilename) && !originalFilename.equals(matrixVo.getName())) {
             throw new MatrixNameDifferentImportFileNameException();
         }
-
-        List<MatrixAttributeVo> attributeVoList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixVo.getUuid());
+        String matrixUuid = matrixVo.getUuid();
+        List<MatrixAttributeVo> attributeVoList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixUuid);
         if (CollectionUtils.isNotEmpty(attributeVoList)) {
             Map<String, MatrixAttributeVo> headerMap = new HashMap<>();
             for (MatrixAttributeVo attributeVo : attributeVoList) {
@@ -158,27 +158,28 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             for (int i = 1; i <= rowNum; i++) {
                 Row row = sheet.getRow(i);
                 boolean isNew = false;
-                MatrixColumnVo uuidColumn = null;
+                String uuid = null;
                 List<MatrixColumnVo> rowData = new ArrayList<>();
                 for (int j = 0; j < colNum; j++) {
                     Cell tbodycell = row.getCell(j);
                     String value = getCellValue(tbodycell);
-                    String attributeUuid;
                     Cell theadCell = headerRow.getCell(j);
                     String columnName = theadCell.getStringCellValue();
                     if (("uuid").equals(columnName)) {
-                        attributeUuid = "uuid";
-                        if (StringUtils.isBlank(value) || matrixDataMapper.getDynamicTableDataCountByUuid(value, matrixVo.getUuid(), TenantContext.get().getDataDbName()) == 0) {
-                            value = UuidUtil.randomUuid();
+                        MatrixDataVo dataVo = new MatrixDataVo();
+                        dataVo.setMatrixUuid(matrixUuid);
+                        dataVo.setUuid(value);
+                        if (StringUtils.isBlank(value) || matrixDataMapper.getDynamicTableDataCountByUuid(dataVo) == 0) {
+                            uuid = UuidUtil.randomUuid();
                             isNew = true;
-                            rowData.add(new MatrixColumnVo(attributeUuid, value));
+                            rowData.add(new MatrixColumnVo("uuid", uuid));
                         } else {
-                            uuidColumn = new MatrixColumnVo(attributeUuid, value);
+                            uuid = value;
                         }
                     } else {
                         MatrixAttributeVo attributeVo = headerMap.get(columnName);
                         if (attributeVo != null) {
-                            attributeUuid = attributeVo.getUuid();
+                            String attributeUuid = attributeVo.getUuid();
                             if (StringUtils.isNotBlank(attributeUuid)) {
                                 if (matrixService.matrixAttributeValueVerify(attributeVo, value)) {
                                     rowData.add(new MatrixColumnVo(attributeUuid, value));
@@ -190,11 +191,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 if (isNew) {
-                    matrixDataMapper.insertDynamicTableData(rowData, matrixVo.getUuid(), TenantContext.get().getDataDbName());
+                    matrixDataMapper.insertDynamicTableData(rowData, matrixUuid, TenantContext.get().getDataDbName());
                     insert++;
                     update++;
                 } else {
-                    matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuidColumn, matrixVo.getUuid(), TenantContext.get().getDataDbName());
+                    matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid, TenantContext.get().getDataDbName());
                 }
             }
         } else {
@@ -383,15 +384,15 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         JSONObject returnObj = new JSONObject();
         List<MatrixAttributeVo> matrixAttributeList = attributeMapper.getMatrixAttributeByMatrixUuid(dataVo.getMatrixUuid());
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
-            if (dataVo.getNeedPage()) {
-                int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
-                dataVo.setRowNum(rowNum);
-            }
             JSONArray dafaultValue = dataVo.getDefaultValue();
             List<Map<String, String>> dataMapList = null;
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
+                if (dataVo.getNeedPage()) {
+                    int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
+                    dataVo.setRowNum(rowNum);
+                }
                 dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);
             }
             List<Map<String, Object>> tbodyList = matrixService.matrixTableDataValueHandle(matrixAttributeList, dataMapList);
@@ -514,10 +515,12 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
         } else {
             if (hasData) {
-                MatrixColumnVo uuidColumn = new MatrixColumnVo("uuid", uuidValue);
-                matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuidColumn, matrixUuid, schemaName);
+                matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuidValue, matrixUuid, schemaName);
             } else {
-                matrixDataMapper.deleteDynamicTableDataByUuid(matrixUuid, uuidValue, schemaName);
+                MatrixDataVo dataVo = new MatrixDataVo();
+                dataVo.setMatrixUuid(matrixUuid);
+                dataVo.setUuid(uuidValue);
+                matrixDataMapper.deleteDynamicTableDataByUuid(dataVo);
             }
         }
         return null;
@@ -559,8 +562,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected void myDeleteTableRowData(String matrixUuid, List<String> uuidList) {
 //        List<String> uuidList = jsonObj.getJSONArray("uuidList").toJavaList(String.class);
+        MatrixDataVo dataVo = new MatrixDataVo();
+        dataVo.setMatrixUuid(matrixUuid);
         for (String uuid : uuidList) {
-            matrixDataMapper.deleteDynamicTableDataByUuid(matrixUuid, uuid, TenantContext.get().getDataDbName());
+            dataVo.setUuid(uuid);
+            matrixDataMapper.deleteDynamicTableDataByUuid(dataVo);
         }
     }
 

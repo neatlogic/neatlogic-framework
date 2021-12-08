@@ -27,7 +27,6 @@ public class MatrixDataVo extends BasePageVo {
     private List<String> attributeValueList;
     private String attributeUuid;
     private JSONArray filterList;
-    private String schemaName = TenantContext.get().getDataDbName();
     List<String> arrayColumnList;
 //    private String targetColumn;
 //
@@ -138,11 +137,7 @@ public class MatrixDataVo extends BasePageVo {
     }
 
     public String getSchemaName() {
-        return schemaName;
-    }
-
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+        return TenantContext.get().getDataDbName();
     }
 
     public List<String> getArrayColumnList() {

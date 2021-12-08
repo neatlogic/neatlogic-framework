@@ -4,7 +4,7 @@
     <select id="getDynamicTableDataCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
-        COUNT(`uuid`)
+        COUNT(1)
         FROM `${schemaName}`.`matrix_${matrixUuid}`
         <where>
             <if test="keyword != null and keyword != ''">
@@ -16,7 +16,7 @@
     </select>
 
     <select id="getDynamicTableDataCountByUuid" resultType="int">
-        SELECT COUNT(`uuid`)
+        SELECT COUNT(1)
         FROM `${schemaName}`.`matrix_${matrixUuid}`
         WHERE `uuid` = #{uuid}
     </select>
@@ -209,7 +209,7 @@
     <select id="getDynamicTableDataByColumnCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
-        COUNT(`id`)
+        COUNT(1)
         FROM `${schemaName}`.`matrix_${matrixUuid}`
         <where>
             <include refid="searchDynamicTableDataSql"/>
@@ -231,7 +231,7 @@
         </where>
     </select>-->
 
-    <select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
+    <!--<select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT
         `${targetColumn}` as `value`,
         `${sourceColumn}` as `text`
@@ -240,7 +240,7 @@
         <foreach collection="list" item="text" separator="," open="(" close=")">
             #{text}
         </foreach>
-    </select>
+    </select>-->
 
     <select id="getDynamicRowDataByUuid" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">

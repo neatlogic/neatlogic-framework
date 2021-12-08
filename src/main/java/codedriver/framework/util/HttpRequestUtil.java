@@ -13,6 +13,7 @@ import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.integration.authentication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
 import codedriver.framework.integration.authentication.enums.AuthenticateType;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.uwyn.jhighlight.tools.ExceptionUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -407,6 +408,7 @@ public class HttpRequestUtil {
             connection.connect();
             return connection;
         } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
             this.error = ExceptionUtils.getExceptionStackTrace(ex);
         }
         return null;
@@ -473,6 +475,14 @@ public class HttpRequestUtil {
     public JSONObject getResultJson() {
         if (StringUtils.isNotBlank(result)) {
             return JSONObject.parseObject(result);
+        } else {
+            return null;
+        }
+    }
+
+    public JSONArray getResultJsonArray() {
+        if (StringUtils.isNotBlank(result)) {
+            return JSONObject.parseArray(result);
         } else {
             return null;
         }

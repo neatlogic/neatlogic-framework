@@ -365,6 +365,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         }
 //                        integrationVo.getParamObj().putAll(jsonObj);
                         paramObj.put("sourceColumnList", sourceColumnList);
+                        paramObj.put("filterList", dataVo.getFilterList());
                         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                         if (StringUtils.isNotBlank(resultVo.getError())) {
                             logger.error(resultVo.getError());

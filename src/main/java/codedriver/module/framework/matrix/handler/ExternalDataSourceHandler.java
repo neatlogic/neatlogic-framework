@@ -73,7 +73,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 return false;
             }
         }
-        validateMatrixExternalData(integrationUuid);
+//        validateMatrixExternalData(integrationUuid);
         MatrixExternalVo externalVo = new MatrixExternalVo(matrixVo.getUuid(), integrationUuid);
         matrixMapper.replaceMatrixExternal(externalVo);
         return true;

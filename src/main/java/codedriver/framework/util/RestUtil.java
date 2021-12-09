@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Deprecated
 public class RestUtil {
     private static final Map<String, Action<DataOutputStream, RestVo>> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(RestUtil.class);
@@ -72,7 +73,7 @@ public class RestUtil {
         }
         if (connection != null) {
             try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                actionMap.get(restVo.getContentType()).execute(out,restVo);
+                actionMap.get(restVo.getContentType()).execute(out, restVo);
                 out.flush();
                 out.close();
                 // 处理返回值
@@ -98,7 +99,8 @@ public class RestUtil {
     /**
      * 发送POST请求，并将返回值写入response
      * 用于文件流下载
-     * @param restVo   请求入参
+     *
+     * @param restVo 请求入参
      */
     public static String sendPostRequestForStream(RestVo restVo) {
         HttpServletResponse response = UserContext.get().getResponse();
@@ -114,7 +116,7 @@ public class RestUtil {
             DataInputStream input = null;
             OutputStream os = null;
             try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                actionMap.get(restVo.getContentType()).execute(out,restVo);
+                actionMap.get(restVo.getContentType()).execute(out, restVo);
                 out.flush();
                 out.close();
                 if (100 <= connection.getResponseCode() && connection.getResponseCode() <= 399) {
@@ -145,7 +147,6 @@ public class RestUtil {
         }
         return result;
     }
-
 
 
     static {

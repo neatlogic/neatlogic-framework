@@ -25,6 +25,7 @@ import java.util.Map;
  * @description:
  * @create: 2020-03-31 17:00
  **/
+@Deprecated
 public class ExcelUtil {
 
     static Logger logger = LoggerFactory.getLogger(ExcelUtil.class);

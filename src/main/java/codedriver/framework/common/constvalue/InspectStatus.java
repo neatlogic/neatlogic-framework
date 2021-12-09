@@ -8,7 +8,9 @@ package codedriver.framework.common.constvalue;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public enum InspectStatus implements IEnum {
     NORMAL("normal", "正常", "text-success"),
@@ -71,10 +73,10 @@ public enum InspectStatus implements IEnum {
         return null;
     }
 
-    public static JSONArray getInspectStatusArray() {
-        JSONArray array = new JSONArray();
+    public static Map<String,JSONObject> getAllInspectStatusMap() {
+        Map<String,JSONObject> map = new HashMap<>();
         for (InspectStatus action : values()) {
-            array.add(new JSONObject() {
+            map.put(action.getValue(),new JSONObject() {
                 {
                     this.put("value", action.getValue());
                     this.put("text", action.getText());
@@ -82,7 +84,7 @@ public enum InspectStatus implements IEnum {
                 }
             });
         }
-        return array;
+        return map;
     }
 
 

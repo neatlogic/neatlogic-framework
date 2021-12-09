@@ -256,7 +256,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 integrationAuditVo.appendError("failed\n" + e.getMessage());
                 integrationAuditVo.setStatus("failed");
             }
-            boolean hasTransfered = false;
+            boolean hasTransferred = false;
             if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
                 String content = outputConfig.getString("content");
                 if (StringUtils.isNotBlank(content)) {
@@ -266,7 +266,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                         } else if (resultVo.getRawResult().startsWith("[")) {
                             resultVo.setTransformedResult(JavascriptUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
                         }
-                        hasTransfered = true;
+                        hasTransferred = true;
                     } catch (Exception ex) {
                         logger.error(ex.getMessage(), ex);
                         resultVo.appendError(ex.getMessage());
@@ -275,7 +275,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     }
                 }
             }
-            if (!hasTransfered) {
+            if (!hasTransferred) {
                 resultVo.setTransformedResult(resultVo.getRawResult());
             }
 

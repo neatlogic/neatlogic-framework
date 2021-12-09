@@ -1,24 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.matrix.dao.mapper.MatrixDataMapper">
-    <select id="getDynamicTableDataCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="int">
+
+    <select id="getDynamicTableDataCountByUuid" resultType="int">
+        SELECT COUNT(1)
+        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <select id="getDynamicRowDataByUuid" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.LinkedHashMap">
         SELECT
-        COUNT(`uuid`)
+        `uuid`,
+        <foreach collection="columnList" separator="," item="column">
+            `${column}`
+        </foreach>
+        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <select id="getDynamicTableDataByUuidList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.LinkedHashMap">
+        SELECT
+        `uuid`,
+        <foreach collection="columnList" item="column" separator=",">
+            `${column}`
+        </foreach>
         FROM `${schemaName}`.`matrix_${matrixUuid}`
         <where>
-            <if test="keyword != null and keyword != ''">
-                <foreach collection="columnList" separator="OR" item="column">
-                    `${column}` LIKE CONCAT('%', #{keyword}, '%')
+            <if test="defaultValue != null and defaultValue.size() > 0">
+                `uuid` in
+                <foreach collection="defaultValue" open="(" close=")" item="uuid" separator=",">
+                    #{uuid}
                 </foreach>
             </if>
         </where>
     </select>
 
-    <select id="getDynamicTableDataCountByUuid" resultType="int">
-        SELECT COUNT(`uuid`)
+    <select id="getDynamicTableDataCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
         FROM `${schemaName}`.`matrix_${matrixUuid}`
-        WHERE `uuid` = #{uuid}
+        <!--<where>
+            <if test="keyword != null and keyword != ''">
+                <foreach collection="columnList" separator="OR" item="column">
+                    `${column}` LIKE CONCAT('%', #{keyword}, '%')
+                </foreach>
+            </if>
+        </where>-->
     </select>
 
     <select id="searchDynamicTableData" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
@@ -29,13 +59,13 @@
             `${column}`
         </foreach>
         FROM `${schemaName}`.`matrix_${matrixUuid}`
-        <where>
+        <!--<where>
             <if test="keyword != null and keyword != ''">
                 <foreach collection="columnList" separator="OR" item="column">
                     `${column}` LIKE CONCAT('%', #{keyword}, '%')
                 </foreach>
             </if>
-        </where>
+        </where>-->
         ORDER BY `id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -85,7 +115,17 @@
         </if>
     </sql>
 
-    <select id="getDynamicTableDataByColumnList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <select id="getDynamicTableDataCountForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        <where>
+            <include refid="searchDynamicTableDataSql"/>
+        </where>
+    </select>
+
+    <select id="getDynamicTableDataForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
@@ -102,10 +142,10 @@
         </if>
     </select>
 
-    <select id="getDynamicTableDataByColumnList2" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         select
-        DISTINCT a.*
+        DISTINCT e.*
         from (
         SELECT
         <foreach collection="columnList" item="column" separator=",">
@@ -114,13 +154,13 @@
         FROM `${schemaName}`.`matrix_${matrixUuid}` a
         <choose>
             <when test="attrType == 'user'">
-                JOIN `user` b ON b.`uuid` = a.`${attributeUuid}`
+                JOIN `user` b ON b.`uuid` = a.`${keywordColumn}`
             </when>
             <when test="attrType == 'team'">
-                JOIN `team` c ON c.`uuid` = a.`${attributeUuid}`
+                JOIN `team` c ON c.`uuid` = a.`${keywordColumn}`
             </when>
             <when test="attrType == 'role'">
-                JOIN `role` d ON d.`name` = a.`${attributeUuid}`
+                JOIN `role` d ON d.`name` = a.`${keywordColumn}`
             </when>
         </choose>
         <where>
@@ -130,127 +170,46 @@
             <if test="keyword != null and keyword != ''">
                 <choose>
                     <when test="attrType == 'input' or attrType == 'date'">
-                            and `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
+                        <if test="keywordExpression == 'like'">
+                            and `${keywordColumn}` LIKE CONCAT('%', #{keyword}, '%')
+                        </if>
+                        <if test="keywordExpression == 'equal'">
+                            and `${keywordColumn}` = #{keyword}
+                        </if>
                     </when>
                     <when test="attrType == 'user'">
-                        and b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
+                        <if test="keywordExpression == 'like'">
+                        and (b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+                        </if>
+                        <if test="keywordExpression == 'equal'">
+                            and (b.`user_id` = #{keyword} OR b.`user_name` = #{keyword})
+                        </if>
                     </when>
                     <when test="attrType == 'team'">
-                        and c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%')
+                        <if test="keywordExpression == 'like'">
+                        and (c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%'))
+                        </if>
+                        <if test="keywordExpression == 'equal'">
+                            and (c.`uuid` = #{keyword} OR c.`name` = #{keyword})
+                        </if>
                     </when>
                     <when test="attrType == 'role'">
-                        and d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%')
+                        <if test="keywordExpression == 'like'">
+                        and (d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%'))
+                        </if>
+                        <if test="keywordExpression == 'equal'">
+                            and (d.`name` = #{keyword} OR d.`description` = #{keyword})
+                        </if>
                     </when>
                 </choose>
             </if>
-            <if test="sourceColumnList != null and sourceColumnList.size() > 0">
-                <foreach collection="sourceColumnList" item="sourceColumn">
-                    <choose>
-                        <when test="sourceColumn.expression == 'equal'">
-                            AND a.`${sourceColumn.column}` = #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'unequal'">
-                            AND a.`${sourceColumn.column}` != #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'like'">
-                            AND a.`${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
-                        </when>
-                        <when test="sourceColumn.expression == 'greater-than'">
-                            AND a.`${sourceColumn.column}` &gt; #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'less-than'">
-                            AND a.`${sourceColumn.column}` &lt; #{sourceColumn.value}
-                        </when>
-                        <otherwise>
-                            AND a.`${sourceColumn.column}` = #{sourceColumn.value}
-                        </otherwise>
-                    </choose>
-                </foreach>
-            </if>
-            <if test="filterList != null and filterList.size() > 0">
-                <foreach collection="filterList" item="filter" separator=" ">
-                    <if test="filter.valueList != null and filter.valueList.size() > 0">
-                        and a.`${filter.uuid}` in
-                        <foreach collection="filter.valueList" item="value" open="(" separator="," close=")">
-                            '${value}'
-                        </foreach>
-                    </if>
-                </foreach>
-            </if>
-        </where>
-        ORDER BY a.`id` DESC
-        ) a
-        <if test="needPage == true">
-            LIMIT #{startNum}, #{pageSize}
-        </if>
-    </select>
-
-    <select id="getDynamicTableDataByUuidList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="java.util.LinkedHashMap">
-        SELECT
-        `uuid`,
-        <foreach collection="columnList" item="column" separator=",">
-            `${column}`
-        </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        <where>
-            <if test="defaultValue != null and defaultValue.size() > 0">
-                `uuid` in
-                <foreach collection="defaultValue" open="(" close=")" item="uuid" separator=",">
-                    #{uuid}
-                </foreach>
-            </if>
-        </where>
-        <if test="needPage == true">
-            LIMIT #{startNum}, #{pageSize}
-        </if>
-    </select>
-
-    <select id="getDynamicTableDataByColumnCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="int">
-        SELECT
-        COUNT(`id`)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
-    </select>
-
-    <!--<select id="getDynamicTableDataByUuidCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="int">
-        SELECT
-        COUNT(`id`)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        <where>
-            <if test="uuidList != null and uuidList.size() > 0">
-                `uuid` in
-                <foreach collection="uuidList" open="(" close=")" item="uuid" separator=",">
-                    #{uuid}
-                </foreach>
-            </if>
-        </where>
-    </select>-->
-
-    <select id="getDynamicTableCellDataMap" resultType="codedriver.framework.common.dto.ValueTextVo">
-        SELECT
-        `${targetColumn}` as `value`,
-        `${sourceColumn}` as `text`
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        WHERE `${sourceColumn}` in
-        <foreach collection="list" item="text" separator="," open="(" close=")">
-            #{text}
-        </foreach>
-    </select>
-
-    <select id="getDynamicRowDataByUuid" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="java.util.LinkedHashMap">
-        SELECT
-        `uuid`,
-        <foreach collection="columnList" separator="," item="column">
-            `${column}`
-        </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
-        WHERE `uuid` = #{uuid}
+        ORDER BY a.`id` DESC
+        ) e
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
     </select>
 
     <select id="checkMatrixAttributeHasDataByAttributeUuidList" resultType="java.util.LinkedHashMap">
@@ -294,7 +253,7 @@
         <foreach collection="rowData" item="columnData" separator=",">
             `${columnData.column}` = #{columnData.value}
         </foreach>
-        WHERE `${uuidColumn.column}` = #{uuidColumn.value}
+        WHERE `uuid` = #{uuid}
     </update>
 
     <delete id="deleteDynamicTableDataByUuid">

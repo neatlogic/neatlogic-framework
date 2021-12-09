@@ -6,6 +6,8 @@
 package codedriver.module.framework.matrix.handler;
 
 import codedriver.framework.common.constvalue.Expression;
+import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.IntegrationHandlerNotFoundException;
 import codedriver.framework.exception.integration.IntegrationNotFoundException;
 import codedriver.framework.exception.type.ParamNotExistsException;
@@ -15,6 +17,7 @@ import codedriver.framework.integration.core.RequestFrom;
 import codedriver.framework.integration.dao.mapper.IntegrationMapper;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
+import codedriver.framework.matrix.constvalue.MatrixAttributeType;
 import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerBase;
 import codedriver.framework.matrix.dto.*;
@@ -22,7 +25,9 @@ import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
 import codedriver.framework.matrix.exception.MatrixExternalAccessException;
 import codedriver.framework.matrix.exception.MatrixExternalNotFoundException;
 import codedriver.framework.util.ExcelUtil;
-import codedriver.module.framework.matrix.service.MatrixService;
+import codedriver.framework.util.javascript.JavascriptUtil;
+import codedriver.module.framework.integration.handler.FrameworkRequestFrom;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,9 +56,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Resource
     private IntegrationMapper integrationMapper;
 
-    @Resource
-    private MatrixService matrixService;
-
     @Override
     public String getHandler() {
         return MatrixType.EXTERNAL.getValue();
@@ -71,7 +73,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 return false;
             }
         }
-        matrixService.validateMatrixExternalData(integrationUuid);
+        validateMatrixExternalData(integrationUuid);
         MatrixExternalVo externalVo = new MatrixExternalVo(matrixVo.getUuid(), integrationUuid);
         matrixMapper.replaceMatrixExternal(externalVo);
         return true;
@@ -157,7 +159,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (handler == null) {
             throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
         }
-        return matrixService.getExternalMatrixAttributeList(matrixVo.getUuid(), integrationVo);
+        return getExternalMatrixAttributeList(matrixVo.getUuid(), integrationVo);
     }
 
     @Override
@@ -197,23 +199,17 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         returnObj.put("pageSize", transformedResult.get("pageSize"));
         returnObj.put("pageCount", transformedResult.get("pageCount"));
         returnObj.put("rowNum", transformedResult.get("rowNum"));
-        returnObj.put("theadList", transformedResult.get("theadList"));
-//            returnObj.putAll(transformedResult);
-        List<Map<String, Object>> tbodyList = new ArrayList<>();
-        JSONArray tbodyArray = transformedResult.getJSONArray("tbodyList");
-        if (CollectionUtils.isNotEmpty(tbodyArray)) {
-            for (int i = 0; i < tbodyArray.size(); i++) {
-                JSONObject rowData = tbodyArray.getJSONObject(i);
-                if (MapUtils.isNotEmpty(rowData)) {
-                    Map<String, Object> rowDataMap = new HashMap<>();
-                    for (Map.Entry<String, Object> entry : rowData.entrySet()) {
-                        rowDataMap.put(entry.getKey(), matrixService.matrixAttributeValueHandle(entry.getValue()));
-                    }
-                    tbodyList.add(rowDataMap);
-                }
+        JSONArray theadList = transformedResult.getJSONArray("theadList");
+        returnObj.put("theadList", theadList);
+        List<String> columnList = new ArrayList<>();
+        for (int i = 0; i < theadList.size(); i++) {
+            JSONObject theadObj = theadList.getJSONObject(i);
+            String key = theadObj.getString("key");
+            if (StringUtils.isNotBlank(key)) {
+                columnList.add(key);
             }
         }
-        returnObj.put("tbodyList", tbodyList);
+        returnObj.put("tbodyList", getExternalDataTbodyList(resultVo, columnList));
         return returnObj;
     }
 
@@ -232,7 +228,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (handler == null) {
             throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
         }
-        List<MatrixAttributeVo> matrixAttributeList = matrixService.getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
+        List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
             List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
             JSONArray dafaultValue = dataVo.getDefaultValue();
@@ -264,7 +260,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         throw new MatrixExternalAccessException();
                     }
                     handler.validate(resultVo);
-                    List<Map<String, JSONObject>> externalDataTbodyList = matrixService.getExternalDataTbodyList(resultVo, dataVo.getColumnList());
+                    List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList());
                     for (Map<String, JSONObject> tbody : externalDataTbodyList) {
                         JSONObject valueObj = tbody.get(uuidColumn);
                         if (MapUtils.isNotEmpty(valueObj)) {
@@ -298,7 +294,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 returnObj.put("pageSize", transformedResult.get("pageSize"));
                 returnObj.put("pageCount", transformedResult.get("pageCount"));
                 returnObj.put("rowNum", transformedResult.get("rowNum"));
-                tbodyList = matrixService.getExternalDataTbodyList(resultVo, dataVo.getColumnList());
+                tbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList());
                 /** 将arrayColumnList包含的属性值转成数组 **/
 //                JSONArray arrayColumnArray = jsonObj.getJSONArray("arrayColumnList");
 //                if (CollectionUtils.isNotEmpty(arrayColumnArray)) {
@@ -314,7 +310,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             returnObj.put("theadList", theadList);
             List<String> arrayColumnList = dataVo.getArrayColumnList();
             if (CollectionUtils.isNotEmpty(arrayColumnList) && CollectionUtils.isNotEmpty(tbodyList)) {
-                matrixService.arrayColumnDataConversion(arrayColumnList, tbodyList);
+                arrayColumnDataConversion(arrayColumnList, tbodyList);
             }
         }
         return returnObj;
@@ -333,7 +329,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
 
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
-        List<MatrixAttributeVo> matrixAttributeList = matrixService.getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
+        List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
             List<String> attributeList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
             List<String> columnList = dataVo.getColumnList();
@@ -369,12 +365,13 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         }
 //                        integrationVo.getParamObj().putAll(jsonObj);
                         paramObj.put("sourceColumnList", sourceColumnList);
+                        paramObj.put("filterList", dataVo.getFilterList());
                         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                         if (StringUtils.isNotBlank(resultVo.getError())) {
                             logger.error(resultVo.getError());
                             throw new MatrixExternalAccessException();
                         }
-                        resultList.addAll(matrixService.getExternalDataTbodyList(resultVo, columnList));
+                        resultList.addAll(getExternalDataTbodyList(resultVo, columnList));
                     }
                 }
             } else {
@@ -401,7 +398,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     logger.error(resultVo.getError());
                     throw new MatrixExternalAccessException();
                 }
-                resultList = matrixService.getExternalDataTbodyList(resultVo, columnList);
+                resultList = getExternalDataTbodyList(resultVo, columnList);
             }
             //去重
             String firstColumn = columnList.get(0);
@@ -441,5 +438,124 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected void myDeleteTableRowData(String matrixUuid, List<String> uuidList) {
 
+    }
+
+    private List<MatrixAttributeVo> getExternalMatrixAttributeList(String matrixUuid, IntegrationVo integrationVo) {
+        List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();
+        JSONObject config = integrationVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            JSONObject output = config.getJSONObject("output");
+            if (MapUtils.isNotEmpty(output)) {
+                String content = output.getString("content");
+                if (StringUtils.isNotBlank(content)) {
+                    try {
+                        content = JavascriptUtil.transform(new JSONObject(), content);
+                        JSONObject contentObj = JSON.parseObject(content);
+                        if (MapUtils.isNotEmpty(contentObj)) {
+                            JSONArray theadList = contentObj.getJSONArray("theadList");
+                            if (CollectionUtils.isNotEmpty(theadList)) {
+                                for (int i = 0; i < theadList.size(); i++) {
+                                    JSONObject theadObj = theadList.getJSONObject(i);
+                                    MatrixAttributeVo matrixAttributeVo = new MatrixAttributeVo();
+                                    matrixAttributeVo.setMatrixUuid(matrixUuid);
+                                    matrixAttributeVo.setUuid(theadObj.getString("key"));
+                                    matrixAttributeVo.setName(theadObj.getString("title"));
+                                    matrixAttributeVo.setType(MatrixAttributeType.INPUT.getValue());
+                                    matrixAttributeVo.setIsDeletable(0);
+                                    matrixAttributeVo.setSort(i);
+                                    matrixAttributeVo.setIsRequired(0);
+                                    Integer primaryKey = theadObj.getInteger("primaryKey");
+                                    if (Objects.equals(primaryKey, 1)) {
+                                        matrixAttributeVo.setPrimaryKey(1);
+                                    }
+                                    Integer isSearchable = theadObj.getInteger("isSearchable");
+                                    matrixAttributeVo.setIsSearchable((isSearchable == null || isSearchable.intValue() != 1) ? 0 : 1);
+                                    matrixAttributeList.add(matrixAttributeVo);
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        logger.error(ex.getMessage(), ex);
+                    }
+                }
+            }
+        }
+        return matrixAttributeList;
+    }
+
+    private List<Map<String, JSONObject>> getExternalDataTbodyList(IntegrationResultVo resultVo, List<String> columnList) {
+        List<Map<String, JSONObject>> resultList = new ArrayList<>();
+        if (resultVo != null && StringUtils.isNotBlank(resultVo.getTransformedResult())) {
+            JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+            if (MapUtils.isNotEmpty(transformedResult)) {
+                JSONArray tbodyList = transformedResult.getJSONArray("tbodyList");
+                if (CollectionUtils.isNotEmpty(tbodyList)) {
+                    for (int i = 0; i < tbodyList.size(); i++) {
+                        JSONObject rowData = tbodyList.getJSONObject(i);
+                        Map<String, JSONObject> resultMap = new HashMap<>(columnList.size());
+                        for (String column : columnList) {
+                            String columnValue = rowData.getString(column);
+                            JSONObject resultObj = new JSONObject();
+                            resultObj.put("type", MatrixAttributeType.INPUT.getValue());
+                            resultObj.put("value", columnValue);
+                            resultObj.put("text", columnValue);
+                            resultMap.put(column, resultObj);
+                        }
+                        resultList.add(resultMap);
+                    }
+                }
+            }
+        }
+        return resultList;
+    }
+    /**
+     *
+     * @Time:2020年7月8日
+     * @Description: 将arrayColumnList包含的属性值转成数组
+     * @param arrayColumnList 需要将值转化成数组的属性集合
+     * @param tbodyList 表格数据
+     * @return void
+     */
+    private void arrayColumnDataConversion(List<String> arrayColumnList, List<Map<String, JSONObject>> tbodyList) {
+        for (Map<String, JSONObject> rowData : tbodyList) {
+            for (Map.Entry<String, JSONObject> entry : rowData.entrySet()) {
+                if (arrayColumnList.contains(entry.getKey())) {
+                    List<ValueTextVo> valueObjList = new ArrayList<>();
+                    JSONObject valueObj = entry.getValue();
+                    String value = valueObj.getString("value");
+                    if (StringUtils.isNotBlank(value)) {
+                        if (value.startsWith("[") && value.endsWith("]")) {
+                            List<String> valueList = valueObj.getJSONArray("value").toJavaList(String.class);
+                            for (String valueStr : valueList) {
+                                valueObjList.add(new ValueTextVo(valueStr, valueStr));
+                            }
+                        } else {
+                            valueObjList.add(new ValueTextVo(value, value));
+                        }
+                    }
+                    valueObj.put("value", valueObjList);
+                }
+            }
+        }
+    }
+    /**
+     * 校验集成接口数据是否符合矩阵格式
+     * @param integrationUuid 集成配置uuid
+     * @throws ApiRuntimeException
+     */
+    private void validateMatrixExternalData(String integrationUuid) throws ApiRuntimeException {
+        IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(integrationUuid);
+        if(integrationVo == null){
+            throw new IntegrationNotFoundException(integrationUuid);
+        }
+        IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
+        if (handler == null) {
+            throw  new IntegrationHandlerNotFoundException(integrationVo.getHandler());
+        }
+        IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.TEST);
+        if(StringUtils.isNotBlank(resultVo.getError())){
+            throw new MatrixExternalAccessException();
+        }
+        handler.validate(resultVo);
     }
 }

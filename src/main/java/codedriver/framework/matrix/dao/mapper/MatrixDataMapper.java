@@ -19,15 +19,11 @@ public interface MatrixDataMapper {
 
     List<Map<String, String>> searchDynamicTableData(MatrixDataVo dataVo);
 
-    int getDynamicTableDataByColumnCount(MatrixDataVo dataVo);
+    int getDynamicTableDataCountForTable(MatrixDataVo dataVo);
 
-    List<Map<String, String>> getDynamicTableDataByColumnList(MatrixDataVo dataVo);
+    List<Map<String, String>> getDynamicTableDataForTable(MatrixDataVo dataVo);
 
-    List<Map<String, String>> getDynamicTableDataByColumnList2(MatrixDataVo dataVo);
-
-//    int getDynamicTableDataByUuidCount(MatrixDataVo dataVo);
-
-//    List<ValueTextVo> getDynamicTableCellDataMap(@Param("matrixUuid") String matrixUuid, @Param("sourceColumn") String sourceColumn, @Param("targetColumn") String targetColumn, @Param("list") List<String> values, @Param("schemaName") String schemaName);
+    List<Map<String, String>> getDynamicTableDataForSelect(MatrixDataVo dataVo);
 
     Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList, @Param("schemaName") String schemaName);
 

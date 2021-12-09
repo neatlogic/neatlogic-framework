@@ -28,8 +28,9 @@ import codedriver.framework.matrix.dto.MatrixVo;
 import codedriver.framework.matrix.exception.*;
 import codedriver.framework.util.ExcelUtil;
 import codedriver.framework.util.TableResultUtil;
+import codedriver.framework.util.TimeUtil;
 import codedriver.framework.util.UuidUtil;
-import codedriver.module.framework.matrix.service.MatrixService;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,9 +64,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
     private MatrixDataMapper matrixDataMapper;
-
-    @Resource
-    private MatrixService matrixService;
 
     @Resource
     private UserMapper userMapper;
@@ -179,7 +178,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (attributeVo != null) {
                             String attributeUuid = attributeVo.getUuid();
                             if (StringUtils.isNotBlank(attributeUuid)) {
-                                if (matrixService.matrixAttributeValueVerify(attributeVo, value)) {
+                                if (matrixAttributeValueVerify(attributeVo, value)) {
                                     rowData.add(new MatrixColumnVo(attributeUuid, value));
                                 } else {
                                     throw new MatrixImportDataIllegalException(i + 1, j + 1, value);
@@ -370,7 +369,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 dataVo.setRowNum(rowNum);
             }
             List<Map<String, String>> dataList = matrixDataMapper.searchDynamicTableData(dataVo);
-            List<Map<String, Object>> tbodyList = matrixService.matrixTableDataValueHandle(attributeVoList, dataList);
+            List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
             JSONArray theadList = getTheadList(attributeVoList);
             return TableResultUtil.getResult(theadList, tbodyList, dataVo);
         }
@@ -387,16 +386,15 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
-                int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
+                int rowNum = matrixDataMapper.getDynamicTableDataCountForTable(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
-                    dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);
+                    dataMapList = matrixDataMapper.getDynamicTableDataForTable(dataVo);
                 }
             }
-            List<Map<String, Object>> tbodyList = matrixService.matrixTableDataValueHandle(matrixAttributeList, dataMapList);
+            List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(matrixAttributeList, dataMapList);
             JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, dataVo.getColumnList());
             returnObj = TableResultUtil.getResult(theadList, tbodyList, dataVo);
-//            returnObj.put("searchColumnDetailList", getSearchColumnDetailList(dataVo.getMatrixUuid(), matrixAttributeList, searchColumnArray));
         }
         return returnObj;
     }
@@ -469,16 +467,14 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                             dataVo.setAttrType(matrixAttribute.getType());
                             dataVo.setKeywordExpression(Expression.EQUAL.getExpression());
                         }
-//                        dataVo.setAttributeUuid(matrixAttribute.getUuid());
                         dataVo.setSourceColumnList(sourceColumnList);
-                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataByColumnList2(dataVo);
-//                        List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
+                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
                         if (CollectionUtils.isNotEmpty(dataMapList)) {
                             for (Map<String, String> dataMap : dataMapList) {
                                 Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                                 for (Map.Entry<String, String> entry : dataMap.entrySet()) {
                                     String attributeUuid = entry.getKey();
-                                    resultMap.put(attributeUuid, matrixService.matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                                    resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
                                 }
                                 resultList.add(resultMap);
                             }
@@ -525,13 +521,12 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setKeywordExpression(Expression.LIKE.getExpression());
                     }
                 }
-                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataByColumnList2(dataVo);
-//                List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
+                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
                 for (Map<String, String> dataMap : dataMapList) {
                     Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                     for (Map.Entry<String, String> entry : dataMap.entrySet()) {
                         String attributeUuid = entry.getKey();
-                        resultMap.put(attributeUuid, matrixService.matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                        resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
                     }
                     resultList.add(resultMap);
                 }
@@ -680,5 +675,118 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
         }
+    }
+    /**
+     *
+     * @Time:2020年12月1日
+     * @Description: 矩阵属性值合法性校验
+     * @param matrixAttributeVo
+     * @param value
+     * @return boolean
+     */
+    private boolean matrixAttributeValueVerify(MatrixAttributeVo matrixAttributeVo, String value) {
+        String type = matrixAttributeVo.getType();
+        if (type.equals(MatrixAttributeType.INPUT.getValue())) {
+            return true;
+        } else if (type.equals(MatrixAttributeType.SELECT.getValue())) {
+            String config = matrixAttributeVo.getConfig();
+            JSONArray dataList = (JSONArray) JSONPath.read(config, "dataList");
+            for (int i = 0; i < dataList.size(); i++) {
+                JSONObject dataObj = dataList.getJSONObject(i);
+                if (value.equals(dataObj.getString("value"))) {
+                    return true;
+                }
+            }
+        } else if (type.equals(MatrixAttributeType.DATE.getValue())) {
+            SimpleDateFormat sdf = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
+            try {
+                sdf.parse(value);
+            } catch (ParseException e) {
+                return false;
+            }
+            return true;
+        } else if (type.equals(MatrixAttributeType.USER.getValue())) {
+            return userMapper.checkUserIsExists(value) > 0;
+        } else if (type.equals(MatrixAttributeType.TEAM.getValue())) {
+            return teamMapper.checkTeamIsExists(value) > 0;
+        } else if (type.equals(MatrixAttributeType.ROLE.getValue())) {
+            return roleMapper.checkRoleIsExists(value) > 0;
+        }
+        return false;
+    }
+
+    private List<Map<String, Object>> matrixTableDataValueHandle(List<MatrixAttributeVo> matrixAttributeList, List<Map<String, String>> valueList) {
+        if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
+            Map<String, MatrixAttributeVo> matrixAttributeMap = new HashMap<>();
+            for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
+                matrixAttributeMap.put(matrixAttributeVo.getUuid(), matrixAttributeVo);
+            }
+            if (CollectionUtils.isNotEmpty(valueList)) {
+                List<Map<String, Object>> resultList = new ArrayList<>(valueList.size());
+                for (Map<String, String> valueMap : valueList) {
+                    Map<String, Object> resultMap = new HashMap<>();
+                    for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                        String attributeUuid = entry.getKey();
+                        resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                    }
+                    resultList.add(resultMap);
+                }
+                return resultList;
+            }
+        }
+        return null;
+    }
+
+    private JSONObject matrixAttributeValueHandle(MatrixAttributeVo matrixAttribute, Object valueObj) {
+        JSONObject resultObj = new JSONObject();
+        String type = MatrixAttributeType.INPUT.getValue();
+        if (matrixAttribute != null) {
+            type = matrixAttribute.getType();
+        }
+        resultObj.put("type", type);
+        if (valueObj == null) {
+            resultObj.put("value", null);
+            resultObj.put("text", null);
+            return resultObj;
+        }
+        String value = valueObj.toString();
+        resultObj.put("value", value);
+        resultObj.put("text", value);
+        if (MatrixAttributeType.SELECT.getValue().equals(type)) {
+            if (matrixAttribute != null) {
+                String config = matrixAttribute.getConfig();
+                if (StringUtils.isNotBlank(config)) {
+                    JSONObject configObj = JSON.parseObject(config);
+                    JSONArray dataList = configObj.getJSONArray("dataList");
+                    if (CollectionUtils.isNotEmpty(dataList)) {
+                        for (int i = 0; i < dataList.size(); i++) {
+                            JSONObject data = dataList.getJSONObject(i);
+                            if (Objects.equals(value, data.getString("value"))) {
+                                resultObj.put("text", data.getString("text"));
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (MatrixAttributeType.USER.getValue().equals(type)) {
+            UserVo userVo = userMapper.getUserBaseInfoByUuid(value);
+            if (userVo != null) {
+                resultObj.put("text", userVo.getUserName());
+                resultObj.put("avatar", userVo.getAvatar());
+                resultObj.put("pinyin", userVo.getPinyin());
+                resultObj.put("vipLevel", userVo.getVipLevel());
+            }
+        } else if (MatrixAttributeType.TEAM.getValue().equals(type)) {
+            TeamVo teamVo = teamMapper.getTeamByUuid(value);
+            if (teamVo != null) {
+                resultObj.put("text", teamVo.getName());
+            }
+        } else if (MatrixAttributeType.ROLE.getValue().equals(type)) {
+            RoleVo roleVo = roleMapper.getRoleByUuid(value);
+            if (roleVo != null) {
+                resultObj.put("text", roleVo.getName());
+            }
+        }
+        return resultObj;
     }
 }

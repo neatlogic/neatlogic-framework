@@ -15,10 +15,10 @@ public interface MatrixViewDataMapper {
 
     List<Map<String, String>> searchDynamicTableData(MatrixDataVo dataVo);
 
-    int getDynamicTableDataByColumnCount(MatrixDataVo dataVo);
+    int getDynamicTableDataCountForTable(MatrixDataVo dataVo);
 
-    List<Map<String, String>> getDynamicTableDataByColumnList(MatrixDataVo dataVo);
+    List<Map<String, String>> getDynamicTableDataForTable(MatrixDataVo dataVo);
 
-    List<Map<String, String>> getDynamicTableDataByColumnList2(MatrixDataVo dataVo);
+    List<Map<String, String>> getDynamicTableDataForSelect(MatrixDataVo dataVo);
 
 }

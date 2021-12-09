@@ -48,23 +48,8 @@
                     <when test="sourceColumn.expression == 'equal'">
                         AND `${sourceColumn.column}` = #{sourceColumn.value}
                     </when>
-                    <when test="sourceColumn.expression == 'unequal'">
-                        AND `${sourceColumn.column}` != #{sourceColumn.value}
-                    </when>
                     <when test="sourceColumn.expression == 'like'">
                         AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
-                    </when>
-                    <when test="sourceColumn.expression == 'greater-than'">
-                        AND `${sourceColumn.column}` &gt; #{sourceColumn.value}
-                    </when>
-                    <when test="sourceColumn.expression == 'less-than'">
-                        AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
-                    </when>
-                    <when test="sourceColumn.expression == 'include' and sourceColumn.value != null and sourceColumn.value.size() > 0">
-                        AND `${sourceColumn.column}` IN
-                        <foreach collection="sourceColumn.value" item="item" open="(" close=")" separator=",">
-                            #{item}
-                        </foreach>
                     </when>
                     <otherwise>
                         AND `${sourceColumn.column}` = #{sourceColumn.value}
@@ -84,7 +69,7 @@
         </if>
     </sql>
 
-    <select id="getDynamicTableDataByColumnCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <select id="getDynamicTableDataCountForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
         COUNT(1)
@@ -94,7 +79,7 @@
         </where>
     </select>
 
-    <select id="getDynamicTableDataByColumnList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <select id="getDynamicTableDataForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
@@ -111,83 +96,23 @@
         </if>
     </select>
 
-    <select id="getDynamicTableDataByColumnList2" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         select
         DISTINCT a.*
         from (
         SELECT
         <foreach collection="columnList" item="column" separator=",">
-            a.`${column}`
+            `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}` a
-        <choose>
-            <when test="attrType == 'user'">
-                JOIN `user` b ON b.`uuid` = a.`${attributeUuid}`
-            </when>
-            <when test="attrType == 'team'">
-                JOIN `team` c ON c.`uuid` = a.`${attributeUuid}`
-            </when>
-            <when test="attrType == 'role'">
-                JOIN `role` d ON d.`name` = a.`${attributeUuid}`
-            </when>
-        </choose>
+        FROM `${schemaName}`.`matrix_${matrixUuid}`
         <where>
             <foreach collection="columnList" item="column" separator="AND">
-                a.`${column}` IS NOT NULL
+                `${column}` IS NOT NULL
             </foreach>
-            <if test="keyword != null and keyword != ''">
-                <choose>
-                    <when test="attrType == 'input' or attrType == 'date'">
-                            and `${attributeUuid}` LIKE CONCAT('%', #{keyword}, '%')
-                    </when>
-                    <when test="attrType == 'user'">
-                        and b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%')
-                    </when>
-                    <when test="attrType == 'team'">
-                        and c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%')
-                    </when>
-                    <when test="attrType == 'role'">
-                        and d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%')
-                    </when>
-                </choose>
-            </if>
-            <if test="sourceColumnList != null and sourceColumnList.size() > 0">
-                <foreach collection="sourceColumnList" item="sourceColumn">
-                    <choose>
-                        <when test="sourceColumn.expression == 'equal'">
-                            AND a.`${sourceColumn.column}` = #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'unequal'">
-                            AND a.`${sourceColumn.column}` != #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'like'">
-                            AND a.`${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
-                        </when>
-                        <when test="sourceColumn.expression == 'greater-than'">
-                            AND a.`${sourceColumn.column}` &gt; #{sourceColumn.value}
-                        </when>
-                        <when test="sourceColumn.expression == 'less-than'">
-                            AND a.`${sourceColumn.column}` &lt; #{sourceColumn.value}
-                        </when>
-                        <otherwise>
-                            AND a.`${sourceColumn.column}` = #{sourceColumn.value}
-                        </otherwise>
-                    </choose>
-                </foreach>
-            </if>
-            <if test="filterList != null and filterList.size() > 0">
-                <foreach collection="filterList" item="filter" separator=" ">
-                    <if test="filter.valueList != null and filter.valueList.size() > 0">
-                        and a.`${filter.uuid}` in
-                        <foreach collection="filter.valueList" item="value" open="(" separator="," close=")">
-                            '${value}'
-                        </foreach>
-                    </if>
-                </foreach>
-            </if>
+            <include refid="searchDynamicTableDataSql"/>
         </where>
-        ORDER BY a.`id` DESC
+        ORDER BY `id` DESC
         ) a
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}

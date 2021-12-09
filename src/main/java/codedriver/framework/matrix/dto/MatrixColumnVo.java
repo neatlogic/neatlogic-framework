@@ -21,7 +21,7 @@ public class MatrixColumnVo {
     public MatrixColumnVo() {
 	}
 
-	public MatrixColumnVo(String column, String value) {
+	public MatrixColumnVo(String column, Object value) {
 		this.column = column;
 		this.value = value;
 	}
@@ -53,11 +53,11 @@ public class MatrixColumnVo {
     			return valueList;
     		}else if(value instanceof String){
     			if(MatrixAttributeType.USER.getValue().equals(type)) {
-    				return value = value.toString().split("#")[1];
+    				return value.toString().split("#")[1];
     			}else if(MatrixAttributeType.TEAM.getValue().equals(type)) {
-    				return value = value.toString().split("#")[1];
+    				return value.toString().split("#")[1];
     			}else if(MatrixAttributeType.ROLE.getValue().equals(type)) {
-    				return value = value.toString().split("#")[1];
+    				return value.toString().split("#")[1];
     			}
     		}
     	}

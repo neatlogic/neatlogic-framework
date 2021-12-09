@@ -8,6 +8,7 @@ package codedriver.module.framework.matrix.handler;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.common.util.PageUtil;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
@@ -31,7 +32,7 @@ import codedriver.framework.util.UuidUtil;
 import codedriver.module.framework.matrix.service.MatrixService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Objects;
+import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,10 +45,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -389,11 +387,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
-                if (dataVo.getNeedPage()) {
-                    int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
+                int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
+                if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
+                    dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);
                 }
-                dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);
             }
             List<Map<String, Object>> tbodyList = matrixService.matrixTableDataValueHandle(matrixAttributeList, dataMapList);
             JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, dataVo.getColumnList());
@@ -418,7 +416,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), column);
                 }
             }
-            String keywordColumn = dataVo.getKeywordColumn();
             JSONArray defaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(defaultValue)) {
                 for (String value : defaultValue.toJavaList(String.class)) {
@@ -430,7 +427,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                             matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
                             sourceColumnList.add(matrixColumnVo);
                         }
-                        dataVo.setSourceColumnList(sourceColumnList);
+                        String keywordColumn = null;
                         if (columnList.size() >= 2) {
                             keywordColumn = columnList.get(1);
                         } else {
@@ -440,8 +437,42 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (matrixAttribute == null) {
                             throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                         }
-                        dataVo.setKeyword(split[1]);
-                        List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
+                        String keyword = split[1];
+                        if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
+                            String config = matrixAttribute.getConfig();
+                            if (StringUtils.isNotBlank(config)) {
+                                JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                                if (CollectionUtils.isNotEmpty(dataArray)) {
+                                    JSONArray valueList = new JSONArray();
+                                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+                                    for (ValueTextVo e : dataList) {
+                                        String text = e.getText();
+                                        if (StringUtils.isNotBlank(text)) {
+                                            if (Objects.equals(e.getText(), keyword)) {
+                                                valueList.add(e.getValue());
+                                            }
+                                        }
+                                    }
+                                    if (CollectionUtils.isNotEmpty(valueList)) {
+                                        MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, valueList);
+                                        matrixColumnVo.setExpression(Expression.INCLUDE.getExpression());
+                                        sourceColumnList.add(matrixColumnVo);
+                                    } else {
+                                        return resultList;
+                                    }
+                                }
+                            }
+                            dataVo.setKeyword(null);
+                        } else {
+                            dataVo.setKeyword(keyword);
+                            dataVo.setKeywordColumn(keywordColumn);
+                            dataVo.setAttrType(matrixAttribute.getType());
+                            dataVo.setKeywordExpression(Expression.EQUAL.getExpression());
+                        }
+//                        dataVo.setAttributeUuid(matrixAttribute.getUuid());
+                        dataVo.setSourceColumnList(sourceColumnList);
+                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataByColumnList2(dataVo);
+//                        List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
                         if (CollectionUtils.isNotEmpty(dataMapList)) {
                             for (Map<String, String> dataMap : dataMapList) {
                                 Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
@@ -449,23 +480,53 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                     String attributeUuid = entry.getKey();
                                     resultMap.put(attributeUuid, matrixService.matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
                                 }
-                                JSONObject textObj = resultMap.get(keywordColumn);
-                                if (MapUtils.isNotEmpty(textObj) && Objects.equal(textObj.get("text"), split[1])) {
-                                    resultList.add(resultMap);
-                                }
+                                resultList.add(resultMap);
                             }
                         }
                     }
                 }
             } else {
-                MatrixAttributeVo matrixAttribute = null;
-                if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
-                    matrixAttribute = matrixAttributeMap.get(keywordColumn);
+                String keywordColumn = dataVo.getKeywordColumn();
+                String keyword = dataVo.getKeyword();
+                if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
+                    MatrixAttributeVo matrixAttribute = matrixAttributeMap.get(keywordColumn);
                     if (matrixAttribute == null) {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }
+                    if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
+                        String config = matrixAttribute.getConfig();
+                        if (StringUtils.isNotBlank(config)) {
+                            JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                            if (CollectionUtils.isNotEmpty(dataArray)) {
+                                JSONArray valueList = new JSONArray();
+                                List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+                                for (ValueTextVo e : dataList) {
+                                    String text = e.getText();
+                                    if (StringUtils.isNotBlank(text)) {
+                                        if (text.contains(keyword)) {
+                                            valueList.add(e.getValue());
+                                        }
+                                    }
+                                }
+                                if (CollectionUtils.isNotEmpty(valueList)) {
+                                    List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
+                                    MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, valueList);
+                                    matrixColumnVo.setExpression(Expression.INCLUDE.getExpression());
+                                    sourceColumnList.add(matrixColumnVo);
+                                    dataVo.setSourceColumnList(sourceColumnList);
+                                } else {
+                                    return resultList;
+                                }
+                            }
+                        }
+                        dataVo.setKeyword(null);
+                    } else {
+                        dataVo.setAttrType(matrixAttribute.getType());
+                        dataVo.setKeywordExpression(Expression.LIKE.getExpression());
+                    }
                 }
-                List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
+                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataByColumnList2(dataVo);
+//                List<Map<String, String>> dataMapList = matrixService.matrixAttributeValueKeyWordSearch(matrixAttribute, dataVo);
                 for (Map<String, String> dataMap : dataMapList) {
                     Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                     for (Map.Entry<String, String> entry : dataMap.entrySet()) {

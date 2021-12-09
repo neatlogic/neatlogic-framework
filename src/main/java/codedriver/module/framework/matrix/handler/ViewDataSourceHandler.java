@@ -15,7 +15,7 @@ import codedriver.framework.file.dao.mapper.FileMapper;
 import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.matrix.constvalue.MatrixType;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerBase;
-import codedriver.framework.matrix.dao.mapper.MatrixDataMapper;
+import codedriver.framework.matrix.dao.mapper.MatrixViewDataMapper;
 import codedriver.framework.matrix.dto.*;
 import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
 import codedriver.framework.matrix.exception.MatrixViewNotFoundException;
@@ -54,7 +54,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     private FileMapper fileMapper;
 
     @Resource
-    private MatrixDataMapper matrixDataMapper;
+    private MatrixViewDataMapper matrixViewDataMapper;
 
     @Resource
     private MatrixService matrixService;
@@ -167,10 +167,10 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             List<String> columnList = attributeVoList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
             dataVo.setColumnList(columnList);
             if (dataVo.getNeedPage()) {
-                int rowNum = matrixDataMapper.getDynamicTableDataCount(dataVo);
+                int rowNum = matrixViewDataMapper.getDynamicTableDataCount(dataVo);
                 dataVo.setRowNum(rowNum);
             }
-            List<Map<String, String>> dataList = matrixDataMapper.searchDynamicTableData(dataVo);
+            List<Map<String, String>> dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
             List<Map<String, Object>>  tbodyList = matrixService.matrixTableDataValueHandle(attributeVoList, dataList);
             JSONArray theadList = getTheadList(attributeVoList);
             return TableResultUtil.getResult(theadList, tbodyList, dataVo);
@@ -189,15 +189,15 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (CollectionUtils.isNotEmpty(attributeList)) {
             List<MatrixAttributeVo> matrixAttributeList = attributeList.toJavaList(MatrixAttributeVo.class);
             if (dataVo.getNeedPage()) {
-                int rowNum = matrixDataMapper.getDynamicTableDataByColumnCount(dataVo);
+                int rowNum = matrixViewDataMapper.getDynamicTableDataByColumnCount(dataVo);
                 dataVo.setRowNum(rowNum);
             }
             List<Map<String, String>> dataMapList = null;
             JSONArray dafaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
-                dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
+                dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
-                dataMapList = matrixDataMapper.getDynamicTableDataByColumnList(dataVo);
+                dataMapList = matrixViewDataMapper.getDynamicTableDataByColumnList(dataVo);
             }
             List<Map<String, Object>> tbodyList = matrixService.matrixTableDataValueHandle(matrixAttributeList, dataMapList);
             JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, dataVo.getColumnList());

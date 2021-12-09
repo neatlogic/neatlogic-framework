@@ -213,7 +213,7 @@ public class MatrixServiceImpl implements MatrixService {
         dataVo.setPageSize(dataVo.getPageSize() * 10);
         if (matrixAttribute != null) {
             dataVo.setAttrType(matrixAttribute.getType());
-            dataVo.setAttributeUuid(matrixAttribute.getUuid());
+            dataVo.setKeywordColumn(matrixAttribute.getUuid());
         }
         List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataByColumnList2(dataVo);
         return dataMapList;

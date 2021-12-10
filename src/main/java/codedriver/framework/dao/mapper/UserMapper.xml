@@ -386,6 +386,17 @@
         <if test="auth != null and auth != ''">
             AND `auth` = #{auth}
         </if>
+        UNION
+        SELECT
+        c.`auth_group` AS authGroup,
+        c.`auth`
+        FROM `user_team` a
+        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
+        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
+        WHERE a.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
     </select>
 
     <select id="searchUserRoleAuthByUserUuid" parameterType="String" resultType="codedriver.framework.dto.RoleAuthVo"

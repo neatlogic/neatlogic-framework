@@ -36,7 +36,7 @@ public class WechatUtil {
         JSONObject jsonObject = HttpRequestUtil.get(requestUrl).sendRequest().getResultJson();
         // 如果请求成功
         if (MapUtils.isNotEmpty(jsonObject)) {
-            if (!jsonObject.containsKey("errcode")) {
+            if (jsonObject.containsKey("access_token")) {
                 accessToken = new AccessToken();
                 accessToken.setToken(jsonObject.getString("access_token"));
                 accessToken.setExpiresIn(jsonObject.getInteger("expires_in"));

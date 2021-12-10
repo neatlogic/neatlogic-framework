@@ -73,6 +73,14 @@ public class Config {
 
     private static String RUNNER_CONTEXT;//runner地址
 
+    //wechat
+    private static String WECHAT_CORP_ID;//企业Id（前往"我的企业"菜单获取）
+    private static String WECHAT_APP_SECRET;//应用的凭证密钥（前往"应用管理"找到目标应用获取）
+    private static String WECHAT_APP_AGENT_ID;//企业应用ID (前往"应用管理"找到目标应用获取）
+    private static String WECHAT_ACCESS_TOKEN_URL;//获取企业微信token链接
+    private static String WECHAT_USERINFO_URL;//获取企业微信user链接
+
+
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
         if (StringUtils.isBlank(CODEDRIVER_HOME)) {
@@ -258,6 +266,26 @@ public class Config {
         return HISTORY_MESSAGE_EXPIRED_DAY;
     }
 
+    public static String WECHAT_ACCESS_TOKEN_URL() {
+        return WECHAT_ACCESS_TOKEN_URL;
+    }
+
+    public static String WECHAT_USERINFO_URL() {
+        return WECHAT_USERINFO_URL;
+    }
+
+    public static String WECHAT_CORP_ID() {
+        return WECHAT_CORP_ID;
+    }
+
+    public static String WECHAT_APP_SECRET() {
+        return WECHAT_APP_SECRET;
+    }
+
+    public static String WECHAT_APP_AGENT_ID() {
+        return WECHAT_APP_AGENT_ID;
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -318,6 +346,12 @@ public class Config {
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "techsure");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
             RUNNER_CONTEXT = prop.getProperty("runner.context", "/autoexecrunner");
+
+            WECHAT_ACCESS_TOKEN_URL = prop.getProperty("wechat.access.token.url", "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=CorpID&corpsecret=SECRET");
+            WECHAT_USERINFO_URL = prop.getProperty("wechat.userinfo.url", "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=ACCESS_TOKEN&code=CODE&agentid=AGENTID");
+            WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
+            WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
+            WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

@@ -105,6 +105,8 @@ public class UserVo extends BasePageVo implements Serializable {
     @EntityField(name = "用户名(与userName取值相同)", type = ApiParamType.STRING)
     private String name;
 
+    private int isMaintenanceMode;
+
     public UserVo() {
 
     }
@@ -504,5 +506,13 @@ public class UserVo extends BasePageVo implements Serializable {
 
     public void setRangeList(List<String> rangeList) {
         this.rangeList = rangeList;
+    }
+
+    public int getIsMaintenanceMode() {
+        return isMaintenanceMode;
+    }
+
+    public void setIsMaintenanceMode(int isMaintenanceMode) {
+        this.isMaintenanceMode = isMaintenanceMode;
     }
 }

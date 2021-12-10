@@ -1,21 +1,22 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.notify.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.dto.ConditionParamVo;
 import codedriver.framework.notify.constvalue.CommonNotifyParam;
 import codedriver.framework.notify.dto.NotifyTriggerTemplateVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.common.constvalue.Expression;
-import codedriver.framework.common.constvalue.GroupSearch;
-import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dto.ConditionParamVo;
-import codedriver.framework.dto.ExpressionVo;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 

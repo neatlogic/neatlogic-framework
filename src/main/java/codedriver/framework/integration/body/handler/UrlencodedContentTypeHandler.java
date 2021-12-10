@@ -5,15 +5,13 @@
 
 package codedriver.framework.integration.body.handler;
 
-import java.net.HttpURLConnection;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import codedriver.framework.integration.authentication.enums.BodyType;
 import codedriver.framework.integration.body.core.IContentTypeHandler;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+
+import java.net.HttpURLConnection;
 
 public class UrlencodedContentTypeHandler implements IContentTypeHandler {
 
@@ -26,22 +24,22 @@ public class UrlencodedContentTypeHandler implements IContentTypeHandler {
 	public String handleData(HttpURLConnection connection, JSONObject integrationParam, JSONObject config) {
 		JSONArray paramList = config.getJSONArray("paramList");
 		if (paramList != null && paramList.size() > 0) {
-			String paramstr = "";
+			String paramStr = "";
 			for (int i = 0; i < paramList.size(); i++) {
-				if (StringUtils.isBlank(paramstr)) {
-					paramstr += "&";
+				if (StringUtils.isBlank(paramStr)) {
+					paramStr += "&";
 				}
 				JSONObject item = paramList.getJSONObject(i);
 				String key = item.getString("key");
 				String type = item.getString("type");
 				String value = item.getString("value");
 				if (type.equals("custom")) {
-					paramstr += key + "=" + value;
+					paramStr += key + "=" + value;
 				} else if (type.equals("mapping")) {
-					paramstr += key + "=" + integrationParam.getString(value);
+					paramStr += key + "=" + integrationParam.getString(value);
 				}
 			}
-			return paramstr;
+			return paramStr;
 		}
 		return "";
 	}

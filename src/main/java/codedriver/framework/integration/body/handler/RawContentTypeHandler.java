@@ -5,19 +5,17 @@
 
 package codedriver.framework.integration.body.handler;
 
+import codedriver.framework.integration.authentication.enums.BodyType;
+import codedriver.framework.integration.body.core.IContentTypeHandler;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+
 import java.net.HttpURLConnection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.integration.authentication.enums.BodyType;
-import codedriver.framework.integration.body.core.IContentTypeHandler;
-
 public class RawContentTypeHandler implements IContentTypeHandler {
-	private static Pattern p = Pattern.compile("\\{\\{([^}]+)\\}\\}");
+	private static final Pattern p = Pattern.compile("\\{\\{([^}]+)}}");
 
 	@Override
 	public String getType() {

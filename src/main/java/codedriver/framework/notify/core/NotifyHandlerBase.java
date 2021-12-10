@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.notify.core;
 
 import codedriver.framework.common.util.FileUtil;
@@ -94,7 +99,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                     }
                 }
                 if (isSend) {
-                    /** 开启邮箱服务器连接会话 */
+                    /* 开启邮箱服务器连接会话 */
                     Properties props = new Properties();
                     props.setProperty("mail.smtp.host", mailServerVo.getHost());
                     props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
@@ -112,27 +117,26 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                         msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
                     }
 
-                    /** 设置收件人 */
+                    /* 设置收件人 */
                     msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", toEmailList), false));
-                    /** 设置邮件标题 */
+                    /* 设置邮件标题 */
                     msg.setSubject(isNormal ? clearStringHTML(notifyVo.getTitle()) : "通知发送异常");
                     msg.setSentDate(new Date());
 
                     MimeMultipart multipart = new MimeMultipart();
-                    /** 设置邮件正文 */
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<html>");
-                    sb.append("<head>");
-                    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-                    sb.append("<style type=\"text/css\">");
-                    sb.append("</style>");
-                    sb.append("</head><body>");
-                    sb.append(isNormal ? notifyVo.getContent() : notifyVo.getError());
-                    sb.append("</body></html>");
+                    /* 设置邮件正文 */
+                    String sb = "<html>" +
+                            "<head>" +
+                            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
+                            "<style type=\"text/css\">" +
+                            "</style>" +
+                            "</head><body>" +
+                            (isNormal ? notifyVo.getContent() : notifyVo.getError()) +
+                            "</body></html>";
                     MimeBodyPart text = new MimeBodyPart();
-                    text.setContent(sb.toString(), "text/html;charset=UTF-8");
+                    text.setContent(sb, "text/html;charset=UTF-8");
                     multipart.addBodyPart(text);
-                    /** 设置附件 */
+                    /* 设置附件 */
                     List<FileVo> fileList = notifyVo.getFileList();
                     if (CollectionUtils.isNotEmpty(fileList)) {
                         for (FileVo vo : fileList) {
@@ -148,7 +152,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                         }
                     }
                     msg.setContent(multipart);
-                    /** 发送邮件 */
+                    /* 发送邮件 */
                     Transport.send(msg);
                 } else {
                     throw new NotifyNoReceiverException();

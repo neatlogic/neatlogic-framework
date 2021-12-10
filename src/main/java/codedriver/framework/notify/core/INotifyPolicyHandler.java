@@ -46,8 +46,6 @@ public interface INotifyPolicyHandler {
 
     /**
      * 是否公开，默认公开
-     *
-     * @return
      */
     default boolean isPublic() {
         return true;
@@ -55,8 +53,6 @@ public interface INotifyPolicyHandler {
 
     /**
      * 是否允许添加多个策略
-     *
-     * @return
      */
     default int isAllowMultiPolicy() {
         return 1;

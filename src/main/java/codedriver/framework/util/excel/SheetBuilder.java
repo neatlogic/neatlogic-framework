@@ -9,17 +9,19 @@ package codedriver.framework.util.excel;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SheetBuilder {
-    private String sheetName;
+    private final String sheetName;
     private List<String> headerList;
     private List<Map<String, Object>> dataList;
     private List<String> columnList;
     private Sheet sheet;
     private Workbook workbook;
     private ExcelBuilder excelBuilder;
+    private final Map<String, String[]> validationMap = new HashMap<>();
 
     SheetBuilder(String sheetName) {
         this.sheetName = sheetName;
@@ -39,6 +41,11 @@ public class SheetBuilder {
         this.columnList = columnList;
         return this;
     }
+
+    public Map<String, String[]> getValidationMap() {
+        return validationMap;
+    }
+
 
     public List<String> getHeaderList() {
         return headerList;
@@ -100,6 +107,11 @@ public class SheetBuilder {
             this.dataList.add(dataMap);
         }
     }
+
+    public void addValidation(String key, String[] validateList) {
+        this.validationMap.put(key, validateList);
+    }
+
 
     private void makeupBody(Cell cell) {
         if (workbook != null && excelBuilder != null) {

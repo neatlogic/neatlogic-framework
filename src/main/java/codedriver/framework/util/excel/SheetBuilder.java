@@ -79,16 +79,13 @@ public class SheetBuilder {
         this.workbook = workbook;
     }
 
-    public ExcelBuilder getExcelBuilder() {
-        return excelBuilder;
-    }
 
     public void setExcelBuilder(ExcelBuilder excelBuilder) {
         this.excelBuilder = excelBuilder;
     }
 
 
-    public void addRow(Map<String, Object> dataMap) {
+    public void addData(Map<String, Object> dataMap) {
         if (this.sheet != null && workbook != null && excelBuilder != null) {
             int lastRowNum = this.sheet.getLastRowNum();
             lastRowNum++;

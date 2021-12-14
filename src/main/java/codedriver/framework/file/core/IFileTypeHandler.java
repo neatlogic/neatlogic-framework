@@ -56,7 +56,7 @@ public interface IFileTypeHandler {
     /**
      * 分析附件，一般在导入或分析的场景使用，支持流式处理附件内容，由于文件流只能读一次，所以要配合needSave=false使用
      */
-    default void analyze(MultipartFile multipartFile) throws Exception {
+    default void analyze(MultipartFile multipartFile, JSONObject paramObj) throws Exception {
 
     }
 }

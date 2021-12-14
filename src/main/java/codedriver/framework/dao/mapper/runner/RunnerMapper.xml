@@ -107,7 +107,8 @@
                  LEFT JOIN `runnergroup_runner` e ON e.`runnergroup_id` = a.`id`
                  LEFT JOIN `runner` c ON c.`id` = e.`runner_id`
                  LEFT JOIN `runner_map` d ON c.`id` = d.`runner_id`
-        WHERE a.`id` = #{id} and c.is_delete = 0
+        WHERE a.`id` = #{id}
+          and c.is_delete = 0
     </select>
 
     <select id="getAllRunnerMap" resultMap="runnerMapMap" useCache="false">
@@ -226,7 +227,7 @@
                p.`access_secret`    AS accessSecret,
                p.`auth_type`        AS authType,
                rgr.`runnergroup_id` AS groupId,
-               p.is_delete AS isDelete,
+               p.is_delete          AS isDelete,
                p.`host`,
                p.`port`
         FROM runner p
@@ -255,22 +256,22 @@
 
     <select id="getRunnerByNettyIpAndNettyPort" resultMap="runnerMap" useCache="false">
         SELECT r.`id`,
-               r.`name`,
-               r.`url`,
-               r.`host`,
-               r.`port`,
-               r.`access_key`       as accessKey,
-               r.`access_secret`    as accessSecret,
-               r.`auth_type`        as authType,
-               r.`public_key`       as publicKey,
-               r.`private_key`      as privateKey,
-               rgr.`runnergroup_id` as groupId
+        r.`name`,
+        r.`url`,
+        r.`host`,
+        r.`port`,
+        r.`access_key` as accessKey,
+        r.`access_secret` as accessSecret,
+        r.`auth_type` as authType,
+        r.`public_key` as publicKey,
+        r.`private_key` as privateKey,
+        rgr.`runnergroup_id` as groupId
         FROM `runner` r
-                 LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         WHERE r.`netty_ip` = #{nettyIp}
-          <if test="nettyPort == null">
+        <if test="nettyPort == null">
             and r.`netty_port` is null
-          </if>
+        </if>
         <if test="nettyPort != null">
             and r.`netty_port` = #{nettyPort}
         </if>
@@ -460,13 +461,30 @@
                p.`access_key`       AS accessKey,
                p.`access_secret`    AS accessSecret,
                p.`auth_type`        AS authType,
-               p.is_delete AS isDelete,
+               p.is_delete          AS isDelete,
                rgr.`runnergroup_id` AS groupId,
                p.`host`,
                p.`port`
         FROM runner p
                  LEFT JOIN runnergroup_runner rgr on p.id = rgr.runner_id
         WHERE p.`name` = #{name}
+    </select>
+
+    <select id="getRunnerByRunnerMapIdList" resultType="codedriver.framework.dto.runner.RunnerMapVo">
+        SELECT p.`id` AS id,
+        p.`name` AS name,
+        p.`url` AS url,
+        p.`access_key` AS accessKey,
+        p.`access_secret` AS accessSecret,
+        p.`auth_type` AS authType,
+        p.is_delete AS isDelete,
+        p.`host`,
+        p.`port`
+        FROM runner p left join runner_map rm on p.id = rm.runner_id
+        where rm.id in
+        <foreach collection="list" item="runnerMapId" close=")" open="(" separator=",">
+            #{runnerMapId}
+        </foreach>
     </select>
 
     <insert id="replaceRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">

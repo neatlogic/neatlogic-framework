@@ -6,9 +6,11 @@
 package codedriver.framework.util.excel;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,30 +52,14 @@ public class ExcelBuilder {
         return sheetBuilder;
     }
 
+    /*
+    字符数
+     */
     public ExcelBuilder withColumnWidth(Integer columnWidth) {
         this.columnWidth = columnWidth;
         return this;
     }
 
-   /* public ExcelBuilder withSheetName(String sheetName) {
-        this.sheetName = sheetName;
-        return this;
-    }
-
-    public ExcelBuilder withHeaderList(List<String> headerList) {
-        this.headerList = headerList;
-        return this;
-    }
-
-    public ExcelBuilder withColumnList(List<String> columnList) {
-        this.columnList = columnList;
-        return this;
-    }
-
-    public ExcelBuilder withDataList(List<Map<String, Object>> dataList) {
-        this.dataList = dataList;
-        return this;
-    }*/
 
     public ExcelBuilder withHeadBgColor(HSSFColor.HSSFColorPredefined color) {
         this.headBgColor = color;
@@ -89,6 +75,7 @@ public class ExcelBuilder {
         this.borderColor = color;
         return this;
     }
+
 
     public HSSFColor.HSSFColorPredefined getBorderColor() {
         return this.borderColor;
@@ -163,6 +150,7 @@ public class ExcelBuilder {
                 sheetBuilder.setExcelBuilder(this);
                 sheetBuilder.setSheet(sheet);
                 sheetBuilder.setWorkbook(this.workbook);
+
                 //设置列宽
                 if (this.columnWidth != null && CollectionUtils.isNotEmpty(sheetBuilder.getColumnList())) {
                     for (int i = 0; i < sheetBuilder.getColumnList().size(); i++) {
@@ -180,6 +168,28 @@ public class ExcelBuilder {
                         makeupHeader(cell);
                         cell.setCellValue(header);
                         i++;
+                    }
+                }
+                //生成校验规则
+                if (MapUtils.isNotEmpty(sheetBuilder.getValidationMap()) && CollectionUtils.isNotEmpty(sheetBuilder.getColumnList())) {
+                    for (String key : sheetBuilder.getValidationMap().keySet()) {
+                        String[] validateList = sheetBuilder.getValidationMap().get(key);
+                        int index = -1;
+                        for (int i = 0; i < sheetBuilder.getColumnList().size(); i++) {
+                            if (key.equals(sheetBuilder.getColumnList().get(i))) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index > -1) {
+                            DataValidationHelper dvHelper = sheet.getDataValidationHelper();
+                            DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(validateList);
+                            CellRangeAddressList addressList = new CellRangeAddressList(1, 65535, index, index);
+                            DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+                            validation.setSuppressDropDownArrow(true);
+                            validation.setShowErrorBox(true);
+                            sheet.addValidationData(validation);
+                        }
                     }
                 }
                 //生成数据行

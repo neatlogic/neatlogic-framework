@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public enum InputFrom implements IEnum {
-    PAGE("page", "页面操作"), IMPORT("import", "excel导入"), RESTFUL("restful", "接口同步"),
+    PAGE("page", "页面操作"), IMPORT("import", "excel导入"), RESTFUL("restful", "接口调用"),
     ITSM("itsm", "流程修改"), UNKNOWN("unknown", "未知"), CRON("cron", "定时任务"), AUTOEXEC("autoexec", "自动采集"), RELATIVE("relative", "级联更新");
 
     private final String value;

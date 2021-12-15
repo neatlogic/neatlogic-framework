@@ -23,7 +23,6 @@ public class Md5Util {
 
     /*
      * @Description: MD5加密 32位 小写
-     * @Author: chenqiwei
      * @Date: 2021/3/18 12:20 下午
      * @Params: [content]
      * @Returns: java.lang.String

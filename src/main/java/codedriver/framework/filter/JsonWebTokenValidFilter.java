@@ -70,24 +70,25 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 }
             }
         }
-
         //判断租户
         try {
             String tenant = request.getHeader("Tenant");
+            //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
+            HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
             if (TenantUtil.hasTenant(tenant)) {
                 hasTenant = true;
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 loginAuth = LoginAuthFactory.getLoginAuth("default");
-                userVo = loginAuth.auth(request, response);
+                userVo = loginAuth.auth(cachedRequest, response);
                 if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
                     authType = request.getHeader("AuthType");
-                    logger.info("AuthType: "+ authType);
+                    logger.info("AuthType: " + authType);
                     if (StringUtils.isNotBlank(authType)) {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
-                            userVo = loginAuth.auth(request, response);
+                            userVo = loginAuth.auth(cachedRequest, response);
                             if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                                 UserContext.init(userVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
@@ -108,7 +109,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
 
             if (hasTenant && isAuth && isUnExpired) {
-                filterChain.doFilter(request, response);
+                filterChain.doFilter(cachedRequest, response);
             } else {
                 if (!hasTenant) {
                     response.setStatus(521);
@@ -141,7 +142,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.error("认证失败", ex);
             response.setStatus(522);
             redirectObj.put("Status", "FAILED");
-            redirectObj.put("Message", "认证失败，具体异常请查看日志");
+            redirectObj.put("Message", ex.getMessage());
             if (loginAuth != null) {
                 redirectObj.put("directUrl", loginAuth.directUrl());
             }

@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.UserMapper">
     <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"/>
     <cache-ref namespace="codedriver.framework.dao.mapper.RoleMapper"/>
+
+    <select id="getUserTokenByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select token
+        from `user`
+        where user_id = #{value}
+    </select>
+
 
     <select id="checkUserAuthorityIsExists" resultType="int" useCache="true">
         SELECT COUNT(1) FROM (
@@ -212,8 +224,9 @@
                 AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth` = #{auth})
                 or
                 EXISTS (
-                    select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` = `user_role`.`role_uuid`
-                    where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
+                select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` =
+                `user_role`.`role_uuid`
+                where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
                 )
             </if>
             <if test="roleUuid != null and roleUuid != ''">
@@ -589,11 +602,10 @@
     </select>
 
     <select id="getUserCountByAuth" resultType="codedriver.framework.dto.AuthVo" useCache="false">
-                 SELECT
-                        a.`auth`  as `name`,
-                        COUNT(DISTINCT (a.`user_uuid`)) as `userCount`
-                 FROM `user_authority` a
-                          LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
+        SELECT a.`auth`                        as `name`,
+               COUNT(DISTINCT (a.`user_uuid`)) as `userCount`
+        FROM `user_authority` a
+                 LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
         GROUP BY a.`auth`
     </select>
 
@@ -873,39 +885,40 @@
         </foreach>
     </select>
 
-    <select id="getUserListByRoleUuid" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+    <select id="getUserListByRoleUuid" parameterType="codedriver.framework.dto.UserVo" resultMap="userInfoMap"
+            useCache="false">
         SELECT k.`id`,
-               k.`uuid`,
-               k.`user_id`   as `userId`,
-               k.`user_name` as `userName`,
-               k.`email`,
-               k.`phone`,
-               k.`pinyin`,
-               k.`is_active` as `isActive`,
-               k.`user_info` as `userInfo`,
-               k.`vip_level` as `vipLevel`,
-               h.`role_uuid` as `roleUuid`,
-               r.`name`      as `roleName`,
-               r.`description`,
-               j.`uuid`      as `teamUuid`,
-               j.`name`      as `teamName`
+        k.`uuid`,
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        k.`user_info` as `userInfo`,
+        k.`vip_level` as `vipLevel`,
+        h.`role_uuid` as `roleUuid`,
+        r.`name` as `roleName`,
+        r.`description`,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
         FROM (
-                 SELECT DISTINCT (a.`uuid`) AS `uuid`,
-                                 b.`id`
-                 FROM `user` a
-                              LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                           WHERE b.`role_uuid` = #{roleUuid}
-                             <if test="keyword != null and keyword != ''">
-                              and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
-                              or a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
-                             </if>
-                              LIMIT #{startNum}, #{pageSize}
-             ) g
-                 JOIN `user` k ON g.`uuid` = k.`uuid`
-                 LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
-                 LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
-                 LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
-                 LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        SELECT DISTINCT (a.`uuid`) AS `uuid`,
+        b.`id`
+        FROM `user` a
+        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`role_uuid` = #{roleUuid}
+        <if test="keyword != null and keyword != ''">
+            and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+            or a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+        ) g
+        JOIN `user` k ON g.`uuid` = k.`uuid`
+        LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+        LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
         order by g.`id`
     </select>
 
@@ -1111,8 +1124,8 @@
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
-                                     `auth_group`,
-                                     `auth`)
+                                      `auth_group`,
+                                      `auth`)
         VALUES (#{userUuid},
                 #{authGroup},
                 #{auth})
@@ -1304,11 +1317,11 @@
         </where>
     </delete>
 
-   <!-- <delete id="deleteUserAgent" parameterType="java.lang.String">
-        DELETE
-        FROM `user_agent`
-        WHERE `user_uuid` = #{value}
-    </delete>-->
+    <!-- <delete id="deleteUserAgent" parameterType="java.lang.String">
+         DELETE
+         FROM `user_agent`
+         WHERE `user_uuid` = #{value}
+     </delete>-->
     <delete id="deleteUserTitleByName">
         DELETE
         FROM `user_title`
@@ -1317,10 +1330,10 @@
 
     <select id="searchUserCountByAuth" resultType="int" parameterType="codedriver.framework.dto.UserVo">
         SELECT
-        COUNT(distinct  a.`uuid`)
+        COUNT(distinct a.`uuid`)
         FROM `user` a
         LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        WHERE  b.`auth` = #{auth}
+        WHERE b.`auth` = #{auth}
         <if test="keyword != null and keyword != ''">
             and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
             or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
@@ -1338,5 +1351,11 @@
         </if>
         LIMIT #{startNum}, #{pageSize}
     </select>
+
+    <update id="updateUserTokenByUuid">
+        update `user`
+        set `token` = #{token}
+        where uuid = #{uuid}
+    </update>
 </mapper>
 

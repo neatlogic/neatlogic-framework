@@ -7,10 +7,9 @@ package codedriver.framework.exception.user;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class UserIdRepeatException extends ApiRuntimeException {
+public class UserTokenNotFoundException extends ApiRuntimeException {
 
-
-    public UserIdRepeatException(String userId) {
-        super("用户ID“" + userId + "”已存在");
+    public UserTokenNotFoundException(String userid) {
+        super("用户“" + userid + "”的令牌不存在，请在页面重新生成");
     }
 }

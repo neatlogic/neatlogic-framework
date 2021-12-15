@@ -515,4 +515,5 @@ public class UserVo extends BasePageVo implements Serializable {
     public void setIsMaintenanceMode(int isMaintenanceMode) {
         this.isMaintenanceMode = isMaintenanceMode;
     }
+
 }

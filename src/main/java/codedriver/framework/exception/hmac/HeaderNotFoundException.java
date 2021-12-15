@@ -3,14 +3,14 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.exception.user;
+package codedriver.framework.exception.hmac;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
-public class UserIdRepeatException extends ApiRuntimeException {
+public class HeaderNotFoundException extends ApiRuntimeException {
 
 
-    public UserIdRepeatException(String userId) {
-        super("用户ID“" + userId + "”已存在");
+    public HeaderNotFoundException(String header) {
+        super("缺少头部“" + header + "”");
     }
 }

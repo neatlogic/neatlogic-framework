@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.filter.core;
 
 import codedriver.framework.common.config.Config;
@@ -15,18 +20,16 @@ import org.springframework.context.annotation.DependsOn;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
-    protected Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
+    protected static Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
 
     public abstract String getType();
 
@@ -69,7 +72,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return userVo;
     }
 
-    public abstract UserVo myAuth(HttpServletRequest request) throws ServletException, IOException;
+    public abstract UserVo myAuth(HttpServletRequest request) throws Exception;
 
     /**
      * 生成jwt对象

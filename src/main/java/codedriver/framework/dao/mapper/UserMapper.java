@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dao.mapper;
 
 import codedriver.framework.dto.*;
@@ -7,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserMapper {
+    String getUserTokenByUserId(String userId);
+
 
     int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("authList") List<String> authList);
 
@@ -217,4 +224,6 @@ public interface UserMapper {
     int searchUserCountByAuth(UserVo vo);
 
     List<String> searchUserUuIdByUser(UserVo vo);
+
+    void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
 }

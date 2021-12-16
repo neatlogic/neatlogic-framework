@@ -226,4 +226,5 @@ public interface UserMapper {
     List<String> searchUserUuIdByUser(UserVo vo);
 
     void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
+
 }

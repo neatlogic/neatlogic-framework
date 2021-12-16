@@ -1122,6 +1122,30 @@
         </where>
     </select>
 
+    <select id="searchUserCountByAuth" resultType="int" parameterType="codedriver.framework.dto.UserVo">
+        SELECT
+        COUNT(distinct a.`uuid`)
+        FROM `user` a
+        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`auth` = #{auth}
+        <if test="keyword != null and keyword != ''">
+            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
+            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="searchUserUuIdByUser" resultType="string" parameterType="codedriver.framework.dto.UserVo">
+        SELECT distinct a.`uuid`
+        FROM `user` a
+        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`auth` = #{auth}
+        <if test="keyword != null and keyword != ''">
+            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
+            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,
@@ -1327,30 +1351,6 @@
         FROM `user_title`
         WHERE `name` = #{value};
     </delete>
-
-    <select id="searchUserCountByAuth" resultType="int" parameterType="codedriver.framework.dto.UserVo">
-        SELECT
-        COUNT(distinct a.`uuid`)
-        FROM `user` a
-        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        WHERE b.`auth` = #{auth}
-        <if test="keyword != null and keyword != ''">
-            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
-            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
-        </if>
-    </select>
-
-    <select id="searchUserUuIdByUser" resultType="string" parameterType="codedriver.framework.dto.UserVo">
-        SELECT distinct a.`uuid`
-        FROM `user` a
-        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
-        WHERE b.`auth` = #{auth}
-        <if test="keyword != null and keyword != ''">
-            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
-            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
-        </if>
-        LIMIT #{startNum}, #{pageSize}
-    </select>
 
     <update id="updateUserTokenByUuid">
         update `user`

@@ -72,6 +72,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
         //判断租户
         try {
+            logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
             String tenant = request.getHeader("Tenant");
             //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
             HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
@@ -149,7 +150,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
-
+        logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
     }
 
     private boolean userExpirationValid() {

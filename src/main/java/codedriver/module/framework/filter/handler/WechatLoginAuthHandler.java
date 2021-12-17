@@ -30,6 +30,7 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
     @Override
     public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException {
         String code = request.getHeader("AuthValue");
+        logger.info("requestUrl : "+request.getRequestURL() +"    Header time : " + request.getHeader("time"));
         String userId;
         String access_token;
         logger.info("---> code:" + code);

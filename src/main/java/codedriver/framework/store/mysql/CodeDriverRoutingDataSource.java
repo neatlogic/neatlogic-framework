@@ -5,15 +5,21 @@
 
 package codedriver.framework.store.mysql;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
-
 public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
+    private final Logger logger = LoggerFactory.getLogger(CodeDriverRoutingDataSource.class);
+
     @Override
     protected Object determineCurrentLookupKey() {
         if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
+            if (logger.isInfoEnabled()) {
+                logger.info("ThreadName:" + Thread.currentThread().getName() + " Tenant:" + TenantContext.get().getTenantUuid());
+            }
             return TenantContext.get().getTenantUuid();
         } else {
             return null;

@@ -288,7 +288,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
 
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
@@ -350,7 +350,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -411,7 +411,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -480,7 +480,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -541,7 +541,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
+            returnObj.put("Message", ex.getMessage(true));
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {

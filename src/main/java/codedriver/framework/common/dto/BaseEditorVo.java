@@ -34,18 +34,6 @@ public class BaseEditorVo extends BasePageVo {
     private String lcuName;
     @EntityField(name = "修改日期", type = ApiParamType.STRING)
     private Date lcd;
-//    @EntityField(name = "创建者额外属性", type = ApiParamType.STRING)
-//    private String fcuInfo;
-//    @EntityField(name = "创建者头像", type = ApiParamType.STRING)
-//    private String fcuAvatar;
-//    @EntityField(name = "创建者VIP等级", type = ApiParamType.INTEGER)
-//    private Integer fcuVipLevel;
-//    @EntityField(name = "修改者额外属性", type = ApiParamType.STRING)
-//    private String lcuInfo;
-//    @EntityField(name = "修改者头像", type = ApiParamType.STRING)
-//    private String lcuAvatar;
-//    @EntityField(name = "修改者VIP等级", type = ApiParamType.INTEGER)
-//    private Integer lcuVipLevel;
     @JSONField(serialize = false)
     public String tenantUuid;//当前租户uuid
 
@@ -119,54 +107,6 @@ public class BaseEditorVo extends BasePageVo {
         this.lcd = lcd;
     }
 
-//    public String getFcuInfo() {
-//        return fcuInfo;
-//    }
-//
-//    public void setFcuInfo(String fcuInfo) {
-//        this.fcuInfo = fcuInfo;
-//    }
-
-//    public String getFcuAvatar() {
-//        if (StringUtils.isBlank(fcuAvatar) && StringUtils.isNotBlank(fcuInfo)) {
-//            JSONObject jsonObject = JSONObject.parseObject(fcuInfo);
-//            fcuAvatar = jsonObject.getString("avatar");
-//        }
-//        return fcuAvatar;
-//    }
-//
-//    public String getLcuInfo() {
-//        return lcuInfo;
-//    }
-//
-//    public void setLcuInfo(String lcuInfo) {
-//        this.lcuInfo = lcuInfo;
-//    }
-//
-//    public String getLcuAvatar() {
-//        if (StringUtils.isBlank(lcuAvatar) && StringUtils.isNotBlank(lcuInfo)) {
-//            JSONObject jsonObject = JSONObject.parseObject(lcuInfo);
-//            lcuAvatar = jsonObject.getString("avatar");
-//        }
-//        return lcuAvatar;
-//    }
-//
-//    public Integer getFcuVipLevel() {
-//        return fcuVipLevel;
-//    }
-//
-//    public void setFcuVipLevel(Integer fcuVipLevel) {
-//        this.fcuVipLevel = fcuVipLevel;
-//    }
-//
-//    public Integer getLcuVipLevel() {
-//        return lcuVipLevel;
-//    }
-//
-//    public void setLcuVipLevel(Integer lcuVipLevel) {
-//        this.lcuVipLevel = lcuVipLevel;
-//    }
-
     public final UserVo getFcuVo() {
         if (fcuVo == null && StringUtils.isNotBlank(fcu)) {
             fcuVo = new UserVo(fcu);
@@ -174,20 +114,12 @@ public class BaseEditorVo extends BasePageVo {
         return fcuVo;
     }
 
-//    public void setFcuVo(UserVo fcuVo) {
-//        this.fcuVo = fcuVo;
-//    }
-
     public final UserVo getLcuVo() {
         if (lcuVo == null && StringUtils.isNotBlank(lcu)) {
             lcuVo = new UserVo(lcu);
         }
         return lcuVo;
     }
-
-//    public void setLcuVo(UserVo lcuVo) {
-//        this.lcuVo = lcuVo;
-//    }
 
     public final String getActionType() {
         if (Objects.equals(fcd, lcd)) {

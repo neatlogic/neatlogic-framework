@@ -17,14 +17,6 @@ public class AuthorityVo {
 		this.uuid = uuid;
 	}
 
-	public AuthorityVo() {
-
-	}
-	public AuthorityVo(String type, String uuid) {
-		this.type = type;
-		this.uuid = uuid;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -107,6 +107,7 @@
         <collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
             <id property="uuid" column="teamUuid"/>
             <result property="name" column="teamName"/>
+            <result property="upwardNamePath" column="upwardNamePath"/>
         </collection>
     </resultMap>
 
@@ -126,7 +127,8 @@
                r.`name`      AS roleName,
                r.`description`,
                c.`team_uuid` AS teamUuid,
-               d.`name`      AS teamName
+               d.`name`      AS teamName,
+               d.`upward_name_path` AS upwardNamePath
         FROM `user` a
                  LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
                  LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`

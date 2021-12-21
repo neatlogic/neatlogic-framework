@@ -221,12 +221,12 @@ public class DynamicListHandler extends FormHandlerBase {
         if (api != null) {
             MyApiComponent restComponent = (MyApiComponent) PrivateApiComponentFactory.getInstance(api.getHandler());
             if (restComponent != null) {
-                String matrixUuid = configObj.getString("matrixUuid");
+                String integrationUuid = configObj.getString("integrationUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
                 uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
                 List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
-                paramObj.put("matrixUuid", matrixUuid);
+                paramObj.put("integrationUuid", integrationUuid);
                 paramObj.put("columnList", columnList);
                 paramObj.put("uuidList", uuidList);
                 paramObj.put("uuidColumn", uuidColumn);

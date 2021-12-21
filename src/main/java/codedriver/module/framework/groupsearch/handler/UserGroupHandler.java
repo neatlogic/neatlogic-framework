@@ -5,7 +5,9 @@
 
 package codedriver.module.framework.groupsearch.handler;
 
+import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.constvalue.GroupSearch;
+import codedriver.framework.common.util.CommonUtil;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,10 +94,13 @@ public class UserGroupHandler implements IGroupSearchHandler {
             userTmp.put("value", getHeader() + userVo.getUuid());
             userTmp.put("text", userVo.getUserName() + "(" + userVo.getUserId() + ")");
 //			userTmp.put("userInfo", ((UserVo) user).getUserInfo());
-            userTmp.put("pinyin", userVo.getPinyin());
+            //移动端临时屏蔽这两个字段，表单也会用到这个接口
+            if(!Objects.equals(DeviceType.MOBILE.getValue(),CommonUtil.getDevice())) {
+                userTmp.put("pinyin", userVo.getPinyin());
+                userTmp.put("team", String.join("/", userVo.getTeamNameList()));
+            }
             userTmp.put("avatar", userVo.getAvatar());
             userTmp.put("vipLevel", userVo.getVipLevel());
-            userTmp.put("team", String.join("/", userVo.getTeamNameList()));
             userArray.add(userTmp);
         }
         userObj.put("sort", getSort());

@@ -1,7 +1,7 @@
 package codedriver.framework.common.constvalue;
 
 public enum DeviceType {
-	ALL("all","所有人"),MOBILE("mobile","手机端"),PC("pc","电脑端");
+	ALL("all","所有"),MOBILE("mobile","手机端"),PC("pc","电脑端");
 
 	private String status;
 	private String text;

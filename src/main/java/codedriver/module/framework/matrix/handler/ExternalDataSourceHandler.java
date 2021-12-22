@@ -495,6 +495,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         Map<String, JSONObject> resultMap = new HashMap<>(columnList.size());
                         for (String column : columnList) {
                             String columnValue = rowData.getString(column);
+                            if (columnValue == null) {
+                                columnValue = "";
+                            }
                             JSONObject resultObj = new JSONObject();
                             resultObj.put("type", MatrixAttributeType.INPUT.getValue());
                             resultObj.put("value", columnValue);
@@ -525,9 +528,22 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     String value = valueObj.getString("value");
                     if (StringUtils.isNotBlank(value)) {
                         if (value.startsWith("[") && value.endsWith("]")) {
-                            List<String> valueList = valueObj.getJSONArray("value").toJavaList(String.class);
-                            for (String valueStr : valueList) {
-                                valueObjList.add(new ValueTextVo(valueStr, valueStr));
+                            JSONArray valueArray = valueObj.getJSONArray("value");
+                            if (CollectionUtils.isNotEmpty(valueArray)) {
+                                for (int i = 0; i < valueArray.size(); i++) {
+                                    Object valueObject = valueArray.get(i);
+                                    if (valueObject instanceof JSONObject) {
+                                        JSONObject valueJsonObject = (JSONObject)valueObject;
+                                        Object valueStr = valueJsonObject.get("value");
+                                        String textStr = valueJsonObject.getString("text");
+                                        if (valueStr != null && StringUtils.isNotBlank(textStr)) {
+                                            valueObjList.add(new ValueTextVo(valueStr, textStr));
+                                        }
+                                    } else if (valueObject instanceof JSONObject) {
+                                        String valueStr = (String) valueObject;
+                                        valueObjList.add(new ValueTextVo(valueStr, valueStr));
+                                    }
+                                }
                             }
                         } else {
                             valueObjList.add(new ValueTextVo(value, value));

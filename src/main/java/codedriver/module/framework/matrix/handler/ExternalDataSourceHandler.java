@@ -495,6 +495,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         Map<String, JSONObject> resultMap = new HashMap<>(columnList.size());
                         for (String column : columnList) {
                             String columnValue = rowData.getString(column);
+                            if (columnValue == null) {
+                                columnValue = "";
+                            }
                             JSONObject resultObj = new JSONObject();
                             resultObj.put("type", MatrixAttributeType.INPUT.getValue());
                             resultObj.put("value", columnValue);

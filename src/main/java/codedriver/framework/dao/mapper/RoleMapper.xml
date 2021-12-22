@@ -203,13 +203,19 @@
         `team_uuid` AS teamUuid,
         `checked_children` AS checkedChildren
         FROM `team_role`
+        WHERE `role_uuid` = #{value}
+    </select>
+
+    <select id="getRoleTeamListByRoleUuidAndTeamUuidList" resultType="codedriver.framework.dto.RoleTeamVo">
+        SELECT
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
+        FROM `team_role`
         WHERE `role_uuid` = #{roleUuid}
-        <if test="teamUuidList != null and teamUuidList.size() > 0">
-            AND `team_uuid` IN
-            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                #{teamUuid}
-            </foreach>
-        </if>
+        AND `team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
     </select>
 
     <select id="getRoleTeamListByRoleUuidList" resultType="codedriver.framework.dto.RoleTeamVo" useCache="false">

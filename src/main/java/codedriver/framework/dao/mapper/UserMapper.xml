@@ -507,13 +507,13 @@
 
     <select id="getActiveUserByRoleUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="false">
-        SELECT `id`,
-               `uuid`,
-               `user_id`   AS userId,
-               `user_name` AS userName,
-               `email`,
-               `phone`,
-               `is_active` AS isActive
+        SELECT u.`id`,
+               u.`uuid`,
+               u.`user_id`   AS userId,
+               u.`user_name` AS userName,
+               u.`email`,
+               u.`phone`,
+               u.`is_active` AS isActive
         FROM `user` u
                  JOIN user_role ur ON ur.`user_uuid` = u.`uuid` AND ur.`role_uuid` = #{roleUuid}
         WHERE u.`is_active` = 1

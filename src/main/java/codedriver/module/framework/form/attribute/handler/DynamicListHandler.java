@@ -172,8 +172,6 @@ public class DynamicListHandler extends FormHandlerBase {
                         JSONArray theadList = resultObj.getJSONArray("theadList");
                         JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
                         if (CollectionUtils.isNotEmpty(tbodyList)) {
-                            System.out.println("selectUuidList.size()=" + selectUuidList.size());
-                            System.out.println("tbodyList.size()=" + tbodyList.size());
                             for (int i = 0; i < tbodyList.size(); i++) {
                                 JSONObject tbodyObj = tbodyList.getJSONObject(i);
                                 tbodyObj.put("_isSelected", true);
@@ -266,7 +264,6 @@ public class DynamicListHandler extends FormHandlerBase {
                 String integrationUuid = configObj.getString("integrationUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
                 uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
-//                List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("integrationUuid", integrationUuid);
                 paramObj.put("columnList", columnList);
@@ -306,8 +303,6 @@ public class DynamicListHandler extends FormHandlerBase {
                         JSONArray tbodyList = new JSONArray();
                         JSONArray tbodyArray = resultObj.getJSONArray("tbodyList");
                         if (CollectionUtils.isNotEmpty(tbodyArray)) {
-                            System.out.println("selectUuidList.size()=" + selectUuidList.size());
-                            System.out.println("tbodyList.size()=" + tbodyArray.size());
                             for (int i = 0; i < tbodyArray.size(); i++) {
                                 List<String> tbodyKeyList = new ArrayList<>();
                                 JSONObject newTbodyObj = new JSONObject();

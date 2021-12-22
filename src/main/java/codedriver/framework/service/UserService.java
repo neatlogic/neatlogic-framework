@@ -28,4 +28,6 @@ public interface UserService {
      */
     void getUserByRangeList(UserVo userVo, List<String> rangeList);
 
+    List<UserVo> getUserListByRoleUuid(String roleUuid);
+
 }

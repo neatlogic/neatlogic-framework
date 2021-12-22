@@ -14,14 +14,15 @@ import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.notify.dto.NotifyVo;
 import codedriver.framework.notify.exception.EmailServerNotFoundException;
 import codedriver.framework.notify.exception.NotifyNoReceiverException;
+import codedriver.framework.service.UserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.annotation.Resource;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
@@ -32,10 +33,13 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyHandlerBase.class);
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
+    private UserService userService;
+
+    @Resource
     private MailServerMapper mailServerMapper;
 
 
@@ -67,7 +71,8 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
             }
             if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
                 for (String roleUuid : notifyVo.getToRoleUuidList()) {
-                    List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(roleUuid);
+                    List<UserVo> userVoList = userService.getUserListByRoleUuid(roleUuid);
+//                    List<UserVo> userVoList = userMapper.getActiveUserByRoleUuid(roleUuid);
                     toUserSet.addAll(userVoList);
                 }
             }

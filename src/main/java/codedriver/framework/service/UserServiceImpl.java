@@ -7,18 +7,17 @@ package codedriver.framework.service;
 
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.RoleMapper;
+import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.RoleTeamVo;
 import codedriver.framework.dto.RoleUserVo;
+import codedriver.framework.dto.TeamVo;
 import codedriver.framework.dto.UserVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private TeamMapper teamMapper;
 
     @Resource
     private RoleMapper roleMapper;
@@ -90,5 +92,50 @@ public class UserServiceImpl implements UserService {
             userVo.setTeamUuidList(new ArrayList<>(teamSet));
             userVo.setParentTeamUuidList(new ArrayList<>(parentTeamSet));
         }
+    }
+
+    @Override
+    public List<UserVo> getUserListByRoleUuid(String roleUuid) {
+        Set<String> userUuidSet = new HashSet<>();
+        List<String> userUuidList = userMapper.getUserUuidListByRoleUuid(roleUuid);
+        userUuidSet.addAll(userUuidList);
+        Set<String> teamUuidSet = new HashSet<>();
+        List<RoleTeamVo> roleTeamList = roleMapper.getRoleTeamListByRoleUuid(roleUuid);
+        for (RoleTeamVo roleTeamVo : roleTeamList) {
+            String teamUuid = roleTeamVo.getTeamUuid();
+            if (Objects.equals(roleTeamVo.getCheckedChildren(), 1)) {
+                TeamVo teamVo = teamMapper.getTeamByUuid(teamUuid);
+                if (teamVo != null) {
+                    teamUuidSet.add(teamUuid);
+                    List<String> teamUuidList = teamMapper.getChildrenUuidListByLeftRightCode(teamVo.getLft(), teamVo.getRht());
+                    teamUuidSet.addAll(teamUuidList);
+                }
+            } else {
+                teamUuidSet.add(teamUuid);
+            }
+            if (teamUuidSet.size() >= 100) {
+                userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+                userUuidSet.addAll(userUuidList);
+                teamUuidSet.clear();
+            }
+        }
+        if (teamUuidSet.size() > 0) {
+            userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+            userUuidSet.addAll(userUuidList);
+        }
+        List<UserVo> allUserList = new ArrayList<>();
+        if (userUuidSet.size() > 0) {
+            List<String> allUserUuidList = new ArrayList<>(userUuidSet);
+            for (int fromIndex = 0; fromIndex < allUserUuidList.size(); fromIndex += 100) {
+                int toIndex = fromIndex + 100;
+                if (toIndex > allUserUuidList.size()) {
+                    toIndex = allUserUuidList.size();
+                }
+                userUuidList = allUserUuidList.subList(fromIndex, toIndex);
+                List<UserVo> userList = userMapper.getUserListByUuidList(userUuidList);
+                allUserList.addAll(userList);
+            }
+        }
+        return allUserList;
     }
 }

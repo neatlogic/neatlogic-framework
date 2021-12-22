@@ -128,7 +128,7 @@ public interface UserMapper {
 
     List<String> getUserUuidListByTeamUuid(String teamUuid);
 
-    List<String> getUserUuidListByRoleUuid(String teamUuid);
+    List<String> getUserUuidListByRoleUuid(String roleUuid);
 
     int checkUserIdIsIsRepeat(UserVo userVo);
 

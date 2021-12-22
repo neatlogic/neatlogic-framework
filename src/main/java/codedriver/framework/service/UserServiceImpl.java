@@ -113,10 +113,29 @@ public class UserServiceImpl implements UserService {
             } else {
                 teamUuidSet.add(teamUuid);
             }
+            if (teamUuidSet.size() >= 100) {
+                userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+                userUuidSet.addAll(userUuidList);
+                teamUuidSet.clear();
+            }
         }
-        userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
-        userUuidSet.addAll(userUuidList);
-        List<UserVo> userList = userMapper.getUserListByUuidList(new ArrayList<>(userUuidSet));
-        return userList;
+        if (teamUuidSet.size() > 0) {
+            userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+            userUuidSet.addAll(userUuidList);
+        }
+        List<UserVo> allUserList = new ArrayList<>();
+        if (userUuidSet.size() > 0) {
+            List<String> allUserUuidList = new ArrayList<>(userUuidSet);
+            for (int fromIndex = 0; fromIndex < allUserUuidList.size(); fromIndex += 100) {
+                int toIndex = fromIndex + 100;
+                if (toIndex > allUserUuidList.size()) {
+                    toIndex = allUserUuidList.size();
+                }
+                userUuidList = allUserUuidList.subList(fromIndex, toIndex);
+                List<UserVo> userList = userMapper.getUserListByUuidList(userUuidList);
+                allUserList.addAll(userList);
+            }
+        }
+        return allUserList;
     }
 }

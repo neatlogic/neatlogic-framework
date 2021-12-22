@@ -1,6 +1,11 @@
 package codedriver.framework.common.constvalue;
 
-public enum DeviceType {
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import java.util.List;
+
+public enum DeviceType implements IEnum{
 	ALL("all","所有"),MOBILE("mobile","手机端"),PC("pc","电脑端");
 
 	private String status;
@@ -37,4 +42,17 @@ public enum DeviceType {
 		return "";
 	}
 
+	@Override
+	public List getValueTextList() {
+		JSONArray array = new JSONArray();
+		for (DeviceType type : values()) {
+			array.add(new JSONObject() {
+				{
+					this.put("value", type.getValue());
+					this.put("text", type.getText());
+				}
+			});
+		}
+		return array;
+	}
 }

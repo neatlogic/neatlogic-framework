@@ -150,7 +150,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
-        logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
+        logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ end");
     }
 
     private boolean userExpirationValid() {

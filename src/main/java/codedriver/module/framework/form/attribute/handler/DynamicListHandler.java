@@ -171,9 +171,24 @@ public class DynamicListHandler extends FormHandlerBase {
                     if (MapUtils.isNotEmpty(resultObj)) {
                         JSONArray theadList = resultObj.getJSONArray("theadList");
                         JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+                        List<String> secondEditColumnList = new ArrayList<>();
+                        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+                        for (int i = 0; i < dataConfig.size(); i++) {
+                            JSONObject dataConfigObj = dataConfig.getJSONObject(i);
+                            Boolean isEdit = dataConfigObj.getBoolean("isEdit");
+                            if (Objects.equals(isEdit, true)) {
+                                String secondEditColumn = dataConfigObj.getString("uuid");
+                                if (StringUtils.isNotBlank(secondEditColumn)) {
+                                    secondEditColumnList.add(secondEditColumn);
+                                }
+                            }
+                        }
+                        JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+                        if (CollectionUtils.isNotEmpty(secondEditColumnList)) {
+                            setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnList, extendedDataObj);
+                        }
                         JSONArray attributeList = configObj.getJSONArray("attributeList");
                         if (CollectionUtils.isNotEmpty(attributeList)) {
-                            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
                             setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
                         }
                         tableObj.put("selectUuidList", selectUuidList);
@@ -194,10 +209,29 @@ public class DynamicListHandler extends FormHandlerBase {
         if (MapUtils.isNotEmpty(table)) {
             JSONArray theadList = table.getJSONArray("theadList");
             JSONArray tbodyList = table.getJSONArray("tbodyList");
+            String uuidColumn = configObj.getString("uuidColumn");
+            if (StringUtils.isBlank(uuidColumn)) {
+                uuidColumn = "uuid";
+            }
+            List<String> secondEditColumnList = new ArrayList<>();
+            JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+            for (int i = 0; i < dataConfig.size(); i++) {
+                JSONObject dataConfigObj = dataConfig.getJSONObject(i);
+                Boolean isEdit = dataConfigObj.getBoolean("isEdit");
+                if (Objects.equals(isEdit, true)) {
+                    String secondEditColumn = dataConfigObj.getString("uuid");
+                    if (StringUtils.isNotBlank(secondEditColumn)) {
+                        secondEditColumnList.add(secondEditColumn);
+                    }
+                }
+            }
+            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+            if (CollectionUtils.isNotEmpty(secondEditColumnList)) {
+                setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnList, extendedDataObj);
+            }
             JSONArray attributeList = configObj.getJSONArray("attributeList");
             if (CollectionUtils.isNotEmpty(attributeList)) {
-                JSONObject valueObj = dataObj.getJSONObject("extendedData");
-                setExtAttributeData(theadList, tbodyList, configObj, valueObj);
+                setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
             }
             tableObj.put("theadList", theadList);
             tableObj.put("tbodyList", tbodyList);
@@ -234,11 +268,55 @@ public class DynamicListHandler extends FormHandlerBase {
                 try {
                     JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
                     if (MapUtils.isNotEmpty(resultObj)) {
-                        JSONArray theadList = resultObj.getJSONArray("theadList");
-                        JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+                        List<String> secondEditColumnList = new ArrayList<>();
+                        JSONArray theadList = new JSONArray();
+                        JSONArray theadArray = resultObj.getJSONArray("theadList");
+                        if (CollectionUtils.isNotEmpty(theadArray)) {
+                            for (int i = 0; i < theadArray.size(); i++) {
+                                JSONObject theadObj = theadArray.getJSONObject(i);
+                                String key = theadObj.getString("key");
+                                Integer primaryKey = theadObj.getInteger("primaryKey");
+                                if (Objects.equals(primaryKey, 1)) {
+                                    uuidColumn = key;
+                                }
+                                JSONObject config = theadObj.getJSONObject("config");
+                                if (MapUtils.isNotEmpty(config)) {
+                                    secondEditColumnList.add(key);
+                                }
+                                JSONObject newTheadObj = new JSONObject();
+                                newTheadObj.put("key", key);
+                                newTheadObj.put("title", theadObj.getString("title"));
+                                theadList.add(newTheadObj);
+                            }
+                        }
+                        JSONArray tbodyList = new JSONArray();
+                        JSONArray tbodyArray = resultObj.getJSONArray("tbodyList");
+                        if (CollectionUtils.isNotEmpty(tbodyArray)) {
+                            for (int i = 0; i < tbodyArray.size(); i++) {
+                                JSONObject newTbodyObj = new JSONObject();
+                                JSONObject tbodyObj = tbodyArray.getJSONObject(i);
+                                for (Map.Entry<String, Object> entry : tbodyObj.entrySet()) {
+                                    String key = entry.getKey();
+                                    Object value = entry.getValue();
+                                    if ("_isSelected".equals(key)) {
+                                        newTbodyObj.put(key, value);
+                                    } else {
+                                        JSONObject valueOjb = new JSONObject();
+                                        valueOjb.put("value", value);
+                                        valueOjb.put("text", value);
+                                        valueOjb.put("type", "input");
+                                        newTbodyObj.put(key, valueOjb);
+                                    }
+                                }
+                                tbodyList.add(newTbodyObj);
+                            }
+                        }
+                        JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+                        if (CollectionUtils.isNotEmpty(secondEditColumnList)) {
+                            setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnList, extendedDataObj);
+                        }
                         JSONArray attributeList = configObj.getJSONArray("attributeList");
                         if (CollectionUtils.isNotEmpty(attributeList)) {
-                            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
                             setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
                         }
                         tableObj.put("selectUuidList", selectUuidList);
@@ -257,17 +335,116 @@ public class DynamicListHandler extends FormHandlerBase {
         tableObj.put("selectUuidList", selectUuidList);
         JSONObject table = dataObj.getJSONObject("table");
         if (MapUtils.isNotEmpty(table)) {
-            JSONArray theadList = table.getJSONArray("theadList");
-            JSONArray tbodyList = table.getJSONArray("tbodyList");
+            String uuidColumn = "uuid";
+            List<String> secondEditColumnList = new ArrayList<>();
+            JSONArray theadList = new JSONArray();
+            JSONArray theadArray = table.getJSONArray("theadList");
+            if (CollectionUtils.isNotEmpty(theadArray)) {
+                for (int i = 0; i < theadArray.size(); i++) {
+                    JSONObject theadObj = theadArray.getJSONObject(i);
+                    String key = theadObj.getString("key");
+                    Integer primaryKey = theadObj.getInteger("primaryKey");
+                    if (Objects.equals(primaryKey, 1)) {
+                        uuidColumn = key;
+                    }
+                    JSONObject config = theadObj.getJSONObject("config");
+                    if (MapUtils.isNotEmpty(config)) {
+                        secondEditColumnList.add(key);
+                    }
+                    JSONObject newTheadObj = new JSONObject();
+                    newTheadObj.put("key", key);
+                    newTheadObj.put("title", theadObj.getString("title"));
+                    theadList.add(newTheadObj);
+                }
+            }
+            JSONArray tbodyList = new JSONArray();
+            JSONArray tbodyArray = table.getJSONArray("tbodyList");
+            if (CollectionUtils.isNotEmpty(tbodyArray)) {
+                for (int i = 0; i < tbodyArray.size(); i++) {
+                    JSONObject newTbodyObj = new JSONObject();
+                    JSONObject tbodyObj = tbodyArray.getJSONObject(i);
+                    for (Map.Entry<String, Object> entry : tbodyObj.entrySet()) {
+                        String key = entry.getKey();
+                        Object value = entry.getValue();
+                        if ("_isSelected".equals(key)) {
+                            newTbodyObj.put(key, value);
+                        } else {
+                            JSONObject valueOjb = new JSONObject();
+                            valueOjb.put("value", value);
+                            valueOjb.put("text", value);
+                            valueOjb.put("type", "input");
+                            newTbodyObj.put(key, valueOjb);
+                        }
+                    }
+                    tbodyList.add(newTbodyObj);
+                }
+            }
+            JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
+            if (CollectionUtils.isNotEmpty(secondEditColumnList)) {
+                setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnList, extendedDataObj);
+            }
             JSONArray attributeList = configObj.getJSONArray("attributeList");
             if (CollectionUtils.isNotEmpty(attributeList)) {
-                JSONObject valueObj = dataObj.getJSONObject("extendedData");
-                setExtAttributeData(theadList, tbodyList, configObj, valueObj);
+                setExtAttributeData(theadList, tbodyList, configObj, extendedDataObj);
             }
             tableObj.put("theadList", theadList);
             tableObj.put("tbodyList", tbodyList);
         }
         return tableObj;
+    }
+
+    /**
+     * 处理二次编辑数据
+     * @param tbodyList
+     * @param uuidColumn
+     * @param secondEditColumnList
+     * @param extendedDataObj
+     */
+    private void setSecondEditAttributeData(JSONArray tbodyList, String uuidColumn, List<String> secondEditColumnList, JSONObject extendedDataObj) {
+        System.out.println(extendedDataObj);
+        for (int i = 0; i < tbodyList.size(); i++) {
+            JSONObject tbodyObj = tbodyList.getJSONObject(i);
+            JSONObject uuidColumnObj = tbodyObj.getJSONObject(uuidColumn);
+            String uuidValue = uuidColumnObj.getString("value");
+
+            for (String column : secondEditColumnList) {
+                JSONObject columnDataObj = tbodyObj.getJSONObject(column);
+                if (MapUtils.isEmpty(columnDataObj)) {
+                    continue;
+                }
+                JSONArray columnValueArray = columnDataObj.getJSONArray("value");
+                if (CollectionUtils.isEmpty(columnValueArray)) {
+                    continue;
+                }
+                JSONArray newColumnValueArray = new JSONArray();
+                if (MapUtils.isNotEmpty(extendedDataObj)) {
+                    JSONObject extendedRowDataObj = extendedDataObj.getJSONObject(uuidValue);
+                    if (MapUtils.isNotEmpty(extendedRowDataObj)) {
+                        JSONArray selectedValueArray = extendedRowDataObj.getJSONArray(column);
+                        if (CollectionUtils.isNotEmpty(selectedValueArray)) {
+                            for (int j = 0; j < columnValueArray.size(); j++) {
+                                JSONObject columnValueObj = columnValueArray.getJSONObject(j);
+                                Object value = columnValueObj.get("value");//TODO 自定义
+                                if (selectedValueArray.contains(value)) {
+                                    newColumnValueArray.add(columnValueObj);
+                                }
+                            }
+                        }
+                    }
+                }
+                columnDataObj.put("value", newColumnValueArray);
+                columnDataObj.put("type", "selects");
+                List<String> textList = new ArrayList<>();
+                for (int j = 0; j < newColumnValueArray.size(); j++) {
+                    JSONObject columnValueObj = newColumnValueArray.getJSONObject(j);
+                    String text = columnValueObj.getString("text");
+                    if (StringUtils.isNotBlank(text)) {
+                        textList.add(text);
+                    }
+                }
+                columnDataObj.put("text", textList);
+            }
+        }
     }
 
     private void setExtAttributeData(JSONArray theadList, JSONArray tbodyList, JSONObject configObj, JSONObject dataObj) {

@@ -525,9 +525,22 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     String value = valueObj.getString("value");
                     if (StringUtils.isNotBlank(value)) {
                         if (value.startsWith("[") && value.endsWith("]")) {
-                            List<String> valueList = valueObj.getJSONArray("value").toJavaList(String.class);
-                            for (String valueStr : valueList) {
-                                valueObjList.add(new ValueTextVo(valueStr, valueStr));
+                            JSONArray valueArray = valueObj.getJSONArray("value");
+                            if (CollectionUtils.isNotEmpty(valueArray)) {
+                                for (int i = 0; i < valueArray.size(); i++) {
+                                    Object valueObject = valueArray.get(i);
+                                    if (valueObject instanceof JSONObject) {
+                                        JSONObject valueJsonObject = (JSONObject)valueObject;
+                                        Object valueStr = valueJsonObject.get("value");
+                                        String textStr = valueJsonObject.getString("text");
+                                        if (valueStr != null && StringUtils.isNotBlank(textStr)) {
+                                            valueObjList.add(new ValueTextVo(valueStr, textStr));
+                                        }
+                                    } else if (valueObject instanceof JSONObject) {
+                                        String valueStr = (String) valueObject;
+                                        valueObjList.add(new ValueTextVo(valueStr, valueStr));
+                                    }
+                                }
                             }
                         } else {
                             valueObjList.add(new ValueTextVo(value, value));

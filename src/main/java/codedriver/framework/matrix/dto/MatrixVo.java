@@ -2,6 +2,7 @@ package codedriver.framework.matrix.dto;
 
 import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.matrix.core.MatrixTypeFactory;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import codedriver.framework.common.constvalue.ApiParamType;
@@ -36,6 +37,8 @@ public class MatrixVo extends BaseEditorVo {
     private FileVo fileVo;
     @EntityField( name = "ci模型id", type = ApiParamType.LONG)
     private Long ciId;
+    @EntityField( name = "配置信息", type = ApiParamType.JSONOBJECT)
+    private JSONObject config;
 
     public Long getId() {
         return id;
@@ -127,5 +130,13 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setCiId(Long ciId) {
         this.ciId = ciId;
+    }
+
+    public JSONObject getConfig() {
+        return config;
+    }
+
+    public void setConfig(JSONObject config) {
+        this.config = config;
     }
 }

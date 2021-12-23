@@ -119,7 +119,8 @@
 	<select id="getMatrixCiByMatrixUuid" parameterType="string" resultType="codedriver.framework.matrix.dto.MatrixCiVo">
 		SELECT
 			`matrix_uuid` AS matrixUuid,
-			`ci_id` AS ciId
+			`ci_id` AS ciId,
+			`config`
 		FROM `matrix_ci`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
@@ -175,10 +176,12 @@
 	<insert id="replaceMatrixCi" parameterType="codedriver.framework.matrix.dto.MatrixCiVo">
 		REPLACE INTO `matrix_ci`(
 			`matrix_uuid`,
-			`ci_id`
+			`ci_id`,
+			`config`
 		) VALUES (
 		#{matrixUuid},
-		#{ciId}
+		#{ciId},
+		#{config}
 		)
 	</insert>
 

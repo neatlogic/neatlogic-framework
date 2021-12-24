@@ -160,11 +160,10 @@ public class DynamicListHandler extends FormHandlerBase {
                 String matrixUuid = configObj.getString("matrixUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
                 uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
-                List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("matrixUuid", matrixUuid);
                 paramObj.put("columnList", columnList);
-                paramObj.put("uuidList", uuidList);
+                paramObj.put("defaultValue", selectUuidList);
                 paramObj.put("uuidColumn", uuidColumn);
                 paramObj.put("needPage", false);
                 try {
@@ -172,6 +171,12 @@ public class DynamicListHandler extends FormHandlerBase {
                     if (MapUtils.isNotEmpty(resultObj)) {
                         JSONArray theadList = resultObj.getJSONArray("theadList");
                         JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+                        if (CollectionUtils.isNotEmpty(tbodyList)) {
+                            for (int i = 0; i < tbodyList.size(); i++) {
+                                JSONObject tbodyObj = tbodyList.getJSONObject(i);
+                                tbodyObj.put("_isSelected", true);
+                            }
+                        }
                         Map<String, String> secondEditColumnMap = new HashMap<>();
                         JSONArray dataConfig = configObj.getJSONArray("dataConfig");
                         for (int i = 0; i < dataConfig.size(); i++) {
@@ -259,11 +264,10 @@ public class DynamicListHandler extends FormHandlerBase {
                 String integrationUuid = configObj.getString("integrationUuid");
                 String uuidColumn = configObj.getString("uuidColumn");
                 uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
-                List<String> uuidList = selectUuidList.toJavaList(String.class);
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("integrationUuid", integrationUuid);
                 paramObj.put("columnList", columnList);
-                paramObj.put("uuidList", uuidList);
+                paramObj.put("defaultValue", selectUuidList);
                 paramObj.put("uuidColumn", uuidColumn);
                 paramObj.put("needPage", false);
                 try {
@@ -303,6 +307,7 @@ public class DynamicListHandler extends FormHandlerBase {
                                 List<String> tbodyKeyList = new ArrayList<>();
                                 JSONObject newTbodyObj = new JSONObject();
                                 JSONObject tbodyObj = tbodyArray.getJSONObject(i);
+                                newTbodyObj.put("_isSelected", true);
                                 for (Map.Entry<String, Object> entry : tbodyObj.entrySet()) {
                                     String key = entry.getKey();
                                     tbodyKeyList.add(key);
@@ -399,6 +404,9 @@ public class DynamicListHandler extends FormHandlerBase {
                         if ("_isSelected".equals(key)) {
                             newTbodyObj.put(key, value);
                         } else {
+                            if (value == null) {
+                                value = "";
+                            }
                             JSONObject valueOjb = new JSONObject();
                             valueOjb.put("value", value);
                             valueOjb.put("text", value);

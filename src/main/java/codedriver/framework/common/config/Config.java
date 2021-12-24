@@ -43,7 +43,9 @@ public class Config {
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
     private static int MQ_SUBSCRIBE_RECONNECT_PERIOD;//MQ连接重试间隔
     private static String HOME_URL;
-    private static String USER_EXPIRETIME; // 会话超时时间
+    private static String USER_EXPIRETIME; // 会话超时时间(分)
+    private static int LOGIN_CAPTCHA_EXPIRED_TIME; //验证码超时时间(秒)
+    private static int LOGIN_FAILED_TIMES_CAPTCHA; //设置需要验证码的登录错误次数
 
     private static String MONGO_HOST;
     private static String MONGO_PASSWORD;
@@ -210,6 +212,14 @@ public class Config {
         return Integer.parseInt(USER_EXPIRETIME);
     }
 
+    public static int LOGIN_CAPTCHA_EXPIRED_TIME() {
+        return LOGIN_CAPTCHA_EXPIRED_TIME;
+    }
+
+    public static int LOGIN_FAILED_TIMES_CAPTCHA() {
+        return LOGIN_FAILED_TIMES_CAPTCHA;
+    }
+
     public static String MINIO_URL() {
         return MINIO_URL;
     }
@@ -328,6 +338,8 @@ public class Config {
             HOME_URL = prop.getProperty("home.url");
             JWT_SECRET = prop.getProperty("jwt.secret", "techsure#codedriver$secret");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
+            LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
+            LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
             DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");

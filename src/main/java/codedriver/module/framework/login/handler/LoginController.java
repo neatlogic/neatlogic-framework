@@ -10,6 +10,8 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.DeviceType;
+import codedriver.framework.common.util.CommonUtil;
 import codedriver.framework.dao.mapper.LoginMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.JwtVo;
@@ -39,6 +41,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/login/")
@@ -83,7 +86,10 @@ public class LoginController {
                 // 还原回租户库
                 tenantContext.setUseDefaultDatasource(false);
             }
-            loginService.loginCaptchaValid(jsonObj);
+            //目前仅先校验移动端
+            if(Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
+                loginService.loginCaptchaValid(jsonObj);
+            }
             // 验证并获取用户
             UserVo userVo = new UserVo();
             userVo.setUserId(userId);

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.awt.*;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -61,6 +62,7 @@ public class LoginServiceImpl implements LoginService {
             if (StringUtils.isNotBlank(sessionId) && StringUtils.isNotBlank(code)) {
                 LoginCaptchaVo loginCaptchaVo = loginMapper.getLoginCaptchaBySessionId(sessionId);
                 //code相等 且 没有超时
+                code = code.toUpperCase(Locale.ROOT);
                 if (loginCaptchaVo != null && Objects.equals(loginCaptchaVo.getCode(), code) && TimeUtil.compareDate(loginCaptchaVo.getExpiredTime(), new Date(System.currentTimeMillis()))) {
                     loginMapper.deleteLoginCaptchaBySessionId(sessionId);
                 }else{

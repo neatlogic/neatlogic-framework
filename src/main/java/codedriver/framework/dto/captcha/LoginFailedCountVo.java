@@ -8,7 +8,10 @@ package codedriver.framework.dto.captcha;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
-public class LoginFailedCountVo {
+import java.io.Serializable;
+
+public class LoginFailedCountVo implements Serializable {
+    private static final long serialVersionUID = -1911666621870552499L;
     @EntityField(name = "用户uuid", type = ApiParamType.STRING)
     private String userId;
     @EntityField(name = "登录失败次数", type = ApiParamType.INTEGER)

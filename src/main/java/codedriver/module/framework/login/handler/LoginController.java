@@ -10,10 +10,15 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.DeviceType;
+import codedriver.framework.common.util.CommonUtil;
+import codedriver.framework.dao.mapper.LoginMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.dto.captcha.LoginCaptchaVo;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
@@ -21,31 +26,39 @@ import codedriver.framework.filter.core.LoginAuthHandlerBase;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.TenantService;
-import codedriver.framework.transaction.util.TransactionUtil;
+import codedriver.framework.util.UuidUtil;
+import codedriver.module.framework.service.LoginService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/login/")
 public class LoginController {
     Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
+    private LoginMapper loginMapper;
+
+    @Resource
     private TenantService tenantService;
+
+    @Resource
+    private LoginService loginService;
 
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
@@ -73,6 +86,10 @@ public class LoginController {
                 // 还原回租户库
                 tenantContext.setUseDefaultDatasource(false);
             }
+            //目前仅先校验移动端
+            if(Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
+                loginService.loginCaptchaValid(jsonObj);
+            }
             // 验证并获取用户
             UserVo userVo = new UserVo();
             userVo.setUserId(userId);
@@ -86,7 +103,7 @@ public class LoginController {
                 if (Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
                 } else {
-                    checkUserVo = userMapper.getUserByUserIdAndPassword(userVo);
+                    checkUserVo = loginService.loginWithUserIdAndPassword(userVo);
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
@@ -100,13 +117,7 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
-                TransactionStatus transactionStatus =TransactionUtil.openTx();
-                if (userMapper.getUserSessionLockByUserUuid(checkUserVo.getUuid()) != null) {
-                    userMapper.updateUserSession(checkUserVo.getUuid());
-                } else {
-                    userMapper.insertUserSession(checkUserVo.getUuid());
-                }
-                TransactionUtil.commitTx(transactionStatus);
+                userMapper.insertUserSession(checkUserVo.getUuid());
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
@@ -115,7 +126,7 @@ public class LoginController {
             } else {
                 throw new UserAuthFailedException();
             }
-        } catch (UserAuthFailedException | TenantNotFoundException ex) {
+        } catch (ApiRuntimeException ex) {
             ReturnJson.error(ex.getMessage(true), response);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -127,4 +138,22 @@ public class LoginController {
             }
         }
     }
+
+    @RequestMapping(value = "/get/captcha/{tenant}")
+    public void getCaptcha(@RequestBody String json, @PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jsonObj = JSONObject.parseObject(json);
+        String sessionId = jsonObj.getString("sessionId");
+        JSONObject result = loginService.getCaptcha();
+        if (StringUtils.isNotBlank(sessionId)) {
+            LoginCaptchaVo loginCaptchaVo = loginMapper.getLoginCaptchaBySessionId(sessionId);
+            if (loginCaptchaVo == null) {
+                sessionId = UuidUtil.randomUuid();
+            }
+        } else {
+            sessionId = UuidUtil.randomUuid();
+        }
+        long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
+        loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
+    }
+
 }

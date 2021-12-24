@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.dao.mapper.LoginMapper">
+    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="10"/>
+    <select id="getLoginCaptchaBySessionId" parameterType="java.lang.String"
+            resultType="codedriver.framework.dto.captcha.LoginCaptchaVo" useCache="false">
+        SELECT `session_id` as sessionId, `code`, `expired_time` as expriedTime
+        FROM `login_captcha`
+        WHERE `session_id` = #{value}
+    </select>
+
+    <select id="getLoginFailedCountByUserId" resultType="java.lang.Integer">
+        SELECT `failed_count`
+        FROM `login_failed_count`
+        WHERE `user_id` = #{value}
+    </select>
+
+    <select id="getLoginFailedCountVoByUserId"
+            resultType="codedriver.framework.dto.captcha.LoginFailedCountVo">
+        SELECT `failed_count` as failedCount, `user_id` as userId
+        FROM `login_failed_count`
+        WHERE `user_id` = #{value}
+    </select>
+
+    <insert id="updateLoginCaptcha" parameterType="codedriver.framework.dto.captcha.LoginCaptchaVo">
+        INSERT INTO `login_captcha` (`session_id`, `code`, `expired_time`)
+        VALUES (#{sessionId}, #{code}, #{expiredTime})
+        ON DUPLICATE KEY
+            UPDATE `code`         = #{code},
+                   `expired_time` = #{expiredTime}
+    </insert>
+
+    <insert id="updateLoginFailedCount" parameterType="codedriver.framework.dto.captcha.LoginFailedCountVo">
+        INSERT INTO `login_failed_count` (`user_id`, `failed_count`)
+        VALUES (#{userId}, #{failedCount})
+        ON DUPLICATE KEY
+            UPDATE failed_count = (failed_count + 1)
+    </insert>
+
+    <delete id="deleteLoginCaptchaBySessionId">
+        delete
+        from login_captcha
+        where session_id = #{value}
+    </delete>
+
+    <delete id="deleteLoginFailedCountByUserId">
+        delete
+        from login_failed_count
+        where user_id = #{value}
+    </delete>
+</mapper>
+

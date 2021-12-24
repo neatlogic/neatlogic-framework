@@ -61,6 +61,7 @@ public class Config {
     private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
+    private static Boolean MOBILE_IS_ONLINE;//是否启动移动端
 
     private static int NEW_MESSAGE_EXPIRED_DAY;
     private static int HISTORY_MESSAGE_EXPIRED_DAY;
@@ -239,6 +240,10 @@ public class Config {
         return MOBILE_TEST_USER;
     }
 
+    public static Boolean MOBILE_IS_ONLINE() {
+        return MOBILE_IS_ONLINE;
+    }
+
     public static boolean ENABLE_INTERFACE_VERIFY() {
         return ENABLE_INTERFACE_VERIFY;
     }
@@ -351,6 +356,7 @@ public class Config {
             MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
             MINIO_BUCKET = prop.getProperty("minio.bucket", "codedriver");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
+            MOBILE_IS_ONLINE = Boolean.parseBoolean(prop.getProperty("mobile.is.online", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));

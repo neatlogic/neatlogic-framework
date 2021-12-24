@@ -142,6 +142,24 @@ public class LoginController {
     @RequestMapping(value = "/get/captcha/{tenant}")
     public void getCaptcha(@RequestBody String json, @PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
         JSONObject jsonObj = JSONObject.parseObject(json);
+        TenantContext tenantContext = TenantContext.init();
+        if (StringUtils.isBlank(tenant)) {
+            tenant = request.getHeader("Tenant");
+        }
+        if (StringUtils.isNotBlank(tenant)) {
+            // 使用master库
+            tenantContext.setUseDefaultDatasource(true);
+            TenantVo tenantVo = tenantService.getTenantByUuid(tenant);
+            if (tenantVo == null) {
+                throw new TenantNotFoundException(tenant);
+            }
+            if (tenantVo.getIsActive().equals(0)) {
+                throw new TenantUnActiveException(tenant);
+            }
+            tenantContext.switchTenant(tenant);
+            // 还原回租户库
+            tenantContext.setUseDefaultDatasource(false);
+        }
         String sessionId = jsonObj.getString("sessionId");
         JSONObject result = loginService.getCaptcha();
         if (StringUtils.isNotBlank(sessionId)) {
@@ -154,6 +172,9 @@ public class LoginController {
         }
         long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
         loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
+        result.remove("code");
+        result.put("sessionId",sessionId);
+        response.getWriter().print(result);
     }
 
 }

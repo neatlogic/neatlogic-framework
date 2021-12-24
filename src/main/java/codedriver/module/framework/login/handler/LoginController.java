@@ -66,6 +66,7 @@ public class LoginController {
         JSONObject returnObj = new JSONObject();
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
+        JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
             String password = jsonObj.getString("password");
@@ -87,8 +88,8 @@ public class LoginController {
                 tenantContext.setUseDefaultDatasource(false);
             }
             //目前仅先校验移动端
-            if(Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
-                loginService.loginCaptchaValid(jsonObj);
+            if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
+                loginService.loginCaptchaValid(jsonObj, resultJson);
             }
             // 验证并获取用户
             UserVo userVo = new UserVo();
@@ -127,7 +128,7 @@ public class LoginController {
                 throw new UserAuthFailedException();
             }
         } catch (ApiRuntimeException ex) {
-            ReturnJson.error(ex.getMessage(true), response);
+            ReturnJson.error(ex.getMessage(true), resultJson, response);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             ReturnJson.error(ex.getMessage(), response);
@@ -173,7 +174,7 @@ public class LoginController {
         long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
         loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
         result.remove("code");
-        result.put("sessionId",sessionId);
+        result.put("sessionId", sessionId);
         response.getWriter().print(result);
     }
 

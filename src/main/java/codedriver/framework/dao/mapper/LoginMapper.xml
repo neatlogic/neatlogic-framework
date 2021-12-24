@@ -9,7 +9,7 @@
     <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="300000" size="10"/>
     <select id="getLoginCaptchaBySessionId" parameterType="java.lang.String"
             resultType="codedriver.framework.dto.captcha.LoginCaptchaVo" useCache="false">
-        SELECT `session_id` as sessionId, `code`, `expired_time` as expriedTime
+        SELECT `session_id` as sessionId, `code`, `expired_time` as expiredTime
         FROM `login_captcha`
         WHERE `session_id` = #{value}
     </select>

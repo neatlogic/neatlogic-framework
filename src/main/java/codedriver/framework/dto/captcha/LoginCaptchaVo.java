@@ -15,7 +15,7 @@ public class LoginCaptchaVo {
     private String sessionId;
     @EntityField(name = "code", type = ApiParamType.STRING)
     private String code;
-    @EntityField(name = "分组uuid", type = ApiParamType.STRING)
+    @EntityField(name = "分组uuid", type = ApiParamType.LONG)
     private Date expiredTime;
 
     public LoginCaptchaVo(){}

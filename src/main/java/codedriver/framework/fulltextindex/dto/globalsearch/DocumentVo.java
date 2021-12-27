@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -88,6 +89,12 @@ public class DocumentVo extends BasePageVo {
 
     public void setType(String type) {
         this.type = type;
+        if (this.typeList == null) {
+            this.typeList = new ArrayList<>();
+        }
+        if (!this.typeList.contains(type)) {
+            this.typeList.add(type);
+        }
     }
 
     public String getTypeText() {

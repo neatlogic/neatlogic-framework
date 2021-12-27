@@ -14,7 +14,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -121,10 +120,7 @@ public class BasePageVo implements Serializable {
 
     public final Set<String> getKeywordList() {
         if (CollectionUtils.isEmpty(this.keywordList) && StringUtils.isNotBlank(keyword)) {
-            try {
-                this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
-            } catch (IOException ignored) {
-            }
+            this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
         }
         return this.keywordList;
     }

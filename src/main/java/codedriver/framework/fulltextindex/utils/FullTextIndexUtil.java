@@ -13,6 +13,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
+    static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
     private static final Analyzer indexAnalyzer = new IKAnalyzer(false);//分词细一点
     private static final Analyzer searchAnalyzer = new IKAnalyzer(true);//分词粗一点
     private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
@@ -35,9 +38,8 @@ public class FullTextIndexUtil {
      *
      * @param keyword 搜索关键字
      * @return 分词结果
-     * @throws IOException 异常
      */
-    public static Set<String> sliceKeyword(String keyword) throws IOException {
+    public static Set<String> sliceKeyword(String keyword) {
         Set<String> wordList = new HashSet<>();
         /*
          * for (String w : word.split("[\\s]+")) { if (StringUtils.isNotBlank(w)
@@ -60,16 +62,20 @@ public class FullTextIndexUtil {
                 keyword = temp.toString();
             }
             if (StringUtils.isNotBlank(keyword)) {
-                Reader reader = new StringReader(keyword);
-                TokenStream stream = searchAnalyzer.tokenStream(null, reader);
-                CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
-                stream.reset();
-                while (stream.incrementToken()) {
-                    String w = term.toString();
-                    wordList.add(w);
+                try {
+                    Reader reader = new StringReader(keyword);
+                    TokenStream stream = searchAnalyzer.tokenStream(null, reader);
+                    CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
+                    stream.reset();
+                    while (stream.incrementToken()) {
+                        String w = term.toString();
+                        wordList.add(w);
+                    }
+                    stream.end();
+                    stream.close();
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
                 }
-                stream.end();
-                stream.close();
             }
         }
         if (CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(keyword)) {

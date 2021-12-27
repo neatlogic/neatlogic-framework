@@ -29,7 +29,7 @@ public class BatchRunner<T> {
 
     public static class State {
         private boolean isSucceed = false;
-        private String error;
+        private Exception exception;
 
         public boolean isSucceed() {
             return isSucceed;
@@ -39,13 +39,15 @@ public class BatchRunner<T> {
             isSucceed = succeed;
         }
 
-        public String getError() {
-            return error;
+
+        public Exception getException() {
+            return exception;
         }
 
-        public void setError(String error) {
-            this.error = error;
+        public void setException(Exception exception) {
+            this.exception = exception;
         }
+
     }
 
     /**
@@ -117,19 +119,26 @@ public class BatchRunner<T> {
                         if (ts != null) {
                             TransactionUtil.commitTx(ts);
                         }
+                    } catch (ApiRuntimeException e) {
+                        state.setSucceed(false);
+                        state.setException(e);
+                        logger.warn(e.getMessage(), e);
+                        if (ts != null) {
+                            TransactionUtil.rollbackTx(ts);
+                        }
                     } catch (Exception e) {
                         state.setSucceed(false);
-                        state.setError(e.getMessage());
+                        state.setException(e);
                         logger.error(e.getMessage(), e);
                         if (ts != null) {
                             TransactionUtil.rollbackTx(ts);
                         }
                     }
                 }
+            } catch (ApiRuntimeException ex) {
+                logger.warn(ex.getMessage(), ex);
             } catch (Exception ex) {
-                if (!(ex instanceof ApiRuntimeException)) {
-                    logger.error(ex.getMessage(), ex);
-                }
+                logger.error(ex.getMessage(), ex);
             } finally {
                 latch.countDown();
             }

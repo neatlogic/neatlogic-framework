@@ -34,7 +34,7 @@ public class LoginServiceImpl implements LoginService {
     LoginMapper loginMapper;
 
     @Override
-    public UserVo loginWithUserIdAndPassword(UserVo userParam) {
+    public UserVo loginWithUserIdAndPassword(UserVo userParam, JSONObject resultJson) {
         UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userParam);
         LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
         if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
@@ -46,6 +46,7 @@ public class LoginServiceImpl implements LoginService {
             loginFailedCountVo = new LoginFailedCountVo(userParam.getUserId(), failedCount);
             loginMapper.updateLoginFailedCount(loginFailedCountVo);
         } else {//如果正常用户登录成功，则清空该用户的失败次数
+            resultJson.remove("isNeedCaptcha");
             loginMapper.deleteLoginFailedCountByUserId(userParam.getUserId());
         }
         return checkUserVo;
@@ -56,6 +57,7 @@ public class LoginServiceImpl implements LoginService {
         //如果错误次数超多限制 则需要输入验证码
         Integer loginFailCount = loginMapper.getLoginFailedCountByUserId(jsonObj.getString("userid"));
         if (loginFailCount != null && loginFailCount >= Config.LOGIN_FAILED_TIMES_CAPTCHA()) {
+            resultJson.put("isNeedCaptcha", 1);
             String sessionId = jsonObj.getString("sessionId");
             String code = jsonObj.getString("code");
             //校验验证码是否合法
@@ -65,16 +67,13 @@ public class LoginServiceImpl implements LoginService {
                 code = code.toUpperCase(Locale.ROOT);
                 if (loginCaptchaVo != null && Objects.equals(loginCaptchaVo.getCode(), code) && TimeUtil.compareDate(loginCaptchaVo.getExpiredTime(), new Date(System.currentTimeMillis()))) {
                     loginMapper.deleteLoginCaptchaBySessionId(sessionId);
-                    resultJson.remove("isNeedCaptcha");
                 } else {
                     long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
                     JSONObject result = getCaptcha();
                     loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
-                    resultJson.put("isNeedCaptcha", 1);
                     throw new LoginCaptchaNotInvalidException();
                 }
             } else {
-                resultJson.put("isNeedCaptcha", 1);
                 throw new LoginCaptchaIsEmptyException(Config.LOGIN_FAILED_TIMES_CAPTCHA());
             }
         }

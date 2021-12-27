@@ -104,7 +104,7 @@ public class LoginController {
                     if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
                         loginService.loginCaptchaValid(jsonObj, resultJson);
                     }
-                    checkUserVo = loginService.loginWithUserIdAndPassword(userVo);
+                    checkUserVo = loginService.loginWithUserIdAndPassword(userVo, resultJson);
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";

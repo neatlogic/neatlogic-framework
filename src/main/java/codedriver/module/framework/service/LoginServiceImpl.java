@@ -65,10 +65,12 @@ public class LoginServiceImpl implements LoginService {
                 code = code.toUpperCase(Locale.ROOT);
                 if (loginCaptchaVo != null && Objects.equals(loginCaptchaVo.getCode(), code) && TimeUtil.compareDate(loginCaptchaVo.getExpiredTime(), new Date(System.currentTimeMillis()))) {
                     loginMapper.deleteLoginCaptchaBySessionId(sessionId);
+                    resultJson.remove("isNeedCaptcha");
                 } else {
                     long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
                     JSONObject result = getCaptcha();
                     loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
+                    resultJson.put("isNeedCaptcha", 1);
                     throw new LoginCaptchaNotInvalidException();
                 }
             } else {

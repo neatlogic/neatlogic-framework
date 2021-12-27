@@ -87,10 +87,6 @@ public class LoginController {
                 // 还原回租户库
                 tenantContext.setUseDefaultDatasource(false);
             }
-            //目前仅先校验移动端
-            if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
-                loginService.loginCaptchaValid(jsonObj, resultJson);
-            }
             // 验证并获取用户
             UserVo userVo = new UserVo();
             userVo.setUserId(userId);
@@ -104,6 +100,10 @@ public class LoginController {
                 if (Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
                 } else {
+                    //目前仅先校验移动端
+                    if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
+                        loginService.loginCaptchaValid(jsonObj, resultJson);
+                    }
                     checkUserVo = loginService.loginWithUserIdAndPassword(userVo);
                 }
                 if (checkUserVo != null) {

@@ -1,9 +1,11 @@
 package codedriver.framework.common.constvalue;
 
+import codedriver.framework.common.config.Config;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum DeviceType implements IEnum{
 	ALL("all","所有"),MOBILE("mobile","手机端"),PC("pc","电脑端");
@@ -46,6 +48,9 @@ public enum DeviceType implements IEnum{
 	public List getValueTextList() {
 		JSONArray array = new JSONArray();
 		for (DeviceType type : values()) {
+			if(!Config.MOBILE_IS_ONLINE() && Objects.equals(type.getValue(),DeviceType.MOBILE.getValue())){
+				continue;
+			}
 			array.add(new JSONObject() {
 				{
 					this.put("value", type.getValue());

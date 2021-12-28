@@ -7,6 +7,7 @@ package codedriver.framework.util;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
+import codedriver.framework.exception.httprequest.HttpMethodIrregularException;
 import codedriver.framework.file.core.FileStorageMediumFactory;
 import codedriver.framework.file.core.IFileStorageHandler;
 import codedriver.framework.file.dto.FileVo;
@@ -32,10 +33,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
@@ -208,6 +206,9 @@ public class HttpRequestUtil {
      * @param outputStream 输出流
      */
     public static HttpRequestUtil download(String url, String method, OutputStream outputStream) {
+        if (!Objects.equals(method, "GET") && !Objects.equals(method, "POST")) {
+            throw new HttpMethodIrregularException();
+        }
         HttpRequestUtil httpRequestUtil = new HttpRequestUtil(url);
         httpRequestUtil.method = method;
         httpRequestUtil.outputStream = outputStream;
@@ -382,7 +383,9 @@ public class HttpRequestUtil {
             //设置连接参数
             connection.setRequestMethod(method);
             connection.setUseCaches(false);
-            connection.setDoOutput(true);
+            if (Objects.equals(this.method, "POST")) {
+                connection.setDoOutput(true);
+            }
             connection.setDoInput(true);
             connection.setConnectTimeout(this.connectTimeout);
             connection.setReadTimeout(this.readTimeout);
@@ -422,10 +425,13 @@ public class HttpRequestUtil {
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
         if (connection != null) {
-            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                OutputStreamHandlerMap.get(this.contentType).execute(out, this);
-                out.flush();
-                out.close();
+            try {
+                if (Objects.equals(this.method, "POST")) {
+                    try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                        OutputStreamHandlerMap.get(this.contentType).execute(out, this);
+                        out.flush();
+                    }
+                }
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
                 if (100 <= this.responseCode && this.responseCode <= 399) {

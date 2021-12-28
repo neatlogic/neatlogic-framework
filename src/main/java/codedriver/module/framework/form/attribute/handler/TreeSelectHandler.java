@@ -61,7 +61,7 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public boolean isConditionable() {
-        return true;
+        return false;
     }
 
     @Override
@@ -71,12 +71,12 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public boolean isValueable() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isFilterable() {
-        return true;
+        return false;
     }
 
     @Override

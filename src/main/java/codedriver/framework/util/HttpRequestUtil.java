@@ -207,9 +207,9 @@ public class HttpRequestUtil {
      * @param url          地址
      * @param outputStream 输出流
      */
-    public static HttpRequestUtil download(String url, OutputStream outputStream) {
+    public static HttpRequestUtil download(String url, String method, OutputStream outputStream) {
         HttpRequestUtil httpRequestUtil = new HttpRequestUtil(url);
-        httpRequestUtil.method = "POST";
+        httpRequestUtil.method = method;
         httpRequestUtil.outputStream = outputStream;
         return httpRequestUtil;
     }
@@ -408,7 +408,7 @@ public class HttpRequestUtil {
             connection.connect();
             return connection;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(),ex);
+            logger.error(ex.getMessage(), ex);
             this.error = ExceptionUtils.getExceptionStackTrace(ex);
         }
         return null;

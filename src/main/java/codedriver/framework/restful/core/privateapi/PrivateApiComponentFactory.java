@@ -375,6 +375,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static List<ApiVo> getTenantActiveApiList() {
         List<String> activeModuleIdList = TenantContext.get().getActiveModuleList().stream().map(ModuleVo::getId).collect(Collectors.toList());
-        return getApiList().stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
+        return apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
     }
 }

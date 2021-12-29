@@ -89,6 +89,8 @@ public interface UserMapper {
      **/
     List<UserVo> getUserTeamRoleListByTeamUuidList(List<String> teamUuidList);
 
+    List<TeamVo> getUserTeamRoleMapByTeamUuidList(List<String> teamUuidList);
+
     List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
     List<String> getUserUuidListByUserName(String userName);

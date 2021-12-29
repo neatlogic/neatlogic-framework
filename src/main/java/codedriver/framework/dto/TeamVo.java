@@ -78,7 +78,16 @@ public class TeamVo extends BasePageVo implements Serializable {
 	@JSONField(serialize = false)
 	private List<String> teamUuidList;
 
+	@EntityField(name = "用户所在组角色信息列表", type = ApiParamType.JSONARRAY)
+	private List<RoleVo> userTeamRoleList;
 
+	public List<RoleVo> getUserTeamRoleList() {
+		return userTeamRoleList;
+	}
+
+	public void setUserTeamRoleList(List<RoleVo> userTeamRoleList) {
+		this.userTeamRoleList = userTeamRoleList;
+	}
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
 	}

@@ -676,6 +676,32 @@
         </foreach>
     </select>
 
+    <resultMap id="userTeamRoleMap" type="codedriver.framework.dto.TeamVo">
+        <id property="uuid" column="teamUuid"/>
+        <result property="name" column="teamName"/>
+        <result property="upwardNamePath" column="upwardNamePath"/>
+        <collection property="userTeamRoleList" ofType="codedriver.framework.dto.RoleVo">
+            <id property="uuid" column="teamRoleUuid"/>
+            <result property="name" column="teamRoleName"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserTeamRoleMapByTeamUuidList" parameterType="java.util.List" resultMap="userTeamRoleMap"
+            useCache="false">
+        SELECT t.`uuid` AS teamUuid,
+        t.`name` AS teamName,
+        t.`upward_name_path` AS upwardNamePath,
+        r.uuid AS teamRoleUuid,
+        r.`name` AS teamRoleName
+        FROM team t
+        LEFT JOIN `team_role` tr ON tr.team_uuid = t.uuid
+        LEFT JOIN `role` r ON r.uuid = tr.role_uuid
+        WHERE t.`uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </select>
+
     <select id="getUserUuidListByRoleUuidList" parameterType="java.util.List" resultType="java.lang.String"
             useCache="false">
         SELECT

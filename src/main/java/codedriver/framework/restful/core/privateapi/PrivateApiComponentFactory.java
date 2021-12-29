@@ -6,10 +6,12 @@
 package codedriver.framework.restful.core.privateapi;
 
 import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActions;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
+import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.restful.annotation.OperationType;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.IBinaryStreamApiComponent;
@@ -29,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RootComponent
 public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
@@ -368,5 +371,10 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     @Override
     protected void myInit() {
 
+    }
+
+    public static List<ApiVo> getTenantActiveApiList() {
+        List<String> activeModuleIdList = TenantContext.get().getActiveModuleList().stream().map(ModuleVo::getId).collect(Collectors.toList());
+        return apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
     }
 }

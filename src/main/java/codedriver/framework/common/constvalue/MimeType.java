@@ -34,4 +34,13 @@ public enum MimeType {
         }
         return "";
     }
+
+    public static String getValue(String suffix) {
+        for (MimeType type : values()) {
+            if (type.getSuffix().equals(suffix)) {
+                return type.getValue();
+            }
+        }
+        return "";
+    }
 }

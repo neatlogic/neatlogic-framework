@@ -266,4 +266,9 @@ public class UserSelectHandler extends FormHandlerBase {
         }
         return null;
     }
+
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

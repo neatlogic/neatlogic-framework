@@ -128,4 +128,9 @@ public class TreeSelectHandler extends FormHandlerBase {
     public int getSort() {
         return 16;
     }
+
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

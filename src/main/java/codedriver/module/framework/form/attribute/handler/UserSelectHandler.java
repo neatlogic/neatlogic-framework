@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.constvalue.UserType;
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.TeamMapper;
 import codedriver.framework.dao.mapper.UserMapper;
@@ -269,6 +270,37 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        Object dataObj = attributeDataVo.getDataObj();
+        if (dataObj != null) {
+            JSONObject resultObj = new JSONObject();
+            List<String> valueList = new ArrayList<>();
+            List<String> textList = new ArrayList<>();
+            List<ValueTextVo> valueTextList = new ArrayList<>();
+            boolean isMultiple = configObj.getBooleanValue("isMultiple");
+            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            if (isMultiple) {
+                valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
+                if (CollectionUtils.isNotEmpty(valueList)) {
+                    for (String value : valueList) {
+                        String text = parse(value);
+                        textList.add(text);
+                        valueTextList.add(new ValueTextVo(value, text));
+                    }
+                }
+            } else {
+                String value = (String) dataObj;
+                if (StringUtils.isNotBlank(value)) {
+                    String text = parse(value);
+                    textList.add(text);
+                    valueList.add(value);
+                    valueTextList.add(new ValueTextVo(value, text));
+                }
+            }
+            resultObj.put("text", textList);
+            resultObj.put("value", valueList);
+            resultObj.put("valueTextList", valueTextList);
+            return resultObj;
+        }
         return null;
     }
 }

@@ -126,7 +126,9 @@ public class AuthActionChecker {
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (!authList.contains(authClass.getSimpleName())) {//防止回环
                     authList.add(authClass.getSimpleName());
-                    return checkAuthList(authClass.getSimpleName(), authList, actionList);
+                    if(checkAuthList(authClass.getSimpleName(), authList, actionList)){//防止漏找后续的include权限，故不能直接return
+                        return true;
+                    }
                 }
             }
         }

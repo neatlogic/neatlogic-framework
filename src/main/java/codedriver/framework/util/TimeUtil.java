@@ -49,7 +49,13 @@ public class TimeUtil {
                 calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - timeRange);
                 break;
             case "week":
-                calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR) - timeRange);
+                int week = calendar.get(Calendar.WEEK_OF_YEAR);
+                int mouth = calendar.get(Calendar.MONTH);
+                //如果月份是12月，且求出来的周数是第一周，说明该日期实质上是这一年的第53周，也是下一年的第一周
+                if (mouth >= 11 && week <= 1) {
+                    week += 52;
+                }
+                calendar.set(Calendar.WEEK_OF_YEAR, week - timeRange);
                 break;
             case "day":
                 calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - timeRange);
@@ -791,8 +797,8 @@ public class TimeUtil {
      */
     public static JSONObject getStartTimeAndEndTimeByDateJson(JSONObject dateConfig) {
         JSONObject json = new JSONObject();
-        String startTime = StringUtils.EMPTY;
-        String endTime = StringUtils.EMPTY;
+        String startTime;
+        String endTime;
         SimpleDateFormat format = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
         if (dateConfig.containsKey("startTime")) {
             startTime = format.format(new Date(dateConfig.getLong("startTime")));

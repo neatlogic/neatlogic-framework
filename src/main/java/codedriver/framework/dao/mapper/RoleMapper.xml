@@ -253,16 +253,16 @@
         <id property="uuid" column="roleUuid"/>
         <result property="name" column="roleName"/>
         <collection property="userRoleTeamList" ofType="codedriver.framework.dto.TeamVo">
-            <id property="uuid" column="roleTeamUuid"/>
-            <result property="name" column="roleTeamName"/>
+            <id property="uuid" column="parentTeamUuid"/>
+            <result property="name" column="parentTeamName"/>
             <result property="childrenTeamUuid" column="childrenTeamUuid"/>
             <result property="childrenTeamName" column="childrenTeamName"/>
         </collection>
     </resultMap>
 
     <select id="getUserTeamRoleMapByTeamUuid" resultMap="userRoleTeamMap">
-        SELECT t.uuid       as roleTeamUuid,
-               t.`name`     as roleTeamName,
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
                tr.role_uuid as roleUuid,
                r.`name`     as roleName
         FROM team t
@@ -273,8 +273,8 @@
 
     <select id="getUserParentTeamRoleMapWithCheckedChildrenByTeam" resultMap="userRoleTeamMap"
             parameterType="codedriver.framework.dto.TeamVo">
-        SELECT t.uuid       as roleTeamUuid,
-               t.`name`     as roleTeamName,
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
                tr.role_uuid as roleUuid,
                r.`name`     as roleName,
                #{uuid}      as childrenTeamUuid,

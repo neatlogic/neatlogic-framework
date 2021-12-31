@@ -77,17 +77,11 @@ public class TeamVo extends BasePageVo implements Serializable {
 	private List<String> rangeList;
 	@JSONField(serialize = false)
 	private List<String> teamUuidList;
+	@EntityField(name = "子分组uuid", type = ApiParamType.STRING)
+	private String childrenTeamUuid;
+	@EntityField(name = "子分组name", type = ApiParamType.STRING)
+	private String childrenTeamName;
 
-	@EntityField(name = "用户所在组角色信息列表", type = ApiParamType.JSONARRAY)
-	private List<RoleVo> userTeamRoleList;
-
-	public List<RoleVo> getUserTeamRoleList() {
-		return userTeamRoleList;
-	}
-
-	public void setUserTeamRoleList(List<RoleVo> userTeamRoleList) {
-		this.userTeamRoleList = userTeamRoleList;
-	}
 	public TeamVo(String uuid) {
 		this.uuid = uuid;
 	}
@@ -321,5 +315,21 @@ public class TeamVo extends BasePageVo implements Serializable {
 
 	public void setTeamUuidList(List<String> teamUuidList) {
 		this.teamUuidList = teamUuidList;
+	}
+
+	public String getChildrenTeamUuid() {
+		return childrenTeamUuid;
+	}
+
+	public void setChildrenTeamUuid(String childrenTeamUuid) {
+		this.childrenTeamUuid = childrenTeamUuid;
+	}
+
+	public String getChildrenTeamName() {
+		return childrenTeamName;
+	}
+
+	public void setChildrenTeamName(String childrenTeamName) {
+		this.childrenTeamName = childrenTeamName;
 	}
 }

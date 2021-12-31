@@ -54,6 +54,22 @@ public interface RoleMapper {
 
     List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
 
+    /**
+     * 根据team的uuid获取当前组的roleList
+     *
+     * @param uuid
+     * @return
+     */
+    List<RoleVo> getUserTeamRoleListByTeamUuid(String uuid);
+
+    /**
+     * 根据team的左右编码查询父分组的并且可穿透的roleList
+     *
+     * @param teamVo
+     * @return
+     */
+    List<RoleVo> getUserParentTeamRoleListWithCheckedChildrenByTeam(TeamVo teamVo);
+
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     int insertRole(RoleVo roleVo);

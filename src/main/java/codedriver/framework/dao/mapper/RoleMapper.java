@@ -57,10 +57,10 @@ public interface RoleMapper {
     /**
      * 根据team的uuid获取当前组的roleList
      *
-     * @param uuid
+     * @param uuidList
      * @return
      */
-    List<RoleVo> getRoleListByTeamUuid(String uuid);
+    List<RoleVo> getRoleListByTeamUuidList(List<String> uuidList);
 
     /**
      * 根据team的左右编码查询父分组的并且可穿透的roleList

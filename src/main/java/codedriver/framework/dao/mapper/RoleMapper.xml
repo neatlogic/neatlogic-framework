@@ -249,7 +249,7 @@
         </if>
     </select>
 
-    <resultMap id="RoleTeamMap" type="codedriver.framework.dto.RoleVo">
+    <resultMap id="roleTeamMap" type="codedriver.framework.dto.RoleVo">
         <id property="uuid" column="roleUuid"/>
         <result property="name" column="roleName"/>
         <collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
@@ -260,7 +260,7 @@
         </collection>
     </resultMap>
 
-    <select id="getRoleListByTeamUuid" resultMap="RoleTeamMap">
+    <select id="getRoleListByTeamUuidList" resultMap="roleTeamMap">
         SELECT t.uuid       as parentTeamUuid,
                t.`name`     as parentTeamName,
                tr.role_uuid as roleUuid,
@@ -268,10 +268,13 @@
         FROM team t
                  JOIN team_role tr ON tr.team_uuid = t.uuid
                  LEFT JOIN role r ON r.uuid = tr.role_uuid
-        WHERE t.uuid = #{value}
+        WHERE t.uuid IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
     </select>
 
-    <select id="getParentTeamRoleListWithCheckedChildrenByTeam" resultMap="RoleTeamMap"
+    <select id="getParentTeamRoleListWithCheckedChildrenByTeam" resultMap="roleTeamMap"
             parameterType="codedriver.framework.dto.TeamVo">
         SELECT t.uuid       as parentTeamUuid,
                t.`name`     as parentTeamName,

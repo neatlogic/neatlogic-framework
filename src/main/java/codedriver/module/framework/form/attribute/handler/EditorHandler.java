@@ -122,4 +122,11 @@ public class EditorHandler extends FormHandlerBase {
         return false;
     }
 
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("value", attributeDataVo.getDataObj());
+        return resultObj;
+    }
+
 }

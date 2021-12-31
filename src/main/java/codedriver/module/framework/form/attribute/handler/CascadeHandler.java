@@ -243,4 +243,8 @@ public class CascadeHandler extends FormHandlerBase {
         return true;
     }
 
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

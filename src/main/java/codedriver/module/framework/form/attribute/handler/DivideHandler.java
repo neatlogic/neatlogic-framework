@@ -109,4 +109,9 @@ public class DivideHandler extends FormHandlerBase {
     public String getHandlerType(FormConditionModel model) {
         return null;
     }
+
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

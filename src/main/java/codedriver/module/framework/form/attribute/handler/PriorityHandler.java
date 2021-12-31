@@ -46,6 +46,11 @@ public class PriorityHandler extends ControlHandlerBase {
     }
 
     @Override
+    public JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
+
+    @Override
     public String getHandlerName() {
         return "修改优先级";
     }

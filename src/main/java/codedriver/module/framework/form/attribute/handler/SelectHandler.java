@@ -246,4 +246,9 @@ public class SelectHandler extends FormHandlerBase {
     public Boolean isNeedSliceWord() {
         return false;
     }
+
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

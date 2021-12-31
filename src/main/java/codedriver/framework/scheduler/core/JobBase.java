@@ -147,7 +147,7 @@ public abstract class JobBase implements IJob {
         try {
             Boolean isAudit = false;
             //判断外部作业是否需要审计
-            if (jobHandler instanceof PublicJobBase) {
+            if (jobHandler instanceof IPublicJob) {//兼容事务动态代理，改为通过接口判断
                 JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobName);
                 if (jobVo != null && jobVo.getNeedAudit().equals(1)) {
                     isAudit = true;

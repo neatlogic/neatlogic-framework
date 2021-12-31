@@ -95,9 +95,9 @@ public class UserVo extends BasePageVo implements Serializable {
     private List<String> rangeList;
 
     /**
-     * 用户所在分组的分组角色列表(考虑穿透)
+     * 用户所在分组角色列表(考虑穿透)
      */
-    @EntityField(name = "用户所在分组的分组角色列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "用户所在分组角色列表", type = ApiParamType.JSONARRAY)
     private List<RoleVo> teamRoleList = new ArrayList<>();
 
     /**

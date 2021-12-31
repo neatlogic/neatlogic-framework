@@ -60,7 +60,7 @@ public interface RoleMapper {
      * @param uuid
      * @return
      */
-    List<RoleVo> getUserTeamRoleListByTeamUuid(String uuid);
+    List<RoleVo> getUserTeamRoleMapByTeamUuid(String uuid);
 
     /**
      * 根据team的左右编码查询父分组的并且可穿透的roleList
@@ -68,7 +68,7 @@ public interface RoleMapper {
      * @param teamVo
      * @return
      */
-    List<RoleVo> getUserParentTeamRoleListWithCheckedChildrenByTeam(TeamVo teamVo);
+    List<RoleVo> getUserParentTeamRoleMapWithCheckedChildrenByTeam(TeamVo teamVo);
 
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 

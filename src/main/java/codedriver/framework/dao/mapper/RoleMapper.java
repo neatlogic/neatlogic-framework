@@ -68,7 +68,7 @@ public interface RoleMapper {
      * @param teamVo
      * @return
      */
-    List<RoleVo> getUserParentTeamRoleMapWithCheckedChildrenByTeam(TeamVo teamVo);
+    List<RoleVo> getParentTeamRoleListWithCheckedChildrenByTeam(TeamVo teamVo);
 
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 

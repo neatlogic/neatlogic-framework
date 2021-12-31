@@ -41,7 +41,7 @@ public class RoleVo extends BasePageVo implements Serializable {
     private List<String> roleUuidList;
 
     @EntityField(name = "角色所在分组的组信息列表", type = ApiParamType.JSONARRAY)
-    private List<TeamVo> userRoleTeamList;
+    private List<TeamVo> teamList;
 
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
@@ -147,11 +147,11 @@ public class RoleVo extends BasePageVo implements Serializable {
     }
 
 
-    public List<TeamVo> getUserRoleTeamList() {
-        return userRoleTeamList;
+    public List<TeamVo> getTeamList() {
+        return teamList;
     }
 
-    public void setUserRoleTeamList(List<TeamVo> userRoleTeamList) {
-        this.userRoleTeamList = userRoleTeamList;
+    public void setTeamList(List<TeamVo> teamList) {
+        this.teamList = teamList;
     }
 }

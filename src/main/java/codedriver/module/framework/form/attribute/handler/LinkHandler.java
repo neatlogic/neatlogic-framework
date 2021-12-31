@@ -113,4 +113,13 @@ public class LinkHandler extends FormHandlerBase {
         return null;
     }
 
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        String value = configObj.getString("value");
+        String text = configObj.getString("text");
+        String target = configObj.getString("target");
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("value", "<a href='" + value + "' target='"+ target +"'>" + text + "</a>");
+        return resultObj;
+    }
 }

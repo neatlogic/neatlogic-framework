@@ -8,6 +8,7 @@ package codedriver.framework.form.attribute.core;
 import codedriver.framework.common.constvalue.FormHandlerType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONArray;
@@ -106,4 +107,11 @@ public abstract class FormHandlerBase implements IFormAttributeHandler {
     public Boolean isUseFormConfig() {
         return true;
     }
+
+    @Override
+    public JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return getMyDetailedData(attributeDataVo, configObj);
+    }
+
+    protected abstract JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj);
 }

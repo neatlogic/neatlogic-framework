@@ -114,4 +114,10 @@ public class TextHandler extends FormHandlerBase {
         return true;
     }
 
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("value", attributeDataVo.getDataObj());
+        return resultObj;
+    }
 }

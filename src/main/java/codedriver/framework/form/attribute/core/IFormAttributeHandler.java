@@ -230,4 +230,6 @@ public interface IFormAttributeHandler {
      * @return 是否需要表单管理编辑保存的config
      */
     public Boolean isUseFormConfig();
+
+    JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj);
 }

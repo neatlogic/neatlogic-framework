@@ -260,7 +260,7 @@
         </collection>
     </resultMap>
 
-    <select id="getUserTeamRoleMapByTeamUuid" resultMap="RoleTeamMap">
+    <select id="getRoleListByTeamUuid" resultMap="RoleTeamMap">
         SELECT t.uuid       as parentTeamUuid,
                t.`name`     as parentTeamName,
                tr.role_uuid as roleUuid,

@@ -15,6 +15,7 @@ import java.util.List;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -173,6 +174,19 @@ public class DateHandler extends FormHandlerBase {
     @Override
     public Boolean isUseFormConfig() {
         return false;
+    }
+
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
+        String format = configObj.getString("showType");
+        String styleType = configObj.getString("styleType");
+        if (StringUtils.isNotBlank(styleType) && !"-".equals(styleType)) {
+            format = format.replace("-", styleType);
+        }
+        resultObj.put("format", format);
+        resultObj.put("value", attributeDataVo.getDataObj());
+        return resultObj;
     }
 
 }

@@ -114,4 +114,11 @@ public class TimeHandler extends FormHandlerBase {
         return true;
     }
 
+    @Override
+    protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("format", configObj.getString("showType"));
+        resultObj.put("value", attributeDataVo.getDataObj());
+        return resultObj;
+    }
 }

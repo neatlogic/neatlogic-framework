@@ -30,14 +30,15 @@ public class UserTypeFactory {
 		}
 	}
 	public static Map<String,UserTypeVo> getUserTypeMap() {
+		Map<String, UserTypeVo> resultUserTypeMap = new HashMap<>();
 		List<ModuleGroupVo> groupVoList = TenantContext.get().getActiveModuleGroupList();
 		for (Map.Entry<String, UserTypeVo> entry : userTypeMap.entrySet()) {
 			String moduleGroup = entry.getKey();
-			if (groupVoList.stream().noneMatch(o -> Objects.equals(moduleGroup, o.getGroup()))) {
-				userTypeMap.remove(moduleGroup);
+			if (groupVoList.stream().anyMatch(o -> Objects.equals(moduleGroup, o.getGroup()))) {
+				resultUserTypeMap.put(moduleGroup,entry.getValue());
 			}
 		}
-		return userTypeMap;
+		return resultUserTypeMap;
 	}
 	
 }

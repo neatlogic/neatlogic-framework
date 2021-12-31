@@ -17,6 +17,7 @@ public enum CalleeType implements ICalleeType {
     MATRIX("matrix", "矩阵"),
     FORM("form", "表单"),
     INTEGRATION("integration", "集成"),
+    CMDBCI("cmdbci", "cmdb模型"),
     WORKTIME("worktime", "服务窗口"),
     NOTIFY_POLICY("notifypolicy", "通知策略");
 

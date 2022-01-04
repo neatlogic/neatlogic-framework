@@ -88,7 +88,7 @@ public interface UserMapper {
      * @Returns: java.util.List<codedriver.framework.dto.UserVo>
      **/
     List<UserVo> getUserTeamRoleListByTeamUuidList(List<String> teamUuidList);
-
+    
     List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
     List<String> getUserUuidListByUserName(String userName);

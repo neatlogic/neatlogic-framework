@@ -249,6 +249,46 @@
         </if>
     </select>
 
+    <resultMap id="roleTeamMap" type="codedriver.framework.dto.RoleVo">
+        <id property="uuid" column="roleUuid"/>
+        <result property="name" column="roleName"/>
+        <collection property="teamList" ofType="codedriver.framework.dto.TeamVo">
+            <id property="uuid" column="parentTeamUuid"/>
+            <result property="name" column="parentTeamName"/>
+            <result property="childrenTeamUuid" column="childrenTeamUuid"/>
+            <result property="childrenTeamName" column="childrenTeamName"/>
+        </collection>
+    </resultMap>
+
+    <select id="getRoleListByTeamUuidList" resultMap="roleTeamMap">
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
+               tr.role_uuid as roleUuid,
+               r.`name`     as roleName
+        FROM team t
+                 JOIN team_role tr ON tr.team_uuid = t.uuid
+                 LEFT JOIN role r ON r.uuid = tr.role_uuid
+        WHERE t.uuid IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </select>
+
+    <select id="getParentTeamRoleListWithCheckedChildrenByTeam" resultMap="roleTeamMap"
+            parameterType="codedriver.framework.dto.TeamVo">
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
+               tr.role_uuid as roleUuid,
+               r.`name`     as roleName,
+               #{uuid}      as childrenTeamUuid,
+               #{name}      as childrenTeamName
+        FROM team t
+                 JOIN team_role tr ON tr.team_uuid = t.uuid and tr.checked_children = 1
+                 LEFT JOIN role r ON r.uuid = tr.role_uuid
+        WHERE t.`lft` &lt; #{lft}
+          and t.`rht` > #{rht}
+    </select>
+
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
         VALUES (#{id}, #{uuid}, #{name}, #{description})

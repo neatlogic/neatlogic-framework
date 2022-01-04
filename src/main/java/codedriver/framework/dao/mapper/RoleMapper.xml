@@ -254,7 +254,7 @@
         VALUES (#{id}, #{uuid}, #{name}, #{description})
     </insert>
 
-    <insert id="insertRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
+    <insert id="replaceRoleUser" parameterType="codedriver.framework.dto.RoleUserVo">
         REPLACE INTO `user_role` (`user_uuid`, `role_uuid`)
         VALUES (#{userUuid}, #{roleUuid})
     </insert>

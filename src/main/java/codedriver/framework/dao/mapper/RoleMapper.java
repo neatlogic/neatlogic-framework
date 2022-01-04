@@ -58,7 +58,7 @@ public interface RoleMapper {
 
     int insertRole(RoleVo roleVo);
 
-    int insertRoleUser(RoleUserVo vo);
+    int replaceRoleUser(RoleUserVo vo);
 
     int insertRoleTeam(RoleTeamVo roleTeamVo);
 

@@ -288,10 +288,6 @@ public class DynamicListHandler extends FormHandlerBase {
                                 }
                                 JSONObject config = theadObj.getJSONObject("config");
                                 if (MapUtils.isNotEmpty(config)) {
-//                                    String valueName = config.getString("valueName");
-//                                    if (StringUtils.isBlank(valueName)) {
-//                                        valueName = "value";
-//                                    }
                                     secondEditColumnMap.put(key, config);
                                 }
                                 JSONObject newTheadObj = new JSONObject();
@@ -378,10 +374,6 @@ public class DynamicListHandler extends FormHandlerBase {
                     }
                     JSONObject config = theadObj.getJSONObject("config");
                     if (MapUtils.isNotEmpty(config)) {
-//                        String valueName = config.getString("valueName");
-//                        if (StringUtils.isBlank(valueName)) {
-//                            valueName = "value";
-//                        }
                         secondEditColumnMap.put(key, config);
                     }
                     JSONObject newTheadObj = new JSONObject();

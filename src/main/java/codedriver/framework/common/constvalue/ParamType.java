@@ -1,16 +1,16 @@
 package codedriver.framework.common.constvalue;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 public enum ParamType implements IEnum{
 	STRING("string","字符串",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
 	NUMBER("number","数字",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
+	ENUM("enum","枚举",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL),Expression.EQUAL),
 	ARRAY("array","数组",Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
 	DATE("date","日期",Arrays.asList(Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.BETWEEN)
 	;

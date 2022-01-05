@@ -43,6 +43,8 @@ public interface TeamMapper {
 
     List<TeamVo> getTeamListByUserUuid(String userUuid);
 
+    List<TeamVo> getTeamListByUserUuidList(List<String> userUuidList);
+
     String getTeamLockByUuid(String uuid);
 
     TeamVo getTeamByParentUuidAndStartNum(@Param("parentUuid") String parentUuid, @Param("startNum") int startNum);

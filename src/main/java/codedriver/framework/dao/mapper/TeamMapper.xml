@@ -333,6 +333,17 @@
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
 
+    <select id="getTeamListByUserUuidList" resultType="codedriver.framework.dto.TeamVo"
+            useCache="true">
+        SELECT t.uuid, t.name, t.lft, t.rht
+        FROM `user_team` ut
+                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+        WHERE ut.`user_uuid` in
+        <foreach collection="list" separator="," open="(" close=")" item="userUuid">
+            #{userUuid}
+        </foreach>
+    </select>
+
     <select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
         SELECT `uuid`
         FROM `team`

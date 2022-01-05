@@ -6,6 +6,7 @@
 package codedriver.framework.notify.core;
 
 import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.util.ModuleUtil;
@@ -51,6 +52,16 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
     public static List<String> getTriggerList(String type) {
         NotifyTreeVo targetNode = getTargetNode(moduleTreeVoList, type);
         return getTriggerList(targetNode);
+    }
+
+    public static List<String> getAllActiveTriggerList(){
+        List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
+        List<String> triggerList = new ArrayList<>();
+        for (ModuleVo moduleVo : activeModuleList) {
+            NotifyTreeVo targetNode = getTargetNode(moduleTreeVoList, moduleVo.getGroup());
+            triggerList.addAll(getTriggerList(targetNode));
+        }
+        return triggerList;
     }
 
     /**

@@ -273,7 +273,7 @@ public class DynamicListHandler extends FormHandlerBase {
                 try {
                     JSONObject resultObj = (JSONObject) restComponent.myDoService(paramObj);
                     if (MapUtils.isNotEmpty(resultObj)) {
-                        Map<String, String> secondEditColumnMap = new HashMap<>();
+                        Map<String, JSONObject> secondEditColumnMap = new HashMap<>();
                         List<String> theadKeyList = new ArrayList<>();
                         JSONArray theadList = new JSONArray();
                         JSONArray theadArray = resultObj.getJSONArray("theadList");
@@ -288,11 +288,7 @@ public class DynamicListHandler extends FormHandlerBase {
                                 }
                                 JSONObject config = theadObj.getJSONObject("config");
                                 if (MapUtils.isNotEmpty(config)) {
-                                    String valueName = config.getString("valueName");
-                                    if (StringUtils.isBlank(valueName)) {
-                                        valueName = "value";
-                                    }
-                                    secondEditColumnMap.put(key, valueName);
+                                    secondEditColumnMap.put(key, config);
                                 }
                                 JSONObject newTheadObj = new JSONObject();
                                 newTheadObj.put("key", key);
@@ -340,7 +336,7 @@ public class DynamicListHandler extends FormHandlerBase {
                         }
                         JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
                         if (MapUtils.isNotEmpty(secondEditColumnMap)) {
-                            setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnMap, extendedDataObj);
+                            setIntegrationSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnMap, extendedDataObj);
                         }
                         JSONArray attributeList = configObj.getJSONArray("attributeList");
                         if (CollectionUtils.isNotEmpty(attributeList)) {
@@ -363,7 +359,7 @@ public class DynamicListHandler extends FormHandlerBase {
         JSONObject table = dataObj.getJSONObject("table");
         if (MapUtils.isNotEmpty(table)) {
             String uuidColumn = "uuid";
-            Map<String, String> secondEditColumnMap = new HashMap<>();
+            Map<String, JSONObject> secondEditColumnMap = new HashMap<>();
             List<String> theadKeyList = new ArrayList<>();
             JSONArray theadList = new JSONArray();
             JSONArray theadArray = table.getJSONArray("theadList");
@@ -378,11 +374,7 @@ public class DynamicListHandler extends FormHandlerBase {
                     }
                     JSONObject config = theadObj.getJSONObject("config");
                     if (MapUtils.isNotEmpty(config)) {
-                        String valueName = config.getString("valueName");
-                        if (StringUtils.isBlank(valueName)) {
-                            valueName = "value";
-                        }
-                        secondEditColumnMap.put(key, valueName);
+                        secondEditColumnMap.put(key, config);
                     }
                     JSONObject newTheadObj = new JSONObject();
                     newTheadObj.put("key", key);
@@ -429,7 +421,7 @@ public class DynamicListHandler extends FormHandlerBase {
             }
             JSONObject extendedDataObj = dataObj.getJSONObject("extendedData");
             if (MapUtils.isNotEmpty(secondEditColumnMap)) {
-                setSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnMap, extendedDataObj);
+                setIntegrationSecondEditAttributeData(tbodyList, uuidColumn, secondEditColumnMap, extendedDataObj);
             }
             JSONArray attributeList = configObj.getJSONArray("attributeList");
             if (CollectionUtils.isNotEmpty(attributeList)) {
@@ -503,6 +495,162 @@ public class DynamicListHandler extends FormHandlerBase {
                     }
                 }
                 columnDataObj.put("text", textList);
+            }
+        }
+    }
+
+    /**
+     * 处理二次编辑数据
+     * @param tbodyList
+     * @param uuidColumn
+     * @param secondEditColumnMap
+     * @param extendedDataObj
+     */
+    private void setIntegrationSecondEditAttributeData(JSONArray tbodyList, String uuidColumn, Map<String, JSONObject> secondEditColumnMap, JSONObject extendedDataObj) {
+        for (int i = 0; i < tbodyList.size(); i++) {
+            JSONObject tbodyObj = tbodyList.getJSONObject(i);
+            JSONObject uuidColumnObj = tbodyObj.getJSONObject(uuidColumn);
+            String uuidValue = uuidColumnObj.getString("value");
+            JSONObject extendedRowDataObj = extendedDataObj.getJSONObject(uuidValue);
+            for (Map.Entry<String, JSONObject> entry : secondEditColumnMap.entrySet()) {
+                String column = entry.getKey();
+                JSONObject columnValueObj = null;
+                JSONObject columnDataObj = tbodyObj.getJSONObject(column);
+                if (MapUtils.isNotEmpty(columnDataObj)) {
+                    columnValueObj = columnDataObj.getJSONObject("value");
+                }
+                JSONObject config = entry.getValue();
+                String type = config.getString("type");
+                if ("text".equals(type)) {
+                    String valueStr = null;
+                    if (MapUtils.isNotEmpty(extendedRowDataObj)) {
+                        valueStr = extendedRowDataObj.getString(column);
+                    }
+                    if (valueStr == null) {
+                        if (MapUtils.isNotEmpty(columnValueObj)) {
+                            valueStr = columnValueObj.getString("value");
+                        }
+                    }
+                    if (valueStr == null) {
+                        valueStr = config.getString("value");
+                    }
+                    if (valueStr != null) {
+                        JSONObject newColumnDataObj = new JSONObject();
+                        newColumnDataObj.put("value", valueStr);
+                        newColumnDataObj.put("type", "input");
+                        newColumnDataObj.put("text", valueStr);
+                        tbodyObj.put(column, newColumnDataObj);
+                    } else {
+                        JSONObject newColumnDataObj = new JSONObject();
+                        newColumnDataObj.put("value", "");
+                        newColumnDataObj.put("type", "input");
+                        newColumnDataObj.put("text", "");
+                        tbodyObj.put(column, newColumnDataObj);
+                    }
+                } else {
+                    JSONArray dataList = null;
+                    if (MapUtils.isNotEmpty(columnValueObj)) {
+                        String rootName = config.getString("rootName");
+                        if (StringUtils.isBlank(rootName)) {
+                            rootName = "dataList";
+                        }
+                        dataList = columnValueObj.getJSONArray(rootName);
+                    }
+                    if (dataList == null) {
+                        dataList = config.getJSONArray("dataList");
+                    }
+                    String valueName = config.getString("valueName");
+                    if (StringUtils.isBlank(valueName)) {
+                        valueName = "value";
+                    }
+                    String textName = config.getString("textName");
+                    if (StringUtils.isBlank(textName)) {
+                        textName = "text";
+                    }
+                    Boolean multiple = config.getBoolean("multiple");
+                    if (multiple == null) {
+                        if ("checkbox".equals(type)) {
+                            multiple = true;
+                        } else {
+                            multiple = false;
+                        }
+                    }
+                    if (multiple) {
+                        JSONArray selectedValueArray = null;
+                        if (MapUtils.isNotEmpty(extendedRowDataObj)) {
+                            selectedValueArray = extendedRowDataObj.getJSONArray(column);
+                        }
+                        if (selectedValueArray == null) {
+                            if (MapUtils.isNotEmpty(columnValueObj)) {
+                                selectedValueArray = columnValueObj.getJSONArray("value");
+                            }
+                        }
+                        if (selectedValueArray == null) {
+                            selectedValueArray = config.getJSONArray("value");
+                        }
+                        if (CollectionUtils.isNotEmpty(selectedValueArray)) {
+                            JSONArray newColumnValueArray = new JSONArray();
+                            for (int j = 0; j < dataList.size(); j++) {
+                                JSONObject dataObj = dataList.getJSONObject(j);
+                                Object valueObj = dataObj.get(valueName);
+                                if (selectedValueArray.contains(valueObj)) {
+                                    newColumnValueArray.add(dataObj);
+                                }
+                            }
+                            JSONObject newColumnDataObj = new JSONObject();
+                            newColumnDataObj.put("value", newColumnValueArray);
+                            newColumnDataObj.put("type", "selects");
+                            List<String> textList = new ArrayList<>();
+                            for (int j = 0; j < newColumnValueArray.size(); j++) {
+                                JSONObject columnValueObject = newColumnValueArray.getJSONObject(j);
+                                String text = columnValueObject.getString(textName);
+                                if (StringUtils.isNotBlank(text)) {
+                                    textList.add(text);
+                                }
+                            }
+                            newColumnDataObj.put("text", textList);
+                            tbodyObj.put(column, newColumnDataObj);
+                        } else {
+                            JSONObject newColumnDataObj = new JSONObject();
+                            newColumnDataObj.put("value", "");
+                            newColumnDataObj.put("type", "input");
+                            newColumnDataObj.put("text", "");
+                            tbodyObj.put(column, newColumnDataObj);
+                        }
+                    } else {
+                        Object selectedValueObj = null;
+                        if (MapUtils.isNotEmpty(extendedRowDataObj)) {
+                            selectedValueObj = extendedRowDataObj.get(column);
+                        }
+                        if (selectedValueObj == null) {
+                            if (MapUtils.isNotEmpty(columnValueObj)) {
+                                selectedValueObj = columnValueObj.get("value");
+                            }
+                        }
+                        if (selectedValueObj == null) {
+                            selectedValueObj = config.get("value");
+                        }
+                        if (selectedValueObj != null) {
+                            JSONObject newColumnDataObj = new JSONObject();
+                            newColumnDataObj.put("type", "input");
+                            for (int j = 0; j < dataList.size(); j++) {
+                                JSONObject dataObj = dataList.getJSONObject(j);
+                                Object valueObj = dataObj.get(valueName);
+                                if (Objects.equals(selectedValueObj, valueObj)) {
+                                    newColumnDataObj.put("value", dataObj.get(valueName));
+                                    newColumnDataObj.put("text", dataObj.get(textName));
+                                }
+                            }
+                            tbodyObj.put(column, newColumnDataObj);
+                        } else {
+                            JSONObject newColumnDataObj = new JSONObject();
+                            newColumnDataObj.put("value", "");
+                            newColumnDataObj.put("type", "input");
+                            newColumnDataObj.put("text", "");
+                            tbodyObj.put(column, newColumnDataObj);
+                        }
+                    }
+                }
             }
         }
     }

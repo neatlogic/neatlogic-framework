@@ -28,10 +28,7 @@ public class EditorHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerType(FormConditionModel model) {
-        if (model == FormConditionModel.CUSTOM) {
-            return "input";
-        }
-        return "editor";
+        return "input";//富文本不管是哪种模式下过滤都是input
     }
 
     @Override

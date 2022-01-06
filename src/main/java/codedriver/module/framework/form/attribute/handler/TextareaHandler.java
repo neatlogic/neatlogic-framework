@@ -39,7 +39,7 @@ public class TextareaHandler extends FormHandlerBase {
        /* if (model != null && model.equals(ProcessConditionModel.CUSTOM.getValue())) {
             return "input";
         }*/
-        return "input";//富文本不管是哪种模式下过滤都是input
+        return "input";//文本域不管是哪种模式下过滤都是input
     }
 
     @Override

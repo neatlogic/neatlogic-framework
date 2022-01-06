@@ -18,7 +18,7 @@ public interface IFileTypeHandler {
      * @param jsonObj  校验所需参数
      * @return 是否允许访问
      */
-    boolean valid(String userUuid, FileVo fileVo, JSONObject jsonObj);
+    boolean valid(String userUuid, FileVo fileVo, JSONObject jsonObj) throws Exception;
 
     String getName();
 

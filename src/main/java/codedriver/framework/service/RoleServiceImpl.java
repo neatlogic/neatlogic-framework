@@ -17,7 +17,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleMapper roleMapper;
 
     @Override
-    public void getRoleTeamAndRoleUser(List<RoleVo> roleList) {
+    public void getRoleTeamCountAndRoleUserCount(List<RoleVo> roleList) {
         if (CollectionUtils.isNotEmpty(roleList)) {
             Map<String, RoleVo> roleVoMap = roleList.stream().collect(Collectors.toMap(RoleVo::getUuid, e -> e));
             List<String> roleUuidLIst = roleList.stream().map(RoleVo::getUuid).collect(Collectors.toList());

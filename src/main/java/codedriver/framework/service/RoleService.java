@@ -6,6 +6,10 @@ import java.util.List;
 
 public interface RoleService {
 
-    void getRoleTeamAndRoleUser(List<RoleVo> roleList);
+    /**
+     * 补充角色的分组数量和用户数量
+     * @param roleList
+     */
+    void getRoleTeamCountAndRoleUserCount(List<RoleVo> roleList);
 
 }

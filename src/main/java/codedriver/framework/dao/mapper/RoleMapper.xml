@@ -35,10 +35,8 @@
         a.`id`,
         a.`uuid`,
         a.`name`,
-        a.`description`,
-        COUNT(DISTINCT (b.`user_uuid`)) as userCount
+        a.`description`
         FROM `role` a
-        LEFT JOIN `user_role` b ON a.`uuid` = b.`role_uuid`
         LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
        <where>
             <if test="keyword != null and keyword != ''">
@@ -287,6 +285,28 @@
                  LEFT JOIN role r ON r.uuid = tr.role_uuid
         WHERE t.`lft` &lt; #{lft}
           and t.`rht` > #{rht}
+    </select>
+
+    <select id="getTeamCountByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
+        select a.role_uuid as uuid,
+        count(DISTINCT (a.`team_uuid`)) as `teamCount`
+        from team_role a
+        where a.role_uuid in
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+             #{roleUuid}
+        </foreach>
+        GROUP BY a.role_uuid
+    </select>
+
+    <select id="getUserCountByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
+        select a.role_uuid as uuid,
+        count(DISTINCT (a.`user_uuid`)) as `userCount`
+        from user_role a
+        where a.role_uuid in
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
+        GROUP BY a.role_uuid
     </select>
 
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">

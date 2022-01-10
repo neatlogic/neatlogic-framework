@@ -6,6 +6,7 @@
 package codedriver.framework.dependency.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface IDependencyHandler {
      * @return
      */
     public default String getHandler() {
-        return ClassUtils.getUserClass(this.getClass()).getName();
+        return ClassUtils.getUserClass(this.getClass()).getSimpleName();
     }
 
     /**
@@ -51,6 +52,16 @@ public interface IDependencyHandler {
      * @return
      */
     public int insert(Object callee, Object caller);
+
+    /**
+     * 插入一条引用关系数据
+     *
+     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param caller 调用者值（如：服务uuid）
+     * @param config 额外数据
+     * @return
+     */
+    public int insert(Object callee, Object caller, JSONObject config);
 
     /**
      * 删除引用关系

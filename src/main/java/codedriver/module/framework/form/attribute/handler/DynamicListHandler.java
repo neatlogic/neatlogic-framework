@@ -7,6 +7,7 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.restful.core.MyApiComponent;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dto.ApiVo;
@@ -905,5 +906,99 @@ public class DynamicListHandler extends FormHandlerBase {
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
+    }
+
+    @Override
+    public void makeupFormAttribute(FormAttributeVo formAttributeVo) {
+        Set<String> integrationUuidSet = new HashSet<>();
+        Set<String> matrixUuidSet = new HashSet<>();
+        Map<String, Set<String>> matrixUuidAttributeUuidSetMap = new HashMap<>();
+        JSONObject config = formAttributeVo.getConfigObj();
+        String dataSource = config.getString("dataSource");
+        if ("matrix".equals(dataSource)) {
+            String matrixUuid = config.getString("matrixUuid");
+            if (StringUtils.isNotBlank(matrixUuid)) {
+                Set<String> attributeUuidSet = new HashSet<>();
+                matrixUuidSet.add(matrixUuid);
+                /** 矩阵属性 **/
+                JSONArray dataConfig = config.getJSONArray("dataConfig");
+                if (CollectionUtils.isNotEmpty(dataConfig)) {
+                    for (int i = 0; i < dataConfig.size(); i++) {
+                        JSONObject attributeObj = dataConfig.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(attributeObj)) {
+                            String uuid = attributeObj.getString("uuid");
+                            if (StringUtils.isNotBlank(uuid)) {
+                                attributeUuidSet.add(uuid);
+                            }
+                        }
+                    }
+                }
+                /** 过滤条件 **/
+                JSONArray filterArray = config.getJSONArray("filterList");
+                if (CollectionUtils.isNotEmpty(filterArray)) {
+                    for (int i = 0; i < filterArray.size(); i++) {
+                        JSONObject filterObj = filterArray.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(filterObj)) {
+                            String uuid = filterObj.getString("uuid");
+                            if (StringUtils.isNotBlank(uuid)) {
+                                attributeUuidSet.add(uuid);
+                            }
+                        }
+                    }
+                }
+                matrixUuidAttributeUuidSetMap.put(matrixUuid, attributeUuidSet);
+                /** 扩展属性 **/
+                JSONArray attributeArray = config.getJSONArray("attributeList");
+                if (CollectionUtils.isNotEmpty(attributeArray)) {
+                    for (int i = 0; i < attributeArray.size(); i++) {
+                        JSONObject attributeObj = attributeArray.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(attributeObj)) {
+                            JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                            if (MapUtils.isNotEmpty(attrConfig)) {
+                                dataSource = attrConfig.getString("dataSource");
+                                if ("matrix".equals(dataSource)) {
+                                    matrixUuid = attrConfig.getString("matrixUuid");
+                                    if (StringUtils.isNotBlank(matrixUuid)) {
+                                        attributeUuidSet = new HashSet<>();
+                                        matrixUuidSet.add(matrixUuid);
+                                        JSONObject mapping = attrConfig.getJSONObject("mapping");
+                                        if (MapUtils.isNotEmpty(mapping)) {
+                                            String value = mapping.getString("value");
+                                            if (StringUtils.isNotBlank(value)) {
+                                                attributeUuidSet.add(value);
+                                            }
+                                            String text = mapping.getString("text");
+                                            if (StringUtils.isNotBlank(text)) {
+                                                attributeUuidSet.add(text);
+                                            }
+                                        }
+                                        Set<String> oldAttributeUuidSet = matrixUuidAttributeUuidSetMap.get(matrixUuid);
+                                        if (oldAttributeUuidSet != null) {
+                                            oldAttributeUuidSet.addAll(attributeUuidSet);
+                                        } else {
+                                            matrixUuidAttributeUuidSetMap.put(matrixUuid, attributeUuidSet);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ("integration".equals(dataSource)) {
+            String integrationUuid = config.getString("integrationUuid");
+            if (StringUtils.isNotBlank(integrationUuid)) {
+                integrationUuidSet.add(integrationUuid);
+            }
+        }
+
+        JSONArray relMatrixUuidArray = config.getJSONArray("relMatrixUuidList");
+        if (CollectionUtils.isNotEmpty(relMatrixUuidArray)) {
+            List<String> relMatrixUuidList = relMatrixUuidArray.toJavaList(String.class);
+            matrixUuidSet.addAll(relMatrixUuidList);
+        }
+        formAttributeVo.setMatrixUuidSet(matrixUuidSet);
+        formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
+        formAttributeVo.setIntegrationUuidSet(integrationUuidSet);
     }
 }

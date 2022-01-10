@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
+import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
@@ -16,12 +17,14 @@ import codedriver.framework.restful.core.IApiComponent;
 import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 @Component
 public class RadioHandler extends FormHandlerBase {
@@ -172,5 +175,53 @@ public class RadioHandler extends FormHandlerBase {
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
+    }
+
+    @Override
+    public void makeupFormAttribute(FormAttributeVo formAttributeVo) {
+        Set<String> matrixUuidSet = new HashSet<>();
+        Map<String, Set<String>> matrixUuidAttributeUuidSetMap = new HashMap<>();
+        JSONObject config = formAttributeVo.getConfigObj();
+        String dataSource = config.getString("dataSource");
+        if ("matrix".equals(dataSource)) {
+            String matrixUuid = config.getString("matrixUuid");
+            if (StringUtils.isNotBlank(matrixUuid)) {
+                matrixUuidSet.add(matrixUuid);
+                Set<String> attributeUuidSet = new HashSet<>();
+                /** 字段映射 **/
+                JSONObject mapping = config.getJSONObject("mapping");
+                if (MapUtils.isNotEmpty(mapping)) {
+                    String value = mapping.getString("value");
+                    if (StringUtils.isNotBlank(value)) {
+                        attributeUuidSet.add(value);
+                    }
+                    String text = mapping.getString("text");
+                    if (StringUtils.isNotBlank(text)) {
+                        attributeUuidSet.add(text);
+                    }
+                }
+                /** 过滤条件 **/
+                JSONArray filterArray = config.getJSONArray("filterList");
+                if (CollectionUtils.isNotEmpty(filterArray)) {
+                    for (int i = 0; i < filterArray.size(); i++) {
+                        JSONObject filterObj = filterArray.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(filterObj)) {
+                            String uuid = filterObj.getString("uuid");
+                            if (StringUtils.isNotBlank(uuid)) {
+                                attributeUuidSet.add(uuid);
+                            }
+                        }
+                    }
+                }
+                matrixUuidAttributeUuidSetMap.put(matrixUuid, attributeUuidSet);
+            }
+        }
+        JSONArray relMatrixUuidArray = config.getJSONArray("relMatrixUuidList");
+        if (CollectionUtils.isNotEmpty(relMatrixUuidArray)) {
+            List<String> relMatrixUuidList = relMatrixUuidArray.toJavaList(String.class);
+            matrixUuidSet.addAll(relMatrixUuidList);
+        }
+        formAttributeVo.setMatrixUuidSet(matrixUuidSet);
+        formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
     }
 }

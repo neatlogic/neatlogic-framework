@@ -15,9 +15,12 @@ import codedriver.framework.dependency.core.ICalleeType;
  **/
 public enum CalleeType implements ICalleeType {
     MATRIX("matrix", "矩阵"),
+    MATRIXATTR("matrixattr", "矩阵属性"),
     FORM("form", "表单"),
+    FORMATTR("formattr", "表单属性"),
     INTEGRATION("integration", "集成"),
     CMDBCI("cmdbci", "cmdb模型"),
+    CMDBCIATTR("cmdbciattr", "cmdb模型属性"),
     WORKTIME("worktime", "服务窗口"),
     NOTIFY_POLICY("notifypolicy", "通知策略");
 

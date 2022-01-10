@@ -7,13 +7,12 @@ package codedriver.framework.dependency.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.dao.mapper.DependencyMapper;
-import com.alibaba.fastjson.JSONArray;
+import codedriver.framework.dependency.dto.DependencyVo;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 依赖关系处理器基类
@@ -21,43 +20,14 @@ import java.util.Map;
  * @author: linbq
  * @since: 2021/4/1 11:43
  **/
-public abstract class DependencyHandlerBase implements IDependencyHandler {
+public abstract class FixedTableDependencyHandlerBase implements IDependencyHandler {
 
-    protected static DependencyMapper dependencyMapper;
+    private static DependencyMapper dependencyMapper;
 
     @Resource
-    public void setDependencyMapper(DependencyMapper dependencyMapper) {
-        this.dependencyMapper = dependencyMapper;
+    public void setDependencyMapper(DependencyMapper _dependencyMapper) {
+        dependencyMapper = _dependencyMapper;
     }
-
-    /**
-     * 表名
-     *
-     * @return
-     */
-    protected abstract String getTableName();
-
-    /**
-     * 被调用者字段
-     *
-     * @return
-     */
-    protected abstract String getCalleeField();
-
-    /**
-     * 调用者字段
-     *
-     * @return
-     */
-    protected abstract String getCallerField();
-
-    /**
-     * 调用者字段列表
-     *
-     * @return
-     */
-    protected abstract List<String> getCallerFieldList();
-
     /**
      * 插入一条引用关系数据
      *
@@ -80,11 +50,8 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int insert(Object callee, Object caller, JSONObject config) {
-        if(caller instanceof JSONArray){
-            return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getCalleeField(), getCallerFieldList(), callee, (JSONArray) caller);
-        } else {
-            return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getCalleeField(), getCallerField(), callee, caller);
-        }
+        DependencyVo dependencyVo = new DependencyVo(callee.toString(), getHandler(), caller.toString(), config);
+        return dependencyMapper.insertDependency(dependencyVo);
     }
 
     /**
@@ -95,7 +62,8 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int delete(Object caller) {
-        return dependencyMapper.deleteDependencyByCaller(getTableName(), getCallerField(), caller);
+        DependencyVo dependencyVo = new DependencyVo(getHandler(), caller.toString());
+        return dependencyMapper.deleteDependency(dependencyVo);
     }
 
     /**
@@ -109,8 +77,8 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
     @Override
     public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize) {
         List<ValueTextVo> resultList = new ArrayList<>();
-        List<Map<String, Object>> callerList = dependencyMapper.getCallerListByCallee(getTableName(), getCalleeField(), callee, startNum, pageSize);
-        for (Object caller : callerList) {
+        List<DependencyVo> callerList = dependencyMapper.getDependencyListByFrom(callee.toString(), getHandler(), startNum, pageSize);
+        for (DependencyVo caller : callerList) {
             ValueTextVo valueTextVo = parse(caller);
             if (valueTextVo != null) {
                 resultList.add(valueTextVo);
@@ -127,7 +95,7 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      */
     @Override
     public int getCallerCount(Object callee) {
-        return dependencyMapper.getCallerCountByCallee(getTableName(), getCalleeField(), callee);
+        return dependencyMapper.getDependencyCountByFrom(callee.toString());
     }
 
     /**
@@ -136,5 +104,5 @@ public abstract class DependencyHandlerBase implements IDependencyHandler {
      * @param caller 调用者值
      * @return
      */
-    protected abstract ValueTextVo parse(Object caller);
+    protected abstract ValueTextVo parse(DependencyVo caller);
 }

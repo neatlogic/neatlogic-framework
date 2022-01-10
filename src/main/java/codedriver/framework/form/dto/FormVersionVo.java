@@ -128,47 +128,4 @@ public class FormVersionVo extends BaseEditorVo {
         this.formName = formName;
     }
 
-//    public List<FormAttributeMatrixVo> getProcessMatrixFormComponentList() {
-//        if (processMatrixFormComponentList == null) {
-//            if (StringUtils.isNotBlank(this.formConfig)) {
-//                JSONObject formConfigObj = JSONObject.parseObject(this.formConfig);
-//                if (MapUtils.isNotEmpty(formConfigObj)) {
-//                    JSONArray controllerList = formConfigObj.getJSONArray("controllerList");
-//                    if (CollectionUtils.isNotEmpty(controllerList)) {
-//                        processMatrixFormComponentList = new ArrayList<>();
-//                        for (int i = 0; i < controllerList.size(); i++) {
-//                            JSONObject controllerObj = controllerList.getJSONObject(i);
-//                            JSONObject config = controllerObj.getJSONObject("config");
-//                            if (MapUtils.isNotEmpty(config)) {
-//                                List<String> relMatrixUuidList = JSON.parseArray(config.getString("relMatrixUuidList"), String.class);
-//                                if (CollectionUtils.isNotEmpty(relMatrixUuidList)) {
-//                                    for (String matrixUuid : relMatrixUuidList) {
-//                                        if (StringUtils.isNotBlank(matrixUuid)) {
-//                                            FormAttributeMatrixVo formAttributeMatrixVo = new FormAttributeMatrixVo();
-//                                            formAttributeMatrixVo.setMatrixUuid(matrixUuid);
-//                                            formAttributeMatrixVo.setFormVersionUuid(getUuid());
-//                                            formAttributeMatrixVo.setFormAttributeLabel(controllerObj.getString("label"));
-//                                            formAttributeMatrixVo.setFormAttributeUuid(controllerObj.getString("uuid"));
-//                                            processMatrixFormComponentList.add(formAttributeMatrixVo);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return processMatrixFormComponentList;
-//    }
-//
-//    public void setProcessMatrixFormComponentList(List<FormAttributeMatrixVo> processMatrixFormComponentList) {
-//        this.processMatrixFormComponentList = processMatrixFormComponentList;
-//    }
-
-    @Override
-    public String toString() {
-        return "FormVersionVo [uuid=" + uuid + ", formName=" + formName + ", formUuid=" + formUuid + ", version=" + version + ", isActive=" + isActive + ", formConfig=" + formConfig + "]";
-    }
-
 }

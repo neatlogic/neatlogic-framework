@@ -20,12 +20,12 @@ public class RoleServiceImpl implements RoleService {
     public void getRoleTeamCountAndRoleUserCount(List<RoleVo> roleList) {
         if (CollectionUtils.isNotEmpty(roleList)) {
             Map<String, RoleVo> roleVoMap = roleList.stream().collect(Collectors.toMap(RoleVo::getUuid, e -> e));
-            List<String> roleUuidLIst = roleList.stream().map(RoleVo::getUuid).collect(Collectors.toList());
+            List<String> roleUuidList = roleList.stream().map(RoleVo::getUuid).collect(Collectors.toList());
             //补充角色的分组数量
-            List<RoleVo> teamCountList = roleMapper.getTeamCountByRoleUuidList(roleUuidLIst);
+            List<RoleVo> teamCountList = roleMapper.getTeamCountByRoleUuidList(roleUuidList);
             teamCountList.forEach(e -> roleVoMap.get(e.getUuid()).setTeamCount(e.getTeamCount()));
             //补充角色的用户数量
-            List<RoleVo> userCountList = roleMapper.getUserCountByRoleUuidList(roleUuidLIst);
+            List<RoleVo> userCountList = roleMapper.getUserCountByRoleUuidList(roleUuidList);
             userCountList.forEach(e -> roleVoMap.get(e.getUuid()).setUserCount(e.getUserCount()));
         }
     }

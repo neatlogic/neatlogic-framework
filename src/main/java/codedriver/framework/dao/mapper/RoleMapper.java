@@ -28,9 +28,9 @@ public interface RoleMapper {
 
     List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
 
-    List<RoleVo> getTeamCountByRoleUuidList(List<String> roleUuidLIst);
+    List<RoleVo> getTeamCountListByRoleUuidList(List<String> roleUuidLIst);
 
-    List<RoleVo> getUserCountByRoleUuidList(List<String> roleUuidLIst);
+    List<RoleVo> getUserCountListByRoleUuidList(List<String> roleUuidLIst);
 
     int searchRoleCount(RoleVo roleVo);
 

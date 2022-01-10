@@ -22,10 +22,10 @@ public class RoleServiceImpl implements RoleService {
             Map<String, RoleVo> roleVoMap = roleList.stream().collect(Collectors.toMap(RoleVo::getUuid, e -> e));
             List<String> roleUuidList = roleList.stream().map(RoleVo::getUuid).collect(Collectors.toList());
             //补充角色的分组数量
-            List<RoleVo> teamCountList = roleMapper.getTeamCountByRoleUuidList(roleUuidList);
+            List<RoleVo> teamCountList = roleMapper.getTeamCountListByRoleUuidList(roleUuidList);
             teamCountList.forEach(e -> roleVoMap.get(e.getUuid()).setTeamCount(e.getTeamCount()));
             //补充角色的用户数量
-            List<RoleVo> userCountList = roleMapper.getUserCountByRoleUuidList(roleUuidList);
+            List<RoleVo> userCountList = roleMapper.getUserCountListByRoleUuidList(roleUuidList);
             userCountList.forEach(e -> roleVoMap.get(e.getUuid()).setUserCount(e.getUserCount()));
         }
     }

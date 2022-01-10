@@ -287,7 +287,7 @@
           and t.`rht` > #{rht}
     </select>
 
-    <select id="getTeamCountByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
+    <select id="getTeamCountListByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
         select a.role_uuid as uuid,
         count(DISTINCT (a.`team_uuid`)) as `teamCount`
         from team_role a
@@ -298,7 +298,7 @@
         GROUP BY a.role_uuid
     </select>
 
-    <select id="getUserCountByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
+    <select id="getUserCountListByRoleUuidList" resultType="codedriver.framework.dto.RoleVo">
         select a.role_uuid as uuid,
         count(DISTINCT (a.`user_uuid`)) as `userCount`
         from user_role a

@@ -46,7 +46,7 @@
     <select id="getDependencyCountByFrom" parameterType="java.lang.String" resultType="int">
         SELECT
             COUNT(1)
-        FROM `global_relation`
+        FROM `dependency`
         WHERE `from` = #{value}
     </select>
 
@@ -56,19 +56,19 @@
             `type`,
             `to`,
             `config` AS configStr
-        FROM `global_relation`
+        FROM `dependency`
         WHERE `from` = #{from}
         AND `type` = #{type}
         LIMIT #{startNum}, #{pageSize}
     </select>
 
     <insert id="insertDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
-        INSERT INTO `global_relation` (`from`, `type`, `to`, `config`)
+        INSERT INTO `dependency` (`from`, `type`, `to`, `config`)
         VALUES (#{from}, #{type}, #{to}, #{configStr})
     </insert>
 
     <delete id="deleteDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
-        DELETE FROM `global_relation`
+        DELETE FROM `dependency`
         WHERE `type` = #{type}
           AND `to` = #{to}
     </delete>

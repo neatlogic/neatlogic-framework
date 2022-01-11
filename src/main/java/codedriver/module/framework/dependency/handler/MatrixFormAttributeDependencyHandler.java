@@ -6,7 +6,6 @@
 package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.CustomTableDependencyHandlerBase;
 import codedriver.framework.dependency.core.IFromType;
@@ -42,7 +41,7 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
     }
 
     /**
-     * 被调用者字段
+     * 被引用者（上游）字段
      *
      * @return
      */
@@ -52,7 +51,7 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
     }
 
     /**
-     * 调用者字段
+     * 引用者（下游）字段
      *
      * @return
      */
@@ -69,31 +68,31 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
     /**
      * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
-     * @param caller 调用者值
+     * @param dependencyObj 引用关系数据
      * @return
      */
     @Override
-    protected DependencyInfoVo parse(Object caller) {
-        if (caller == null) {
+    protected DependencyInfoVo parse(Object dependencyObj) {
+        if (dependencyObj == null) {
             return null;
         }
-        if (caller instanceof FormAttributeMatrixVo) {
-            FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) caller;
-            DependencyInfoVo valueTextVo = new DependencyInfoVo();
-            valueTextVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());
+        if (dependencyObj instanceof FormAttributeMatrixVo) {
+            FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) dependencyObj;
+            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+            dependencyInfoVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());
             String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
                     TenantContext.get().getTenantUuid(),
                     formAttributeMatrixVo.getFormUuid(),
                     formAttributeMatrixVo.getFormVersionUuid(),
                     formAttributeMatrixVo.getFormName() + "-" + formAttributeMatrixVo.getVersion() + "-" + formAttributeMatrixVo.getFormAttributeLabel());
-            valueTextVo.setText(text);
-            return valueTextVo;
+            dependencyInfoVo.setText(text);
+            return dependencyInfoVo;
         }
         return null;
     }
 
     /**
-     * 被调用方名
+     * 被引用者（上游）类型
      *
      * @return
      */
@@ -105,7 +104,7 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
     /**
      * 查询引用列表数据
      *
-     * @param from   被调用者值（如：服务时间窗口uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 每页条数
      * @return

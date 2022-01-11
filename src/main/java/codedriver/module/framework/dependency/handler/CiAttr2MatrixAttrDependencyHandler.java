@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
+ * 矩阵属性引用cmdbci模型属性或关系
  * @author linbq
  * @since 2022/1/11 13:05
  **/

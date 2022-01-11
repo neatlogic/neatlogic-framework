@@ -6,7 +6,6 @@
 package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.FixedTableDependencyHandlerBase;
 import codedriver.framework.dependency.core.IFromType;
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 表单属性引用矩阵属性关系处理器
  * @author linbq
  * @since 2022/1/7 15:50
  **/
@@ -37,8 +37,8 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
     private FormMapper formMapper;
 
     @Override
-    protected DependencyInfoVo parse(DependencyVo caller) {
-        JSONObject config = caller.getConfig();
+    protected DependencyInfoVo parse(DependencyVo dependencyVo) {
+        JSONObject config = dependencyVo.getConfig();
         if (MapUtils.isNotEmpty(config)) {
             String formVersionUuid = config.getString("formVersionUuid");
             if (StringUtils.isNotBlank(formVersionUuid)) {
@@ -49,16 +49,16 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
                         List<FormAttributeVo> formAttributeList = formVersionVo.getFormAttributeList();
                         if (CollectionUtils.isNotEmpty(formAttributeList)) {
                             for (FormAttributeVo formAttributeVo : formAttributeList) {
-                                if (Objects.equals(formAttributeVo.getUuid(), caller.getTo())) {
-                                    DependencyInfoVo valueTextVo = new DependencyInfoVo();
-                                    valueTextVo.setValue(formAttributeVo.getUuid());
+                                if (Objects.equals(formAttributeVo.getUuid(), dependencyVo.getTo())) {
+                                    DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+                                    dependencyInfoVo.setValue(formAttributeVo.getUuid());
                                     String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
                                             TenantContext.get().getTenantUuid(),
                                             formVo.getUuid(),
                                             formVersionVo.getUuid(),
                                             formVo.getName() + "-" + formVersionVo.getVersion() + "-" + formAttributeVo.getLabel());
-                                    valueTextVo.setText(text);
-                                    return valueTextVo;
+                                    dependencyInfoVo.setText(text);
+                                    return dependencyInfoVo;
                                 }
                             }
                         }

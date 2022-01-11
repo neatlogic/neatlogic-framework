@@ -43,4 +43,34 @@
         WHERE `${callerField}` = #{caller}
     </delete>
 
+    <select id="getDependencyCountByFrom" parameterType="java.lang.String" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `dependency`
+        WHERE `from` = #{value}
+    </select>
+
+    <select id="getDependencyListByFrom" resultType="codedriver.framework.dependency.dto.DependencyVo">
+        SELECT
+            `from`,
+            `type`,
+            `to`,
+            `config` AS configStr
+        FROM `dependency`
+        WHERE `from` = #{from}
+        AND `type` = #{type}
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
+        INSERT INTO `dependency` (`from`, `type`, `to`, `config`)
+        VALUES (#{from}, #{type}, #{to}, #{configStr})
+    </insert>
+
+    <delete id="deleteDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
+        DELETE FROM `dependency`
+        WHERE `type` = #{type}
+          AND `to` = #{to}
+    </delete>
+
 </mapper>

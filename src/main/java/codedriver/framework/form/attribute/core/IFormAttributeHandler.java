@@ -8,6 +8,7 @@ package codedriver.framework.form.attribute.core;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
+import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONObject;
 
@@ -232,4 +233,8 @@ public interface IFormAttributeHandler {
     public Boolean isUseFormConfig();
 
     JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj);
+
+    default void makeupFormAttribute(FormAttributeVo formAttributeVo) {
+
+    }
 }

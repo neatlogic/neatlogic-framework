@@ -5,11 +5,10 @@
 
 package codedriver.framework.dependency.dao.mapper;
 
+import codedriver.framework.dependency.dto.DependencyVo;
 import com.alibaba.fastjson.JSONArray;
-import com.beust.jcommander.Parameter;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,4 +48,12 @@ public interface DependencyMapper {
             @Param("tableName") String tableName,
             @Param("callerField") String callerField,
             @Param("caller") Object caller);
+
+    int getDependencyCountByFrom(String from);
+
+    List<DependencyVo> getDependencyListByFrom(@Param("from") String from, @Param("type") String type, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
+
+    int insertDependency(DependencyVo dependencyVo);
+
+    int deleteDependency(DependencyVo dependencyVo);
 }

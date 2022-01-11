@@ -8,10 +8,13 @@ package codedriver.framework.form.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import codedriver.framework.form.attribute.core.FormAttributeHandlerFactory;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -21,6 +24,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.dto.ExpressionVo;
 import codedriver.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
@@ -51,6 +55,18 @@ public class FormAttributeVo implements Serializable {
 
     @EntityField(name = "条件模型")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
+
+    @JSONField(serialize = false)
+    private JSONObject configObj;
+
+    @JSONField(serialize = false)
+    private Set<String> integrationUuidSet;
+
+    @JSONField(serialize = false)
+    private Set<String> matrixUuidSet;
+
+    @JSONField(serialize = false)
+    private Map<String, Set<String>> matrixUuidAttributeUuidSetMap;
 
     public FormAttributeVo() {
 
@@ -250,5 +266,36 @@ public class FormAttributeVo implements Serializable {
 
     public void setIsUseFormConfig(boolean isUseFormConfig) {
         this.isUseFormConfig = isUseFormConfig;
+    }
+
+    public JSONObject getConfigObj() {
+        if (configObj == null && StringUtils.isNotBlank(config)) {
+            configObj = JSONObject.parseObject(config);
+        }
+        return configObj;
+    }
+
+    public Set<String> getIntegrationUuidSet() {
+        return integrationUuidSet;
+    }
+
+    public void setIntegrationUuidSet(Set<String> integrationUuidSet) {
+        this.integrationUuidSet = integrationUuidSet;
+    }
+
+    public Set<String> getMatrixUuidSet() {
+        return matrixUuidSet;
+    }
+
+    public void setMatrixUuidSet(Set<String> matrixUuidSet) {
+        this.matrixUuidSet = matrixUuidSet;
+    }
+
+    public Map<String, Set<String>> getMatrixUuidAttributeUuidSetMap() {
+        return matrixUuidAttributeUuidSetMap;
+    }
+
+    public void setMatrixUuidAttributeUuidSetMap(Map<String, Set<String>> matrixUuidAttributeUuidSetMap) {
+        this.matrixUuidAttributeUuidSetMap = matrixUuidAttributeUuidSetMap;
     }
 }

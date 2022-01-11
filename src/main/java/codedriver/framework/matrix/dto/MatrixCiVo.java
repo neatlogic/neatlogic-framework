@@ -43,6 +43,9 @@ public class MatrixCiVo {
     }
 
     public JSONObject getConfig() {
+        if (config == null && configStr != null) {
+            config = JSONObject.parseObject(configStr);
+        }
         return config;
     }
 
@@ -51,6 +54,9 @@ public class MatrixCiVo {
     }
 
     public String getConfigStr() {
+        if (configStr == null && config != null) {
+            configStr = config.toJSONString();
+        }
         return configStr;
     }
 

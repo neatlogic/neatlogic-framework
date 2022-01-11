@@ -38,21 +38,21 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     protected abstract String getTableName();
 
     /**
-     * 被调用者字段
+     * 被引用者（上游）字段
      *
      * @return
      */
     protected abstract String getFromField();
 
     /**
-     * 调用者字段
+     * 引用者（下游）字段
      *
      * @return
      */
     protected abstract String getToField();
 
     /**
-     * 调用者字段列表
+     * 引用者（下游）字段列表
      *
      * @return
      */
@@ -61,20 +61,20 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
     @Override
-    public int insert(Object from, Object caller) {
-        return insert(from, caller, null);
+    public int insert(Object from, Object to) {
+        return insert(from, to, null);
     }
 
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被调用者值（如：服务时间窗口uuid）
-     * @param to 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
@@ -90,7 +90,7 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 删除引用关系
      *
-     * @param to 调用者值（如：服务uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
     @Override
@@ -101,7 +101,7 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 查询引用列表数据
      *
-     * @param from   被调用者值（如：服务时间窗口uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 每页条数
      * @return
@@ -122,19 +122,19 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 查询引用次数
      *
-     * @param to 被调用者值（如：服务时间窗口uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
     @Override
-    public int getDependencyCount(Object to) {
-        return dependencyMapper.getCallerCountByCallee(getTableName(), getFromField(), to);
+    public int getDependencyCount(Object from) {
+        return dependencyMapper.getCallerCountByCallee(getTableName(), getFromField(), from);
     }
 
     /**
      * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
-     * @param caller 调用者值
+     * @param dependencyObj 引用关系数据
      * @return
      */
-    protected abstract DependencyInfoVo parse(Object caller);
+    protected abstract DependencyInfoVo parse(Object dependencyObj);
 }

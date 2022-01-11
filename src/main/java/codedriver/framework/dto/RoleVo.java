@@ -33,6 +33,7 @@ public class RoleVo extends BasePageVo implements Serializable {
             type = ApiParamType.STRING)
     private String description;
     private int userCount;
+    private int teamCount;
     private String authGroup;
     private String auth;
     private List<String> userUuidList;
@@ -132,6 +133,14 @@ public class RoleVo extends BasePageVo implements Serializable {
 
     public void setUserCount(int userCount) {
         this.userCount = userCount;
+    }
+
+    public int getTeamCount() {
+        return teamCount;
+    }
+
+    public void setTeamCount(int teamCount) {
+        this.teamCount = teamCount;
     }
 
     public String getInitType() {

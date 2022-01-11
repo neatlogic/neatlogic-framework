@@ -9,12 +9,14 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
+import codedriver.framework.service.RoleService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,9 @@ import java.util.List;
 public class RoleGroupHandler implements IGroupSearchHandler {
     @Autowired
     private RoleMapper roleMapper;
+
+    @Resource
+    private RoleService roleService;
 
     @Override
     public String getName() {
@@ -63,6 +68,7 @@ public class RoleGroupHandler implements IGroupSearchHandler {
             roleVo.setRoleUuidList(roleUuidList);
         }
         roleList = roleMapper.searchRole(roleVo);
+        roleService.setRoleTeamCountAndRoleUserCount(roleList);
         return (List<T>) roleList;
     }
 

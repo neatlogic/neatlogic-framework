@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 依赖关系处理器基类
+ * 自定义表结构依赖关系处理器基类
  *
  * @author: linbq
  * @since: 2021/4/1 11:43

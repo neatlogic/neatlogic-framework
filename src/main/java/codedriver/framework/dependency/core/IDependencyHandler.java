@@ -20,7 +20,7 @@ import java.util.List;
 public interface IDependencyHandler {
 
     /**
-     * 处理器唯一标识，全限定类名
+     * 处理器唯一标识
      *
      * @return
      */
@@ -29,7 +29,7 @@ public interface IDependencyHandler {
     }
 
     /**
-     * 被调用方名
+     * 被引用者（上游）类型
      *
      * @return
      */
@@ -47,8 +47,8 @@ public interface IDependencyHandler {
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被调用者值（如：服务时间窗口uuid）
-     * @param to 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
     public int insert(Object from, Object to);
@@ -56,8 +56,8 @@ public interface IDependencyHandler {
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被调用者值（如：服务时间窗口uuid）
-     * @param to 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
@@ -66,7 +66,7 @@ public interface IDependencyHandler {
     /**
      * 删除引用关系
      *
-     * @param to 调用者值（如：服务uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
     public int delete(Object to);
@@ -74,7 +74,7 @@ public interface IDependencyHandler {
     /**
      * 查询引用列表数据
      *
-     * @param from   被调用者值（如：服务时间窗口uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 数据量
      * @return
@@ -84,7 +84,7 @@ public interface IDependencyHandler {
     /**
      * 查询引用次数
      *
-     * @param to 被调用者值（如：服务时间窗口uuid）
+     * @param to 被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
     public int getDependencyCount(Object to);

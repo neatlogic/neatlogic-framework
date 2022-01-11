@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 被调用者类型工厂
+ * 被引用者（上游）类型工厂
  *
  * @author: linbq
  * @since: 2021/4/2 11:37
@@ -28,7 +28,7 @@ public class FromTypeFactory {
     private static String allCalleeTypeToString;
 
     /**
-     * 获取ICalleeType接口所有实现枚举类集合
+     * 获取IFromType接口所有实现枚举类集合
      *
      * @return
      */
@@ -66,9 +66,9 @@ public class FromTypeFactory {
     }
 
     /**
-     * 用于用户传入错误数据访问接口时，提示calleeType参数的所有可选值
+     * 用于用户传入错误数据访问接口时，提示fromType参数的所有可选值
      *
-     * @return 返回ICalleeType接口所有实现枚举类集合的数据信息
+     * @return 返回IFromType接口所有实现枚举类集合的数据信息
      */
     public static String getAllCalleeTypeToString() {
         if (StringUtils.isBlank(allCalleeTypeToString)) {

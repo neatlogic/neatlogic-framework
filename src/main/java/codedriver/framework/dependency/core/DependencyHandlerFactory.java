@@ -25,7 +25,7 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final Map<String, IDependencyHandler> componentMap = new HashMap<>();
 
-    private static final Map<ICalleeType, List<IDependencyHandler>> calleeHandlerListMap = new HashMap<>();
+    private static final Map<IFromType, List<IDependencyHandler>> calleeHandlerListMap = new HashMap<>();
 
     /**
      * 通过handler获取依赖关系处理器对象
@@ -41,7 +41,7 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
      *
      * @param calleeType 被调用者类型
      */
-    public static List<IDependencyHandler> getHandlerList(ICalleeType calleeType) {
+    public static List<IDependencyHandler> getHandlerList(IFromType calleeType) {
         return calleeHandlerListMap.get(calleeType);
     }
 
@@ -56,7 +56,7 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
         for (Map.Entry<String, IDependencyHandler> entry : myMap.entrySet()) {
             IDependencyHandler component = entry.getValue();
             componentMap.put(component.getHandler(), component);
-            calleeHandlerListMap.computeIfAbsent(component.getCalleeType(), k -> new ArrayList<>()).add(component);
+            calleeHandlerListMap.computeIfAbsent(component.getFromType(), k -> new ArrayList<>()).add(component);
         }
     }
 }

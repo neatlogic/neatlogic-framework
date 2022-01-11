@@ -7,9 +7,10 @@ package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dependency.constvalue.CalleeType;
+import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.FixedTableDependencyHandlerBase;
-import codedriver.framework.dependency.core.ICalleeType;
+import codedriver.framework.dependency.core.IFromType;
+import codedriver.framework.dependency.dto.DependencyInfoVo;
 import codedriver.framework.dependency.dto.DependencyVo;
 import codedriver.framework.form.dao.mapper.FormMapper;
 import codedriver.framework.form.dto.FormAttributeVo;
@@ -36,7 +37,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
     private FormMapper formMapper;
 
     @Override
-    protected ValueTextVo parse(DependencyVo caller) {
+    protected DependencyInfoVo parse(DependencyVo caller) {
         JSONObject config = caller.getConfig();
         if (MapUtils.isNotEmpty(config)) {
             String formVersionUuid = config.getString("formVersionUuid");
@@ -49,7 +50,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
                         if (CollectionUtils.isNotEmpty(formAttributeList)) {
                             for (FormAttributeVo formAttributeVo : formAttributeList) {
                                 if (Objects.equals(formAttributeVo.getUuid(), caller.getTo())) {
-                                    ValueTextVo valueTextVo = new ValueTextVo();
+                                    DependencyInfoVo valueTextVo = new DependencyInfoVo();
                                     valueTextVo.setValue(formAttributeVo.getUuid());
                                     String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
                                             TenantContext.get().getTenantUuid(),
@@ -69,7 +70,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
     }
 
     @Override
-    public ICalleeType getCalleeType() {
-        return CalleeType.MATRIXATTR;
+    public IFromType getFromType() {
+        return FromType.MATRIXATTR;
     }
 }

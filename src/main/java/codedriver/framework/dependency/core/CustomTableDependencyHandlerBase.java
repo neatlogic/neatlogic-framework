@@ -5,15 +5,15 @@
 
 package codedriver.framework.dependency.core;
 
-import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dependency.dao.mapper.DependencyMapper;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
-import codedriver.framework.dependency.dto.DependencyVo;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 依赖关系处理器基类
@@ -21,14 +21,43 @@ import java.util.List;
  * @author: linbq
  * @since: 2021/4/1 11:43
  **/
-public abstract class FixedTableDependencyHandlerBase implements IDependencyHandler {
+public abstract class CustomTableDependencyHandlerBase implements IDependencyHandler {
 
-    private static DependencyMapper dependencyMapper;
+    protected static DependencyMapper dependencyMapper;
 
     @Resource
     public void setDependencyMapper(DependencyMapper _dependencyMapper) {
         dependencyMapper = _dependencyMapper;
     }
+
+    /**
+     * 表名
+     *
+     * @return
+     */
+    protected abstract String getTableName();
+
+    /**
+     * 被调用者字段
+     *
+     * @return
+     */
+    protected abstract String getFromField();
+
+    /**
+     * 调用者字段
+     *
+     * @return
+     */
+    protected abstract String getToField();
+
+    /**
+     * 调用者字段列表
+     *
+     * @return
+     */
+    protected abstract List<String> getToFieldList();
+
     /**
      * 插入一条引用关系数据
      *
@@ -51,8 +80,11 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int insert(Object from, Object to, JSONObject config) {
-        DependencyVo dependencyVo = new DependencyVo(from.toString(), getHandler(), to.toString(), config);
-        return dependencyMapper.insertDependency(dependencyVo);
+        if(to instanceof JSONArray){
+            return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getFromField(), getToFieldList(), from, (JSONArray) to);
+        } else {
+            return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getFromField(), getToField(), from, to);
+        }
     }
 
     /**
@@ -63,8 +95,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int delete(Object to) {
-        DependencyVo dependencyVo = new DependencyVo(getHandler(), to.toString());
-        return dependencyMapper.deleteDependency(dependencyVo);
+        return dependencyMapper.deleteDependencyByCaller(getTableName(), getToField(), to);
     }
 
     /**
@@ -78,8 +109,8 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     @Override
     public List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize) {
         List<DependencyInfoVo> resultList = new ArrayList<>();
-        List<DependencyVo> callerList = dependencyMapper.getDependencyListByFrom(from.toString(), getHandler(), startNum, pageSize);
-        for (DependencyVo caller : callerList) {
+        List<Map<String, Object>> callerList = dependencyMapper.getCallerListByCallee(getTableName(), getFromField(), from, startNum, pageSize);
+        for (Object caller : callerList) {
             DependencyInfoVo valueTextVo = parse(caller);
             if (valueTextVo != null) {
                 resultList.add(valueTextVo);
@@ -96,7 +127,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int getDependencyCount(Object to) {
-        return dependencyMapper.getDependencyCountByFrom(to.toString());
+        return dependencyMapper.getCallerCountByCallee(getTableName(), getFromField(), to);
     }
 
     /**
@@ -105,5 +136,5 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      * @param caller 调用者值
      * @return
      */
-    protected abstract DependencyInfoVo parse(DependencyVo caller);
+    protected abstract DependencyInfoVo parse(Object caller);
 }

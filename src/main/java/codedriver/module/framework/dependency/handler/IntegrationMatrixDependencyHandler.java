@@ -7,9 +7,10 @@ package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.dependency.constvalue.CalleeType;
-import codedriver.framework.dependency.core.DependencyHandlerBase;
-import codedriver.framework.dependency.core.ICalleeType;
+import codedriver.framework.dependency.constvalue.FromType;
+import codedriver.framework.dependency.core.CustomTableDependencyHandlerBase;
+import codedriver.framework.dependency.core.IFromType;
+import codedriver.framework.dependency.dto.DependencyInfoVo;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixVo;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ import java.util.Map;
  * @since: 2021/4/6 15:21
  **/
 @Service
-public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
+public class IntegrationMatrixDependencyHandler extends CustomTableDependencyHandlerBase {
 
     @Resource
     private MatrixMapper matrixMapper;
@@ -46,7 +47,7 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      * @return
      */
     @Override
-    protected String getCalleeField() {
+    protected String getFromField() {
         return "integration_uuid";
     }
 
@@ -56,12 +57,12 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      * @return
      */
     @Override
-    protected String getCallerField() {
+    protected String getToField() {
         return "matrix_uuid";
     }
 
     @Override
-    protected List<String> getCallerFieldList() {
+    protected List<String> getToFieldList() {
         return null;
     }
 
@@ -72,13 +73,13 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      * @return
      */
     @Override
-    protected ValueTextVo parse(Object caller) {
+    protected DependencyInfoVo parse(Object caller) {
         if (caller instanceof Map) {
             Map<String, Object> map = (Map)caller;
             String matrixUuid =  (String) map.get("matrix_uuid");
             MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
             if (matrixVo != null) {
-                ValueTextVo valueTextVo = new ValueTextVo();
+                DependencyInfoVo valueTextVo = new DependencyInfoVo();
                 valueTextVo.setValue(matrixVo.getUuid());
                 valueTextVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-external-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
                 return valueTextVo;
@@ -93,7 +94,7 @@ public class IntegrationMatrixDependencyHandler extends DependencyHandlerBase {
      * @return
      */
     @Override
-    public ICalleeType getCalleeType() {
-        return CalleeType.INTEGRATION;
+    public IFromType getFromType() {
+        return FromType.INTEGRATION;
     }
 }

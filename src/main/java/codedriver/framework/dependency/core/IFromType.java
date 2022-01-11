@@ -11,7 +11,7 @@ package codedriver.framework.dependency.core;
  * @author: linbq
  * @since: 2021/4/2 10:29
  **/
-public interface ICalleeType {
+public interface IFromType {
     /**
      * 被调用者类型值
      *

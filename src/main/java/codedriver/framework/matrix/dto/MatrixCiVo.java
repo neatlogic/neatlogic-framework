@@ -14,12 +14,13 @@ import com.alibaba.fastjson.JSONObject;
 public class MatrixCiVo {
     private String matrixUuid;
     private Long ciId;
-    private String config;
+    private JSONObject config;
+    private String configStr;
 
     public MatrixCiVo() {
     }
 
-    public MatrixCiVo(String matrixUuid, Long ciId, String config) {
+    public MatrixCiVo(String matrixUuid, Long ciId, JSONObject config) {
         this.matrixUuid = matrixUuid;
         this.ciId = ciId;
         this.config = config;
@@ -41,11 +42,19 @@ public class MatrixCiVo {
         this.ciId = ciId;
     }
 
-    public String getConfig() {
+    public JSONObject getConfig() {
         return config;
     }
 
-    public void setConfig(String config) {
+    public void setConfig(JSONObject config) {
         this.config = config;
+    }
+
+    public String getConfigStr() {
+        return configStr;
+    }
+
+    public void setConfigStr(String configStr) {
+        this.configStr = configStr;
     }
 }

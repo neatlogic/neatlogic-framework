@@ -6,7 +6,7 @@
 package codedriver.framework.matrix.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.dependency.constvalue.CalleeType;
+import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.DependencyManager;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
@@ -71,7 +71,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
 
     @Override
     public void deleteMatrix(String uuid) {
-        if (DependencyManager.getDependencyCount(CalleeType.MATRIX, uuid) > 0) {
+        if (DependencyManager.getDependencyCount(FromType.MATRIX, uuid) > 0) {
             throw new MatrixReferencedCannotBeDeletedException(uuid);
         }
         matrixMapper.deleteMatrixByUuid(uuid);

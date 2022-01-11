@@ -17,13 +17,13 @@ import java.util.Set;
  * @author: linbq
  * @since: 2021/4/2 11:37
  **/
-public class CalleeTypeFactory {
+public class FromTypeFactory {
     /**
      * 标记是否未初始化数据，只初始化一次
      **/
     private static volatile boolean isUninitialized = true;
 
-    private static Set<ICalleeType> set = new HashSet<>();
+    private static Set<IFromType> set = new HashSet<>();
 
     private static String allCalleeTypeToString;
 
@@ -32,14 +32,14 @@ public class CalleeTypeFactory {
      *
      * @return
      */
-    public static Set<ICalleeType> getCalleeTypeSet() {
+    public static Set<IFromType> getCalleeTypeSet() {
         if (isUninitialized) {
-            synchronized (CalleeTypeFactory.class) {
+            synchronized (FromTypeFactory.class) {
                 if (isUninitialized) {
                     Reflections reflections = new Reflections("codedriver");
-                    Set<Class<? extends ICalleeType>> classSet = reflections.getSubTypesOf(ICalleeType.class);
-                    for (Class<? extends ICalleeType> c : classSet) {
-                        for (ICalleeType obj : c.getEnumConstants()) {
+                    Set<Class<? extends IFromType>> classSet = reflections.getSubTypesOf(IFromType.class);
+                    for (Class<? extends IFromType> c : classSet) {
+                        for (IFromType obj : c.getEnumConstants()) {
                             set.add(obj);
                         }
                     }
@@ -56,8 +56,8 @@ public class CalleeTypeFactory {
      * @param _value
      * @return
      */
-    public static ICalleeType getCalleeType(String _value) {
-        for (ICalleeType type : getCalleeTypeSet()) {
+    public static IFromType getCalleeType(String _value) {
+        for (IFromType type : getCalleeTypeSet()) {
             if (type.getValue().equals(_value)) {
                 return type;
             }
@@ -73,7 +73,7 @@ public class CalleeTypeFactory {
     public static String getAllCalleeTypeToString() {
         if (StringUtils.isBlank(allCalleeTypeToString)) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (ICalleeType type : getCalleeTypeSet()) {
+            for (IFromType type : getCalleeTypeSet()) {
                 stringBuilder.append(type.getValue());
                 stringBuilder.append("（");
                 stringBuilder.append(type.getText());

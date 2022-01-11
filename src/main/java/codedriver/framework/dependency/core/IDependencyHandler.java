@@ -5,7 +5,7 @@
 
 package codedriver.framework.dependency.core;
 
-import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.dependency.dto.DependencyInfoVo;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
@@ -33,7 +33,7 @@ public interface IDependencyHandler {
      *
      * @return
      */
-    public ICalleeType getCalleeType();
+    public IFromType getFromType();
 
     /**
      * 依赖关系能否解除，比如服务引用时间窗口可以解除，但工单引用时间窗口不可以解除
@@ -47,45 +47,45 @@ public interface IDependencyHandler {
     /**
      * 插入一条引用关系数据
      *
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被调用者值（如：服务时间窗口uuid）
+     * @param to 调用者值（如：服务uuid）
      * @return
      */
-    public int insert(Object callee, Object caller);
+    public int insert(Object from, Object to);
 
     /**
      * 插入一条引用关系数据
      *
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被调用者值（如：服务时间窗口uuid）
+     * @param to 调用者值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
-    public int insert(Object callee, Object caller, JSONObject config);
+    public int insert(Object from, Object to, JSONObject config);
 
     /**
      * 删除引用关系
      *
-     * @param caller 调用者值（如：服务uuid）
+     * @param to 调用者值（如：服务uuid）
      * @return
      */
-    public int delete(Object caller);
+    public int delete(Object to);
 
     /**
      * 查询引用列表数据
      *
-     * @param callee   被调用者值（如：服务时间窗口uuid）
+     * @param from   被调用者值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 数据量
      * @return
      */
-    public List<ValueTextVo> getCallerList(Object callee, int startNum, int pageSize);
+    public List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize);
 
     /**
      * 查询引用次数
      *
-     * @param callee 被调用者值（如：服务时间窗口uuid）
+     * @param to 被调用者值（如：服务时间窗口uuid）
      * @return
      */
-    public int getCallerCount(Object callee);
+    public int getDependencyCount(Object to);
 }

@@ -10,6 +10,6 @@ public interface RoleService {
      * 补充角色的分组数量和用户数量
      * @param roleList
      */
-    void getRoleTeamCountAndRoleUserCount(List<RoleVo> roleList);
+    void setRoleTeamCountAndRoleUserCount(List<RoleVo> roleList);
 
 }

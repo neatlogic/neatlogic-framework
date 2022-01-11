@@ -68,7 +68,7 @@ public class RoleGroupHandler implements IGroupSearchHandler {
             roleVo.setRoleUuidList(roleUuidList);
         }
         roleList = roleMapper.searchRole(roleVo);
-        roleService.getRoleTeamCountAndRoleUserCount(roleList);
+        roleService.setRoleTeamCountAndRoleUserCount(roleList);
         return (List<T>) roleList;
     }
 

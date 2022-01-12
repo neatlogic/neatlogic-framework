@@ -87,6 +87,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 loginAuth = LoginAuthFactory.getLoginAuth("default");
                 userVo = loginAuth.auth(cachedRequest, response);
+                AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
                     authType = request.getHeader("AuthType");
                     logger.info("AuthType: " + authType);
@@ -94,23 +95,29 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(cachedRequest, response);
+                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+                                authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                                    loginPostProcessor.loginAfterInitialization();
+                                }
+                            }
                         }
                     } else {
                         loginAuth = null;
                     }
                 }
                 if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                    UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                    if (authenticationInfoVo == null) {
+                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                        UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                    }
                     isUnExpired = userExpirationValid();
                     isAuth = true;
                 }
             }
 
             if (hasTenant && isAuth && isUnExpired) {
-                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                    loginPostProcessor.loginAfterInitialization();
-                }
                 filterChain.doFilter(cachedRequest, response);
             } else {
                 if (!hasTenant) {

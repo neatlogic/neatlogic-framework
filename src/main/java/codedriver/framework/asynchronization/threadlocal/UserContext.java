@@ -6,6 +6,7 @@
 package codedriver.framework.asynchronization.threadlocal;
 
 import codedriver.framework.common.constvalue.SystemUser;
+import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.exception.user.NoUserException;
 import com.alibaba.fastjson.JSONArray;
@@ -34,6 +35,7 @@ public class UserContext implements Serializable {
     private String timezone = "+8:00";
     private String token;
     private List<String> roleUuidList = new ArrayList<>();
+    private AuthenticationInfoVo authenticationInfoVo;
 
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
@@ -82,6 +84,24 @@ public class UserContext implements Serializable {
         context.setRequest(request);
         context.setResponse(response);
         context.setTimezone(timezone);
+        for (String roleUuid : userVo.getRoleUuidList()) {
+            context.addRole(roleUuid);
+        }
+        instance.set(context);
+        return context;
+    }
+
+    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+        UserContext context = new UserContext();
+        context.setUserId(userVo.getUserId());
+        context.setUserUuid(userVo.getUuid());
+        context.setUserName(userVo.getUserName());
+        context.setTenant(userVo.getTenant());
+        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
+        context.setRequest(request);
+        context.setResponse(response);
+        context.setTimezone(timezone);
+        context.setAuthenticationInfoVo(authenticationInfoVo);
         for (String roleUuid : userVo.getRoleUuidList()) {
             context.addRole(roleUuid);
         }
@@ -207,5 +227,13 @@ public class UserContext implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public AuthenticationInfoVo getAuthenticationInfoVo() {
+        return authenticationInfoVo;
+    }
+
+    public void setAuthenticationInfoVo(AuthenticationInfoVo authenticationInfoVo) {
+        this.authenticationInfoVo = authenticationInfoVo;
     }
 }

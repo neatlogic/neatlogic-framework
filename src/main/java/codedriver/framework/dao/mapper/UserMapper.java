@@ -68,7 +68,7 @@ public interface UserMapper {
 
     UserVo getActiveUserByUserId(UserVo userVo);
 
-    UserSessionVo getUserSessionLockByUserUuid(String userUuid);
+    UserSessionVo getUserSessionByUserUuid(String userUuid);
 
     List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 

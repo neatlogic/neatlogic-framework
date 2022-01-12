@@ -50,15 +50,24 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
                         if (CollectionUtils.isNotEmpty(formAttributeList)) {
                             for (FormAttributeVo formAttributeVo : formAttributeList) {
                                 if (Objects.equals(formAttributeVo.getUuid(), dependencyVo.getTo())) {
-                                    DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-                                    dependencyInfoVo.setValue(formAttributeVo.getUuid());
-                                    String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
-                                            TenantContext.get().getTenantUuid(),
-                                            formVo.getUuid(),
-                                            formVersionVo.getUuid(),
-                                            formVo.getName() + "-" + formVersionVo.getVersion() + "-" + formAttributeVo.getLabel());
-                                    dependencyInfoVo.setText(text);
-                                    return dependencyInfoVo;
+                                    JSONObject dependencyInfoConfig = new JSONObject();
+                                    dependencyInfoConfig.put("formUuid", formVo.getUuid());
+                                    dependencyInfoConfig.put("formName", formVo.getName());
+                                    dependencyInfoConfig.put("formVersion", formVersionVo.getVersion());
+                                    dependencyInfoConfig.put("formVersionUuid", formVersionVo.getUuid());
+                                    dependencyInfoConfig.put("attributeLabel", formAttributeVo.getLabel());
+                                    String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
+                                    String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formName}&currentVersionUuid=${DATA.formVersion}";
+                                    return new DependencyInfoVo(formAttributeVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+//                                    DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+//                                    dependencyInfoVo.setValue(formAttributeVo.getUuid());
+//                                    String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
+//                                            TenantContext.get().getTenantUuid(),
+//                                            formVo.getUuid(),
+//                                            formVersionVo.getUuid(),
+//                                            formVo.getName() + "-" + formVersionVo.getVersion() + "-" + formAttributeVo.getLabel());
+//                                    dependencyInfoVo.setText(text);
+//                                    return dependencyInfoVo;
                                 }
                             }
                         }

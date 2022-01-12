@@ -12,6 +12,7 @@ import codedriver.framework.dependency.core.IFromType;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixVo;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -78,10 +79,17 @@ public class IntegrationMatrixDependencyHandler extends CustomTableDependencyHan
             String matrixUuid =  (String) map.get("matrix_uuid");
             MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
             if (matrixVo != null) {
-                DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-                dependencyInfoVo.setValue(matrixVo.getUuid());
-                dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-external-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
-                return dependencyInfoVo;
+                JSONObject dependencyInfoConfig = new JSONObject();
+                dependencyInfoConfig.put("matrixUuid", matrixVo.getUuid());
+                dependencyInfoConfig.put("matrixName", matrixVo.getName());
+                dependencyInfoConfig.put("matrixType", matrixVo.getType());
+                String pathFormat = "矩阵-${DATA.matrixName}";
+                String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";
+                return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+//                DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+//                dependencyInfoVo.setValue(matrixVo.getUuid());
+//                dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-external-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
+//                return dependencyInfoVo;
             }
         }
         return null;

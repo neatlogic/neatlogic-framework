@@ -11,9 +11,11 @@ import codedriver.framework.dependency.core.FixedTableDependencyHandlerBase;
 import codedriver.framework.dependency.core.IFromType;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
 import codedriver.framework.dependency.dto.DependencyVo;
+import codedriver.framework.exception.util.FreemarkerTransformException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixCiVo;
 import codedriver.framework.matrix.dto.MatrixVo;
+import codedriver.framework.util.FreemarkerUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,11 +55,20 @@ public class CiAttr2MatrixAttrDependencyHandler extends FixedTableDependencyHand
                                     if (MapUtils.isNotEmpty(showAttributeObj)) {
                                         String uuid = showAttributeObj.getString("uuid");
                                         if (uuid.endsWith(dependencyVo.getFrom())) {
+                                            JSONObject dependencyInfoConfig = new JSONObject();
+                                            dependencyInfoConfig.put("matrixUuid", matrixVo.getUuid());
+                                            dependencyInfoConfig.put("matrixName", matrixVo.getName());
+                                            dependencyInfoConfig.put("matrixType", matrixVo.getType());
                                             String toName = showAttributeObj.getString("name");
-                                            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-                                            dependencyInfoVo.setValue(matrixVo.getUuid());
-                                            dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-view-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName(), toName));
-                                            return dependencyInfoVo;
+                                            dependencyInfoConfig.put("attributeName", toName);
+                                            String pathFormat = "矩阵-${DATA.matrixName}-${DATA.attributeName}";
+                                            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";
+                                            return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+//                                            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+//                                            dependencyInfoVo.setValue(matrixVo.getUuid());
+//                                            dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-view-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s-%s</a>",
+//                                                    TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName(), toName));
+//                                            return dependencyInfoVo;
                                         }
                                     }
                                 }

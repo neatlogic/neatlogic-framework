@@ -12,6 +12,7 @@ import codedriver.framework.dependency.core.IFromType;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
 import codedriver.framework.form.dao.mapper.FormMapper;
 import codedriver.framework.form.dto.FormAttributeMatrixVo;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -78,15 +79,24 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
         }
         if (dependencyObj instanceof FormAttributeMatrixVo) {
             FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) dependencyObj;
-            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-            dependencyInfoVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());
-            String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
-                    TenantContext.get().getTenantUuid(),
-                    formAttributeMatrixVo.getFormUuid(),
-                    formAttributeMatrixVo.getFormVersionUuid(),
-                    formAttributeMatrixVo.getFormName() + "-" + formAttributeMatrixVo.getVersion() + "-" + formAttributeMatrixVo.getFormAttributeLabel());
-            dependencyInfoVo.setText(text);
-            return dependencyInfoVo;
+            JSONObject dependencyInfoConfig = new JSONObject();
+            dependencyInfoConfig.put("formUuid", formAttributeMatrixVo.getFormUuid());
+            dependencyInfoConfig.put("formName", formAttributeMatrixVo.getFormName());
+            dependencyInfoConfig.put("formVersion", formAttributeMatrixVo.getVersion());
+            dependencyInfoConfig.put("formVersionUuid", formAttributeMatrixVo.getFormVersionUuid());
+            dependencyInfoConfig.put("attributeLabel", formAttributeMatrixVo.getFormAttributeLabel());
+            String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
+            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formName}&currentVersionUuid=${DATA.formVersion}";
+            return new DependencyInfoVo(formAttributeMatrixVo.getFormAttributeUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+//            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
+//            dependencyInfoVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());
+//            String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",
+//                    TenantContext.get().getTenantUuid(),
+//                    formAttributeMatrixVo.getFormUuid(),
+//                    formAttributeMatrixVo.getFormVersionUuid(),
+//                    formAttributeMatrixVo.getFormName() + "-" + formAttributeMatrixVo.getVersion() + "-" + formAttributeMatrixVo.getFormAttributeLabel());
+//            dependencyInfoVo.setText(text);
+//            return dependencyInfoVo;
         }
         return null;
     }

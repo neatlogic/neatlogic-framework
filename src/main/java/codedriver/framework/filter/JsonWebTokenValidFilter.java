@@ -11,12 +11,14 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.cache.UserSessionCache;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
+import codedriver.framework.service.AuthenticationInfoService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AuthenticationInfoService authenticationInfoService;
 
     /**
      * Default constructor.
@@ -72,7 +76,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
         //判断租户
         try {
-            logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
+            //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
             String tenant = request.getHeader("Tenant");
             //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
             HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
@@ -83,6 +87,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 loginAuth = LoginAuthFactory.getLoginAuth("default");
                 userVo = loginAuth.auth(cachedRequest, response);
+                AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
                     authType = request.getHeader("AuthType");
                     logger.info("AuthType: " + authType);
@@ -91,19 +96,22 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(cachedRequest, response);
                             if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                                UserContext.init(userVo, timezone, request, response);
+                                authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                                     loginPostProcessor.loginAfterInitialization();
                                 }
                             }
-
                         }
                     } else {
                         loginAuth = null;
                     }
                 }
                 if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                    UserContext.init(userVo, timezone, request, response);
+                    if (authenticationInfoVo == null) {
+                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                        UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                    }
                     isUnExpired = userExpirationValid();
                     isAuth = true;
                 }
@@ -150,14 +158,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
-        logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ end");
+        //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ end");
     }
 
     private boolean userExpirationValid() {
         String userUuid = UserContext.get().getUserUuid();
         String tenant = TenantContext.get().getTenantUuid();
         if (UserSessionCache.getItem(tenant, userUuid) == null) {
-            UserSessionVo userSessionVo = userMapper.getUserSessionLockByUserUuid(userUuid);
+            UserSessionVo userSessionVo = userMapper.getUserSessionByUserUuid(userUuid);
             if (null != userSessionVo) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();

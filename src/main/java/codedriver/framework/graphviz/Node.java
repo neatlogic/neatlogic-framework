@@ -1,10 +1,11 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.graphviz;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -25,8 +26,8 @@ public class Node {
         if (StringUtils.isNotBlank(builder.tooltip)) {
             propMap.put("tooltip", builder.tooltip);
         }
-        if (StringUtils.isNotBlank(builder.className)) {
-            propMap.put("class", builder.className);
+        if (CollectionUtils.isNotEmpty(builder.className)) {
+            propMap.put("class", String.join(" ", builder.className));
         }
         if (StringUtils.isNotBlank(builder.fontColor)) {
             propMap.put("fontcolor", builder.fontColor);
@@ -79,14 +80,16 @@ public class Node {
         private String id;
         private String label;
         private String tooltip;
-        private String className = "cinode";
+        private List<String> className = new ArrayList<>();
         private String fontColor;
         private String image;
         private String icon;
         private int segment;
 
+
         public Builder(String _id) {
             this.id = _id;
+            className.add("cinode");
         }
 
         public Builder withIcon(String _icon) {
@@ -126,8 +129,10 @@ public class Node {
             return this;
         }
 
-        public Builder withClass(String _class) {
-            this.className = _class;
+        public Builder addClass(String _class) {
+            if (!this.className.contains(_class)) {
+                this.className.add(_class);
+            }
             return this;
         }
 

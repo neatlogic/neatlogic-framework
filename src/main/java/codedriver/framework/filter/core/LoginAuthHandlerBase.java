@@ -52,22 +52,17 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         String type = this.getType();
         String tenant = request.getHeader("tenant");
         UserVo userVo = myAuth(request);
-        logger.info("loginAuth type: " + type);
+        //logger.info("loginAuth type: " + type);
         if (userVo != null) {
-            logger.info("get userUuId: " + userVo.getUuid());
-            logger.info("get userId: " + userVo.getUserId());
+            //logger.info("get userUuId: " + userVo.getUuid());
+            //logger.info("get userId: " + userVo.getUserId());
         }
         //如果不存在 cookie authorization，则构建jwt,以便下次认证直接走 default 认证
         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid()) && StringUtils.isBlank(userVo.getCookieAuthorization())) {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
             userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
-            if (userMapper.getUserSessionLockByUserUuid(userVo.getUuid()) != null) {
-                userMapper.updateUserSession(userVo.getUuid());
-            } else {
-                userMapper.insertUserSession(userVo.getUuid());
-            }
-
+            userMapper.insertUserSession(userVo.getUuid());
         }
         return userVo;
     }

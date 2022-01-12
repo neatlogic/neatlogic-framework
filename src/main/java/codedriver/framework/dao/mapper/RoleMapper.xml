@@ -6,7 +6,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.RoleMapper">
-    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"></cache>
+    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"/>
 
     <select id="getRoleUuidListByAuth" resultType="java.lang.String" useCache="true">
         SELECT
@@ -112,7 +112,7 @@
     </select>
 
     <select id="getRoleByUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.RoleVo"
-            useCache="false">
+            useCache="true">
         SELECT `id`,
                `uuid`,
                `name`,

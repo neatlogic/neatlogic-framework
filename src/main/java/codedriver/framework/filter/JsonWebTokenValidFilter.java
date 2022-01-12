@@ -11,12 +11,14 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.cache.UserSessionCache;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
+import codedriver.framework.service.AuthenticationInfoService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AuthenticationInfoService authenticationInfoService;
 
     /**
      * Default constructor.
@@ -90,26 +94,23 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(cachedRequest, response);
-                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                                UserContext.init(userVo, timezone, request, response);
-                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                                    loginPostProcessor.loginAfterInitialization();
-                                }
-                            }
-
                         }
                     } else {
                         loginAuth = null;
                     }
                 }
                 if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                    UserContext.init(userVo, timezone, request, response);
+                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                    UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
                     isUnExpired = userExpirationValid();
                     isAuth = true;
                 }
             }
 
             if (hasTenant && isAuth && isUnExpired) {
+                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                    loginPostProcessor.loginAfterInitialization();
+                }
                 filterChain.doFilter(cachedRequest, response);
             } else {
                 if (!hasTenant) {

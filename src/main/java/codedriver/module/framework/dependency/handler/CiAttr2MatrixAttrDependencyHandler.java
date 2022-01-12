@@ -57,7 +57,7 @@ public class CiAttr2MatrixAttrDependencyHandler extends FixedTableDependencyHand
                                             dependencyInfoConfig.put("matrixUuid", matrixVo.getUuid());
                                             dependencyInfoConfig.put("matrixName", matrixVo.getName());
                                             dependencyInfoConfig.put("matrixType", matrixVo.getType());
-                                            String toName = showAttributeObj.getString("name");
+                                            String toName = showAttributeObj.getString("label");
                                             dependencyInfoConfig.put("attributeName", toName);
                                             String pathFormat = "矩阵-${DATA.matrixName}-${DATA.attributeName}";
                                             String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";

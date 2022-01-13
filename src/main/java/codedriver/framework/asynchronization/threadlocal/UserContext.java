@@ -124,6 +124,22 @@ public class UserContext implements Serializable {
         return context;
     }
 
+    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
+        UserContext context = new UserContext();
+        context.setUserId(userVo.getUserId());
+        context.setUserUuid(userVo.getUuid());
+        context.setUserName(userVo.getUserName());
+        context.setTenant(userVo.getTenant());
+        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
+        context.setTimezone(timezone);
+        context.setAuthenticationInfoVo(authenticationInfoVo);
+        for (String roleUuid : userVo.getRoleUuidList()) {
+            context.addRole(roleUuid);
+        }
+        instance.set(context);
+        return context;
+    }
+
     public void addRole(String role) {
         if (!roleUuidList.contains(role)) {
             roleUuidList.add(role);

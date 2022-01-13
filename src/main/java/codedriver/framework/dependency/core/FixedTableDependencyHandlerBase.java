@@ -22,11 +22,23 @@ import java.util.List;
  **/
 public abstract class FixedTableDependencyHandlerBase implements IDependencyHandler {
 
+    private String groupName;
+
     private static DependencyMapper dependencyMapper;
 
     @Resource
     public void setDependencyMapper(DependencyMapper _dependencyMapper) {
         dependencyMapper = _dependencyMapper;
+    }
+
+    @Override
+    public String getGroupName() {
+        return groupName;
+    }
+
+    @Override
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
     /**
      * 插入一条引用关系数据

@@ -23,11 +23,23 @@ import java.util.Map;
  **/
 public abstract class CustomTableDependencyHandlerBase implements IDependencyHandler {
 
+    private String groupName;
+
     protected static DependencyMapper dependencyMapper;
 
     @Resource
     public void setDependencyMapper(DependencyMapper _dependencyMapper) {
         dependencyMapper = _dependencyMapper;
+    }
+
+    @Override
+    public String getGroupName() {
+        return groupName;
+    }
+
+    @Override
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     /**

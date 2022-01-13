@@ -85,7 +85,7 @@ public class CmdbCiMatrixDependencyHandler extends CustomTableDependencyHandlerB
                 dependencyInfoConfig.put("matrixType", matrixVo.getType());
                 String pathFormat = "矩阵-${DATA.matrixName}";
                 String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";
-                return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+                return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
 //                DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
 //                dependencyInfoVo.setValue(matrixVo.getUuid());
 //                dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-view-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));

@@ -52,9 +52,11 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {
+        String groupName = context.getGroupName();
         Map<String, IDependencyHandler> myMap = context.getBeansOfType(IDependencyHandler.class);
         for (Map.Entry<String, IDependencyHandler> entry : myMap.entrySet()) {
             IDependencyHandler component = entry.getValue();
+            component.setGroupName(groupName);
             componentMap.put(component.getHandler(), component);
             calleeHandlerListMap.computeIfAbsent(component.getFromType(), k -> new ArrayList<>()).add(component);
         }

@@ -58,7 +58,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends FixedTableDependencyHa
                                     dependencyInfoConfig.put("attributeLabel", formAttributeVo.getLabel());
                                     String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
                                     String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formName}&currentVersionUuid=${DATA.formVersion}";
-                                    return new DependencyInfoVo(formAttributeVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat);
+                                    return new DependencyInfoVo(formAttributeVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
 //                                    DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
 //                                    dependencyInfoVo.setValue(formAttributeVo.getUuid());
 //                                    String text = String.format("<a href=\"/%s/framework.html#/form-edit?uuid=%s&currentVersionUuid=%s\" target=\"_blank\">%s</a>",

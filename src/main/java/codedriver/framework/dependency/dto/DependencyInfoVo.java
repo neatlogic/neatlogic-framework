@@ -22,17 +22,19 @@ public class DependencyInfoVo {
     private String path;
     private String url;
     private JSONObject config;
+    final private String groupName;
 
     @JSONField(serialize = false)
-    String pathFormat;
+    final String pathFormat;
     @JSONField(serialize = false)
-    String urlFormat;
+    final String urlFormat;
 
-    public DependencyInfoVo(Object value, JSONObject config, String pathFormat, String urlFormat) {
+    public DependencyInfoVo(Object value, JSONObject config, String pathFormat, String urlFormat, String groupName) {
         this.value = value;
         this.config = config;
         this.pathFormat = pathFormat;
         this.urlFormat = urlFormat;
+        this.groupName = groupName;
     }
 
     public Object getValue() {
@@ -60,6 +62,9 @@ public class DependencyInfoVo {
                 path = FreemarkerUtil.transform(config, pathFormat);
             } catch (FreemarkerTransformException e) {
                 path = pathFormat;
+            }
+            if (StringUtils.isNotBlank(groupName)) {
+                path = groupName + "-" + path;
             }
         }
         return path;
@@ -92,19 +97,15 @@ public class DependencyInfoVo {
         this.config = config;
     }
 
+    public String getGroupName() {
+        return groupName;
+    }
+
     public String getPathFormat() {
         return pathFormat;
     }
 
-    public void setPathFormat(String pathFormat) {
-        this.pathFormat = pathFormat;
-    }
-
     public String getUrlFormat() {
         return urlFormat;
-    }
-
-    public void setUrlFormat(String urlFormat) {
-        this.urlFormat = urlFormat;
     }
 }

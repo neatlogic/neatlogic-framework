@@ -24,7 +24,7 @@ public interface IDependencyHandler {
      *
      * @return
      */
-    public default String getHandler() {
+    default String getHandler() {
         return ClassUtils.getUserClass(this.getClass()).getSimpleName();
     }
 
@@ -33,17 +33,20 @@ public interface IDependencyHandler {
      *
      * @return
      */
-    public IFromType getFromType();
+    IFromType getFromType();
 
     /**
      * 依赖关系能否解除，比如服务引用时间窗口可以解除，但工单引用时间窗口不可以解除
      *
      * @return
      */
-    public default boolean canBeLifted() {
+    default boolean canBeLifted() {
         return true;
     }
 
+    void setGroupName(String groupName);
+
+    String getGroupName();
     /**
      * 插入一条引用关系数据
      *
@@ -51,7 +54,7 @@ public interface IDependencyHandler {
      * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public int insert(Object from, Object to);
+    int insert(Object from, Object to);
 
     /**
      * 插入一条引用关系数据
@@ -61,7 +64,7 @@ public interface IDependencyHandler {
      * @param config 额外数据
      * @return
      */
-    public int insert(Object from, Object to, JSONObject config);
+    int insert(Object from, Object to, JSONObject config);
 
     /**
      * 删除引用关系
@@ -69,7 +72,7 @@ public interface IDependencyHandler {
      * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public int delete(Object to);
+    int delete(Object to);
 
     /**
      * 查询引用列表数据
@@ -79,7 +82,7 @@ public interface IDependencyHandler {
      * @param pageSize 数据量
      * @return
      */
-    public List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize);
+    List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize);
 
     /**
      * 查询引用次数
@@ -87,5 +90,5 @@ public interface IDependencyHandler {
      * @param to 被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
-    public int getDependencyCount(Object to);
+    int getDependencyCount(Object to);
 }

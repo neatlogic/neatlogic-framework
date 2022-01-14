@@ -10,7 +10,7 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dao.cache.UserSessionCache;
-import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dao.mapper.UserSessionMapper;
 import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
@@ -21,9 +21,9 @@ import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.AuthenticationInfoService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.http.Cookie;
@@ -35,10 +35,9 @@ import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     // private ServletContext context;
-
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
+    @Resource
+    private UserSessionMapper userSessionMapper;
+    @Resource
     private AuthenticationInfoService authenticationInfoService;
 
     /**
@@ -165,18 +164,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         String userUuid = UserContext.get().getUserUuid();
         String tenant = TenantContext.get().getTenantUuid();
         if (UserSessionCache.getItem(tenant, userUuid) == null) {
-            UserSessionVo userSessionVo = userMapper.getUserSessionByUserUuid(userUuid);
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByUserUuid(userUuid);
             if (null != userSessionVo) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();
                 int expire = Config.USER_EXPIRETIME();
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
-                    userMapper.updateUserSession(userUuid);
+                    userSessionMapper.updateUserSession(userUuid);
                     UserSessionCache.addItem(tenant, userUuid);
                     return true;
                 }
-                userMapper.deleteUserSessionByUserUuid(userUuid);
+                userSessionMapper.deleteUserSessionByUserUuid(userUuid);
             }
         } else {
             return true;

@@ -8,7 +8,6 @@ package codedriver.framework.dao.mapper;
 import codedriver.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface UserMapper {
@@ -67,8 +66,6 @@ public interface UserMapper {
     UserVo getUserByUserIdAndPassword(UserVo userVo);
 
     UserVo getActiveUserByUserId(UserVo userVo);
-
-    UserSessionVo getUserSessionByUserUuid(String userUuid);
 
     List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
@@ -136,27 +133,6 @@ public interface UserMapper {
 
     List<UserVo> getUserListByRoleUuid(UserVo userVo);
 
-    int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
-            @Param("userUuidList") List<String> userUuidList,
-            @Param("teamUuidList") List<String> teamUuidList,
-            @Param("roleUuidList") List<String> roleUuidList,
-            @Param("sessionTime") Date sessionTime
-    );
-
-    List<String> getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
-            @Param("userUuidList") List<String> userUuidList,
-            @Param("teamUuidList") List<String> teamUuidList,
-            @Param("roleUuidList") List<String> roleUuidList,
-            @Param("sessionTime") Date sessionTime,
-            @Param("needPage") Boolean needPage,
-            @Param("startNum") Integer startNum,
-            @Param("pageSize") Integer pageSize
-    );
-
-    int getAllOnlineUserCount(Date sessionTime);
-
-    List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
-
     List<UserTitleVo> getUserTitleListLockByTitleNameList(@Param("titleNameList") List<String> titleList);
 
     int searchUserTitleCount(UserTitleVo userTitleVo);
@@ -183,8 +159,6 @@ public interface UserMapper {
 
     int insertUserProfile(UserProfileVo userProfileVo);
 
-    int insertUserSession(String userUuid);
-
     int insertUserData(UserDataVo userDataVo);
 
 //    int insertUserAgent(UserAgentVo userAgentVo);
@@ -194,8 +168,6 @@ public interface UserMapper {
     int updateUser(UserVo userVo);
 
     int updateUserActive(UserVo userVo);
-
-    int updateUserSession(String userUuid);
 
     int updateUserData(UserDataVo userDataVo);
 
@@ -208,8 +180,6 @@ public interface UserMapper {
     int deleteUserByUuid(String uuid);
 
     int deleteUserRoleByUserUuid(String userUuid);
-
-    int deleteUserSessionByUserUuid(String userUuid);
 
     int deleteUserTeamByUserUuid(String userUuid);
 

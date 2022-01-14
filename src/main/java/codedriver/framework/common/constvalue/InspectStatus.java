@@ -16,7 +16,7 @@ public enum InspectStatus implements IEnum {
     NORMAL("normal", "正常", "text-success"),
     WARN("warn", "告警", "text-warning"),
     CRITICAL("critical", "严重", "text-error"),
-    FATAL("fatal", "致命", "bg-error");
+    FATAL("fatal", "致命", "text-error");
 
     private final String value;
     private final String text;

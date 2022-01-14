@@ -575,13 +575,6 @@
           AND a.`is_active` = 1
     </select>
 
-    <select id="getUserSessionByUserUuid" parameterType="java.lang.String"
-            resultType="codedriver.framework.dto.UserSessionVo" useCache="false">
-        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime
-        FROM `user_session`
-        WHERE `user_uuid` = #{value}
-    </select>
-
     <select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="codedriver.framework.dto.UserVo"
             useCache="false">
         SELECT
@@ -923,117 +916,13 @@
         order by g.`id`
     </select>
 
-    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount"
-            resultType="int">
-        select
-        count(1)
-        from
-        (
-        <if test="userUuidList != null and userUuidList.size() > 0">
-            SELECT
-            a.`uuid`
-            FROM `user` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `uuid` IN
-            <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
-                #{userUuid}
-            </foreach>
-        </if>
-        <if test="roleUuidList != null and roleUuidList.size() > 0">
-            <if test="userUuidList != null and userUuidList.size() > 0">
-                UNION
-            </if>
-            SELECT
-            a.`user_uuid`
-            FROM `user_role` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `role_uuid` IN
-            <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
-                #{roleUuid}
-            </foreach>
-        </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0">
-            <if test="(roleUuidList != null and roleUuidList.size() > 0) || (userUuidList != null and userUuidList.size() > 0)">
-                UNION
-            </if>
-            SELECT
-            a.`user_uuid`
-            FROM `user_team` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `team_uuid` IN
-            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                #{teamUuid}
-            </foreach>
-        </if>
-        ) a
-    </select>
-
-    <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime"
-            resultType="java.lang.String">
-        select
-        `uuid`
-        from
-        (
-        <if test="userUuidList != null and userUuidList.size() > 0">
-            SELECT
-            a.`uuid` as `uuid`
-            FROM `user` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `uuid` IN
-            <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
-                #{userUuid}
-            </foreach>
-        </if>
-        <if test="roleUuidList != null and roleUuidList.size() > 0">
-            <if test="userUuidList != null and userUuidList.size() > 0">
-                UNION
-            </if>
-            SELECT
-            a.`user_uuid` as `uuid`
-            FROM `user_role` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `role_uuid` IN
-            <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
-                #{roleUuid}
-            </foreach>
-        </if>
-        <if test="teamUuidList != null and teamUuidList.size() > 0">
-            <if test="(roleUuidList != null and roleUuidList.size() > 0) || (userUuidList != null and userUuidList.size() > 0)">
-                UNION
-            </if>
-            SELECT
-            a.`user_uuid` as `uuid`
-            FROM `user_team` a
-            JOIN `user_session` b ON b.`user_uuid` = a.`user_uuid` AND b.`visit_time` &gt; #{sessionTime}
-            WHERE `team_uuid` IN
-            <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                #{teamUuid}
-            </foreach>
-        </if>
-        ) a
-        <if test="needPage">
-            limit #{startNum},#{pageSize}
-        </if>
-    </select>
-
-    <select id="getAllOnlineUserCount" parameterType="java.util.Date" resultType="int">
-        SELECT count(1)
-        FROM `user` a
-                 JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{value}
-    </select>
-
-    <select id="getAllOnlineUser" resultType="java.lang.String">
-        SELECT a.`uuid`
-        FROM `user` a
-                 JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
-        limit #{startNum},#{pageSize}
-    </select>
     <select id="getUserTitleLockByName" resultType="codedriver.framework.dto.UserTitleVo">
         select `id`, `name`
         from `user_title`
         where `name` = #{value} for
         update
     </select>
+
     <select id="getUserTitleByName" resultType="codedriver.framework.dto.UserTitleVo">
         select `id`, `name`
         from `user_title`
@@ -1202,12 +1091,7 @@
         VALUES (#{userUuid}, #{roleUuid})
     </insert>
 
-    <insert id="insertUserSession" parameterType="java.lang.String">
-        INSERT INTO `user_session` (`user_uuid`, `visit_time`)
-        VALUES (#{userUuid}, NOW(3))
-        ON DUPLICATE KEY
-            UPDATE `visit_time` = NOW(3)
-    </insert>
+
 
     <insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
         INSERT INTO `user_profile` (`user_uuid`, `module_id`, `config`)
@@ -1261,12 +1145,6 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateUserSession" parameterType="java.lang.String">
-        UPDATE `user_session`
-        set `visit_time` = now(3)
-        WHERE `user_uuid` = #{userUuid}
-    </update>
-
     <update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">
         UPDATE `user_profile`
         set `config` = #{config}
@@ -1302,12 +1180,6 @@
         DELETE
         FROM `user`
         WHERE `uuid` = #{value}
-    </delete>
-
-    <delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
-        DELETE
-        FROM `user_session`
-        where `user_uuid` = #{value}
     </delete>
 
     <delete id="deleteUserRoleByUserUuid" parameterType="java.lang.String">

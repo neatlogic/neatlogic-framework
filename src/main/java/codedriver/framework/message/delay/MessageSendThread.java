@@ -10,6 +10,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dao.mapper.UserSessionMapper;
 import codedriver.framework.message.core.IMessageHandler;
 import codedriver.framework.message.core.MessageHandlerFactory;
 import codedriver.framework.message.dao.mapper.MessageMapper;
@@ -34,6 +35,7 @@ public class MessageSendThread extends CodeDriverThread {
     private final static int BATCH_INSERT_MAX_COUNT = 1000;
     private static MessageMapper messageMapper;
     private static UserMapper userMapper;
+    private static UserSessionMapper userSessionMapper;
 
     @Autowired
     public void setMessageMapper(MessageMapper _messageMapper) {
@@ -45,6 +47,10 @@ public class MessageSendThread extends CodeDriverThread {
         userMapper = _userMapper;
     }
 
+    @Autowired
+    public void setUserSessionMapper(UserSessionMapper _userSessionMapper) {
+        userSessionMapper = _userSessionMapper;
+    }
     private MessageCache messageCache;
 
     public MessageSendThread() {
@@ -129,7 +135,7 @@ public class MessageSendThread extends CodeDriverThread {
                 /* 计算出用户登录失效时间点 **/
                 long expireTime = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(Config.USER_EXPIRETIME());
                 /* 根据用户、组、角色和登录失效时间点，找出所有在线用户 **/
-                List<String> onlineUserUuidList = userMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
+                List<String> onlineUserUuidList = userSessionMapper.getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTime(
                         messageHandlerAndRecipientVo.getToUserUuidList(), messageHandlerAndRecipientVo.getToTeamUuidList(), messageHandlerAndRecipientVo.getToRoleUuidList(), new Date(expireTime), false, null, null);
 
                 List<String> toUserUuidList = messageHandlerAndRecipientVo.getToUserUuidList();

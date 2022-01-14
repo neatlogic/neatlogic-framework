@@ -14,6 +14,7 @@ import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.util.CommonUtil;
 import codedriver.framework.dao.mapper.LoginMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dao.mapper.UserSessionMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
@@ -50,6 +51,9 @@ public class LoginController {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private UserSessionMapper userSessionMapper;
 
     @Resource
     private LoginMapper loginMapper;
@@ -118,7 +122,7 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
-                userMapper.insertUserSession(checkUserVo.getUuid());
+                userSessionMapper.insertUserSession(checkUserVo.getUuid());
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");

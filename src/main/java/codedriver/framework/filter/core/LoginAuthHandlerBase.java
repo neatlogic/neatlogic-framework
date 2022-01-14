@@ -8,6 +8,7 @@ package codedriver.framework.filter.core;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.RoleMapper;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dao.mapper.UserSessionMapper;
 import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.UserVo;
 import com.alibaba.fastjson.JSONObject;
@@ -37,6 +38,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     protected static RoleMapper roleMapper;
 
+    protected static UserSessionMapper userSessionMapper;
+
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
@@ -45,6 +48,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Autowired
     public void setRoleMapper(RoleMapper _roleMapper) {
         roleMapper = _roleMapper;
+    }
+
+    @Autowired
+    public void setUserSessionMapper(UserSessionMapper _userSessionMapper) {
+        userSessionMapper = _userSessionMapper;
     }
 
     @Override
@@ -62,7 +70,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
             userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
-            userMapper.insertUserSession(userVo.getUuid());
+            userSessionMapper.insertUserSession(userVo.getUuid());
         }
         return userVo;
     }

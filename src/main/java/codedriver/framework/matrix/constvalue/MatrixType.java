@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.matrix.constvalue;
 
 import codedriver.framework.common.constvalue.IEnum;
@@ -10,12 +15,13 @@ import java.util.List;
 public enum MatrixType implements IMatrixType, IEnum {
     CUSTOM("custom", "自定义数据源", "custom", 1),
     EXTERNAL("external", "外部数据源", "integrationUuid", 2),
-    VIEW("view", "视图", "fileId", 3);
+    VIEW("view", "数据库视图", "fileId", 3);
 
     private String value;
     private String name;
     private String key;
     private int sort;
+
     MatrixType(String _value, String _name, String _key, int _sort) {
         this.value = _value;
         this.name = _name;

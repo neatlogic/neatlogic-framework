@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -20,7 +20,7 @@ public class Md5Handler implements TypeHandler<String> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        if (StringUtils.isNotBlank(parameter)) {//大于150个字符才开始压缩
+        if (StringUtils.isNotBlank(parameter)) {
             parameter = parameter.toLowerCase(Locale.ROOT);
             parameter = DigestUtils.md5DigestAsHex(parameter.getBytes());
         }

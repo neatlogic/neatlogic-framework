@@ -48,6 +48,12 @@
         where session_id = #{value}
     </delete>
 
+    <delete id="deleteLoginInvalidCaptcha">
+        DELETE
+        FROM login_captcha
+        WHERE NOW(3) > expired_time
+    </delete>
+
     <delete id="deleteLoginFailedCountByUserId">
         delete
         from login_failed_count

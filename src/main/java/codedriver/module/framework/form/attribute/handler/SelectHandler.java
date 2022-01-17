@@ -251,7 +251,70 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject resultObj = new JSONObject();
+        Object dataObj = attributeDataVo.getDataObj();
+        if (dataObj != null) {
+            List<String> valueList = new ArrayList<>();
+            List<String> textList = new ArrayList<>();
+            boolean isMultiple = configObj.getBooleanValue("isMultiple");
+            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            String dataSource = configObj.getString("dataSource");
+            if ("static".equals(dataSource)) {
+                JSONArray dataArray = configObj.getJSONArray("dataList");
+                if (CollectionUtils.isNotEmpty(dataArray)) {
+                    Map<Object, String> valueTextMap = new HashMap<>();
+                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+                    for (ValueTextVo data : dataList) {
+                        valueTextMap.put(data.getValue(), data.getText());
+                    }
+                    if (isMultiple) {
+                        JSONArray valueArray = (JSONArray) dataObj;
+                        if (CollectionUtils.isNotEmpty(valueArray)) {
+                            valueList = valueArray.toJavaList(String.class);
+                            for (String key : valueList) {
+                                String text = valueTextMap.get(key);
+                                if (text != null) {
+                                    textList.add(text);
+                                } else {
+                                    textList.add(key);
+                                }
+                            }
+                        }
+                    } else {
+                        valueList.add((String) dataObj);
+                        String text = valueTextMap.get(dataObj);
+                        if (text != null) {
+                            textList.add(text);
+                        } else {
+                            textList.add((String) dataObj);
+                        }
+                    }
+                }
+            } else {// 其他，如动态数据源
+                if (isMultiple) {
+                    JSONArray valueArray = (JSONArray) dataObj;
+                    if (CollectionUtils.isNotEmpty(valueArray)) {
+                        valueList = valueArray.toJavaList(String.class);
+                        for (String key : valueList) {
+                            if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                                textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                            } else {
+                                textList.add(key);
+                            }
+                        }
+                    }
+                } else {
+                    String value = (String) dataObj;
+                    if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                        textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                    } else {
+                        textList.add((String) dataObj);
+                    }
+                }
+            }
+            resultObj.put("valueList", valueList);
+        }
+        return resultObj;
     }
 
     @Override

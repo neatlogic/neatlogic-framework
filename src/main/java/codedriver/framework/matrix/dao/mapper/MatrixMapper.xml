@@ -120,7 +120,7 @@
 		SELECT
 			`matrix_uuid` AS matrixUuid,
 			`ci_id` AS ciId,
-			`config`
+			`config` AS configStr
 		FROM `matrix_ci`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
@@ -181,7 +181,7 @@
 		) VALUES (
 		#{matrixUuid},
 		#{ciId},
-		#{config}
+		#{configStr}
 		)
 	</insert>
 

@@ -7,24 +7,25 @@ package codedriver.framework.dependency.core;
 
 import codedriver.framework.dependency.dao.mapper.DependencyMapper;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
-import codedriver.framework.dependency.dto.DependencyVo;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * 固定表结构依赖关系处理器基类
+ * 自定义表结构依赖关系处理器基类
  *
  * @author: linbq
  * @since: 2021/4/1 11:43
  **/
-public abstract class FixedTableDependencyHandlerBase implements IDependencyHandler {
+public abstract class CustomTableDependencyHandlerBase implements IDependencyHandler {
 
     private String groupName;
 
-    private static DependencyMapper dependencyMapper;
+    protected static DependencyMapper dependencyMapper;
 
     @Resource
     public void setDependencyMapper(DependencyMapper _dependencyMapper) {
@@ -40,6 +41,35 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
+    /**
+     * 表名
+     *
+     * @return
+     */
+    protected abstract String getTableName();
+
+    /**
+     * 被引用者（上游）字段
+     *
+     * @return
+     */
+    protected abstract String getFromField();
+
+    /**
+     * 引用者（下游）字段
+     *
+     * @return
+     */
+    protected abstract String getToField();
+
+    /**
+     * 引用者（下游）字段列表
+     *
+     * @return
+     */
+    protected abstract List<String> getToFieldList();
+
     /**
      * 插入一条引用关系数据
      *
@@ -62,8 +92,11 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int insert(Object from, Object to, JSONObject config) {
-        DependencyVo dependencyVo = new DependencyVo(from.toString(), getHandler(), to.toString(), config);
-        return dependencyMapper.insertDependency(dependencyVo);
+        if(to instanceof JSONArray){
+            return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getFromField(), getToFieldList(), from, (JSONArray) to);
+        } else {
+            return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getFromField(), getToField(), from, to);
+        }
     }
 
     /**
@@ -74,8 +107,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int delete(Object to) {
-        DependencyVo dependencyVo = new DependencyVo(getHandler(), to.toString());
-        return dependencyMapper.deleteDependency(dependencyVo);
+        return dependencyMapper.deleteDependencyByCaller(getTableName(), getToField(), to);
     }
 
     /**
@@ -89,9 +121,9 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     @Override
     public List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize) {
         List<DependencyInfoVo> resultList = new ArrayList<>();
-        List<DependencyVo> toList = dependencyMapper.getDependencyListByFrom(from.toString(), getHandler(), startNum, pageSize);
-        for (DependencyVo to : toList) {
-            DependencyInfoVo valueTextVo = parse(to);
+        List<Map<String, Object>> callerList = dependencyMapper.getCallerListByCallee(getTableName(), getFromField(), from, startNum, pageSize);
+        for (Object caller : callerList) {
+            DependencyInfoVo valueTextVo = parse(caller);
             if (valueTextVo != null) {
                 resultList.add(valueTextVo);
             }
@@ -102,12 +134,12 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     /**
      * 查询引用次数
      *
-     * @param to 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
     @Override
-    public int getDependencyCount(Object to) {
-        return dependencyMapper.getDependencyCountByFrom(to.toString());
+    public int getDependencyCount(Object from) {
+        return dependencyMapper.getCallerCountByCallee(getTableName(), getFromField(), from);
     }
 
     /**
@@ -116,5 +148,5 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      * @param dependencyObj 引用关系数据
      * @return
      */
-    protected abstract DependencyInfoVo parse(DependencyVo dependencyObj);
+    protected abstract DependencyInfoVo parse(Object dependencyObj);
 }

@@ -25,7 +25,7 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final Map<String, IDependencyHandler> componentMap = new HashMap<>();
 
-    private static final Map<ICalleeType, List<IDependencyHandler>> calleeHandlerListMap = new HashMap<>();
+    private static final Map<IFromType, List<IDependencyHandler>> calleeHandlerListMap = new HashMap<>();
 
     /**
      * 通过handler获取依赖关系处理器对象
@@ -39,10 +39,10 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
     /**
      * 通过calleeType获取依赖关系处理器对象列表，一个功能可以被多个地方引用，例如集成可以被流程图的动作引用，也可以被矩阵外部数据源引用
      *
-     * @param calleeType 被调用者类型
+     * @param fromType 被调用者类型
      */
-    public static List<IDependencyHandler> getHandlerList(ICalleeType calleeType) {
-        return calleeHandlerListMap.get(calleeType);
+    public static List<IDependencyHandler> getHandlerList(IFromType fromType) {
+        return calleeHandlerListMap.get(fromType);
     }
 
     @Override
@@ -52,11 +52,13 @@ public class DependencyHandlerFactory extends ModuleInitializedListenerBase {
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {
+        String groupName = context.getGroupName();
         Map<String, IDependencyHandler> myMap = context.getBeansOfType(IDependencyHandler.class);
         for (Map.Entry<String, IDependencyHandler> entry : myMap.entrySet()) {
             IDependencyHandler component = entry.getValue();
+            component.setGroupName(groupName);
             componentMap.put(component.getHandler(), component);
-            calleeHandlerListMap.computeIfAbsent(component.getCalleeType(), k -> new ArrayList<>()).add(component);
+            calleeHandlerListMap.computeIfAbsent(component.getFromType(), k -> new ArrayList<>()).add(component);
         }
     }
 }

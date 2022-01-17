@@ -5,15 +5,15 @@
 
 package codedriver.framework.dependency.constvalue;
 
-import codedriver.framework.dependency.core.ICalleeType;
+import codedriver.framework.dependency.core.IFromType;
 
 /**
- * 被调用者类型
+ * 被引用者（上游）类型
  *
  * @author: linbq
  * @since: 2021/4/2 10:30
  **/
-public enum CalleeType implements ICalleeType {
+public enum FromType implements IFromType {
     MATRIX("matrix", "矩阵"),
     MATRIXATTR("matrixattr", "矩阵属性"),
     FORM("form", "表单"),
@@ -27,26 +27,16 @@ public enum CalleeType implements ICalleeType {
     private String value;
     private String text;
 
-    private CalleeType(String value, String text) {
+    FromType(String value, String text) {
         this.value = value;
         this.text = text;
     }
 
-    /**
-     * 被调用者类型值
-     *
-     * @return
-     */
     @Override
     public String getValue() {
         return value;
     }
 
-    /**
-     * 被调用者类型名
-     *
-     * @return
-     */
     @Override
     public String getText() {
         return text;

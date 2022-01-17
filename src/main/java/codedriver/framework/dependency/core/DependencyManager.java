@@ -6,7 +6,7 @@
 package codedriver.framework.dependency.core;
 
 import codedriver.framework.common.dto.BasePageVo;
-import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.dependency.dto.DependencyInfoVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,84 +26,84 @@ public class DependencyManager {
      * 先清空再插入一条引用关系数据
      *
      * @param clazz  引用关系处理器类
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public static int clearAndInsert(Class<? extends IDependencyHandler> clazz, Object callee, Object caller) {
+    public static int clearAndInsert(Class<? extends IDependencyHandler> clazz, Object from, Object to) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
-        dependencyHandler.delete(caller);
-        return dependencyHandler.insert(callee, caller);
+        dependencyHandler.delete(to);
+        return dependencyHandler.insert(from, to);
     }
 
     /**
      * 插入一条引用关系数据
      *
      * @param clazz  引用关系处理器类
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public static int insert(Class<? extends IDependencyHandler> clazz, Object callee, Object caller) {
+    public static int insert(Class<? extends IDependencyHandler> clazz, Object from, Object to) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
-        return dependencyHandler.insert(callee, caller);
+        return dependencyHandler.insert(from, to);
     }
 
     /**
      * 插入一条引用关系数据
      *
      * @param clazz  引用关系处理器类
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param caller 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public static int insert(Class<? extends IDependencyHandler> clazz, Object callee, Object caller, JSONObject config) {
+    public static int insert(Class<? extends IDependencyHandler> clazz, Object from, Object to, JSONObject config) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
-        return dependencyHandler.insert(callee, caller, config);
+        return dependencyHandler.insert(from, to, config);
     }
 
     /**
      * 插入一条引用关系数据
      *
      * @param clazz  引用关系处理器类
-     * @param callee 被调用者值（如：服务时间窗口uuid）
-     * @param callerArray 调用者值（如：服务uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param toArray 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public static int insert(Class<? extends IDependencyHandler> clazz, Object callee, JSONArray callerArray) {
+    public static int insert(Class<? extends IDependencyHandler> clazz, Object from, JSONArray toArray) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
-        return dependencyHandler.insert(callee, callerArray);
+        return dependencyHandler.insert(from, toArray);
     }
     /**
      * 删除引用关系
      *
      * @param clazz  引用关系处理器类
-     * @param caller 调用者值（如：服务uuid）
+     * @param to 引用者（下游）值（如：服务uuid）
      * @return
      */
-    public static int delete(Class<? extends IDependencyHandler> clazz, Object caller) {
+    public static int delete(Class<? extends IDependencyHandler> clazz, Object to) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
-        if (caller instanceof List) {
+        if (to instanceof List) {
             int sum = 0;
-            for (Object c : (List) caller) {
+            for (Object c : (List) to) {
                 sum += dependencyHandler.delete(c);
             }
             return sum;
         } else {
-            return dependencyHandler.delete(caller);
+            return dependencyHandler.delete(to);
         }
     }
 
     /**
      * 查询引用列表
      *
-     * @param calleeType 被调用者类型
-     * @param callee     被调用者值（如：服务时间窗口uuid）
+     * @param fromType 被引用者（上游）类型
+     * @param from     被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
-    public static List<ValueTextVo> getDependencyList(ICalleeType calleeType, Object callee, BasePageVo basePageVo) {
-        List<ValueTextVo> resultList = new ArrayList<>();
-        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(calleeType);
+    public static List<DependencyInfoVo> getDependencyList(IFromType fromType, Object from, BasePageVo basePageVo) {
+        List<DependencyInfoVo> resultList = new ArrayList<>();
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         int pageSize = basePageVo.getPageSize();
         int startNum = basePageVo.getStartNum();
         for (IDependencyHandler handler : dependencyHandlerList) {
@@ -113,14 +113,14 @@ public class DependencyManager {
             if (pageSize == 0) {
                 break;
             }
-            int count = handler.getCallerCount(callee);
+            int count = handler.getDependencyCount(from);
             if (startNum > count) {
                 startNum -= count;
                 continue;
             }
-            List<ValueTextVo> callerList = handler.getCallerList(callee, startNum, pageSize);
-            resultList.addAll(callerList);
-            pageSize -= callerList.size();
+            List<DependencyInfoVo> toList = handler.getDependencyList(from, startNum, pageSize);
+            resultList.addAll(toList);
+            pageSize -= toList.size();
             startNum = 0;
         }
         return resultList;
@@ -129,18 +129,18 @@ public class DependencyManager {
     /**
      * 查询引用个数
      *
-     * @param calleeType  被调用者类型
-     * @param callee      被调用者值（如：服务时间窗口uuid）
+     * @param fromType  被引用者（上游）类型
+     * @param from      被引用者（上游）值（如：服务时间窗口uuid）
      * @param canBeLifted 依赖关系能否解除
      * @return
      */
-    public static int getDependencyCount(ICalleeType calleeType, Object callee, boolean canBeLifted) {
+    public static int getDependencyCount(IFromType fromType, Object from, boolean canBeLifted) {
         int sum = 0;
-        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(calleeType);
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
-                    sum += handler.getCallerCount(callee);
+                    sum += handler.getDependencyCount(from);
                 }
             }
         }
@@ -150,11 +150,11 @@ public class DependencyManager {
     /**
      * 查询引用个数
      *
-     * @param calleeType 被调用者类型
-     * @param callee     被调用者值（如：服务时间窗口uuid）
+     * @param fromType 被引用者（上游）类型
+     * @param from     被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
-    public static int getDependencyCount(ICalleeType calleeType, Object callee) {
-        return getDependencyCount(calleeType, callee, true);
+    public static int getDependencyCount(IFromType fromType, Object from) {
+        return getDependencyCount(fromType, from, true);
     }
 }

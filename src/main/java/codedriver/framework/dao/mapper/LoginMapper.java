@@ -23,4 +23,6 @@ public interface LoginMapper {
     Integer deleteLoginCaptchaBySessionId(String sessionId);
 
     Integer deleteLoginFailedCountByUserId(String userId);
+
+    void deleteLoginInvalidCaptcha();
 }

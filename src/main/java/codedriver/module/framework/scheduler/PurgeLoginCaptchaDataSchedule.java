@@ -29,7 +29,7 @@ public class PurgeLoginCaptchaDataSchedule extends PublicJobBase {
 
     @Override
     public String getName() {
-        return "清除登陆验证码数据";
+        return "清除登录验证码数据";
     }
 
     @Override

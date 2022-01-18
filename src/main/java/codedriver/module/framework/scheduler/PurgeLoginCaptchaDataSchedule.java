@@ -38,7 +38,7 @@ public class PurgeLoginCaptchaDataSchedule extends PublicJobBase {
         String jobUuid = jobDetail.getKey().getName();
         JobVo jobVo = schedulerMapper.getJobByUuid(jobUuid);
         if (jobVo != null) {
-            //删除无效的（过期的）登陆验证码
+            //删除无效的（过期的）登录验证码
             loginMapper.deleteLoginInvalidCaptcha();
         }
     }

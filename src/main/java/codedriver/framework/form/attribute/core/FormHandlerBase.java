@@ -9,15 +9,22 @@ import codedriver.framework.common.constvalue.FormHandlerType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.restful.core.IApiComponent;
-import codedriver.framework.restful.dto.ApiVo;
-import com.alibaba.fastjson.JSONArray;
+import codedriver.framework.matrix.core.IMatrixDataSourceHandler;
+import codedriver.framework.matrix.core.MatrixDataSourceHandlerFactory;
+import codedriver.framework.matrix.dao.mapper.MatrixMapper;
+import codedriver.framework.matrix.dto.MatrixDataVo;
+import codedriver.framework.matrix.dto.MatrixVo;
+import codedriver.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
+import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public abstract class FormHandlerBase implements IFormAttributeHandler {
 
@@ -43,27 +50,39 @@ public abstract class FormHandlerBase implements IFormAttributeHandler {
         }
     }
 
+    protected MatrixMapper matrixMapper;
+
+    @Resource
+    public void setMatrixMapper(MatrixMapper _matrixMapper){
+        this.matrixMapper = _matrixMapper;
+    }
     @Override
     public final String getType() {
         return "form";
     }
 
-    protected String getValue(String matrixUuid, ValueTextVo mapping, String value, IApiComponent restComponent, ApiVo api) {
+    protected String getValue(String matrixUuid, ValueTextVo mapping, String value) {
         if (StringUtils.isBlank(value)) {
             return value;
         }
         try {
-            JSONObject paramObj = new JSONObject();
-            paramObj.put("matrixUuid", matrixUuid);
-            JSONArray columnList = new JSONArray();
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+            if (matrixVo == null) {
+                throw new MatrixNotFoundException(matrixUuid);
+            }
+            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+            if (matrixDataSourceHandler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
+            MatrixDataVo dataVo = new MatrixDataVo();
+            dataVo.setMatrixUuid(matrixUuid);
+            List<String> columnList = new ArrayList<>();
             columnList.add((String) mapping.getValue());
             columnList.add(mapping.getText());
-            paramObj.put("columnList", columnList);
-            JSONObject resultObj = (JSONObject) restComponent.doService(api, paramObj, null);
-            JSONArray columnDataList = resultObj.getJSONArray("columnDataList");
-            for (int i = 0; i < columnDataList.size(); i++) {
-                JSONObject firstObj = columnDataList.getJSONObject(i);
-                JSONObject valueObj = firstObj.getJSONObject((String) mapping.getValue());
+            dataVo.setColumnList(columnList);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            for (Map<String, JSONObject> firstObj : tbodyList) {
+                JSONObject valueObj = firstObj.get(mapping.getValue());
                 /** 当text与value字段相同时，不同类型的矩阵字段，拼接value的逻辑不同，下拉、用户、组、角色，按uuid&=&text拼接，其余按value&=&value拼接 **/
                 if (mapping.getValue().equals(mapping.getText())
                         && (GroupSearch.USER.getValue().equals(valueObj.getString("type"))

@@ -165,7 +165,33 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject resultObj = new JSONObject();
+        String value = (String) attributeDataVo.getDataObj();
+        if (StringUtils.isNotBlank(value)) {
+            List<String> valueList = new ArrayList<>();
+            valueList.add(value);
+            List<String> textList = new ArrayList<>();
+            String dataSource = configObj.getString("dataSource");
+            if ("static".equals(dataSource)) {
+                JSONArray dataArray = configObj.getJSONArray("dataList");
+                if (CollectionUtils.isNotEmpty(dataArray)) {
+                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+                    for (ValueTextVo data : dataList) {
+                        if (value.equals(data.getValue())) {
+                            textList.add(data.getText());
+                            break;
+                        }
+                    }
+                }
+            } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
+                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                }
+            }
+            resultObj.put("valueList", valueList);
+            resultObj.put("textList", textList);
+        }
+        return resultObj;
     }
 
     @Override

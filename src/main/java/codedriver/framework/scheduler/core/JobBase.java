@@ -165,7 +165,7 @@ public abstract class JobBase implements IJob {
                     auditVo.setStatus(JobAuditVo.Status.SUCCEED.getValue());
                 } catch (ApiRuntimeException ex) {
                     auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
-                    auditVo.appendContent(ex.getMessage(true));
+                    auditVo.appendContent(ex.getMessage());
                 } catch (Exception ex) {
                     auditVo.setStatus(JobAuditVo.Status.FAILED.getValue());
                     auditVo.appendContent(ExceptionUtils.getStackTrace(ex));

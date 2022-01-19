@@ -21,11 +21,11 @@ public class ApiException extends Exception {
     }
 
     public ApiException(String message, Throwable ex) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message, ex);
+        super(message, ex);
     }
 
     public ApiException(String message) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message);
+        super(message);
     }
 
     public String getErrorCode() {

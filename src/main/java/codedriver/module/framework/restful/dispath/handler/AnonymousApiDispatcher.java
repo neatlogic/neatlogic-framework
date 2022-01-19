@@ -197,13 +197,13 @@ public class AnonymousApiDispatcher {
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -245,17 +245,17 @@ public class AnonymousApiDispatcher {
         } catch (ResubmitException ex) {
             response.setStatus(524);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));

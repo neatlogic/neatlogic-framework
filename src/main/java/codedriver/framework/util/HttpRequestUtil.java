@@ -453,7 +453,7 @@ public class HttpRequestUtil {
                     throw new ApiRuntimeException(writer.toString());
                 }
             } catch (ApiRuntimeException e) {
-                this.error = e.getMessage(true);
+                this.error = e.getMessage();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 this.error = ExceptionUtils.getExceptionStackTrace(e);

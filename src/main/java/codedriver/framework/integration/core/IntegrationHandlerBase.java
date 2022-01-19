@@ -188,7 +188,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             connection.connect();
         } catch (Exception e) {
-            String errorMsg = (e instanceof ApiRuntimeException) ? ((ApiRuntimeException) e).getMessage(true) : e.getMessage();
+            String errorMsg = (e instanceof ApiRuntimeException) ? ((ApiRuntimeException) e).getMessage() : e.getMessage();
             logger.error(e.getMessage(), e);
             integrationAuditVo.appendError(errorMsg);
             resultVo.appendError(errorMsg);

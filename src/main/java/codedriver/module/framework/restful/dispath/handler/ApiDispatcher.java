@@ -224,7 +224,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -234,9 +234,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -288,7 +288,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
 
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
@@ -296,7 +296,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -306,12 +306,12 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
         if (!response.isCommitted()) {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
@@ -350,14 +350,14 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -367,9 +367,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -411,14 +411,14 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -428,9 +428,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -480,14 +480,14 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -497,9 +497,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -541,14 +541,14 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -558,9 +558,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -585,7 +585,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -595,9 +595,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -620,7 +620,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -630,9 +630,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
@@ -655,7 +655,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
@@ -665,9 +665,9 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage(true));
+            returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            logger.error((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "") + ":::::::" + ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
             response.setStatus(500);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));

@@ -133,7 +133,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
                 if (ex instanceof ApiRuntimeException) {
-                    fullTextIndexTargetVo.setError(((ApiRuntimeException) ex).getMessage(true));
+                    fullTextIndexTargetVo.setError(((ApiRuntimeException) ex).getMessage());
                 } else {
                     fullTextIndexTargetVo.setError(ex.getMessage());
                 }
@@ -268,7 +268,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                 myRebuildIndex(fullTextIndexTypeVo);
             } catch (Exception ex) {
                 if (ex instanceof ApiRuntimeException) {
-                    auditVo.setError(((ApiRuntimeException) ex).getMessage(true));
+                    auditVo.setError(((ApiRuntimeException) ex).getMessage());
                 } else {
                     auditVo.setError(ExceptionUtils.getStackTrace(ex));
                 }

@@ -58,7 +58,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
 
             } catch (Exception ex) {
                 if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
-                    throw new ApiRuntimeException(((ApiRuntimeException)ex.getCause()).getMessage(true));
+                    throw new ApiRuntimeException(((ApiRuntimeException)ex.getCause()).getMessage());
                 } else {
                     throw ex;
                 }

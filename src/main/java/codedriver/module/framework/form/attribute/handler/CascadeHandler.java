@@ -279,6 +279,7 @@ public class CascadeHandler extends FormHandlerBase {
                 }
             }
         }
+        resultObj.put("textList", textList);
         return resultObj;
     }
 

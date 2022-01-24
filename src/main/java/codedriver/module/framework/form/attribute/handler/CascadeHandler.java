@@ -245,7 +245,42 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject resultObj = new JSONObject();
+        Object dataObj = attributeDataVo.getDataObj();
+        if (dataObj == null) {
+            return resultObj;
+        }
+        JSONArray valueArray = (JSONArray) dataObj;
+        resultObj.put("valueList", valueArray);
+        if (CollectionUtils.isEmpty(valueArray)) {
+            return resultObj;
+        }
+        List<String> valueList = valueArray.toJavaList(String.class);
+        List<String> textList = new ArrayList<>();
+        String dataSource = configObj.getString("dataSource");
+        if ("static".equals(dataSource)) {
+            JSONArray dataList = configObj.getJSONArray("dataList");
+            for (String value : valueList) {
+                for (int i = 0; i < dataList.size(); i++) {
+                    JSONObject dataObject = dataList.getJSONObject(i);
+                    if (Objects.equals(dataObject.getString("value"), value)) {
+                        textList.add(dataObject.getString("text"));
+                        dataList = dataObject.getJSONArray("children");
+                        break;
+                    }
+                }
+            }
+        } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
+            for (String value : valueList) {
+                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                } else {
+                    textList.add(value);
+                }
+            }
+        }
+        resultObj.put("textList", textList);
+        return resultObj;
     }
 
     @Override

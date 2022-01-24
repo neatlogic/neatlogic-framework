@@ -47,7 +47,7 @@
         </foreach>
         ,PRIMARY KEY (`uuid`),
         KEY `id`(`id`)
-        )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+        )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4
 
     </update>
 

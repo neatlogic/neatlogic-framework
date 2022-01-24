@@ -1,5 +1,8 @@
 package codedriver.framework.util;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
@@ -21,6 +24,7 @@ import org.w3c.tidy.Tidy;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +33,8 @@ public class ExportUtil {
     /**
      * 导出HTML为PDF
      *
-     * @param html html
-     * @param os 输出流
+     * @param html                html
+     * @param os                  输出流
      * @param landscape
      * @param isNeedCompletedHtml 是否需要补全HTML标签
      * @throws Exception
@@ -52,8 +56,8 @@ public class ExportUtil {
     /**
      * 导出HTML为WORD
      *
-     * @param html html
-     * @param os 输出流
+     * @param html                html
+     * @param os                  输出流
      * @param landscape
      * @param isNeedCompletedHtml 是否需要补全HTML标签
      * @throws Exception
@@ -348,6 +352,25 @@ public class ExportUtil {
 
     public static void saveDocx(WordprocessingMLPackage wordMLPackage, OutputStream os) throws Exception {
         wordMLPackage.save(os);
+    }
+
+    /**
+     * 使用itextpdf导出pdf
+     *
+     * @param content html
+     * @param os      OutputStream
+     * @throws IOException
+     * @throws DocumentException
+     */
+    public static void savePdf(String content, OutputStream os) throws IOException, DocumentException {
+        com.itextpdf.text.Document doc = new com.itextpdf.text.Document();
+        PdfWriter writer = PdfWriter.getInstance(doc, os);
+        doc.open();
+        ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        XMLWorkerHelper.getInstance().parseXHtml(writer, doc, bis, StandardCharsets.UTF_8);
+        bis.close();
+        doc.close();
+        writer.close();
     }
 
 }

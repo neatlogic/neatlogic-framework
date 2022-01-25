@@ -36,13 +36,4 @@ public class ApiException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public String getMessage(boolean clear) {
-        String message = super.getMessage();
-        if (message.contains(":::::::")) {
-            return message.split(":::::::")[1];
-        } else {
-            return message;
-        }
-    }
-
 }

@@ -48,13 +48,4 @@ public class ApiRuntimeException extends RuntimeException {
         return param;
     }
 
-    public String getMessage(boolean clear) {
-        String message = super.getMessage();
-        if (message.contains(":::::::")) {
-            return message.split(":::::::")[1];
-        } else {
-            return message;
-        }
-    }
-
 }

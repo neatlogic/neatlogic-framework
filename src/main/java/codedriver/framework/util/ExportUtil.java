@@ -1,6 +1,8 @@
 package codedriver.framework.util;
 
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -357,13 +359,14 @@ public class ExportUtil {
     /**
      * 使用itextpdf导出pdf
      *
-     * @param content html
-     * @param os      OutputStream
+     * @param content   html
+     * @param os        OutputStream
+     * @param landscape 是否竖向排版
      * @throws IOException
      * @throws DocumentException
      */
-    public static void savePdf(String content, OutputStream os) throws IOException, DocumentException {
-        com.itextpdf.text.Document doc = new com.itextpdf.text.Document();
+    public static void savePdf(String content, OutputStream os, boolean landscape) throws IOException, DocumentException {
+        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(landscape ? PageSize.A4 : PageSize.A4.rotate());
         PdfWriter writer = PdfWriter.getInstance(doc, os);
         doc.open();
         ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));

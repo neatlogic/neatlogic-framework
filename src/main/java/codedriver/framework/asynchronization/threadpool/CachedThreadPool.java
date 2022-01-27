@@ -24,7 +24,7 @@ public class CachedThreadPool {
             60L, TimeUnit.SECONDS,
             new SynchronousQueue<>(), new CodedriverRejectHandler());
     /*
-    备份线程池，当主线程池满了以后启用，队列满了以后开始阻塞主线程
+    备份线程池，当主线程池满了以后启用，队列满了以后开始抛异常并丢弃该任务
      */
     private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu * 2,
             0L, TimeUnit.SECONDS,

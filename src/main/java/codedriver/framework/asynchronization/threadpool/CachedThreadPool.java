@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 
 public class CachedThreadPool {
     static int cpu = Runtime.getRuntime().availableProcessors();
-    static int queueLen = 1000;
+    static int queueLen = 10000;
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
     /*
     主线程池，直接创建线程快速处理任务
@@ -26,9 +26,9 @@ public class CachedThreadPool {
     /*
     备份线程池，当主线程池满了以后启用，队列满了以后开始阻塞主线程
      */
-    private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu,
+    private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu * 2,
             0L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.CallerRunsPolicy());
+            new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.AbortPolicy());
 
     public static void execute(CodeDriverThread command) {
         try {

@@ -35,40 +35,44 @@ public class StartupManager extends ModuleInitializedListenerBase {
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {
+        List<IStartup> list = new ArrayList<>();
         //先收集所有启动作业
         Map<String, IStartup> myMap = context.getBeansOfType(IStartup.class);
         for (Map.Entry<String, IStartup> entry : myMap.entrySet()) {
-            startupList.add(entry.getValue());
+            list.add(entry.getValue());
         }
         //模块全部加载完毕后再开始启动作业
-        if (CollectionUtils.isNotEmpty(startupList)) {
-            startupList.sort(Comparator.comparingInt(IStartup::sort));
-            List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
-            if (CollectionUtils.isNotEmpty(tenantList)) {
-                CachedThreadPool.execute(new CodeDriverThread("STARTUP-RUNNER") {
-                    @Override
-                    protected void execute() {
-                        for (TenantVo tenantVo : tenantList) {
-                            TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                            for (IStartup startup : startupList) {
+//        if (ModuleInitApplicationListener.getModuleinitphaser().getArrivedParties() == 0) {
+            if (CollectionUtils.isNotEmpty(list)) {
+                list.sort(Comparator.comparingInt(IStartup::sort));
+                List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
+                if (CollectionUtils.isNotEmpty(tenantList)) {
+                    CachedThreadPool.execute(new CodeDriverThread("STARTUP-RUNNER") {
+                        @Override
+                        protected void execute() {
+                            for (TenantVo tenantVo : tenantList) {
+                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                                for (IStartup startup : list) {
+                                    try {
+                                        startup.executeForCurrentTenant();
+                                    } catch (Exception ex) {
+                                        logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
+                                    }
+                                }
+                            }
+                            for (IStartup startup : list) {
                                 try {
-                                    startup.executeForCurrentTenant();
+                                    startup.executeForAllTenant();
                                 } catch (Exception ex) {
-                                    logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
+                                    logger.error("启动作业“" + startup.getName() + "“执行失败：" + ex.getMessage(), ex);
                                 }
                             }
                         }
-                        for (IStartup startup : startupList) {
-                            try {
-                                startup.executeForAllTenant();
-                            } catch (Exception ex) {
-                                logger.error("启动作业“" + startup.getName() + "“执行失败：" + ex.getMessage(), ex);
-                            }
-                        }
-                    }
-                });
+                    });
+                }
+                startupList.addAll(list);
             }
-        }
+//        }
     }
 
     /**

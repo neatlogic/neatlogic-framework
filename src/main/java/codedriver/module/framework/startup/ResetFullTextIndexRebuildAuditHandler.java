@@ -7,12 +7,13 @@ package codedriver.module.framework.startup;
 
 import codedriver.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper;
 import codedriver.framework.startup.IStartup;
+import codedriver.framework.startup.StartupBase;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 @Service
-public class ResetFullTextIndexRebuildAuditHandler implements IStartup {
+public class ResetFullTextIndexRebuildAuditHandler  extends StartupBase {
     @Resource
     private FullTextIndexRebuildAuditMapper auditMapper;
 

@@ -29,4 +29,16 @@ public interface IStartup {
      * @return 顺序
      */
     int sort();
+
+    /**
+     * 设置所在模块组名
+     * @param groupName
+     */
+    void setGroupName(String groupName);
+
+    /**
+     * 获取所在模块组名
+     * @return
+     */
+    String getGroupName();
 }

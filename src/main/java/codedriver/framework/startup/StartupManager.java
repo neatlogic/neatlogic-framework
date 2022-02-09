@@ -41,7 +41,6 @@ public class StartupManager extends ModuleInitializedListenerBase {
             startupList.add(entry.getValue());
         }
         //模块全部加载完毕后再开始启动作业
-        ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
         if (CollectionUtils.isNotEmpty(startupList)) {
             startupList.sort(Comparator.comparingInt(IStartup::sort));
             List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();

@@ -35,8 +35,6 @@ public class StartupManager extends ModuleInitializedListenerBase {
     private final static List<IStartup> startupList = new ArrayList<>();
     @Resource
     private TenantMapper tenantMapper;
-    @Resource
-    private ModuleMapper moduleMapper;
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {

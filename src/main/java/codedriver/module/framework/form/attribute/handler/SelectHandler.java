@@ -13,9 +13,6 @@ import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.restful.core.IApiComponent;
-import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -156,20 +153,14 @@ public class SelectHandler extends FormHandlerBase {
                 ValueTextVo mapping = JSON.toJavaObject(config.getJSONObject("mapping"), ValueTextVo.class);
                 if (StringUtils.isNotBlank(matrixUuid) && CollectionUtils.isNotEmpty(values)
                         && mapping != null) {
-                    ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/search/forselect/new");
-                    if (api != null) {
-                        IApiComponent restComponent = PrivateApiComponentFactory.getInstance(api.getHandler());
-                        if (restComponent != null) {
-                            if (isMultiple) {
-                                JSONArray jsonArray = new JSONArray();
-                                for (String value : values) {
-                                    jsonArray.add(getValue(matrixUuid, mapping, value, restComponent, api));
-                                }
-                                result = jsonArray;
-                            } else {
-                                result = getValue(matrixUuid, mapping, values.get(0), restComponent, api);
-                            }
+                    if (isMultiple) {
+                        JSONArray jsonArray = new JSONArray();
+                        for (String value : values) {
+                            jsonArray.add(getValue(matrixUuid, mapping, value));
                         }
+                        result = jsonArray;
+                    } else {
+                        result = getValue(matrixUuid, mapping, values.get(0));
                     }
                 }
             }

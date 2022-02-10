@@ -8,6 +8,7 @@ package codedriver.framework.matrix.core;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.DependencyManager;
+import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
@@ -17,11 +18,13 @@ import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +140,39 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myTableDataSearch(MatrixDataVo dataVo);
     @Override
     public List<Map<String, JSONObject>> TableColumnDataSearch(MatrixDataVo dataVo){
-        return myTableColumnDataSearch(dataVo);
+        List<String> columnList = dataVo.getColumnList();
+        if (CollectionUtils.isEmpty(columnList)) {
+            throw new ParamIrregularException("columnList");
+        }
+        /** 属性集合去重 **/
+        List<String> distinctColumList = new ArrayList<>();
+        for (String column : columnList) {
+            if (!distinctColumList.contains(column)) {
+                distinctColumList.add(column);
+            }
+        }
+        columnList = distinctColumList;
+        dataVo.setColumnList(distinctColumList);
+        List<Map<String, JSONObject>> resultList = myTableColumnDataSearch(dataVo);
+        if (columnList.size() >= 2) {
+            for (Map<String, JSONObject> resultObj : resultList) {
+                JSONObject firstObj = resultObj.get(columnList.get(0));
+                String firstValue = firstObj.getString("value");
+                String firstText = firstObj.getString("text");
+                JSONObject secondObj = resultObj.get(columnList.get(1));
+                String secondText = secondObj.getString("text");
+                secondObj.put("compose", secondText + "(" + firstText + ")");
+                firstObj.put("compose", firstValue + SELECT_COMPOSE_JOINER + secondText);
+            }
+        } else if (columnList.size() == 1) {
+            for (Map<String, JSONObject> resultObj : resultList) {
+                JSONObject firstObj = resultObj.get(columnList.get(0));
+                String firstValue = firstObj.getString("value");
+                String firstText = firstObj.getString("text");
+                firstObj.put("compose", firstValue + SELECT_COMPOSE_JOINER + firstText);
+            }
+        }
+        return resultList;
     }
     protected abstract List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo);
     @Override

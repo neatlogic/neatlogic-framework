@@ -13,9 +13,6 @@ import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.restful.core.IApiComponent;
-import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -94,13 +91,7 @@ public class RadioHandler extends FormHandlerBase {
                 ValueTextVo mapping = JSON.toJavaObject(configObj.getJSONObject("mapping"), ValueTextVo.class);
                 if (StringUtils.isNotBlank(matrixUuid) && StringUtils.isNotBlank(value)
                         && mapping != null) {
-                    ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/search/forselect/new");
-                    if (api != null) {
-                        IApiComponent restComponent = PrivateApiComponentFactory.getInstance(api.getHandler());
-                        if (restComponent != null) {
-                            result = getValue(matrixUuid, mapping, value, restComponent, api);
-                        }
-                    }
+                    result = getValue(matrixUuid, mapping, value);
                 }
             }
         }

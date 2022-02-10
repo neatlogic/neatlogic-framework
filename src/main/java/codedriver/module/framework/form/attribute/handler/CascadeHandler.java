@@ -9,14 +9,17 @@ import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.FormAttributeVo;
+import codedriver.framework.matrix.core.IMatrixDataSourceHandler;
+import codedriver.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import codedriver.framework.matrix.dto.MatrixColumnVo;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.restful.core.IApiComponent;
-import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import codedriver.framework.restful.dto.ApiVo;
+import codedriver.framework.matrix.dto.MatrixDataVo;
+import codedriver.framework.matrix.dto.MatrixVo;
+import codedriver.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
+import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -99,28 +102,22 @@ public class CascadeHandler extends FormHandlerBase {
                     JSON.parseArray(JSON.toJSONString(configObj.getJSONArray("mapping")), ValueTextVo.class);
             if (StringUtils.isNotBlank(matrixUuid) && CollectionUtils.isNotEmpty(valueList)
                     && CollectionUtils.isNotEmpty(mappingList)) {
-                ApiVo api = PrivateApiComponentFactory.getApiByToken("matrix/column/data/search/forselect/new");
-                if (api != null) {
-                    IApiComponent restComponent = PrivateApiComponentFactory.getInstance(api.getHandler());
-                    if (restComponent != null) {
-                        if (valueList.size() > 0 && mappingList.size() > 0) {
-                            if (ConversionType.TOTEXT.getValue().equals(conversionType)) {
-                                List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-                                result.add(getText(matrixUuid, mappingList.get(0), valueList.get(0), sourceColumnList, restComponent, api));
-                                if (valueList.size() > 1 && mappingList.size() > 1) {
-                                    result.add(getText(matrixUuid, mappingList.get(1), valueList.get(1), sourceColumnList, restComponent, api));
-                                    if (valueList.size() > 2 && mappingList.size() > 2) {
-                                        result.add(getText(matrixUuid, mappingList.get(2), valueList.get(2), sourceColumnList, restComponent, api));
-                                    }
-                                }
-                            } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
-                                result.add(getValueForCascade(matrixUuid, mappingList.get(0), valueList.get(0), restComponent, api));
-                                if (valueList.size() > 1 && mappingList.size() > 1) {
-                                    result.add(getValueForCascade(matrixUuid, mappingList.get(1), valueList.get(1), restComponent, api));
-                                    if (valueList.size() > 2 && mappingList.size() > 2) {
-                                        result.add(getValueForCascade(matrixUuid, mappingList.get(2), valueList.get(2), restComponent, api));
-                                    }
-                                }
+                if (valueList.size() > 0 && mappingList.size() > 0) {
+                    if (ConversionType.TOTEXT.getValue().equals(conversionType)) {
+                        List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
+                        result.add(getText(matrixUuid, mappingList.get(0), valueList.get(0), sourceColumnList));
+                        if (valueList.size() > 1 && mappingList.size() > 1) {
+                            result.add(getText(matrixUuid, mappingList.get(1), valueList.get(1), sourceColumnList));
+                            if (valueList.size() > 2 && mappingList.size() > 2) {
+                                result.add(getText(matrixUuid, mappingList.get(2), valueList.get(2), sourceColumnList));
+                            }
+                        }
+                    } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
+                        result.add(getValueForCascade(matrixUuid, mappingList.get(0), valueList.get(0)));
+                        if (valueList.size() > 1 && mappingList.size() > 1) {
+                            result.add(getValueForCascade(matrixUuid, mappingList.get(1), valueList.get(1)));
+                            if (valueList.size() > 2 && mappingList.size() > 2) {
+                                result.add(getValueForCascade(matrixUuid, mappingList.get(2), valueList.get(2)));
                             }
                         }
                     }
@@ -130,27 +127,32 @@ public class CascadeHandler extends FormHandlerBase {
         return result;
     }
 
-    private String getText(String matrixUuid, ValueTextVo mapping, String value, List<MatrixColumnVo> sourceColumnList,
-                           IApiComponent restComponent, ApiVo api) {
+    private String getText(String matrixUuid, ValueTextVo mapping, String value, List<MatrixColumnVo> sourceColumnList) {
         if (StringUtils.isBlank(value)) {
             return value;
         }
         String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
         try {
-            JSONObject paramObj = new JSONObject();
-            paramObj.put("matrixUuid", matrixUuid);
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+            if (matrixVo == null) {
+                throw new MatrixNotFoundException(matrixUuid);
+            }
+            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+            if (matrixDataSourceHandler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
+            MatrixDataVo dataVo = new MatrixDataVo();
+            dataVo.setMatrixUuid(matrixUuid);
             List<String> columnList = new ArrayList<>();
             columnList.add((String) mapping.getValue());
             columnList.add(mapping.getText());
-            paramObj.put("columnList", columnList);
+            dataVo.setColumnList(columnList);
             sourceColumnList.add(new MatrixColumnVo((String) mapping.getValue(), split[0]));
             sourceColumnList.add(new MatrixColumnVo(mapping.getText(), split[1]));
-            paramObj.put("sourceColumnList", sourceColumnList);
-            JSONObject resultObj = (JSONObject) restComponent.doService(api, paramObj, null);
-            JSONArray columnDataList = resultObj.getJSONArray("columnDataList");
-            for (int i = 0; i < columnDataList.size(); i++) {
-                JSONObject firstObj = columnDataList.getJSONObject(i);
-                JSONObject textObj = firstObj.getJSONObject(mapping.getText());
+            dataVo.setSourceColumnList(sourceColumnList);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            for (Map<String, JSONObject> firstObj : tbodyList) {
+                JSONObject textObj = firstObj.get(mapping.getText());
                 if (Objects.equals(textObj.getString("value"), split[1])) {
                     return textObj.getString("text");
                 }
@@ -161,24 +163,30 @@ public class CascadeHandler extends FormHandlerBase {
         return split[1];
     }
 
-    private String getValueForCascade(String matrixUuid, ValueTextVo mapping, String value, IApiComponent restComponent, ApiVo api) {
+    private String getValueForCascade(String matrixUuid, ValueTextVo mapping, String value) {
         if (StringUtils.isBlank(value)) {
             return value;
         }
         try {
-            JSONObject paramObj = new JSONObject();
-            paramObj.put("matrixUuid", matrixUuid);
-            JSONArray columnList = new JSONArray();
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+            if (matrixVo == null) {
+                throw new MatrixNotFoundException(matrixUuid);
+            }
+            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+            if (matrixDataSourceHandler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
+            MatrixDataVo dataVo = new MatrixDataVo();
+            dataVo.setMatrixUuid(matrixUuid);
+            List<String> columnList = new ArrayList<>();
             columnList.add((String) mapping.getValue());
             columnList.add(mapping.getText());
-            paramObj.put("columnList", columnList);
-            JSONObject resultObj = (JSONObject) restComponent.doService(api, paramObj, null);
-            JSONArray columnDataList = resultObj.getJSONArray("columnDataList");
-            for (int i = 0; i < columnDataList.size(); i++) {
-                JSONObject firstObj = columnDataList.getJSONObject(i);
-                JSONObject valueObj = firstObj.getJSONObject((String) mapping.getValue());
+            dataVo.setColumnList(columnList);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            for (Map<String, JSONObject> firstObj : tbodyList) {
+                JSONObject valueObj = firstObj.get(mapping.getValue());
                 if (valueObj.getString("compose").contains(value)) {
-                    JSONObject textObj = firstObj.getJSONObject(mapping.getText());
+                    JSONObject textObj = firstObj.get(mapping.getText());
                     return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + textObj.getString("value");
                 }
             }

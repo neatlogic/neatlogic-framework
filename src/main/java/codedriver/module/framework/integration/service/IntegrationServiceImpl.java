@@ -70,10 +70,10 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                                     isSearch = (isSearch == null || isSearch.intValue() != 1) ? 0 : 1;
                                     columnVo.setIsSearch(isSearch);
                                     Boolean isPC = theadObj.getBoolean("isPC");
-                                    isPC = isPC == null ? true : isPC;
+                                    isPC = isPC == null || isPC;
                                     columnVo.setIsPC(isPC);
                                     Boolean isMobile = theadObj.getBoolean("isMobile");
-                                    isMobile = isMobile == null ? false : isMobile;
+                                    isMobile = isMobile != null && isMobile;
                                     columnVo.setIsMobile(isMobile);
                                     columnVo.setSort(i);
                                     columnVo.setIsRequired(0);

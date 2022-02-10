@@ -73,7 +73,7 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                                     isPC = isPC == null ? true : isPC;
                                     columnVo.setIsPC(isPC);
                                     Boolean isMobile = theadObj.getBoolean("isMobile");
-                                    isMobile = isMobile == null ? true : isMobile;
+                                    isMobile = isMobile == null ? false : isMobile;
                                     columnVo.setIsMobile(isMobile);
                                     columnVo.setSort(i);
                                     columnVo.setIsRequired(0);

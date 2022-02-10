@@ -10,18 +10,18 @@
         ${value}
     </select>
 
-    <select id="checkTableHasData" parameterType="java.lang.String" resultType="int">
+    <!--<select id="checkTableHasData" parameterType="java.lang.String" resultType="int">
         SELECT COUNT(1)
         FROM ${value}
         LIMIT 1
-    </select>
+    </select>-->
 
-    <select id="checkTableIsExists" resultType="int">
+    <!--<select id="checkTableIsExists" resultType="int">
         select count(1)
         from information_schema.tables a
         where a.TABLE_SCHEMA = #{schemaName}
           and a.TABLE_NAME = #{tableName}
-    </select>
+    </select>-->
 
     <select id="checkSchemaIsExists" parameterType="java.lang.String" resultType="int">
         SELECT COUNT(1)
@@ -29,41 +29,53 @@
         WHERE schema_name = #{value}
     </select>
 
-    <insert id="insertAttrToCiTable">
+    <select id="checkTableOrViewIsExists" resultType="java.lang.String">
+        SELECT `table_type` FROM `information_schema`.`tables`
+        WHERE `table_schema` = #{tableSchema}
+          AND `table_name` = #{tableName}
+    </select>
+
+    <select id="getTableOrViewAllColumnNameList" resultType="java.lang.String">
+        SELECT `column_name` FROM `information_schema`.`COLUMNS`
+        WHERE `table_schema` = #{tableSchema}
+          AND `table_name` = #{tableName}
+    </select>
+
+    <!--<insert id="insertAttrToCiTable">
         ALTER TABLE ${tableName}
             ADD COLUMN `${attrVo.id}`      TEXT     NULL COMMENT '${attrVo.label}',
             ADD COLUMN `${attrVo.id}_hash` CHAR(32) NULL COMMENT '${attrVo.label}值散列码',
             ADD KEY `index_${attrVo.id}_hash` (`${attrVo.id}_hash`);
-    </insert>
+    </insert>-->
 
-    <insert id="insertCiTable">
+    <!--<insert id="insertCiTable">
         CREATE TABLE IF NOT EXISTS ${tableName}
         (
             `cientity_id` bigint(20) NOT NULL COMMENT '配置项id',
             PRIMARY KEY (`cientity_id`)
             ) ENGINE = INNODB
             DEFAULT CHARSET = utf8mb4
-    </insert>
+    </insert>-->
 
     <insert id="insertView" parameterType="java.lang.String">
         ${value}
     </insert>
 
 
-    <delete id="deleteAttrFromCiTable">
+    <!--<delete id="deleteAttrFromCiTable">
         ALTER TABLE ${tableName}
             DROP
                 COLUMN `${attrVo.id}_hash`,
             DROP
                 COLUMN `${attrVo.id}`
+    </delete>-->
+
+    <delete id="deleteTable" parameterType="java.lang.String">
+        DROP TABLE IF EXISTS ${value}
     </delete>
 
-    <delete id="deleteTable">
-        DROP TABLE IF EXISTS ${tableName}
-    </delete>
-
-    <delete id="deleteView">
-        DROP VIEW IF EXISTS ${tableName}
+    <delete id="deleteView" parameterType="java.lang.String">
+        DROP VIEW IF EXISTS ${value}
     </delete>
 
 

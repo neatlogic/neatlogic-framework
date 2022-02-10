@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -63,21 +63,6 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         if (StringUtils.isBlank(user)) {
             throw new HeaderNotFoundException("x-access-key");
         }
-        /*String accessTime = request.getHeader("x-access-time");
-        if (StringUtils.isBlank(accessTime)) {
-            throw new HeaderNotFoundException("x-access-time");
-        }
-        Date accessDate = null;
-        try {
-            accessDate = new Date(Long.parseLong(accessTime));
-        } catch (Exception ex) {
-            throw new HeaderIrregularException("x-access-time");
-        }
-        Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, -expiretime);
-        if (now.getTime().after(accessDate)) {
-            throw new RequestExpiredException();
-        }*/
 
         UserVo userVo = userMapper.getUserByUserId(user);
 
@@ -102,17 +87,6 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
             }
         }
 
-       /* InputStream input2 = new CachedBodyHttpServletRequest(request).getInputStream();
-        StringBuilder sb2 = new StringBuilder();
-        BufferedReader reader2;
-        if (input2 != null) {
-            reader2 = new BufferedReader(new InputStreamReader(input2));
-            char[] charBuffer = new char[2048];
-            int bytesRead = -1;
-            while ((bytesRead = reader2.read(charBuffer)) > 0) {
-                sb2.append(charBuffer, 0, bytesRead);
-            }
-        }*/
         String sign = user + "#" + request.getRequestURI() + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
         String result = SHA256Util.encrypt(token, sign);
         if (result.equalsIgnoreCase(authorization)) {
@@ -126,7 +100,6 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Override
     public String directUrl() {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -24,15 +24,15 @@ public class ApiRuntimeException extends RuntimeException {
     }
 
     public ApiRuntimeException(String message, Throwable ex) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message, ex);
+        super(message, ex);
     }
 
     public ApiRuntimeException(String message) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message);
+        super(message);
     }
 
     public ApiRuntimeException(String message, JSONObject param) {
-        super((TenantContext.get() != null ? TenantContext.get().getTenantUuid() : "-") + ":" + (RequestContext.get() != null ? RequestContext.get().getUrl() : "-") + ":::::::" + message);
+        super(message);
         this.param = param;
     }
 
@@ -46,15 +46,6 @@ public class ApiRuntimeException extends RuntimeException {
 
     public JSONObject getParam() {
         return param;
-    }
-
-    public String getMessage(boolean clear) {
-        String message = super.getMessage();
-        if (message.contains(":::::::")) {
-            return message.split(":::::::")[1];
-        } else {
-            return message;
-        }
     }
 
 }

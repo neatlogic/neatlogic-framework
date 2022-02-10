@@ -1,5 +1,9 @@
 package codedriver.framework.util;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
@@ -21,6 +25,7 @@ import org.w3c.tidy.Tidy;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,36 +34,38 @@ public class ExportUtil {
     /**
      * 导出HTML为PDF
      *
-     * @param html html
-     * @param os 输出流
-     * @param landscape
+     * @param html                html
+     * @param os                  输出流
+     * @param landscape           是否竖向排版
      * @param isNeedCompletedHtml 是否需要补全HTML标签
      * @throws Exception
      */
     public static void getPdfFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
-        if (isNeedCompletedHtml) {
-            String completedHtml = completeHtml(html);
-            if (StringUtils.isNotBlank(completedHtml)) {
-                html = completedHtml;
-            }
-        }
-        html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");// 过滤掉XML的无效字符
-        Document doc = Jsoup.parse(html);
-        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
-        savePdf(xhtml2word(doc, landscape), os);
+        savePdf(getWordprocessingMLPackage(html, landscape, isNeedCompletedHtml), os);
     }
 
     /**
      * 导出HTML为WORD
      *
-     * @param html html
-     * @param os 输出流
-     * @param landscape
+     * @param html                html
+     * @param os                  输出流
+     * @param landscape           是否竖向排版
      * @param isNeedCompletedHtml 是否需要补全HTML标签
      * @throws Exception
      */
     public static void getWordFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
+        saveDocx(getWordprocessingMLPackage(html, landscape, isNeedCompletedHtml), os);
+    }
+
+    /**
+     * @param html                html
+     * @param landscape           是否竖向排版
+     * @param isNeedCompletedHtml 是否需要补全HTML标签
+     * @return
+     * @throws Exception
+     */
+    private static WordprocessingMLPackage getWordprocessingMLPackage(String html, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         // fixme --laiwt 有部分html经过tidy解析后，返回空串，暂不清楚是何原因
         if (isNeedCompletedHtml) {
             String completedHtml = completeHtml(html);
@@ -69,7 +76,7 @@ public class ExportUtil {
         html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");// 过滤掉XML的无效字符
         Document doc = Jsoup.parse(html);
         doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml); // 转为
-        saveDocx(xhtml2word(doc, landscape), os);
+        return xhtml2word(doc, landscape);
     }
 
     /**
@@ -348,6 +355,26 @@ public class ExportUtil {
 
     public static void saveDocx(WordprocessingMLPackage wordMLPackage, OutputStream os) throws Exception {
         wordMLPackage.save(os);
+    }
+
+    /**
+     * 使用itextpdf导出pdf
+     *
+     * @param content   html
+     * @param os        OutputStream
+     * @param landscape 是否竖向排版
+     * @throws IOException
+     * @throws DocumentException
+     */
+    public static void savePdf(String content, OutputStream os, boolean landscape) throws IOException, DocumentException {
+        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(landscape ? PageSize.A4 : PageSize.A4.rotate());
+        PdfWriter writer = PdfWriter.getInstance(doc, os);
+        doc.open();
+        ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        XMLWorkerHelper.getInstance().parseXHtml(writer, doc, bis, StandardCharsets.UTF_8);
+        bis.close();
+        doc.close();
+        writer.close();
     }
 
 }

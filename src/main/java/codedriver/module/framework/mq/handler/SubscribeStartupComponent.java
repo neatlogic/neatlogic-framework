@@ -15,6 +15,7 @@ import codedriver.framework.mq.core.SubscribeManager;
 import codedriver.framework.mq.dao.mapper.MqSubscribeMapper;
 import codedriver.framework.mq.dto.SubscribeVo;
 import codedriver.framework.startup.IStartup;
+import codedriver.framework.startup.StartupBase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class SubscribeStartupComponent implements IStartup {
+public class SubscribeStartupComponent extends StartupBase {
     private final static Logger logger = LoggerFactory.getLogger(SubscribeStartupComponent.class);
 
     @Resource

@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -15,8 +15,9 @@ import java.util.Set;
 
 public class AfterTransactionJob<T> {
     public enum EVENT {
-        COMMITED(), COMPLETED()
+        COMMITTED(), COMPLETED()
     }
+
 
     private final ThreadLocal<Set<T>> THREADLOCAL = new ThreadLocal<>();
     private final ThreadLocal<Set<CodeDriverThread>> T_THREADLOCAL = new ThreadLocal<>();
@@ -30,11 +31,11 @@ public class AfterTransactionJob<T> {
     /**
      * 异步执行
      *
-     * @param t        对象
-     * @param commited 提交时执行主体
+     * @param t         对象
+     * @param committed 提交时执行主体
      */
-    public void execute(T t, ICommitted<T> commited) {
-        execute(t, commited, null, false);
+    public void execute(T t, ICommitted<T> committed) {
+        execute(t, committed, null, false);
     }
 
 
@@ -42,11 +43,11 @@ public class AfterTransactionJob<T> {
      * 异步执行
      *
      * @param t         对象
-     * @param commited  提交时执行主体
+     * @param committed 提交时执行主体
      * @param completed 完成时执行主体
      */
-    public void execute(T t, ICommitted<T> commited, ICompleted<T> completed) {
-        execute(t, commited, completed, false);
+    public void execute(T t, ICommitted<T> committed, ICompleted<T> completed) {
+        execute(t, committed, completed, false);
     }
 
     /**
@@ -66,7 +67,7 @@ public class AfterTransactionJob<T> {
      * @param t 线程
      */
     public void execute(CodeDriverThread t) {
-        execute(t, EVENT.COMMITED);
+        execute(t, EVENT.COMMITTED);
     }
 
     /**
@@ -86,7 +87,7 @@ public class AfterTransactionJob<T> {
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        if (event == EVENT.COMMITED) {
+                        if (event == EVENT.COMMITTED) {
                             Set<CodeDriverThread> tList = T_THREADLOCAL.get();
                             for (CodeDriverThread t : tList) {
                                 CachedThreadPool.execute(t);
@@ -154,7 +155,7 @@ public class AfterTransactionJob<T> {
                         if (commited != null) {
                             Set<T> tList = THREADLOCAL.get();
                             if (!isSync) {
-                                CachedThreadPool.execute(new CodeDriverThread(threadName + "-COMMITED") {
+                                CachedThreadPool.execute(new CodeDriverThread(threadName + "-COMMITTED") {
                                     @Override
                                     protected void execute() {
                                         for (T t : tList) {

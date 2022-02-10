@@ -15,22 +15,26 @@ public interface SchemaMapper {
 
     List<Map<String, String>> testCiViewSql(String sql);
 
-    int checkTableHasData(String tableName);
+//    int checkTableHasData(String tableName);
 
-    int checkTableIsExists(@Param("schemaName") String schemaName, @Param("tableName") String tableName);
+//    int checkTableIsExists(@Param("schemaName") String schemaName, @Param("tableName") String tableName);
 
     int checkSchemaIsExists(String databaseName);
 
-    void insertAttrToCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
+    String checkTableOrViewIsExists(@Param("tableSchema") String tableSchema, @Param("tableName") String tableName);
 
-    void insertCiTable(@Param("tableName") String tableName);
+    List<String> getTableOrViewAllColumnNameList(@Param("tableSchema") String tableSchema, @Param("tableName") String tableName);
+
+//    void insertAttrToCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
+
+//    void insertCiTable(@Param("tableName") String tableName);
 
     void insertView(String sql);
 
-    void deleteAttrFromCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
+//    void deleteAttrFromCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
 
-    void deleteTable(@Param("tableName") String tableName);
+    void deleteTable(String tableName);
 
-    void deleteView(@Param("tableName") String tableName);
+    void deleteView(String tableName);
 
 }

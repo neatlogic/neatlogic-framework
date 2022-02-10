@@ -132,7 +132,7 @@ public class LoginController {
                 throw new UserAuthFailedException();
             }
         } catch (ApiRuntimeException ex) {
-            ReturnJson.error(ex.getMessage(true), resultJson, response);
+            ReturnJson.error(ex.getMessage(), resultJson, response);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             ReturnJson.error(ex.getMessage(), response);

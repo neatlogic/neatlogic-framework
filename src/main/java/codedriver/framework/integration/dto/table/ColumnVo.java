@@ -47,7 +47,7 @@ public class ColumnVo extends BasePageVo {
     private ExpressionVo defaultExpression;
     @EntityField(name = "是否在PC端显示", type = ApiParamType.BOOLEAN)
     private Boolean isPC;
-    @EntityField(name = "是否在PC端显示移动端显示", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "是否在移动端显示", type = ApiParamType.BOOLEAN)
     private Boolean isMobile;
 
     public String getUuid() {

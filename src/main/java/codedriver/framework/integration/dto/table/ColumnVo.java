@@ -45,6 +45,10 @@ public class ColumnVo extends BasePageVo {
     private List<ExpressionVo> expressionList;
     @EntityField( name = "默认表达式", type = ApiParamType.JSONOBJECT)
     private ExpressionVo defaultExpression;
+    @EntityField(name = "是否在PC端显示", type = ApiParamType.BOOLEAN)
+    private Boolean isPC;
+    @EntityField(name = "是否在PC端显示移动端显示", type = ApiParamType.BOOLEAN)
+    private Boolean isMobile;
 
     public String getUuid() {
         return uuid;
@@ -141,4 +145,19 @@ public class ColumnVo extends BasePageVo {
         this.defaultExpression = defaultExpression;
     }
 
+    public Boolean getIsPC() {
+        return isPC;
+    }
+
+    public void setIsPC(Boolean isPC) {
+        this.isPC = isPC;
+    }
+
+    public Boolean getIsMobile() {
+        return isMobile;
+    }
+
+    public void setIsMobile(Boolean isMobile) {
+        this.isMobile = isMobile;
+    }
 }

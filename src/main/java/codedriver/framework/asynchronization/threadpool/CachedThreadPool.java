@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 
 public class CachedThreadPool {
     static int cpu = Runtime.getRuntime().availableProcessors();
-    static int queueLen = 10000;
+    static int queueLen = 100000;
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
     /*
     主线程池，直接创建线程快速处理任务
@@ -57,9 +57,9 @@ public class CachedThreadPool {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
             if (r instanceof CodeDriverThread) {
-                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, " + ((CodeDriverThread) r).getThreadName() + " is taking over by backup thread pool(size:" + cpu + ").");
+                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, " + ((CodeDriverThread) r).getThreadName() + " is taking over by backup thread pool(size:" + (cpu * 2) + ").");
             } else {
-                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, unknown thread is taking over by backup thread pool(size:" + cpu + ").");
+                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, unknown thread is taking over by backup thread pool(size:" + (cpu * 2) + ").");
             }
             backupThreadPool.execute(r);
         }

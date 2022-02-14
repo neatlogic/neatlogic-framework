@@ -2,6 +2,7 @@ package codedriver.framework.service;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.exception.file.FileAccessDeniedException;
 import codedriver.framework.exception.file.FileNotFoundException;
@@ -58,7 +59,8 @@ public class FileServiceImpl implements FileService {
         if (fileVo != null) {
             IFileTypeHandler fileTypeHandler = FileTypeHandlerFactory.getHandler(fileVo.getType());
             if (fileTypeHandler != null) {
-                if (fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
+                //system 用户下载权限豁免
+                if (Objects.equals(UserContext.get().getUserUuid(), SystemUser.SYSTEM.getUserUuid()) || fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
                     ServletOutputStream os = null;
                     InputStream in = null;
                     in = FileUtil.getData(fileVo.getPath());

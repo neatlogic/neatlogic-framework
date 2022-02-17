@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.util.Set;
 
 public class BasePageVo implements Serializable {
+    //以当前页起最多展示页码数
+    private static final int OFFSET_SIZE = 5;
     @JSONField(serialize = false)
     private boolean needPage = true;
     @JSONField(serialize = false)
@@ -45,6 +47,16 @@ public class BasePageVo implements Serializable {
     private JSONArray defaultValue;
     @JSONField(serialize = false)
     private Long cacheFlushKey;//用于扰乱mybatis的Level 1 Cache
+    @EntityField(name = "开始页数", type = ApiParamType.INTEGER)
+    private Integer startPage;
+    @EntityField(name = "结束页数", type = ApiParamType.INTEGER)
+    private Integer endPage;
+    @EntityField(name = "以当前页起实际分页条数", type = ApiParamType.INTEGER)
+    @JSONField(serialize = false)
+    private Integer offsetRowNum;
+    @EntityField(name = "以当前页起预计分页条数", type = ApiParamType.INTEGER)
+    @JSONField(serialize = false)
+    private Integer expectOffsetRowNum;
 
     public BasePageVo() {
     }
@@ -146,5 +158,44 @@ public class BasePageVo implements Serializable {
 
     public final void setCacheFlushKey(Long cacheFlushKey) {
         this.cacheFlushKey = cacheFlushKey;
+    }
+
+    public Integer getStartPage() {
+        if (currentPage < OFFSET_SIZE + 2) {
+            return 1;
+        } else {
+            return currentPage - OFFSET_SIZE;
+        }
+    }
+
+    public Integer getEndPage() {
+        if (offsetRowNum != null) {
+            if (offsetRowNum % pageSize > 0) {
+                return currentPage + offsetRowNum / pageSize;
+            }
+            return currentPage + offsetRowNum / pageSize - 1;
+        }
+        return null;
+    }
+
+    public void setOffsetRowNum(Integer offsetRowNum) {
+        this.offsetRowNum = offsetRowNum;
+    }
+
+    public Integer getExpectOffsetRowNum() {
+        if (expectOffsetRowNum == null) {
+            int expectOffsetSize;
+            if (currentPage < OFFSET_SIZE + 2) {
+                expectOffsetSize = OFFSET_SIZE * 2 - (currentPage - 1);
+            } else {
+                expectOffsetSize = OFFSET_SIZE;
+            }
+            return expectOffsetSize * pageSize;
+        }
+        return expectOffsetRowNum;
+    }
+
+    public void setExpectOffsetRowNum(Integer expectOffsetRowNum) {
+        this.expectOffsetRowNum = expectOffsetRowNum;
     }
 }

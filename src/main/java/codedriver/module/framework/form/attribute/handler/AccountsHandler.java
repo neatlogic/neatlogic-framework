@@ -10,6 +10,7 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -152,9 +153,139 @@ public class AccountsHandler extends FormHandlerBase {
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }
-
+//表单组件配置信息
+//    {
+//        "handler": "formaccounts",
+//        "label": "账号组件_1",
+//        "type": "form",
+//        "uuid": "79ea2bc150cf4d6396882f66e07850b4",
+//        "config": {
+//            "isRequired": false,
+//            "ruleList": [],
+//            "width": "100%",
+//            "validList": [],
+//            "quoteUuid": "",
+//            "defaultValueType": "self",
+//            "placeholder": "选择帐户组件",
+//            "authorityConfig": [
+//                "common#alluser"
+//            ]
+//        }
+//    }
+//保存数据
+//    {
+//        "selectedDataList": [
+//            {
+//                "id": 493223793189019,
+//                "name": "Mysql",
+//                "ip": "192.168.1.140",
+//                "accountId": 502566202695680,
+//                "account": "root",
+//                "accountName": "mysql_ro_勿动",
+//                "protocolId": 478219996241920,
+//                "protocol": "database",
+//                "port": "3306",
+//                "tempId": 3,
+//                "_selected": true,
+//                "actionType": "创建",
+//                "fcu": "fccf704231734072a1bf80d90b2d1de2",
+//                "lcu": "fccf704231734072a1bf80d90b2d1de2",
+//                "fcuVo": {
+//                    "roleUuidList": [],
+//                    "startPage": 1,
+//                    "userAuthList": [],
+//                    "teamUuidList": [],
+//                    "initType": "user",
+//                    "roleList": [],
+//                    "uuid": "fccf704231734072a1bf80d90b2d1de2",
+//                    "teamRoleList": [],
+//                    "pinyin": "",
+//                    "teamNameList": [],
+//                    "id": 564355489644556,
+//                    "teamList": [],
+//                    "isMaintenanceMode": 0
+//                },
+//                "lcuVo": {
+//                    "roleUuidList": [],
+//                    "startPage": 1,
+//                    "userAuthList": [],
+//                    "teamUuidList": [],
+//                    "initType": "user",
+//                    "roleList": [],
+//                    "uuid": "fccf704231734072a1bf80d90b2d1de2",
+//                    "teamRoleList": [],
+//                    "pinyin": "",
+//                    "teamNameList": [],
+//                    "id": 564355489644557,
+//                    "teamList": [],
+//                    "isMaintenanceMode": 0
+//                }
+//            }
+//        ]
+//    }
+//返回数据结构
+//    {
+//        "theadList": [
+//            {
+//                "key": "name",
+//                    "title": "资产名"
+//            },
+//            {
+//                "key": "ip",
+//                    "title": "资产IP"
+//            },
+//            {
+//                "key": "account",
+//                    "title": "账号名称"
+//            },
+//            {
+//                "key": "accountName",
+//                    "title": "用户名"
+//            },
+//            {
+//                "key": "protocol",
+//                    "title": "连接协议"
+//            },
+//            {
+//                "key": "port",
+//                    "title": "端口"
+//            }
+//        ],
+//        "tbodyList": [
+//            {
+//                "id": 493223793189019,
+//                    "name": "Mysql",
+//                    "ip": "192.168.1.140",
+//                    "accountId": 502566202695680,
+//                    "account": "root",
+//                    "accountName": "mysql_ro_勿动",
+//                    "protocolId": 478219996241920,
+//                    "protocol": "database",
+//                    "port": "8080",
+//                    "tempId": 3,
+//                    "_selected": true
+//            }
+//        ]
+//    }
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray tbodyList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                tableObj.put("theadList", theadList);
+                for (int i = 0; i < tbodyList.size(); i++) {
+                    JSONObject tbodyObj = tbodyList.getJSONObject(i);
+                    tbodyObj.remove("actionType");
+                    tbodyObj.remove("fcu");
+                    tbodyObj.remove("lcu");
+                    tbodyObj.remove("fcuVo");
+                    tbodyObj.remove("lcuVo");
+                }
+                tableObj.put("tbodyList", tbodyList);
+            }
+        }
+        return tableObj;
     }
 }

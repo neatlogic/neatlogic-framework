@@ -13,6 +13,7 @@ import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.treeselect.core.ITreeSelectDataSourceHandler;
 import codedriver.framework.form.treeselect.core.TreeSelectDataSourceFactory;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -107,7 +108,8 @@ public class TreeSelectHandler extends FormHandlerBase {
             if (StringUtils.isNotBlank(dataSource)) {
                 ITreeSelectDataSourceHandler handler = TreeSelectDataSourceFactory.getHandler(dataSource);
                 if (handler != null) {
-                    return handler.valueConversionTextPath(data);
+                    List<String> pathList = handler.valueConversionTextPathList(data);
+                    return String.join("/", pathList);
                 }
             }
         }
@@ -129,8 +131,61 @@ public class TreeSelectHandler extends FormHandlerBase {
         return 16;
     }
 
+//表单组件配置信息
+//    {
+//        "handler": "formtreeselect",
+//        "label": "下拉树组件_1",
+//        "type": "form",
+//        "uuid": "2fd292d9e99940c5add33543a48dd045",
+//        "config": {
+//            "isRequired": false,
+//                    "ruleList": [],
+//            "width": "100%",
+//                    "validList": [],
+//            "quoteUuid": "",
+//                    "defaultValueType": "self",
+//                    "placeholder": "请选择下拉树",
+//                    "value": "",
+//                    "authorityConfig": [
+//            "common#alluser"
+//                    ],
+//            "config": {
+//                "textName": "name",
+//                        "valueName": "uuid",
+//                        "url": "/api/rest/knowledge/document/type/tree/forselect"
+//            },
+//            "dataSource": "knowledgeType",
+//                    "url": "/api/rest/knowledge/document/type/tree/forselect"
+//        }
+//    }
+//保存数据
+//7174540d09f043948fb4e168045a4094
+//返回数据结构
+//{
+//    "value": "7174540d09f043948fb4e168045a4094",
+//    "text": "发布文档",
+//    "textList": ["测试", "发布文档"],
+//    "path": "测试>发布文档"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject resultObj = new JSONObject();
+        String value = (String) attributeDataVo.getDataObj();
+        resultObj.put("value", value);
+        if (StringUtils.isNotBlank(value)) {
+            String dataSource = configObj.getString("dataSource");
+            if (StringUtils.isNotBlank(dataSource)) {
+                ITreeSelectDataSourceHandler handler = TreeSelectDataSourceFactory.getHandler(dataSource);
+                if (handler != null) {
+                    List<String> pathList = handler.valueConversionTextPathList(value);
+                    resultObj.put("textList", pathList);
+                    resultObj.put("path", String.join(">", pathList));
+                    if (CollectionUtils.isNotEmpty(pathList)) {
+                        resultObj.put("text", pathList.get(pathList.size() - 1));
+                    }
+                }
+            }
+        }
+        return resultObj;
     }
 }

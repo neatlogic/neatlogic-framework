@@ -5,6 +5,7 @@
 
 package codedriver.framework.util;
 
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import codedriver.framework.exception.httprequest.HttpMethodIrregularException;
@@ -459,6 +460,9 @@ public class HttpRequestUtil {
                 this.error = ExceptionUtils.getExceptionStackTrace(e);
             } finally {
                 connection.disconnect();
+                if(UserContext.get() != null && UserContext.get().getResponse() != null) {
+                    UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
+                }
             }
         }
         return this;

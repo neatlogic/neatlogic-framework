@@ -164,8 +164,7 @@ public class TreeSelectHandler extends FormHandlerBase {
 //{
 //    "value": "7174540d09f043948fb4e168045a4094",
 //    "text": "发布文档",
-//    "textList": ["测试", "发布文档"],
-//    "path": "测试>发布文档"
+//    "textList": ["测试", "发布文档"]
 //}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
@@ -179,7 +178,6 @@ public class TreeSelectHandler extends FormHandlerBase {
                 if (handler != null) {
                     List<String> pathList = handler.valueConversionTextPathList(value);
                     resultObj.put("textList", pathList);
-                    resultObj.put("path", String.join(">", pathList));
                     if (CollectionUtils.isNotEmpty(pathList)) {
                         resultObj.put("text", pathList.get(pathList.size() - 1));
                     }

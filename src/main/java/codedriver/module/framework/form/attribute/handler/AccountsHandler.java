@@ -225,6 +225,7 @@ public class AccountsHandler extends FormHandlerBase {
 //    }
 //返回数据结构
 //    {
+//        "value": 原始数据,
 //        "theadList": [
 //            {
 //                "key": "name",
@@ -271,6 +272,7 @@ public class AccountsHandler extends FormHandlerBase {
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
         if (MapUtils.isNotEmpty(dataObj)) {
             JSONArray tbodyList = dataObj.getJSONArray("selectedDataList");
             if (CollectionUtils.isNotEmpty(tbodyList)) {

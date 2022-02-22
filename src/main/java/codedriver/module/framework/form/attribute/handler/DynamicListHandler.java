@@ -899,10 +899,303 @@ public class DynamicListHandler extends FormHandlerBase {
     public String getHandlerType(FormConditionModel model) {
         return null;
     }
-
+    //表单组件配置信息
+//{
+//	"handler": "formdynamiclist",
+//	"label": "表格选择组件_3",
+//	"type": "form",
+//	"uuid": "08789b3c99ec4108b6db9184ba7f8743",
+//	"config": {
+//		"isRequired": false,
+//		"relMatrixUuidList": [
+//			"8db9a7aa7f8e485d86c97d6ba6d37ae0"
+//		],
+//		"ruleList": [],
+//		"extendAttributes": true,
+//		"attributeList": [
+//			{
+//				"isRequired": false,
+//				"valid_o": false,
+//				"attributeUuid": "17ada8f1ace54cf49e95c695988197fd",
+//				"attrConfig": {
+//					"mapping": {
+//						"text": "",
+//						"value": ""
+//					},
+//					"defaultValue": "文本框a",
+//					"dataList": [
+//						{
+//							"text": "",
+//							"value": ""
+//						}
+//					],
+//					"value": "文本框a",
+//					"dataSource": "static",
+//					"matrixUuid": ""
+//				},
+//				"attribute": "文本框1",
+//				"type": "text"
+//			}
+//		],
+//		"pageSize": 10,
+//		"validList": [],
+//		"matrixType": "custom",
+//		"quoteUuid": "",
+//		"dataConfig": [
+//			{
+//				"isSearch": false,
+//				"name": "aaa",
+//				"isMobile": false,
+//				"isSearchable": 1,
+//				"isPC": true,
+//				"uuid": "e31052d7732345fd825c43a9f9deacb1"
+//			},
+//			{
+//				"isSearch": false,
+//				"name": "bbb",
+//				"isMobile": false,
+//				"isSearchable": 1,
+//				"isPC": true,
+//				"uuid": "bc0afbec74ea4936acf62ba30e332854"
+//			},
+//			{
+//				"isSearch": false,
+//				"name": "ccc",
+//				"isMobile": false,
+//				"isSearchable": 1,
+//				"isPC": true,
+//				"uuid": "912e9a241ec24e6cb0f0ad95fb2a7e5b"
+//			}
+//		],
+//		"type": "custom",
+//		"matrixUuid": "8db9a7aa7f8e485d86c97d6ba6d37ae0",
+//		"mode": "dialog/normal",
+//		"needPage": false,
+//		"integrationUuid": "5b9d7a56adf54c97a35f54df60f403d9",
+//		"uuidColumn": "subSysId",
+//		"width": "100%",
+//		"defaultValueType": "self",
+//		"filterList": [
+//			{
+//				"valueList": [
+//					"111"
+//				],
+//				"uuid": "e31052d7732345fd825c43a9f9deacb1"
+//			}
+//		],
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"dataSource": "matrix/integration"
+//	}
+//}
+    //保存数据结构
+//{
+//	"selectUuidList": [
+//		"66f1f6137c4e45a18df229f6f029ee59"
+//	],
+//	"extendedData": {
+//		"66f1f6137c4e45a18df229f6f029ee59": {
+//			"17ada8f1ace54cf49e95c695988197fd": "文本框a"
+//		}
+//	},
+//	"matrixType": "custom",
+//	"table": {
+//		"selectUuidList": [],
+//		"pageCount": 1,
+//		"searchColumnDetailList": [],
+//		"rowNum": 1,
+//		"pageSize": 100,
+//		"currentPage": 1,
+//		"type": "custom",
+//		"isSelectAll": true,
+//		"theadList": [
+//			{
+//				"title": "aaa",
+//				"key": "e31052d7732345fd825c43a9f9deacb1"
+//			},
+//			{
+//				"title": "bbb",
+//				"key": "bc0afbec74ea4936acf62ba30e332854"
+//			},
+//			{
+//				"title": "ccc",
+//				"key": "912e9a241ec24e6cb0f0ad95fb2a7e5b"
+//			},
+//			{
+//				"isRequired": false,
+//				"control": true,
+//				"title": "文本框1",
+//				"type": "text",
+//				"config": {
+//					"mapping": {
+//						"text": "",
+//						"value": ""
+//					},
+//					"defaultValue": "",
+//					"dataList": [
+//						{
+//							"text": "",
+//							"value": ""
+//						}
+//					],
+//					"dataSource": "static",
+//					"value": "",
+//					"matrixUuid": ""
+//				},
+//				"key": "bd6ee064bdcd4463ad00848d2cb34c2e"
+//			}
+//		],
+//		"tbodyList": [
+//			{
+//				"e31052d7732345fd825c43a9f9deacb1": {
+//					"text": "111",
+//					"type": "input",
+//					"value": "111"
+//				},
+//				"912e9a241ec24e6cb0f0ad95fb2a7e5b": {
+//					"vipLevel": 0,
+//					"pinyin": "yanya",
+//					"text": "闫雅",
+//					"type": "user",
+//					"value": "002558df23aa7f9addec101c18f94f16"
+//				},
+//				"uuid": {
+//					"text": "66f1f6137c4e45a18df229f6f029ee59",
+//					"type": "input",
+//					"value": "66f1f6137c4e45a18df229f6f029ee59"
+//				},
+//				"bc0afbec74ea4936acf62ba30e332854": {
+//					"text": "2022-02-22 00:00:00",
+//					"type": "date",
+//					"value": "2022-02-22 00:00:00"
+//				},
+//				"bd6ee064bdcd4463ad00848d2cb34c2e": {
+//					"isRequired": false,
+//					"defaultValue": "",
+//					"disabled": false,
+//					"text": "",
+//					"type": "text",
+//					"value": ""
+//				},
+//				"_isSelected": true
+//			}
+//		]
+//	},
+//	"detailData": {
+//		"66f1f6137c4e45a18df229f6f029ee59": {
+//			"e31052d7732345fd825c43a9f9deacb1": {
+//				"text": "111",
+//				"type": "input",
+//				"value": "111"
+//			},
+//			"912e9a241ec24e6cb0f0ad95fb2a7e5b": {
+//				"text": "闫雅",
+//				"type": "user",
+//				"value": "002558df23aa7f9addec101c18f94f16"
+//			},
+//			"17ada8f1ace54cf49e95c695988197fd": {
+//				"text": "文本框a",
+//				"type": "text",
+//				"value": "文本框a"
+//			},
+//			"uuid": {
+//				"text": "66f1f6137c4e45a18df229f6f029ee59",
+//				"type": "input",
+//				"value": "66f1f6137c4e45a18df229f6f029ee59"
+//			},
+//			"bc0afbec74ea4936acf62ba30e332854": {
+//				"text": "2022-02-22 00:00:00",
+//				"type": "date",
+//				"value": "2022-02-22 00:00:00"
+//			}
+//		}
+//	}
+//}
+    //返回数据结构
+//{
+//  "value": 原始数据
+//	"selectUuidList": [
+//		"66f1f6137c4e45a18df229f6f029ee59"
+//	],
+//	"theadList": [
+//		{
+//			"title": "aaa",
+//			"key": "e31052d7732345fd825c43a9f9deacb1"
+//		},
+//		{
+//			"title": "bbb",
+//			"key": "bc0afbec74ea4936acf62ba30e332854"
+//		},
+//		{
+//			"title": "ccc",
+//			"key": "912e9a241ec24e6cb0f0ad95fb2a7e5b"
+//		},
+//		{
+//			"title": "文本框1",
+//			"key": "17ada8f1ace54cf49e95c695988197fd"
+//		}
+//	],
+//	"tbodyList": [
+//		{
+//			"e31052d7732345fd825c43a9f9deacb1": {
+//				"text": "111",
+//				"type": "input",
+//				"value": "111"
+//			},
+//			"912e9a241ec24e6cb0f0ad95fb2a7e5b": {
+//				"text": "闫雅",
+//				"type": "user",
+//				"value": "002558df23aa7f9addec101c18f94f16"
+//			},
+//			"17ada8f1ace54cf49e95c695988197fd": {
+//				"text": "文本框a",
+//				"type": "text",
+//				"value": "文本框a"
+//			},
+//			"uuid": {
+//				"text": "66f1f6137c4e45a18df229f6f029ee59",
+//				"type": "input",
+//				"value": "66f1f6137c4e45a18df229f6f029ee59"
+//			},
+//			"bc0afbec74ea4936acf62ba30e332854": {
+//				"text": "2022-02-22 00:00:00",
+//				"type": "date",
+//				"value": "2022-02-22 00:00:00"
+//			},
+//			"_isSelected": true
+//		}
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
+        if (MapUtils.isEmpty(dataObj)) {
+            return tableObj;
+        }
+        JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+        if (CollectionUtils.isEmpty(selectUuidList)) {
+            return tableObj;
+        }
+        String mode = configObj.getString("mode");
+        Boolean needPage = configObj.getBoolean("needPage");
+        String dataSource = configObj.getString("dataSource");
+        if ("matrix".equals(dataSource)) {
+            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+                tableObj.putAll(matrixDataSourceNoNeedPage(dataObj, selectUuidList, configObj));
+            } else {//分页
+                tableObj.putAll(matrixDataSourceNeedPage(dataObj, selectUuidList, configObj));
+            }
+        } else if ("integration".equals(dataSource)) {
+            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+                tableObj.putAll(integrationDataSourceNoNeedPage(dataObj, selectUuidList, configObj));
+            } else {//分页
+                tableObj.putAll(integrationDataSourceNeedPage(dataObj, selectUuidList, configObj));
+            }
+        }
+        return tableObj;
     }
 
     @Override

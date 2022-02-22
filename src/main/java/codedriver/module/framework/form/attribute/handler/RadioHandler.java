@@ -163,6 +163,53 @@ public class RadioHandler extends FormHandlerBase {
         return false;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formradio",
+//	"label": "单选框_6",
+//	"type": "form",
+//	"uuid": "749af88f046d4478a2a3c31f4dd4ec3a",
+//	"config": {
+//		"isRequired": false,
+//		"mapping": {
+//			"text": "",
+//			"value": ""
+//		},
+//		"defaultValueList": "1",
+//		"ruleList": [],
+//		"validList": [],
+//		"isMultiple": false,
+//		"quoteUuid": "",
+//		"dataList": [
+//			{
+//				"text": "单选1",
+//				"value": "1"
+//			},
+//			{
+//				"text": "单选2",
+//				"value": "2"
+//			}
+//		],
+//		"width": "100%",
+//		"defaultValueType": "self",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"dataSource": "static",
+//		"direction": "transverse"
+//	}
+//}
+    //保存数据结构
+//    1
+    //返回数据结构
+//{
+//	"textList": [
+//		"单选1"
+//	],
+//	"valueList": [
+//		"1"
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

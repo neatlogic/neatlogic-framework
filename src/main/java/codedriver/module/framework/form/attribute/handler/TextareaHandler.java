@@ -115,6 +115,33 @@ public class TextareaHandler extends FormHandlerBase {
         return true;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formtextarea",
+//	"label": "文本域_2",
+//	"type": "form",
+//	"uuid": "c22797047f5a4306bc23db9983d8a9fc",
+//	"config": {
+//		"isRequired": false,
+//		"defaultValueList": "文本b",
+//		"ruleList": [],
+//		"width": "100%",
+//		"validList": [],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"placeholder": "请输入",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"textareaMaxlength": 500
+//	}
+//}
+    //保存数据结构
+//    "文本b"
+    //返回数据结构
+//{
+//	"value": "文本b"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

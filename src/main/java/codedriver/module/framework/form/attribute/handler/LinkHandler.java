@@ -113,13 +113,44 @@ public class LinkHandler extends FormHandlerBase {
         return null;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formlink",
+//	"label": "链接_11",
+//	"type": "form",
+//	"uuid": "cf9557ac6bac404a8e20355df23f2e11",
+//	"config": {
+//		"isRequired": false,
+//		"ruleList": [],
+//		"width": "100%",
+//		"validList": [],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"text": "百度",
+//		"value": "https://www.baidu.com/",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"target": "_blank"
+//	}
+//}
+    //保存数据结构
+//    "https://www.baidu.com/"
+    //返回数据结构
+//{
+//	"text": "百度",
+//	"label": "<a href='https://www.baidu.com/' target='_blank'>百度</a>",
+//	"value": "https://www.baidu.com/"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         String value = configObj.getString("value");
         String text = configObj.getString("text");
         String target = configObj.getString("target");
         JSONObject resultObj = new JSONObject();
-        resultObj.put("value", "<a href='" + value + "' target='"+ target +"'>" + text + "</a>");
+        resultObj.put("value", value);
+        resultObj.put("text", text);
+        resultObj.put("label", "<a href='" + value + "' target='"+ target +"'>" + text + "</a>");
         return resultObj;
     }
 }

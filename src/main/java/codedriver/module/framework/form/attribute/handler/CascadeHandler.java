@@ -251,6 +251,95 @@ public class CascadeHandler extends FormHandlerBase {
         return true;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formcascadelist",
+//	"label": "级联下拉_10",
+//	"type": "form",
+//	"uuid": "2d14af78bf684e36837251df7481fa2c",
+//	"config": {
+//		"isRequired": false,
+//		"mapping": [
+//			{
+//				"text": "",
+//				"value": ""
+//			},
+//			{
+//				"text": "",
+//				"value": ""
+//			}
+//		],
+//		"defaultValueList": [
+//			"1",
+//			"3"
+//		],
+//		"ruleList": [],
+//		"validList": [],
+//		"quoteUuid": "",
+//		"levelType": "2",
+//		"dataList": [
+//			{
+//				"children": [
+//					{
+//						"index": 2,
+//						"text": "二级1",
+//						"value": "3"
+//					},
+//					{
+//						"index": 2,
+//						"text": "二级2",
+//						"value": "4"
+//					}
+//				],
+//				"index": 1,
+//				"text": "一级1",
+//				"value": "1"
+//			},
+//			{
+//				"children": [
+//					{
+//						"index": 2,
+//						"text": "二级3",
+//						"value": "5"
+//					},
+//					{
+//						"index": 2,
+//						"text": "二级4",
+//						"value": "6"
+//					}
+//				],
+//				"index": 1,
+//				"text": "一级2",
+//				"value": "2"
+//			}
+//		],
+//		"width": "100%",
+//		"defaultValueType": "self",
+//		"placeholder": [
+//			"请选择一级下拉",
+//			"请选择二级下拉",
+//			"请选择三级下拉"
+//		],
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"dataSource": "static",
+//		"direction": "transverse"
+//	}
+//}
+    //保存数据结构
+//    ["1","3"]
+    //返回数据结构
+//{
+//	"textList": [
+//		"一级1",
+//		"二级1"
+//	],
+//	"valueList": [
+//		"1",
+//		"3"
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

@@ -119,6 +119,33 @@ public class EditorHandler extends FormHandlerBase {
         return false;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formeditor",
+//	"label": "富文本框_3",
+//	"type": "form",
+//	"uuid": "9b6e8d7342e44127b224af410fc1b5aa",
+//	"config": {
+//		"isRequired": false,
+//		"editorMaxlength": "",
+//		"defaultValueList": "文本c",
+//		"ruleList": [],
+//		"width": "100%",
+//		"validList": [],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"placeholder": "请输入",
+//		"authorityConfig": [
+//			"common#alluser"
+//		]
+//	}
+//}
+    //保存数据结构
+//    "文本c"
+    //返回数据结构
+//{
+//	"value": "文本c"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

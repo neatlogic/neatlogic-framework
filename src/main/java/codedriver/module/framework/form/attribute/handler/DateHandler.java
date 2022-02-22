@@ -176,6 +176,40 @@ public class DateHandler extends FormHandlerBase {
         return false;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formdate",
+//	"label": "日期_4",
+//	"type": "form",
+//	"uuid": "a261982383e64f5ca45437cc025a1b72",
+//	"config": {
+//		"isRequired": false,
+//		"validType": [],
+//		"defaultValueList": "2022-02-21 00:00",
+//		"ruleList": [],
+//		"validValueList": [],
+//		"validList": [],
+//		"quoteUuid": "",
+//		"styleType": "-",
+//		"nowValue": "",
+//		"nowUnit": "",
+//		"width": "100%",
+//		"showType": "yyyy-MM-dd HH:mm",
+//		"defaultValueType": "self",
+//		"placeholder": "请选择日期",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"nowExpression": "others"
+//	}
+//}
+    //保存数据结构
+//    "2022-02-21 00:00"
+    //返回数据结构
+//{
+//	"format": "yyyy-MM-dd HH:mm",
+//	"value": "2022-02-21 00:00"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

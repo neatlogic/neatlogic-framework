@@ -240,6 +240,54 @@ public class SelectHandler extends FormHandlerBase {
         return false;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formselect",
+//	"label": "下拉框_8",
+//	"type": "form",
+//	"uuid": "4425ae2a7fd3402ebc828233a79d5c62",
+//	"config": {
+//		"isRequired": false,
+//		"mapping": {
+//			"text": "",
+//			"value": ""
+//		},
+//		"defaultValueList": "1",
+//		"ruleList": [],
+//		"validList": [],
+//		"isMultiple": false,
+//		"quoteUuid": "",
+//		"dataList": [
+//			{
+//				"text": "下拉1",
+//				"value": "1"
+//			},
+//			{
+//				"text": "下拉2",
+//				"value": "2"
+//			}
+//		],
+//		"width": "100%",
+//		"defaultValueType": "self",
+//		"placeholder": "请输入",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"dataSource": "static",
+//		"direction": "transverse"
+//	}
+//}
+    //保存数据结构
+//    1
+    //返回数据结构
+//{
+//	"textList": [
+//		"下拉1"
+//	],
+//	"valueList": [
+//		"1"
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();
@@ -304,6 +352,7 @@ public class SelectHandler extends FormHandlerBase {
                 }
             }
             resultObj.put("valueList", valueList);
+            resultObj.put("textList", textList);
         }
         return resultObj;
     }

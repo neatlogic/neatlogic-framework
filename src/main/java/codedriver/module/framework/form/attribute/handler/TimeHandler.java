@@ -114,6 +114,36 @@ public class TimeHandler extends FormHandlerBase {
         return true;
     }
 
+    //表单组件配置信息
+    //{
+//	"handler": "formtime",
+//	"label": "时间_5",
+//	"type": "form",
+//	"uuid": "3dd979696e83434daf2ec730fc023fa8",
+//	"config": {
+//		"isRequired": false,
+//		"validType": [],
+//		"defaultValueList": "05:05:05",
+//		"ruleList": [],
+//		"width": "100%",
+//		"validValueList": [],
+//		"showType": "HH:mm:ss",
+//		"validList": [],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"placeholder": "请选择时间",
+//		"authorityConfig": [
+//			"common#alluser"
+//		]
+//	}
+//}
+    //保存数据结构
+//    "05:05:05"
+    //返回数据结构
+//{
+//	"format": "HH:mm:ss",
+//	"value": "05:05:05"
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

@@ -8,6 +8,8 @@ package codedriver.framework.form.treeselect.core;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 public interface ITreeSelectDataSourceHandler {
 
     /**
@@ -30,5 +32,5 @@ public interface ITreeSelectDataSourceHandler {
      */
     JSONObject getConfig();
 
-    String valueConversionTextPath(Object value);
+    List<String> valueConversionTextPathList(Object value);
 }

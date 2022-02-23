@@ -268,6 +268,47 @@ public class UserSelectHandler extends FormHandlerBase {
         return null;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formuserselect",
+//	"label": "用户选择器_9",
+//	"type": "form",
+//	"uuid": "d3f620927a584d2d868372cc64bd73df",
+//	"config": {
+//		"isRequired": false,
+//		"defaultValueList": "user#003367933ead65dba67e1df1e66b1000",
+//		"ruleList": [],
+//		"width": "100%",
+//		"validList": [],
+//		"isMultiple": false,
+//		"groupList": [
+//			"user"
+//		],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"placeholder": "请选择",
+//		"authorityConfig": [
+//			"common#alluser"
+//		]
+//	}
+//}
+    //保存数据结构
+//    "user#003367933ead65dba67e1df1e66b1000"
+    //返回数据结构
+//{
+//	"valueTextList": [
+//		{
+//			"text": "蒋琪",
+//			"value": "user#003367933ead65dba67e1df1e66b1000"
+//		}
+//	],
+//	"text": [
+//		"蒋琪"
+//	],
+//	"value": [
+//		"user#003367933ead65dba67e1df1e66b1000"
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         Object dataObj = attributeDataVo.getDataObj();

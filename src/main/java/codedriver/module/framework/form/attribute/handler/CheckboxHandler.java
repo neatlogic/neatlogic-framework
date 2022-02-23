@@ -191,6 +191,55 @@ public class CheckboxHandler extends FormHandlerBase {
         return false;
     }
 
+    //表单组件配置信息
+//{
+//	"handler": "formcheckbox",
+//	"label": "复选框_7",
+//	"type": "form",
+//	"uuid": "4120a16ca0dc4b90a794eea80d3b61d3",
+//	"config": {
+//		"isRequired": false,
+//		"mapping": {
+//			"text": "",
+//			"value": ""
+//		},
+//		"defaultValueList": [
+//			"1"
+//		],
+//		"ruleList": [],
+//		"validList": [],
+//		"isMultiple": true,
+//		"quoteUuid": "",
+//		"dataList": [
+//			{
+//				"text": "复选1",
+//				"value": "1"
+//			},
+//			{
+//				"text": "复选2",
+//				"value": "2"
+//			}
+//		],
+//		"width": "100%",
+//		"defaultValueType": "self",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"dataSource": "static",
+//		"direction": "transverse"
+//	}
+//}
+    //保存数据结构
+//    ["1"]
+    //返回数据结构
+//{
+//	"textList": [
+//		"复选1"
+//	],
+//	"valueList": [
+//		"1"
+//	]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

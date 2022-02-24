@@ -117,6 +117,11 @@ public class UserVo extends BasePageVo implements Serializable {
 
     }
 
+    public UserVo(String uuid, String userName) {
+        this.uuid = uuid;
+        this.userName = userName;
+    }
+
     public UserVo(String uuid) {
         this.uuid = uuid;
     }

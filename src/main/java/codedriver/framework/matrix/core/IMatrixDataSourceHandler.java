@@ -101,14 +101,14 @@ public interface IMatrixDataSourceHandler {
      * @param dataVo
      * @return
      */
-    JSONObject TableDataSearch(MatrixDataVo dataVo);
+    JSONObject searchTableData(MatrixDataVo dataVo);
 
     /**
      * 查询矩阵表格某列数据
      * @param dataVo
      * @return
      */
-    List<Map<String, JSONObject>> TableColumnDataSearch(MatrixDataVo dataVo);
+    List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo);
 
     /**
      * 保存矩阵表格一行数据

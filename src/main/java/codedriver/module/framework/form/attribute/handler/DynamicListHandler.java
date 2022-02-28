@@ -180,7 +180,7 @@ public class DynamicListHandler extends FormHandlerBase {
         uuidColumn = uuidColumn == null ? "uuid" : uuidColumn;
         dataVo.setUuidColumn(uuidColumn);
         dataVo.setNeedPage(false);
-        JSONObject resultObj = matrixDataSourceHandler.TableDataSearch(dataVo);
+        JSONObject resultObj = matrixDataSourceHandler.searchTableData(dataVo);
         if (MapUtils.isNotEmpty(resultObj)) {
             JSONArray theadList = resultObj.getJSONArray("theadList");
             JSONArray tbodyList = resultObj.getJSONArray("tbodyList");

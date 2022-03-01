@@ -8,6 +8,7 @@ public enum FormHandlerType {
 	RADIO("radio"),
 	CHECKBOX("checkbox"),
 	DATE("date"), 
+	DATETIME("datetime"),
 	TIME("time"),
 	TIMESELECT("timeselect"),
 	USERSELECT("userselect"),

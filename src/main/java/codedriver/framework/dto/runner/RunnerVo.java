@@ -274,7 +274,7 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, url, protocol, host, port);
+        return Objects.hash(id, name, protocol, host, port);
     }
 
     public enum HttpProtocol implements IEnum {

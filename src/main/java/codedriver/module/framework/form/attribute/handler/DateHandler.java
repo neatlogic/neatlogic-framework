@@ -5,29 +5,26 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.exception.type.ParamIrregularException;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
+import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.dto.AttributeDataVo;
+import codedriver.framework.form.exception.AttributeValidException;
+import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
-
-import codedriver.framework.form.constvalue.FormConditionModel;
-import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.exception.type.ParamIrregularException;
-import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
-
-import javax.annotation.Resource;
 
 @Component
 public class DateHandler extends FormHandlerBase {
@@ -48,7 +45,7 @@ public class DateHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerType(FormConditionModel model) {
-        return "date";
+        return "datetime";
     }
 
     @Override

@@ -551,11 +551,5 @@
           and `runner_id` = #{runnerId}
     </delete>
 
-    <delete id="deleteRuunerByName">
-        delete
-        from runner
-        where name = #{name}
-    </delete>
-
 </mapper>
 

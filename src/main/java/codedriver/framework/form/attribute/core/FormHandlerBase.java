@@ -80,7 +80,7 @@ public abstract class FormHandlerBase implements IFormAttributeHandler {
             columnList.add((String) mapping.getValue());
             columnList.add(mapping.getText());
             dataVo.setColumnList(columnList);
-            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
             for (Map<String, JSONObject> firstObj : tbodyList) {
                 JSONObject valueObj = firstObj.get(mapping.getValue());
                 /** 当text与value字段相同时，不同类型的矩阵字段，拼接value的逻辑不同，下拉、用户、组、角色，按uuid&=&text拼接，其余按value&=&value拼接 **/

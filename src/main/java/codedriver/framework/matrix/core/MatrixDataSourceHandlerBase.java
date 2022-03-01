@@ -134,12 +134,12 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myGetTableData(MatrixDataVo dataVo);
 
     @Override
-    public JSONObject TableDataSearch(MatrixDataVo dataVo){
+    public JSONObject searchTableData(MatrixDataVo dataVo){
         return myTableDataSearch(dataVo);
     }
     protected abstract JSONObject myTableDataSearch(MatrixDataVo dataVo);
     @Override
-    public List<Map<String, JSONObject>> TableColumnDataSearch(MatrixDataVo dataVo){
+    public List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo){
         List<String> columnList = dataVo.getColumnList();
         if (CollectionUtils.isEmpty(columnList)) {
             throw new ParamIrregularException("columnList");

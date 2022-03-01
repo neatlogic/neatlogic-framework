@@ -150,7 +150,7 @@ public class CascadeHandler extends FormHandlerBase {
             sourceColumnList.add(new MatrixColumnVo((String) mapping.getValue(), split[0]));
             sourceColumnList.add(new MatrixColumnVo(mapping.getText(), split[1]));
             dataVo.setSourceColumnList(sourceColumnList);
-            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
             for (Map<String, JSONObject> firstObj : tbodyList) {
                 JSONObject textObj = firstObj.get(mapping.getText());
                 if (Objects.equals(textObj.getString("value"), split[1])) {
@@ -182,7 +182,7 @@ public class CascadeHandler extends FormHandlerBase {
             columnList.add((String) mapping.getValue());
             columnList.add(mapping.getText());
             dataVo.setColumnList(columnList);
-            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.TableColumnDataSearch(dataVo);
+            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
             for (Map<String, JSONObject> firstObj : tbodyList) {
                 JSONObject valueObj = firstObj.get(mapping.getValue());
                 if (valueObj.getString("compose").contains(value)) {

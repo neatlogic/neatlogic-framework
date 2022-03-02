@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author lvzk
@@ -262,19 +261,6 @@ public class RunnerVo extends BasePageVo implements Serializable {
 
     public void setIsFilterGroup(Integer isFilterGroup) {
         this.isFilterGroup = isFilterGroup;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RunnerVo runnerVo = (RunnerVo) o;
-        return Objects.equals(id, runnerVo.id) && Objects.equals(name, runnerVo.name) && Objects.equals(protocol, runnerVo.protocol) && Objects.equals(host, runnerVo.host) && Objects.equals(port, runnerVo.port);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, protocol, host, port);
     }
 
     public enum HttpProtocol implements IEnum {

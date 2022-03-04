@@ -76,9 +76,8 @@
 
     <select id="getApiAuditCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int"
             useCache="false">
-        SELECT count(`token`)
-        FROM `api_audit`
-        WHERE `token` = #{token}
+        SELECT count(a.`token`)
+        <include refid="getApiAudit"></include>
     </select>
 
     <select id="getAllApi" resultType="codedriver.framework.restful.dto.ApiVo" useCache="true">
@@ -127,28 +126,36 @@
         order by `create_time` desc
     </select>
 
+    <sql id="getApiAudit">
+        FROM `api_audit` a
+        LEFT JOIN `user` u ON u.`uuid` = a.`user_uuid`
+        WHERE a.`token` = #{token}
+        <if test="status != null and status != ''">
+            AND a.`status` =#{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (a.`ip` LIKE CONCAT('%', #{keyword}, '%') or u.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </sql>
+
     <select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
             resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
-        SELECT `id`,
-               `token`,
-               `user_uuid`                                                                   AS userUuid,
-               (SELECT u.`user_name` from `user` u WHERE u.`uuid` = `api_audit`.`user_uuid`) AS userName,
-               `authtype`,
-               `server_id`                                                                   AS serverId,
-               `ip`,
-               `start_time`                                                                  AS startTime,
-               `end_time`                                                                    AS endTime,
-               `time_cost`                                                                   AS timeCost,
-               `status`,
-               `param_file_path`                                                             AS paramFilePath,
-               `result_file_path`                                                            AS resultFilePath,
-               `error_file_path`                                                             AS errorFilePath
--- 		`param_hash` as paramHash,
--- 		`result_hash` as resultHash,
--- 		`error_hash` as errorHash,
-        FROM `api_audit`
-        WHERE `token` = #{token}
-        ORDER BY `start_time` DESC
+        SELECT a.`id`,
+        a.`token`,
+        a.`user_uuid` AS userUuid,
+        u.`user_name` AS userName,
+        a.`authtype`,
+        a.`server_id` AS serverId,
+        a.`ip`,
+        a.`start_time` AS startTime,
+        a.`end_time` AS endTime,
+        a.`time_cost` AS timeCost,
+        a.`status`,
+        a.`param_file_path` AS paramFilePath,
+        a.`result_file_path` AS resultFilePath,
+        a.`error_file_path` AS errorFilePath
+       <include refid="getApiAudit"></include>
+        ORDER BY a.`start_time` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>
 

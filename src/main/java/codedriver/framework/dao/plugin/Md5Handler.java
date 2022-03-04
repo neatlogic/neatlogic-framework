@@ -5,7 +5,6 @@
 
 package codedriver.framework.dao.plugin;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.DigestUtils;
@@ -16,15 +15,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Locale;
 
-public class Md5Handler implements TypeHandler<String> {
+public class Md5Handler implements TypeHandler<Object> {
 
     @Override
-    public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-        if (StringUtils.isNotBlank(parameter)) {
-            parameter = parameter.toLowerCase(Locale.ROOT);
-            parameter = DigestUtils.md5DigestAsHex(parameter.getBytes());
+    public void setParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
+        if (parameter != null) {
+            String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
+            parameter = DigestUtils.md5DigestAsHex(parameterStr.getBytes());
         }
-        ps.setString(i, parameter);
+        ps.setObject(i, parameter);
     }
 
 

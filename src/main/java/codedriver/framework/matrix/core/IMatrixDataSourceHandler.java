@@ -9,7 +9,7 @@ import codedriver.framework.matrix.dto.MatrixAttributeVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,6 +26,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 保存矩阵信息
+     *
      * @param matrixVo
      * @return
      * @throws Exception
@@ -34,6 +35,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵信息
+     *
      * @param Uuid
      * @return
      */
@@ -41,12 +43,14 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 删除矩阵信息
+     *
      * @param uuid
      */
     void deleteMatrix(String uuid);
 
     /**
      * 复制矩阵
+     *
      * @param sourceUuid
      * @param matrixVo
      */
@@ -54,6 +58,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 导入矩阵
+     *
      * @param matrixVo
      * @param multipartFile
      * @return
@@ -63,13 +68,15 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 导出矩阵
+     *
      * @param matrixVo
      * @return
      */
-    HSSFWorkbook exportMatrix(MatrixVo matrixVo);
+    Workbook exportMatrix(MatrixVo matrixVo);
 
     /**
      * 保存矩阵属性列表信息
+     *
      * @param matrixUuid
      * @param matrixAttributeList
      */
@@ -77,6 +84,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵属性列表信息
+     *
      * @param matrixVo
      * @return
      */
@@ -84,6 +92,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 导出模板
+     *
      * @param matrixVo
      * @return
      */
@@ -91,6 +100,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵表格数据
+     *
      * @param dataVo
      * @return
      */
@@ -98,6 +108,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵表格数据
+     *
      * @param dataVo
      * @return
      */
@@ -105,6 +116,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵表格某列数据
+     *
      * @param dataVo
      * @return
      */
@@ -112,6 +124,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 保存矩阵表格一行数据
+     *
      * @param matrixUuid
      * @param rowData
      */
@@ -119,6 +132,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 查询矩阵表格一行数据
+     *
      * @param matrixDataVo
      * @return
      */
@@ -126,6 +140,7 @@ public interface IMatrixDataSourceHandler {
 
     /**
      * 删除矩阵表格多行数据
+     *
      * @param matrixUuid
      * @param uuidList
      */

@@ -130,11 +130,10 @@
         FROM `api_audit` a
         LEFT JOIN `user` u ON u.`uuid` = a.`user_uuid`
         WHERE a.`token` = #{token}
+        AND a.`start_time` &gt;= #{startTime}
+        AND a.`end_time` &lt;= #{endTime}
         <if test="status != null and status != ''">
             AND a.`status` =#{status}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            AND (a.`ip` LIKE CONCAT('%', #{keyword}, '%') or u.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
         </if>
     </sql>
 

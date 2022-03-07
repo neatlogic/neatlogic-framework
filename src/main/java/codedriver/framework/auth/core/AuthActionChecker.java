@@ -9,6 +9,7 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,6 +62,10 @@ public class AuthActionChecker {
         }
 
         if (userContext != null) {
+            if (SystemUser.SYSTEM.getUserUuid().equals(userContext.getUserUuid())) {
+                //系统用户不需要鉴权
+                return true;
+            }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
             return false;

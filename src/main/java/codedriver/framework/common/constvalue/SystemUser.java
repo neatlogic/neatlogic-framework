@@ -1,7 +1,12 @@
 package codedriver.framework.common.constvalue;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.dto.JwtVo;
 import codedriver.framework.dto.UserVo;
-import com.alibaba.fastjson.JSONObject;
+import codedriver.framework.filter.core.LoginAuthHandlerBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
 * @Author:14378
@@ -12,6 +17,9 @@ import com.alibaba.fastjson.JSONObject;
 public enum SystemUser {
 	SYSTEM("system","system","系统"),
 	ANONYMOUS("anonymous","anonymous","匿名用户");
+
+	private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
+
 	private String userId;
 	private String userUuid;
 	private String userName;
@@ -39,6 +47,14 @@ public enum SystemUser {
 		userVo.setUuid(userUuid);
 		userVo.setUserId(userId);
 		userVo.setUserName(userName);
+		userVo.setTenant(TenantContext.get().getTenantUuid());
+		try {
+			JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(userVo);
+			String authorizatioin = "Bearer_" + jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign();
+			userVo.setAuthorization(authorizatioin);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
 		return userVo;
 	};
 	

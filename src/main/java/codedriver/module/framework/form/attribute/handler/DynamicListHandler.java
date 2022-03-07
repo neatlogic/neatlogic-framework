@@ -556,6 +556,9 @@ public class DynamicListHandler extends FormHandlerBase {
                     }
                     if (dataList == null) {
                         dataList = config.getJSONArray("dataList");
+                        if (dataList == null) {
+                            dataList = new JSONArray();
+                        }
                     }
                     String valueName = config.getString("valueName");
                     if (StringUtils.isBlank(valueName)) {

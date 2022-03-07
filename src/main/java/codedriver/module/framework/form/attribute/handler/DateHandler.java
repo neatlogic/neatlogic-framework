@@ -19,11 +19,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -58,30 +63,28 @@ public class DateHandler extends FormHandlerBase {
             if (validTypeList.contains("workdate")) {
                 String worktimeUuid = jsonObj.getString("worktimeUuid");
                 String data = attributeDataVo.getData();
-                String styleType = configObj.getString("styleType");
+                JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+                String format = detailedData.getString("format");
                 String showType = configObj.getString("showType");
                 if (DATE_FORMAT.equals(showType)) {
-                    String date = data.replace(styleType, "-");
                     try {
-                        dateFormatter.parse(date);
-                        boolean result = worktimeMapper.checkIsWithinWorktime(worktimeUuid, date) > 0;
+                        SimpleDateFormat sdf = new SimpleDateFormat(format);
+                        Date date = sdf.parse(data);
+                        String dateStr = dateFormatter.format((date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+                        boolean result = worktimeMapper.checkIsWithinWorktime(worktimeUuid, dateStr) > 0;
                         resultObj.put("result", result);
                         return resultObj;
-                    } catch (DateTimeParseException ex) {
-                        String format = DATE_FORMAT.replace("-", styleType);
+                    } catch (ParseException ex) {
                         throw new ParamIrregularException("data", format);
                     }
                 } else if (DATETIME_FORMAT.equals(showType)) {
-                    String dateTime = data.replace(styleType, "-");
                     try {
-                        TemporalAccessor temporalAccessor = dateTimeFormatter.parse(dateTime);
-                        LocalDateTime endLocalDateTime = LocalDateTime.from(temporalAccessor);
-                        long datetime = endLocalDateTime.toInstant(OffsetDateTime.now().getOffset()).toEpochMilli();
-                        boolean result = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, datetime) > 0;
+                        SimpleDateFormat sdf = new SimpleDateFormat(format);
+                        Date date = sdf.parse(data);
+                        boolean result = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, date.getTime()) > 0;
                         resultObj.put("result", result);
                         return resultObj;
-                    } catch (DateTimeParseException ex) {
-                        String format = DATETIME_FORMAT.replace("-", styleType);
+                    } catch (ParseException ex) {
                         throw new ParamIrregularException("data", format);
                     }
                 }
@@ -213,6 +216,11 @@ public class DateHandler extends FormHandlerBase {
         String format = configObj.getString("showType");
         String styleType = configObj.getString("styleType");
         if (StringUtils.isNotBlank(styleType) && !"-".equals(styleType)) {
+            if ("|".equals(styleType)) {
+                //当styleType为“|”时，设置的是“yyyyMMdd HH:mm”格式
+                styleType = "";
+            }
+            // 当styleType是"/"，showType="yyyy-MM-dd"，保存的日期值是2022/02/11，需要将yyyy-MM-dd转换成yyyy/MM/dd
             format = format.replace("-", styleType);
         }
         resultObj.put("format", format);

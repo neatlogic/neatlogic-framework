@@ -6,6 +6,7 @@
 package codedriver.module.framework.matrix.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.dao.mapper.SchemaMapper;
@@ -29,6 +30,7 @@ import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,6 +63,11 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     public String getHandler() {
         return MatrixType.VIEW.getValue();
+    }
+
+    @Override
+    public String getExportFileType() {
+        return ExportFileType.CSV.getValue();
     }
 
     @Override
@@ -127,7 +134,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected void myExportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException {
+    protected void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException {
         MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(matrixVo.getUuid());
@@ -180,6 +187,11 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
         }
+    }
+
+    @Override
+    protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
+        return null;
     }
 
     @Override

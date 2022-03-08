@@ -9,6 +9,7 @@ import codedriver.framework.matrix.dto.MatrixAttributeVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -67,12 +68,26 @@ public interface IMatrixDataSourceHandler {
     JSONObject importMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException;
 
     /**
-     * 导出矩阵
+     * 导出矩阵为CSV
+     *
+     * @param matrixVo
+     * @param os
+     * @throws IOException
+     */
+    void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException;
+
+    /**
+     * 导出矩阵为EXCEL
      *
      * @param matrixVo
      * @return
      */
-    void exportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException;
+    Workbook exportMatrix2Excel(MatrixVo matrixVo);
+
+    /**
+     *
+     */
+    String getExportFileType();
 
     /**
      * 保存矩阵属性列表信息

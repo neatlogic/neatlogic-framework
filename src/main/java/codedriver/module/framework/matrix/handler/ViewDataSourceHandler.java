@@ -66,11 +66,6 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    public String getExportFileType() {
-        return ExportFileType.CSV.getValue();
-    }
-
-    @Override
     protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
         Long fileId = matrixVo.getFileId();
         if (fileId == null) {
@@ -187,11 +182,6 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
         }
-    }
-
-    @Override
-    protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
-        return null;
     }
 
     @Override

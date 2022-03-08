@@ -65,11 +65,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    public String getExportFileType() {
-        return ExportFileType.CSV.getValue();
-    }
-
-    @Override
     protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
         String integrationUuid = matrixVo.getIntegrationUuid();
         if (StringUtils.isBlank(integrationUuid)) {
@@ -109,11 +104,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myImportMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException {
         return null;
-    }
-
-    @Override
-    protected void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException {
-
     }
 
     @Override

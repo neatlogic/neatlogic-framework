@@ -6,8 +6,10 @@
 package codedriver.framework.matrix.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.DependencyManager;
+import codedriver.framework.exception.file.FileTypeNotSupportToExportException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
@@ -102,7 +104,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myImportMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException;
 
     @Override
-    public void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException {
+    public void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws Exception {
         myExportMatrix2CSV(matrixVo, os);
     }
 
@@ -111,9 +113,13 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         return myExportMatrix2Excel(matrixVo);
     }
 
-    protected abstract void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException;
+    protected void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws Exception {
+        throw new FileTypeNotSupportToExportException(ExportFileType.CSV.getValue());
+    }
 
-    protected abstract Workbook myExportMatrix2Excel(MatrixVo matrixVo);
+    protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
+        throw new FileTypeNotSupportToExportException(ExportFileType.EXCEL.getValue());
+    }
 
     @Override
     public void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {

@@ -82,11 +82,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    public String getExportFileType() {
-        return ExportFileType.EXCEL.getValue();
-    }
-
-    @Override
     protected boolean mySaveMatrix(MatrixVo matrixVo) throws Exception {
         return true;
     }
@@ -209,11 +204,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         returnObj.put("update", update);
         returnObj.put("unExist", unExist);
         return returnObj;
-    }
-
-    @Override
-    protected void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException {
-
     }
 
     @Override

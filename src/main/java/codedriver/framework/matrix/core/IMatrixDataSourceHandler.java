@@ -74,7 +74,7 @@ public interface IMatrixDataSourceHandler {
      * @param os
      * @throws IOException
      */
-    void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws IOException;
+    void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws Exception;
 
     /**
      * 导出矩阵为EXCEL
@@ -83,11 +83,6 @@ public interface IMatrixDataSourceHandler {
      * @return
      */
     Workbook exportMatrix2Excel(MatrixVo matrixVo);
-
-    /**
-     *
-     */
-    String getExportFileType();
 
     /**
      * 保存矩阵属性列表信息

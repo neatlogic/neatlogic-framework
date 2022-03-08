@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.matrix.handler;
 
+import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -34,6 +35,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,7 +107,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected HSSFWorkbook myExportMatrix(MatrixVo matrixVo) {
+    protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
         HSSFWorkbook workbook = null;
         MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (externalVo == null) {
@@ -511,13 +514,13 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         return resultList;
     }
+
     /**
-     *
+     * @param arrayColumnList 需要将值转化成数组的属性集合
+     * @param tbodyList       表格数据
+     * @return void
      * @Time:2020年7月8日
      * @Description: 将arrayColumnList包含的属性值转成数组
-     * @param arrayColumnList 需要将值转化成数组的属性集合
-     * @param tbodyList 表格数据
-     * @return void
      */
     private void arrayColumnDataConversion(List<String> arrayColumnList, List<Map<String, JSONObject>> tbodyList) {
         for (Map<String, JSONObject> rowData : tbodyList) {
@@ -533,7 +536,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 for (int i = 0; i < valueArray.size(); i++) {
                                     Object valueObject = valueArray.get(i);
                                     if (valueObject instanceof JSONObject) {
-                                        JSONObject valueJsonObject = (JSONObject)valueObject;
+                                        JSONObject valueJsonObject = (JSONObject) valueObject;
                                         Object valueStr = valueJsonObject.get("value");
                                         String textStr = valueJsonObject.getString("text");
                                         if (valueStr != null && StringUtils.isNotBlank(textStr)) {
@@ -554,22 +557,24 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
         }
     }
+
     /**
      * 校验集成接口数据是否符合矩阵格式
+     *
      * @param integrationUuid 集成配置uuid
      * @throws ApiRuntimeException
      */
     private void validateMatrixExternalData(String integrationUuid) throws ApiRuntimeException {
         IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(integrationUuid);
-        if(integrationVo == null){
+        if (integrationVo == null) {
             throw new IntegrationNotFoundException(integrationUuid);
         }
         IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
         if (handler == null) {
-            throw  new IntegrationHandlerNotFoundException(integrationVo.getHandler());
+            throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
         }
         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.TEST);
-        if(StringUtils.isNotBlank(resultVo.getError())){
+        if (StringUtils.isNotBlank(resultVo.getError())) {
             throw new MatrixExternalAccessException();
         }
         handler.validate(resultVo);

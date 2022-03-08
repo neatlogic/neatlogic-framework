@@ -6,8 +6,10 @@
 package codedriver.framework.matrix.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
+import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.dependency.constvalue.FromType;
 import codedriver.framework.dependency.core.DependencyManager;
+import codedriver.framework.exception.file.FileTypeNotSupportToExportException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
@@ -19,11 +21,12 @@ import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedExce
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +87,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract void myDeleteMatrix(String uuid);
 
     @Override
-    public void copyMatrix(String sourceUuid, MatrixVo matrixVo){
+    public void copyMatrix(String sourceUuid, MatrixVo matrixVo) {
         matrixVo.setFcu(UserContext.get().getUserUuid(true));
         matrixVo.setLcu(UserContext.get().getUserUuid(true));
         matrixMapper.insertMatrix(matrixVo);
@@ -94,23 +97,35 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract void myCopyMatrix(String sourceUuid, MatrixVo matrixVo);
 
     @Override
-    public JSONObject importMatrix(MatrixVo matrixVo,MultipartFile multipartFile) throws IOException {
+    public JSONObject importMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException {
         return myImportMatrix(matrixVo, multipartFile);
     }
 
     protected abstract JSONObject myImportMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException;
 
     @Override
-    public HSSFWorkbook exportMatrix(MatrixVo matrixVo) {
-        return myExportMatrix(matrixVo);
+    public void exportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws Exception {
+        myExportMatrix2CSV(matrixVo, os);
     }
-
-    protected abstract HSSFWorkbook myExportMatrix(MatrixVo matrixVo);
 
     @Override
-    public void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList){
+    public Workbook exportMatrix2Excel(MatrixVo matrixVo) {
+        return myExportMatrix2Excel(matrixVo);
+    }
+
+    protected void myExportMatrix2CSV(MatrixVo matrixVo, OutputStream os) throws Exception {
+        throw new FileTypeNotSupportToExportException(ExportFileType.CSV.getValue());
+    }
+
+    protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
+        throw new FileTypeNotSupportToExportException(ExportFileType.EXCEL.getValue());
+    }
+
+    @Override
+    public void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {
         mySaveAttributeList(matrixUuid, matrixAttributeList);
     }
+
     protected abstract void mySaveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList);
 
     @Override
@@ -121,9 +136,10 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract List<MatrixAttributeVo> myGetAttributeList(MatrixVo matrixVo);
 
     @Override
-    public JSONObject exportAttribute(MatrixVo matrixVo){
+    public JSONObject exportAttribute(MatrixVo matrixVo) {
         return myExportAttribute(matrixVo);
     }
+
     protected abstract JSONObject myExportAttribute(MatrixVo matrixVo);
 
     @Override
@@ -134,12 +150,14 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myGetTableData(MatrixDataVo dataVo);
 
     @Override
-    public JSONObject searchTableData(MatrixDataVo dataVo){
+    public JSONObject searchTableData(MatrixDataVo dataVo) {
         return myTableDataSearch(dataVo);
     }
+
     protected abstract JSONObject myTableDataSearch(MatrixDataVo dataVo);
+
     @Override
-    public List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo){
+    public List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo) {
         List<String> columnList = dataVo.getColumnList();
         if (CollectionUtils.isEmpty(columnList)) {
             throw new ParamIrregularException("columnList");
@@ -174,7 +192,9 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         }
         return resultList;
     }
+
     protected abstract List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo);
+
     @Override
     public void saveTableRowData(String matrixUuid, JSONObject rowData) {
         mySaveTableRowData(matrixUuid, rowData);
@@ -193,8 +213,8 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     public void deleteTableRowData(String matrixUuid, List<String> uuidList) {
         myDeleteTableRowData(matrixUuid, uuidList);
     }
-    protected abstract void myDeleteTableRowData(String matrixUuid, List<String> uuidList);
 
+    protected abstract void myDeleteTableRowData(String matrixUuid, List<String> uuidList);
 
 
     protected JSONArray getTheadList(List<MatrixAttributeVo> attributeList) {

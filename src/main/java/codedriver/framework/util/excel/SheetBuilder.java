@@ -6,6 +6,7 @@
 package codedriver.framework.util.excel;
 
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.ArrayList;
@@ -102,6 +103,12 @@ public class SheetBuilder {
                 dataList = new ArrayList<>();
             }
             this.dataList.add(dataMap);
+        }
+    }
+
+    public void addDataList(List<Map<String, Object>> dataMapList) {
+        if (CollectionUtils.isNotEmpty(dataMapList)) {
+            dataMapList.forEach(this::addData);
         }
     }
 

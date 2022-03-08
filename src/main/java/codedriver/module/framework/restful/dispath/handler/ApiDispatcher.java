@@ -7,7 +7,7 @@ package codedriver.module.framework.restful.dispath.handler;
 
 import codedriver.framework.asynchronization.threadlocal.InputFromContext;
 import codedriver.framework.asynchronization.threadlocal.RequestContext;
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.InputFrom;
 import codedriver.framework.dto.FieldValidResultVo;
@@ -436,6 +436,9 @@ public class ApiDispatcher {
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
         if (!response.isCommitted()) {
+            if(UserContext.get() != null && UserContext.get().getResponse() != null) {
+                UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
+            }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             if (returnObj.containsKey("_disableDetect")) {
                 returnObj.remove("_disableDetect");

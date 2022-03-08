@@ -19,11 +19,11 @@ import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedExce
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,11 +101,11 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myImportMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException;
 
     @Override
-    public Workbook exportMatrix(MatrixVo matrixVo) {
-        return myExportMatrix(matrixVo);
+    public void exportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException {
+        myExportMatrix(matrixVo, os);
     }
 
-    protected abstract Workbook myExportMatrix(MatrixVo matrixVo);
+    protected abstract void myExportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException;
 
     @Override
     public void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {

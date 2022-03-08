@@ -9,10 +9,10 @@ import codedriver.framework.matrix.dto.MatrixAttributeVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public interface IMatrixDataSourceHandler {
      * @param matrixVo
      * @return
      */
-    Workbook exportMatrix(MatrixVo matrixVo);
+    void exportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException;
 
     /**
      * 保存矩阵属性列表信息

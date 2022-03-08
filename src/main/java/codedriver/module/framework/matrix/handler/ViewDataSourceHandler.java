@@ -23,26 +23,23 @@ import codedriver.framework.matrix.exception.*;
 import codedriver.framework.matrix.view.MatrixViewSqlBuilder;
 import codedriver.framework.transaction.core.EscapeTransactionJob;
 import codedriver.framework.util.TableResultUtil;
-import codedriver.framework.util.excel.ExcelBuilder;
-import codedriver.framework.util.excel.SheetBuilder;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -130,8 +127,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected Workbook myExportMatrix(MatrixVo matrixVo) {
-        Workbook workbook = null;
+    protected void myExportMatrix(MatrixVo matrixVo, OutputStream os) throws IOException {
         MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
         if (matrixViewVo == null) {
             throw new MatrixViewNotFoundException(matrixVo.getUuid());
@@ -139,27 +135,21 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         JSONArray attributeList = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
         if (CollectionUtils.isNotEmpty(attributeList)) {
             List<MatrixAttributeVo> attributeVoList = attributeList.toJavaList(MatrixAttributeVo.class);
+            StringBuilder header = new StringBuilder();
             List<String> headList = new ArrayList<>();
-            List<String> columnList = new ArrayList<>();
             JSONArray theadList = getTheadList(attributeVoList);
             for (int i = 0; i < theadList.size(); i++) {
                 JSONObject obj = theadList.getJSONObject(i);
                 String title = obj.getString("title");
                 String key = obj.getString("key");
                 if (StringUtils.isNotBlank(title) && StringUtils.isNotBlank(key)) {
-                    headList.add(title);
-                    columnList.add(key);
+                    header.append(title).append(",");
+                    headList.add(key);
                 }
             }
-            ExcelBuilder builder = new ExcelBuilder(SXSSFWorkbook.class);
-            SheetBuilder sheetBuilder = builder.withBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT)
-                    .withHeadFontColor(HSSFColor.HSSFColorPredefined.WHITE)
-                    .withHeadBgColor(HSSFColor.HSSFColorPredefined.DARK_BLUE)
-                    .withColumnWidth(30)
-                    .addSheet("数据")
-                    .withHeaderList(headList)
-                    .withColumnList(columnList);
-            workbook = builder.build();
+            header.append("\n");
+            os.write(header.toString().getBytes("GBK"));
+            os.flush();
             MatrixDataVo dataVo = new MatrixDataVo();
             dataVo.setMatrixUuid(matrixVo.getUuid());
             dataVo.setColumnList(attributeVoList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList()));
@@ -167,17 +157,29 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (rowNum > 0) {
                 dataVo.setRowNum(rowNum);
                 int currentPage = 1;
-                dataVo.setPageSize(20);
+                dataVo.setPageSize(1000);
                 Integer pageCount = dataVo.getPageCount();
+                List<Map<String, Object>> dataList;
                 while (currentPage <= pageCount) {
                     dataVo.setCurrentPage(currentPage);
-                    List<Map<String, Object>> dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
-                    sheetBuilder.addDataList(dataList);
+                    dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
+                    if (!dataList.isEmpty()) {
+                        StringBuilder content = new StringBuilder();
+                        for (Map<String, Object> map : dataList) {
+                            for (String head : headList) {
+                                Object value = map.get(head);
+                                content.append(value != null ? value.toString().replaceAll("\n", "").replaceAll(",", "，") : StringUtils.EMPTY).append(",");
+                            }
+                            content.append("\n");
+                        }
+                        os.write(content.toString().getBytes("GBK"));
+                        os.flush();
+                    }
+                    dataList.clear();
                     currentPage++;
                 }
             }
         }
-        return workbook;
     }
 
     @Override

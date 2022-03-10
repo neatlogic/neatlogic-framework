@@ -149,7 +149,6 @@ public class DynamicListHandler extends FormHandlerBase {
 //        }
         return tableObj;
     }
-
     private JSONObject matrixDataSourceNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         List<String> columnList = new ArrayList<>();
@@ -157,6 +156,10 @@ public class DynamicListHandler extends FormHandlerBase {
         if (CollectionUtils.isNotEmpty(columnHeadList)) {
             for (int i = 0; i < columnHeadList.size(); i++) {
                 JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+//                Boolean isPC = columnHeadObj.getBoolean("isPC");
+//                if (Objects.equals(isPC, false)) {
+//                    continue;
+//                }
                 String uuid = columnHeadObj.getString("uuid");
                 if (StringUtils.isNotBlank(uuid)) {
                     columnList.add(uuid);
@@ -259,6 +262,10 @@ public class DynamicListHandler extends FormHandlerBase {
         if (CollectionUtils.isNotEmpty(columnHeadList)) {
             for (int i = 0; i < columnHeadList.size(); i++) {
                 JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+//                Boolean isPC = columnHeadObj.getBoolean("isPC");
+//                if (Objects.equals(isPC, false)) {
+//                    continue;
+//                }
                 String uuid = columnHeadObj.getString("uuid");
                 if (StringUtils.isNotBlank(uuid)) {
                     columnList.add(uuid);
@@ -1182,21 +1189,133 @@ public class DynamicListHandler extends FormHandlerBase {
         if (CollectionUtils.isEmpty(selectUuidList)) {
             return tableObj;
         }
+        tableObj.put("selectUuidList", selectUuidList);
         String mode = configObj.getString("mode");
         Boolean needPage = configObj.getBoolean("needPage");
-        String dataSource = configObj.getString("dataSource");
-        if ("matrix".equals(dataSource)) {
-            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
-                tableObj.putAll(matrixDataSourceNoNeedPage(dataObj, selectUuidList, configObj));
-            } else {//分页
-                tableObj.putAll(matrixDataSourceNeedPage(dataObj, selectUuidList, configObj));
+        if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+            tableObj.putAll(noNeedPage(dataObj));
+        } else {//分页
+            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
+        }
+        return tableObj;
+    }
+
+    private JSONObject needPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        List<String> columnList = new ArrayList<>();
+        JSONArray theadList = new JSONArray();
+        JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isNotEmpty(columnHeadList)) {
+            for (int i = 0; i < columnHeadList.size(); i++) {
+                JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+                Boolean isPC = columnHeadObj.getBoolean("isPC");
+                if (Objects.equals(isPC, false)) {
+                    continue;
+                }
+                String uuid = columnHeadObj.getString("uuid");
+                if (StringUtils.isBlank(uuid)) {
+                    continue;
+                }
+                String name = columnHeadObj.getString("name");
+                JSONObject theadObj = new JSONObject();
+                theadObj.put("title", name);
+                theadObj.put("key", uuid);
+                theadList.add(theadObj);
+                columnList.add(uuid);
             }
-        } else if ("integration".equals(dataSource)) {
-            if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
-                tableObj.putAll(integrationDataSourceNoNeedPage(dataObj, selectUuidList, configObj));
-            } else {//分页
-                tableObj.putAll(integrationDataSourceNeedPage(dataObj, selectUuidList, configObj));
+        }
+        JSONArray attributeList = configObj.getJSONArray("attributeList");
+        if (CollectionUtils.isNotEmpty(attributeList)) {
+            for (int i = 0; i < attributeList.size(); i++) {
+                JSONObject attributeObj = attributeList.getJSONObject(i);
+                String attributeUuid = attributeObj.getString("attributeUuid");
+                if (StringUtils.isBlank(attributeUuid)) {
+                    continue;
+                }
+                if (columnList.contains(attributeUuid)) {
+                    continue;
+                }
+                String attribute = attributeObj.getString("attribute");
+                JSONObject theadObj = new JSONObject();
+                theadObj.put("title", attribute);
+                theadObj.put("key", attributeUuid);
+                theadList.add(theadObj);
+                columnList.add(attributeUuid);
             }
+        }
+        JSONObject detailData = dataObj.getJSONObject("detailData");
+        if (MapUtils.isEmpty(detailData)) {
+            return tableObj;
+        }
+        JSONArray tbodyList = new JSONArray();
+        for (int i = 0; i < selectUuidList.size(); i++) {
+            String selectUuid = selectUuidList.getString(i);
+            JSONObject rowData = detailData.getJSONObject(selectUuid);
+            if (MapUtils.isEmpty(rowData)) {
+               continue;
+            }
+            JSONObject tbodyObj = new JSONObject();
+            for (String column : columnList) {
+                JSONObject cellObj = rowData.getJSONObject(column);
+                if (MapUtils.isEmpty(cellObj)) {
+                    continue;
+                }
+                tbodyObj.put(column, cellObj);
+            }
+            tbodyObj.put("_isSelected", true);
+            tbodyList.add(tbodyObj);
+        }
+        tableObj.put("theadList", theadList);
+        tableObj.put("tbodyList", tbodyList);
+        return tableObj;
+    }
+
+    private JSONObject noNeedPage(JSONObject dataObj) {
+        JSONObject tableObj = new JSONObject();
+        JSONObject table = dataObj.getJSONObject("table");
+        if (MapUtils.isNotEmpty(table)) {
+            JSONArray theadList = new JSONArray();
+            JSONArray theadArray = table.getJSONArray("theadList");
+            for (int i = 0; i < theadArray.size(); i++) {
+                JSONObject thead = theadArray.getJSONObject(i);
+                String key = thead.getString("key");
+                String title = thead.getString("title");
+                if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(title)) {
+                    JSONObject theadObj = new JSONObject();
+                    theadObj.put("key", key);
+                    theadObj.put("title", title);
+                    theadList.add(theadObj);
+                }
+            }
+            tableObj.put("theadList", theadList);
+            JSONArray tbodyList = new JSONArray();
+            JSONArray tbodyArray = table.getJSONArray("tbodyList");
+            for (int i = 0; i < tbodyArray.size(); i++) {
+                JSONObject tbodyObj = new JSONObject();
+                JSONObject tbody = tbodyArray.getJSONObject(i);
+                for (Map.Entry<String, Object> entry : tbody.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    if ("_isSelected".equals(key)) {
+                        tbodyObj.put(key, value);
+                    } else {
+                        JSONObject valueObj = new JSONObject();
+                        if (value instanceof JSONObject) {
+                            JSONObject valueJSONObject = (JSONObject) value;
+                            valueObj.put("value", valueJSONObject.get("value"));
+                            valueObj.put("type", valueJSONObject.get("type"));
+                            valueObj.put("text", valueJSONObject.get("text"));
+                        } else {
+                            valueObj.put("value", value);
+                            valueObj.put("type", "input");
+                            valueObj.put("text", value);
+                        }
+                        tbodyObj.put(key, valueObj);
+                    }
+                }
+                tbodyList.add(tbodyObj);
+            }
+            tableObj.put("tbodyList", tbodyList);
         }
         return tableObj;
     }

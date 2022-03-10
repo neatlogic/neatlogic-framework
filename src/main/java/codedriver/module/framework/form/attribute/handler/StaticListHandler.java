@@ -1190,7 +1190,7 @@ public class StaticListHandler extends FormHandlerBase {
                             JSONArray valueList = rowData.getJSONArray(j);
                             AttributeDataVo attributeData = new AttributeDataVo();
                             attributeData.setDataObj(valueList);
-                            Object tableData = dataTransformationForEmail(attributeData, attrConfig);
+                            Object tableData = getMyDetailedData(attributeData, attrConfig);
                             cellObj.put("value", valueList);
                             cellObj.put("text", tableData);
                         }

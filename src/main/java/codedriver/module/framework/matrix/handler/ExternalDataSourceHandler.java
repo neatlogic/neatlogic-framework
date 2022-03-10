@@ -542,7 +542,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                                         if (valueStr != null && StringUtils.isNotBlank(textStr)) {
                                             valueObjList.add(new ValueTextVo(valueStr, textStr));
                                         }
-                                    } else if (valueObject instanceof JSONObject) {
+                                    } else if (valueObject instanceof String) {
                                         String valueStr = (String) valueObject;
                                         valueObjList.add(new ValueTextVo(valueStr, valueStr));
                                     }
@@ -553,6 +553,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         }
                     }
                     valueObj.put("value", valueObjList);
+                    valueObj.put("type", "selects");
                 }
             }
         }

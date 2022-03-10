@@ -552,7 +552,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                             valueObjList.add(new ValueTextVo(value, value));
                         }
                     }
-                    valueObj.put("value", valueObjList);
+                    valueObj.put("dataList", valueObjList);
                     valueObj.put("type", "selects");
                 }
             }

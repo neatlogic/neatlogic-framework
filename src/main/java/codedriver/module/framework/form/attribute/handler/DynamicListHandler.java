@@ -480,10 +480,17 @@ public class DynamicListHandler extends FormHandlerBase {
                             }
                         } else {
                             for (int j = 0; j < columnValueArray.size(); j++) {
-                                JSONObject columnValueObj = columnValueArray.getJSONObject(j);
-                                Object value = columnValueObj.get(valueName);
-                                if (Objects.equals(selectedValueObj, value)) {
-                                    newColumnValueArray.add(columnValueObj);
+                                Object columnValue = columnValueArray.get(j);
+                                if (columnValue instanceof JSONObject) {
+                                    JSONObject columnValueObj = (JSONObject) columnValue;
+                                    Object value = columnValueObj.get(valueName);
+                                    if (Objects.equals(selectedValueObj, value)) {
+                                        newColumnValueArray.add(columnValueObj);
+                                    }
+                                } else {
+                                    if (Objects.equals(selectedValueObj, columnValue)) {
+                                        newColumnValueArray.add(columnValue);
+                                    }
                                 }
                             }
                         }

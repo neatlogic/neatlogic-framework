@@ -176,14 +176,9 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
             }
             //组装对应依赖关系
             for (DependencyInfoVo dependencyInfoVo : dependencyInfoVoList) {
-                Object callerObject = dependencyInfoVo.getCaller();
-                if (!resultMap.containsKey(callerObject)) {
-                    List<DependencyInfoVo> returnDependencyList = new ArrayList<>();
-                    resultMap.put(callerObject, returnDependencyList);
-                } else {
-                    resultMap.get(callerObject).add(dependencyInfoVo);
-                }
+                resultMap.computeIfAbsent(dependencyInfoVo.getCaller(), k -> new ArrayList<>()).add(dependencyInfoVo);
             }
+
         }
         return resultMap;
     }

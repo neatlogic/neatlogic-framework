@@ -168,8 +168,8 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
         List<Map<String, Object>> callerList = dependencyMapper.getBatchCallerListByCallee(getTableName(), getFromField(), (List<Object>) from, startNum, pageSize);
         if (CollectionUtils.isNotEmpty(callerList)) {
             //转DependencyInfoVo
-            for (Object caller : callerList) {
-                DependencyInfoVo valueTextVo = parse(caller);
+            for (Object callerObject : callerList) {
+                DependencyInfoVo valueTextVo = parse(callerObject);
                 if (valueTextVo != null) {
                     dependencyInfoVoList.add(valueTextVo);
                 }

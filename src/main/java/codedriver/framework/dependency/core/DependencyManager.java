@@ -224,7 +224,13 @@ public class DependencyManager {
             if (pageSize == 0) {
                 break;
             }
-            int count = handler.getDependencyCount(from);
+            int count = 0;
+            List<Map<Object, Integer>> dependencyCountMapList = handler.getBatchDependencyCount(from);
+            if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
+                for (Map<Object, Integer> map : dependencyCountMapList) {
+                    count = count + Integer.parseInt(String.valueOf(map.get("callerCount")));
+                }
+            }
             if (startNum > count) {
                 startNum -= count;
                 continue;

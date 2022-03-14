@@ -167,18 +167,18 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object from, boolean canBeLifted) {
-        List<Map<Object, Integer>> resultMapList = new ArrayList<>();
+        List<Map<Object, Integer>> dependencyCountMapList = new ArrayList<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
 
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
-                    if (CollectionUtils.isEmpty(resultMapList)) {
-                        resultMapList = handler.getBatchDependencyCount(from);
+                    if (CollectionUtils.isEmpty(dependencyCountMapList)) {
+                        dependencyCountMapList = handler.getBatchDependencyCount(from);
                     } else {
-                        List<Map<Object, Integer>> moreMapList = handler.getBatchDependencyCount(from);
-                        if (CollectionUtils.isNotEmpty(moreMapList)) {
-                            resultMapList.addAll(moreMapList);
+                        List<Map<Object, Integer>> moreDependencyCountMapList = handler.getBatchDependencyCount(from);
+                        if (CollectionUtils.isNotEmpty(moreDependencyCountMapList)) {
+                            dependencyCountMapList.addAll(moreDependencyCountMapList);
                         }
                     }
                 }
@@ -186,8 +186,8 @@ public class DependencyManager {
 
         }
         Map<Object, Integer> returnMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(resultMapList)) {
-            for (Map<Object, Integer> map : resultMapList) {
+        if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
+            for (Map<Object, Integer> map : dependencyCountMapList) {
                 returnMap.put(map.get("caller"), Integer.parseInt(String.valueOf(map.get("callerCount"))));
             }
         }
@@ -213,7 +213,7 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object from, BasePageVo basePageVo) {
-        Map<Object, List<DependencyInfoVo>> resultMap = new HashMap<>();
+        Map<Object, List<DependencyInfoVo>> dependencyMap = new HashMap<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         int pageSize = basePageVo.getPageSize();
         int startNum = basePageVo.getStartNum();
@@ -229,18 +229,17 @@ public class DependencyManager {
                 startNum -= count;
                 continue;
             }
-            if (resultMap.isEmpty()) {
-                resultMap = handler.getBatchDependencyList(from, startNum, pageSize);
+            if (dependencyMap.isEmpty()) {
+                dependencyMap = handler.getBatchDependencyList(from, startNum, pageSize);
             } else {
-                Map<Object, List<DependencyInfoVo>> moreMap = handler.getBatchDependencyList(from, startNum, pageSize);
-                Set<Object> mapKeySet = moreMap.keySet();
+                Map<Object, List<DependencyInfoVo>> moreDependencyMap = handler.getBatchDependencyList(from, startNum, pageSize);
+                Set<Object> mapKeySet = moreDependencyMap.keySet();
                 for (Object key : mapKeySet) {
-                    resultMap.put(key, moreMap.get(key));
+                    dependencyMap.put(key, moreDependencyMap.get(key));
                 }
             }
             startNum = 0;
         }
-        return resultMap;
+        return dependencyMap;
     }
-
 }

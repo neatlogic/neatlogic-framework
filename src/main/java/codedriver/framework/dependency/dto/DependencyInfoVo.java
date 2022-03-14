@@ -38,15 +38,6 @@ public class DependencyInfoVo {
         this.groupName = groupName;
     }
 
-    public DependencyInfoVo(Object caller, Object value, JSONObject config, String groupName, String pathFormat, String urlFormat) {
-        this.caller = caller;
-        this.value = value;
-        this.config = config;
-        this.groupName = groupName;
-        this.pathFormat = pathFormat;
-        this.urlFormat = urlFormat;
-    }
-
     public Object getCaller() {
         return caller;
     }

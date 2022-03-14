@@ -1207,6 +1207,13 @@ public class DynamicListHandler extends FormHandlerBase {
         return tableObj;
     }
 
+    /**
+     * 表格选择组件设置分页显示的情况，从原始数据的theadList中获取theadList数据，从原始数据的detailData中获取tbodyList数据
+     * @param dataObj 原始数据
+     * @param selectUuidList 选择行集合
+     * @param configObj 表单组件的配置信息
+     * @return
+     */
     private JSONObject needPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         List<String> columnList = new ArrayList<>();
@@ -1277,6 +1284,11 @@ public class DynamicListHandler extends FormHandlerBase {
         return tableObj;
     }
 
+    /**
+     * 表格选择组件设置不分页显示的情况，从表单组件的配置信息中获取theadList数据，从原始数据的tbodyList中获取tbodyList数据
+     * @param dataObj 原始数据
+     * @return
+     */
     private JSONObject noNeedPage(JSONObject dataObj) {
         JSONObject tableObj = new JSONObject();
         JSONObject table = dataObj.getJSONObject("table");

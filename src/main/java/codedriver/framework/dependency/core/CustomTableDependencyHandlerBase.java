@@ -174,11 +174,12 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
                     dependencyInfoVoList.add(valueTextVo);
                 }
             }
-            //组装对应依赖关系
-            for (DependencyInfoVo dependencyInfoVo : dependencyInfoVoList) {
-                resultMap.computeIfAbsent(dependencyInfoVo.getCaller(), k -> new ArrayList<>()).add(dependencyInfoVo);
+            if (CollectionUtils.isNotEmpty(dependencyInfoVoList)) {
+                //组装对应依赖关系
+                for (DependencyInfoVo dependencyInfoVo : dependencyInfoVoList) {
+                    resultMap.computeIfAbsent(dependencyInfoVo.getCaller(), k -> new ArrayList<>()).add(dependencyInfoVo);
+                }
             }
-
         }
         return resultMap;
     }

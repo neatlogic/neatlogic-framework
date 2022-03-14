@@ -162,7 +162,7 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
      * @param pageSize
      * @return
      */
-    public Map<Object, List<DependencyInfoVo>> getBatchDependencyList(Object from, int startNum, int pageSize) {
+    public Map<Object, List<DependencyInfoVo>> getBatchDependencyListMap(Object from, int startNum, int pageSize) {
         Map<Object, List<DependencyInfoVo>> resultMap = new HashMap<>();
         List<Map<String, Object>> callerList = dependencyMapper.getBatchCallerListByCallee(getTableName(), getFromField(), (List<Object>) from, startNum, pageSize);
         if (CollectionUtils.isNotEmpty(callerList)) {

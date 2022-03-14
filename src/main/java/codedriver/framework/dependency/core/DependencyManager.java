@@ -236,9 +236,9 @@ public class DependencyManager {
                 continue;
             }
             if (dependencyMap.isEmpty()) {
-                dependencyMap = handler.getBatchDependencyList(from, startNum, pageSize);
+                dependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
             } else {
-                Map<Object, List<DependencyInfoVo>> moreDependencyMap = handler.getBatchDependencyList(from, startNum, pageSize);
+                Map<Object, List<DependencyInfoVo>> moreDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
                 Set<Object> mapKeySet = moreDependencyMap.keySet();
                 for (Object key : mapKeySet) {
                     dependencyMap.put(key, moreDependencyMap.get(key));

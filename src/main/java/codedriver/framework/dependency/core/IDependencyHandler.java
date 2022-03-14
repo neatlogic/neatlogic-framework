@@ -112,7 +112,7 @@ public interface IDependencyHandler {
      * @param pageSize
      * @return
      */
-    default Map<Object, List<DependencyInfoVo>> getBatchDependencyList(Object from, int startNum, int pageSize) {
+    default Map<Object, List<DependencyInfoVo>> getBatchDependencyListMap(Object from, int startNum, int pageSize) {
         return null;
     }
 }

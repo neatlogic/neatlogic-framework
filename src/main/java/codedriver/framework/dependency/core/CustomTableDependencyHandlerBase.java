@@ -163,7 +163,6 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
      * @return
      */
     public Map<Object, List<DependencyInfoVo>> getBatchDependencyList(Object from, int startNum, int pageSize) {
-        List<DependencyInfoVo> dependencyInfoVoList = new ArrayList<>();
         Map<Object, List<DependencyInfoVo>> resultMap = new HashMap<>();
         List<Map<String, Object>> callerList = dependencyMapper.getBatchCallerListByCallee(getTableName(), getFromField(), (List<Object>) from, startNum, pageSize);
         if (CollectionUtils.isNotEmpty(callerList)) {
@@ -171,13 +170,8 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
             for (Object callerObject : callerList) {
                 DependencyInfoVo valueTextVo = parse(callerObject);
                 if (valueTextVo != null) {
-                    dependencyInfoVoList.add(valueTextVo);
-                }
-            }
-            if (CollectionUtils.isNotEmpty(dependencyInfoVoList)) {
-                //组装对应依赖关系
-                for (DependencyInfoVo dependencyInfoVo : dependencyInfoVoList) {
-                    resultMap.computeIfAbsent(dependencyInfoVo.getCaller(), k -> new ArrayList<>()).add(dependencyInfoVo);
+                    //组装对应依赖关系
+                    resultMap.computeIfAbsent(valueTextVo.getCaller(), k -> new ArrayList<>()).add(valueTextVo);
                 }
             }
         }

@@ -7,7 +7,7 @@ package codedriver.framework.matrix.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.ExportFileType;
-import codedriver.framework.dependency.constvalue.FromType;
+import codedriver.framework.dependency.constvalue.FrameworkFromType;
 import codedriver.framework.dependency.core.DependencyManager;
 import codedriver.framework.exception.file.FileTypeNotSupportToExportException;
 import codedriver.framework.exception.type.ParamIrregularException;
@@ -77,7 +77,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
 
     @Override
     public void deleteMatrix(String uuid) {
-        if (DependencyManager.getDependencyCount(FromType.MATRIX, uuid) > 0) {
+        if (DependencyManager.getDependencyCount(FrameworkFromType.MATRIX, uuid) > 0) {
             throw new MatrixReferencedCannotBeDeletedException(uuid);
         }
         matrixMapper.deleteMatrixByUuid(uuid);

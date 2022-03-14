@@ -9,9 +9,11 @@ import codedriver.framework.dependency.dao.mapper.DependencyMapper;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +76,7 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
      * 插入一条引用关系数据
      *
      * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param to   引用者（下游）值（如：服务uuid）
      * @return
      */
     @Override
@@ -85,14 +87,14 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to     引用者（下游）值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
     @Override
     public int insert(Object from, Object to, JSONObject config) {
-        if(to instanceof JSONArray){
+        if (to instanceof JSONArray) {
             return dependencyMapper.insertIgnoreDependencyForCallerFieldList(getTableName(), getFromField(), getToFieldList(), from, (JSONArray) to);
         } else {
             return dependencyMapper.insertIgnoreDependencyForCallerField(getTableName(), getFromField(), getToField(), from, to);
@@ -113,7 +115,7 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 查询引用列表数据
      *
-     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param from     被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 每页条数
      * @return
@@ -140,6 +142,50 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     @Override
     public int getDependencyCount(Object from) {
         return dependencyMapper.getCallerCountByCallee(getTableName(), getFromField(), from);
+    }
+
+    /**
+     * 批量查询引用次数
+     *
+     * @param from
+     * @return
+     */
+    public List<Map<Object, Integer>> getBatchDependencyCount(Object from) {
+        return dependencyMapper.getBatchCallerCountByCallee(getTableName(), getFromField(), (List<Object>) from);
+    }
+
+    /**
+     * 批量查询引用列表数据
+     *
+     * @param from
+     * @param startNum
+     * @param pageSize
+     * @return
+     */
+    public Map<Object, List<DependencyInfoVo>> getBatchDependencyList(Object from, int startNum, int pageSize) {
+        List<DependencyInfoVo> dependencyInfoVoList = new ArrayList<>();
+        Map<Object, List<DependencyInfoVo>> resultMap = new HashMap<>();
+        List<Map<String, Object>> callerList = dependencyMapper.getBatchCallerListByCallee(getTableName(), getFromField(), (List<Object>) from, startNum, pageSize);
+        if (CollectionUtils.isNotEmpty(callerList)) {
+            //转DependencyInfoVo
+            for (Object caller : callerList) {
+                DependencyInfoVo valueTextVo = parse(caller);
+                if (valueTextVo != null) {
+                    dependencyInfoVoList.add(valueTextVo);
+                }
+            }
+            //组装对应依赖关系
+            for (DependencyInfoVo dependencyInfoVo : dependencyInfoVoList) {
+                Object callerObject = dependencyInfoVo.getCaller();
+                if (!resultMap.containsKey(callerObject)) {
+                    List<DependencyInfoVo> returnDependencyList = new ArrayList<>();
+                    resultMap.put(callerObject, returnDependencyList);
+                } else {
+                    resultMap.get(callerObject).add(dependencyInfoVo);
+                }
+            }
+        }
+        return resultMap;
     }
 
     /**

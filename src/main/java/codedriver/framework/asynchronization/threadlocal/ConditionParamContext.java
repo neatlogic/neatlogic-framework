@@ -8,6 +8,7 @@ package codedriver.framework.asynchronization.threadlocal;
 import org.apache.commons.collections4.MapUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 public class ConditionParamContext {
 
@@ -29,6 +30,10 @@ public class ConditionParamContext {
 		ConditionParamContext context = new ConditionParamContext();
 		if (MapUtils.isNotEmpty(_paramData)) {
 			context.paramData.putAll(_paramData);
+			String formConfigStr = _paramData.getString("formConfig");
+			if (StringUtils.isNotBlank(formConfigStr)) {
+				context.formConfig = JSONObject.parseObject(formConfigStr);
+			}
 		}
 		instance.set(context);
 		return context;

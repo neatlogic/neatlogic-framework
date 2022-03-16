@@ -170,20 +170,11 @@ public class DependencyManager {
         List<Map<Object, Integer>> dependencyCountMapList = new ArrayList<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
-
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
-                    if (CollectionUtils.isEmpty(dependencyCountMapList)) {
-                        dependencyCountMapList = handler.getBatchDependencyCount(from);
-                    } else {
-                        List<Map<Object, Integer>> moreDependencyCountMapList = handler.getBatchDependencyCount(from);
-                        if (CollectionUtils.isNotEmpty(moreDependencyCountMapList)) {
-                            dependencyCountMapList.addAll(moreDependencyCountMapList);
-                        }
-                    }
+                    dependencyCountMapList.addAll(handler.getBatchDependencyCount(from));
                 }
             }
-
         }
         Map<Object, Integer> returnMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
@@ -213,7 +204,7 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object from, BasePageVo basePageVo) {
-        Map<Object, List<DependencyInfoVo>> dependencyMap = new HashMap<>();
+        Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         int pageSize = basePageVo.getPageSize();
         int startNum = basePageVo.getStartNum();
@@ -224,6 +215,7 @@ public class DependencyManager {
             if (pageSize == 0) {
                 break;
             }
+            //获取当前handler的总依赖数
             int count = 0;
             List<Map<Object, Integer>> dependencyCountMapList = handler.getBatchDependencyCount(from);
             if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
@@ -235,17 +227,14 @@ public class DependencyManager {
                 startNum -= count;
                 continue;
             }
-            if (dependencyMap.isEmpty()) {
-                dependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
-            } else {
-                Map<Object, List<DependencyInfoVo>> moreDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
-                Set<Object> mapKeySet = moreDependencyMap.keySet();
-                for (Object key : mapKeySet) {
-                    dependencyMap.put(key, moreDependencyMap.get(key));
-                }
+            //获取当前handler的依赖关系
+            Map<Object, List<DependencyInfoVo>> handlerDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
+            for (Object key : handlerDependencyMap.keySet()) {
+                returnMap.put(key, handlerDependencyMap.get(key));
             }
+            pageSize -= count;
             startNum = 0;
         }
-        return dependencyMap;
+        return returnMap;
     }
 }

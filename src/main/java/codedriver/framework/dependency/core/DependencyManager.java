@@ -167,19 +167,15 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object from, boolean canBeLifted) {
-        List<Map<Object, Integer>> dependencyCountMapList = new ArrayList<>();
+        Map<Object, Integer> returnMap = new HashMap<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
-                    dependencyCountMapList.addAll(handler.getBatchDependencyCount(from));
+                    for (Map<Object, Integer> map : handler.getBatchDependencyCount(from)) {
+                        returnMap.put(map.get("caller"), Integer.parseInt(String.valueOf(map.get("callerCount"))));
+                    }
                 }
-            }
-        }
-        Map<Object, Integer> returnMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
-            for (Map<Object, Integer> map : dependencyCountMapList) {
-                returnMap.put(map.get("caller"), Integer.parseInt(String.valueOf(map.get("callerCount"))));
             }
         }
         return returnMap;
@@ -228,11 +224,13 @@ public class DependencyManager {
                 continue;
             }
             //获取当前handler的依赖关系
+            int handlerDependencyCount = 0;
             Map<Object, List<DependencyInfoVo>> handlerDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
             for (Object key : handlerDependencyMap.keySet()) {
                 returnMap.put(key, handlerDependencyMap.get(key));
+                handlerDependencyCount += handlerDependencyMap.get(key).size();
             }
-            pageSize -= count;
+            pageSize -= handlerDependencyCount;
             startNum = 0;
         }
         return returnMap;

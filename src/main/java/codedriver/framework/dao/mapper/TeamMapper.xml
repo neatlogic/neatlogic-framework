@@ -306,6 +306,7 @@
         `uuid`,
         `name`,
         `parent_uuid` AS parentUuid,
+        `level`,
         `lft`,
         `rht`,
         `upward_uuid_path` AS upwardUuidPath,

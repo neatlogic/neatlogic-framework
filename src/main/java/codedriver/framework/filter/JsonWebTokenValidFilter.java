@@ -14,6 +14,7 @@ import codedriver.framework.dao.mapper.UserSessionMapper;
 import codedriver.framework.dto.AuthenticationInfoVo;
 import codedriver.framework.dto.UserSessionVo;
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.exception.core.NoLicenseException;
 import codedriver.framework.filter.core.ILoginAuthHandler;
 import codedriver.framework.filter.core.LoginAuthFactory;
 import codedriver.framework.login.core.ILoginPostProcessor;
@@ -146,6 +147,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
                 response.getWriter().print(redirectObj.toJSONString());
             }
+        }catch (NoLicenseException ex) {
+            response.setStatus(525);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            redirectObj.put("Status", "ERROR");
+            redirectObj.put("Message", ex.getMessage());
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            response.getWriter().print(redirectObj.toJSONString());
         } catch (Exception ex) {
             logger.error("认证失败", ex);
             response.setStatus(522);

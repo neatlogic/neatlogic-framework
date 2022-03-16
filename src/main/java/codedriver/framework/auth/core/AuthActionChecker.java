@@ -5,12 +5,14 @@
 
 package codedriver.framework.auth.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.UserMapper;
+import codedriver.framework.dto.LicenseVo;
 import codedriver.framework.dto.UserAuthVo;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -97,16 +99,28 @@ public class AuthActionChecker {
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
+        //先判断租户license 是否有该auth
+        List<String> licenseActionList;
+        LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+        if(licenseVo != null && CollectionUtils.isNotEmpty(licenseVo.getAuthList())){
+            List<UserAuthVo> licenseUserAuthList = AuthActionChecker.getAuthListByAuth(licenseVo.getAuthList());
+            licenseActionList = actionList.stream().filter(o->licenseUserAuthList.stream().anyMatch(l->Objects.equals(l.getAuth(),o))).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(licenseActionList)){
+                return false;
+            }
+        }else{
+            return false;
+        }
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
         //判断从数据库查询的用户权限是否满足
-        List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
+        List<String> contains = userAuthList.stream().filter(licenseActionList::contains).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(contains)) {
             return true;
         }
         //以上不满足，则遍历递归所有权限寻找
         for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
-            if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {
+            if (checkAuthList(userAuthList.get(i), userAuthList, licenseActionList)) {
                 return true;
             }
         }
@@ -148,8 +162,27 @@ public class AuthActionChecker {
     public static void getAuthList(List<UserAuthVo> userAuthList) {
         for (int i = 0; i < userAuthList.size(); i++) {
             AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
-            getAuthListByAuth(authBase, userAuthList);
+            if(authBase != null) {
+                getAuthListByAuth(authBase, userAuthList);
+            }
         }
+    }
+
+    /**
+     * 根据用户权限穿透获取所有权限
+     *
+     * @param authList 未穿透的权限
+     */
+    public static List<UserAuthVo> getAuthListByAuth(List<String> authList) {
+        List<UserAuthVo> userAuthList = new ArrayList<>();
+        for (String s : authList) {
+            AuthBase authBase = AuthFactory.getAuthInstance(s);
+            if (authBase != null) {
+                userAuthList.add(new UserAuthVo(authBase));
+                getAuthListByAuth(authBase, userAuthList);
+            }
+        }
+        return userAuthList;
     }
 
     private static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {

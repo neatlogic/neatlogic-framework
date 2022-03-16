@@ -5,8 +5,12 @@
 
 package codedriver.framework.auth.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.LicenseVo;
+import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.exception.auth.NoAuthGroupException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
@@ -47,6 +51,22 @@ public class AuthFactory {
     }
 
     public static Map<String, List<AuthBase>> getAuthGroupMap() {
-        return authGroupMap;
+        //过滤出对应租户license 权限
+        Map<String,List<AuthBase>> licenseAuthGroupMap = new HashMap<>();
+        for(Map.Entry<String ,List<AuthBase>> authGroupEntry : authGroupMap.entrySet()){
+            List<AuthBase> authBaseList = authGroupEntry.getValue();
+            List<AuthBase> licenseAuthBaseList = new ArrayList<>();
+            authBaseList.forEach(authBase -> {
+                LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+                if(licenseVo != null && CollectionUtils.isNotEmpty(licenseVo.getAuthList())) {
+                    List<UserAuthVo> licenseUserAuth = AuthActionChecker.getAuthListByAuth(licenseVo.getAuthList());
+                    if (licenseUserAuth.stream().anyMatch(u -> Objects.equals(u.getAuth(), authBase.getAuthName()))) {
+                        licenseAuthBaseList.add(authBase);
+                    }
+                }
+            });
+            licenseAuthGroupMap.put(authGroupEntry.getKey(),licenseAuthBaseList);
+        }
+        return licenseAuthGroupMap;
     }
 }

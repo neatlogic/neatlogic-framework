@@ -31,6 +31,8 @@ public class TenantVo extends BasePageVo {
 	private List<ModuleGroupVo> moduleGroupList;
 	@EntityField(name = "状态", type = ApiParamType.STRING)
 	private String status;
+	@EntityField(name = "license", type = ApiParamType.JSONOBJECT)
+	private LicenseVo license;
 
 	public TenantVo() {
 		this.setPageSize(20);
@@ -115,4 +117,11 @@ public class TenantVo extends BasePageVo {
 		this.status = status;
 	}
 
+	public LicenseVo getLicense() {
+		return license;
+	}
+
+	public void setLicense(LicenseVo license) {
+		this.license = license;
+	}
 }

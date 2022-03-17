@@ -48,6 +48,8 @@ public interface FormMapper {
 
     public List<FormAttributeMatrixVo> getFormAttributeMatrixByMatrixUuid(@Param("matrixUuid") String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
 
+    List<FormVersionVo> getFormVersionListByFormConfigLikeKeyword(String value);
+
     public int insertForm(FormVo formVo);
 
     public int insertFormAttributeMatrix(FormAttributeMatrixVo componentVo);
@@ -56,7 +58,11 @@ public interface FormMapper {
 
     public int updateFormVersion(FormVersionVo formVersionVo);
 
+    int updateFormVersionConfigByUuid(FormVersionVo formVersionVo);
+
     public void updateForm(FormVo formVo);
+
+    int updateFormAttributeConfig(FormAttributeVo formAttributeVo);
 
     public int insertFormVersion(FormVersionVo formVersionVo);
 

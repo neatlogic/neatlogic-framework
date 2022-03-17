@@ -86,7 +86,7 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
             dependencyInfoConfig.put("formVersionUuid", formAttributeMatrixVo.getFormVersionUuid());
             dependencyInfoConfig.put("attributeLabel", formAttributeMatrixVo.getFormAttributeLabel());
             String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
-            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formName}&currentVersionUuid=${DATA.formVersion}";
+            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formUuid}&currentVersionUuid=${DATA.formVersionUuid}";
             return new DependencyInfoVo(formAttributeMatrixVo.getFormAttributeUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
 //            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
 //            dependencyInfoVo.setValue(formAttributeMatrixVo.getFormAttributeUuid());

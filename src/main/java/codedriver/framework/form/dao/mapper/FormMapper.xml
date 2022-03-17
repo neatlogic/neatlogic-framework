@@ -216,6 +216,22 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
+    <select id="getFormVersionListByFormConfigLikeKeyword" parameterType="java.lang.String" resultType="codedriver.framework.form.dto.FormVersionVo">
+        SELECT
+            a.`uuid`,
+            a.`version`,
+            a.`is_active` AS isActive,
+            a.`form_uuid` AS formUuid,
+            a.`form_config` AS formConfig,
+            a.`fcd`,
+            a.`fcu`,
+            a.`lcd`,
+            a.`lcu`
+        FROM `form_version` a
+        WHERE a.`form_config` LIKE CONCAT('%',#{value},'%')
+        ORDER BY a.`form_uuid`
+    </select>
+
     <update id="updateFormVersion" parameterType="codedriver.framework.form.dto.FormVersionVo">
         UPDATE
         `form_version`
@@ -229,6 +245,10 @@
         `lcd` = NOW(3),
         `lcu` = #{lcu}
         WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateFormVersionConfigByUuid" parameterType="codedriver.framework.form.dto.FormVersionVo">
+        UPDATE `form_version` SET `form_config` = #{formConfig} WHERE `uuid` = #{uuid}
     </update>
 
     <update id="resetFormVersionIsActiveByFormUuid" parameterType="java.lang.String">
@@ -247,6 +267,14 @@
         </if>
         `uuid` = #{uuid}
         WHERE `uuid` = #{uuid};
+    </update>
+
+    <update id="updateFormAttributeConfig" parameterType="codedriver.framework.form.dto.FormAttributeVo">
+        UPDATE `form_attribute`
+        SET `config` = #{config}
+        WHERE `form_uuid` = #{formUuid}
+          AND `formversion_uuid` = #{formVersionUuid}
+          AND `uuid` = #{uuid}
     </update>
 
     <insert id="insertForm" parameterType="codedriver.framework.form.dto.FormVo">

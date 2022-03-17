@@ -30,4 +30,6 @@ public interface UserService {
 
     List<UserVo> getUserListByRoleUuid(String roleUuid);
 
+    Set<String> getUserUuidSetByRoleUuid(String roleUuid);
+
 }

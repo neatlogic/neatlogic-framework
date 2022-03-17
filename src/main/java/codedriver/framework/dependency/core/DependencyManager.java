@@ -211,9 +211,11 @@ public class DependencyManager {
         for (Object key : getBatchDependencyCount(fromType, from, true).keySet()) {
             returnCountMap.put(key, pageSize);
         }
-        int returnCountSum = pageSize * returnCountMap.size();
-
         for (IDependencyHandler handler : dependencyHandlerList) {
+            int returnCountSum = 0;
+            for (Object key : returnCountMap.keySet()) {
+                returnCountSum = returnCountSum + returnCountMap.get(key);
+            }
             if (returnCountSum < 1) {
                 break;
             }

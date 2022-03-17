@@ -11,7 +11,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 依赖关系管理类，基本操作：保存依赖关系数据，删除依赖关系数据，查询依赖数量，查询引用列表
@@ -200,38 +203,33 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object from, BasePageVo basePageVo) {
-        Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
-        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         int pageSize = basePageVo.getPageSize();
         int startNum = basePageVo.getStartNum();
+        Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
+        Map<Object, Integer> returnCountMap = new HashMap<>();
+        for (Object key : getBatchDependencyCount(fromType, from, true).keySet()) {
+            returnCountMap.put(key, pageSize);
+        }
+        int returnCountSum = pageSize * returnCountMap.size();
+
         for (IDependencyHandler handler : dependencyHandlerList) {
-            if (!handler.canBeLifted()) {
-                continue;
+            if (returnCountSum < 1) {
+                break;
             }
             if (pageSize == 0) {
                 break;
             }
-            //获取当前handler的总依赖数
-            int count = 0;
-            List<Map<Object, Integer>> dependencyCountMapList = handler.getBatchDependencyCount(from);
-            if (CollectionUtils.isNotEmpty(dependencyCountMapList)) {
-                for (Map<Object, Integer> map : dependencyCountMapList) {
-                    count = count + Integer.parseInt(String.valueOf(map.get("callerCount")));
-                }
-            }
-            if (startNum > count) {
-                startNum -= count;
+            if (!handler.canBeLifted()) {
                 continue;
             }
-            //获取当前handler的依赖关系
-            int handlerDependencyCount = 0;
             Map<Object, List<DependencyInfoVo>> handlerDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
             for (Object key : handlerDependencyMap.keySet()) {
-                returnMap.put(key, handlerDependencyMap.get(key));
-                handlerDependencyCount += handlerDependencyMap.get(key).size();
+                if (returnCountMap.get(key) > 0) {
+                    returnMap.put(key, handlerDependencyMap.get(key));
+                    returnCountMap.put(key, returnCountMap.get(key) - 1);
+                }
             }
-            pageSize -= handlerDependencyCount;
-            startNum = 0;
         }
         return returnMap;
     }

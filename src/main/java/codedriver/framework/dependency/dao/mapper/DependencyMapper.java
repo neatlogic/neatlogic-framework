@@ -35,13 +35,6 @@ public interface DependencyMapper {
             @Param("calleeField") String calleeField,
             @Param("callee") List<Object> caller);
 
-    List<Map<String, Object>> getBatchCallerListByCallee(
-            @Param("tableName") String tableName,
-            @Param("calleeField") String calleeField,
-            @Param("callee") List<Object> callee,
-            @Param("startNum") int startNum,
-            @Param("pageSize") int pageSize);
-
     int insertIgnoreDependencyForCallerField(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,

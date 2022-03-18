@@ -30,16 +30,6 @@
         GROUP BY `${calleeField}`
     </select>
 
-    <select id="getBatchCallerListByCallee" resultType="java.util.Map">
-        SELECT t.`${calleeField}` as caller, t.*
-        FROM `${tableName}` t
-        WHERE t.`${calleeField}` in
-        <foreach collection="callee" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-        LIMIT #{startNum} , #{pageSize}
-    </select>
-
     <insert id="insertIgnoreDependencyForCallerField">
         INSERT
         IGNORE INTO `${tableName}` (`${callerField}`, `${calleeField}`)

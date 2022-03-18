@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
  * @since 2022/1/11 12:16
  **/
 public class DependencyInfoVo {
-    private Object caller;
     private Object value;
     private String text;
     private String path;
@@ -36,14 +35,6 @@ public class DependencyInfoVo {
         this.pathFormat = pathFormat;
         this.urlFormat = urlFormat;
         this.groupName = groupName;
-    }
-
-    public Object getCaller() {
-        return caller;
-    }
-
-    public void setCaller(Object caller) {
-        this.caller = caller;
     }
 
     public Object getValue() {

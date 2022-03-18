@@ -206,8 +206,7 @@ public class DependencyManager {
         List<Object> fromList = (List <Object>) fromListObject;
         Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
         for (Object fromObject : fromList) {
-            List<DependencyInfoVo> dependencyInfoVoList = getDependencyList(fromType, fromObject, basePageVo);
-            returnMap.put(fromObject, dependencyInfoVoList);
+            returnMap.put(fromObject, getDependencyList(fromType, fromObject, basePageVo));
         }
             return returnMap;
     }

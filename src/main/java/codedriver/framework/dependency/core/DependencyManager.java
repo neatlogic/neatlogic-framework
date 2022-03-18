@@ -199,13 +199,13 @@ public class DependencyManager {
      * 批量查询引用列表
      *
      * @param fromType 被引用者（上游）类型
-     * @param fromListObject     被引用者（上游）值（如：服务时间窗口uuid）
+     * @param fromList     被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
-    public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object fromListObject, BasePageVo basePageVo) {
+    public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object fromList, BasePageVo basePageVo) {
         Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
-        for (Object fromObject : (List <Object>) fromListObject) {
-            returnMap.put(fromObject, getDependencyList(fromType, fromObject, basePageVo));
+        for (Object from : (List <Object>) fromList) {
+            returnMap.put(from, getDependencyList(fromType, from, basePageVo));
         }
             return returnMap;
     }

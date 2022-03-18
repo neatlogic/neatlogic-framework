@@ -203,9 +203,8 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object fromListObject, BasePageVo basePageVo) {
-        List<Object> fromList = (List <Object>) fromListObject;
         Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
-        for (Object fromObject : fromList) {
+        for (Object fromObject : (List <Object>) fromListObject) {
             returnMap.put(fromObject, getDependencyList(fromType, fromObject, basePageVo));
         }
             return returnMap;

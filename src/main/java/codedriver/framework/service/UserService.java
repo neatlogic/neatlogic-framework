@@ -23,13 +23,20 @@ public interface UserService {
 
     /**
      * 根据指定范围获取用户
-     * @param userVo 用户参数
+     *
+     * @param userVo    用户参数
      * @param rangeList 范围
      */
     void getUserByRangeList(UserVo userVo, List<String> rangeList);
 
     List<UserVo> getUserListByRoleUuid(String roleUuid);
 
+    /**
+     * 根据角色uuid获取其下所有用户uuid，包括分组中的用户
+     *
+     * @param roleUuid 角色uuid
+     * @return
+     */
     Set<String> getUserUuidSetByRoleUuid(String roleUuid);
 
 }

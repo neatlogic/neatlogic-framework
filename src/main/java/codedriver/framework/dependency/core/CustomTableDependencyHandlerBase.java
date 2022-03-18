@@ -145,11 +145,11 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     /**
      * 批量查询引用次数
      *
-     * @param from
+     * @param fromList
      * @return
      */
-    public List<Map<Object, Integer>> getBatchDependencyCount(Object from) {
-        return dependencyMapper.getBatchCallerCountByCallee(getTableName(), getFromField(), (List<Object>) from);
+    public List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {
+        return dependencyMapper.getBatchCallerCountByCallee(getTableName(), getFromField(), (List<Object>) fromList);
     }
 
     /**

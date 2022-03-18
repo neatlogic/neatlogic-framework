@@ -97,10 +97,10 @@ public interface IDependencyHandler {
     /**
      * 批量查询引用次数
      *
-     * @param from
+     * @param fromList
      * @return
      */
-    default List<Map<Object, Integer>> getBatchDependencyCount(Object from) {
+    default List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {
         return null;
     }
 

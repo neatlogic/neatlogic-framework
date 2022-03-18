@@ -165,17 +165,17 @@ public class DependencyManager {
      * 批量查询引用个数
      *
      * @param fromType
-     * @param from
+     * @param fromList
      * @param canBeLifted
      * @return
      */
-    public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object from, boolean canBeLifted) {
+    public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object fromList, boolean canBeLifted) {
         Map<Object, Integer> returnMap = new HashMap<>();
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
-                    for (Map<Object, Integer> map : handler.getBatchDependencyCount(from)) {
+                    for (Map<Object, Integer> map : handler.getBatchDependencyCount(fromList)) {
                         returnMap.put(map.get("caller"), Integer.parseInt(String.valueOf(map.get("callerCount"))));
                     }
                 }
@@ -188,11 +188,11 @@ public class DependencyManager {
      * 批量查询引用个数
      *
      * @param fromType
-     * @param from
+     * @param fromList
      * @return
      */
-    public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object from) {
-        return getBatchDependencyCount(fromType, from, true);
+    public static Map<Object, Integer> getBatchDependencyCount(IFromType fromType, Object fromList) {
+        return getBatchDependencyCount(fromType, fromList, true);
     }
 
     /**

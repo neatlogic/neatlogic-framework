@@ -9,11 +9,9 @@ import codedriver.framework.dependency.dao.mapper.DependencyMapper;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -152,30 +150,6 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
      */
     public List<Map<Object, Integer>> getBatchDependencyCount(Object from) {
         return dependencyMapper.getBatchCallerCountByCallee(getTableName(), getFromField(), (List<Object>) from);
-    }
-
-    /**
-     * 批量查询引用列表数据
-     *
-     * @param from
-     * @param startNum
-     * @param pageSize
-     * @return
-     */
-    public Map<Object, List<DependencyInfoVo>> getBatchDependencyListMap(Object from, int startNum, int pageSize) {
-        Map<Object, List<DependencyInfoVo>> resultMap = new HashMap<>();
-        List<Map<String, Object>> callerList = dependencyMapper.getBatchCallerListByCallee(getTableName(), getFromField(), (List<Object>) from, startNum, pageSize);
-        if (CollectionUtils.isNotEmpty(callerList)) {
-            //转DependencyInfoVo
-            for (Object callerObject : callerList) {
-                DependencyInfoVo valueTextVo = parse(callerObject);
-                if (valueTextVo != null) {
-                    //组装对应依赖关系
-                    resultMap.computeIfAbsent(valueTextVo.getCaller(), k -> new ArrayList<>()).add(valueTextVo);
-                }
-            }
-        }
-        return resultMap;
     }
 
     /**

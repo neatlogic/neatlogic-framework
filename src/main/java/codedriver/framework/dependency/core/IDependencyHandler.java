@@ -104,15 +104,4 @@ public interface IDependencyHandler {
         return null;
     }
 
-    /**
-     * 批量查询引用列表数据
-     *
-     * @param from
-     * @param startNum
-     * @param pageSize
-     * @return
-     */
-    default Map<Object, List<DependencyInfoVo>> getBatchDependencyListMap(Object from, int startNum, int pageSize) {
-        return null;
-    }
 }

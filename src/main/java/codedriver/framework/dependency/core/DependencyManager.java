@@ -203,36 +203,12 @@ public class DependencyManager {
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object from, BasePageVo basePageVo) {
-        int pageSize = basePageVo.getPageSize();
-        int startNum = basePageVo.getStartNum();
+        List<Object> fromList = (List <Object>) from;
         Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
-        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
-        Map<Object, Integer> returnCountMap = new HashMap<>();
-        for (Object key : getBatchDependencyCount(fromType, from, true).keySet()) {
-            returnCountMap.put(key, pageSize);
+        for (Object fromObject : fromList) {
+            List<DependencyInfoVo> dependencyInfoVoList = getDependencyList(fromType, fromObject, basePageVo);
+            returnMap.put(fromObject, dependencyInfoVoList);
         }
-        for (IDependencyHandler handler : dependencyHandlerList) {
-            int returnCountSum = 0;
-            for (Object key : returnCountMap.keySet()) {
-                returnCountSum = returnCountSum + returnCountMap.get(key);
-            }
-            if (returnCountSum < 1) {
-                break;
-            }
-            if (pageSize == 0) {
-                break;
-            }
-            if (!handler.canBeLifted()) {
-                continue;
-            }
-            Map<Object, List<DependencyInfoVo>> handlerDependencyMap = handler.getBatchDependencyListMap(from, startNum, pageSize);
-            for (Object key : handlerDependencyMap.keySet()) {
-                if (returnCountMap.get(key) > 0) {
-                    returnMap.put(key, handlerDependencyMap.get(key));
-                    returnCountMap.put(key, returnCountMap.get(key) - 1);
-                }
-            }
-        }
-        return returnMap;
+            return returnMap;
     }
 }

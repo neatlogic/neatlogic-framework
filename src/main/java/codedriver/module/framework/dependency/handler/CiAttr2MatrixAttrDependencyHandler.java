@@ -6,7 +6,7 @@
 package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.dependency.constvalue.FromType;
+import codedriver.framework.dependency.constvalue.FrameworkFromType;
 import codedriver.framework.dependency.core.FixedTableDependencyHandlerBase;
 import codedriver.framework.dependency.core.IFromType;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
@@ -81,6 +81,6 @@ public class CiAttr2MatrixAttrDependencyHandler extends FixedTableDependencyHand
 
     @Override
     public IFromType getFromType() {
-        return FromType.CMDBCIATTR;
+        return FrameworkFromType.CMDBCIATTR;
     }
 }

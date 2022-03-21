@@ -85,7 +85,7 @@ public interface UserMapper {
      * @Returns: java.util.List<codedriver.framework.dto.UserVo>
      **/
     List<UserVo> getUserTeamRoleListByTeamUuidList(List<String> teamUuidList);
-    
+
     List<String> getUserUuidListByRoleUuidList(List<String> roleUuidList);
 
     List<String> getUserUuidListByUserName(String userName);
@@ -144,6 +144,13 @@ public interface UserMapper {
     List<UserTitleVo> getUserTitleListByUserUuid(String userUuid);
 
     List<String> checkUserInRangeList(@Param("userUuidList") List<String> userUuidList, @Param("user") UserVo userVo);
+
+    /**
+     * 根据用户uuid列表查询激活用户（不查询角色信息）
+     *
+     * @return
+     */
+    List<UserVo> getActiveUserListExcludeRoleInfoByUserUuidList(List<String> uuidList);
 
     int insertUserAuth(UserAuthVo userAuthVo);
 

@@ -18,33 +18,38 @@ import java.util.Map;
  **/
 public interface DependencyMapper {
 
-    public List<Map<String, Object>> getCallerListByCallee(
+    List<Map<String, Object>> getCallerListByCallee(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callee") Object callee,
             @Param("startNum") int startNum,
             @Param("pageSize") int pageSize);
 
-    public Integer getCallerCountByCallee(
+    Integer getCallerCountByCallee(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callee") Object callee);
 
-    public int insertIgnoreDependencyForCallerField(
+    List<Map<Object, Integer>> getBatchCallerCountByCallee(
+            @Param("tableName") String tableName,
+            @Param("calleeField") String calleeField,
+            @Param("callee") List<Object> caller);
+
+    int insertIgnoreDependencyForCallerField(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callerField") String callerField,
             @Param("callee") Object callee,
             @Param("caller") Object caller);
 
-    public int insertIgnoreDependencyForCallerFieldList(
+    int insertIgnoreDependencyForCallerFieldList(
             @Param("tableName") String tableName,
             @Param("calleeField") String calleeField,
             @Param("callerFieldList") List<String> callerFieldList,
             @Param("callee") Object callee,
             @Param("callerArray") JSONArray callerArray);
 
-    public int deleteDependencyByCaller(
+    int deleteDependencyByCaller(
             @Param("tableName") String tableName,
             @Param("callerField") String callerField,
             @Param("caller") Object caller);

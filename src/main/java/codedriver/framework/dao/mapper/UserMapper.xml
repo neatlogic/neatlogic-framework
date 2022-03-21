@@ -1036,6 +1036,30 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
+    <select id="getActiveUserListExcludeRoleInfoByUserUuidList" parameterType="java.util.List" resultMap="userInfoMap">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_name` AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` AS isActive,
+               a.`user_info` AS userInfo,
+               a.`vip_level` AS vipLevel,
+               c.`uuid`      AS teamUuid,
+               c.`name`      AS teamName,
+               c.`upward_name_path` AS upwardNamePath
+        FROM `user` a
+        LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
+        WHERE a.`is_active` = 1
+        AND a.`uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,

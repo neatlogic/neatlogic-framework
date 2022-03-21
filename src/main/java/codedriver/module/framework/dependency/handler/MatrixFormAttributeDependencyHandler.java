@@ -6,7 +6,7 @@
 package codedriver.module.framework.dependency.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.dependency.constvalue.FromType;
+import codedriver.framework.dependency.constvalue.FrameworkFromType;
 import codedriver.framework.dependency.core.CustomTableDependencyHandlerBase;
 import codedriver.framework.dependency.core.IFromType;
 import codedriver.framework.dependency.dto.DependencyInfoVo;
@@ -108,7 +108,7 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
      */
     @Override
     public IFromType getFromType() {
-        return FromType.MATRIX;
+        return FrameworkFromType.MATRIX;
     }
 
     /**

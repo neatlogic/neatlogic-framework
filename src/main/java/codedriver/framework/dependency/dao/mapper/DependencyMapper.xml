@@ -9,8 +9,8 @@
     <select id="getCallerListByCallee" resultType="java.util.HashMap">
         SELECT *
         FROM `${tableName}`
-        WHERE `${calleeField}` = #{callee}
-        LIMIT #{startNum} , #{pageSize}
+        WHERE `${calleeField}` = #{callee} LIMIT #{startNum}
+            , #{pageSize}
     </select>
 
     <select id="getCallerCountByCallee" resultType="java.lang.Integer">
@@ -19,9 +19,24 @@
         WHERE `${calleeField}` = #{callee}
     </select>
 
+    <select id="getBatchCallerCountByCallee" resultType="java.util.Map">
+        SELECT `${calleeField}` as caller,
+        COUNT(1) as callerCount
+        FROM `${tableName}`
+        WHERE `${calleeField}` in
+        <foreach collection="callee" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY `${calleeField}`
+    </select>
+
     <insert id="insertIgnoreDependencyForCallerField">
-        INSERT IGNORE INTO `${tableName}` (`${callerField}`, `${calleeField}`)
-        VALUES (#{caller}, #{callee})
+        INSERT
+        IGNORE INTO `${tableName}` (`${callerField}`, `${calleeField}`)
+        VALUES (
+        #{caller},
+        #{callee}
+        )
     </insert>
 
     <insert id="insertIgnoreDependencyForCallerFieldList">
@@ -44,22 +59,20 @@
     </delete>
 
     <select id="getDependencyCountByFrom" parameterType="java.lang.String" resultType="int">
-        SELECT
-            COUNT(1)
+        SELECT COUNT(1)
         FROM `dependency`
         WHERE `from` = #{value}
     </select>
 
     <select id="getDependencyListByFrom" resultType="codedriver.framework.dependency.dto.DependencyVo">
-        SELECT
-            `from`,
-            `type`,
-            `to`,
-            `config` AS configStr
+        SELECT `from`,
+               `type`,
+               `to`,
+               `config` AS configStr
         FROM `dependency`
         WHERE `from` = #{from}
-        AND `type` = #{type}
-        LIMIT #{startNum}, #{pageSize}
+          AND `type` = #{type} LIMIT #{startNum}
+            , #{pageSize}
     </select>
 
     <insert id="insertDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
@@ -68,7 +81,8 @@
     </insert>
 
     <delete id="deleteDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">
-        DELETE FROM `dependency`
+        DELETE
+        FROM `dependency`
         WHERE `type` = #{type}
           AND `to` = #{to}
     </delete>

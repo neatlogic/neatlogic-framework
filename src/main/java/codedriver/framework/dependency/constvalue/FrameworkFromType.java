@@ -13,7 +13,7 @@ import codedriver.framework.dependency.core.IFromType;
  * @author: linbq
  * @since: 2021/4/2 10:30
  **/
-public enum FromType implements IFromType {
+public enum FrameworkFromType implements IFromType {
     MATRIX("matrix", "矩阵"),
     MATRIXATTR("matrixattr", "矩阵属性"),
     FORM("form", "表单"),
@@ -27,7 +27,7 @@ public enum FromType implements IFromType {
     private String value;
     private String text;
 
-    FromType(String value, String text) {
+    FrameworkFromType(String value, String text) {
         this.value = value;
         this.text = text;
     }

@@ -3,14 +3,14 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.dto;
+package codedriver.framework.dto.license;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.dto.TenantVo;
 import codedriver.framework.restful.annotation.EntityField;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 public class LicenseVo implements Serializable {
     private static final long serialVersionUID = -4515626151148587123L;
@@ -18,8 +18,8 @@ public class LicenseVo implements Serializable {
     private TenantVo tenantVo;
     @EntityField(name = "到期时间", type = ApiParamType.STRING)
     private Date expireTime;
-    @EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
-    private List<String> authList;
+    @EntityField(name = "权限列表", type = ApiParamType.JSONOBJECT)
+    private LicenseAuthVo licenseAuth;
 
     public TenantVo getTenantVo() {
         return tenantVo;
@@ -37,11 +37,11 @@ public class LicenseVo implements Serializable {
         this.expireTime = expireTime;
     }
 
-    public List<String> getAuthList() {
-        return authList;
+    public LicenseAuthVo getLicenseAuth() {
+        return licenseAuth;
     }
 
-    public void setAuthList(List<String> authList) {
-        this.authList = authList;
+    public void setLicenseAuth(LicenseAuthVo licenseAuth) {
+        this.licenseAuth = licenseAuth;
     }
 }

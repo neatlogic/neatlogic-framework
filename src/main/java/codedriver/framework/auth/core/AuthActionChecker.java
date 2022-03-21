@@ -12,8 +12,8 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.UserMapper;
-import codedriver.framework.dto.LicenseVo;
 import codedriver.framework.dto.UserAuthVo;
+import codedriver.framework.dto.license.LicenseVo;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -102,13 +102,9 @@ public class AuthActionChecker {
         //先判断租户license 是否有该auth
         List<String> licenseActionList;
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        if(licenseVo != null && CollectionUtils.isNotEmpty(licenseVo.getAuthList())){
-            List<UserAuthVo> licenseUserAuthList = AuthActionChecker.getAuthListByAuth(licenseVo.getAuthList());
-            licenseActionList = actionList.stream().filter(o->licenseUserAuthList.stream().anyMatch(l->Objects.equals(l.getAuth(),o))).collect(Collectors.toList());
-            if(CollectionUtils.isEmpty(licenseActionList)){
-                return false;
-            }
-        }else{
+        List<UserAuthVo> licenseUserAuthList = AuthActionChecker.getAuthListByLicenseAuth(licenseVo);
+        licenseActionList = actionList.stream().filter(o -> licenseUserAuthList.stream().anyMatch(l -> Objects.equals(l.getAuth(), o))).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(licenseActionList)) {
             return false;
         }
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
@@ -145,7 +141,7 @@ public class AuthActionChecker {
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (!authList.contains(authClass.getSimpleName())) {//防止回环
                     authList.add(authClass.getSimpleName());
-                    if(checkAuthList(authClass.getSimpleName(), authList, actionList)){//防止漏找后续的include权限，故不能直接return
+                    if (checkAuthList(authClass.getSimpleName(), authList, actionList)) {//防止漏找后续的include权限，故不能直接return
                         return true;
                     }
                 }
@@ -162,7 +158,7 @@ public class AuthActionChecker {
     public static void getAuthList(List<UserAuthVo> userAuthList) {
         for (int i = 0; i < userAuthList.size(); i++) {
             AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
-            if(authBase != null) {
+            if (authBase != null) {
                 getAuthListByAuth(authBase, userAuthList);
             }
         }
@@ -171,20 +167,30 @@ public class AuthActionChecker {
     /**
      * 根据用户权限穿透获取所有权限
      *
-     * @param authList 未穿透的权限
+     * @param licenseVo license
      */
-    public static List<UserAuthVo> getAuthListByAuth(List<String> authList) {
+    public static List<UserAuthVo> getAuthListByLicenseAuth(LicenseVo licenseVo) {
         List<UserAuthVo> userAuthList = new ArrayList<>();
-        for (String s : authList) {
-            AuthBase authBase = AuthFactory.getAuthInstance(s);
-            if (authBase != null) {
-                userAuthList.add(new UserAuthVo(authBase));
-                getAuthListByAuth(authBase, userAuthList);
+        if (licenseVo != null && licenseVo.getLicenseAuth() != null) {
+            List<String> moduleGroupList = licenseVo.getLicenseAuth().getModuleGroupList();
+
+            List<String> authActionList = licenseVo.getLicenseAuth().getAuthActionList();
+            for (String s : authActionList) {
+                AuthBase authBase = AuthFactory.getAuthInstance(s);
+                if (authBase != null) {
+                    userAuthList.add(new UserAuthVo(authBase));
+                    getAuthListByAuth(authBase, userAuthList);
+                }
             }
         }
         return userAuthList;
     }
 
+    /**
+     *  递归穿透获取权限
+     * @param authBase 权限对象
+     * @param userAuthList 用户对应权限
+     */
     private static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
         if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
@@ -197,5 +203,7 @@ public class AuthActionChecker {
             }
         }
     }
+
+
 
 }

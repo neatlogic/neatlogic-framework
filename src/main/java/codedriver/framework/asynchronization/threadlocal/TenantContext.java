@@ -9,7 +9,7 @@ import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
-import codedriver.framework.dto.LicenseVo;
+import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.exception.core.NoLicenseException;

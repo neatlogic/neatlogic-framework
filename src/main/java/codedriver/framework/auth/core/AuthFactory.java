@@ -7,10 +7,9 @@ package codedriver.framework.auth.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dto.LicenseVo;
 import codedriver.framework.dto.UserAuthVo;
+import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.exception.auth.NoAuthGroupException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
@@ -58,12 +57,12 @@ public class AuthFactory {
             List<AuthBase> licenseAuthBaseList = new ArrayList<>();
             authBaseList.forEach(authBase -> {
                 LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-                if(licenseVo != null && CollectionUtils.isNotEmpty(licenseVo.getAuthList())) {
-                    List<UserAuthVo> licenseUserAuth = AuthActionChecker.getAuthListByAuth(licenseVo.getAuthList());
+
+                    List<UserAuthVo> licenseUserAuth = AuthActionChecker.getAuthListByLicenseAuth(licenseVo);
                     if (licenseUserAuth.stream().anyMatch(u -> Objects.equals(u.getAuth(), authBase.getAuthName()))) {
                         licenseAuthBaseList.add(authBase);
                     }
-                }
+
             });
             licenseAuthGroupMap.put(authGroupEntry.getKey(),licenseAuthBaseList);
         }

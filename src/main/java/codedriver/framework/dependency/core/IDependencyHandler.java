@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.util.ClassUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 依赖关系处理器接口
@@ -47,11 +48,12 @@ public interface IDependencyHandler {
     void setGroupName(String groupName);
 
     String getGroupName();
+
     /**
      * 插入一条引用关系数据
      *
      * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param to   引用者（下游）值（如：服务uuid）
      * @return
      */
     int insert(Object from, Object to);
@@ -59,8 +61,8 @@ public interface IDependencyHandler {
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to     引用者（下游）值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
@@ -77,7 +79,7 @@ public interface IDependencyHandler {
     /**
      * 查询引用列表数据
      *
-     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param from     被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 数据量
      * @return
@@ -91,4 +93,15 @@ public interface IDependencyHandler {
      * @return
      */
     int getDependencyCount(Object to);
+
+    /**
+     * 批量查询引用次数
+     *
+     * @param fromList
+     * @return
+     */
+    default List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {
+        return null;
+    }
+
 }

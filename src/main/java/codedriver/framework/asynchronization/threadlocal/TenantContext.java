@@ -9,11 +9,9 @@ import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
-import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
-import codedriver.framework.exception.core.NoLicenseException;
-import com.alibaba.fastjson.JSONObject;
+import codedriver.framework.dto.license.LicenseVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -128,12 +126,8 @@ public class TenantContext implements Serializable {
                     this.activeModuleGroupList.add(groupVo);
                 }
             }
-            // 查询对应租户的license TODO 解密
-            String license = licenseMapper.getTenantLicenseByTenantUuid(tenantUuid);
-            if(StringUtils.isBlank(license)){
-                throw new NoLicenseException();
-            }
-            licenseVo = JSONObject.parseObject(license).toJavaObject(LicenseVo.class);
+            // 查询对应租户的license
+            this.licenseVo = LicenseVo.getInstance(licenseMapper.getTenantLicenseByTenantUuid(tenantUuid));
             // 还原回租户库
             this.setUseDefaultDatasource(false);
             activeModuleMap = new HashMap<>();

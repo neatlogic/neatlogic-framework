@@ -5,12 +5,19 @@
 
 package codedriver.framework.dto.license;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.dto.TenantVo;
+import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.util.RSAUtils;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 
 public class LicenseVo implements Serializable {
     private static final long serialVersionUID = -4515626151148587123L;
@@ -43,5 +50,22 @@ public class LicenseVo implements Serializable {
 
     public void setLicenseAuth(LicenseAuthVo licenseAuth) {
         this.licenseAuth = licenseAuth;
+    }
+
+    public static LicenseVo getInstance(String license) {
+        if (StringUtils.isBlank(license)) {
+            throw new LicenseInvalidException();
+        }
+        String[] licenses = license.split("=========================");
+        if (licenses.length != 2) {
+            throw new LicenseInvalidException();
+        }
+        String sign = licenses[1];
+        byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
+        if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
+            throw new LicenseInvalidException();
+        }
+        String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
+        return JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
     }
 }

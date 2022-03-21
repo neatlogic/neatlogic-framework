@@ -12,7 +12,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.InputFrom;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.core.NoLicenseException;
+import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
@@ -219,7 +219,7 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -298,7 +298,7 @@ public class ApiDispatcher {
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
 
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -366,7 +366,7 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -434,7 +434,7 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -513,7 +513,7 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -574,7 +574,7 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -625,7 +625,7 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -667,7 +667,7 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -709,7 +709,7 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
-        } catch (NoLicenseException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);

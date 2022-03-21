@@ -83,6 +83,7 @@ public class Config {
     private static String WECHAT_ACCESS_TOKEN_URL;//获取企业微信token链接
     private static String WECHAT_USERINFO_URL;//获取企业微信user链接
 
+    public static String LICENSE_PK; //license 公钥
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -301,6 +302,10 @@ public class Config {
         return WECHAT_APP_AGENT_ID;
     }
 
+    public static String LICENSE_PK() {
+        return LICENSE_PK;
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -370,6 +375,8 @@ public class Config {
             WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
             WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
             WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
+
+            LICENSE_PK = prop.getProperty("license.pk");
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

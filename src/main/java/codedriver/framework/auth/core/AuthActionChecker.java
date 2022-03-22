@@ -103,8 +103,12 @@ public class AuthActionChecker {
         List<String> licenseActionList;
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
         List<UserAuthVo> licenseUserAuthList = AuthActionChecker.getAuthListByLicenseAuth(licenseVo);
-        licenseActionList = actionList.stream().filter(o -> licenseUserAuthList.stream().anyMatch(l -> Objects.equals(l.getAuth(), o))).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(licenseActionList)) {
+        if(licenseVo.getHasAllAuth()){
+            licenseActionList = actionList;
+        }else{
+            licenseActionList = actionList.stream().filter(o -> licenseUserAuthList.stream().anyMatch(l -> Objects.equals(l.getAuth(), o))).collect(Collectors.toList());
+        }
+        if ( CollectionUtils.isEmpty(licenseActionList)) {
             return false;
         }
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
@@ -171,15 +175,17 @@ public class AuthActionChecker {
      */
     public static List<UserAuthVo> getAuthListByLicenseAuth(LicenseVo licenseVo) {
         List<UserAuthVo> userAuthList = new ArrayList<>();
-        if (licenseVo != null && licenseVo.getLicenseAuth() != null) {
-            List<String> moduleGroupList = licenseVo.getLicenseAuth().getModuleGroupList();
-
-            List<String> authActionList = licenseVo.getLicenseAuth().getAuthActionList();
-            for (String s : authActionList) {
-                AuthBase authBase = AuthFactory.getAuthInstance(s);
-                if (authBase != null) {
-                    userAuthList.add(new UserAuthVo(authBase));
-                    getAuthListByAuth(authBase, userAuthList);
+        if (licenseVo != null && licenseVo.getAuth() != null) {
+            List<String> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
+            List<String> authActionList = licenseVo.getAuth().getAuthActionList();
+            authActionList.addAll(AuthFactory.getAuthActionListByAuthGroupList(moduleGroupList));
+            if (CollectionUtils.isNotEmpty(authActionList)) {
+                for (String s : authActionList) {
+                    AuthBase authBase = AuthFactory.getAuthInstance(s);
+                    if (authBase != null) {
+                        userAuthList.add(new UserAuthVo(authBase));
+                        getAuthListByAuth(authBase, userAuthList);
+                    }
                 }
             }
         }
@@ -187,8 +193,9 @@ public class AuthActionChecker {
     }
 
     /**
-     *  递归穿透获取权限
-     * @param authBase 权限对象
+     * 递归穿透获取权限
+     *
+     * @param authBase     权限对象
      * @param userAuthList 用户对应权限
      */
     private static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
@@ -203,7 +210,6 @@ public class AuthActionChecker {
             }
         }
     }
-
 
 
 }

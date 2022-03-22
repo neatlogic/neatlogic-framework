@@ -7,33 +7,38 @@ package codedriver.framework.dto.license;
 
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.dto.TenantVo;
 import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.RSAUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class LicenseVo implements Serializable {
     private static final long serialVersionUID = -4515626151148587123L;
-    @EntityField(name = "租户", type = ApiParamType.JSONOBJECT)
-    private TenantVo tenantVo;
+    @EntityField(name = "租户", type = ApiParamType.STRING)
+    private String tenant;
     @EntityField(name = "到期时间", type = ApiParamType.STRING)
     private Date expireTime;
     @EntityField(name = "权限列表", type = ApiParamType.JSONOBJECT)
-    private LicenseAuthVo licenseAuth;
+    private LicenseAuthVo auth;
+    @EntityField(name = "创建时间", type = ApiParamType.STRING)
+    private Date createTime;
+    @EntityField(name = "是否拥有所有权限", type = ApiParamType.BOOLEAN)
+    private Boolean isHasAllAuth = false;
 
-    public TenantVo getTenantVo() {
-        return tenantVo;
+    public String getTenant() {
+        return tenant;
     }
 
-    public void setTenantVo(TenantVo tenantVo) {
-        this.tenantVo = tenantVo;
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public Date getExpireTime() {
@@ -44,19 +49,36 @@ public class LicenseVo implements Serializable {
         this.expireTime = expireTime;
     }
 
-    public LicenseAuthVo getLicenseAuth() {
-        return licenseAuth;
+    public LicenseAuthVo getAuth() {
+        return auth;
     }
 
-    public void setLicenseAuth(LicenseAuthVo licenseAuth) {
-        this.licenseAuth = licenseAuth;
+    public void setAuth(LicenseAuthVo auth) {
+        this.auth = auth;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Boolean getHasAllAuth() {
+        return isHasAllAuth;
+    }
+
+    public void setHasAllAuth(Boolean hasAllAuth) {
+        isHasAllAuth = hasAllAuth;
     }
 
     public static LicenseVo getInstance(String license) {
         if (StringUtils.isBlank(license)) {
             throw new LicenseInvalidException();
         }
-        String[] licenses = license.split("=========================");
+        //license = license.replaceAll(System.lineSeparator(),StringUtils.EMPTY);
+        String[] licenses = license.split("\n=========================\n");
         if (licenses.length != 2) {
             throw new LicenseInvalidException();
         }
@@ -66,6 +88,15 @@ public class LicenseVo implements Serializable {
             throw new LicenseInvalidException();
         }
         String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
-        return JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
+        LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
+        if(licenseVo.getExpireTime().getTime() < new Date().getTime()){
+            throw new LicenseInvalidException();
+        }
+        //如果moduleGroup 存在 all，则拥有所有权限
+        if(licenseVo.getAuth() != null && CollectionUtils.isNotEmpty(licenseVo.getAuth().getModuleGroupList())
+          && licenseVo.getAuth().getModuleGroupList().stream().anyMatch(o->Objects.equals(o.toUpperCase(Locale.ROOT),"ALL"))){
+            licenseVo.setHasAllAuth(true);
+        }
+        return licenseVo;
     }
 }

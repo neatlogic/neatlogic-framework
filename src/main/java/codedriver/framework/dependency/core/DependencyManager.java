@@ -176,7 +176,7 @@ public class DependencyManager {
                         Object caller = map.get("caller");
                         Integer callerCount = Integer.parseInt(String.valueOf(map.get("callerCount")));
                         if (Objects.isNull(returnMap.get(caller))) {
-                            returnMap.put(caller,callerCount);
+                            returnMap.put(caller, callerCount);
                         } else {
                             returnMap.put(caller, returnMap.get(caller) + callerCount);
                         }

@@ -11,10 +11,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 依赖关系管理类，基本操作：保存依赖关系数据，删除依赖关系数据，查询依赖数量，查询引用列表
@@ -176,7 +173,13 @@ public class DependencyManager {
             for (IDependencyHandler handler : dependencyHandlerList) {
                 if (handler.canBeLifted() == canBeLifted) {
                     for (Map<Object, Integer> map : handler.getBatchDependencyCount(fromList)) {
-                        returnMap.put(map.get("caller"), Integer.parseInt(String.valueOf(map.get("callerCount"))));
+                        Object caller = map.get("caller");
+                        Integer callerCount = Integer.parseInt(String.valueOf(map.get("callerCount")));
+                        if (Objects.isNull(returnMap.get(caller))) {
+                            returnMap.put(caller, callerCount);
+                        } else {
+                            returnMap.put(caller, returnMap.get(caller) + callerCount);
+                        }
                     }
                 }
             }
@@ -199,14 +202,14 @@ public class DependencyManager {
      * 批量查询引用列表
      *
      * @param fromType 被引用者（上游）类型
-     * @param fromList     被引用者（上游）值（如：服务时间窗口uuid）
+     * @param fromList 被引用者（上游）值（如：服务时间窗口uuid）
      * @return
      */
     public static Map<Object, List<DependencyInfoVo>> getBatchDependencyList(IFromType fromType, Object fromList, BasePageVo basePageVo) {
         Map<Object, List<DependencyInfoVo>> returnMap = new HashMap<>();
-        for (Object from : (List <Object>) fromList) {
+        for (Object from : (List<Object>) fromList) {
             returnMap.put(from, getDependencyList(fromType, from, basePageVo));
         }
-            return returnMap;
+        return returnMap;
     }
 }

@@ -472,7 +472,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setSourceColumnList(sourceColumnList);
                         List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
                         if (CollectionUtils.isNotEmpty(dataMapList)) {
+                            //对dataMapList去重
+                            List<Map<String, String>> distinctList = new ArrayList<>();
                             for (Map<String, String> dataMap : dataMapList) {
+                                if(distinctList.contains(dataMap)){
+                                    continue;
+                                }
+                                distinctList.add(dataMap);
                                 Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                                 for (Map.Entry<String, String> entry : dataMap.entrySet()) {
                                     String attributeUuid = entry.getKey();
@@ -523,8 +529,14 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setKeywordExpression(Expression.LIKE.getExpression());
                     }
                 }
+                //对dataMapList去重
+                List<Map<String, String>> distinctList = new ArrayList<>();
                 List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
                 for (Map<String, String> dataMap : dataMapList) {
+                    if(distinctList.contains(dataMap)){
+                        continue;
+                    }
+                    distinctList.add(dataMap);
                     Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                     for (Map.Entry<String, String> entry : dataMap.entrySet()) {
                         String attributeUuid = entry.getKey();

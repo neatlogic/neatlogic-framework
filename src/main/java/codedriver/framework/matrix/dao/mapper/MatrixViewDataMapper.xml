@@ -98,9 +98,6 @@
 
     <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
-        select
-        DISTINCT a.*
-        from (
         SELECT
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
@@ -113,7 +110,6 @@
             <include refid="searchDynamicTableDataSql"/>
         </where>
         ORDER BY `id` DESC
-        ) a
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

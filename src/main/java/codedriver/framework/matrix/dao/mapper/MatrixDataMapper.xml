@@ -144,9 +144,6 @@
 
     <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
-        select
-        DISTINCT e.*
-        from (
         SELECT
         <foreach collection="columnList" item="column" separator=",">
             a.`${column}`
@@ -179,7 +176,7 @@
                     </when>
                     <when test="attrType == 'user'">
                         <if test="keywordExpression == 'like'">
-                        and (b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (b.`user_id` = #{keyword} OR b.`user_name` = #{keyword})
@@ -187,7 +184,7 @@
                     </when>
                     <when test="attrType == 'team'">
                         <if test="keywordExpression == 'like'">
-                        and (c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (c.`uuid` = #{keyword} OR c.`name` = #{keyword})
@@ -195,7 +192,7 @@
                     </when>
                     <when test="attrType == 'role'">
                         <if test="keywordExpression == 'like'">
-                        and (d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (d.`name` = #{keyword} OR d.`description` = #{keyword})
@@ -206,7 +203,6 @@
             <include refid="searchDynamicTableDataSql"/>
         </where>
         ORDER BY a.`id` DESC
-        ) e
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

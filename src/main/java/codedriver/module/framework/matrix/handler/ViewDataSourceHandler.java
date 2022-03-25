@@ -389,7 +389,13 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     public List<Map<String, JSONObject>> matrixTableDataValueHandle(List<Map<String, Object>> valueList) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(valueList)) {
+            //对valueList去重
+            List<Map<String, Object>> distinctList = new ArrayList<>();
             for (Map<String, Object> valueMap : valueList) {
+                if(distinctList.contains(valueMap)){
+                    continue;
+                }
+                distinctList.add(valueMap);
                 Map<String, JSONObject> resultMap = new HashMap<>();
                 for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
                     JSONObject resultObj = new JSONObject();

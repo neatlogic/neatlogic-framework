@@ -16,7 +16,7 @@ public class PermissionDeniedException extends ApiException {
     public PermissionDeniedException() {
         super("没有权限进行当前操作");
     }
-    protected PermissionDeniedException(String message) {
+    public PermissionDeniedException(String message) {
         super(message);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {

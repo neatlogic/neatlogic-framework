@@ -65,6 +65,11 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	}
 
 	public String getUserUuid() {
+		if (StringUtils.isNotBlank(userUuid)) {
+			if (userUuid.contains("#")) {
+				userUuid = userUuid.split("#")[1];
+			}
+		}
 		return userUuid;
 	}
 

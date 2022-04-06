@@ -3,8 +3,16 @@
 <mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
 	<sql id="searchIntegrationAuditCondition">
 		<where>
+			`start_time` &gt;= #{startTime}
+			AND `end_time` &lt;= #{endTime}
 			<if test="integrationUuid != null and integrationUuid != ''">
 				AND integration_uuid = #{integrationUuid}
+			</if>
+			<if test="userUuid != null and userUuid != ''">
+				AND `user_uuid`=#{userUuid}
+			</if>
+			<if test="status != null and status != ''">
+				AND `status` =#{status}
 			</if>
 		</where>
 	</sql>
@@ -33,7 +41,7 @@
 		</if>
 	</select>
 
-	<select id="searchIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
+	<select id="getIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
 		SELECT
 		COUNT(1)
 		FROM

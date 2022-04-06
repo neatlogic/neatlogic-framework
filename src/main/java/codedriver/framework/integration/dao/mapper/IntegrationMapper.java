@@ -10,7 +10,7 @@ public interface IntegrationMapper {
 
     List<IntegrationAuditVo> searchIntegrationAudit(IntegrationAuditVo integrationAuditVo);
 
-    int searchIntegrationAuditCount(IntegrationAuditVo integrationAuditVo);
+    int getIntegrationAuditCount(IntegrationAuditVo integrationAuditVo);
 
     IntegrationVo getIntegrationByUuid(String uuid);
 

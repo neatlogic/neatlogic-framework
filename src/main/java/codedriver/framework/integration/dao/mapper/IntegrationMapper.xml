@@ -8,14 +8,21 @@
 			<if test="integrationUuid != null and integrationUuid != ''">
 				AND integration_uuid = #{integrationUuid}
 			</if>
-			<if test="userUuid != null and userUuid != ''">
-				AND `user_uuid`=#{userUuid}
+			<if test="userUuidList != null and userUuidList.size() > 0">
+				AND `user_uuid` IN
+				<foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
+					#{uuid}
+				</foreach>
 			</if>
-			<if test="status != null and status != ''">
-				AND `status` =#{status}
+			<if test="statusList != null and statusList.size() > 0">
+				AND `status` IN
+				<foreach collection="statusList" item="status" open="(" separator="," close=")">
+					#{status}
+				</foreach>
 			</if>
 		</where>
 	</sql>
+
 
 	<select id="searchIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="codedriver.framework.integration.dto.IntegrationAuditVo">
 		SELECT

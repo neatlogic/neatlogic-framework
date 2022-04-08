@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -15,204 +15,197 @@ import org.apache.ibatis.cache.Cache;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class CodeDriverCache implements Cache {
-	/**
-	 * The cache manager reference.
-	 */
-	protected static CacheManager CACHE_MANAGER = CacheManager.create();
+    /**
+     * The cache manager reference.
+     */
+    protected static CacheManager CACHE_MANAGER = CacheManager.create();
 
-	/**
-	 * The cache id (namespace)
-	 */
-	protected final String id;
+    /**
+     * The cache id (namespace)
+     */
+    protected final String id;
 
 
-	/**
-	 * @param id
-	 */
-	public CodeDriverCache(final String id) {
-		if (id == null) {
-			throw new IllegalArgumentException("Cache instances require an ID");
-		}
-		this.id = id;
-	}
-	
-	private synchronized Ehcache getCache() {
-		TenantContext tenantContext = TenantContext.get();
-		String tenant = null;
-		if (tenantContext != null) {
-			tenant = tenantContext.getTenantUuid();
-		}
-		if (StringUtils.isNotBlank(tenant)) {
-			if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
-				CACHE_MANAGER.addCache(tenant + ":" + id);
-			}
-			return CACHE_MANAGER.getEhcache(tenant + ":" + id);
-		} else {
-			if (!CACHE_MANAGER.cacheExists(id)) {
-				CACHE_MANAGER.addCache(id);
-			}
-			return CACHE_MANAGER.getEhcache(id);
-		}
-	}
+    public CodeDriverCache(final String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Cache instances require an ID");
+        }
+        this.id = id;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void clear() {
-		getCache().removeAll();
-	}
+    private synchronized Ehcache getCache() {
+        TenantContext tenantContext = TenantContext.get();
+        String tenant = null;
+        if (tenantContext != null) {
+            tenant = tenantContext.getTenantUuid();
+        }
+        if (StringUtils.isNotBlank(tenant)) {
+            if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
+                CACHE_MANAGER.addCache(tenant + ":" + id);
+            }
+            return CACHE_MANAGER.getEhcache(tenant + ":" + id);
+        } else {
+            if (!CACHE_MANAGER.cacheExists(id)) {
+                CACHE_MANAGER.addCache(id);
+            }
+            return CACHE_MANAGER.getEhcache(id);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId() {
-		return id;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+       /* if (id.contains("CiMapper")) {
+            System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
+        }*/
+        getCache().removeAll();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object getObject(Object key) {
-		Element cachedElement = getCache().get(key);
-		if (cachedElement == null) {
-			return null;
-		}
-		//System.out.println(cachedElement.getObjectValue());
-		return cachedElement.getObjectValue();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getSize() {
-		return getCache().getSize();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getObject(Object key) {
+        Element cachedElement = getCache().get(key);
+        if (cachedElement == null) {
+            return null;
+        }
+       /* if (key.toString().contains("getAttrByCiId")) {
+            System.out.println(System.currentTimeMillis() + ":match getAttrByCiId cached,value=" + cachedElement.getObjectValue());
+        }*/
+        return cachedElement.getObjectValue();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void putObject(Object key, Object value) {
-		getCache().put(new Element(key, value));
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSize() {
+        return getCache().getSize();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object removeObject(Object key) {
-		Object obj = getObject(key);
-		getCache().remove(key);
-		return obj;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void putObject(Object key, Object value) {
+        getCache().put(new Element(key, value));
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void unlock(Object key) {
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object removeObject(Object key) {
+        Object obj = getObject(key);
+        getCache().remove(key);
+        return obj;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Cache)) {
-			return false;
-		}
+    /**
+     * {@inheritDoc}
+     */
+    public void unlock(Object key) {
+    }
 
-		Cache otherCache = (Cache) obj;
-		return id.equals(otherCache.getId());
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Cache)) {
+            return false;
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
+        Cache otherCache = (Cache) obj;
+        return id.equals(otherCache.getId());
+    }
 
-	@Override
-	public ReadWriteLock getReadWriteLock() {
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return "EHCache {" + id + "}";
-	}
+    @Override
+    public ReadWriteLock getReadWriteLock() {
+        return null;
+    }
 
-	// DYNAMIC PROPERTIES
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "EHCache {" + id + "}";
+    }
 
-	/**
-	 * Sets the time to idle for an element before it expires. Is only used if
-	 * the element is not eternal.
-	 *
-	 * @param timeToIdleSeconds
-	 *            the default amount of time to live for an element from its
-	 *            last accessed or modified date
-	 */
-	public void setTimeToIdleSeconds(long timeToIdleSeconds) {
-		getCache().getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
-	}
+    // DYNAMIC PROPERTIES
 
-	/**
-	 * Sets the time to idle for an element before it expires. Is only used if
-	 * the element is not eternal.
-	 *
-	 * @param timeToLiveSeconds
-	 *            the default amount of time to live for an element from its
-	 *            creation date
-	 */
-	public void setTimeToLiveSeconds(long timeToLiveSeconds) {
-		getCache().getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
-	}
+    /**
+     * Sets the time to idle for an element before it expires. Is only used if
+     * the element is not eternal.
+     *
+     * @param timeToIdleSeconds the default amount of time to live for an element from its
+     *                          last accessed or modified date
+     */
+    public void setTimeToIdleSeconds(long timeToIdleSeconds) {
+        getCache().getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
+    }
 
-	/**
-	 * Sets the maximum objects to be held in memory (0 = no limit).
-	 *
-	 * @param maxElementsInMemory
-	 *            The maximum number of elements in memory, before they are
-	 *            evicted (0 == no limit)
-	 */
-	public void setMaxEntriesLocalHeap(long maxEntriesLocalHeap) {
-		getCache().getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
-	}
+    /**
+     * Sets the time to idle for an element before it expires. Is only used if
+     * the element is not eternal.
+     *
+     * @param timeToLiveSeconds the default amount of time to live for an element from its
+     *                          creation date
+     */
+    public void setTimeToLiveSeconds(long timeToLiveSeconds) {
+        getCache().getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
+    }
 
-	/**
-	 * Sets the maximum number elements on Disk. 0 means unlimited.
-	 *
-	 * @param maxElementsOnDisk
-	 *            the maximum number of Elements to allow on the disk. 0 means
-	 *            unlimited.
-	 */
-	public void setMaxEntriesLocalDisk(long maxEntriesLocalDisk) {
-		getCache().getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
-	}
+    /**
+     * Sets the maximum objects to be held in memory (0 = no limit).
+     * evicted (0 == no limit)
+     */
+    public void setMaxEntriesLocalHeap(long maxEntriesLocalHeap) {
+        getCache().getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
+    }
 
-	/**
-	 * Sets the eviction policy. An invalid argument will set it to null.
-	 *
-	 * @param memoryStoreEvictionPolicy
-	 *            a String representation of the policy. One of "LRU", "LFU" or
-	 *            "FIFO".
-	 */
-	public void setMemoryStoreEvictionPolicy(String memoryStoreEvictionPolicy) {
-		getCache().getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
-	}
+    /**
+     * Sets the maximum number elements on Disk. 0 means unlimited.
+     * unlimited.
+     */
+    public void setMaxEntriesLocalDisk(long maxEntriesLocalDisk) {
+        getCache().getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
+    }
+
+    /**
+     * Sets the eviction policy. An invalid argument will set it to null.
+     *
+     * @param memoryStoreEvictionPolicy a String representation of the policy. One of "LRU", "LFU" or
+     *                                  "FIFO".
+     */
+    public void setMemoryStoreEvictionPolicy(String memoryStoreEvictionPolicy) {
+        getCache().getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
+    }
 
 }

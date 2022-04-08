@@ -57,9 +57,7 @@ public class CodeDriverCache implements Cache {
      */
     @Override
     public void clear() {
-        if (id.contains("CiMapper")) {
-            System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
-        }
+        System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
         getCache().removeAll();
     }
 

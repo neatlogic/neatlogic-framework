@@ -57,7 +57,7 @@ public class CodeDriverCache implements Cache {
      */
     @Override
     public void clear() {
-        System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
+        //System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
         getCache().removeAll();
     }
 
@@ -78,9 +78,9 @@ public class CodeDriverCache implements Cache {
         if (cachedElement == null) {
             return null;
         }
-        if (key.toString().contains("getAttrByCiId")) {
+        /*if (key.toString().contains("getAttrByCiId")) {
             System.out.println(System.currentTimeMillis() + ":match getAttrByCiId cached,value=" + cachedElement.getObjectValue());
-        }
+        }*/
         return cachedElement.getObjectValue();
     }
 

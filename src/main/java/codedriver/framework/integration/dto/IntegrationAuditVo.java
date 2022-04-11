@@ -3,12 +3,15 @@ package codedriver.framework.integration.dto;
 import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -205,8 +208,15 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 		this.errorFilePath = errorFilePath;
 	}
 
-	public List<String> getUserUuidList() {
-		return userUuidList;
+    public List<String> getUserUuidList() {
+        List<String> returnUserUuidList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+            for (String uuid : userUuidList) {
+                returnUserUuidList.add(GroupSearch.removePrefix(uuid));
+            }
+            userUuidList = returnUserUuidList;
+        }
+        return userUuidList;
 	}
 
 	public void setUserUuidList(List<String> userUuidList) {

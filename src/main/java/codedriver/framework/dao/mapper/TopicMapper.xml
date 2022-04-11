@@ -12,7 +12,9 @@
     </delete>
 
     <select id="getTopic" resultType="codedriver.framework.dto.TopicVo">
-        select config as configStr,
+        select
+               id,
+               config as configStr,
                lcd,
                lcu,
                fcd,
@@ -21,7 +23,7 @@
     </select>
 
     <insert id="insertTopic" parameterType="codedriver.framework.dto.TopicVo">
-        insert into topic(config, lcd, lcu, fcd, fcu)
-        values (#{configStr}, now(3), #{lcu}, now(3), #{fcu})
+        insert into topic(id, config, lcd, lcu, fcd, fcu)
+        values (#{id}, #{configStr}, now(3), #{lcu}, now(3), #{fcu})
     </insert>
 </mapper>

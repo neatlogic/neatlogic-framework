@@ -10,6 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "id", type = ApiParamType.LONG)
@@ -44,6 +45,11 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	private String resultFilePath;
 	@EntityField(name = "错误内容文件路径", type = ApiParamType.STRING)
 	private String errorFilePath;
+	@JSONField(serialize = false)
+	private List<String> userUuidList;
+	@JSONField(serialize = false)
+	private List<String> statusList;
+
 
 	public Long getId() {
 		if (id == null) {
@@ -198,4 +204,21 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	public void setErrorFilePath(String errorFilePath) {
 		this.errorFilePath = errorFilePath;
 	}
+
+	public List<String> getUserUuidList() {
+		return userUuidList;
+	}
+
+	public void setUserUuidList(List<String> userUuidList) {
+		this.userUuidList = userUuidList;
+	}
+
+	public List<String> getStatusList() {
+		return statusList;
+	}
+
+	public void setStatusList(List<String> statusList) {
+		this.statusList = statusList;
+	}
+
 }

@@ -6,7 +6,7 @@
 package codedriver.framework.restful.audit;
 
 import codedriver.framework.asynchronization.thread.CodeDriverThread;
-import codedriver.framework.restful.dao.mapper.ApiMapper;
+import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.util.AuditUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiAuditSaveThread extends CodeDriverThread {
 
-    private static ApiMapper apiMapper;
+    private static ApiAuditMapper apiAuditMapper;
+
 
     @Autowired
-    public void setApiMapper(ApiMapper _apiMapper) {
-        apiMapper = _apiMapper;
+    public void setApiMapper(ApiAuditMapper _apiAuditManager) {
+        apiAuditMapper = _apiAuditManager;
     }
 
     private ApiAuditVo apiAuditVo;
@@ -37,7 +38,7 @@ public class ApiAuditSaveThread extends CodeDriverThread {
     protected void execute() {
         if (apiAuditVo != null) {
             AuditUtil.saveAuditDetail(apiAuditVo, "api_audit");
-            apiMapper.insertApiAudit(apiAuditVo);
+            apiAuditMapper.insertApiAudit(apiAuditVo);
         }
     }
 

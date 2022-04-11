@@ -9,9 +9,9 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.util.FileUtil;
 import codedriver.framework.exception.file.FilePathIllegalException;
+import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
 import codedriver.module.framework.file.handler.LocalFileSystemHandler;
 import codedriver.module.framework.file.handler.MinioFileSystemHandler;
-import codedriver.framework.restful.dao.mapper.ApiMapper;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,11 +32,11 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class AuditUtil {
 
-    private static ApiMapper apiMapper;
+    private static ApiAuditMapper apiAuditMapper;
 
     @Autowired
-    public void setApiMapper(ApiMapper _apiMapper) {
-        apiMapper = _apiMapper;
+    public void setApiMapper(ApiAuditMapper _apiAuditMapper) {
+        apiAuditMapper = _apiAuditMapper;
     }
 
     /*查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看*/
@@ -90,7 +90,7 @@ public class AuditUtil {
         sb.append("error<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         String fileHash = DigestUtils.md5DigestAsHex(sb.toString().getBytes());
         String filePath;
-        filePath = apiMapper.getAuditFileByHash(fileHash);
+        filePath = apiAuditMapper.getAuditFileByHash(fileHash);
         /* 如果在audit_file表中找到文件路径，说明此次请求与之前某次请求完全一致，则不再重复生成日志文件 */
         if (StringUtils.isBlank(filePath)) {
             InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
@@ -105,7 +105,7 @@ public class AuditUtil {
                 }
             } finally {
                 if (StringUtils.isNotBlank(filePath)) {
-                    apiMapper.insertAuditFile(fileHash, filePath);
+                    apiAuditMapper.insertAuditFile(fileHash, filePath);
                 }
                 try {
                     inputStream.close();

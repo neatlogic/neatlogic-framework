@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.restful.dao.mapper.ApiAuditMapper">
+
+    <sql id="getApiAudit">
+        FROM `api_audit` a
+        LEFT JOIN `user` u ON u.`uuid` = a.`user_uuid`
+        WHERE a.`token` = #{token}
+        AND a.`start_time` &gt;= #{startTime}
+        AND a.`end_time` &lt;= #{endTime}
+        <if test="status != null and status != ''">
+            AND a.`status` =#{status}
+        </if>
+    </sql>
+
+    <select id="getApiAuditCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int"
+            useCache="false">
+        SELECT count(a.`token`)
+        <include refid="getApiAudit"></include>
+    </select>
+
+    <select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
+            resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
+        SELECT a.`id`,
+        a.`token`,
+        a.`user_uuid` AS userUuid,
+        u.`user_name` AS userName,
+        a.`authtype`,
+        a.`server_id` AS serverId,
+        a.`ip`,
+        a.`start_time` AS startTime,
+        a.`end_time` AS endTime,
+        a.`time_cost` AS timeCost,
+        a.`status`,
+        a.`param_file_path` AS paramFilePath,
+        a.`result_file_path` AS resultFilePath,
+        a.`error_file_path` AS errorFilePath
+        <include refid="getApiAudit"></include>
+        ORDER BY a.`start_time` DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getApiVisitTimesListByTokenList" parameterType="java.lang.String"
+            resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
+        SELECT
+        `token`,
+        COUNT(`token`) AS visitTimes
+        FROM `api_audit`
+        WHERE `token` IN
+        <foreach collection="list" item="token" separator="," open="(" close=")">
+            #{token}
+        </foreach>
+        GROUP BY `token`
+    </select>
+
+    <select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT `content`
+        FROM `api_audit_detail`
+        WHERE hash = #{value}
+    </select>
+
+    <select id="getApiAccessCountByTokenList" parameterType="java.lang.String"
+            resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
+        SELECT
+        `token`,
+        `count` AS visitTimes
+        FROM
+        `api_access_count`
+        WHERE token in
+        <foreach collection="list" item="token" separator="," open="(" close=")">
+            #{token}
+        </foreach>
+    </select>
+
+    <select id="getApiAccessCountLockByToken" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT `token`
+        FROM `api_access_count`
+        WHERE token = #{token} FOR
+            UPDATE
+    </select>
+
+    <select id="searchApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
+            resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
+        select api_audit.id as id,
+        `api_audit`.`token` as token,
+        `api_audit`.`user_uuid` as userUuid,
+        `api_audit`.`authtype` as authtype,
+        `api_audit`.`server_id` as serverId,
+        `api_audit`.`ip` as ip,
+        `api_audit`.`start_time` as startTime,
+        `api_audit`.`end_time` as endTime,
+        `api_audit`.`time_cost` as timeCost,
+        `api_audit`.`status` as status,
+        `api_audit`.`param_file_path` as paramFilePath,
+        `api_audit`.`result_file_path` as resultFilePath,
+        `api_audit`.`error_file_path` as errorFilePath,
+        `user`.`user_name` as userName
+        from `api_audit` LEFT JOIN `user`
+        on `api_audit`.`user_uuid` = `user`.`uuid`
+        where 1=1
+        <if test="userUuid != null and userUuid != ''">
+            and `api_audit`.`user_uuid` = #{userUuid}
+        </if>
+        <if test="tokenList != null and tokenList.size() > 0">
+            AND `api_audit`.`token` IN
+            <foreach collection="tokenList" item="token" open="(" separator="," close=")">
+                #{token}
+            </foreach>
+        </if>
+        <if test="startTime != null">
+            and `start_time` &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and `start_time` &lt;= #{endTime}
+        </if>
+        <if test="ip != null and ip != ''">
+            and `ip` LIKE CONCAT('%', #{ip}, '%')
+        </if>
+        <choose>
+            <when test="orderType == 'desc' or orderType == ''">
+                order by `start_time` desc
+            </when>
+            <otherwise>
+                order by `start_time`
+            </otherwise>
+        </choose>
+        <if test="needPage">
+            limit #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="searchApiAuditListCount" parameterType="codedriver.framework.restful.dto.ApiAuditVo" resultType="int"
+            useCache="false">
+        select
+        COUNT(1)
+        from `api_audit` LEFT JOIN `user`
+        on `api_audit`.`user_uuid` = `user`.`uuid`
+        <where>
+            <if test="userUuid != null and userUuid != ''">
+                and `api_audit`.`user_uuid` = #{userUuid}
+            </if>
+            <if test="tokenList != null and tokenList.size() > 0">
+                AND `api_audit`.`token` IN
+                <foreach collection="tokenList" item="token" open="(" separator="," close=")">
+                    #{token}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                and `start_time` &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and `start_time` &lt;= #{endTime}
+            </if>
+            <if test="ip != null and ip != ''">
+                and `ip` LIKE CONCAT('%', #{ip}, '%')
+            </if>
+        </where>
+        <choose>
+            <when test="orderType == 'desc' or orderType == ''">
+                order by `start_time` desc
+            </when>
+            <otherwise>
+                order by `start_time`
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchApiAuditForExport" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
+            resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
+        select CONCAT(api_audit.id,'') as id,
+        `api_audit`.`token` as token,
+        -- `api_audit`.`user_uuid` as userUuid,
+        `api_audit`.`authtype` as authtype,
+        CONCAT(`api_audit`.`server_id`,'') as serverId,
+        `api_audit`.`ip` as ip,
+        DATE_FORMAT(`api_audit`.`start_time`,'%Y-%m-%d %H:%i:%s') as startTime,
+        DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
+        CONCAT(`api_audit`.`time_cost`,'') as timeCost,
+        `api_audit`.`status` as status,
+        `api_audit`.`param_file_path` as paramFilePath,
+        `api_audit`.`result_file_path` as resultFilePath,
+        `api_audit`.`error_file_path` as errorFilePath,
+        `user`.`user_name` as userName
+        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
+        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
+        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
+        from `api_audit` LEFT JOIN `user`
+        on `api_audit`.`user_uuid` = `user`.`uuid`
+        <where>
+            <if test="userUuid != null and userUuid != ''">
+                and `api_audit`.`user_uuid` = #{userUuid}
+            </if>
+            <if test="tokenList != null and tokenList.size() > 0">
+                AND `api_audit`.`token` IN
+                <foreach collection="tokenList" item="token" open="(" separator="," close=")">
+                    #{token}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                and `start_time` &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and `start_time` &lt;= #{endTime}
+            </if>
+            <if test="ip != null and ip != ''">
+                and `ip` LIKE CONCAT('%', #{ip}, '%')
+            </if>
+        </where>
+        <choose>
+            <when test="orderType == 'desc' or orderType == ''">
+                order by `start_time` desc
+            </when>
+            <otherwise>
+                order by `start_time`
+            </otherwise>
+        </choose>
+        <if test="needPage">
+            limit #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getDistinctTokenInApiAudit" resultType="java.lang.String" useCache="false">
+        SELECT distinct `token`
+        FROM `api_audit`
+    </select>
+
+    <select id="getAuditFileByHash" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+        SELECT `path`
+        FROM `audit_file`
+        where `hash` = #{value}
+    </select>
+
+    <update id="updateApiAccessCount">
+        UPDATE `api_access_count`
+        SET `count` = `count` + #{count}
+        WHERE `token` = #{token}
+    </update>
+
+    <update id="updateApiNeedAuditByToken" parameterType="java.lang.String">
+        UPDATE `api`
+        SET `need_audit` = 1 - `need_audit`
+        WHERE `token` = #{value}
+    </update>
+
+    <insert id="insertApiAudit" parameterType="codedriver.framework.restful.dto.ApiAuditVo">
+        INSERT INTO `api_audit` (`id`,
+                                 `token`,
+                                 `user_uuid`,
+                                 `authtype`,
+                                 `server_id`,
+                                 `ip`,
+                                 `start_time`,
+                                 `end_time`,
+                                 `time_cost`,
+                                 `status`,
+                                 `param_file_path`,
+                                 `result_file_path`,
+                                 `error_file_path`)
+        VALUES (#{id},
+                #{token},
+                #{userUuid},
+                #{authtype},
+                #{serverId},
+                #{ip},
+                #{startTime},
+                #{endTime},
+                #{timeCost},
+                #{status},
+                #{paramFilePath},
+                #{resultFilePath},
+                #{errorFilePath})
+    </insert>
+
+    <insert id="insertApiAccessCount">
+        INSERT INTO `api_access_count` (`token`, `count`)
+        VALUES (#{token}, #{count})
+    </insert>
+
+    <insert id="insertAuditFile">
+        INSERT ignore INTO `audit_file` (`hash`, `path`)
+        VALUES (#{hash}, #{filePath})
+    </insert>
+
+</mapper>

@@ -1,5 +1,6 @@
 package codedriver.framework.restful.service;
 
+import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,8 @@ public class ApiServiceImpl implements ApiService {
 	@Autowired
 	private ApiMapper apiMapper;
 
+	@Autowired
+	private ApiAuditMapper apiAuditMapper;
 
 	@Override
 	public ApiVo getApiByToken(String token) {
@@ -21,10 +24,10 @@ public class ApiServiceImpl implements ApiService {
 
 	@Override
 	public int saveApiAccessCount(String token, int count) {
-		if(apiMapper.getApiAccessCountLockByToken(token) == null) {
-			return apiMapper.insertApiAccessCount(token, count);
+		if(apiAuditMapper.getApiAccessCountLockByToken(token) == null) {
+			return apiAuditMapper.insertApiAccessCount(token, count);
 		}else {
-			return apiMapper.updateApiAccessCount(token, count);
+			return apiAuditMapper.updateApiAccessCount(token, count);
 		}
 	}
 }

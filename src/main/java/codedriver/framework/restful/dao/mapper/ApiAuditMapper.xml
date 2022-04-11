@@ -24,8 +24,6 @@
         <include refid="getApiAudit"></include>
     </select>
 
-
-
     <select id="getApiAuditList" parameterType="codedriver.framework.restful.dto.ApiAuditVo"
             resultType="codedriver.framework.restful.dto.ApiAuditVo" useCache="false">
         SELECT a.`id`,
@@ -47,9 +45,6 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
-
-
-
     <select id="getApiVisitTimesListByTokenList" parameterType="java.lang.String"
             resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
         SELECT
@@ -62,9 +57,6 @@
         </foreach>
         GROUP BY `token`
     </select>
-
-
-
 
     <select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String"
             useCache="false">
@@ -244,14 +236,6 @@
         FROM `audit_file`
         where `hash` = #{value}
     </select>
-
-    <update id="updateApihandlerById" parameterType="codedriver.framework.restful.dto.ApiVo">
-        UPDATE `api`
-        SET handler = #{handler}
-        WHERE id = #{id}
-    </update>
-
-
 
     <update id="updateApiAccessCount">
         UPDATE `api_access_count`

@@ -26,11 +26,6 @@ public interface ApiMapper {
 
     int deleteApiByToken(String token);
 
-
     int replaceApi(ApiVo apiVo);
-
-
-
-
 
 }

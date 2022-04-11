@@ -36,7 +36,6 @@ public interface ApiAuditMapper {
 
     int insertApiAudit(ApiAuditVo apiAudit);
 
-
     /**
      * @param token
      * @param count
@@ -50,7 +49,7 @@ public interface ApiAuditMapper {
 
     /**
      * @param token
-     * @param visitTimes
+     * @param count
      * @return int
      * @Time:2020年7月15日
      * @Description: 增加接口访问次数

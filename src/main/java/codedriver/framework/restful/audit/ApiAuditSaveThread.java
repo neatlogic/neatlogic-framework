@@ -17,7 +17,6 @@ public class ApiAuditSaveThread extends CodeDriverThread {
 
     private static ApiAuditMapper apiAuditMapper;
 
-
     @Autowired
     public void setApiMapper(ApiAuditMapper _apiAuditManager) {
         apiAuditMapper = _apiAuditManager;

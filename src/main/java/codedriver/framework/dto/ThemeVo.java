@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author longrf
  * @date 2022/4/8 4:15 下午
  */
-public class TopicVo extends BaseEditorVo {
+public class ThemeVo extends BaseEditorVo {
 
     @EntityField(name = "主键id", type = ApiParamType.LONG)
     private Long id;

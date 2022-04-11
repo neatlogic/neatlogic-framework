@@ -6,7 +6,7 @@ import codedriver.framework.auth.core.AuthBase;
  * @author longrf
  * @date 2022/4/8 3:49 下午
  */
-public class TOPIC_MODIFY extends AuthBase {
+public class THEME_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {

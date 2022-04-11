@@ -18,6 +18,8 @@ public class TopicVo extends BaseEditorVo {
 
     @EntityField(name = "主键id", type = ApiParamType.LONG)
     private Long id;
+    @EntityField(name = "logo 图片文件id", type = ApiParamType.LONG)
+    private Long logoFileId;
     @EntityField(name = "主题配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
     @JSONField(serialize = false)
@@ -32,6 +34,14 @@ public class TopicVo extends BaseEditorVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getLogoFileId() {
+        return logoFileId;
+    }
+
+    public void setLogoFileId(Long logoFileId) {
+        this.logoFileId = logoFileId;
     }
 
     public JSONObject getConfig() {

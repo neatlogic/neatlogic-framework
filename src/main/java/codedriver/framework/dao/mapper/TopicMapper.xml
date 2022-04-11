@@ -6,24 +6,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TopicMapper">
 
-    <delete id="deleteTopic">
-        delete
-        from topic
-    </delete>
-
     <select id="getTopic" resultType="codedriver.framework.dto.TopicVo">
-        select
-               id,
-               config as configStr,
-               lcd,
-               lcu,
+        select id,
+               logo_file_id as LogoFileId,
+               config       as configStr,
                fcd,
                fcu
         from topic
     </select>
 
     <insert id="insertTopic" parameterType="codedriver.framework.dto.TopicVo">
-        insert into topic(id, config, lcd, lcu, fcd, fcu)
-        values (#{id}, #{configStr}, now(3), #{lcu}, now(3), #{fcu})
+        insert into topic(id, logo_file_id, config, fcd, fcu)
+        values (#{id}, #{logoFileId}, #{configStr}, now(3), #{fcu})
     </insert>
+
+    <delete id="deleteTopic">
+        delete
+        from topic
+    </delete>
+
 </mapper>

@@ -11,9 +11,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "id", type = ApiParamType.LONG)
@@ -209,12 +209,8 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	}
 
     public List<String> getUserUuidList() {
-        List<String> returnUserUuidList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(userUuidList)) {
-            for (String uuid : userUuidList) {
-                returnUserUuidList.add(GroupSearch.removePrefix(uuid));
-            }
-            userUuidList = returnUserUuidList;
+			userUuidList = userUuidList.stream().map(GroupSearch::removePrefix).collect(Collectors.toList());
         }
         return userUuidList;
 	}

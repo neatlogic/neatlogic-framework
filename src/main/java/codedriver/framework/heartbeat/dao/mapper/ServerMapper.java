@@ -15,12 +15,15 @@ public interface ServerMapper {
 	List<ServerCounterVo> getServerCounterIncreaseByFromServerId(Integer fromServerId);
 	//UPDATE
 	int updateServerByServerId(ServerClusterVo server);
+
 	int resetCounterByToServerId(int toServerId);
+
+	int updateServerCounterIncrementByOneByFromServerId(Integer fromServerId);
 	
 	//INSERT
 	int replaceServer(ServerClusterVo server);
 	int replaceServerCounter(ServerCounterVo serverCounter);
 	
 	//DELETE
-	int deleteCounterByServerId(int serverId);		
+	int deleteCounterByServerId(int serverId);
 }

@@ -53,6 +53,10 @@
 		WHERE to_server_id=#{toServerId}
 	</update>
 
+	<update id="updateServerCounterIncrementByOneByFromServerId" parameterType="java.lang.Integer">
+		UPDATE `server_counter` SET `counter` = `counter` + 1 WHERE `from_server_id` = #{value};
+	</update>
+
 	<insert id="replaceServer">
 		REPLACE INTO server_status(ip, server_id, status) VALUES(#{ip}, #{serverId}, #{status})
 	</insert>

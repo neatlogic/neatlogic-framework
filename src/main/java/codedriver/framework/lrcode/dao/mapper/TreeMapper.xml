@@ -54,7 +54,7 @@
         WHERE
         <choose>
             <when test="parentIdValue == null">
-                a.`${parentIdKey}` = 0 OR a.`${parentIdKey}` is null
+                a.`${parentIdKey}` = '0' OR a.`${parentIdKey}` is null
             </when>
             <otherwise>a.`${parentIdKey}` = #{parentIdValue}</otherwise>
         </choose>

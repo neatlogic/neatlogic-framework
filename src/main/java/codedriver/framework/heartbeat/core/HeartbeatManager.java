@@ -69,11 +69,6 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
                     // 查出正常服务器及计数器加一后的值
                     serverMapper.updateServerCounterIncrementByOneByFromServerId(Config.SCHEDULE_SERVER_ID);
-//                    List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
-//                    for (ServerCounterVo serverCounter : serverCounterList) {
-//                        // 重新插入数据
-//                        serverMapper.replaceServerCounter(serverCounter);
-//                    }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }

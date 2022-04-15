@@ -9,6 +9,10 @@ import codedriver.framework.notify.dto.NotifyPolicyVo;
 
 	 NotifyPolicyVo getNotifyPolicyById(Long id);
 
+	 NotifyPolicyVo getNotifyPolicyByName(String name);
+
+	 List<NotifyPolicyVo> getNotifyPolicyListByIdList(List<Long> idList);
+
 	 int checkNotifyPolicyNameIsRepeat(NotifyPolicyVo notifyPolicyVo);
 
 	 List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo);

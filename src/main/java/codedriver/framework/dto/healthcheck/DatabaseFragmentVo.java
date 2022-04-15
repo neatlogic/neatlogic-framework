@@ -10,7 +10,9 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.healthcheck.enums.SchemaType;
 import codedriver.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -27,14 +29,22 @@ public class DatabaseFragmentVo extends BasePageVo {
     private String engine;
     @EntityField(name = "行数", type = ApiParamType.INTEGER)
     private int dataRows;
-    @EntityField(name = "数据文件占用空间，单位：M", type = ApiParamType.INTEGER)
+    @EntityField(name = "数据文件占用空间，单位：字节", type = ApiParamType.INTEGER)
     private int dataSize;
-    @EntityField(name = "索引文件占用空间，单位：M", type = ApiParamType.INTEGER)
+    @EntityField(name = "数据文件占用空间（带单位）", type = ApiParamType.STRING)
+    private String dataSizeText;
+    @EntityField(name = "索引文件占用空间，单位：字节", type = ApiParamType.INTEGER)
     private int indexSize;
-    @EntityField(name = "总使用占用空间，单位：M", type = ApiParamType.INTEGER)
+    @EntityField(name = "索引文件占用空间（带单位）", type = ApiParamType.STRING)
+    private String indexSizeText;
+    @EntityField(name = "总使用占用空间，单位：字节", type = ApiParamType.INTEGER)
     private int totalSize;
-    @EntityField(name = "数据空闲空间，单位：M", type = ApiParamType.INTEGER)
+    @EntityField(name = "总使用占用空间（带单位）", type = ApiParamType.STRING)
+    private String totalSizeText;
+    @EntityField(name = "数据空闲空间，单位：字节", type = ApiParamType.INTEGER)
     private int dataFree;
+    @EntityField(name = "数据空闲空间（带单位）", type = ApiParamType.STRING)
+    private String dataFreeText;
     @EntityField(name = "碎片率", type = ApiParamType.INTEGER)
     private float fragmentRate;
     @EntityField(name = "排序", type = ApiParamType.JSONARRAY)
@@ -132,4 +142,63 @@ public class DatabaseFragmentVo extends BasePageVo {
     public void setSortList(List<String> sortList) {
         this.sortList = sortList;
     }
+
+    String[] units = new String[]{"字节", "K", "M", "G"};
+
+    public String getDataSizeText() {
+        if (StringUtils.isBlank(dataSizeText)) {
+            float d = dataSize;
+            int unitindex = 0;
+            while (d > 1024 && unitindex <= 3) {
+                d = d / 1024;
+                unitindex += 1;
+            }
+            dataSizeText = decimalFormat.format(d) + units[unitindex];
+        }
+        return dataSizeText;
+    }
+
+
+    public String getIndexSizeText() {
+        if (StringUtils.isBlank(indexSizeText)) {
+            float d = indexSize;
+            int unitindex = 0;
+            while (d > 1024 && unitindex <= 3) {
+                d = d / 1024;
+                unitindex += 1;
+            }
+            indexSizeText = decimalFormat.format(d) + units[unitindex];
+        }
+        return indexSizeText;
+    }
+
+
+    public String getTotalSizeText() {
+        if (StringUtils.isBlank(totalSizeText)) {
+            float d = totalSize;
+            int unitindex = 0;
+            while (d > 1024 && unitindex <= 3) {
+                d = d / 1024;
+                unitindex += 1;
+            }
+            totalSizeText = decimalFormat.format(d) + units[unitindex];
+        }
+        return totalSizeText;
+    }
+
+    DecimalFormat decimalFormat = new DecimalFormat("0.##");
+
+    public String getDataFreeText() {
+        if (StringUtils.isBlank(dataFreeText)) {
+            float d = dataFree;
+            int unitindex = 0;
+            while (d > 1024 && unitindex <= 3) {
+                d = d / 1024;
+                unitindex += 1;
+            }
+            dataFreeText = decimalFormat.format(d) + units[unitindex];
+        }
+        return dataFreeText;
+    }
+
 }

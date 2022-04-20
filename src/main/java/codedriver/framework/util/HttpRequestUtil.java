@@ -433,6 +433,11 @@ public class HttpRequestUtil {
                         out.flush();
                     }
                 }
+                //默认使用原来的Content-Disposition，保留原来文件名
+                String contentDisPosition =  connection.getHeaderField("Content-Disposition");
+                if(StringUtils.isNotBlank(contentDisPosition)){
+                    UserContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
+                }
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
                 if (100 <= this.responseCode && this.responseCode <= 399) {
@@ -460,7 +465,7 @@ public class HttpRequestUtil {
                 this.error = ExceptionUtils.getExceptionStackTrace(e);
             } finally {
                 connection.disconnect();
-                if(UserContext.get() != null && UserContext.get().getResponse() != null) {
+                if(UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
                     UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
                 }
             }

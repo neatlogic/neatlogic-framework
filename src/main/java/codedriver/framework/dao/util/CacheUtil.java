@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class CacheUtil {
     /**
-     * 清空当前事务会话的一级缓存，避免脏读
+     * 清空当前事务会话的一级缓存
      */
     public static void clearSqlSessionCache(){
         if (TransactionSynchronizationManager.isSynchronizationActive()) {

@@ -35,7 +35,6 @@ public class MatrixDataVo extends BasePageVo {
     private JSONArray relFilterList;
     private Long filterCiEntityId;
     private Long filterCiId;
-    private Long groupId;
 //    private String targetColumn;
 //
 //    public String getTargetColumn() {
@@ -194,13 +193,5 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setFilterCiId(Long filterCiId) {
         this.filterCiId = filterCiId;
-    }
-
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
     }
 }

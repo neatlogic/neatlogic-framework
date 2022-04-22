@@ -5,8 +5,8 @@
 
 package codedriver.framework.exception.runner;
 
-public class RunnerUrlIllegalException extends RuntimeException {
-    public RunnerUrlIllegalException(Long runnerId) {
-        super("runner id 为：" + runnerId + "url 为空");
+public class RunnerUrlIsNullException extends RuntimeException {
+    public RunnerUrlIsNullException(Long runnerId) {
+        super("runner id 为：“" + runnerId + "”的url 为空");
     }
 }

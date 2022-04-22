@@ -20,5 +20,6 @@
         <!-- <plugin interceptor="codedriver.framework.dao.plugin.BusinessGroupInterceptor"/>-->
         <!-- <plugin interceptor="codedriver.framework.dao.plugin.FulltextIndexInterceptor"/>-->
         <plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor"/>
+        <plugin interceptor="codedriver.framework.dao.plugin.SqlSessionCacheClearInterceptor"/>
     </plugins>
 </configuration>

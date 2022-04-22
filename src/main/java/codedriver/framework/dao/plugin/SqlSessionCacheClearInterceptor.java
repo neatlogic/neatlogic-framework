@@ -56,7 +56,6 @@ public class SqlSessionCacheClearInterceptor implements Interceptor {
         }
         // 如果sql是以“for update”结尾，就清空当前SqlSession缓存
         if (isForUpdate) {
-            System.out.println(sql);
             if (TransactionSynchronizationManager.isSynchronizationActive()) {
                 Map<Object, Object> resourceMap = TransactionSynchronizationManager.getResourceMap();
                 for (Map.Entry<Object, Object> entry : resourceMap.entrySet()) {

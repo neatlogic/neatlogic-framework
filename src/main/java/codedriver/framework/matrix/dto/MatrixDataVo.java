@@ -33,6 +33,9 @@ public class MatrixDataVo extends BasePageVo {
     //表单编辑页引用配置项矩阵时的保存过滤条件数据
     private JSONArray attrFilterList;
     private JSONArray relFilterList;
+    private Long filterCiEntityId;
+    private Long filterCiId;
+    private Long groupId;
 //    private String targetColumn;
 //
 //    public String getTargetColumn() {
@@ -175,5 +178,29 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setRelFilterList(JSONArray relFilterList) {
         this.relFilterList = relFilterList;
+    }
+
+    public Long getFilterCiEntityId() {
+        return filterCiEntityId;
+    }
+
+    public void setFilterCiEntityId(Long filterCiEntityId) {
+        this.filterCiEntityId = filterCiEntityId;
+    }
+
+    public Long getFilterCiId() {
+        return filterCiId;
+    }
+
+    public void setFilterCiId(Long filterCiId) {
+        this.filterCiId = filterCiId;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 }

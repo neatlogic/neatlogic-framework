@@ -84,6 +84,8 @@ public interface RoleMapper {
 
     int insertRoleTeamList(List<RoleTeamVo> roleTeamList);
 
+    int batchInsertUserRole(List<RoleUserVo> list);
+
     int updateRole(RoleVo roleVo);
 
     int updateTeamRole(RoleTeamVo roleTeamVo);

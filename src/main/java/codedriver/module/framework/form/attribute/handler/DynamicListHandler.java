@@ -1423,11 +1423,6 @@ public class DynamicListHandler extends FormHandlerBase {
             }
         }
 
-        JSONArray relMatrixUuidArray = config.getJSONArray("relMatrixUuidList");
-        if (CollectionUtils.isNotEmpty(relMatrixUuidArray)) {
-            List<String> relMatrixUuidList = relMatrixUuidArray.toJavaList(String.class);
-            matrixUuidSet.addAll(relMatrixUuidList);
-        }
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
         formAttributeVo.setIntegrationUuidSet(integrationUuidSet);

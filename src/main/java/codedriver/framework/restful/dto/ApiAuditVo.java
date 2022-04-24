@@ -106,6 +106,9 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     private String logPath;
     @JSONField(serialize = false)
     private String tenant;
+    @JSONField(serialize = false)
+    private List<String> userUuidList;
+    private List<String> statusList;
 
     public ApiAuditVo() {
         this.setPageSize(20);
@@ -379,5 +382,21 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setErrorFilePath(String errorFilePath) {
         this.errorFilePath = errorFilePath;
+    }
+
+    public List<String> getUserUuidList() {
+        return userUuidList;
+    }
+
+    public void setUserUuidList(List<String> userUuidList) {
+        this.userUuidList = userUuidList;
+    }
+
+    public List<String> getStatusList() {
+        return statusList;
+    }
+
+    public void setStatusList(List<String> statusList) {
+        this.statusList = statusList;
     }
 }

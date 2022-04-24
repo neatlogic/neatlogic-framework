@@ -7,6 +7,7 @@ package codedriver.framework.restful.dto;
 
 import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleGroupVo;
@@ -16,11 +17,13 @@ import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
@@ -386,6 +389,9 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     }
 
     public List<String> getUserUuidList() {
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+            userUuidList = userUuidList.stream().map(GroupSearch::removePrefix).collect(Collectors.toList());
+        }
         return userUuidList;
     }
 

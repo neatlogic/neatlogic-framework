@@ -108,6 +108,7 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     private String tenant;
     @JSONField(serialize = false)
     private List<String> userUuidList;
+    @JSONField(serialize = false)
     private List<String> statusList;
 
     public ApiAuditVo() {

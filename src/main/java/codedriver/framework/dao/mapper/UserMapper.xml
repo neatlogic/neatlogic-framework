@@ -1060,7 +1060,7 @@
         </foreach>
     </select>
 
-    <select id="checkUserIsInMoreThanOneTeam" resultType="java.lang.Integer">
+    <select id="getUserTeamCountByUserUuid" resultType="java.lang.Integer">
         SELECT count(1) FROM `user_team` WHERE `user_uuid` = #{value}
     </select>
 
@@ -1195,7 +1195,7 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateUserTeam" parameterType="codedriver.framework.dto.TeamUserVo">
+    <update id="updateUserTeamByUserUuid" parameterType="codedriver.framework.dto.TeamUserVo">
         UPDATE `user_team`
         SET `team_uuid` = #{teamUuid}
         WHERE `user_uuid` = #{userUuid}

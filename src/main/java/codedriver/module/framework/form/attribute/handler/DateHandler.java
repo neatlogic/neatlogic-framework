@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
+import codedriver.framework.form.constvalue.DateRange;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
@@ -95,7 +96,28 @@ public class DateHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getDataObj();
+        Object data = attributeDataVo.getDataObj();
+        if (data == null) {
+            return null;
+        } else if (data instanceof JSONObject) {
+            // 下面代码逻辑用于工单中心
+            JSONObject dataObj = (JSONObject) data;
+            Integer timeRange = dataObj.getInteger("timeRange");
+            String timeUnit = dataObj.getString("timeUnit");
+            if (timeRange != null && StringUtils.isNotBlank(timeUnit)) {
+                return DateRange.getText(timeRange, timeUnit);
+            } else {
+                Long startTime = dataObj.getLong("startTime");
+                Long endTime = dataObj.getLong("endTime");
+                if (startTime != null && endTime != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String startTimeStr = sdf.format(new Date(startTime));
+                    String endTimeStr = sdf.format(new Date(endTime));
+                    return startTimeStr + " - " + endTimeStr;
+                }
+            }
+        }
+        return data;
     }
 
     @Override

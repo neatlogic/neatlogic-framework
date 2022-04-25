@@ -57,7 +57,7 @@
                 </choose>
             </foreach>
         </if>
-        <if test="filterList != null and filterList.size() > 0">
+        <!--<if test="filterList != null and filterList.size() > 0">
             <foreach collection="filterList" item="filter" separator=" ">
                 <if test="filter.valueList != null and filter.valueList.size() > 0">
                     and `${filter.uuid}` in
@@ -66,7 +66,7 @@
                     </foreach>
                 </if>
             </foreach>
-        </if>
+        </if>-->
     </sql>
 
     <select id="getDynamicTableDataCountForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"

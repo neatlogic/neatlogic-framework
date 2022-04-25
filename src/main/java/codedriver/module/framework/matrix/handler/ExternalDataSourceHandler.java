@@ -236,7 +236,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
             JSONArray dafaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
-//                String uuidColumn = jsonObj.getString("uuidColumn");
                 String uuidColumn = dataVo.getUuidColumn();
                 boolean uuidColumnExist = false;
                 for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
@@ -277,14 +276,12 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
                 returnObj.put("tbodyList", tbodyList);
             } else {
-//                jsonObj.put("sourceColumnList", dataVo.getSourceColumnList()); //防止集成管理 js length 异常
-//            integrationVo.getParamObj().putAll(jsonObj);
                 JSONObject paramObj = integrationVo.getParamObj();
                 paramObj.put("currentPage", dataVo.getCurrentPage());
                 int pageSize = dataVo.getPageSize();
                 paramObj.put("pageSize", pageSize);
                 paramObj.put("needPage", pageSize < 100);
-                paramObj.put("filterList", dataVo.getFilterList());
+//                paramObj.put("filterList", dataVo.getFilterList());
                 paramObj.put("sourceColumnList", dataVo.getSourceColumnList());
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
@@ -298,19 +295,11 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 returnObj.put("pageCount", transformedResult.get("pageCount"));
                 returnObj.put("rowNum", transformedResult.get("rowNum"));
                 tbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList());
-                /** 将arrayColumnList包含的属性值转成数组 **/
-//                JSONArray arrayColumnArray = jsonObj.getJSONArray("arrayColumnList");
-//                if (CollectionUtils.isNotEmpty(arrayColumnArray)) {
-//                    List<String> arrayColumnList = arrayColumnArray.toJavaList(String.class);
-//                    if (CollectionUtils.isNotEmpty(tbodyList)) {
-//                        matrixService.arrayColumnDataConversion(arrayColumnList, tbodyList);
-//                    }
-//                }
                 returnObj.put("tbodyList", tbodyList);
-//            returnObj.put("searchColumnDetailList", getSearchColumnDetailList(dataVo.getMatrixUuid(), matrixAttributeList, searchColumnArray));
             }
             JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, dataVo.getColumnList());
             returnObj.put("theadList", theadList);
+            /** 将arrayColumnList包含的属性值转成数组 **/
             List<String> arrayColumnList = dataVo.getArrayColumnList();
             if (CollectionUtils.isNotEmpty(arrayColumnList) && CollectionUtils.isNotEmpty(tbodyList)) {
                 arrayColumnDataConversion(arrayColumnList, tbodyList);
@@ -342,8 +331,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
             JSONObject paramObj = integrationVo.getParamObj();
-            List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-//            jsonObj.put("sourceColumnList", sourceColumnList); //防止集成管理 js length 异常
 
             JSONArray defaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(defaultValue)) {
@@ -357,6 +344,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 splitList.add(str);
                             }
                         }
+                        List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
                         int min = Math.min(splitList.size(), columnList.size());
                         for (int i = 0; i < min; i++) {
                             String column = columnList.get(i);
@@ -366,9 +354,8 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 sourceColumnList.add(matrixColumnVo);
                             }
                         }
-//                        integrationVo.getParamObj().putAll(jsonObj);
                         paramObj.put("sourceColumnList", sourceColumnList);
-                        paramObj.put("filterList", dataVo.getFilterList());
+//                        paramObj.put("filterList", dataVo.getFilterList());
                         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                         if (StringUtils.isNotBlank(resultVo.getError())) {
                             logger.error(resultVo.getError());
@@ -378,6 +365,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
+                List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                 String keywordColumn = dataVo.getKeywordColumn();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
                     if (!attributeList.contains(keywordColumn)) {
@@ -389,12 +377,11 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     matrixColumnVo.setValue(dataVo.getKeyword());
                     sourceColumnList.add(matrixColumnVo);
                 }
-//                integrationVo.getParamObj().putAll(jsonObj);
                 paramObj.put("currentPage", dataVo.getCurrentPage());
                 int pageSize = dataVo.getPageSize();
                 paramObj.put("pageSize", pageSize);
                 paramObj.put("needPage", pageSize < 100);
-                paramObj.put("filterList", dataVo.getFilterList());
+//                paramObj.put("filterList", dataVo.getFilterList());
                 paramObj.put("sourceColumnList", sourceColumnList);
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {

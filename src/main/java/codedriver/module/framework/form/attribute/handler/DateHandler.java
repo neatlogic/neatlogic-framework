@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -95,9 +96,19 @@ public class DateHandler extends FormHandlerBase {
         Object data = attributeDataVo.getDataObj();
         if (data == null) {
             return null;
-        } else if (data instanceof JSONObject) {
+        }
+        JSONObject dataObj = null;
+        if (data instanceof JSONObject) {
             // 下面代码逻辑用于工单中心
-            JSONObject dataObj = (JSONObject) data;
+            dataObj = (JSONObject) data;
+        } else if (data instanceof JSONArray) {
+            // 下面代码逻辑用于工单中心
+            JSONArray dataArray = (JSONArray) data;
+            if (CollectionUtils.isNotEmpty(dataArray)) {
+                dataObj = dataArray.getJSONObject(0);
+            }
+        }
+        if (MapUtils.isNotEmpty(dataObj)) {
             Integer timeRange = dataObj.getInteger("timeRange");
             String timeUnit = dataObj.getString("timeUnit");
             if (timeRange != null && StringUtils.isNotBlank(timeUnit)) {
@@ -110,26 +121,6 @@ public class DateHandler extends FormHandlerBase {
                     String startTimeStr = sdf.format(new Date(startTime));
                     String endTimeStr = sdf.format(new Date(endTime));
                     return startTimeStr + " - " + endTimeStr;
-                }
-            }
-        } else if (data instanceof JSONArray) {
-            // 下面代码逻辑用于工单中心
-            JSONArray dataArray = (JSONArray) data;
-            if (CollectionUtils.isNotEmpty(dataArray)) {
-                JSONObject dataObj = dataArray.getJSONObject(1);
-                Integer timeRange = dataObj.getInteger("timeRange");
-                String timeUnit = dataObj.getString("timeUnit");
-                if (timeRange != null && StringUtils.isNotBlank(timeUnit)) {
-                    return DateRange.getText(timeRange, timeUnit);
-                } else {
-                    Long startTime = dataObj.getLong("startTime");
-                    Long endTime = dataObj.getLong("endTime");
-                    if (startTime != null && endTime != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        String startTimeStr = sdf.format(new Date(startTime));
-                        String endTimeStr = sdf.format(new Date(endTime));
-                        return startTimeStr + " - " + endTimeStr;
-                    }
                 }
             }
         }

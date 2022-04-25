@@ -14,10 +14,12 @@ import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.xlsx4j.sml.Col;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -114,6 +116,26 @@ public class DateHandler extends FormHandlerBase {
                     String startTimeStr = sdf.format(new Date(startTime));
                     String endTimeStr = sdf.format(new Date(endTime));
                     return startTimeStr + " - " + endTimeStr;
+                }
+            }
+        } else if (data instanceof JSONArray) {
+            // 下面代码逻辑用于工单中心
+            JSONArray dataArray = (JSONArray) data;
+            if (CollectionUtils.isNotEmpty(dataArray)) {
+                JSONObject dataObj = dataArray.getJSONObject(1);
+                Integer timeRange = dataObj.getInteger("timeRange");
+                String timeUnit = dataObj.getString("timeUnit");
+                if (timeRange != null && StringUtils.isNotBlank(timeUnit)) {
+                    return DateRange.getText(timeRange, timeUnit);
+                } else {
+                    Long startTime = dataObj.getLong("startTime");
+                    Long endTime = dataObj.getLong("endTime");
+                    if (startTime != null && endTime != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        String startTimeStr = sdf.format(new Date(startTime));
+                        String endTimeStr = sdf.format(new Date(endTime));
+                        return startTimeStr + " - " + endTimeStr;
+                    }
                 }
             }
         }

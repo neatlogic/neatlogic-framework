@@ -97,9 +97,9 @@ public class DateHandler extends FormHandlerBase {
         if (data == null) {
             return null;
         }
+        // 下面代码逻辑用于工单中心
         JSONObject dataObj = null;
         if (data instanceof JSONObject) {
-            // 下面代码逻辑用于工单中心
             dataObj = (JSONObject) data;
         } else if (data instanceof JSONArray) {
             // 下面代码逻辑用于工单中心

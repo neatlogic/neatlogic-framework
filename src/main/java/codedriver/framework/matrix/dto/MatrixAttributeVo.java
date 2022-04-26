@@ -25,6 +25,8 @@ public class MatrixAttributeVo extends BasePageVo {
     private String uuid;
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
+    @EntityField( name = "属性label", type = ApiParamType.STRING)
+    private String label;
     @EntityField( name = "类型", type = ApiParamType.STRING)
     private String type;
     @EntityField( name = "是否必填", type = ApiParamType.INTEGER)
@@ -68,7 +70,15 @@ public class MatrixAttributeVo extends BasePageVo {
         this.name = name;
     }
 
-    public String getType() {
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getType() {
 		return type;
 	}
 

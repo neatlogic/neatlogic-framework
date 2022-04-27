@@ -46,13 +46,13 @@
             <foreach collection="sourceColumnList" item="sourceColumn">
                 <choose>
                     <when test="sourceColumn.expression == 'equal'">
-                        AND `${sourceColumn.column}` = #{sourceColumn.value}
+                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
                     </when>
                     <when test="sourceColumn.expression == 'like'">
-                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
+                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.valueList[0]}, '%')
                     </when>
                     <otherwise>
-                        AND `${sourceColumn.column}` = #{sourceColumn.value}
+                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
                     </otherwise>
                 </choose>
             </foreach>

@@ -77,28 +77,28 @@
             <foreach collection="sourceColumnList" item="sourceColumn">
                 <choose>
                     <when test="sourceColumn.expression == 'equal'">
-                        AND `${sourceColumn.column}` = #{sourceColumn.value}
+                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
                     </when>
                     <when test="sourceColumn.expression == 'unequal'">
-                        AND `${sourceColumn.column}` != #{sourceColumn.value}
+                        AND `${sourceColumn.column}` != #{sourceColumn.valueList[0]}
                     </when>
                     <when test="sourceColumn.expression == 'like'">
-                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
+                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.valueList[0]}, '%')
                     </when>
                     <when test="sourceColumn.expression == 'greater-than'">
-                        AND `${sourceColumn.column}` &gt; #{sourceColumn.value}
+                        AND `${sourceColumn.column}` &gt; #{sourceColumn.valueList[0]}
                     </when>
                     <when test="sourceColumn.expression == 'less-than'">
-                        AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
+                        AND `${sourceColumn.column}` &lt; #{sourceColumn.valueList[0]}
                     </when>
-                    <when test="sourceColumn.expression == 'include' and sourceColumn.value != null and sourceColumn.value.size() > 0">
+                    <when test="sourceColumn.expression == 'include' and sourceColumn.valueList != null and sourceColumn.valueList.size() > 0">
                         AND `${sourceColumn.column}` IN
-                        <foreach collection="sourceColumn.value" item="item" open="(" close=")" separator=",">
+                        <foreach collection="sourceColumn.valueList" item="item" open="(" close=")" separator=",">
                             #{item}
                         </foreach>
                     </when>
                     <otherwise>
-                        AND `${sourceColumn.column}` = #{sourceColumn.value}
+                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
                     </otherwise>
                 </choose>
             </foreach>

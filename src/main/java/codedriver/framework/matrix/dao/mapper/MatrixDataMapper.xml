@@ -157,7 +157,7 @@
                 JOIN `team` c ON c.`uuid` = a.`${keywordColumn}`
             </when>
             <when test="attrType == 'role'">
-                JOIN `role` d ON d.`name` = a.`${keywordColumn}`
+                JOIN `role` d ON d.`uuid` = a.`${keywordColumn}`
             </when>
         </choose>
         <where>

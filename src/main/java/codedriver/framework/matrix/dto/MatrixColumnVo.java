@@ -17,7 +17,7 @@ public class MatrixColumnVo {
     private Object value;
     private String expression;
     private String type;
-
+	private List<String> defaultValue;
     public MatrixColumnVo() {
 	}
 
@@ -82,5 +82,13 @@ public class MatrixColumnVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public List<String> getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(List<String> defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 }

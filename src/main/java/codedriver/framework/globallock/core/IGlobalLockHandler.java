@@ -50,4 +50,11 @@ public interface IGlobalLockHandler {
      * @param paramJson 入参
      */
     void doNotify(GlobalLockVo globalLockVo,JSONObject paramJson);
+
+    /**
+     * 重试notify
+     * @param lockId cancel lockId
+     * @param paramJson 入参
+     */
+    void retryNotify(Long lockId,JSONObject paramJson);
 }

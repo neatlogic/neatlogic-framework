@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -51,10 +52,13 @@ public class GlobalLockManager {
                 globalLockVo.setIsLock(1);
             }
             TransactionUtil.commitTx(transactionStatus);
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            if(!(ex.getCause() instanceof SQLException)){
+                logger.error(ex.getMessage(),ex);
+            }
             //如果wait lock timeout 则仅加入队列，等待notify
             TransactionUtil.rollbackTx(transactionStatus);
-            globalLockVo = null;
+            globalLockVo.setWaitReason(ex.getMessage());
         }
         return globalLockVo;
     }

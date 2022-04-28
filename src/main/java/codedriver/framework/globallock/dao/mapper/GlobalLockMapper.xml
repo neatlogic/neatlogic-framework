@@ -8,23 +8,46 @@
 <mapper namespace="codedriver.framework.globallock.dao.mapper.GlobalLockMapper">
     <select id="getGlobalLockByUuidForUpdate" parameterType="java.lang.String"
             resultType="codedriver.framework.dto.globallock.GlobalLockVo">
-        SELECT `id`, `uuid`, `key`, `mode`, `is_lock`, `description`, `fcd`
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`,
+               `description`,
+               `fcd`
         FROM `global_lock`
         WHERE `uuid` = #{value} FOR
         UPDATE
     </select>
 
     <select id="getGlobalLockById" resultType="codedriver.framework.dto.globallock.GlobalLockVo">
-        SELECT `id`, `uuid`, `key`, `mode`, `is_lock`, `description`, `fcd`
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`,
+               `description`,
+               `fcd`
         FROM `global_lock`
         WHERE `id` = #{value}
     </select>
+
     <select id="getNextGlobalLockByUuid" resultType="codedriver.framework.dto.globallock.GlobalLockVo">
-        SELECT `id`, `uuid`, `key`, `mode`, `is_lock`, `description`, `fcd`
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`,
+               `description`,
+               `fcd`
         FROM `global_lock`
         WHERE `uuid` = #{value}
           and `is_lock` = 0
         order by `id` asc
+        limit 1
     </select>
 
     <update id="updateToLockById">
@@ -34,8 +57,8 @@
     </update>
 
     <insert id="insertLock" parameterType="codedriver.framework.dto.globallock.GlobalLockVo">
-        INSERT INTO `global_lock` (`id`, `uuid`, `key`, `mode`, `is_lock`, `description`, `fcd`)
-        VALUES (#{id}, #{uuid}, #{key}, #{mode}, #{isLock}, #{description}, now())
+        INSERT INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
+        VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{isLock}, #{description}, now())
     </insert>
 
     <delete id="deleteLock" parameterType="java.lang.Long">

@@ -5,5 +5,42 @@
 
 package codedriver.framework.globallock.core;
 
-public abstract class GlobalLockHandlerBase implements IGlobalLockHandler{
+import codedriver.framework.dto.globallock.GlobalLockVo;
+import codedriver.framework.exception.type.ParamIrregularException;
+import codedriver.framework.globallock.GlobalLockManager;
+import com.alibaba.fastjson.JSONObject;
+
+public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
+    @Override
+    public void retryNotify(Long lockId, JSONObject paramJson) {
+        if(lockId == null){
+            throw new ParamIrregularException("lockId");
+        }
+        MyRetryNotify(lockId, paramJson);
+    }
+
+    protected void MyRetryNotify(Long lockId, JSONObject paramJson) {
+
+    }
+
+    @Override
+    public void doNotify(GlobalLockVo globalLockVo, JSONObject paramJson) {
+        myDoNotify(globalLockVo, paramJson);
+    }
+
+    protected void myDoNotify(GlobalLockVo globalLockVo, JSONObject paramJson) {
+
+    }
+
+    @Override
+    public void cancelLock(Long lockId, JSONObject paramJson) {
+        if(lockId == null){
+            throw new ParamIrregularException("lockId");
+        }
+        myCancelLock(lockId, paramJson);
+    }
+
+    protected void myCancelLock(Long lockId, JSONObject paramJson) {
+        GlobalLockManager.cancelLock(lockId, paramJson);
+    }
 }

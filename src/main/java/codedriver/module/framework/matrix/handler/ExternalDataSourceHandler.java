@@ -251,7 +251,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 sourceColumnVo.setColumn(uuidColumn);
                 List<String> uuidList = dafaultValue.toJavaList(String.class);
                 for (String uuidValue : uuidList) {
-                    sourceColumnVo.setValue(uuidValue);
+                    List<String> valueList = new ArrayList<>();
+                    valueList.add(uuidValue);
+                    sourceColumnVo.setValueList(valueList);
                     sourceColumnVo.setExpression(Expression.EQUAL.getExpression());
                     sourceColumnList.clear();
                     sourceColumnList.add(sourceColumnVo);
@@ -366,6 +368,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             } else {
                 List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
+                if (sourceColumnList == null) {
+                    sourceColumnList = new ArrayList<>();
+                }
                 String keywordColumn = dataVo.getKeywordColumn();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
                     if (!attributeList.contains(keywordColumn)) {
@@ -374,7 +379,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     MatrixColumnVo matrixColumnVo = new MatrixColumnVo();
                     matrixColumnVo.setColumn(keywordColumn);
                     matrixColumnVo.setExpression(Expression.LIKE.getExpression());
-                    matrixColumnVo.setValue(dataVo.getKeyword());
+                    List<String> valueList = new ArrayList<>();
+                    valueList.add(dataVo.getKeyword());
+                    matrixColumnVo.setValueList(valueList);
                     sourceColumnList.add(matrixColumnVo);
                 }
                 paramObj.put("currentPage", dataVo.getCurrentPage());

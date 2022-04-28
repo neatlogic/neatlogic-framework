@@ -77,19 +77,19 @@
             <foreach collection="sourceColumnList" item="sourceColumn">
                 <choose>
                     <when test="sourceColumn.expression == 'equal'">
-                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
+                        AND `${sourceColumn.column}` = #{sourceColumn.value}
                     </when>
                     <when test="sourceColumn.expression == 'unequal'">
-                        AND `${sourceColumn.column}` != #{sourceColumn.valueList[0]}
+                        AND `${sourceColumn.column}` != #{sourceColumn.value}
                     </when>
                     <when test="sourceColumn.expression == 'like'">
-                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.valueList[0]}, '%')
+                        AND `${sourceColumn.column}` LIKE CONCAT('%', #{sourceColumn.value}, '%')
                     </when>
                     <when test="sourceColumn.expression == 'greater-than'">
-                        AND `${sourceColumn.column}` &gt; #{sourceColumn.valueList[0]}
+                        AND `${sourceColumn.column}` &gt; #{sourceColumn.value}
                     </when>
                     <when test="sourceColumn.expression == 'less-than'">
-                        AND `${sourceColumn.column}` &lt; #{sourceColumn.valueList[0]}
+                        AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
                     </when>
                     <when test="sourceColumn.expression == 'include' and sourceColumn.valueList != null and sourceColumn.valueList.size() > 0">
                         AND `${sourceColumn.column}` IN
@@ -98,7 +98,7 @@
                         </foreach>
                     </when>
                     <otherwise>
-                        AND `${sourceColumn.column}` = #{sourceColumn.valueList[0]}
+                        AND `${sourceColumn.column}` = #{sourceColumn.value}
                     </otherwise>
                 </choose>
             </foreach>

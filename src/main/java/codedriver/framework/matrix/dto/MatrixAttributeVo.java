@@ -3,6 +3,8 @@ package codedriver.framework.matrix.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +27,8 @@ public class MatrixAttributeVo extends BasePageVo {
     private String uuid;
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
+    @EntityField( name = "属性label", type = ApiParamType.STRING)
+    private String label;
     @EntityField( name = "类型", type = ApiParamType.STRING)
     private String type;
     @EntityField( name = "是否必填", type = ApiParamType.INTEGER)
@@ -33,8 +37,11 @@ public class MatrixAttributeVo extends BasePageVo {
     private Integer sort;
 	@EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
 	private Integer isDeletable = 1;
+    @EntityField( name = "配置信息", type = ApiParamType.JSONOBJECT)
+    private JSONObject config;
     @EntityField( name = "配置信息", type = ApiParamType.STRING)
-    private String config;
+	@JSONField(serialize = false)
+    private String configStr;
     @EntityField( name = "表达式列表", type = ApiParamType.JSONARRAY)
     private List<ExpressionVo> expressionList;
     @EntityField( name = "默认表达式", type = ApiParamType.JSONOBJECT)
@@ -68,7 +75,15 @@ public class MatrixAttributeVo extends BasePageVo {
         this.name = name;
     }
 
-    public String getType() {
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getType() {
 		return type;
 	}
 
@@ -84,13 +99,27 @@ public class MatrixAttributeVo extends BasePageVo {
 		this.isRequired = isRequired;
 	}
 
-	public String getConfig() {
+	public JSONObject getConfig() {
+    	if (config == null && StringUtils.isNotBlank(configStr)) {
+			config = JSONObject.parseObject(configStr);
+		}
         return config;
     }
 
-    public void setConfig(String config) {
+    public void setConfig(JSONObject config) {
         this.config = config;
     }
+
+	public String getConfigStr() {
+    	if (StringUtils.isBlank(configStr) && config != null) {
+			configStr = config.toJSONString();
+		}
+		return configStr;
+	}
+
+	public void setConfigStr(String configStr) {
+		this.configStr = configStr;
+	}
 
 	public Integer getSort() {
 		return sort;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -56,7 +56,7 @@ public class SelectHandler extends FormHandlerBase {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
             String dataSource = configObj.getString("dataSource");
             if ("static".equals(dataSource)) {
                 List<ValueTextVo> dataList =
@@ -82,11 +82,15 @@ public class SelectHandler extends FormHandlerBase {
                         }
                         return valueList;
                     } else {
-                        String text = valueTextMap.get((String) dataObj);
-                        if (text != null) {
-                            return text;
+                        if (dataObj instanceof JSONArray) {
+                            return ((JSONArray) dataObj).getString(0);
                         } else {
-                            return dataObj;
+                            String text = valueTextMap.get((String) dataObj);
+                            if (text != null) {
+                                return text;
+                            } else {
+                                return dataObj;
+                            }
                         }
                     }
                 }
@@ -296,7 +300,7 @@ public class SelectHandler extends FormHandlerBase {
             List<String> valueList = new ArrayList<>();
             List<String> textList = new ArrayList<>();
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
             String dataSource = configObj.getString("dataSource");
             if ("static".equals(dataSource)) {
                 JSONArray dataArray = configObj.getJSONArray("dataList");
@@ -381,14 +385,26 @@ public class SelectHandler extends FormHandlerBase {
                     }
                 }
                 /** 过滤条件 **/
-                JSONArray filterArray = config.getJSONArray("filterList");
-                if (CollectionUtils.isNotEmpty(filterArray)) {
-                    for (int i = 0; i < filterArray.size(); i++) {
-                        JSONObject filterObj = filterArray.getJSONObject(i);
-                        if (MapUtils.isNotEmpty(filterObj)) {
-                            String uuid = filterObj.getString("uuid");
-                            if (StringUtils.isNotBlank(uuid)) {
-                                attributeUuidSet.add(uuid);
+//                JSONArray filterArray = config.getJSONArray("filterList");
+//                if (CollectionUtils.isNotEmpty(filterArray)) {
+//                    for (int i = 0; i < filterArray.size(); i++) {
+//                        JSONObject filterObj = filterArray.getJSONObject(i);
+//                        if (MapUtils.isNotEmpty(filterObj)) {
+//                            String uuid = filterObj.getString("uuid");
+//                            if (StringUtils.isNotBlank(uuid)) {
+//                                attributeUuidSet.add(uuid);
+//                            }
+//                        }
+//                    }
+//                }
+                JSONArray sourceColumnList = config.getJSONArray("sourceColumnList");
+                if (CollectionUtils.isNotEmpty(sourceColumnList)) {
+                    for (int i = 0; i < sourceColumnList.size(); i++) {
+                        JSONObject sourceColumnObj = sourceColumnList.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(sourceColumnObj)) {
+                            String column = sourceColumnObj.getString("column");
+                            if (StringUtils.isNotBlank(column)) {
+                                attributeUuidSet.add(column);
                             }
                         }
                     }

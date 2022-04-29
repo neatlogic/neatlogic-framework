@@ -5,6 +5,10 @@
 
 package codedriver.framework.integration.dto.table;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+
 /**
  * @author linbq
  * @since 2021/10/22 17:45
@@ -12,6 +16,7 @@ package codedriver.framework.integration.dto.table;
 public class SourceColumnVo {
     private String column;
     private Object value;
+    private List<String> valueList;
 
     public String getColumn() {
         return column;
@@ -22,10 +27,21 @@ public class SourceColumnVo {
     }
 
     public Object getValue() {
+        if (value == null && CollectionUtils.isNotEmpty(valueList)) {
+            value = valueList.get(0);
+        }
         return value;
     }
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public List<String> getValueList() {
+        return valueList;
+    }
+
+    public void setValueList(List<String> valueList) {
+        this.valueList = valueList;
     }
 }

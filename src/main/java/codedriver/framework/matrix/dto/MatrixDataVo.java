@@ -3,6 +3,7 @@ package codedriver.framework.matrix.dto;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.BasePageVo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -29,6 +30,11 @@ public class MatrixDataVo extends BasePageVo {
 //    private String attributeUuid;
     private JSONArray filterList;
     List<String> arrayColumnList;
+    //表单编辑页引用配置项矩阵时的保存过滤条件数据
+    private JSONArray attrFilterList;
+    private JSONArray relFilterList;
+    private Long filterCiEntityId;
+    private Long filterCiId;
 //    private String targetColumn;
 //
 //    public String getTargetColumn() {
@@ -155,5 +161,37 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setArrayColumnList(List<String> arrayColumnList) {
         this.arrayColumnList = arrayColumnList;
+    }
+
+    public JSONArray getAttrFilterList() {
+        return attrFilterList;
+    }
+
+    public void setAttrFilterList(JSONArray attrFilterList) {
+        this.attrFilterList = attrFilterList;
+    }
+
+    public JSONArray getRelFilterList() {
+        return relFilterList;
+    }
+
+    public void setRelFilterList(JSONArray relFilterList) {
+        this.relFilterList = relFilterList;
+    }
+
+    public Long getFilterCiEntityId() {
+        return filterCiEntityId;
+    }
+
+    public void setFilterCiEntityId(Long filterCiEntityId) {
+        this.filterCiEntityId = filterCiEntityId;
+    }
+
+    public Long getFilterCiId() {
+        return filterCiId;
+    }
+
+    public void setFilterCiId(Long filterCiId) {
+        this.filterCiId = filterCiId;
     }
 }

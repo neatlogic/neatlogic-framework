@@ -112,6 +112,14 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         return componentMap;
     }
 
+    public static Map<String, IBinaryStreamApiComponent> getBinaryStreamComponentMap() {
+        return binaryComponentMap;
+    }
+
+    public static Map<String, IJsonStreamApiComponent> getJsonStreamComponentMap() {
+        return streamComponentMap;
+    }
+
     public static Map<String, ApiHandlerVo> getApiHandlerMap() {
         return apiHandlerMap;
     }

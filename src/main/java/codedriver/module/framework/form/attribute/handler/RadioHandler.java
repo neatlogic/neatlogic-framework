@@ -265,18 +265,6 @@ public class RadioHandler extends FormHandlerBase {
                     }
                 }
                 /** 过滤条件 **/
-//                JSONArray filterArray = config.getJSONArray("filterList");
-//                if (CollectionUtils.isNotEmpty(filterArray)) {
-//                    for (int i = 0; i < filterArray.size(); i++) {
-//                        JSONObject filterObj = filterArray.getJSONObject(i);
-//                        if (MapUtils.isNotEmpty(filterObj)) {
-//                            String uuid = filterObj.getString("uuid");
-//                            if (StringUtils.isNotBlank(uuid)) {
-//                                attributeUuidSet.add(uuid);
-//                            }
-//                        }
-//                    }
-//                }
                 JSONArray sourceColumnList = config.getJSONArray("sourceColumnList");
                 if (CollectionUtils.isNotEmpty(sourceColumnList)) {
                     for (int i = 0; i < sourceColumnList.size(); i++) {

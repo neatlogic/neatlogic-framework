@@ -51,13 +51,13 @@ public class CiAttr2MatrixAttrDependencyHandler extends FixedTableDependencyHand
                                 for (int i = 0; i < showAttributeArray.size(); i++) {
                                     JSONObject showAttributeObj = showAttributeArray.getJSONObject(i);
                                     if (MapUtils.isNotEmpty(showAttributeObj)) {
-                                        String uuid = showAttributeObj.getString("uuid");
-                                        if (uuid.endsWith(dependencyVo.getFrom())) {
+                                        String label = showAttributeObj.getString("label");
+                                        if (label.endsWith(dependencyVo.getFrom())) {
                                             JSONObject dependencyInfoConfig = new JSONObject();
                                             dependencyInfoConfig.put("matrixUuid", matrixVo.getUuid());
                                             dependencyInfoConfig.put("matrixName", matrixVo.getName());
                                             dependencyInfoConfig.put("matrixType", matrixVo.getType());
-                                            String toName = showAttributeObj.getString("label");
+                                            String toName = showAttributeObj.getString("name");
                                             dependencyInfoConfig.put("attributeName", toName);
                                             String pathFormat = "矩阵-${DATA.matrixName}-${DATA.attributeName}";
                                             String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";

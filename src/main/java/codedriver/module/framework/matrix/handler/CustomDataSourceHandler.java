@@ -439,9 +439,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         }
                         String keyword = split[1];
                         if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
-                            String config = matrixAttribute.getConfig();
-                            if (StringUtils.isNotBlank(config)) {
-                                JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                            JSONObject config = matrixAttribute.getConfig();
+                            if (MapUtils.isNotEmpty(config)) {
+                                JSONArray dataArray = config.getJSONArray("dataList");
                                 if (CollectionUtils.isNotEmpty(dataArray)) {
                                     List<String> valueList = new ArrayList<>();
                                     List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
@@ -498,9 +498,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }
                     if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
-                        String config = matrixAttribute.getConfig();
-                        if (StringUtils.isNotBlank(config)) {
-                            JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                        JSONObject config = matrixAttribute.getConfig();
+                        if (MapUtils.isNotEmpty(config)) {
+                            JSONArray dataArray = config.getJSONArray("dataList");
                             if (CollectionUtils.isNotEmpty(dataArray)) {
                                 List<String> valueList = new ArrayList<>();
                                 List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
@@ -674,10 +674,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
      * @param selectValueList
      */
     private void decodeDataConfig(MatrixAttributeVo attributeVo, List<String> selectValueList) {
-        if (StringUtils.isNotBlank(attributeVo.getConfig())) {
-            String config = attributeVo.getConfig();
-            JSONObject configObj = JSONObject.parseObject(config);
-            JSONArray dataList = configObj.getJSONArray("dataList");
+            JSONObject config = attributeVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            JSONArray dataList = config.getJSONArray("dataList");
             if (CollectionUtils.isNotEmpty(dataList)) {
                 for (int i = 0; i < dataList.size(); i++) {
                     JSONObject dataObj = dataList.getJSONObject(i);
@@ -704,12 +703,14 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (type.equals(MatrixAttributeType.INPUT.getValue())) {
             return true;
         } else if (type.equals(MatrixAttributeType.SELECT.getValue())) {
-            String config = matrixAttributeVo.getConfig();
-            JSONArray dataList = (JSONArray) JSONPath.read(config, "dataList");
-            for (int i = 0; i < dataList.size(); i++) {
-                JSONObject dataObj = dataList.getJSONObject(i);
-                if (value.equals(dataObj.getString("value"))) {
-                    return true;
+            JSONObject config = matrixAttributeVo.getConfig();
+            if (MapUtils.isNotEmpty(config)) {
+                JSONArray dataList = config.getJSONArray("dataList");
+                for (int i = 0; i < dataList.size(); i++) {
+                    JSONObject dataObj = dataList.getJSONObject(i);
+                    if (value.equals(dataObj.getString("value"))) {
+                        return true;
+                    }
                 }
             }
         } else if (type.equals(MatrixAttributeType.DATE.getValue())) {
@@ -769,10 +770,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         resultObj.put("text", value);
         if (MatrixAttributeType.SELECT.getValue().equals(type)) {
             if (matrixAttribute != null) {
-                String config = matrixAttribute.getConfig();
-                if (StringUtils.isNotBlank(config)) {
-                    JSONObject configObj = JSON.parseObject(config);
-                    JSONArray dataList = configObj.getJSONArray("dataList");
+                JSONObject config = matrixAttribute.getConfig();
+                if (MapUtils.isNotEmpty(config)) {
+                    JSONArray dataList = config.getJSONArray("dataList");
                     if (CollectionUtils.isNotEmpty(dataList)) {
                         for (int i = 0; i < dataList.size(); i++) {
                             JSONObject data = dataList.getJSONObject(i);

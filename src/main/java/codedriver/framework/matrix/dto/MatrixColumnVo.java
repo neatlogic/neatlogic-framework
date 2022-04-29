@@ -17,6 +17,7 @@ public class MatrixColumnVo {
     private Object value;
     private String expression;
     private String type;
+
     public MatrixColumnVo() {
 	}
 

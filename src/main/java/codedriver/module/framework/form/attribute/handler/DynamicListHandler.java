@@ -992,14 +992,6 @@ public class DynamicListHandler extends FormHandlerBase {
 //		"uuidColumn": "subSysId",
 //		"width": "100%",
 //		"defaultValueType": "self",
-//		"filterList": [
-//			{
-//				"valueList": [
-//					"111"
-//				],
-//				"uuid": "e31052d7732345fd825c43a9f9deacb1"
-//			}
-//		],
 //		"authorityConfig": [
 //			"common#alluser"
 //		],
@@ -1365,18 +1357,6 @@ public class DynamicListHandler extends FormHandlerBase {
                     }
                 }
                 /** 过滤条件 **/
-//                JSONArray filterArray = config.getJSONArray("filterList");
-//                if (CollectionUtils.isNotEmpty(filterArray)) {
-//                    for (int i = 0; i < filterArray.size(); i++) {
-//                        JSONObject filterObj = filterArray.getJSONObject(i);
-//                        if (MapUtils.isNotEmpty(filterObj)) {
-//                            String uuid = filterObj.getString("uuid");
-//                            if (StringUtils.isNotBlank(uuid)) {
-//                                attributeUuidSet.add(uuid);
-//                            }
-//                        }
-//                    }
-//                }
                 JSONArray sourceColumnList = config.getJSONArray("sourceColumnList");
                 if (CollectionUtils.isNotEmpty(sourceColumnList)) {
                     for (int i = 0; i < sourceColumnList.size(); i++) {

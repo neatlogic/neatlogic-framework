@@ -27,7 +27,6 @@ public class MatrixDataVo extends BasePageVo {
     private String uuid;
     private String attrType;
     private List<String> attributeValueList;
-//    private String attributeUuid;
     private JSONArray filterList;
     List<String> arrayColumnList;
     //表单编辑页引用配置项矩阵时的保存过滤条件数据
@@ -35,15 +34,6 @@ public class MatrixDataVo extends BasePageVo {
     private JSONArray relFilterList;
     private Long filterCiEntityId;
     private Long filterCiId;
-//    private String targetColumn;
-//
-//    public String getTargetColumn() {
-//        return targetColumn;
-//    }
-//
-//    public void setTargetColumn(String targetColumn) {
-//        this.targetColumn = targetColumn;
-//    }
 
     public String getMatrixUuid() {
         return matrixUuid;
@@ -135,13 +125,6 @@ public class MatrixDataVo extends BasePageVo {
         this.attributeValueList = attributeValueList;
     }
 
-//    public String getAttributeUuid() {
-//        return attributeUuid;
-//    }
-//
-//    public void setAttributeUuid(String attributeUuid) {
-//        this.attributeUuid = attributeUuid;
-//    }
 
     public JSONArray getFilterList() {
         return filterList;

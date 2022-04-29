@@ -283,7 +283,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int pageSize = dataVo.getPageSize();
                 paramObj.put("pageSize", pageSize);
                 paramObj.put("needPage", pageSize < 100);
-//                paramObj.put("filterList", dataVo.getFilterList());
                 paramObj.put("sourceColumnList", dataVo.getSourceColumnList());
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
@@ -357,7 +356,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                             }
                         }
                         paramObj.put("sourceColumnList", sourceColumnList);
-//                        paramObj.put("filterList", dataVo.getFilterList());
                         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                         if (StringUtils.isNotBlank(resultVo.getError())) {
                             logger.error(resultVo.getError());
@@ -388,7 +386,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int pageSize = dataVo.getPageSize();
                 paramObj.put("pageSize", pageSize);
                 paramObj.put("needPage", pageSize < 100);
-//                paramObj.put("filterList", dataVo.getFilterList());
                 paramObj.put("sourceColumnList", sourceColumnList);
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {

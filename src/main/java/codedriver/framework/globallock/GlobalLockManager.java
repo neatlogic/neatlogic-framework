@@ -7,6 +7,7 @@ package codedriver.framework.globallock;
 
 import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.dto.globallock.GlobalLockVo;
+import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.globallock.core.GlobalLockHandlerFactory;
 import codedriver.framework.globallock.dao.mapper.GlobalLockMapper;
 import codedriver.framework.lock.core.LockManager;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -34,6 +34,30 @@ public class GlobalLockManager {
     }
 
     /**
+     * 加入锁队列
+     *
+     * @param globalLockVo 锁入参
+     */
+    public static void insertLock(GlobalLockVo globalLockVo) {
+        TransactionStatus transactionStatus = TransactionUtil.openTx();
+        globalLockMapper.insertLock(globalLockVo);
+        try {
+            //获取所有该key的锁和未上锁的队列 for update
+            List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+            //执行mode 策略 验证是否允许上锁
+            if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanInsertLock(globalLockVoList, globalLockVo)) {
+                TransactionUtil.commitTx(transactionStatus);
+            }else{
+                TransactionUtil.rollbackTx(transactionStatus);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            //如果wait lock timeout 则仅加入队列，等待notify
+            TransactionUtil.rollbackTx(transactionStatus);
+            throw new ApiRuntimeException(ex.getMessage());
+        }
+    }
+    /**
      * 获取锁
      *
      * @param globalLockVo 锁入参
@@ -41,7 +65,18 @@ public class GlobalLockManager {
      */
     public static GlobalLockVo getLock(GlobalLockVo globalLockVo) {
         //预先加入锁队列
-        globalLockMapper.insertLock(globalLockVo);
+        insertLock(globalLockVo);
+        lock(globalLockVo);
+        return globalLockVo;
+    }
+
+    /**
+     * 锁
+     *
+     * @param globalLockVo 锁入参
+     * @return lockId
+     */
+    private static GlobalLockVo lock(GlobalLockVo globalLockVo){
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
             //获取所有该key的锁和未上锁的队列 for update
@@ -53,9 +88,7 @@ public class GlobalLockManager {
             }
             TransactionUtil.commitTx(transactionStatus);
         } catch (Exception ex) {
-            if(!(ex.getCause() instanceof SQLException)){
-                logger.error(ex.getMessage(),ex);
-            }
+            logger.error(ex.getMessage(),ex);
             //如果wait lock timeout 则仅加入队列，等待notify
             TransactionUtil.rollbackTx(transactionStatus);
             globalLockVo.setWaitReason(ex.getMessage());
@@ -63,7 +96,7 @@ public class GlobalLockManager {
         return globalLockVo;
     }
 
-    public static void cancelLock(Long lockId, JSONObject notifyJson) {
+    public static void cancelLock(Long lockId, JSONObject paramJson) {
         GlobalLockVo globalLockVo = globalLockMapper.getGlobalLockById(lockId);
         if (globalLockVo != null) {
             TransactionStatus transactionStatus = TransactionUtil.openTx();
@@ -75,15 +108,27 @@ public class GlobalLockManager {
                 GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
                 TransactionUtil.commitTx(transactionStatus);
                 if(nextGlobalLockVo != null){
-                    GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo,notifyJson);
+                    GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo,paramJson);
                 }
-            } catch (Exception ignored) {
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(),ex);
                 TransactionUtil.rollbackTx(transactionStatus);
+                throw new ApiRuntimeException(ex.getMessage());
             }
         }
     }
 
-    public static void retryNotify(){
-
+    /**
+     * 重试获取锁
+     * @param lockId 锁 id
+     */
+    public static GlobalLockVo retryLock(GlobalLockVo globalLockVo){
+        GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
+        if (globalLockTmp == null) {
+            insertLock(globalLockVo);
+        }
+        globalLockVo = globalLockTmp ;
+        return lock(globalLockVo);
     }
+
 }

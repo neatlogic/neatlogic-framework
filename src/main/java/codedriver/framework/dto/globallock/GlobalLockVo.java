@@ -40,6 +40,30 @@ public class GlobalLockVo {
     @EntityField(name = "wait 原因", type = ApiParamType.STRING)
     private String waitReason;
 
+    public GlobalLockVo() {
+
+    }
+    public GlobalLockVo( String handler, String jobId, String handlerParamStr) {
+        init(null,handler,jobId,handlerParamStr,null);
+    }
+    public GlobalLockVo( String handler, String jobId, String handlerParamStr,String description) {
+        init(null,handler,jobId,handlerParamStr,description);
+    }
+    public GlobalLockVo( Long lockId,String handler, String jobId, String handlerParamStr,String description) {
+        init(lockId,handler,jobId,handlerParamStr,description);
+    }
+    public GlobalLockVo(Long lockId, String handler, String jobId, String handlerParamStr) {
+        init(lockId,handler,jobId,handlerParamStr,null);
+    }
+
+    private void init(Long lockId,String handler, String jobId, String handlerParamStr,String description){
+        this.id = lockId;
+        this.handler = handler;
+        this.key = jobId;
+        this.handlerParamStr = handlerParamStr;
+        this.description = description;
+    }
+
 
     public Long getId() {
         if (id == null) {

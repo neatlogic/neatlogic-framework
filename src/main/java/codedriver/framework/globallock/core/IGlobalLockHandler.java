@@ -24,7 +24,15 @@ public interface IGlobalLockHandler {
     String getHandlerName();
 
     /**
-     * 获取lock mode 互斥结果，然后上锁
+     * 是否允许插入锁
+     * @param globalLockVoList 同个key的所有数据
+     * @param globalLockVo 当前需要上锁的数据
+     * @return true｜false
+     */
+    boolean getIsCanInsertLock(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo);
+
+    /**
+     * 是否允许上锁
      * @param globalLockVoList 同个key的所有数据
      * @param globalLockVo 当前需要上锁的数据
      * @return true｜false
@@ -42,7 +50,7 @@ public interface IGlobalLockHandler {
      * @param lockId cancel lockId
      * @param paramJson 入参
      */
-    void cancelLock(Long lockId,JSONObject paramJson);
+    JSONObject cancelLock(Long lockId,JSONObject paramJson);
 
     /**
      * 执行回调notify
@@ -52,9 +60,9 @@ public interface IGlobalLockHandler {
     void doNotify(GlobalLockVo globalLockVo,JSONObject paramJson);
 
     /**
-     * 重试notify
+     * 重试 获取锁
      * @param lockId cancel lockId
      * @param paramJson 入参
      */
-    void retryNotify(Long lockId,JSONObject paramJson);
+    JSONObject retryLock(Long lockId,JSONObject paramJson);
 }

@@ -10,18 +10,9 @@ import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.globallock.GlobalLockManager;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
-    @Override
-    public void retryNotify(Long lockId, JSONObject paramJson) {
-        if(lockId == null){
-            throw new ParamIrregularException("lockId");
-        }
-        MyRetryNotify(lockId, paramJson);
-    }
-
-    protected void MyRetryNotify(Long lockId, JSONObject paramJson) {
-
-    }
 
     @Override
     public void doNotify(GlobalLockVo globalLockVo, JSONObject paramJson) {
@@ -33,14 +24,20 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
     }
 
     @Override
-    public void cancelLock(Long lockId, JSONObject paramJson) {
+    public JSONObject cancelLock(Long lockId, JSONObject paramJson) {
         if(lockId == null){
             throw new ParamIrregularException("lockId");
         }
-        myCancelLock(lockId, paramJson);
+        return myCancelLock(lockId, paramJson);
     }
 
-    protected void myCancelLock(Long lockId, JSONObject paramJson) {
+    protected JSONObject myCancelLock(Long lockId, JSONObject paramJson) {
         GlobalLockManager.cancelLock(lockId, paramJson);
+        return null;
+    }
+
+    @Override
+    public boolean getIsCanInsertLock(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
+        return true;
     }
 }

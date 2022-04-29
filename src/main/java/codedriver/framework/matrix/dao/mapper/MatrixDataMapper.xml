@@ -91,9 +91,9 @@
                     <when test="sourceColumn.expression == 'less-than'">
                         AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
                     </when>
-                    <when test="sourceColumn.expression == 'include' and sourceColumn.value != null and sourceColumn.value.size() > 0">
+                    <when test="sourceColumn.expression == 'include' and sourceColumn.valueList != null and sourceColumn.valueList.size() > 0">
                         AND `${sourceColumn.column}` IN
-                        <foreach collection="sourceColumn.value" item="item" open="(" close=")" separator=",">
+                        <foreach collection="sourceColumn.valueList" item="item" open="(" close=")" separator=",">
                             #{item}
                         </foreach>
                     </when>
@@ -103,7 +103,7 @@
                 </choose>
             </foreach>
         </if>
-        <if test="filterList != null and filterList.size() > 0">
+        <!--<if test="filterList != null and filterList.size() > 0">
             <foreach collection="filterList" item="filter" separator=" ">
                 <if test="filter.valueList != null and filter.valueList.size() > 0">
                     and `${filter.uuid}` in
@@ -112,7 +112,7 @@
                     </foreach>
                 </if>
             </foreach>
-        </if>
+        </if>-->
     </sql>
 
     <select id="getDynamicTableDataCountForTable" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
@@ -157,7 +157,7 @@
                 JOIN `team` c ON c.`uuid` = a.`${keywordColumn}`
             </when>
             <when test="attrType == 'role'">
-                JOIN `role` d ON d.`name` = a.`${keywordColumn}`
+                JOIN `role` d ON d.`uuid` = a.`${keywordColumn}`
             </when>
         </choose>
         <where>

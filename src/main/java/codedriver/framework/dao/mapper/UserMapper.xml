@@ -1060,6 +1060,10 @@
         </foreach>
     </select>
 
+    <select id="getUserTeamCountByUserUuid" resultType="java.lang.Integer">
+        SELECT count(1) FROM `user_team` WHERE `user_uuid` = #{value}
+    </select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,
@@ -1189,6 +1193,12 @@
         UPDATE `user`
         SET `user_info` = #{userInfo}
         WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateUserTeamByUserUuid" parameterType="codedriver.framework.dto.TeamUserVo">
+        UPDATE `user_team`
+        SET `team_uuid` = #{teamUuid}
+        WHERE `user_uuid` = #{userUuid}
     </update>
 
     <delete id="deleteUserPasswordByLimit">

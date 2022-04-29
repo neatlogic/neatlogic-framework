@@ -13,8 +13,17 @@
         WHERE a.`token` = #{token}
         AND a.`start_time` &gt;= #{startTime}
         AND a.`end_time` &lt;= #{endTime}
-        <if test="status != null and status != ''">
-            AND a.`status` =#{status}
+        <if test="userUuidList != null and userUuidList.size() > 0">
+            AND a.`user_uuid` IN
+            <foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
+                #{uuid}
+            </foreach>
+        </if>
+        <if test="statusList != null and statusList.size() > 0">
+            AND a.`status` IN
+            <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
     </sql>
 

@@ -411,11 +411,6 @@ public class CascadeHandler extends FormHandlerBase {
                 matrixUuidAttributeUuidSetMap.put(matrixUuid, attributeUuidSet);
             }
         }
-        JSONArray relMatrixUuidArray = config.getJSONArray("relMatrixUuidList");
-        if (CollectionUtils.isNotEmpty(relMatrixUuidArray)) {
-            List<String> relMatrixUuidList = relMatrixUuidArray.toJavaList(String.class);
-            matrixUuidSet.addAll(relMatrixUuidList);
-        }
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
     }

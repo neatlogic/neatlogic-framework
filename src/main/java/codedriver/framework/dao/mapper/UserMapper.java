@@ -152,6 +152,8 @@ public interface UserMapper {
      */
     List<UserVo> getActiveUserListExcludeRoleInfoByUserUuidList(List<String> uuidList);
 
+    int getUserTeamCountByUserUuid(String userUuid);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);
@@ -181,6 +183,8 @@ public interface UserMapper {
     int updateUserInfo(UserVo userVo);
 
     int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
+
+    int updateUserTeamByUserUuid(TeamUserVo vo);
 
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 

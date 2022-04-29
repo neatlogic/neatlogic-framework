@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dto.condition;
 
 import codedriver.framework.common.dto.BasePageVo;
@@ -18,32 +23,44 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
 
     private static final long serialVersionUID = 5439300427812355573L;
 
-    protected List<ConditionGroupVo> conditionGroupList = new ArrayList<ConditionGroupVo>();;
-    @JSONField(serialize = false)
-    private Map<String, ConditionGroupVo> conditionGroupMap ;
-    protected List<ConditionGroupRelVo> conditionGroupRelList = new ArrayList<ConditionGroupRelVo>();;
+    protected List<ConditionGroupVo> conditionGroupList = new ArrayList<>();
 
-    public ConditionConfigVo() {}
+    @JSONField(serialize = false)
+    private Map<String, ConditionGroupVo> conditionGroupMap;
+    protected List<ConditionGroupRelVo> conditionGroupRelList = new ArrayList<>();
+
+
+    public ConditionConfigVo() {
+    }
 
     public ConditionConfigVo(JSONObject jsonObj) {
-        JSONArray conditionGroupArray = jsonObj.getJSONArray("conditionGroupList");
-        if (CollectionUtils.isNotEmpty(conditionGroupArray)) {
-            conditionGroupMap = new HashMap<String, ConditionGroupVo>();
-            for (int i = 0; i < conditionGroupArray.size(); i++) {
-                JSONObject conditionGroupJson = conditionGroupArray.getJSONObject(i);
-                ConditionGroupVo conditionGroupVo = new ConditionGroupVo(conditionGroupJson);
-                conditionGroupList.add(conditionGroupVo);
-                conditionGroupMap.put(conditionGroupVo.getUuid(), conditionGroupVo);
-            }
-            JSONArray conditionGroupRelArray = jsonObj.getJSONArray("conditionGroupRelList");
-            if (CollectionUtils.isNotEmpty(conditionGroupRelArray)) {
-                for (int i = 0; i < conditionGroupRelArray.size(); i++) {
-                    JSONObject conditionRelGroup = conditionGroupRelArray.getJSONObject(i);
-                    conditionGroupRelList.add(new ConditionGroupRelVo(conditionRelGroup));
+        init(jsonObj);
+    }
+
+    public void init(JSONObject jsonObj) {
+        if (jsonObj != null) {
+            conditionGroupList.clear();
+            conditionGroupRelList.clear();
+            JSONArray conditionGroupArray = jsonObj.getJSONArray("conditionGroupList");
+            if (CollectionUtils.isNotEmpty(conditionGroupArray)) {
+                conditionGroupMap = new HashMap<>();
+                for (int i = 0; i < conditionGroupArray.size(); i++) {
+                    JSONObject conditionGroupJson = conditionGroupArray.getJSONObject(i);
+                    ConditionGroupVo conditionGroupVo = new ConditionGroupVo(conditionGroupJson);
+                    conditionGroupList.add(conditionGroupVo);
+                    conditionGroupMap.put(conditionGroupVo.getUuid(), conditionGroupVo);
+                }
+                JSONArray conditionGroupRelArray = jsonObj.getJSONArray("conditionGroupRelList");
+                if (CollectionUtils.isNotEmpty(conditionGroupRelArray)) {
+                    for (int i = 0; i < conditionGroupRelArray.size(); i++) {
+                        JSONObject conditionRelGroup = conditionGroupRelArray.getJSONObject(i);
+                        conditionGroupRelList.add(new ConditionGroupRelVo(conditionRelGroup));
+                    }
                 }
             }
         }
     }
+
 
     public List<ConditionGroupVo> getConditionGroupList() {
         return conditionGroupList;

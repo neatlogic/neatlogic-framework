@@ -1,16 +1,17 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.dto.condition;
 
-import codedriver.framework.exception.type.ParamIrregularException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConditionGroupVo implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(ConditionGroupVo.class);
     private static final long serialVersionUID = 8392325201425982471L;
 
     private String uuid;
@@ -35,12 +37,9 @@ public class ConditionGroupVo implements Serializable {
     }
 
     public ConditionGroupVo(JSONObject jsonObj) {
-        try {
-            this.uuid = jsonObj.getString("uuid");
-            JSONArray conditionArray = jsonObj.getJSONArray("conditionList");
-            if (conditionArray.size() == 0) {
-                throw new ParamIrregularException("conditionList");
-            }
+        this.uuid = jsonObj.getString("uuid");
+        JSONArray conditionArray = jsonObj.getJSONArray("conditionList");
+        if (CollectionUtils.isNotEmpty(conditionArray)) {
             JSONArray channelArray = jsonObj.getJSONArray("channelUuidList");
             if (CollectionUtils.isNotEmpty(channelArray)) {
                 channelUuidList = JSONObject.parseArray(channelArray.toJSONString(), String.class);
@@ -61,8 +60,6 @@ public class ConditionGroupVo implements Serializable {
                     conditionRelList.add(new ConditionRelVo(conditionRel));
                 }
             }
-        }catch(Exception ex){
-            throw new ParamIrregularException("ConditionGroup");
         }
     }
 

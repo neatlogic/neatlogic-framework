@@ -1,30 +1,28 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.form.dto;
+
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.Expression;
+import codedriver.framework.dto.ExpressionVo;
+import codedriver.framework.form.attribute.core.FormAttributeHandlerFactory;
+import codedriver.framework.form.attribute.core.IFormAttributeHandler;
+import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.restful.annotation.EntityField;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import codedriver.framework.form.attribute.core.FormAttributeHandlerFactory;
-import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.form.constvalue.FormConditionModel;
-import com.alibaba.fastjson.annotation.JSONField;
-import org.apache.commons.collections4.CollectionUtils;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.constvalue.Expression;
-import codedriver.framework.dto.ExpressionVo;
-import codedriver.framework.restful.annotation.EntityField;
-import org.apache.commons.lang3.StringUtils;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
@@ -52,7 +50,8 @@ public class FormAttributeVo implements Serializable {
     ExpressionVo defaultExpression;
     @EntityField(name = "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config", type = ApiParamType.BOOLEAN)
     private boolean isUseFormConfig;
-
+    @EntityField(name = "服务uuid，当表单属性作为工单中心搜索条件时需要使用此属性进行对应", type = ApiParamType.STRING)
+    private String channelUuid;
     @EntityField(name = "条件模型")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
 
@@ -92,6 +91,14 @@ public class FormAttributeVo implements Serializable {
         this.isRequired = isRequired;
         this.config = config;
         this.data = data;
+    }
+
+    public String getChannelUuid() {
+        return channelUuid;
+    }
+
+    public void setChannelUuid(String channelUuid) {
+        this.channelUuid = channelUuid;
     }
 
     public String getUuid() {

@@ -17,6 +17,7 @@ public class MatrixColumnVo {
     private String expression;
     private String type;
 	private List<String> defaultValue;
+	private boolean isFilterList;
 	@JSONField(serialize = false)
 	private String value;
     public MatrixColumnVo() {
@@ -81,5 +82,13 @@ public class MatrixColumnVo {
 
 	public void setDefaultValue(List<String> defaultValue) {
 		this.defaultValue = defaultValue;
+	}
+
+	public boolean getIsFilterList() {
+		return isFilterList;
+	}
+
+	public void setIsFilterList(boolean isFilterList) {
+		isFilterList = isFilterList;
 	}
 }

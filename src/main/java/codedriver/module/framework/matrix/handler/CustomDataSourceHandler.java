@@ -443,13 +443,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                             if (StringUtils.isNotBlank(config)) {
                                 JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
                                 if (CollectionUtils.isNotEmpty(dataArray)) {
-                                    JSONArray valueList = new JSONArray();
+                                    List<String> valueList = new ArrayList<>();
                                     List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
                                     for (ValueTextVo e : dataList) {
                                         String text = e.getText();
                                         if (StringUtils.isNotBlank(text)) {
                                             if (Objects.equals(e.getText(), keyword)) {
-                                                valueList.add(e.getValue());
+                                                valueList.add((String)e.getValue());
                                             }
                                         }
                                     }
@@ -502,13 +502,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (StringUtils.isNotBlank(config)) {
                             JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
                             if (CollectionUtils.isNotEmpty(dataArray)) {
-                                JSONArray valueList = new JSONArray();
+                                List<String> valueList = new ArrayList<>();
                                 List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
                                 for (ValueTextVo e : dataList) {
                                     String text = e.getText();
                                     if (StringUtils.isNotBlank(text)) {
                                         if (text.contains(keyword)) {
-                                            valueList.add(e.getValue());
+                                            valueList.add((String)e.getValue());
                                         }
                                     }
                                 }

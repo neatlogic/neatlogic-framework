@@ -241,6 +241,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return returnObj;
+                }
                 int rowNum = matrixViewDataMapper.getDynamicTableDataCountForTable(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
@@ -303,6 +306,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return resultList;
+                }
                 String keywordColumn = dataVo.getKeywordColumn();
                 String keyword = dataVo.getKeyword();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {

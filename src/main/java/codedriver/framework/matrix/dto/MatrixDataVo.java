@@ -52,6 +52,9 @@ public class MatrixDataVo extends BasePageVo {
     }
 
     public List<MatrixColumnVo> getSourceColumnList() {
+        if (sourceColumnList == null) {
+            sourceColumnList = new ArrayList<>();
+        }
         return sourceColumnList;
     }
 

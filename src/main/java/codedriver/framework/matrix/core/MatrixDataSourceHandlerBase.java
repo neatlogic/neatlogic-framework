@@ -7,12 +7,14 @@ package codedriver.framework.matrix.core;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.ExportFileType;
+import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.dependency.constvalue.FrameworkFromType;
 import codedriver.framework.dependency.core.DependencyManager;
 import codedriver.framework.exception.file.FileTypeNotSupportToExportException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
 import codedriver.framework.matrix.dto.MatrixAttributeVo;
+import codedriver.framework.matrix.dto.MatrixColumnVo;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
@@ -20,17 +22,17 @@ import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author linbq
@@ -255,5 +257,56 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
             theadList.add(theadObj);
         }
         return theadList;
+    }
+
+    /**
+     * 合并filterList和sourceColumnList
+     * @param dataVo
+     */
+    protected boolean mergeFilterListAndSourceColumnList(MatrixDataVo dataVo) {
+        JSONArray filterArray = dataVo.getFilterList();
+        if (CollectionUtils.isNotEmpty(filterArray)) {
+            return true;
+        }
+        List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
+        Map<String, MatrixColumnVo> sourceColumnMap = sourceColumnList.stream().collect(Collectors.toMap(e -> e.getColumn(), e -> e));
+        for (int i = 0; i < filterArray.size(); i++) {
+            JSONObject filterObj = filterArray.getJSONObject(i);
+            if (MapUtils.isEmpty(filterObj)) {
+                continue;
+            }
+            String uuid = filterObj.getString("uuid");
+            if (StringUtils.isBlank(uuid)) {
+                continue;
+            }
+            JSONArray valueArray = filterObj.getJSONArray("valueList");
+            if (CollectionUtils.isEmpty(valueArray)) {
+                continue;
+            }
+            List<String> filterValueList = valueArray.toJavaList(String.class);
+            MatrixColumnVo sourceColumnVo = sourceColumnMap.get(uuid);
+            if (sourceColumnVo != null) {
+                List<String> valueList = sourceColumnVo.getValueList();
+                String expression = sourceColumnVo.getExpression();
+                if (Objects.equals(expression, Expression.EQUAL.getExpression()) || Objects.equals(expression, Expression.INCLUDE.getExpression())) {
+                    valueList.retainAll(filterValueList);
+                    if (CollectionUtils.isEmpty(valueList)) {
+                        return false;
+                    }
+                    continue;
+                } else if (Objects.equals(expression, Expression.UNEQUAL.getExpression()) || Objects.equals(expression, Expression.EXCLUDE.getExpression())) {
+                    filterValueList.retainAll(valueList);
+                    if (CollectionUtils.isEmpty(filterValueList)) {
+                        return false;
+                    }
+                }
+            }
+            MatrixColumnVo sourceColumn = new MatrixColumnVo();
+            sourceColumn.setColumn(uuid);
+            sourceColumn.setExpression(Expression.INCLUDE.getExpression());
+            sourceColumn.setValueList(filterValueList);
+            sourceColumnList.add(sourceColumn);
+        }
+        return true;
     }
 }

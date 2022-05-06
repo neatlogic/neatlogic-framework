@@ -110,11 +110,23 @@ public class SelectHandler extends FormHandlerBase {
                     }
                     return valueList;
                 } else {
-                    String value = (String) dataObj;
-                    if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                        return value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1];
+                    if (dataObj instanceof JSONArray) {
+                        JSONArray dl = (JSONArray) dataObj;
+                        if (dl.size() > 0) {
+                            String value = dl.getString(0);
+                            if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                                return value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1];
+                            } else {
+                                return value;
+                            }
+                        }
                     } else {
-                        return dataObj;
+                        String value = (String) dataObj;
+                        if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                            return value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1];
+                        } else {
+                            return dataObj;
+                        }
                     }
                 }
             }

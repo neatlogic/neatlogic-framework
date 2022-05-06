@@ -265,7 +265,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
      */
     protected boolean mergeFilterListAndSourceColumnList(MatrixDataVo dataVo) {
         JSONArray filterArray = dataVo.getFilterList();
-        if (CollectionUtils.isNotEmpty(filterArray)) {
+        if (CollectionUtils.isEmpty(filterArray)) {
             return true;
         }
         List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();

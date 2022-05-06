@@ -16,6 +16,7 @@ import java.util.List;
 public class SourceColumnVo {
     private String column;
     private Object value;
+    private String expression;
     private List<String> valueList;
 
     public String getColumn() {
@@ -35,6 +36,14 @@ public class SourceColumnVo {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
     }
 
     public List<String> getValueList() {

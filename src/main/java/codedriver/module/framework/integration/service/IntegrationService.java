@@ -8,6 +8,7 @@ package codedriver.module.framework.integration.service;
 import codedriver.framework.integration.dto.IntegrationResultVo;
 import codedriver.framework.integration.dto.IntegrationVo;
 import codedriver.framework.integration.dto.table.ColumnVo;
+import codedriver.framework.integration.dto.table.SourceColumnVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -33,4 +34,11 @@ public interface IntegrationService {
      * @return
      */
     JSONObject searchTableData(JSONObject jsonObj);
+
+    /**
+     * 合并filterList和sourceColumnList
+     * @param filterList
+     * @param sourceColumnList
+     */
+    boolean mergeFilterListAndSourceColumnList(JSONArray filterList, List<SourceColumnVo> sourceColumnList);
 }

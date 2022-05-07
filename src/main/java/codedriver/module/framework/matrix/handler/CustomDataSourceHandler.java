@@ -532,7 +532,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 //对dataMapList去重
-                List<Map<String, String>> distinctList = new ArrayList<>();
+                List<Map<String, String>> distinctList = new ArrayList<>(100);
                 int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
@@ -552,6 +552,12 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
                             }
                             resultList.add(resultMap);
+                            if (resultList.size() >= 100) {
+                                break;
+                            }
+                        }
+                        if (resultList.size() >= 100) {
+                            break;
                         }
                     }
                 }

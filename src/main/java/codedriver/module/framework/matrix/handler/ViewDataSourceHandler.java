@@ -331,6 +331,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setCurrentPage(currentPage);
                         List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
                         resultList.addAll(matrixTableDataValueHandle(dataMapList));
+                        if (resultList.size() >= 100) {
+                            break;
+                        }
                     }
                 }
             }

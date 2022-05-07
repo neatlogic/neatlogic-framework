@@ -119,6 +119,7 @@ public class StaticListHandler extends FormHandlerBase {
     public String getHandlerType(FormConditionModel model) {
         return null;
     }
+
     //表单组件配置信息
 //{
 //	"handler": "formstaticlist",
@@ -1152,8 +1153,9 @@ public class StaticListHandler extends FormHandlerBase {
 
     /**
      * 将原始数据转换成表格数据（包含theadList、tbodyList）
-     * @param dataObj 原始数据
-     * @param configObj 配置信息
+     *
+     * @param dataObj        原始数据
+     * @param configObj      配置信息
      * @param selectUuidList 选中的行列表
      * @return
      */
@@ -1449,6 +1451,15 @@ public class StaticListHandler extends FormHandlerBase {
         }
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
+    }
+
+    @Override
+    public int getExcelHeadLength(JSONObject configObj) {
+        JSONArray attributeList = configObj.getJSONArray("attributeList");
+        if (CollectionUtils.isNotEmpty(attributeList)) {
+            return attributeList.size();
+        }
+        return 0;
     }
 
     private void parseExtendAttribute(JSONObject attrConfig, Set<String> matrixUuidSet, Map<String, Set<String>> matrixUuidAttributeUuidSetMap) {

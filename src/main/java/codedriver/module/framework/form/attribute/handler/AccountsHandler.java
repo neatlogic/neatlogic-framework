@@ -290,4 +290,9 @@ public class AccountsHandler extends FormHandlerBase {
         }
         return tableObj;
     }
+
+    @Override
+    public int getExcelHeadLength(JSONObject configObj) {
+        return theadList.size();
+    }
 }

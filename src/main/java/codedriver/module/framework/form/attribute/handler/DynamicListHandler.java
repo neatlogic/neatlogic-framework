@@ -1434,6 +1434,7 @@ public class DynamicListHandler extends FormHandlerBase {
     public int getExcelHeadLength(JSONObject configObj) {
         int count = 0;
         JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+        JSONArray attributeList = configObj.getJSONArray("attributeList"); // 扩展属性
         if (CollectionUtils.isNotEmpty(columnHeadList)) {
             for (int i = 0; i < columnHeadList.size(); i++) {
                 JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
@@ -1448,7 +1449,9 @@ public class DynamicListHandler extends FormHandlerBase {
                 count++;
             }
         }
-        // todo 扩展属性
+        if (CollectionUtils.isNotEmpty(attributeList)) {
+            count += attributeList.size();
+        }
         return count;
     }
 }

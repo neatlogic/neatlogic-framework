@@ -187,6 +187,7 @@
             <include refid="searchDynamicTableDataSql"/>
         </where>
     </sql>
+
     <select id="getDynamicTableDataCountForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
@@ -194,6 +195,7 @@
         FROM `${schemaName}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataForSelectSql"/>
     </select>
+
     <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT

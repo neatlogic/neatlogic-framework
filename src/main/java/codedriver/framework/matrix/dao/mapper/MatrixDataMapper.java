@@ -23,6 +23,8 @@ public interface MatrixDataMapper {
 
     List<Map<String, String>> getDynamicTableDataForTable(MatrixDataVo dataVo);
 
+    int getDynamicTableDataCountForSelect(MatrixDataVo dataVo);
+
     List<Map<String, String>> getDynamicTableDataForSelect(MatrixDataVo dataVo);
 
     Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList, @Param("schemaName") String schemaName);
@@ -40,5 +42,4 @@ public interface MatrixDataMapper {
     int updateDynamicTableDataByUuid(@Param("rowData") List<MatrixColumnVo> rowData, @Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
 
     int deleteDynamicTableDataByUuid(MatrixDataVo dataVo);
-
 }

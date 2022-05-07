@@ -322,8 +322,17 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     sourceColumnList.add(matrixColumnVo);
                     dataVo.setSourceColumnList(sourceColumnList);
                 }
-                List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
-                resultList.addAll(matrixTableDataValueHandle(dataMapList));
+                int rowNum = matrixViewDataMapper.getDynamicTableDataCountForSelect(dataVo);
+                if (rowNum > 0) {
+                    dataVo.setRowNum(rowNum);
+                    dataVo.setPageSize(100);
+                    int pageCount = dataVo.getPageCount();
+                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                        dataVo.setCurrentPage(currentPage);
+                        List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                        resultList.addAll(matrixTableDataValueHandle(dataMapList));
+                    }
+                }
             }
         }
         return resultList;

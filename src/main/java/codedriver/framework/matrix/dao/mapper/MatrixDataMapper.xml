@@ -132,13 +132,7 @@
         </if>
     </select>
 
-    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="java.util.LinkedHashMap">
-        SELECT
-        <foreach collection="columnList" item="column" separator=",">
-            a.`${column}`
-        </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+    <sql id="searchDynamicTableDataForSelectSql">
         <choose>
             <when test="attrType == 'user'">
                 JOIN `user` b ON b.`uuid` = a.`${keywordColumn}`
@@ -192,6 +186,22 @@
             </if>
             <include refid="searchDynamicTableDataSql"/>
         </where>
+    </sql>
+    <select id="getDynamicTableDataCountForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        <include refid="searchDynamicTableDataForSelectSql"/>
+    </select>
+    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.LinkedHashMap">
+        SELECT
+        <foreach collection="columnList" item="column" separator=",">
+            a.`${column}`
+        </foreach>
+        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        <include refid="searchDynamicTableDataForSelectSql"/>
         ORDER BY a.`id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}

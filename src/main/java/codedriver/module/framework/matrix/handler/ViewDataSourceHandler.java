@@ -336,11 +336,11 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                             if(distinctList.contains(dataMap)){
                                 continue;
                             }
+                            distinctDataMapList.add(dataMap);
                             distinctList.add(dataMap);
                             if (distinctList.size() >= 100) {
                                 break;
                             }
-                            distinctDataMapList.add(dataMap);
                         }
                         resultList.addAll(matrixTableDataValueHandle(distinctDataMapList));
                         if (resultList.size() >= 100) {

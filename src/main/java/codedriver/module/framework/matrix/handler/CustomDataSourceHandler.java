@@ -532,19 +532,34 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 //对dataMapList去重
-                List<Map<String, String>> distinctList = new ArrayList<>();
-                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
-                for (Map<String, String> dataMap : dataMapList) {
-                    if(distinctList.contains(dataMap)){
-                        continue;
+                List<Map<String, String>> distinctList = new ArrayList<>(100);
+                int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
+                if (rowNum > 0) {
+                    dataVo.setRowNum(rowNum);
+                    dataVo.setPageSize(100);
+                    int pageCount = dataVo.getPageCount();
+                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                        dataVo.setCurrentPage(currentPage);
+                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+                        for (Map<String, String> dataMap : dataMapList) {
+                            if(distinctList.contains(dataMap)){
+                                continue;
+                            }
+                            distinctList.add(dataMap);
+                            Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
+                            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+                                String attributeUuid = entry.getKey();
+                                resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                            }
+                            resultList.add(resultMap);
+                            if (resultList.size() >= 100) {
+                                break;
+                            }
+                        }
+                        if (resultList.size() >= 100) {
+                            break;
+                        }
                     }
-                    distinctList.add(dataMap);
-                    Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-                    for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                        String attributeUuid = entry.getKey();
-                        resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
-                    }
-                    resultList.add(resultMap);
                 }
             }
         }

@@ -92,6 +92,19 @@
         </if>
     </select>
 
+    <select id="getDynamicTableDataCountForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        <where>
+            <foreach collection="columnList" item="column" separator="AND">
+                `${column}` IS NOT NULL
+            </foreach>
+            <include refid="searchDynamicTableDataSql"/>
+        </where>
+    </select>
+
     <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT

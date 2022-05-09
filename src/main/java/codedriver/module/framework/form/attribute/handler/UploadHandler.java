@@ -55,7 +55,7 @@ public class UploadHandler extends FormHandlerBase {
 
     @Override
     public boolean isAudit() {
-        return false;
+        return true;
     }
 
     @Override

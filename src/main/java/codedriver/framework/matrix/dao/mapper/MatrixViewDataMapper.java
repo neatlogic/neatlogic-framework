@@ -17,6 +17,8 @@ public interface MatrixViewDataMapper {
 
     List<Map<String, Object>> getDynamicTableDataForTable(MatrixDataVo dataVo);
 
+    int getDynamicTableDataCountForSelect(MatrixDataVo dataVo);
+
     List<Map<String, Object>> getDynamicTableDataForSelect(MatrixDataVo dataVo);
 
 }

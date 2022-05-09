@@ -6,7 +6,6 @@
 package codedriver.module.framework.matrix.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
@@ -31,10 +30,8 @@ import codedriver.framework.util.ExcelUtil;
 import codedriver.framework.util.TableResultUtil;
 import codedriver.framework.util.TimeUtil;
 import codedriver.framework.util.UuidUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -388,6 +384,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return returnObj;
+                }
                 int rowNum = matrixDataMapper.getDynamicTableDataCountForTable(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
@@ -490,6 +489,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return resultList;
+                }
                 String keywordColumn = dataVo.getKeywordColumn();
                 String keyword = dataVo.getKeyword();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
@@ -513,7 +515,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                     }
                                 }
                                 if (CollectionUtils.isNotEmpty(valueList)) {
-                                    List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
+                                    List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                                     MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, valueList);
                                     matrixColumnVo.setExpression(Expression.INCLUDE.getExpression());
                                     sourceColumnList.add(matrixColumnVo);
@@ -530,19 +532,34 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 //对dataMapList去重
-                List<Map<String, String>> distinctList = new ArrayList<>();
-                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
-                for (Map<String, String> dataMap : dataMapList) {
-                    if(distinctList.contains(dataMap)){
-                        continue;
+                List<Map<String, String>> distinctList = new ArrayList<>(100);
+                int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
+                if (rowNum > 0) {
+                    dataVo.setRowNum(rowNum);
+                    dataVo.setPageSize(100);
+                    int pageCount = dataVo.getPageCount();
+                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                        dataVo.setCurrentPage(currentPage);
+                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+                        for (Map<String, String> dataMap : dataMapList) {
+                            if(distinctList.contains(dataMap)){
+                                continue;
+                            }
+                            distinctList.add(dataMap);
+                            Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
+                            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+                                String attributeUuid = entry.getKey();
+                                resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                            }
+                            resultList.add(resultMap);
+                            if (resultList.size() >= 100) {
+                                break;
+                            }
+                        }
+                        if (resultList.size() >= 100) {
+                            break;
+                        }
                     }
-                    distinctList.add(dataMap);
-                    Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-                    for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                        String attributeUuid = entry.getKey();
-                        resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
-                    }
-                    resultList.add(resultMap);
                 }
             }
         }

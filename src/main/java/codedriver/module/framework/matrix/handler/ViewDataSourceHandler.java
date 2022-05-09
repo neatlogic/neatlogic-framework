@@ -241,6 +241,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return returnObj;
+                }
                 int rowNum = matrixViewDataMapper.getDynamicTableDataCountForTable(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
@@ -303,6 +306,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return resultList;
+                }
                 String keywordColumn = dataVo.getKeywordColumn();
                 String keyword = dataVo.getKeyword();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
@@ -316,8 +322,32 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     sourceColumnList.add(matrixColumnVo);
                     dataVo.setSourceColumnList(sourceColumnList);
                 }
-                List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
-                resultList.addAll(matrixTableDataValueHandle(dataMapList));
+                List<Map<String, Object>> distinctList = new ArrayList<>(100);
+                int rowNum = matrixViewDataMapper.getDynamicTableDataCountForSelect(dataVo);
+                if (rowNum > 0) {
+                    dataVo.setRowNum(rowNum);
+                    dataVo.setPageSize(100);
+                    int pageCount = dataVo.getPageCount();
+                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                        dataVo.setCurrentPage(currentPage);
+                        List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
+                        List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                        for (Map<String, Object> dataMap : dataMapList) {
+                            if(distinctList.contains(dataMap)){
+                                continue;
+                            }
+                            distinctDataMapList.add(dataMap);
+                            distinctList.add(dataMap);
+                            if (distinctList.size() >= 100) {
+                                break;
+                            }
+                        }
+                        resultList.addAll(matrixTableDataValueHandle(distinctDataMapList));
+                        if (resultList.size() >= 100) {
+                            break;
+                        }
+                    }
+                }
             }
         }
         return resultList;

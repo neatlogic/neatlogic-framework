@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.integration.service;
 
+import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.exception.integration.*;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.integration.core.IIntegrationHandler;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author linbq
@@ -265,6 +267,49 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
             }
         }
         return returnObj;
+    }
+
+    @Override
+    public boolean mergeFilterListAndSourceColumnList(JSONArray filterList, List<SourceColumnVo> sourceColumnList) {
+        Map<String, SourceColumnVo> sourceColumnMap = sourceColumnList.stream().collect(Collectors.toMap(e -> e.getColumn(), e -> e));
+        for (int i = 0; i < filterList.size(); i++) {
+            JSONObject filterObj = filterList.getJSONObject(i);
+            if (MapUtils.isEmpty(filterObj)) {
+                continue;
+            }
+            String uuid = filterObj.getString("uuid");
+            if (StringUtils.isBlank(uuid)) {
+                continue;
+            }
+            JSONArray valueArray = filterObj.getJSONArray("valueList");
+            if (CollectionUtils.isEmpty(valueArray)) {
+                continue;
+            }
+            List<String> filterValueList = valueArray.toJavaList(String.class);
+            SourceColumnVo sourceColumnVo = sourceColumnMap.get(uuid);
+            if (sourceColumnVo != null) {
+                List<String> valueList = sourceColumnVo.getValueList();
+                String expression = sourceColumnVo.getExpression();
+                if (Objects.equals(expression, Expression.EQUAL.getExpression()) || Objects.equals(expression, Expression.INCLUDE.getExpression())) {
+                    valueList.retainAll(filterValueList);
+                    if (CollectionUtils.isEmpty(valueList)) {
+                        return false;
+                    }
+                    continue;
+                } else if (Objects.equals(expression, Expression.UNEQUAL.getExpression()) || Objects.equals(expression, Expression.EXCLUDE.getExpression())) {
+                    filterValueList.retainAll(valueList);
+                    if (CollectionUtils.isEmpty(filterValueList)) {
+                        return false;
+                    }
+                }
+            }
+            SourceColumnVo sourceColumn = new SourceColumnVo();
+            sourceColumn.setColumn(uuid);
+            sourceColumn.setExpression(Expression.INCLUDE.getExpression());
+            sourceColumn.setValueList(filterValueList);
+            sourceColumnList.add(sourceColumn);
+        }
+        return true;
     }
 
     private List<ColumnVo> getSearchColumnDetailList(String integrationUuid, List<ColumnVo> columnVoList, JSONArray searchColumnArray) {

@@ -5,7 +5,6 @@
 
 package codedriver.module.framework.matrix.handler;
 
-import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
@@ -43,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -278,6 +276,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
                 returnObj.put("tbodyList", tbodyList);
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return returnObj;
+                }
                 JSONObject paramObj = integrationVo.getParamObj();
                 paramObj.put("currentPage", dataVo.getCurrentPage());
                 int pageSize = dataVo.getPageSize();
@@ -365,10 +366,10 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
-                List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
-                if (sourceColumnList == null) {
-                    sourceColumnList = new ArrayList<>();
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return resultList;
                 }
+                List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                 String keywordColumn = dataVo.getKeywordColumn();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
                     if (!attributeList.contains(keywordColumn)) {

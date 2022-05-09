@@ -210,8 +210,8 @@
             c.`uuid` AS formUuid,
             c.`name` AS formName
         FROM `form_attribute_matrix` a
-        LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
-        LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
+        JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+        JOIN form c ON c.`uuid` = b.`form_uuid`
         WHERE a.`matrix_uuid` = #{matrixUuid}
         LIMIT #{startNum}, #{pageSize}
     </select>

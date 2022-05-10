@@ -3,8 +3,9 @@
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
-package codedriver.framework.dao.config;
+package codedriver.framework.dao.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -14,21 +15,32 @@ import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
-public class MybatisConfigurationBuilder {
-    private DataSource dataSource;
+public class SqlUtilBuilder {
 
-    public MybatisConfigurationBuilder(DataSource dataSource) {
+    private DataSource dataSource;
+    private String namespace;
+
+    public SqlUtilBuilder(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public Configuration build(String mapperXml) throws Exception {
+    public SqlUtilBuilder withNamespace(String namespace) {
+        this.namespace = namespace;
+        return this;
+    }
+    public SqlUtil build(String mapperXml) throws Exception {
         Configuration configuration = new Configuration();
         configuration.setVariables(null);
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">");
-        stringBuilder.append("<mapper namespace=\"codedriver\">");
+        if (StringUtils.isNotBlank(namespace)) {
+            stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
+        } else {
+            stringBuilder.append("<mapper namespace=\"codedriver\">");
+        }
+
         stringBuilder.append(mapperXml.substring("<mapper>".length()));
         ByteArrayInputStream inputStream = null;
         Throwable var8 = null;
@@ -52,6 +64,7 @@ public class MybatisConfigurationBuilder {
                 }
             }
         }
-        return configuration;
+
+        return new SqlUtil(configuration);
     }
 }

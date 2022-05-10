@@ -16,9 +16,16 @@ import java.util.*;
 
 public class SqlUtil {
 
-    public static Map<String, List> executeSelectMappedStatement(Configuration configuration, Map<String, Object> paramMap) {
+    private Configuration configuration;
+    private SqlSessionFactory sqlSessionFactory;
+
+    public SqlUtil(Configuration configuration) {
+        this.configuration = configuration;
+        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+    }
+
+    public Map<String, List> executeAllSelectMappedStatement(Map<String, Object> paramMap) {
         Map<String, List> resultMap = new HashMap<>();
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
         List<String> selectIdList = new ArrayList<>();
         Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
         for (MappedStatement mappedStatement : mappedStatementList) {
@@ -37,5 +44,26 @@ public class SqlUtil {
             resultMap.put(selectId, reportTypeList);
         }
         return resultMap;
+    }
+    public List executeAllSelectMappedStatementById(String id, Map<String, Object> paramMap) {
+        List<String> selectIdList = new ArrayList<>();
+        Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
+        for (MappedStatement mappedStatement : mappedStatementList) {
+            SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
+            if (sqlCommandType == SqlCommandType.SELECT) {
+                String selectId = mappedStatement.getId();
+                if (!selectIdList.contains(selectId)) {
+                    selectIdList.add(selectId);
+                }
+            }
+        }
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        for (String selectId : selectIdList) {
+            System.out.println(selectId);
+            if (Objects.equals(id, selectId)) {
+                return sqlSession.selectList(selectId, paramMap);
+            }
+        }
+        return null;
     }
 }

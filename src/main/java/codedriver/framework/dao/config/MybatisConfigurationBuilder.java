@@ -14,10 +14,10 @@ import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
-public class ConfigurationBuilder {
+public class MybatisConfigurationBuilder {
     private DataSource dataSource;
 
-    public ConfigurationBuilder(DataSource dataSource) {
+    public MybatisConfigurationBuilder(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

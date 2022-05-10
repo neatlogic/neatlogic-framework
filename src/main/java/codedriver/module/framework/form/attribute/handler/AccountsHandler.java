@@ -28,6 +28,7 @@ import java.util.List;
 public class AccountsHandler extends FormHandlerBase {
 
     private final static JSONArray theadList = new JSONArray();
+
     static {
         JSONObject name = new JSONObject();
         name.put("title", "资产名");
@@ -153,7 +154,8 @@ public class AccountsHandler extends FormHandlerBase {
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }
-//表单组件配置信息
+
+    //表单组件配置信息
 //    {
 //        "handler": "formaccounts",
 //        "label": "账号组件_1",
@@ -294,5 +296,17 @@ public class AccountsHandler extends FormHandlerBase {
     @Override
     public int getExcelHeadLength(JSONObject configObj) {
         return theadList.size();
+    }
+
+    @Override
+    public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray tbodyList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                return tbodyList.size() + 1;
+            }
+        }
+        return 1;
     }
 }

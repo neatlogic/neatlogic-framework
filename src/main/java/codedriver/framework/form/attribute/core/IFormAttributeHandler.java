@@ -237,6 +237,19 @@ public interface IFormAttributeHandler {
     JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj);
 
     /**
+     * 导出excel时，当前表单组件数据需要占据的行数
+     * 对于普通组件，如文本框、日期等，默认占一行
+     * 对于表格输入组件等表格类组件，占据的行数视数据而定
+     *
+     * @param attributeDataVo
+     * @param configObj
+     * @return
+     */
+    default int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return 1;
+    }
+
+    /**
      * 导出excel时，当前表单组件需要占据的表头单元格长度
      * 对于普通组件，如文本框、日期等，默认占一格
      * 对于表格输入组件等表格类组件，占据的单元格长度视具体配置而定

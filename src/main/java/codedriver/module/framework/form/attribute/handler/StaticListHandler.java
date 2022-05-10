@@ -5,21 +5,18 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
-import codedriver.framework.form.attribute.core.IFormAttributeHandler;
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
+import codedriver.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
 
 import java.util.*;
 
@@ -1460,6 +1457,18 @@ public class StaticListHandler extends FormHandlerBase {
             return attributeList.size();
         }
         return 0;
+    }
+
+    @Override
+    public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+        if (MapUtils.isNotEmpty(detailedData)) {
+            JSONArray tbodyList = detailedData.getJSONArray("tbodyList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                return tbodyList.size() + 1;
+            }
+        }
+        return 1;
     }
 
     private void parseExtendAttribute(JSONObject attrConfig, Set<String> matrixUuidSet, Map<String, Set<String>> matrixUuidAttributeUuidSetMap) {

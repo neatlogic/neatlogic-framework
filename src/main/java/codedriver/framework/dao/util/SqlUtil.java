@@ -5,15 +5,19 @@
 
 package codedriver.framework.dao.util;
 
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
-import org.apache.ibatis.mapping.SqlCommandType;
+import codedriver.framework.dao.plugin.SqlCostInterceptor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 
+import javax.sql.DataSource;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class SqlUtil {
@@ -160,5 +164,61 @@ public class SqlUtil {
             }
         }
         return idList;
+    }
+
+    public static class SqlUtilBuilder {
+
+        private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
+        private DataSource dataSource;
+        private String namespace;
+
+        public SqlUtilBuilder(DataSource dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        public SqlUtilBuilder withNamespace(String namespace) {
+            this.namespace = namespace;
+            return this;
+        }
+
+        public SqlUtil build(String mapperXml) throws Exception {
+            Configuration configuration = new Configuration();
+            configuration.addInterceptor(new SqlCostInterceptor());
+            Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
+            configuration.setEnvironment(environment);
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(DOCTYPE);
+            if (StringUtils.isNotBlank(namespace)) {
+                stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
+            } else {
+                stringBuilder.append("<mapper namespace=\"codedriver\">");
+            }
+
+            stringBuilder.append(mapperXml.substring("<mapper>".length()));
+            ByteArrayInputStream inputStream = null;
+            Throwable var8 = null;
+            try {
+                inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, "", configuration.getSqlFragments());
+                mapperParser.parse();
+            } catch (Throwable var32) {
+                var8 = var32;
+                throw var32;
+            } finally {
+                if (inputStream != null) {
+                    if (var8 != null) {
+                        try {
+                            inputStream.close();
+                        } catch (Throwable var30) {
+                            var8.addSuppressed(var30);
+                        }
+                    } else {
+                        inputStream.close();
+                    }
+                }
+            }
+
+            return new SqlUtil(configuration);
+        }
     }
 }

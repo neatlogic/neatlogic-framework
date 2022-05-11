@@ -28,6 +28,7 @@ public class SqlUtil {
 
     /**
      * 执行mapper中所有select语句
+     *
      * @param paramMap
      * @return
      */
@@ -53,6 +54,7 @@ public class SqlUtil {
 
     /**
      * 执行mapper中特定某个select语句
+     *
      * @param id
      * @param paramMap
      * @return
@@ -72,6 +74,7 @@ public class SqlUtil {
 
     /**
      * 获取mapper中所有select语句的id列表
+     *
      * @return
      */
     public List<String> getAllSelectMappedStatementIdList() {
@@ -91,12 +94,18 @@ public class SqlUtil {
 
     /**
      * 获取mapper中所有resultMap的column与property的映射关系
+     *
      * @return
      */
     public List<Map<String, String>> getAllResultMappingList() {
         List<Map<String, String>> list = new ArrayList<>();
+        Set<String> idSet = new HashSet<>();
         Collection<ResultMap> resultMaps = configuration.getResultMaps();
         for (ResultMap resultMap : resultMaps) {
+            if (idSet.contains(resultMap.getId())) {
+                continue;
+            }
+            idSet.add(resultMap.getId());
             List<ResultMapping> resultMappings = resultMap.getResultMappings();
             for (ResultMapping resultMapping : resultMappings) {
                 Map<String, String> map = new HashMap<>();
@@ -110,6 +119,7 @@ public class SqlUtil {
 
     /**
      * 获取mapper中特定某个resultMap的column与property的映射关系
+     *
      * @return
      */
     public List<Map<String, String>> getResultMappingListByResultMapId(String id) {
@@ -130,13 +140,16 @@ public class SqlUtil {
 
     /**
      * 获取mapper中所有resultMap的id列表
+     *
      * @return
      */
     public List getResultMapIdList() {
         List<String> idList = new ArrayList<>();
         Collection<ResultMap> resultMaps = configuration.getResultMaps();
         for (ResultMap resultMap : resultMaps) {
-            idList.add(resultMap.getId());
+            if (!idList.contains(resultMap.getId())) {
+                idList.add(resultMap.getId());
+            }
         }
         return idList;
     }

@@ -30,6 +30,7 @@ public class SqlUtilBuilder {
         this.namespace = namespace;
         return this;
     }
+
     public SqlUtil build(String mapperXml) throws Exception {
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());

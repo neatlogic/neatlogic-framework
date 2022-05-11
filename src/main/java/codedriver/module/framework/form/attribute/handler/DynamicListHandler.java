@@ -1200,7 +1200,7 @@ public class DynamicListHandler extends FormHandlerBase {
         String mode = configObj.getString("mode");
         Boolean needPage = configObj.getBoolean("needPage");
         if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
-            tableObj.putAll(noNeedPage(dataObj));
+            tableObj.putAll(noNeedPage(dataObj, true));
         } else {//分页
             tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
         }
@@ -1288,10 +1288,11 @@ public class DynamicListHandler extends FormHandlerBase {
     /**
      * 表格选择组件设置不分页显示的情况，从表单组件的配置信息中获取theadList数据，从原始数据的tbodyList中获取tbodyList数据
      *
-     * @param dataObj 原始数据
+     * @param dataObj          原始数据
+     * @param retainNoSelected 是否保留未选中的数据
      * @return
      */
-    private JSONObject noNeedPage(JSONObject dataObj) {
+    private JSONObject noNeedPage(JSONObject dataObj, boolean retainNoSelected) {
         JSONObject tableObj = new JSONObject();
         JSONObject table = dataObj.getJSONObject("table");
         if (MapUtils.isNotEmpty(table)) {
@@ -1333,6 +1334,9 @@ public class DynamicListHandler extends FormHandlerBase {
                         }
                         tbodyObj.put(key, valueObj);
                     }
+                }
+                if (Objects.equals(tbodyObj.getBoolean("_isSelected"), false) && !retainNoSelected) {
+                    continue;
                 }
                 tbodyList.add(tbodyObj);
             }
@@ -1431,6 +1435,29 @@ public class DynamicListHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
+        if (MapUtils.isEmpty(dataObj)) {
+            return tableObj;
+        }
+        JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+        if (CollectionUtils.isEmpty(selectUuidList)) {
+            return tableObj;
+        }
+        tableObj.put("selectUuidList", selectUuidList);
+        String mode = configObj.getString("mode");
+        Boolean needPage = configObj.getBoolean("needPage");
+        if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+            tableObj.putAll(noNeedPage(dataObj, false)); // 不保留未选中的数据
+        } else {//分页
+            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
+        }
+        return tableObj;
+    }
+
+    @Override
     public int getExcelHeadLength(JSONObject configObj) {
         int count = 0;
         JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
@@ -1451,6 +1478,9 @@ public class DynamicListHandler extends FormHandlerBase {
         }
         if (CollectionUtils.isNotEmpty(attributeList)) {
             count += attributeList.size();
+        }
+        if (count == 0) {
+            count++;
         }
         return count;
     }

@@ -10,14 +10,12 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import java.util.List;
 
 /**
@@ -291,6 +289,11 @@ public class AccountsHandler extends FormHandlerBase {
             }
         }
         return tableObj;
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return getMyDetailedData(attributeDataVo, configObj);
     }
 
     @Override

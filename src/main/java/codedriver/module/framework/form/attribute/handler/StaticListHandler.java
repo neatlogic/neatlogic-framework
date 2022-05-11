@@ -1451,12 +1451,17 @@ public class StaticListHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return getMyDetailedData(attributeDataVo, configObj);
+    }
+
+    @Override
     public int getExcelHeadLength(JSONObject configObj) {
         JSONArray attributeList = configObj.getJSONArray("attributeList");
         if (CollectionUtils.isNotEmpty(attributeList)) {
             return attributeList.size();
         }
-        return 0;
+        return 1;
     }
 
     @Override

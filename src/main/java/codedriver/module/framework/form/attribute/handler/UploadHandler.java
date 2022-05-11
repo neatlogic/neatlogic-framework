@@ -122,4 +122,9 @@ public class UploadHandler extends FormHandlerBase {
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
     }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return null;
+    }
 }

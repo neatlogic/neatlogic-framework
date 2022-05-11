@@ -115,4 +115,8 @@ public class PriorityHandler extends ControlHandlerBase {
         return null;
     }
 
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return attributeDataVo.getData();
+    }
 }

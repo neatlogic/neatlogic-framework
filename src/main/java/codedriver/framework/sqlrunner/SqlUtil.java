@@ -14,21 +14,98 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Component
 public class SqlUtil {
+    private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
+
+    @Resource
+    private static DataSource dataSource;
+
+    private String namespace;
 
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
 
-    private SqlUtil(Configuration configuration) {
+    public SqlUtil() {
+
+    }
+    public SqlUtil(String mapperXml) {
+        this(mapperXml, null, null);
+    }
+    public SqlUtil(String mapperXml, String namespace) {
+        this(mapperXml, namespace, null);
+    }
+    public SqlUtil(String mapperXml, DataSource dataSource) {
+        this(mapperXml, null, dataSource);
+    }
+    public SqlUtil(String mapperXml, String namespace, DataSource dataSource) {
+        if (namespace != null) {
+            this.namespace = namespace;
+        }
+        if (dataSource != null) {
+            this.dataSource = dataSource;
+        }
+
+        Configuration configuration = new Configuration();
+        configuration.addInterceptor(new SqlCostInterceptor());
+        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
+        configuration.setEnvironment(environment);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOCTYPE);
+        if (StringUtils.isNotBlank(this.namespace)) {
+            stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
+        } else {
+            stringBuilder.append("<mapper namespace=\"codedriver\">");
+        }
+
+        stringBuilder.append(mapperXml.substring("<mapper>".length()));
+        ByteArrayInputStream inputStream = null;
+        Throwable var8 = null;
+        try {
+            inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, "", configuration.getSqlFragments());
+            mapperParser.parse();
+        } catch (Throwable var32) {
+            var8 = var32;
+            throw var32;
+        } finally {
+            if (inputStream != null) {
+                if (var8 != null) {
+                    try {
+                        inputStream.close();
+                    } catch (Throwable var30) {
+                        var8.addSuppressed(var30);
+                    }
+                } else {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         this.configuration = configuration;
         this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
     }
+
+    @Resource
+    public void setDataSource(DataSource _dataSource) {
+        dataSource = _dataSource;
+    }
+//    private SqlUtil(Configuration configuration) {
+//        this.configuration = configuration;
+//        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+//    }
 
     /**
      * 执行mapper中所有select语句
@@ -166,58 +243,58 @@ public class SqlUtil {
         return idList;
     }
 
-    public static class SqlUtilBuilder {
-
-        private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
-        private DataSource dataSource;
-        private String namespace;
-
-        public SqlUtilBuilder(DataSource dataSource) {
-            this.dataSource = dataSource;
-        }
-
-        public SqlUtilBuilder withNamespace(String namespace) {
-            this.namespace = namespace;
-            return this;
-        }
-
-        public SqlUtil build(String mapperXml) throws Exception {
-            Configuration configuration = new Configuration();
-            configuration.addInterceptor(new SqlCostInterceptor());
-            Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
-            configuration.setEnvironment(environment);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(DOCTYPE);
-            if (StringUtils.isNotBlank(namespace)) {
-                stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
-            } else {
-                stringBuilder.append("<mapper namespace=\"codedriver\">");
-            }
-
-            stringBuilder.append(mapperXml.substring("<mapper>".length()));
-            ByteArrayInputStream inputStream = null;
-            Throwable var8 = null;
-            try {
-                inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, "", configuration.getSqlFragments());
-                mapperParser.parse();
-            } catch (Throwable var32) {
-                var8 = var32;
-                throw var32;
-            } finally {
-                if (inputStream != null) {
-                    if (var8 != null) {
-                        try {
-                            inputStream.close();
-                        } catch (Throwable var30) {
-                            var8.addSuppressed(var30);
-                        }
-                    } else {
-                        inputStream.close();
-                    }
-                }
-            }
-            return new SqlUtil(configuration);
-        }
-    }
+//    public static class SqlUtilBuilder {
+//
+//        private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
+//        private DataSource dataSource;
+//        private String namespace;
+//
+//        public SqlUtilBuilder(DataSource dataSource) {
+//            this.dataSource = dataSource;
+//        }
+//
+//        public SqlUtilBuilder withNamespace(String namespace) {
+//            this.namespace = namespace;
+//            return this;
+//        }
+//
+//        public SqlUtil build(String mapperXml) throws Exception {
+//            Configuration configuration = new Configuration();
+//            configuration.addInterceptor(new SqlCostInterceptor());
+//            Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
+//            configuration.setEnvironment(environment);
+//            StringBuilder stringBuilder = new StringBuilder();
+//            stringBuilder.append(DOCTYPE);
+//            if (StringUtils.isNotBlank(namespace)) {
+//                stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
+//            } else {
+//                stringBuilder.append("<mapper namespace=\"codedriver\">");
+//            }
+//
+//            stringBuilder.append(mapperXml.substring("<mapper>".length()));
+//            ByteArrayInputStream inputStream = null;
+//            Throwable var8 = null;
+//            try {
+//                inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+//                XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, "", configuration.getSqlFragments());
+//                mapperParser.parse();
+//            } catch (Throwable var32) {
+//                var8 = var32;
+//                throw var32;
+//            } finally {
+//                if (inputStream != null) {
+//                    if (var8 != null) {
+//                        try {
+//                            inputStream.close();
+//                        } catch (Throwable var30) {
+//                            var8.addSuppressed(var30);
+//                        }
+//                    } else {
+//                        inputStream.close();
+//                    }
+//                }
+//            }
+//            return new SqlUtil(configuration);
+//        }
+//    }
 }

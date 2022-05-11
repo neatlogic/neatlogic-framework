@@ -25,7 +25,7 @@ public class SqlUtil {
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
 
-    public SqlUtil(Configuration configuration) {
+    private SqlUtil(Configuration configuration) {
         this.configuration = configuration;
         this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
     }

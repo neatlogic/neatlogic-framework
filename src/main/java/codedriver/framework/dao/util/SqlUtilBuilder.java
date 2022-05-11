@@ -5,6 +5,7 @@
 
 package codedriver.framework.dao.util;
 
+import codedriver.framework.dao.plugin.SqlCostInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.mapping.Environment;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 
 public class SqlUtilBuilder {
 
+    private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
     private DataSource dataSource;
     private String namespace;
 
@@ -30,11 +32,11 @@ public class SqlUtilBuilder {
     }
     public SqlUtil build(String mapperXml) throws Exception {
         Configuration configuration = new Configuration();
-        configuration.setVariables(null);
+        configuration.addInterceptor(new SqlCostInterceptor());
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">");
+        stringBuilder.append(DOCTYPE);
         if (StringUtils.isNotBlank(namespace)) {
             stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
         } else {

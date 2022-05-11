@@ -45,9 +45,13 @@ public class SqlUtil {
             }
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        for (String selectId : selectIdList) {
-            List reportTypeList = sqlSession.selectList(selectId, paramMap);
-            resultMap.put(selectId, reportTypeList);
+        try {
+            for (String selectId : selectIdList) {
+                List reportTypeList = sqlSession.selectList(selectId, paramMap);
+                resultMap.put(selectId, reportTypeList);
+            }
+        } finally {
+            sqlSession.close();
         }
         return resultMap;
     }
@@ -69,7 +73,11 @@ public class SqlUtil {
             return new ArrayList<>();
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        return sqlSession.selectList(id, paramMap);
+        try {
+            return sqlSession.selectList(id, paramMap);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     /**

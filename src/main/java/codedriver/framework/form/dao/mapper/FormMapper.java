@@ -22,6 +22,8 @@ public interface FormMapper {
 
     public List<FormVo> searchFormList(FormVo formVo);
 
+    public List<FormVo> getFormListByUuidList(List<String> uuid);
+
     public List<ValueTextVo> searchFormListForSelect(FormVo formVo);
 
     public int searchFormCount(FormVo formVo);

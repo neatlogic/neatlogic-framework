@@ -8,13 +8,33 @@ package codedriver.framework.sqlrunner;
 import java.util.List;
 
 public class SqlInfo {
+    /**
+     * 唯一标识
+     */
     private String id;
+    /**
+     * 预处理sql语句
+     */
     private String sql;
+    /**
+     * 超时时间
+     */
     private Integer timeout;
+    /**
+     * 返回结果类型
+     */
     private String resultType;
+    /**
+     * 返回结果resultMap的id
+     */
     private String resultMap;
-    private List<String> parameterList;
+    /**
+     * resultMap中column列表
+     */
     private List<String> columnList;
+    /**
+     * resultMap中property列表
+     */
     private List<String> propertyList;
 
     public String getId() {
@@ -55,14 +75,6 @@ public class SqlInfo {
 
     public void setResultMap(String resultMap) {
         this.resultMap = resultMap;
-    }
-
-    public List<String> getParameterList() {
-        return parameterList;
-    }
-
-    public void setParameterList(List<String> parameterList) {
-        this.parameterList = parameterList;
     }
 
     public List<String> getColumnList() {

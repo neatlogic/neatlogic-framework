@@ -217,7 +217,6 @@ public class SqlUtil {
                     }
                 }
             }
-
             return new SqlUtil(configuration);
         }
     }

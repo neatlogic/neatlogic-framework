@@ -17,6 +17,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author linbq
@@ -293,7 +295,36 @@ public class AccountsHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return getMyDetailedData(attributeDataVo, configObj);
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray selectedDataList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(selectedDataList)) {
+                tableObj.put("theadList", theadList);
+                JSONArray tbodyList = new JSONArray();
+                for (int i = 0; i < selectedDataList.size(); i++) {
+                    JSONObject tbodyObj = selectedDataList.getJSONObject(i);
+                    tbodyObj.remove("actionType");
+                    tbodyObj.remove("fcu");
+                    tbodyObj.remove("lcu");
+                    tbodyObj.remove("fcuVo");
+                    tbodyObj.remove("lcuVo");
+                    Set<Map.Entry<String, Object>> entrySet = tbodyObj.entrySet();
+                    JSONObject obj = new JSONObject();
+                    for (Map.Entry<String, Object> entry : entrySet) {
+                        obj.put(entry.getKey(), new JSONObject() {
+                            {
+                                this.put("text", entry.getValue());
+                            }
+                        });
+                        tbodyList.add(obj);
+                    }
+                }
+                tableObj.put("tbodyList", tbodyList);
+            }
+        }
+        return tableObj;
     }
 
     @Override

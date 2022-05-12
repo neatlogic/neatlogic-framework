@@ -1288,11 +1288,11 @@ public class DynamicListHandler extends FormHandlerBase {
     /**
      * 表格选择组件设置不分页显示的情况，从表单组件的配置信息中获取theadList数据，从原始数据的tbodyList中获取tbodyList数据
      *
-     * @param dataObj          原始数据
-     * @param retainNoSelected 是否保留未选中的数据
+     * @param dataObj             原始数据
+     * @param retainNoSelectedRow 是否保留未选中的数据
      * @return
      */
-    private JSONObject noNeedPage(JSONObject dataObj, boolean retainNoSelected) {
+    private JSONObject noNeedPage(JSONObject dataObj, boolean retainNoSelectedRow) {
         JSONObject tableObj = new JSONObject();
         JSONObject table = dataObj.getJSONObject("table");
         if (MapUtils.isNotEmpty(table)) {
@@ -1335,7 +1335,7 @@ public class DynamicListHandler extends FormHandlerBase {
                         tbodyObj.put(key, valueObj);
                     }
                 }
-                if (Objects.equals(tbodyObj.getBoolean("_isSelected"), false) && !retainNoSelected) {
+                if (Objects.equals(tbodyObj.getBoolean("_isSelected"), false) && !retainNoSelectedRow) {
                     continue;
                 }
                 tbodyList.add(tbodyObj);

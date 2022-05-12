@@ -1487,11 +1487,11 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
-        if (MapUtils.isNotEmpty(detailedData)) {
-            JSONArray tbodyList = detailedData.getJSONArray("tbodyList");
-            if (CollectionUtils.isNotEmpty(tbodyList)) {
-                return tbodyList.size() + 1;
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+            if (CollectionUtils.isNotEmpty(selectUuidList)) {
+                return selectUuidList.size() + 1;
             }
         }
         return 1;

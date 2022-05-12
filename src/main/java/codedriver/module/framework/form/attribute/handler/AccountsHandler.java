@@ -318,8 +318,8 @@ public class AccountsHandler extends FormHandlerBase {
                                 this.put("text", entry.getValue());
                             }
                         });
-                        tbodyList.add(obj);
                     }
+                    tbodyList.add(obj);
                 }
                 tableObj.put("tbodyList", tbodyList);
             }

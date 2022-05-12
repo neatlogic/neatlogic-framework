@@ -12,7 +12,7 @@ import codedriver.framework.util.SnowflakeUtil;
 
 import java.util.Date;
 
-public class ReportDataSourceAuditVo extends BasePageVo {
+public class DataSourceAuditVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "数据源id", type = ApiParamType.LONG)

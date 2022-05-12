@@ -5,9 +5,9 @@
 
 package codedriver.framework.datawarehouse.utils;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceConditionVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceFieldVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceConditionVo;
+import codedriver.framework.datawarehouse.dto.DataSourceFieldVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import codedriver.framework.datawarehouse.dto.ResultMapVo;
 import codedriver.framework.datawarehouse.exceptions.DataSourceXmlIrregularException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,7 +19,7 @@ import java.util.*;
 public class ReportXmlUtil {
     //static Logger logger = LoggerFactory.getLogger(ReportXmlUtil.class);
 
-    private static void generateConditionFromXml(List<Element> elementList, Set<String> checkSet, List<ReportDataSourceConditionVo> conditionList) {
+    private static void generateConditionFromXml(List<Element> elementList, Set<String> checkSet, List<DataSourceConditionVo> conditionList) {
         for (Element sub : elementList) {
             if (sub.getName().equals("condition")) {
                 String name = sub.attributeValue("name");
@@ -35,7 +35,7 @@ public class ReportXmlUtil {
                         checkSet.add(sub.attributeValue("name"));
                     }
                 }
-                ReportDataSourceConditionVo condition = new ReportDataSourceConditionVo(name, label, type);
+                DataSourceConditionVo condition = new DataSourceConditionVo(name, label, type);
                 if (StringUtils.isNotBlank(isRequired)) {
                     condition.setIsRequired(isRequired.equals("1") || isRequired.equalsIgnoreCase("true") ? 1 : 0);
                 }
@@ -44,7 +44,7 @@ public class ReportXmlUtil {
         }
     }
 
-    private static void generateFieldFromXml(List<Element> elementList, Set<String> checkSet, List<ReportDataSourceFieldVo> fieldList) {
+    private static void generateFieldFromXml(List<Element> elementList, Set<String> checkSet, List<DataSourceFieldVo> fieldList) {
         for (Element sub : elementList) {
             if (sub.getName().equals("id") || sub.getName().equals("field")) {
                 String column = sub.attributeValue("column");
@@ -59,7 +59,7 @@ public class ReportXmlUtil {
                         checkSet.add(sub.attributeValue("column"));
                     }
                 }
-                fieldList.add(new ReportDataSourceFieldVo(column, label, type, sub.getName().equals("id") ? 1 : 0));
+                fieldList.add(new DataSourceFieldVo(column, label, type, sub.getName().equals("id") ? 1 : 0));
             }
         }
     }
@@ -68,17 +68,17 @@ public class ReportXmlUtil {
      * @param xml 配置xml
      * @return 数据源对象
      */
-    public static ReportDataSourceVo generateDataSourceFromXml(String xml) throws DocumentException {
+    public static DataSourceVo generateDataSourceFromXml(String xml) throws DocumentException {
         Document document = DocumentHelper.parseText(xml);
         Element root = document.getRootElement();
-        ReportDataSourceVo reportDataSourceVo = new ReportDataSourceVo();
-        if (!root.getName().equals("report")) {
-            throw new DataSourceXmlIrregularException("xml根节点名称必须是“report”");
+        DataSourceVo reportDataSourceVo = new DataSourceVo();
+        if (!root.getName().equalsIgnoreCase("datasource")) {
+            throw new DataSourceXmlIrregularException("xml根节点名称必须是“datasource”");
         }
 
 
         Element fieldsElement = root.element("fields");
-        Element conditionsElement = root.element("conditions");
+        //Element conditionsElement = root.element("conditions");
         Element selectElement = root.element("select");
         if (fieldsElement == null) {
             throw new DataSourceXmlIrregularException("请定义“fields”节点");
@@ -86,7 +86,7 @@ public class ReportXmlUtil {
             List<Element> subResultElList = fieldsElement.elements();
             Set<String> fieldCheckSet = new HashSet<>();
             if (CollectionUtils.isNotEmpty(subResultElList)) {
-                List<ReportDataSourceFieldVo> fieldList = new ArrayList<>();
+                List<DataSourceFieldVo> fieldList = new ArrayList<>();
                 generateFieldFromXml(subResultElList, fieldCheckSet, fieldList);
                 reportDataSourceVo.setFieldList(fieldList);
             } else {
@@ -94,17 +94,17 @@ public class ReportXmlUtil {
             }
         }
 
-        if (conditionsElement != null) {
+        /*if (conditionsElement != null) {
             List<Element> conditionElList = conditionsElement.elements();
             Set<String> conditionCheckSet = new HashSet<>();
             if (CollectionUtils.isNotEmpty(conditionElList)) {
-                List<ReportDataSourceConditionVo> conditionList = new ArrayList<>();
+                List<DataSourceConditionVo> conditionList = new ArrayList<>();
                 generateConditionFromXml(conditionElList, conditionCheckSet, conditionList);
                 reportDataSourceVo.setConditionList(conditionList);
             } else {
                 throw new DataSourceXmlIrregularException("conditions节点必须包含condition节点");
             }
-        }
+        }*/
 
         if (selectElement == null) {
             throw new DataSourceXmlIrregularException("请定义一个“select”节点");

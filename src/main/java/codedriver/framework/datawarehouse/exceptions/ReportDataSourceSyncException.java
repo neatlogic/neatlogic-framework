@@ -6,10 +6,10 @@
 package codedriver.framework.datawarehouse.exceptions;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 
 public class ReportDataSourceSyncException extends ApiRuntimeException {
-    public ReportDataSourceSyncException(ReportDataSourceVo reportDataSourceVo, Exception ex) {
+    public ReportDataSourceSyncException(DataSourceVo reportDataSourceVo, Exception ex) {
         super("数据源“" + reportDataSourceVo.getName() + "”数据同步失败，异常：" + ex.getMessage());
     }
 }

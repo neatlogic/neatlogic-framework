@@ -6,7 +6,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataMapper">
-    <select id="getDataSourceDataCount" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo"
+    <select id="getDataSourceDataCount" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
             resultType="int">
         select count(1)
         from ${tableName}
@@ -24,15 +24,16 @@
                 </when>
             </choose>
             <if test="conditionList != null and conditionList.size() > 0">
-                and
-                <foreach collection="conditionList" item="item" separator="and">
-                    `${item.id}` like concat('%', #{item.value}, '%')
+                <foreach collection="conditionList" item="item">
+                    <if test="item.sqlConditionExpression != null and item.sqlConditionExpression != ''">
+                        and ${item.sqlConditionExpression}
+                    </if>
                 </foreach>
             </if>
         </where>
     </sql>
 
-    <select id="searchDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo"
+    <select id="searchDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
             resultType="java.util.HashMap">
         select
         <foreach collection="fieldList" item="item">
@@ -46,7 +47,7 @@
         limit #{startNum},#{pageSize}
     </select>
 
-    <select id="searchDataSourceDataCount" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo"
+    <select id="searchDataSourceDataCount" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
             resultType="int">
         select
         count(1)
@@ -54,7 +55,7 @@
         <include refid="searchDataSourceDataCondition"></include>
     </select>
 
-    <insert id="insertDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo">
+    <insert id="insertDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo">
         insert into ${tableName}
         (
         <foreach collection="fieldList" item="item">
@@ -83,11 +84,11 @@
         </choose>
     </insert>
 
-    <delete id="truncateTable" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <delete id="truncateTable" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         truncate table ${tableName}
     </delete>
 
-    <delete id="clearExpiredData" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo">
+    <delete id="clearExpiredData" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo">
         delete
         from ${tableName}
         where expire_time is not null

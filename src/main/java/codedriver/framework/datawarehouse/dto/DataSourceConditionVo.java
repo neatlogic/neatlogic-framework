@@ -14,7 +14,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
-public class ReportDataSourceConditionVo extends BasePageVo {
+public class DataSourceConditionVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "数据源id", type = ApiParamType.LONG)
@@ -36,11 +36,11 @@ public class ReportDataSourceConditionVo extends BasePageVo {
     @JSONField(serialize = false)
     private String configStr;
 
-    public ReportDataSourceConditionVo() {
+    public DataSourceConditionVo() {
 
     }
 
-    public ReportDataSourceConditionVo(String name, String label, String type) {
+    public DataSourceConditionVo(String name, String label, String type) {
         this.name = name;
         this.label = label;
         this.type = type;

@@ -7,7 +7,7 @@ package codedriver.module.framework.scheduler.datawarehouse;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import codedriver.framework.datawarehouse.service.ReportDataSourceService;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
@@ -36,7 +36,7 @@ public class ReportDataSourceJob extends JobBase {
 
     @Override
     public Boolean isHealthy(JobObject jobObject) {
-        ReportDataSourceVo dataSourceVo = reportDataSourceMapper.getReportDataSourceById(Long.valueOf(jobObject.getJobName()));
+        DataSourceVo dataSourceVo = reportDataSourceMapper.getDataSourceById(Long.valueOf(jobObject.getJobName()));
         if (dataSourceVo != null) {
             return dataSourceVo.getIsActive().equals(1) && dataSourceVo.getCronExpression().equals(jobObject.getCron());
         }
@@ -47,7 +47,7 @@ public class ReportDataSourceJob extends JobBase {
     public void reloadJob(JobObject jobObject) {
         String tenantUuid = jobObject.getTenantUuid();
         TenantContext.get().switchTenant(tenantUuid);
-        ReportDataSourceVo dataSourceVo = reportDataSourceMapper.getReportDataSourceById(Long.valueOf(jobObject.getJobName()));
+        DataSourceVo dataSourceVo = reportDataSourceMapper.getDataSourceById(Long.valueOf(jobObject.getJobName()));
         if (dataSourceVo != null && Objects.equals(dataSourceVo.getIsActive(), 1)) {
             JobObject newJobObject = new JobObject.Builder(dataSourceVo.getId().toString(), this.getGroupName(), this.getClassName(), tenantUuid)
                     .withCron(dataSourceVo.getCronExpression())
@@ -61,9 +61,9 @@ public class ReportDataSourceJob extends JobBase {
 
     @Override
     public void initJob(String tenantUuid) {
-        List<ReportDataSourceVo> dataSourceList = reportDataSourceMapper.getAllHasCronReportDataSource();
+        List<DataSourceVo> dataSourceList = reportDataSourceMapper.getAllHasCronReportDataSource();
         if (CollectionUtils.isNotEmpty(dataSourceList)) {
-            for (ReportDataSourceVo vo : dataSourceList) {
+            for (DataSourceVo vo : dataSourceList) {
                 JobObject newJobObject = new JobObject.Builder(vo.getId().toString(), this.getGroupName(), this.getClassName(), tenantUuid)
                         .withCron(vo.getCronExpression())
                         .addData("datasourceId", vo.getId())
@@ -76,7 +76,7 @@ public class ReportDataSourceJob extends JobBase {
     @Override
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws SQLException {
         Long datasourceId = (Long) jobObject.getData("datasourceId");
-        ReportDataSourceVo reportDataSourceVo = reportDataSourceMapper.getReportDataSourceById(datasourceId);
+        DataSourceVo reportDataSourceVo = reportDataSourceMapper.getDataSourceById(datasourceId);
         reportDataSourceService.executeReportDataSource(reportDataSourceVo);
     }
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReportDataSourceVo extends BasePageVo {
+public class DataSourceVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "唯一标识", type = ApiParamType.STRING)
@@ -53,22 +53,33 @@ public class ReportDataSourceVo extends BasePageVo {
     @EntityField(name = "有效时间单位", type = ApiParamType.ENUM, member = ExpireUnit.class)
     private String expireUnit;
     @EntityField(name = "字段列表", type = ApiParamType.JSONARRAY)
-    private List<ReportDataSourceFieldVo> fieldList;
-    @EntityField(name = "条件列表", type = ApiParamType.JSONARRAY)
-    private List<ReportDataSourceConditionVo> conditionList;
+    private List<DataSourceFieldVo> fieldList;
     @EntityField(name = "数据连接id", type = ApiParamType.LONG)
     private Long connectionId;
     @JSONField(serialize = false)//数据列表
-    private List<ReportDataSourceDataVo> dataList;
+    private List<DataSourceDataVo> dataList;
 
-    public ReportDataSourceVo() {
+    public DataSourceVo() {
 
     }
 
-    public ReportDataSourceVo(Long id) {
+    public DataSourceVo(Long id) {
         this.id = id;
     }
 
+    public void addField(List<DataSourceFieldVo> fieldList) {
+        if (this.fieldList == null) {
+            this.fieldList = new ArrayList<>();
+        }
+        this.fieldList.addAll(fieldList);
+    }
+
+    public void addField(DataSourceFieldVo field) {
+        if (this.fieldList == null) {
+            this.fieldList = new ArrayList<>();
+        }
+        this.fieldList.add(field);
+    }
 
     public Long getId() {
         if (id == null) {
@@ -122,7 +133,7 @@ public class ReportDataSourceVo extends BasePageVo {
     public List<Long> getKeyList() {
         if (CollectionUtils.isNotEmpty(fieldList)) {
             List<Long> keyList = new ArrayList<>();
-            for (ReportDataSourceFieldVo fieldVo : fieldList) {
+            for (DataSourceFieldVo fieldVo : fieldList) {
                 if (fieldVo.getIsKey().equals(1)) {
                     keyList.add(fieldVo.getId());
                 }
@@ -132,8 +143,8 @@ public class ReportDataSourceVo extends BasePageVo {
         return null;
     }
 
-    public ReportDataSourceFieldVo getFieldById(Long fieldId) {
-        Optional<ReportDataSourceFieldVo> op = fieldList.stream().filter(d -> d.getId().equals(fieldId)).findFirst();
+    public DataSourceFieldVo getFieldById(Long fieldId) {
+        Optional<DataSourceFieldVo> op = fieldList.stream().filter(d -> d.getId().equals(fieldId)).findFirst();
         return op.orElse(null);
     }
 
@@ -240,19 +251,19 @@ public class ReportDataSourceVo extends BasePageVo {
         this.isActive = isActive;
     }
 
-    public List<ReportDataSourceFieldVo> getFieldList() {
+    public List<DataSourceFieldVo> getFieldList() {
         return fieldList;
     }
 
-    public void setFieldList(List<ReportDataSourceFieldVo> fieldList) {
+    public void setFieldList(List<DataSourceFieldVo> fieldList) {
         this.fieldList = fieldList;
     }
 
-    public List<ReportDataSourceConditionVo> getConditionList() {
-        return conditionList;
-    }
+    // public List<DataSourceConditionVo> getConditionList() {
+    //return conditionList;
+//}
 
-    public void setConditionList(List<ReportDataSourceConditionVo> conditionList) {
-        this.conditionList = conditionList;
-    }
+//public void setConditionList(List<DataSourceConditionVo> conditionList) {
+//   this.conditionList = conditionList;
+//}
 }

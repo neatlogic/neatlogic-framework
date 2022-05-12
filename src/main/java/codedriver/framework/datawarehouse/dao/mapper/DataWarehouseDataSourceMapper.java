@@ -5,47 +5,55 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceConditionVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceFieldVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceConditionVo;
+import codedriver.framework.datawarehouse.dto.DataSourceFieldVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface DataWarehouseDataSourceMapper {
-    List<ReportDataSourceVo> getAllHasCronReportDataSource();
+    List<DataSourceVo> getAllHasCronReportDataSource();
 
-    int checkDataSourceNameIsExists(ReportDataSourceVo reportDataSourceVo);
+    int checkDataSourceNameIsExists(DataSourceVo reportDataSourceVo);
 
-    List<ReportDataSourceVo> getReportDataSourceByIdList(@Param("idList") List<Long> dataSourceIdList);
+    List<DataSourceVo> getDataSourceByIdList(@Param("idList") List<Long> dataSourceIdList);
 
-    ReportDataSourceVo getReportDataSourceById(Long id);
+    DataSourceVo getDataSourceById(Long id);
 
-    List<ReportDataSourceVo> searchReportDataSource(ReportDataSourceVo reportDataSourceVo);
+    List<DataSourceVo> searchDataSource(DataSourceVo reportDataSourceVo);
 
-    int searchReportDataSourceCount(ReportDataSourceVo reportDataSourceVo);
+    int searchDataSourceCount(DataSourceVo reportDataSourceVo);
 
-    void insertReportDataSource(ReportDataSourceVo reportDataSourceVo);
+    void insertDataSource(DataSourceVo reportDataSourceVo);
 
-    void insertReportDataSourceField(ReportDataSourceFieldVo reportDataSourceFieldVo);
+    void insertDataSourceField(DataSourceFieldVo reportDataSourceFieldVo);
 
-    void insertReportDataSourceCondition(ReportDataSourceConditionVo reportDataSourceConditionVo);
+    // void insertReportDataSourceCondition(DataSourceConditionVo reportDataSourceConditionVo);
 
-    void updateReportDataSource(ReportDataSourceVo reportDataSourceVo);
+    void updateDataSourceField(DataSourceFieldVo dataSourceFieldVo);
 
-    void updateReportDataSourceIsActive(ReportDataSourceVo reportDataSourceVo);
+    void updateDataSourceFieldCondition(DataSourceFieldVo dataSourceFieldVo);
 
-    void updateReportDataSourceDataCount(ReportDataSourceVo reportDataSourceVo);
+    void updateDataSource(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceStatus(ReportDataSourceVo reportDataSourceVo);
+    void updateDataSourcePolicy(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceConditionValue(ReportDataSourceConditionVo reportDataSourceConditionVo);
+    void updateReportDataSourceIsActive(DataSourceVo reportDataSourceVo);
+
+    void updateReportDataSourceDataCount(DataSourceVo reportDataSourceVo);
+
+    void updateReportDataSourceStatus(DataSourceVo reportDataSourceVo);
+
+    void updateReportDataSourceConditionValue(DataSourceConditionVo reportDataSourceConditionVo);
 
     void resetReportDataSourceStatus();
 
     void deleteReportDataSourceById(Long id);
 
-    void deleteReportDataSourceConditionByDataSourceId(Long dataSourceId);
+    //void deleteReportDataSourceConditionByDataSourceId(Long dataSourceId);
 
-    void deleteReportDataSourceFieldByDataSourceId(Long dataSourceId);
+    void deleteDataSourceFieldByDataSourceId(Long dataSourceId);
+
+    void deleteDataSourceFieldById(Long id);
 }

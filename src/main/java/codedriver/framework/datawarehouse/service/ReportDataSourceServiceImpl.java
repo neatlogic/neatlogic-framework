@@ -74,7 +74,7 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
     }
 
 
-    private SelectVo getSqlFromDataSource(ReportDataSourceVo reportDataSourceVo) throws DocumentException {
+    private SelectVo getSqlFromDataSource(DataSourceVo reportDataSourceVo) throws DocumentException {
         Document document = DocumentHelper.parseText(reportDataSourceVo.getXml());
         Element root = document.getRootElement();
         Element selectElement = root.element("select");
@@ -82,11 +82,11 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
         String regex_dollar_param = "\\$\\{([^}]+?)}";
         String[] replace_regex = new String[]{"<[/]?if[^>]*?>", "<[/]?select[^>]*?>", "<[/]?forEach[^>]*?>", "<[/]?ifNotNull[^>]*?>", "<[/]?ifNull[^>]*?>", "<[/]?forEach[^>]*?>", "\\<\\!\\[CDATA\\[", "\\]\\]\\>"};
         JSONObject paramMap = new JSONObject();
-        if (CollectionUtils.isNotEmpty(reportDataSourceVo.getConditionList())) {
-            for (ReportDataSourceConditionVo conditionVo : reportDataSourceVo.getConditionList()) {
+        /*if (CollectionUtils.isNotEmpty(reportDataSourceVo.getConditionList())) {
+            for (DataSourceConditionVo conditionVo : reportDataSourceVo.getConditionList()) {
                 paramMap.put(conditionVo.getName(), conditionVo.getValue());
             }
-        }
+        }*/
         SelectVo selectVo = new SelectVo();
         if (selectElement != null) {
             List<Element> ifElList = selectElement.elements("if");
@@ -243,9 +243,9 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
         return selectVo;
     }
 
-    private Connection getConnection(ReportDataSourceVo reportDataSourceVo) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private Connection getConnection(DataSourceVo reportDataSourceVo) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         if (reportDataSourceVo.getConnectionId() != null) {
-            ReportConnectionVo connectionVo = reportConnectionMapper.getConnectionById(reportDataSourceVo.getConnectionId());
+            ConnectionVo connectionVo = reportConnectionMapper.getConnectionById(reportDataSourceVo.getConnectionId());
             if (connectionVo != null) {
                 DatabaseVersion version = DatabaseVersion.getVersion(connectionVo.getDatabaseVersion());
                 if (version == null) {
@@ -268,10 +268,10 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
     }
 
     @Override
-    public void deleteReportDataSource(ReportDataSourceVo reportDataSourceVo) {
+    public void deleteReportDataSource(DataSourceVo reportDataSourceVo) {
         if (reportDataSourceVo != null) {
-            reportDataSourceMapper.deleteReportDataSourceFieldByDataSourceId(reportDataSourceVo.getId());
-            reportDataSourceMapper.deleteReportDataSourceConditionByDataSourceId(reportDataSourceVo.getId());
+            reportDataSourceMapper.deleteDataSourceFieldByDataSourceId(reportDataSourceVo.getId());
+            //reportDataSourceMapper.deleteReportDataSourceConditionByDataSourceId(reportDataSourceVo.getId());
             reportDataSourceMapper.deleteReportDataSourceById(reportDataSourceVo.getId());
             reportDataSourceAuditMapper.deleteReportDataSourceAuditByDatasourceId(reportDataSourceVo.getId());
             //由于以下操作是DDL操作，所以需要使用EscapeTransactionJob避开当前事务，否则在进行DDL操作之前事务就会提交，如果DDL出错，则上面的事务就无法回滚了
@@ -283,7 +283,7 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
     }
 
     @Override
-    public void executeReportDataSource(ReportDataSourceVo pDataSourceVo) {
+    public void executeReportDataSource(DataSourceVo pDataSourceVo) {
         if (pDataSourceVo != null && CollectionUtils.isNotEmpty(pDataSourceVo.getFieldList())) {
             if (Objects.equals(pDataSourceVo.getStatus(), Status.DOING.getValue())) {
                 throw new ReportDataSourceIsSyncingException(pDataSourceVo);
@@ -291,10 +291,10 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
             //更新数据源状态，写入审计信息
             pDataSourceVo.setStatus(Status.DOING.getValue());
             reportDataSourceMapper.updateReportDataSourceStatus(pDataSourceVo);
-            ReportDataSourceAuditVo reportDataSourceAuditVo = new ReportDataSourceAuditVo();
+            DataSourceAuditVo reportDataSourceAuditVo = new DataSourceAuditVo();
             reportDataSourceAuditVo.setDataSourceId(pDataSourceVo.getId());
             reportDataSourceAuditMapper.insertReportDataSourceAudit(reportDataSourceAuditVo);
-            AfterTransactionJob<ReportDataSourceVo> afterTransactionJob = new AfterTransactionJob<>("REPORT-DATASOURCE-SYNC");
+            AfterTransactionJob<DataSourceVo> afterTransactionJob = new AfterTransactionJob<>("REPORT-DATASOURCE-SYNC");
             afterTransactionJob.execute(pDataSourceVo, dataSourceVo -> {
                 //如果是替换模式，则需要先清理数据
                 if (StringUtils.isNotBlank(dataSourceVo.getMode()) && dataSourceVo.getMode().equals(Mode.REPLACE.getValue())) {
@@ -342,9 +342,9 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
                     }
 
                     while (resultSet.next()) {
-                        ReportDataSourceDataVo reportDataSourceDataVo = new ReportDataSourceDataVo(dataSourceVo.getId());
+                        DataSourceDataVo reportDataSourceDataVo = new DataSourceDataVo(dataSourceVo.getId());
                         reportDataSourceDataVo.setExpireMinute(dataSourceVo.getExpireMinute());
-                        for (ReportDataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
+                        for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
                             if (fieldMap.containsKey(fieldVo.getName())) {
                                 fieldVo.setValue(resultSet.getObject(fieldMap.get(fieldVo.getName())));
                             }
@@ -373,7 +373,7 @@ public class ReportDataSourceServiceImpl implements ReportDataSourceService {
                         logger.error(e.getMessage(), e);
                     }
                     dataSourceVo.setStatus(Status.DONE.getValue());
-                    int dataCount = reportDataSourceDataMapper.getDataSourceDataCount(new ReportDataSourceDataVo(dataSourceVo.getId()));
+                    int dataCount = reportDataSourceDataMapper.getDataSourceDataCount(new DataSourceDataVo(dataSourceVo.getId()));
                     dataSourceVo.setDataCount(dataCount);
                     reportDataSourceMapper.updateReportDataSourceStatus(dataSourceVo);
                     reportDataSourceAuditMapper.updateReportDataSourceAudit(reportDataSourceAuditVo);

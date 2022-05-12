@@ -5,14 +5,14 @@
 
 package codedriver.framework.datawarehouse.service;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 
 public interface ReportDataSourceService {
-    void deleteReportDataSource(ReportDataSourceVo reportDataSourceVo);
+    void deleteReportDataSource(DataSourceVo reportDataSourceVo);
 
     @Transactional
-    void executeReportDataSource(ReportDataSourceVo dataSourceVo) throws SQLException;
+    void executeReportDataSource(DataSourceVo dataSourceVo) throws SQLException;
 }

@@ -6,7 +6,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper">
-    <select id="checkDataSourceNameIsExists" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo"
+    <select id="checkDataSourceNameIsExists" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo"
             resultType="int">
         select count(1)
         from datawarehouse_datasource
@@ -14,7 +14,7 @@
           and id != #{id}
     </select>
 
-    <select id="getAllHasCronReportDataSource" resultType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <select id="getAllHasCronReportDataSource" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         select a.id,
                a.`name`,
                a.label,
@@ -27,7 +27,7 @@
           and a.cron_expression != ''
     </select>
 
-    <resultMap id="dataSourceResultMap" type="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <resultMap id="dataSourceResultMap" type="codedriver.framework.datawarehouse.dto.DataSourceVo">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="label" property="label"/>
@@ -40,26 +40,19 @@
         <result column="expireUnit" property="expireUnit"/>
         <result column="isActive" property="isActive"/>
         <result column="dataCount" property="dataCount"/>
-        <collection property="fieldList" ofType="codedriver.framework.datawarehouse.dto.ReportDataSourceFieldVo">
+        <collection property="fieldList" ofType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
             <id column="fieldId" property="id"/>
             <result column="fieldName" property="name"/>
             <result column="fieldLabel" property="label"/>
             <result column="fieldType" property="type"/>
             <result column="fieldInputType" property="inputType"/>
             <result column="fieldIsKey" property="isKey"/>
-        </collection>
-        <collection property="conditionList"
-                    ofType="codedriver.framework.datawarehouse.dto.ReportDataSourceConditionVo">
-            <id column="conditionId" property="id"/>
-            <result column="conditionName" property="name"/>
-            <result column="conditionLabel" property="label"/>
-            <result column="conditionType" property="type"/>
-            <result column="conditionValue" property="value"/>
-            <result column="conditionIsRequired" property="isRequired"/>
+            <result column="fieldIsCondition" property="isCondition"/>
+            <result column="fieldConfigStr" property="configStr"/>
         </collection>
     </resultMap>
 
-    <select id="getReportDataSourceByIdList" resultType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <select id="getDataSourceByIdList" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         select a.id,
         a.`name`,
         a.label,
@@ -76,7 +69,7 @@
         <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </select>
 
-    <select id="getReportDataSourceById" parameterType="java.lang.Long"
+    <select id="getDataSourceById" parameterType="java.lang.Long"
             resultMap="dataSourceResultMap">
         select a.id,
                a.`name`,
@@ -96,15 +89,10 @@
                b.type            as fieldType,
                b.input_type      as fieldInputType,
                b.is_key          as fieldIsKey,
-               c.id              as conditionId,
-               c.`name`          as conditionName,
-               c.label           as conditionLabel,
-               c.type            as conditionType,
-               c.`value`         as conditionValue,
-               c.is_required     as conditionIsRequired
+               b.is_condition    as fieldIsCondition,
+               b.config          as fieldConfigStr
         from datawarehouse_datasource a
                  left join datawarehouse_datasource_field b on a.id = b.datasource_id
-                 left join datawarehouse_datasource_condition c on a.id = c.datasource_id
         where a.id = #{value}
     </select>
 
@@ -121,8 +109,8 @@
         </where>
     </sql>
 
-    <select id="searchReportDataSource" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo"
-            resultType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <select id="searchDataSource" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo"
+            resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         select
         id,
         name,
@@ -140,34 +128,41 @@
         limit #{startNum}, #{pageSize}
     </select>
 
-    <select id="searchReportDataSourceCount" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo"
+    <select id="searchDataSourceCount" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo"
             resultType="int">
         select count(1)
         from datawarehouse_datasource
         <include refid="searchReportDataSourceSql"></include>
     </select>
 
-    <select id="updateReportDataSource" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <select id="updateDataSource" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         update datawarehouse_datasource
-        set label           = #{label},
-            cron_expression = #{cronExpression},
-            description     = #{description},
+        set label       = #{label},
+            description = #{description},
+            data_count  = #{dataCount},
+            xml         = #{xml,typeHandler=CompressHandler}
+        where id = #{id}
+    </select>
+
+    <select id="updateDataSourcePolicy" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
+        update datawarehouse_datasource
+        set cron_expression = #{cronExpression},
+            label           = #{label},
             mode            = #{mode},
             expire_count    = #{expireCount},
             expire_unit     = #{expireUnit},
-            is_active       = #{isActive},
-            data_count      = #{dataCount}
+            is_active       = #{isActive}
         where id = #{id}
     </select>
 
     <select id="updateReportDataSourceIsActive"
-            parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         update datawarehouse_datasource
         set is_active = #{isActive}
         where id = #{id}
     </select>
 
-    <select id="insertReportDataSource" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <select id="insertDataSource" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         insert into datawarehouse_datasource (id,
                                               name,
                                               label,
@@ -178,7 +173,7 @@
                 #{name},
                 #{label},
                 #{description},
-                #{xml},
+                #{xml,typeHandler=CompressHandler},
                 #{isActive})
     </select>
 
@@ -189,13 +184,13 @@
     </update>
 
     <update id="updateReportDataSourceDataCount"
-            parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         update datawarehouse_datasource
         set data_count = #{dataCount}
         where id = #{id}
     </update>
 
-    <update id="updateReportDataSourceStatus" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <update id="updateReportDataSourceStatus" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         update datawarehouse_datasource
         set status = #{status}
         <if test="dataCount!=null">
@@ -205,52 +200,64 @@
     </update>
 
     <update id="updateReportDataSourceConditionValue"
-            parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceConditionVo">
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceConditionVo">
         update datawarehouse_datasource_condition
         set value = #{value}
         where id = #{id}
     </update>
 
+    <update id="updateDataSourceField" parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
+        update datawarehouse_datasource_field
+        set label  = #{label},
+            is_key = #{isKey}
+        where id = #{id}
+    </update>
 
-    <insert id="insertReportDataSourceField"
-            parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceFieldVo">
+    <update id="updateDataSourceFieldCondition"
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
+        update datawarehouse_datasource_field
+        set is_condition = #{isCondition},
+            config       = #{configStr,typeHandler=CompressHandler},
+            input_type   = #{inputType}
+        where id = #{id}
+    </update>
+
+
+    <insert id="insertDataSourceField"
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
         insert into datawarehouse_datasource_field
         (id,
          datasource_id,
          name,
          label,
          type,
-         input_type,
-         config,
          is_key)
         values (#{id},
                 #{dataSourceId},
                 #{name},
                 #{label},
                 #{type},
-                #{inputType},
-                #{configStr},
                 #{isKey})
     </insert>
 
-    <insert id="insertReportDataSourceCondition"
-            parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceConditionVo">
-        insert into datawarehouse_datasource_condition
-        (id,
-         datasource_id,
-         name,
-         label,
-         type,
-         is_required,
-         config)
-        values (#{id},
-                #{dataSourceId},
-                #{name},
-                #{label},
-                #{type},
-                #{isRequired},
-                #{configStr})
-    </insert>
+    <!-- <insert id="insertReportDataSourceCondition"
+             parameterType="codedriver.framework.datawarehouse.dto.DataSourceConditionVo">
+         insert into datawarehouse_datasource_condition
+         (id,
+          datasource_id,
+          name,
+          label,
+          type,
+          is_required,
+          config)
+         values (#{id},
+                 #{dataSourceId},
+                 #{name},
+                 #{label},
+                 #{type},
+                 #{isRequired},
+                 #{configStr})
+     </insert>-->
 
     <delete id="deleteReportDataSourceById" parameterType="java.lang.Long">
         delete
@@ -259,15 +266,21 @@
     </delete>
 
 
-    <delete id="deleteReportDataSourceFieldByDataSourceId" parameterType="java.lang.Long">
+    <delete id="deleteDataSourceFieldByDataSourceId" parameterType="java.lang.Long">
         delete
         from datawarehouse_datasource_field
         where datasource_id = #{value}
     </delete>
 
-    <delete id="deleteReportDataSourceConditionByDataSourceId" parameterType="java.lang.Long">
+    <delete id="deleteDataSourceFieldById" parameterType="java.lang.Long">
         delete
-        from datawarehouse_datasource_condition
-        where datasource_id = #{value}
+        from datawarehouse_datasource_field
+        where id = #{value}
     </delete>
+
+    <!-- <delete id="deleteReportDataSourceConditionByDataSourceId" parameterType="java.lang.Long">
+         delete
+         from datawarehouse_datasource_condition
+         where datasource_id = #{value}
+     </delete>-->
 </mapper>

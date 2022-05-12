@@ -5,18 +5,18 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceAuditVo;
+import codedriver.framework.datawarehouse.dto.DataSourceAuditVo;
 
 import java.util.List;
 
 public interface DataWarehouseDataSourceAuditMapper {
-    int searchReportDataSourceAuditCount(ReportDataSourceAuditVo reportDataSourceAuditVo);
+    int searchReportDataSourceAuditCount(DataSourceAuditVo reportDataSourceAuditVo);
 
-    List<ReportDataSourceAuditVo> searchReportDataSourceAudit(ReportDataSourceAuditVo reportDataSourceAuditVo);
+    List<DataSourceAuditVo> searchReportDataSourceAudit(DataSourceAuditVo reportDataSourceAuditVo);
 
-    void insertReportDataSourceAudit(ReportDataSourceAuditVo reportDataSourceAuditVo);
+    void insertReportDataSourceAudit(DataSourceAuditVo reportDataSourceAuditVo);
 
-    void updateReportDataSourceAudit(ReportDataSourceAuditVo reportDataSourceAuditVo);
+    void updateReportDataSourceAudit(DataSourceAuditVo reportDataSourceAuditVo);
 
     void deleteReportDataSourceAuditByDatasourceId(Long datasourceId);
 }

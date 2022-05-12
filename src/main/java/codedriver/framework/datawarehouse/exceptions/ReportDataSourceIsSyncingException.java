@@ -6,10 +6,10 @@
 package codedriver.framework.datawarehouse.exceptions;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 
 public class ReportDataSourceIsSyncingException extends ApiRuntimeException {
-    public ReportDataSourceIsSyncingException(ReportDataSourceVo reportDataSourceVo) {
+    public ReportDataSourceIsSyncingException(DataSourceVo reportDataSourceVo) {
         super("数据源“" + reportDataSourceVo.getName() + "”同步数据中，请稍后再发起同步操作。");
     }
 }

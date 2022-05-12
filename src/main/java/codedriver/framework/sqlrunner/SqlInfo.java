@@ -36,6 +36,10 @@ public class SqlInfo {
      * resultMap中property列表
      */
     private List<String> propertyList;
+    /**
+     * mapper的命名空间
+     */
+    private String namespace;
 
     public String getId() {
         return id;
@@ -91,5 +95,13 @@ public class SqlInfo {
 
     public void setPropertyList(List<String> propertyList) {
         this.propertyList = propertyList;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

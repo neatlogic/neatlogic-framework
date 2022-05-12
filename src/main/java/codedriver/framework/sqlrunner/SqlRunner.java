@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class SqlRunner {
@@ -107,10 +106,6 @@ public class SqlRunner {
     public void setDataSource(DataSource _dataSource) {
         dataSource = _dataSource;
     }
-//    private SqlUtil(Configuration configuration) {
-//        this.configuration = configuration;
-//        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-//    }
 
     /**
      * 执行mapper中所有select语句
@@ -134,7 +129,7 @@ public class SqlRunner {
         try {
             for (String selectId : selectIdList) {
                 List reportTypeList = sqlSession.selectList(selectId, paramMap);
-                resultMap.put(selectId, reportTypeList);
+                resultMap.put(selectId.substring(this.namespace.length() + 1), reportTypeList);
             }
         } finally {
             sqlSession.close();
@@ -149,8 +144,7 @@ public class SqlRunner {
      * @param paramMap
      * @return
      */
-    public List runSqlById(String id, Map<String, Object> paramMap) {
-        List<String> selectIdList = new ArrayList<>();
+    public <E> List<E>  runSqlById(String id, Map<String, Object> paramMap) {
         MappedStatement mappedStatement = configuration.getMappedStatement(id);
         if (mappedStatement == null) {
             return new ArrayList<>();
@@ -160,7 +154,7 @@ public class SqlRunner {
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
-            return sqlSession.selectList(id, paramMap);
+            return sqlSession.selectList(this.namespace + "." + id, paramMap);
         } finally {
             sqlSession.close();
         }
@@ -177,7 +171,7 @@ public class SqlRunner {
         Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
         for (MappedStatement mappedStatement : mappedStatementList) {
             SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
-            if (sqlCommandType == SqlCommandType.SELECT) {
+            if (sqlCommandType != SqlCommandType.SELECT) {
                 continue;
             }
             String id = mappedStatement.getId();
@@ -186,7 +180,7 @@ public class SqlRunner {
             }
             idList.add(id);
             SqlInfo sqlInfo = new SqlInfo();
-            sqlInfo.setId(id);
+            sqlInfo.setId(id.substring(this.namespace.length() + 1));
             BoundSql boundSql = mappedStatement.getBoundSql(paramMap);
             String sql = boundSql.getSql();
             sqlInfo.setSql(sql);
@@ -200,6 +194,7 @@ public class SqlRunner {
             }
             Integer timeout = mappedStatement.getTimeout();
             sqlInfo.setTimeout(timeout);
+            sqlInfo.setNamespace(this.namespace);
             sqlInfoList.add(sqlInfo);
         }
         return sqlInfoList;

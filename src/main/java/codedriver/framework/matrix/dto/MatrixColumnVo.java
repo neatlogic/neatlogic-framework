@@ -18,8 +18,8 @@ public class MatrixColumnVo {
     private String type;
 	private List<String> defaultValue;
 	private boolean isFilterList;
-//	@JSONField(serialize = false)
-//	private String value;
+	@JSONField(serialize = false)
+	private String value;
     public MatrixColumnVo() {
 	}
 
@@ -41,16 +41,16 @@ public class MatrixColumnVo {
         this.column = column;
     }
 
-//    public String getValue() {
-//    	if(value == null && CollectionUtils.isNotEmpty(valueList)) {
-//    		value = valueList.get(0);
-//    	}
-//        return value;
-//    }
-//
-//    public void setValue(String value) {
-//        this.value = value;
-//    }
+    public String getValue() {
+    	if(value == null && CollectionUtils.isNotEmpty(valueList)) {
+    		value = valueList.get(0);
+    	}
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
 	public List<String> getValueList() {
 		return valueList;

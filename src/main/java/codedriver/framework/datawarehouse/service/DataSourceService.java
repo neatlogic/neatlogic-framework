@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 
-public interface ReportDataSourceService {
+public interface DataSourceService {
     void deleteReportDataSource(DataSourceVo reportDataSourceVo);
 
     @Transactional

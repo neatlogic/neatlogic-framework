@@ -50,6 +50,7 @@ public class ReportXmlUtil {
                 String column = sub.attributeValue("column");
                 String label = sub.attributeValue("label");
                 String type = sub.attributeValue("type");
+                String aggregate = sub.attributeValue("aggregate");
                 if (StringUtils.isBlank(sub.attributeValue("column"))) {
                     throw new DataSourceXmlIrregularException("“" + sub.getName() + "”节点必须定义唯一的“column”属性");
                 } else {
@@ -59,7 +60,7 @@ public class ReportXmlUtil {
                         checkSet.add(sub.attributeValue("column"));
                     }
                 }
-                fieldList.add(new DataSourceFieldVo(column, label, type, sub.getName().equals("id") ? 1 : 0));
+                fieldList.add(new DataSourceFieldVo(column, label, type, sub.getName().equals("id") ? 1 : 0, aggregate));
             }
         }
     }

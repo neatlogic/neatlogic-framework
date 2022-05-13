@@ -15,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class DataSourceDataVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
@@ -39,6 +40,16 @@ public class DataSourceDataVo extends BasePageVo {
             fieldList = new ArrayList<>();
         }
         fieldList.add(fieldVo);
+    }
+
+    public DataSourceFieldVo getFieldById(Long id) {
+        if (CollectionUtils.isNotEmpty(fieldList)) {
+            Optional<DataSourceFieldVo> op = fieldList.stream().filter(d -> d.getId().equals(id)).findFirst();
+            if (op.isPresent()) {
+                return op.get();
+            }
+        }
+        return null;
     }
 
     public DataSourceDataVo() {

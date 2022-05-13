@@ -55,6 +55,24 @@
         <include refid="searchDataSourceDataCondition"></include>
     </select>
 
+    <select id="getAggregateFieldValue" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="java.util.HashMap">
+        select 1
+        <foreach collection="fieldList" item="item">
+            <if test="item.aggregate != null and item.aggregate != ''">
+                ,`${item.id}` as `field_${item.id}`
+            </if>
+        </foreach>
+        from ${tableName} where
+        true
+        <foreach collection="fieldList" item="item">
+            <if test="item.isKey==1">
+                and `${item.id}_hash` = #{item.value,typeHandler=Md5Handler}
+            </if>
+        </foreach>
+        limit 1
+    </select>
+
     <insert id="insertDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo">
         insert into ${tableName}
         (

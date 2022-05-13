@@ -48,6 +48,7 @@
             <result column="fieldInputType" property="inputType"/>
             <result column="fieldIsKey" property="isKey"/>
             <result column="fieldIsCondition" property="isCondition"/>
+            <result column="fieldAggregate" property="aggregate"/>
             <result column="fieldConfigStr" property="configStr"/>
         </collection>
     </resultMap>
@@ -90,6 +91,7 @@
                b.input_type      as fieldInputType,
                b.is_key          as fieldIsKey,
                b.is_condition    as fieldIsCondition,
+               b.aggregate       as fieldAggregate,
                b.config          as fieldConfigStr
         from datawarehouse_datasource a
                  left join datawarehouse_datasource_field b on a.id = b.datasource_id
@@ -231,12 +233,14 @@
          name,
          label,
          type,
+         aggregate,
          is_key)
         values (#{id},
                 #{dataSourceId},
                 #{name},
                 #{label},
                 #{type},
+                #{aggregate},
                 #{isKey})
     </insert>
 

@@ -9,7 +9,7 @@ import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 
-public class ReportConnectionVo {
+public class ConnectionVo {
     private Long id;
     private String name;
     private String url;

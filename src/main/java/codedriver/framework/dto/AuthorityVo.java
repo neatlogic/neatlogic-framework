@@ -1,3 +1,8 @@
+/*
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
 package codedriver.framework.dto;
 
 public class AuthorityVo {
@@ -20,20 +25,16 @@ public class AuthorityVo {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		AuthorityVo that = (AuthorityVo) o;
 		if (type == null) {
-			if (that.type != null)
-				return false;
-		} else if (!type.equals(that.type))
-			return false;
-		if (uuid == null) {
-			if (that.uuid != null)
-				return false;
-		} else if (!uuid.equals(that.uuid))
-			return false;
-		return true;
+            if (that.type != null)
+                return false;
+        } else if (!type.equals(that.type))
+            return false;
+        if (uuid == null) {
+            return that.uuid == null;
+        } else return uuid.equals(that.uuid);
 	}
 
 	@Override

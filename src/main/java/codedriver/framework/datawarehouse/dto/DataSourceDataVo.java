@@ -15,14 +15,15 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-public class ReportDataSourceDataVo extends BasePageVo {
+public class DataSourceDataVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "数据源id", type = ApiParamType.LONG)
     private Long dataSourceId;
     @EntityField(name = "字段列表", type = ApiParamType.JSONARRAY)
-    private List<ReportDataSourceFieldVo> fieldList;
+    private List<DataSourceFieldVo> fieldList;
     @EntityField(name = "有效时间，单位分钟", type = ApiParamType.INTEGER)
     private Integer expireMinute;
     @EntityField(name = "添加日期", type = ApiParamType.LONG)
@@ -30,22 +31,32 @@ public class ReportDataSourceDataVo extends BasePageVo {
     @EntityField(name = "过期日期", type = ApiParamType.LONG)
     private Date expireTime;
     @EntityField(name = "条件列表", type = ApiParamType.JSONARRAY)
-    private List<ReportDataSourceFieldVo> conditionList;
+    private List<DataSourceFieldVo> conditionList;
     @EntityField(name = "是否过期", type = ApiParamType.INTEGER)
     private Integer isExpired = 0;
 
-    public void addField(ReportDataSourceFieldVo fieldVo) {
+    public void addField(DataSourceFieldVo fieldVo) {
         if (fieldList == null) {
             fieldList = new ArrayList<>();
         }
         fieldList.add(fieldVo);
     }
 
-    public ReportDataSourceDataVo() {
+    public DataSourceFieldVo getFieldById(Long id) {
+        if (CollectionUtils.isNotEmpty(fieldList)) {
+            Optional<DataSourceFieldVo> op = fieldList.stream().filter(d -> d.getId().equals(id)).findFirst();
+            if (op.isPresent()) {
+                return op.get();
+            }
+        }
+        return null;
+    }
+
+    public DataSourceDataVo() {
 
     }
 
-    public ReportDataSourceDataVo(Long dataSourceId) {
+    public DataSourceDataVo(Long dataSourceId) {
         this.dataSourceId = dataSourceId;
     }
 
@@ -95,11 +106,11 @@ public class ReportDataSourceDataVo extends BasePageVo {
         this.dataSourceId = dataSourceId;
     }
 
-    public List<ReportDataSourceFieldVo> getFieldList() {
+    public List<DataSourceFieldVo> getFieldList() {
         return fieldList;
     }
 
-    public void setFieldList(List<ReportDataSourceFieldVo> fieldList) {
+    public void setFieldList(List<DataSourceFieldVo> fieldList) {
         this.fieldList = fieldList;
     }
 
@@ -120,11 +131,11 @@ public class ReportDataSourceDataVo extends BasePageVo {
         this.expireTime = expireTime;
     }
 
-    public List<ReportDataSourceFieldVo> getConditionList() {
+    public List<DataSourceFieldVo> getConditionList() {
         return conditionList;
     }
 
-    public void setConditionList(List<ReportDataSourceFieldVo> conditionList) {
+    public void setConditionList(List<DataSourceFieldVo> conditionList) {
         this.conditionList = conditionList;
     }
 }

@@ -5,8 +5,8 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.ReportConnectionVo;
+import codedriver.framework.datawarehouse.dto.ConnectionVo;
 
 public interface DataWarehouseConnectionMapper {
-    ReportConnectionVo getConnectionById(Long id);
+    ConnectionVo getConnectionById(Long id);
 }

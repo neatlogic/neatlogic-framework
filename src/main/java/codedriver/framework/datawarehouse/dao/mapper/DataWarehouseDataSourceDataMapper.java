@@ -5,23 +5,25 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceDataVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 
 import java.util.HashMap;
 import java.util.List;
 
 public interface DataWarehouseDataSourceDataMapper {
-    int getDataSourceDataCount(ReportDataSourceDataVo reportDataSourceDataVo);
+    int getDataSourceDataCount(DataSourceDataVo reportDataSourceDataVo);
 
-    int searchDataSourceDataCount(ReportDataSourceDataVo reportDataSourceDataVo);
+    HashMap<String, Object> getAggregateFieldValue(DataSourceDataVo dataSourceDataVo);
 
-    List<HashMap<String, Object>> searchDataSourceData(ReportDataSourceDataVo reportDataSourceDataVo);
+    int searchDataSourceDataCount(DataSourceDataVo reportDataSourceDataVo);
 
-    void insertDataSourceData(ReportDataSourceDataVo reportDataSourceDataVo);
+    List<HashMap<String, Object>> searchDataSourceData(DataSourceDataVo dataSourceDataVo);
 
-    void truncateTable(ReportDataSourceVo reportDataSourceVo);
+    void insertDataSourceData(DataSourceDataVo reportDataSourceDataVo);
+
+    void truncateTable(DataSourceVo reportDataSourceVo);
 
     //需要返回删除行数
-    int clearExpiredData(ReportDataSourceDataVo reportDataSourceDataVo);
+    int clearExpiredData(DataSourceDataVo reportDataSourceDataVo);
 }

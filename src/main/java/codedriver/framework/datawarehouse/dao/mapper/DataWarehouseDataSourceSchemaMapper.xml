@@ -6,7 +6,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceSchemaMapper">
-    <insert id="createDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <insert id="createDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         CREATE TABLE IF NOT EXISTS ${tableName}
         (
         <foreach collection="fieldList" item="item">
@@ -51,7 +51,7 @@
         DEFAULT CHARSET = utf8mb4
     </insert>
 
-    <delete id="deleteDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.ReportDataSourceVo">
+    <delete id="deleteDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         DROP TABLE IF EXISTS ${tableName}
     </delete>
 </mapper>

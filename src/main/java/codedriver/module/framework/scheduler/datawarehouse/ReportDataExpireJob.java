@@ -6,8 +6,8 @@
 package codedriver.module.framework.scheduler.datawarehouse;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceDataVo;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceDataVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataMapper;
@@ -54,21 +54,21 @@ public class ReportDataExpireJob extends JobBase {
 
     @Override
     public void executeInternal(JobExecutionContext context, JobObject jobObject) {
-        ReportDataSourceVo pReportDataSourceVo = new ReportDataSourceVo();
+        DataSourceVo pReportDataSourceVo = new DataSourceVo();
         pReportDataSourceVo.setPageSize(100);
         pReportDataSourceVo.setCurrentPage(1);
         pReportDataSourceVo.setIsActive(1);
-        List<ReportDataSourceVo> reportDataSourceList = reportDataSourceMapper.searchReportDataSource(pReportDataSourceVo);
+        List<DataSourceVo> reportDataSourceList = reportDataSourceMapper.searchDataSource(pReportDataSourceVo);
         while (CollectionUtils.isNotEmpty(reportDataSourceList)) {
-            for (ReportDataSourceVo reportDataSourceVo : reportDataSourceList) {
-                ReportDataSourceDataVo dataVo = new ReportDataSourceDataVo(reportDataSourceVo.getId());
+            for (DataSourceVo reportDataSourceVo : reportDataSourceList) {
+                DataSourceDataVo dataVo = new DataSourceDataVo(reportDataSourceVo.getId());
                 if (reportDataSourceDataMapper.clearExpiredData(dataVo) > 0) {
                     reportDataSourceVo.setDataCount(reportDataSourceDataMapper.getDataSourceDataCount(dataVo));
                     reportDataSourceMapper.updateReportDataSourceDataCount(reportDataSourceVo);
                 }
             }
             pReportDataSourceVo.setCurrentPage(pReportDataSourceVo.getCurrentPage() + 1);
-            reportDataSourceList = reportDataSourceMapper.searchReportDataSource(pReportDataSourceVo);
+            reportDataSourceList = reportDataSourceMapper.searchDataSource(pReportDataSourceVo);
         }
     }
 

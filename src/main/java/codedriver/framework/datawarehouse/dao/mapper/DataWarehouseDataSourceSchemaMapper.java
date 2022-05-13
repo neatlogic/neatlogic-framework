@@ -5,12 +5,12 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 
 public interface DataWarehouseDataSourceSchemaMapper {
 
 
-    void createDataSourceTable(ReportDataSourceVo reportDataSourceVo);
+    void createDataSourceTable(DataSourceVo reportDataSourceVo);
 
-    void deleteDataSourceTable(ReportDataSourceVo reportDataSourceVo);
+    void deleteDataSourceTable(DataSourceVo reportDataSourceVo);
 }

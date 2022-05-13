@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -50,8 +50,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         authenticationInfoVo.setTeamUuidList(teamUuidList);
         List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
-        Set<String> roleUuidSet = new HashSet<>();
-        roleUuidSet.addAll(userRoleUuidList);
+        Set<String> roleUuidSet = new HashSet<>(userRoleUuidList);
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
             List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
             roleUuidSet.addAll(teamRoleUuidList);

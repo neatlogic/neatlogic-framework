@@ -49,6 +49,20 @@
         </if>
     </select>
 
+    <select id="getFormListByUuidList" parameterType="java.lang.String"
+            resultType="codedriver.framework.form.dto.FormVo">
+        SELECT
+        `uuid`,
+        `name`,
+        `is_active` AS isActive
+        FROM `form`
+        WHERE `uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+        ORDER BY `fcd` DESC
+    </select>
+
     <select id="searchFormListForSelect" parameterType="codedriver.framework.form.dto.FormVo"
             resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT

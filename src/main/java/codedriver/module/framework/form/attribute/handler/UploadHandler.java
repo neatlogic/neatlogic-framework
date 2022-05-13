@@ -11,9 +11,14 @@ import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -50,7 +55,7 @@ public class UploadHandler extends FormHandlerBase {
 
     @Override
     public boolean isAudit() {
-        return false;
+        return true;
     }
 
     @Override
@@ -95,12 +100,26 @@ public class UploadHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONArray dataArray = (JSONArray) attributeDataVo.getDataObj();
+        if (CollectionUtils.isNotEmpty(dataArray)) {
+            List<String> nameList = new ArrayList<>();
+            for (int i = 0; i < dataArray.size(); i++) {
+                JSONObject dataObj = dataArray.getJSONObject(i);
+                if (MapUtils.isNotEmpty(dataObj)) {
+                    String name = dataObj.getString("name");
+                    if (StringUtils.isNotBlank(name)) {
+                        nameList.add(name);
+                    }
+                }
+            }
+            return nameList;
+        }
         return null;
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        return getMyDetailedData(attributeDataVo, configObj);
     }
 
     @Override
@@ -117,10 +136,56 @@ public class UploadHandler extends FormHandlerBase {
     public void makeupFormAttribute(FormAttributeVo formAttributeVo) {
 
     }
-
+//表单组件配置信息
+//{
+//	"handler": "formupload",
+//	"label": "附件上传_1",
+//	"type": "form",
+//	"uuid": "090ae87ae1c24950b1ea039d45ab0a85",
+//	"config": {
+//		"isRequired": false,
+//		"defaultValueList": [],
+//		"isTemplate": false,
+//		"ruleList": [],
+//		"width": "100%",
+//		"uploadType": "one",
+//		"validList": [],
+//		"quoteUuid": "",
+//		"defaultValueType": "self",
+//		"placeholder": "选择上传的附件",
+//		"authorityConfig": [
+//			"common#alluser"
+//		],
+//		"value": null
+//	}
+//}
+//保存数据
+//[{"name":"asd.jpg","id":623050252673024}]
+//返回数据结构
+//{
+//    "value": [{"name":"asd.jpg","id":623050252673024}],
+//    "text": ["asd.jpg"]
+//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return null;
+        JSONObject resultObj = new JSONObject();
+        JSONArray dataArray = (JSONArray) attributeDataVo.getDataObj();
+        if (CollectionUtils.isNotEmpty(dataArray)) {
+            resultObj.put("value", dataArray);
+            List<String> nameList = new ArrayList<>();
+            for (int i = 0; i < dataArray.size(); i++) {
+                JSONObject dataObj = dataArray.getJSONObject(i);
+                if (MapUtils.isNotEmpty(dataObj)) {
+                    String name = dataObj.getString("name");
+                    if (StringUtils.isNotBlank(name)) {
+                        nameList.add(name);
+                    }
+                }
+            }
+            resultObj.put("text", nameList);
+            return resultObj;
+        }
+        return resultObj;
     }
 
     @Override

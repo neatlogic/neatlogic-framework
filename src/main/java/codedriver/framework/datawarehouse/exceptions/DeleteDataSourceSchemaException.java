@@ -6,10 +6,10 @@
 package codedriver.framework.datawarehouse.exceptions;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.datawarehouse.dto.ReportDataSourceVo;
+import codedriver.framework.datawarehouse.dto.DataSourceVo;
 
 public class DeleteDataSourceSchemaException extends ApiRuntimeException {
-    public DeleteDataSourceSchemaException(ReportDataSourceVo reportDataSourceVo) {
+    public DeleteDataSourceSchemaException(DataSourceVo reportDataSourceVo) {
         super("删除数据源“" + reportDataSourceVo.getName() + "”表格失败");
     }
 }

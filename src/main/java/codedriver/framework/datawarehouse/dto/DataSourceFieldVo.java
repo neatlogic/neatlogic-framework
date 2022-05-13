@@ -7,6 +7,9 @@ package codedriver.framework.datawarehouse.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.datawarehouse.condition.DatasourceConditionHandlerFactory;
+import codedriver.framework.datawarehouse.condition.IDatasourceConditionHandler;
+import codedriver.framework.datawarehouse.enums.AggregateType;
 import codedriver.framework.datawarehouse.enums.FieldInputType;
 import codedriver.framework.datawarehouse.enums.FieldType;
 import codedriver.framework.restful.annotation.EntityField;
@@ -15,7 +18,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
-public class ReportDataSourceFieldVo extends BasePageVo {
+import java.util.Objects;
+
+public class DataSourceFieldVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "数据源id", type = ApiParamType.LONG)
@@ -34,29 +39,76 @@ public class ReportDataSourceFieldVo extends BasePageVo {
     private String inputTypeText;
     @EntityField(name = "是否主键", type = ApiParamType.INTEGER)
     private Integer isKey;
-    @EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "是否作为条件", type = ApiParamType.INTEGER)
+    private int isCondition;
+    @EntityField(name = "条件输入控件配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
+    @EntityField(name = "聚合算法", type = ApiParamType.ENUM, member = AggregateType.class)
+    private String aggregate;
+
     @JSONField(serialize = false)
     private String configStr;
     @JSONField(serialize = false)
     private Object value;//值,作为条件
 
-    public ReportDataSourceFieldVo() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataSourceFieldVo that = (DataSourceFieldVo) o;
+        return name.equals(that.name) && type.equals(that.type);
+    }
+
+    public String getAggregate() {
+        return aggregate;
+    }
+
+    public void setAggregate(String aggregate) {
+        this.aggregate = aggregate;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
+    }
+
+    public DataSourceFieldVo() {
 
     }
 
-    public ReportDataSourceFieldVo(ReportDataSourceFieldVo reportDataSourceFieldVo) {
-        this.name = reportDataSourceFieldVo.getName();
-        this.label = reportDataSourceFieldVo.getLabel();
-        this.type = reportDataSourceFieldVo.getType();
-        this.id = reportDataSourceFieldVo.getId();
+    public DataSourceFieldVo(DataSourceFieldVo _dataSourceFieldVo) {
+        this.name = _dataSourceFieldVo.getName();
+        this.label = _dataSourceFieldVo.getLabel();
+        this.type = _dataSourceFieldVo.getType();
+        this.id = _dataSourceFieldVo.getId();
+        this.isKey = _dataSourceFieldVo.getIsKey();
     }
 
-    public ReportDataSourceFieldVo(String name, String label, String type, Integer isKey) {
+    public DataSourceFieldVo(String name, String label, String type, Integer isKey, String aggregate) {
         this.name = name;
         this.label = label;
         this.type = type;
         this.isKey = isKey;
+        this.aggregate = aggregate;
+    }
+
+    public int getIsCondition() {
+        return isCondition;
+    }
+
+    @JSONField(serialize = false)
+    public String getSqlConditionExpression() {
+        if (StringUtils.isNotBlank(this.inputType)) {
+            IDatasourceConditionHandler handler = DatasourceConditionHandlerFactory.getHandler(this.inputType);
+            if (handler != null) {
+                return handler.getExpression(this.id, this.value);
+            }
+        }
+        return null;
+    }
+
+    public void setIsCondition(int isCondition) {
+        this.isCondition = isCondition;
     }
 
     public String getTypeText() {
@@ -159,6 +211,13 @@ public class ReportDataSourceFieldVo extends BasePageVo {
     }
 
     public JSONObject getConfig() {
+        if (config == null && StringUtils.isNotBlank(configStr)) {
+            try {
+                config = JSONObject.parseObject(configStr);
+            } catch (Exception ignored) {
+
+            }
+        }
         return config;
     }
 
@@ -167,7 +226,7 @@ public class ReportDataSourceFieldVo extends BasePageVo {
     }
 
     public String getConfigStr() {
-        if (StringUtils.isBlank(configStr) && config != null) {
+        if (config != null) {
             configStr = config.toString();
         }
         return configStr;

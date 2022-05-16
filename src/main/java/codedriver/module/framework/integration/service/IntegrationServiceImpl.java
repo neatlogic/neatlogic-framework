@@ -157,30 +157,6 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
         return resultList;
     }
 
-//    @Override
-//    public void arrayColumnDataConversion(List<String> arrayColumnList, List<Map<String, Object>> tbodyList) {
-//        for (Map<String, Object> rowData : tbodyList) {
-//            for (Map.Entry<String, Object> entry : rowData.entrySet()) {
-//                if (arrayColumnList.contains(entry.getKey())) {
-//                    List<ValueTextVo> valueObjList = new ArrayList<>();
-//                    Object valueObj = entry.getValue();
-//                    String value = valueObj.getString("value");
-//                    if (StringUtils.isNotBlank(value)) {
-//                        if (value.startsWith("[") && value.endsWith("]")) {
-//                            List<String> valueList = valueObj.getJSONArray("value").toJavaList(String.class);
-//                            for (String valueStr : valueList) {
-//                                valueObjList.add(new ValueTextVo(valueStr, valueStr));
-//                            }
-//                        } else {
-//                            valueObjList.add(new ValueTextVo(value, value));
-//                        }
-//                    }
-//                    valueObj.put("value", valueObjList);
-//                }
-//            }
-//        }
-//    }
-
     /**
      * 集成属性数据查询
      * @param jsonObj 参数
@@ -204,30 +180,34 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
         }
         List<ColumnVo> columnVoList = getColumnList(integrationVo);
         if (CollectionUtils.isNotEmpty(columnVoList)) {
+
+            String uuidColumn = null;
+            for (ColumnVo columnVo : columnVoList) {
+                Integer primaryKey = columnVo.getPrimaryKey();
+                if (Objects.equals(primaryKey, 1)) {
+                    uuidColumn = columnVo.getUuid();
+                    break;
+                }
+            }
+            if (uuidColumn == null) {
+                throw new IntegrationTablePrimaryKeyColumnNotFoundException(integrationVo.getName());
+            }
             List<String> columnList = columnArray.toJavaList(String.class);
             JSONArray theadList = getTheadList(integrationVo, columnList);
             returnObj.put("theadList", theadList);
-            integrationVo.getParamObj().putAll(jsonObj);
+            if (!columnList.contains(uuidColumn)) {
+                columnList.add(uuidColumn);
+            }
             JSONArray defaultValue = jsonObj.getJSONArray("defaultValue");
             if (CollectionUtils.isNotEmpty(defaultValue)) {
-                String uuidColumn = null;
-                for (int i = 0; i < theadList.size(); i++) {
-                    JSONObject theadObj = theadList.getJSONObject(i);
-                    Integer primaryKey = theadObj.getInteger("primaryKey");
-                    if (Objects.equals(primaryKey, 1)) {
-                        uuidColumn = theadObj.getString("key");
-                        break;
-                    }
-                }
-                if (uuidColumn == null) {
-                    throw new IntegrationTablePrimaryKeyColumnNotFoundException(integrationVo.getName());
-                }
                 List<SourceColumnVo> sourceColumnList = new ArrayList<>();
                 SourceColumnVo sourceColumnVo = new SourceColumnVo();
                 sourceColumnVo.setColumn(uuidColumn);
                 List<Map<String, Object>> tbodyArray = new ArrayList<>();
                 for (Object uuidValue : defaultValue) {
-                    sourceColumnVo.setValue(uuidValue);
+                    List<Object> valueList = new ArrayList<>();
+                    valueList.add(uuidValue);
+                    sourceColumnVo.setValueList(valueList);
                     sourceColumnList.clear();
                     sourceColumnList.add(sourceColumnVo);
                     integrationVo.getParamObj().put("sourceColumnList", sourceColumnList);
@@ -247,6 +227,37 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                 }
                 returnObj.put("tbodyList", tbodyArray);
             } else {
+                JSONArray searchColumnArray = jsonObj.getJSONArray("searchColumnList");
+                if (CollectionUtils.isNotEmpty(searchColumnArray)) {
+                    returnObj.put("searchColumnDetailList", getSearchColumnDetailList(integrationVo.getName(), columnVoList, searchColumnArray));
+                }
+                List<SourceColumnVo> sourceColumnList = new ArrayList<>();
+                JSONArray sourceColumnArray = jsonObj.getJSONArray("sourceColumnList");
+                if (CollectionUtils.isNotEmpty(sourceColumnArray)) {
+                    sourceColumnList = sourceColumnArray.toJavaList(SourceColumnVo.class);
+                    Iterator<SourceColumnVo> iterator = sourceColumnList.iterator();
+                    while (iterator.hasNext()) {
+                        SourceColumnVo sourceColumnVo = iterator.next();
+                        if (StringUtils.isBlank(sourceColumnVo.getColumn())) {
+                            iterator.remove();
+                        } else if (CollectionUtils.isEmpty(sourceColumnVo.getValueList())) {
+                            iterator.remove();
+                        }
+                    }
+                }
+                JSONArray filterList = jsonObj.getJSONArray("filterList");
+                if (CollectionUtils.isNotEmpty(filterList)) {
+                    if (!mergeFilterListAndSourceColumnList(filterList, sourceColumnList)) {
+                        return returnObj;
+                    }
+                }
+                JSONObject paramObj = new JSONObject();
+                paramObj.put("currentPage", jsonObj.getInteger("currentPage"));
+                paramObj.put("pageSize", jsonObj.getInteger("pageSize"));
+                paramObj.put("needPage", jsonObj.getBoolean("needPage"));
+                paramObj.put("sourceColumnList", sourceColumnList);
+                integrationVo.setParamObj(paramObj);
+//                integrationVo.getParamObj().putAll(jsonObj);
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.FORM);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
                     logger.error(resultVo.getError());
@@ -260,10 +271,6 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                 returnObj.put("rowNum", transformedResult.get("rowNum"));
                 List<Map<String, Object>> tbodyList = getTbodyList(resultVo, columnList);
                 returnObj.put("tbodyList", tbodyList);
-                JSONArray searchColumnArray = jsonObj.getJSONArray("searchColumnList");
-                if (CollectionUtils.isNotEmpty(searchColumnArray)) {
-                    returnObj.put("searchColumnDetailList", getSearchColumnDetailList(integrationVo.getName(), columnVoList, searchColumnArray));
-                }
             }
         }
         return returnObj;
@@ -288,7 +295,7 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
             List<String> filterValueList = valueArray.toJavaList(String.class);
             SourceColumnVo sourceColumnVo = sourceColumnMap.get(uuid);
             if (sourceColumnVo != null) {
-                List<String> valueList = sourceColumnVo.getValueList();
+                List<?> valueList = sourceColumnVo.getValueList();
                 String expression = sourceColumnVo.getExpression();
                 if (Objects.equals(expression, Expression.EQUAL.getExpression()) || Objects.equals(expression, Expression.INCLUDE.getExpression())) {
                     valueList.retainAll(filterValueList);

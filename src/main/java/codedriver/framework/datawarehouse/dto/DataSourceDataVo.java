@@ -10,6 +10,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -34,6 +35,10 @@ public class DataSourceDataVo extends BasePageVo {
     private List<DataSourceFieldVo> conditionList;
     @EntityField(name = "是否过期", type = ApiParamType.INTEGER)
     private Integer isExpired = 0;
+    @JSONField(serialize = false)
+    private List<DataSourceFieldSortVo> sortList;//排序设置
+    @JSONField(serialize = false)
+    private int limit;//限制返回行数，0代表不限制
 
     public void addField(DataSourceFieldVo fieldVo) {
         if (fieldList == null) {
@@ -50,6 +55,22 @@ public class DataSourceDataVo extends BasePageVo {
             }
         }
         return null;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public List<DataSourceFieldSortVo> getSortList() {
+        return sortList;
+    }
+
+    public void setSortList(List<DataSourceFieldSortVo> sortList) {
+        this.sortList = sortList;
     }
 
     public DataSourceDataVo() {

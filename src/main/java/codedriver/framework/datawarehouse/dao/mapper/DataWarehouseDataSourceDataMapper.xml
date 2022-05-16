@@ -44,7 +44,20 @@
         expire_time as expireTime
         from ${tableName}
         <include refid="searchDataSourceDataCondition"></include>
-        limit #{startNum},#{pageSize}
+        <if test="sortList != null and sortList.size() > 0">
+            order by
+            <foreach collection="sortList" item="sort" separator=",">
+                `field_${sort.fieldId}` ${sort.type}
+            </foreach>
+        </if>
+        <choose>
+            <when test="limit > 0">
+                limit #{limit}
+            </when>
+            <otherwise>
+                limit #{startNum},#{pageSize}
+            </otherwise>
+        </choose>
     </select>
 
     <select id="searchDataSourceDataCount" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
@@ -53,6 +66,24 @@
         count(1)
         from ${tableName}
         <include refid="searchDataSourceDataCondition"></include>
+    </select>
+
+    <select id="getAggregateFieldValue" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="java.util.HashMap">
+        select 1
+        <foreach collection="fieldList" item="item">
+            <if test="item.aggregate != null and item.aggregate != ''">
+                ,`${item.id}` as `field_${item.id}`
+            </if>
+        </foreach>
+        from ${tableName} where
+        true
+        <foreach collection="fieldList" item="item">
+            <if test="item.isKey==1">
+                and `${item.id}_hash` = #{item.value,typeHandler=Md5Handler}
+            </if>
+        </foreach>
+        limit 1
     </select>
 
     <insert id="insertDataSourceData" parameterType="codedriver.framework.datawarehouse.dto.DataSourceDataVo">

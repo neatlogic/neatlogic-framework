@@ -14,9 +14,11 @@ import java.util.List;
 public interface DataWarehouseDataSourceDataMapper {
     int getDataSourceDataCount(DataSourceDataVo reportDataSourceDataVo);
 
+    HashMap<String, Object> getAggregateFieldValue(DataSourceDataVo dataSourceDataVo);
+
     int searchDataSourceDataCount(DataSourceDataVo reportDataSourceDataVo);
 
-    List<HashMap<String, Object>> searchDataSourceData(DataSourceDataVo reportDataSourceDataVo);
+    List<HashMap<String, Object>> searchDataSourceData(DataSourceDataVo dataSourceDataVo);
 
     void insertDataSourceData(DataSourceDataVo reportDataSourceDataVo);
 

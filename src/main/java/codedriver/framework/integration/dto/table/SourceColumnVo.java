@@ -15,9 +15,9 @@ import java.util.List;
  **/
 public class SourceColumnVo {
     private String column;
-    private Object value;
+//    private Object value;
     private String expression;
-    private List<String> valueList;
+    private List<?> valueList;
 
     public String getColumn() {
         return column;
@@ -27,16 +27,16 @@ public class SourceColumnVo {
         this.column = column;
     }
 
-    public Object getValue() {
-        if (value == null && CollectionUtils.isNotEmpty(valueList)) {
-            value = valueList.get(0);
-        }
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
+//    public Object getValue() {
+//        if (value == null && CollectionUtils.isNotEmpty(valueList)) {
+//            value = valueList.get(0);
+//        }
+//        return value;
+//    }
+//
+//    public void setValue(Object value) {
+//        this.value = value;
+//    }
 
     public String getExpression() {
         return expression;
@@ -46,11 +46,11 @@ public class SourceColumnVo {
         this.expression = expression;
     }
 
-    public List<String> getValueList() {
+    public List<?> getValueList() {
         return valueList;
     }
 
-    public void setValueList(List<String> valueList) {
+    public void setValueList(List<?> valueList) {
         this.valueList = valueList;
     }
 }

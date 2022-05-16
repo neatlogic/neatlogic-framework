@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.datawarehouse.condition.DatasourceConditionHandlerFactory;
 import codedriver.framework.datawarehouse.condition.IDatasourceConditionHandler;
+import codedriver.framework.datawarehouse.enums.AggregateType;
 import codedriver.framework.datawarehouse.enums.FieldInputType;
 import codedriver.framework.datawarehouse.enums.FieldType;
 import codedriver.framework.restful.annotation.EntityField;
@@ -42,6 +43,9 @@ public class DataSourceFieldVo extends BasePageVo {
     private int isCondition;
     @EntityField(name = "条件输入控件配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
+    @EntityField(name = "聚合算法", type = ApiParamType.ENUM, member = AggregateType.class)
+    private String aggregate;
+
     @JSONField(serialize = false)
     private String configStr;
     @JSONField(serialize = false)
@@ -53,6 +57,14 @@ public class DataSourceFieldVo extends BasePageVo {
         if (o == null || getClass() != o.getClass()) return false;
         DataSourceFieldVo that = (DataSourceFieldVo) o;
         return name.equals(that.name) && type.equals(that.type);
+    }
+
+    public String getAggregate() {
+        return aggregate;
+    }
+
+    public void setAggregate(String aggregate) {
+        this.aggregate = aggregate;
     }
 
     @Override
@@ -72,11 +84,12 @@ public class DataSourceFieldVo extends BasePageVo {
         this.isKey = _dataSourceFieldVo.getIsKey();
     }
 
-    public DataSourceFieldVo(String name, String label, String type, Integer isKey) {
+    public DataSourceFieldVo(String name, String label, String type, Integer isKey, String aggregate) {
         this.name = name;
         this.label = label;
         this.type = type;
         this.isKey = isKey;
+        this.aggregate = aggregate;
     }
 
     public int getIsCondition() {

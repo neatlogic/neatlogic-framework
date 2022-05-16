@@ -8,7 +8,7 @@ package codedriver.module.framework.scheduler.datawarehouse;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import codedriver.framework.datawarehouse.dto.DataSourceVo;
-import codedriver.framework.datawarehouse.service.ReportDataSourceService;
+import codedriver.framework.datawarehouse.service.DataSourceService;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,7 +31,7 @@ public class ReportDataSourceJob extends JobBase {
     private DataWarehouseDataSourceMapper reportDataSourceMapper;
 
     @Resource
-    private ReportDataSourceService reportDataSourceService;
+    private DataSourceService reportDataSourceService;
 
 
     @Override

@@ -10,11 +10,13 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class DataSourceDataVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
@@ -33,12 +35,42 @@ public class DataSourceDataVo extends BasePageVo {
     private List<DataSourceFieldVo> conditionList;
     @EntityField(name = "是否过期", type = ApiParamType.INTEGER)
     private Integer isExpired = 0;
+    @JSONField(serialize = false)
+    private List<DataSourceFieldSortVo> sortList;//排序设置
+    @JSONField(serialize = false)
+    private int limit;//限制返回行数，0代表不限制
 
     public void addField(DataSourceFieldVo fieldVo) {
         if (fieldList == null) {
             fieldList = new ArrayList<>();
         }
         fieldList.add(fieldVo);
+    }
+
+    public DataSourceFieldVo getFieldById(Long id) {
+        if (CollectionUtils.isNotEmpty(fieldList)) {
+            Optional<DataSourceFieldVo> op = fieldList.stream().filter(d -> d.getId().equals(id)).findFirst();
+            if (op.isPresent()) {
+                return op.get();
+            }
+        }
+        return null;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public List<DataSourceFieldSortVo> getSortList() {
+        return sortList;
+    }
+
+    public void setSortList(List<DataSourceFieldSortVo> sortList) {
+        this.sortList = sortList;
     }
 
     public DataSourceDataVo() {

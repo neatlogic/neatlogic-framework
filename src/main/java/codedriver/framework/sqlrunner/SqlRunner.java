@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SqlRunner {
@@ -184,6 +185,8 @@ public class SqlRunner {
             BoundSql boundSql = mappedStatement.getBoundSql(paramMap);
             String sql = boundSql.getSql();
             sqlInfo.setSql(sql);
+            List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+            sqlInfo.setParameterList(parameterMappingList.stream().map(ParameterMapping::getProperty).collect(Collectors.toList()));
             List<ResultMap> resultMaps = mappedStatement.getResultMaps();
             if (CollectionUtils.isNotEmpty(resultMaps)) {
                 ResultMap resultMap = resultMaps.get(0);

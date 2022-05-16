@@ -40,6 +40,10 @@ public class SqlInfo {
      * mapper的命名空间
      */
     private String namespace;
+    /**
+     * sql语句中参数列表
+     */
+    private List<String> parameterList;
 
     public String getId() {
         return id;
@@ -103,5 +107,13 @@ public class SqlInfo {
 
     public void setNamespace(String namespace) {
         this.namespace = namespace;
+    }
+
+    public List<String> getParameterList() {
+        return parameterList;
+    }
+
+    public void setParameterList(List<String> parameterList) {
+        this.parameterList = parameterList;
     }
 }

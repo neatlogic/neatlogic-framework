@@ -204,8 +204,8 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                 SourceColumnVo sourceColumnVo = new SourceColumnVo();
                 sourceColumnVo.setColumn(uuidColumn);
                 List<Map<String, Object>> tbodyArray = new ArrayList<>();
-                for (Object uuidValue : defaultValue) {
-                    List<Object> valueList = new ArrayList<>();
+                for (String uuidValue : defaultValue.toJavaList(String.class)) {
+                    List<String> valueList = new ArrayList<>();
                     valueList.add(uuidValue);
                     sourceColumnVo.setValueList(valueList);
                     sourceColumnList.clear();
@@ -295,7 +295,7 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
             List<String> filterValueList = valueArray.toJavaList(String.class);
             SourceColumnVo sourceColumnVo = sourceColumnMap.get(uuid);
             if (sourceColumnVo != null) {
-                List<?> valueList = sourceColumnVo.getValueList();
+                List<String> valueList = sourceColumnVo.getValueList();
                 String expression = sourceColumnVo.getExpression();
                 if (Objects.equals(expression, Expression.EQUAL.getExpression()) || Objects.equals(expression, Expression.INCLUDE.getExpression())) {
                     valueList.retainAll(filterValueList);

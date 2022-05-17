@@ -28,108 +28,43 @@ import java.util.stream.Collectors;
 
 @Component
 public class SqlRunner {
-    private final String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
+    private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
 
-//    @Resource
-    private DataSource dataSource;
+    private static DataSource dataSource;
 
 //    private String namespace;
 
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
+    public SqlRunner() {
 
-    @Autowired
-    public SqlRunner(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.configuration = new Configuration();
-        configuration.addInterceptor(new SqlCostInterceptor());
-        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
-        System.out.println("dataSource:" + dataSource);
-        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
-        configuration.setEnvironment(environment);
-        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+    }
+    public SqlRunner(String mapperXml) {
+        this(mapperXml, null, null);
     }
 
-//    public SqlRunner(String mapperXml) {
-//        this(mapperXml, null, null);
-//    }
+    public SqlRunner(String mapperXml, String namespace) {
+        this(mapperXml, namespace, null);
+    }
 
-//    public SqlRunner(String mapperXml, String namespace) {
-//        this(mapperXml, namespace, null);
-//    }
+    public SqlRunner(String mapperXml, DataSource dataSource) {
+        this(mapperXml, null, dataSource);
+    }
 
-//    public SqlRunner(String mapperXml, DataSource dataSource) {
-//        this(mapperXml, null, dataSource);
-//    }
-
-//    public SqlRunner(String mapperXml, String namespace, DataSource dataSource) {
-//        this(dataSource);
-////        if (namespace != null) {
-////            this.namespace = namespace;
-////        }
-//        if (dataSource != null) {
-//            this.dataSource = dataSource;
+    public SqlRunner(String mapperXml, String namespace, DataSource dataSource) {
+//        if (namespace != null) {
+//            this.namespace = namespace;
 //        }
-//        addMapperXml(mapperXml, namespace);
-////        Configuration configuration = new Configuration();
-////        configuration.addInterceptor(new SqlCostInterceptor());
-////        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
-////        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
-////        configuration.setEnvironment(environment);
-////        StringBuilder stringBuilder = new StringBuilder();
-////        stringBuilder.append(DOCTYPE);
-////        if (StringUtils.isNotBlank(this.namespace)) {
-////            stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
-////        } else {
-////            stringBuilder.append("<mapper namespace=\"codedriver\">");
-////        }
-////
-////        stringBuilder.append(mapperXml.substring("<mapper>".length()));
-////        ByteArrayInputStream inputStream = null;
-////        Throwable var8 = null;
-////        try {
-////            inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-////            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, this.namespace, configuration.getSqlFragments());
-////            mapperParser.parse();
-////        } catch (Throwable var32) {
-////            var8 = var32;
-////            throw var32;
-////        } finally {
-////            if (inputStream != null) {
-////                if (var8 != null) {
-////                    try {
-////                        inputStream.close();
-////                    } catch (Throwable var30) {
-////                        var8.addSuppressed(var30);
-////                    }
-////                } else {
-////                    try {
-////                        inputStream.close();
-////                    } catch (IOException e) {
-////                        e.printStackTrace();
-////                    }
-////                }
-////            }
-////        }
-////        this.configuration = configuration;
-////        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-//    }
-
-//    public void setDataSource(DataSource _dataSource) {
-//        dataSource = _dataSource;
-//    }
-
-//    public void addMapperXml(String mapperXml) {
-//        addMapperXml(mapperXml, null);
-//    }
-    public void addMapperXml(String mapperXml, String namespace) {
+        if (dataSource != null) {
+            this.dataSource = dataSource;
+        }
+        Configuration configuration = new Configuration();
+        configuration.addInterceptor(new SqlCostInterceptor());
+        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
+        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
+        configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
-//        if (StringUtils.isNotBlank(this.namespace)) {
-//            stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
-//        } else {
-//            stringBuilder.append("<mapper namespace=\"codedriver\">");
-//        }
         if (StringUtils.isNotBlank(namespace)) {
             stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
         } else {
@@ -163,7 +98,64 @@ public class SqlRunner {
                 }
             }
         }
+        this.configuration = configuration;
+        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
     }
+
+    @Resource
+    public void setDataSource(DataSource _dataSource) {
+        dataSource = _dataSource;
+    }
+
+//    @Autowired
+//    public SqlRunner(DataSource dataSource) {
+//        this.dataSource = dataSource;
+//        this.configuration = new Configuration();
+//        configuration.addInterceptor(new SqlCostInterceptor());
+//        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
+//        System.out.println("dataSource:" + dataSource);
+//        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
+//        configuration.setEnvironment(environment);
+//        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
+//    }
+
+//    public void addMapperXml(String mapperXml, String namespace) {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        stringBuilder.append(DOCTYPE);
+//        if (StringUtils.isNotBlank(namespace)) {
+//            stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
+//        } else {
+//            stringBuilder.append("<mapper namespace=\"codedriver\">");
+//        }
+//
+//        stringBuilder.append(mapperXml.substring("<mapper>".length()));
+//        ByteArrayInputStream inputStream = null;
+//        Throwable var8 = null;
+//        try {
+//            inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+//            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, namespace, configuration.getSqlFragments());
+//            mapperParser.parse();
+//        } catch (Throwable var32) {
+//            var8 = var32;
+//            throw var32;
+//        } finally {
+//            if (inputStream != null) {
+//                if (var8 != null) {
+//                    try {
+//                        inputStream.close();
+//                    } catch (Throwable var30) {
+//                        var8.addSuppressed(var30);
+//                    }
+//                } else {
+//                    try {
+//                        inputStream.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+//    }
     /**
      * 执行mapper中所有select语句
      *

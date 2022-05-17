@@ -110,55 +110,6 @@ public class SqlRunner {
         dataSource = _dataSource;
     }
 
-//    @Autowired
-//    public SqlRunner(DataSource dataSource) {
-//        this.dataSource = dataSource;
-//        this.configuration = new Configuration();
-//        configuration.addInterceptor(new SqlCostInterceptor());
-//        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
-//        System.out.println("dataSource:" + dataSource);
-//        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
-//        configuration.setEnvironment(environment);
-//        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-//    }
-
-//    public void addMapperXml(String mapperXml, String namespace) {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        stringBuilder.append(DOCTYPE);
-//        if (StringUtils.isNotBlank(namespace)) {
-//            stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
-//        } else {
-//            stringBuilder.append("<mapper namespace=\"codedriver\">");
-//        }
-//
-//        stringBuilder.append(mapperXml.substring("<mapper>".length()));
-//        ByteArrayInputStream inputStream = null;
-//        Throwable var8 = null;
-//        try {
-//            inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-//            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, namespace, configuration.getSqlFragments());
-//            mapperParser.parse();
-//        } catch (Throwable var32) {
-//            var8 = var32;
-//            throw var32;
-//        } finally {
-//            if (inputStream != null) {
-//                if (var8 != null) {
-//                    try {
-//                        inputStream.close();
-//                    } catch (Throwable var30) {
-//                        var8.addSuppressed(var30);
-//                    }
-//                } else {
-//                    try {
-//                        inputStream.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-//    }
     /**
      * 执行mapper中所有select语句
      *
@@ -200,7 +151,7 @@ public class SqlRunner {
      * @return
      */
     public <E> List<E>  runSqlById(SqlInfo sqlInfo, Map<String, Object> paramMap) {
-        MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getId());
+        MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getNamespace() + "." + sqlInfo.getId());
         if (mappedStatement == null) {
             return new ArrayList<>();
         }

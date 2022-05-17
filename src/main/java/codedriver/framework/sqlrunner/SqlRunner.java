@@ -36,9 +36,11 @@ public class SqlRunner {
 
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
+
     public SqlRunner() {
 
     }
+
     public SqlRunner(String mapperXml) {
         this(mapperXml, null, null);
     }
@@ -58,9 +60,10 @@ public class SqlRunner {
         if (dataSource != null) {
             this.dataSource = dataSource;
         }
+
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());
-        System.out.println("CacheEnabled:" + configuration.isCacheEnabled());
+
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();

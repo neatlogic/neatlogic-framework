@@ -204,9 +204,9 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                 SourceColumnVo sourceColumnVo = new SourceColumnVo();
                 sourceColumnVo.setColumn(uuidColumn);
                 List<Map<String, Object>> tbodyArray = new ArrayList<>();
-                for (String uuidValue : defaultValue.toJavaList(String.class)) {
+                for (Object uuidValue : defaultValue) {
                     List<String> valueList = new ArrayList<>();
-                    valueList.add(uuidValue);
+                    valueList.add(uuidValue.toString());
                     sourceColumnVo.setValueList(valueList);
                     sourceColumnList.clear();
                     sourceColumnList.add(sourceColumnVo);

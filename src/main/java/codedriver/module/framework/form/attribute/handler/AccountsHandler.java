@@ -27,8 +27,8 @@ import java.util.List;
 @Component
 public class AccountsHandler extends FormHandlerBase {
 
-    private final static JSONArray theadList = new JSONArray();
-    static {
+    private final JSONArray theadList = new JSONArray();
+    {
         JSONObject name = new JSONObject();
         name.put("title", "资产名");
         name.put("key", "name");

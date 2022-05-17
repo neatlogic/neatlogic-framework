@@ -154,6 +154,10 @@ public interface UserMapper {
 
     int getUserTeamCountByUserUuid(String userUuid);
 
+    List<String> getActiveUserEmailListByUserUuidList(List<String> userUuidList);
+
+    List<String> getActiveUserEmailListByTeamUuid(String teamUuid);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);

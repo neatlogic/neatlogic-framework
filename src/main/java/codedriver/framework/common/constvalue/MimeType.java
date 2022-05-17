@@ -9,6 +9,7 @@ public enum MimeType {
     DOC("application/msword", ".doc"),
     PDF("application/pdf", ".pdf"),
     XLS("application/vnd.ms-excel", ".xls"),
+    XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"),
     PPT("application/vnd.ms-powerpoint", ".ppt");
     private String value;
     private String suffix;

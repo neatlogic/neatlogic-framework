@@ -32,7 +32,7 @@ public class SqlRunner {
 
     private static DataSource dataSource;
 
-    private String namespace;
+    private String namespace = "codedriver";
 
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
@@ -54,7 +54,7 @@ public class SqlRunner {
     }
 
     public SqlRunner(String mapperXml, String namespace, DataSource dataSource) {
-        if (namespace != null) {
+        if (StringUtils.isNotBlank(namespace)) {
             this.namespace = namespace;
         }
         if (dataSource != null) {
@@ -68,18 +68,14 @@ public class SqlRunner {
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
-        if (StringUtils.isNotBlank(namespace)) {
-            stringBuilder.append("<mapper namespace=\"" + namespace + "\">");
-        } else {
-            stringBuilder.append("<mapper namespace=\"codedriver\">");
-        }
+        stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
 
         stringBuilder.append(mapperXml.substring("<mapper>".length()));
         ByteArrayInputStream inputStream = null;
         Throwable var8 = null;
         try {
             inputStream = new ByteArrayInputStream(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, namespace, configuration.getSqlFragments());
+            XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, this.namespace, configuration.getSqlFragments());
             mapperParser.parse();
         } catch (Throwable var32) {
             var8 = var32;
@@ -166,6 +162,16 @@ public class SqlRunner {
      * @param paramMap
      * @return
      */
+    public Map<String, List> runAllSql(Map<String, Object> paramMap) {
+        return runAllSql(namespace, paramMap);
+    }
+
+    /**
+     * 执行mapper中所有select语句
+     *
+     * @param paramMap
+     * @return
+     */
     public Map<String, List> runAllSql(String namespace, Map<String, Object> paramMap) {
         Map<String, List> resultMap = new HashMap<>();
         List<String> selectIdList = new ArrayList<>();
@@ -191,16 +197,6 @@ public class SqlRunner {
             sqlSession.close();
         }
         return resultMap;
-    }
-
-    /**
-     * 执行mapper中所有select语句
-     *
-     * @param paramMap
-     * @return
-     */
-    public Map<String, List> runAllSql(Map<String, Object> paramMap) {
-        return runAllSql(namespace, paramMap);
     }
 
     /**

@@ -31,7 +31,7 @@ public class SqlRunner {
 
     private static DataSource dataSource;
 
-    private String namespace;
+    private String namespace = "codedriver";
 
     private Configuration configuration;
     private SqlSessionFactory sqlSessionFactory;
@@ -53,7 +53,7 @@ public class SqlRunner {
     }
 
     public SqlRunner(String mapperXml, String namespace, DataSource dataSource) {
-        if (namespace != null) {
+        if (StringUtils.isNotBlank(namespace)) {
             this.namespace = namespace;
         }
         if (dataSource != null) {
@@ -66,11 +66,7 @@ public class SqlRunner {
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
-        if (StringUtils.isNotBlank(this.namespace)) {
-            stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
-        } else {
-            stringBuilder.append("<mapper namespace=\"codedriver\">");
-        }
+        stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
 
         stringBuilder.append(mapperXml.substring("<mapper>".length()));
         ByteArrayInputStream inputStream = null;
@@ -107,10 +103,6 @@ public class SqlRunner {
     public void setDataSource(DataSource _dataSource) {
         dataSource = _dataSource;
     }
-//    private SqlUtil(Configuration configuration) {
-//        this.configuration = configuration;
-//        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
-//    }
 
     /**
      * 执行mapper中所有select语句
@@ -119,10 +111,23 @@ public class SqlRunner {
      * @return
      */
     public Map<String, List> runAllSql(Map<String, Object> paramMap) {
+        return runAllSql(namespace, paramMap);
+    }
+
+    /**
+     * 执行mapper中所有select语句
+     *
+     * @param paramMap
+     * @return
+     */
+    public Map<String, List> runAllSql(String namespace, Map<String, Object> paramMap) {
         Map<String, List> resultMap = new HashMap<>();
         List<String> selectIdList = new ArrayList<>();
         Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
         for (MappedStatement mappedStatement : mappedStatementList) {
+            if (!Objects.equals(mappedStatement.getResource(), namespace)) {
+                continue;
+            }
             if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
                 String selectId = mappedStatement.getId();
                 if (!selectIdList.contains(selectId)) {
@@ -134,7 +139,7 @@ public class SqlRunner {
         try {
             for (String selectId : selectIdList) {
                 List reportTypeList = sqlSession.selectList(selectId, paramMap);
-                resultMap.put(selectId, reportTypeList);
+                resultMap.put(selectId.substring(namespace.length() + 1), reportTypeList);
             }
         } finally {
             sqlSession.close();
@@ -145,13 +150,12 @@ public class SqlRunner {
     /**
      * 执行mapper中特定某个select语句
      *
-     * @param id
+     * @param sqlInfo
      * @param paramMap
      * @return
      */
-    public List runSqlById(String id, Map<String, Object> paramMap) {
-        List<String> selectIdList = new ArrayList<>();
-        MappedStatement mappedStatement = configuration.getMappedStatement(id);
+    public <E> List<E>  runSqlById(SqlInfo sqlInfo, Map<String, Object> paramMap) {
+        MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getNamespace() + "." + sqlInfo.getId());
         if (mappedStatement == null) {
             return new ArrayList<>();
         }
@@ -160,7 +164,7 @@ public class SqlRunner {
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
-            return sqlSession.selectList(id, paramMap);
+            return sqlSession.selectList(sqlInfo.getNamespace() + "." + sqlInfo.getId(), paramMap);
         } finally {
             sqlSession.close();
         }
@@ -177,7 +181,7 @@ public class SqlRunner {
         Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
         for (MappedStatement mappedStatement : mappedStatementList) {
             SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
-            if (sqlCommandType == SqlCommandType.SELECT) {
+            if (sqlCommandType != SqlCommandType.SELECT) {
                 continue;
             }
             String id = mappedStatement.getId();
@@ -185,11 +189,15 @@ public class SqlRunner {
                 continue;
             }
             idList.add(id);
+            String namespace = mappedStatement.getResource();
             SqlInfo sqlInfo = new SqlInfo();
-            sqlInfo.setId(id);
+            sqlInfo.setId(id.substring(namespace.length() + 1));
+            sqlInfo.setNamespace(namespace);
             BoundSql boundSql = mappedStatement.getBoundSql(paramMap);
             String sql = boundSql.getSql();
             sqlInfo.setSql(sql);
+            List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+            sqlInfo.setParameterList(parameterMappingList.stream().map(ParameterMapping::getProperty).collect(Collectors.toList()));
             List<ResultMap> resultMaps = mappedStatement.getResultMaps();
             if (CollectionUtils.isNotEmpty(resultMaps)) {
                 ResultMap resultMap = resultMaps.get(0);

@@ -5,21 +5,18 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
-import codedriver.framework.form.attribute.core.IFormAttributeHandler;
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
+import codedriver.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
 
 import java.util.*;
 
@@ -119,6 +116,7 @@ public class StaticListHandler extends FormHandlerBase {
     public String getHandlerType(FormConditionModel model) {
         return null;
     }
+
     //表单组件配置信息
 //{
 //	"handler": "formstaticlist",
@@ -1152,8 +1150,9 @@ public class StaticListHandler extends FormHandlerBase {
 
     /**
      * 将原始数据转换成表格数据（包含theadList、tbodyList）
-     * @param dataObj 原始数据
-     * @param configObj 配置信息
+     *
+     * @param dataObj        原始数据
+     * @param configObj      配置信息
      * @param selectUuidList 选中的行列表
      * @return
      */
@@ -1449,6 +1448,32 @@ public class StaticListHandler extends FormHandlerBase {
         }
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return getMyDetailedData(attributeDataVo, configObj);
+    }
+
+    @Override
+    public int getExcelHeadLength(JSONObject configObj) {
+        JSONArray attributeList = configObj.getJSONArray("attributeList");
+        if (CollectionUtils.isNotEmpty(attributeList)) {
+            return attributeList.size();
+        }
+        return 1;
+    }
+
+    @Override
+    public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+        if (MapUtils.isNotEmpty(detailedData)) {
+            JSONArray tbodyList = detailedData.getJSONArray("tbodyList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                return tbodyList.size() + 1;
+            }
+        }
+        return 1;
     }
 
     private void parseExtendAttribute(JSONObject attrConfig, Set<String> matrixUuidSet, Map<String, Set<String>> matrixUuidAttributeUuidSetMap) {

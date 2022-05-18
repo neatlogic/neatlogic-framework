@@ -57,7 +57,7 @@ public class UserSelectHandler extends FormHandlerBase {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
             if (isMultiple) {
                 List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
                 if (CollectionUtils.isNotEmpty(valueList)) {
@@ -318,7 +318,7 @@ public class UserSelectHandler extends FormHandlerBase {
             List<String> textList = new ArrayList<>();
             List<ValueTextVo> valueTextList = new ArrayList<>();
             boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple? 1 : 0);
+            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
             if (isMultiple) {
                 valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
                 if (CollectionUtils.isNotEmpty(valueList)) {
@@ -341,6 +341,18 @@ public class UserSelectHandler extends FormHandlerBase {
             resultObj.put("value", valueList);
             resultObj.put("valueTextList", valueTextList);
             return resultObj;
+        }
+        return null;
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+        if (detailedData != null) {
+            JSONArray text = detailedData.getJSONArray("text");
+            if (CollectionUtils.isNotEmpty(text)) {
+                return String.join(",", text.toJavaList(String.class));
+            }
         }
         return null;
     }

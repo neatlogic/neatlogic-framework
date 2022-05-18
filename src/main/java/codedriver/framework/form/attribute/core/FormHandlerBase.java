@@ -53,9 +53,10 @@ public abstract class FormHandlerBase implements IFormAttributeHandler {
     protected MatrixMapper matrixMapper;
 
     @Resource
-    public void setMatrixMapper(MatrixMapper _matrixMapper){
+    public void setMatrixMapper(MatrixMapper _matrixMapper) {
         this.matrixMapper = _matrixMapper;
     }
+
     @Override
     public final String getType() {
         return "form";

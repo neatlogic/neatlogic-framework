@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<String> getRoleTeamUuidSet(String roleUuid) {
+    public Set<String> getTeamUuidSetByRoleUuid(String roleUuid) {
         Set<String> teamUuidSet = null;
         List<RoleTeamVo> roleTeamList = roleMapper.getRoleTeamListByRoleUuid(roleUuid);
         if (roleTeamList.size() > 0) {

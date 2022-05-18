@@ -45,6 +45,6 @@ public interface UserService {
      * @param roleUuid 角色uuid
      * @return
      */
-    Set<String> getRoleTeamUuidSet(String roleUuid);
+    Set<String> getTeamUuidSetByRoleUuid(String roleUuid);
 
 }

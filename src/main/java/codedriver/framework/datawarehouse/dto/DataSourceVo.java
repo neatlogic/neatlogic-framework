@@ -58,6 +58,8 @@ public class DataSourceVo extends BasePageVo {
     private Long connectionId;
     @JSONField(serialize = false)//数据列表
     private List<DataSourceDataVo> dataList;
+    @EntityField(name = "参数列表", type = ApiParamType.JSONARRAY)
+    private List<DataSourceParamVo> paramList;
 
     public DataSourceVo() {
 
@@ -79,6 +81,20 @@ public class DataSourceVo extends BasePageVo {
             this.fieldList = new ArrayList<>();
         }
         this.fieldList.add(field);
+    }
+
+    public void addParam(List<DataSourceParamVo> paramList) {
+        if (this.paramList == null) {
+            this.paramList = new ArrayList<>();
+        }
+        this.paramList.addAll(paramList);
+    }
+
+    public void addParam(DataSourceParamVo param) {
+        if (this.paramList == null) {
+            this.paramList = new ArrayList<>();
+        }
+        this.paramList.add(param);
     }
 
     public Long getId() {
@@ -259,11 +275,11 @@ public class DataSourceVo extends BasePageVo {
         this.fieldList = fieldList;
     }
 
-    // public List<DataSourceConditionVo> getConditionList() {
-    //return conditionList;
-//}
+    public List<DataSourceParamVo> getParamList() {
+        return paramList;
+    }
 
-//public void setConditionList(List<DataSourceConditionVo> conditionList) {
-//   this.conditionList = conditionList;
-//}
+    public void setParamList(List<DataSourceParamVo> paramList) {
+        this.paramList = paramList;
+    }
 }

@@ -5,7 +5,7 @@
 
 package codedriver.framework.datawarehouse.dao.mapper;
 
-import codedriver.framework.datawarehouse.dto.DataSourceConditionVo;
+import codedriver.framework.datawarehouse.dto.DataSourceParamVo;
 import codedriver.framework.datawarehouse.dto.DataSourceFieldVo;
 import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import org.apache.ibatis.annotations.Param;
@@ -15,23 +15,29 @@ import java.util.List;
 public interface DataWarehouseDataSourceMapper {
     List<DataSourceVo> getAllHasCronReportDataSource();
 
-    int checkDataSourceNameIsExists(DataSourceVo reportDataSourceVo);
+    int checkDataSourceNameIsExists(DataSourceVo dataSourceVo);
 
     List<DataSourceVo> getDataSourceByIdList(@Param("idList") List<Long> dataSourceIdList);
 
     DataSourceVo getDataSourceById(Long id);
 
-    List<DataSourceVo> searchDataSource(DataSourceVo reportDataSourceVo);
+    List<DataSourceVo> searchDataSource(DataSourceVo dataSourceVo);
 
     int searchDataSourceCount(DataSourceVo reportDataSourceVo);
 
     void insertDataSource(DataSourceVo reportDataSourceVo);
 
-    void insertDataSourceField(DataSourceFieldVo reportDataSourceFieldVo);
+    void insertDataSourceParam(DataSourceParamVo dataSourceParamVo);
+
+    void insertDataSourceField(DataSourceFieldVo dataSourceFieldVo);
 
     // void insertReportDataSourceCondition(DataSourceConditionVo reportDataSourceConditionVo);
 
     void updateDataSourceField(DataSourceFieldVo dataSourceFieldVo);
+
+    void updateDataSourceParam(DataSourceParamVo dataSourceParamVo);
+
+    void updateDataSourceParamCurrentValue(DataSourceParamVo dataSourceParamVo);
 
     void updateDataSourceFieldCondition(DataSourceFieldVo dataSourceFieldVo);
 
@@ -39,13 +45,13 @@ public interface DataWarehouseDataSourceMapper {
 
     void updateDataSourcePolicy(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceIsActive(DataSourceVo reportDataSourceVo);
+    void updateReportDataSourceIsActive(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceDataCount(DataSourceVo reportDataSourceVo);
+    void updateReportDataSourceDataCount(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceStatus(DataSourceVo reportDataSourceVo);
+    void updateReportDataSourceStatus(DataSourceVo dataSourceVo);
 
-    void updateReportDataSourceConditionValue(DataSourceConditionVo reportDataSourceConditionVo);
+    void updateReportDataSourceConditionValue(DataSourceParamVo dataSourceConditionVo);
 
     void resetReportDataSourceStatus();
 
@@ -56,4 +62,6 @@ public interface DataWarehouseDataSourceMapper {
     void deleteDataSourceFieldByDataSourceId(Long dataSourceId);
 
     void deleteDataSourceFieldById(Long id);
+
+    void deleteDataSourceParamById(Long id);
 }

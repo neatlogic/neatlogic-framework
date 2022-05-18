@@ -82,14 +82,13 @@ public class DataSourceServiceImpl implements DataSourceService {
         Element root = document.getRootElement();
         List<Element> selectElementList = root.elements("select");
         String regex_param = "#\\{([^}]+?)}";
-        String regex_dollar_param = "\\$\\{([^}]+?)}";
         String[] replace_regex = new String[]{"<[/]?if[^>]*?>", "<[/]?select[^>]*?>", "<[/]?forEach[^>]*?>", "<[/]?ifNotNull[^>]*?>", "<[/]?ifNull[^>]*?>", "<[/]?forEach[^>]*?>", "\\<\\!\\[CDATA\\[", "\\]\\]\\>"};
         JSONObject paramMap = new JSONObject();
-        /*if (CollectionUtils.isNotEmpty(reportDataSourceVo.getConditionList())) {
-            for (DataSourceConditionVo conditionVo : reportDataSourceVo.getConditionList()) {
-                paramMap.put(conditionVo.getName(), conditionVo.getValue());
+        if (CollectionUtils.isNotEmpty(reportDataSourceVo.getParamList())) {
+            for (DataSourceParamVo paramVo : reportDataSourceVo.getParamList()) {
+                paramMap.put(paramVo.getName(), paramVo.getCurrentValue() == null ? paramVo.getDefaultValue() : paramVo.getCurrentValue());
             }
-        }*/
+        }
         List<SelectVo> selectList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(selectElementList)) {
             for (Element selectElement : selectElementList) {
@@ -119,7 +118,7 @@ public class DataSourceServiceImpl implements DataSourceService {
                             String separator = foreachEl.attributeValue("separator");
                             String orgText = foreachEl.getText();
                             StringBuilder newText = new StringBuilder();
-                            if (p instanceof String) {
+                            if (p instanceof String || p instanceof Number) {
                                 newText = new StringBuilder(orgText);
                             } else if (p instanceof String[]) {
                                 for (int pi = 0; pi < ((String[]) p).length; pi++) {
@@ -177,7 +176,7 @@ public class DataSourceServiceImpl implements DataSourceService {
                         key = key.substring(0, key.lastIndexOf("#"));
                     }
                     Object pp = paramMap.get(key);
-                    if (pp instanceof String) {
+                    if (pp instanceof String || pp instanceof Number) {
                         matcher.appendReplacement(temp, "?");
                         paramList.add(pp);
                     } else if (pp instanceof String[]) {
@@ -191,6 +190,18 @@ public class DataSourceServiceImpl implements DataSourceService {
                         } else {
                             matcher.appendReplacement(temp, "?");
                             paramList.add(((String[]) pp)[0]);
+                        }
+                    } else if (pp instanceof Number[]) {
+                        if (matcher.group(1).contains("#")) {
+                            int s = Integer.parseInt(matcher.group(1).substring(matcher.group(1).lastIndexOf("#") + 1));
+                            Number[] ps = (Number[]) pp;
+                            if (ps[s] != null) {
+                                paramList.add(ps[s]);
+                                matcher.appendReplacement(temp, "?");
+                            }
+                        } else {
+                            matcher.appendReplacement(temp, "?");
+                            paramList.add(((Number[]) pp)[0]);
                         }
                     } else if (pp instanceof List<?>) {
                         if (matcher.group(1).contains("#")) {
@@ -208,38 +219,6 @@ public class DataSourceServiceImpl implements DataSourceService {
                 }
                 matcher.appendTail(temp);
 
-                pattern = Pattern.compile(regex_dollar_param, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-                result = temp.toString();
-                temp = new StringBuffer();
-                matcher = pattern.matcher(result);
-                while (matcher.find()) {
-                    String key = matcher.group(1);
-                    Object pp = paramMap.get(key);
-                    if (pp instanceof String) {
-                        matcher.appendReplacement(temp, (String) pp);
-                    } else if (pp instanceof String[]) {
-                        if (matcher.group(1).contains("$")) {
-                            int s = Integer.parseInt(matcher.group(1).substring(matcher.group(1).lastIndexOf("$") + 1));
-                            String[] ps = (String[]) pp;
-                            if (ps[s] != null) {
-                                matcher.appendReplacement(temp, ps[s]);
-                            }
-                        } else {
-                            matcher.appendReplacement(temp, ((String[]) pp)[0]);
-                        }
-                    } else if (pp instanceof List<?>) {
-                        if (matcher.group(1).contains("$")) {
-                            int s = Integer.parseInt(matcher.group(1).substring(matcher.group(1).lastIndexOf("$") + 1));
-                            List<String> ps = (List<String>) pp;
-                            if (ps.get(s) != null) {
-                                matcher.appendReplacement(temp, ps.get(s));
-                            }
-                        } else {
-                            matcher.appendReplacement(temp, ((List<String>) pp).get(0));
-                        }
-                    }
-                }
-                matcher.appendTail(temp);
                 selectVo.setParamList(paramList);
                 selectVo.setSql(temp.toString());
                 selectVo.setSql(selectVo.getSql().replace("&gt;", ">").replace("&lt;", "<"));
@@ -325,11 +304,14 @@ public class DataSourceServiceImpl implements DataSourceService {
 
                         if (CollectionUtils.isNotEmpty(select.getParamList())) {
                             for (int p = 0; p < select.getParamList().size(); p++) {
-                                if (select.getParamList().get(p) instanceof String) {
+                                if (select.getParamList().get(p) instanceof String || select.getParamList().get(p) instanceof Number) {
                                     queryStatement.setObject(p + 1, select.getParamList().get(p));
-                                } else {
+                                } else if (select.getParamList().get(p) instanceof String[]) {
                                     // 数组参数有待处理
                                     queryStatement.setObject(p + 1, ((String[]) select.getParamList().get(p))[0]);
+                                } else if (select.getParamList().get(p) instanceof Number[]) {
+                                    // 数组参数有待处理
+                                    queryStatement.setObject(p + 1, ((Number[]) select.getParamList().get(p))[0]);
                                 }
                             }
                         }
@@ -353,6 +335,26 @@ public class DataSourceServiceImpl implements DataSourceService {
                             reportDataSourceDataVo.setExpireMinute(dataSourceVo.getExpireMinute());
                             List<DataSourceFieldVo> aggregateFieldList = new ArrayList<>();
                             List<DataSourceFieldVo> keyFieldList = new ArrayList<>();
+                            if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
+                                for (DataSourceParamVo paramVo : dataSourceVo.getParamList()) {
+                                    if (fieldMap.containsKey(paramVo.getName().toLowerCase())) {
+                                        Object v = resultSet.getObject(fieldMap.get(paramVo.getName().toLowerCase()));
+                                        Long lv = null;
+                                        try {
+                                            lv = (Long) v;
+                                        } catch (Exception ex) {
+                                            logger.error(ex.getMessage(), ex);
+                                        }
+                                        if (lv != null) {
+                                            if (paramVo.getCurrentValue() == null) {
+                                                paramVo.setCurrentValue(lv);
+                                            } else if (lv > paramVo.getCurrentValue()) {
+                                                paramVo.setCurrentValue(lv);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
                                 if (fieldMap.containsKey(fieldVo.getName().toLowerCase())) {
                                     Object v = resultSet.getObject(fieldMap.get(fieldVo.getName().toLowerCase()));
@@ -398,6 +400,11 @@ public class DataSourceServiceImpl implements DataSourceService {
                             }
                             dataSourceDataMapper.insertDataSourceData(reportDataSourceDataVo);
                             reportDataSourceAuditVo.addCount();
+                        }
+                        if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
+                            for (DataSourceParamVo param : dataSourceVo.getParamList()) {
+                                dataSourceMapper.updateDataSourceParamCurrentValue(param);
+                            }
                         }
                     }
                 } catch (SQLException | DocumentException | InstantiationException | IllegalAccessException |

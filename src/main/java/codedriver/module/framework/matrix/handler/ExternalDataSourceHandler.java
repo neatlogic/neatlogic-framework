@@ -404,6 +404,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     resultList.addAll(list);
                     pageSize -= list.size();
                     currentPage++;
+                    if (currentPage >= 10) {
+                        break;
+                    }
                 }
             }
         }

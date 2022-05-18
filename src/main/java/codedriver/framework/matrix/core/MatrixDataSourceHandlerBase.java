@@ -309,4 +309,44 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         }
         return true;
     }
+
+    /**
+     * 删除重复数据
+     * @param columnList
+     * @param resultList
+     * @return
+     */
+    protected void deduplicateData(List<String> columnList, List<Map<String, JSONObject>> resultList) {
+        List<String> exsited = new ArrayList<>();
+        deduplicateData(columnList, exsited, resultList);
+    }
+
+    /**
+     * 删除重复数据
+     * @param columnList
+     * @param exsited
+     * @param resultList
+     * @return
+     */
+    protected void deduplicateData(List<String> columnList, List<String> exsited, List<Map<String, JSONObject>> resultList) {
+        String firstColumn = columnList.get(0);
+        String secondColumn = columnList.get(0);
+        if (columnList.size() >= 2) {
+            secondColumn = columnList.get(1);
+        }
+        Iterator<Map<String, JSONObject>> iterator = resultList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, JSONObject> resultObj = iterator.next();
+            JSONObject firstObj = resultObj.get(firstColumn);
+            JSONObject secondObj = resultObj.get(secondColumn);
+            String firstValue = firstObj.getString("value");
+            String secondText = secondObj.getString("text");
+            String compose = firstValue + SELECT_COMPOSE_JOINER + secondText;
+            if (exsited.contains(compose)) {
+                iterator.remove();
+            } else {
+                exsited.add(compose);
+            }
+        }
+    }
 }

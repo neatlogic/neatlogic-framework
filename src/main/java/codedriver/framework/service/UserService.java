@@ -39,4 +39,12 @@ public interface UserService {
      */
     Set<String> getUserUuidSetByRoleUuid(String roleUuid);
 
+    /**
+     * 根据角色uuid获取其关联的所有分组uuid，如果关联的组需要穿透，则找出其所有子分组uuid
+     *
+     * @param roleUuid 角色uuid
+     * @return
+     */
+    Set<String> getRoleTeamUuidSet(String roleUuid);
+
 }

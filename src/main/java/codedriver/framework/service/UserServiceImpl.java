@@ -145,4 +145,28 @@ public class UserServiceImpl implements UserService {
         }
         return userUuidSet;
     }
+
+    @Override
+    public Set<String> getRoleTeamUuidSet(String roleUuid) {
+        Set<String> teamUuidSet = null;
+        List<RoleTeamVo> roleTeamList = roleMapper.getRoleTeamListByRoleUuid(roleUuid);
+        if (roleTeamList.size() > 0) {
+            teamUuidSet = new HashSet<>();
+            List<String> allTeamUuidList = roleTeamList.stream().map(RoleTeamVo::getTeamUuid).collect(Collectors.toList());
+            List<String> list = roleTeamList.stream().filter(o -> Objects.equals(o.getCheckedChildren(), 0)).map(RoleTeamVo::getTeamUuid).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(list)) {
+                teamUuidSet.addAll(list);  // 没有穿透的team直接add到teamUuidSet
+                allTeamUuidList.removeAll(list);
+                // 剩下有穿透的team，挨个找出其子节点并add到teamUuidSet
+                if (allTeamUuidList.size() > 0) {
+                    teamUuidSet.addAll(allTeamUuidList);
+                    List<TeamVo> teamList = teamMapper.getTeamByUuidList(allTeamUuidList);
+                    for (TeamVo team : teamList) {
+                        teamUuidSet.addAll(teamMapper.getChildrenUuidListByLeftRightCode(team.getLft(), team.getRht()));
+                    }
+                }
+            }
+        }
+        return teamUuidSet;
+    }
 }

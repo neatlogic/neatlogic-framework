@@ -149,6 +149,7 @@ public class DynamicListHandler extends FormHandlerBase {
 //        }
         return tableObj;
     }
+
     private JSONObject matrixDataSourceNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         List<String> columnList = new ArrayList<>();
@@ -219,6 +220,7 @@ public class DynamicListHandler extends FormHandlerBase {
         }
         return tableObj;
     }
+
     private JSONObject matrixDataSourceNoNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         tableObj.put("selectUuidList", selectUuidList);
@@ -255,6 +257,7 @@ public class DynamicListHandler extends FormHandlerBase {
         }
         return tableObj;
     }
+
     private JSONObject integrationDataSourceNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         List<String> columnList = new ArrayList<>();
@@ -358,6 +361,7 @@ public class DynamicListHandler extends FormHandlerBase {
         }
         return tableObj;
     }
+
     private JSONObject integrationDataSourceNoNeedPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
         tableObj.put("selectUuidList", selectUuidList);
@@ -440,6 +444,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     /**
      * 处理二次编辑数据
+     *
      * @param tbodyList
      * @param uuidColumn
      * @param secondEditColumnMap
@@ -513,6 +518,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     /**
      * 处理二次编辑数据
+     *
      * @param tbodyList
      * @param uuidColumn
      * @param secondEditColumnMap
@@ -747,7 +753,7 @@ public class DynamicListHandler extends FormHandlerBase {
                         cellObj.put("value", valueList);
                         JSONArray textList = new JSONArray();
                         if (CollectionUtils.isNotEmpty(valueList)) {
-                            for (String value : valueList.toJavaList(String.class) ) {
+                            for (String value : valueList.toJavaList(String.class)) {
                                 String text = "";
                                 if (StringUtils.isNotBlank(value)) {
                                     JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
@@ -805,7 +811,7 @@ public class DynamicListHandler extends FormHandlerBase {
                         cellObj.put("value", valueList);
                         JSONArray textList = new JSONArray();
                         if (CollectionUtils.isNotEmpty(valueList)) {
-                            for (String value : valueList.toJavaList(String.class) ) {
+                            for (String value : valueList.toJavaList(String.class)) {
                                 String text = "";
                                 if (StringUtils.isNotBlank(value)) {
                                     JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
@@ -847,6 +853,7 @@ public class DynamicListHandler extends FormHandlerBase {
 //            tbodyObj.putAll(extData);
         }
     }
+
     @Override
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
@@ -916,6 +923,7 @@ public class DynamicListHandler extends FormHandlerBase {
     public String getHandlerType(FormConditionModel model) {
         return null;
     }
+
     //表单组件配置信息
 //{
 //	"handler": "formdynamiclist",
@@ -1192,7 +1200,7 @@ public class DynamicListHandler extends FormHandlerBase {
         String mode = configObj.getString("mode");
         Boolean needPage = configObj.getBoolean("needPage");
         if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
-            tableObj.putAll(noNeedPage(dataObj));
+            tableObj.putAll(noNeedPage(dataObj, true));
         } else {//分页
             tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
         }
@@ -1201,9 +1209,10 @@ public class DynamicListHandler extends FormHandlerBase {
 
     /**
      * 表格选择组件设置分页显示的情况，从原始数据的theadList中获取theadList数据，从原始数据的detailData中获取tbodyList数据
-     * @param dataObj 原始数据
+     *
+     * @param dataObj        原始数据
      * @param selectUuidList 选择行集合
-     * @param configObj 表单组件的配置信息
+     * @param configObj      表单组件的配置信息
      * @return
      */
     private JSONObject needPage(JSONObject dataObj, JSONArray selectUuidList, JSONObject configObj) {
@@ -1258,7 +1267,7 @@ public class DynamicListHandler extends FormHandlerBase {
             String selectUuid = selectUuidList.getString(i);
             JSONObject rowData = detailData.getJSONObject(selectUuid);
             if (MapUtils.isEmpty(rowData)) {
-               continue;
+                continue;
             }
             JSONObject tbodyObj = new JSONObject();
             for (String column : columnList) {
@@ -1278,10 +1287,12 @@ public class DynamicListHandler extends FormHandlerBase {
 
     /**
      * 表格选择组件设置不分页显示的情况，从表单组件的配置信息中获取theadList数据，从原始数据的tbodyList中获取tbodyList数据
-     * @param dataObj 原始数据
+     *
+     * @param dataObj             原始数据
+     * @param retainNoSelectedRow 是否保留未选中的数据
      * @return
      */
-    private JSONObject noNeedPage(JSONObject dataObj) {
+    private JSONObject noNeedPage(JSONObject dataObj, boolean retainNoSelectedRow) {
         JSONObject tableObj = new JSONObject();
         JSONObject table = dataObj.getJSONObject("table");
         if (MapUtils.isNotEmpty(table)) {
@@ -1323,6 +1334,9 @@ public class DynamicListHandler extends FormHandlerBase {
                         }
                         tbodyObj.put(key, valueObj);
                     }
+                }
+                if (Objects.equals(tbodyObj.getBoolean("_isSelected"), false) && !retainNoSelectedRow) {
+                    continue;
                 }
                 tbodyList.add(tbodyObj);
             }
@@ -1418,5 +1432,68 @@ public class DynamicListHandler extends FormHandlerBase {
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
         formAttributeVo.setIntegrationUuidSet(integrationUuidSet);
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
+        if (MapUtils.isEmpty(dataObj)) {
+            return tableObj;
+        }
+        JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+        if (CollectionUtils.isEmpty(selectUuidList)) {
+            return tableObj;
+        }
+        tableObj.put("selectUuidList", selectUuidList);
+        String mode = configObj.getString("mode");
+        Boolean needPage = configObj.getBoolean("needPage");
+        if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+            tableObj.putAll(noNeedPage(dataObj, false)); // 不保留未选中的数据
+        } else {//分页
+            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
+        }
+        return tableObj;
+    }
+
+    @Override
+    public int getExcelHeadLength(JSONObject configObj) {
+        int count = 0;
+        JSONArray columnHeadList = configObj.getJSONArray("dataConfig");
+        JSONArray attributeList = configObj.getJSONArray("attributeList"); // 扩展属性
+        if (CollectionUtils.isNotEmpty(columnHeadList)) {
+            for (int i = 0; i < columnHeadList.size(); i++) {
+                JSONObject columnHeadObj = columnHeadList.getJSONObject(i);
+                Boolean isPC = columnHeadObj.getBoolean("isPC");
+                if (Objects.equals(isPC, false)) {
+                    continue;
+                }
+                String uuid = columnHeadObj.getString("uuid");
+                if (StringUtils.isBlank(uuid)) {
+                    continue;
+                }
+                count++;
+            }
+        }
+        if (CollectionUtils.isNotEmpty(attributeList)) {
+            count += attributeList.size();
+        }
+        if (count == 0) {
+            count++;
+        }
+        return count;
+    }
+
+    @Override
+    public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+            if (CollectionUtils.isNotEmpty(selectUuidList)) {
+                return selectUuidList.size() + 1;
+            }
+        }
+        return 1;
     }
 }

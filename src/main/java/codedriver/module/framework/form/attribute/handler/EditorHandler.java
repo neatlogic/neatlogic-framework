@@ -153,4 +153,8 @@ public class EditorHandler extends FormHandlerBase {
         return resultObj;
     }
 
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return attributeDataVo.getDataObj();
+    }
 }

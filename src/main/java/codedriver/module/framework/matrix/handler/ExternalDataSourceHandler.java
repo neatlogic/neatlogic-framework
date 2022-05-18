@@ -365,7 +365,9 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         resultList.addAll(getExternalDataTbodyList(resultVo, columnList));
                     }
                 }
+                deduplicateData(columnList, resultList);
             } else {
+                List<String> exsited = new ArrayList<>();
                 if (!mergeFilterListAndSourceColumnList(dataVo)) {
                     return resultList;
                 }
@@ -383,37 +385,25 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     matrixColumnVo.setValueList(valueList);
                     sourceColumnList.add(matrixColumnVo);
                 }
-                paramObj.put("currentPage", dataVo.getCurrentPage());
+                int currentPage = 1;
                 int pageSize = dataVo.getPageSize();
-                paramObj.put("pageSize", pageSize);
-                paramObj.put("needPage", pageSize < 100);
-                paramObj.put("sourceColumnList", sourceColumnList);
-                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-                if (StringUtils.isNotBlank(resultVo.getError())) {
-                    logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException();
-                }
-                resultList = getExternalDataTbodyList(resultVo, columnList);
-            }
-            //去重
-            String firstColumn = columnList.get(0);
-            String secondColumn = columnList.get(0);
-            if (columnList.size() >= 2) {
-                secondColumn = columnList.get(1);
-            }
-            List<String> exsited = new ArrayList<>();
-            Iterator<Map<String, JSONObject>> iterator = resultList.iterator();
-            while (iterator.hasNext()) {
-                Map<String, JSONObject> resultObj = iterator.next();
-                JSONObject firstObj = resultObj.get(firstColumn);
-                JSONObject secondObj = resultObj.get(secondColumn);
-                String firstValue = firstObj.getString("value");
-                String secondText = secondObj.getString("text");
-                String compose = firstValue + SELECT_COMPOSE_JOINER + secondText;
-                if (exsited.contains(compose)) {
-                    iterator.remove();
-                } else {
-                    exsited.add(compose);
+                while (resultList.size() < pageSize) {
+                    paramObj.put("currentPage", currentPage);
+                    paramObj.put("pageSize", pageSize);
+                    paramObj.put("sourceColumnList", sourceColumnList);
+                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+                    if (StringUtils.isNotBlank(resultVo.getError())) {
+                        logger.error(resultVo.getError());
+                        throw new MatrixExternalAccessException();
+                    }
+                    List<Map<String, JSONObject>> list = getExternalDataTbodyList(resultVo, columnList);
+                    if (CollectionUtils.isEmpty(list)) {
+                        break;
+                    }
+                    deduplicateData(columnList, exsited, list);
+                    resultList.addAll(list);
+                    pageSize -= list.size();
+                    currentPage++;
                 }
             }
         }

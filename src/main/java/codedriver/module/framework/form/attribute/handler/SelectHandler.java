@@ -415,4 +415,16 @@ public class SelectHandler extends FormHandlerBase {
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
     }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+        if (detailedData != null) {
+            JSONArray textList = detailedData.getJSONArray("textList");
+            if (CollectionUtils.isNotEmpty(textList)) {
+                return String.join(",", textList.toJavaList(String.class));
+            }
+        }
+        return null;
+    }
 }

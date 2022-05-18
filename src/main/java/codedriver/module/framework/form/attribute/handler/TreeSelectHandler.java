@@ -186,4 +186,9 @@ public class TreeSelectHandler extends FormHandlerBase {
         }
         return resultObj;
     }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return valueConversionText(attributeDataVo, configObj);
+    }
 }

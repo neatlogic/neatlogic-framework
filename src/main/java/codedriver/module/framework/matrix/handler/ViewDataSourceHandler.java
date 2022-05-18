@@ -331,6 +331,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setCurrentPage(currentPage);
                         List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
                         List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                        if (CollectionUtils.isEmpty(dataMapList)) {
+                            break;
+                        }
                         for (Map<String, Object> dataMap : dataMapList) {
                             if(distinctList.contains(dataMap)){
                                 continue;

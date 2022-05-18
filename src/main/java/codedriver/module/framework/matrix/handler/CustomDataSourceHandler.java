@@ -540,6 +540,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
                         dataVo.setCurrentPage(currentPage);
                         List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+                        if (CollectionUtils.isEmpty(dataMapList)) {
+                            break;
+                        }
                         for (Map<String, String> dataMap : dataMapList) {
                             if(distinctList.contains(dataMap)){
                                 continue;

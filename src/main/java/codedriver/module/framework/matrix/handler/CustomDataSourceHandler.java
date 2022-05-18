@@ -536,7 +536,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
-                    dataVo.setPageSize(100);
                     int pageCount = dataVo.getPageCount();
                     for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
                         dataVo.setCurrentPage(currentPage);
@@ -552,11 +551,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
                             }
                             resultList.add(resultMap);
-                            if (resultList.size() >= 100) {
+                            if (resultList.size() >= dataVo.getPageSize()) {
                                 break;
                             }
                         }
-                        if (resultList.size() >= 100) {
+                        if (resultList.size() >= dataVo.getPageSize()) {
                             break;
                         }
                     }

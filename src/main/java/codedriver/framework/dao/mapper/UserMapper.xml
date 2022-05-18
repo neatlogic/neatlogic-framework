@@ -1064,6 +1064,17 @@
         SELECT count(1) FROM `user_team` WHERE `user_uuid` = #{value}
     </select>
 
+    <select id="getActiveUserEmailListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+        SELECT `email` FROM `user` WHERE `is_active` = 1 AND `uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getActiveUserEmailListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
+        SELECT a.`email` FROM `user` a JOIN `user_team` b ON a.`uuid` = b.`user_uuid` WHERE a.`is_active` = 1 AND b.`team_uuid` = #{value}
+    </select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,

@@ -15,7 +15,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -63,7 +62,6 @@ public class SqlRunner {
 
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());
-
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
@@ -193,8 +191,8 @@ public class SqlRunner {
             idList.add(id);
             String namespace = mappedStatement.getResource();
             SqlInfo sqlInfo = new SqlInfo();
-            sqlInfo.setNamespace(namespace);
             sqlInfo.setId(id.substring(namespace.length() + 1));
+            sqlInfo.setNamespace(namespace);
             BoundSql boundSql = mappedStatement.getBoundSql(paramMap);
             String sql = boundSql.getSql();
             sqlInfo.setSql(sql);

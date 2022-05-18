@@ -17,7 +17,7 @@ public class SourceColumnVo {
     private String column;
 //    private Object value;
     private String expression;
-    private List<?> valueList;
+    private List<String> valueList;
 
     public String getColumn() {
         return column;
@@ -46,11 +46,11 @@ public class SourceColumnVo {
         this.expression = expression;
     }
 
-    public List<?> getValueList() {
+    public List<String> getValueList() {
         return valueList;
     }
 
-    public void setValueList(List<?> valueList) {
+    public void setValueList(List<String> valueList) {
         this.valueList = valueList;
     }
 }

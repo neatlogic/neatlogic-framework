@@ -33,7 +33,7 @@ public class WechatUtil {
         }
         AccessToken accessToken = null;
         String requestUrl = Config.WECHAT_ACCESS_TOKEN_URL().replace("CorpID", corpID).replace("SECRET", secret);
-        JSONObject jsonObject = HttpRequestUtil.get(requestUrl).sendRequest().getResultJson();
+        JSONObject jsonObject = HttpRequestUtil.get(requestUrl).setConnectTimeout(10000).sendRequest().getResultJson();
         // 如果请求成功
         if (MapUtils.isNotEmpty(jsonObject)) {
             if (jsonObject.containsKey("access_token")) {
@@ -66,7 +66,7 @@ public class WechatUtil {
         String url = Config.WECHAT_USERINFO_URL().replace("ACCESS_TOKEN", access_token);
         url = url.replace("CODE", code);
         url = url.replace("AGENTID", agentId);
-        JSONObject jsonobject = HttpRequestUtil.get(url).sendRequest().getResultJson();
+        JSONObject jsonobject = HttpRequestUtil.get(url).setConnectTimeout(10000).sendRequest().getResultJson();
         if (MapUtils.isNotEmpty(jsonobject)) {
             UserId = jsonobject.getString("UserId");
             if (StringUtils.isNotBlank(UserId)) {

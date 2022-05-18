@@ -6,10 +6,10 @@
 package codedriver.framework.datawarehouse.exceptions;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.datawarehouse.dto.DataSourceConditionVo;
+import codedriver.framework.datawarehouse.dto.DataSourceParamVo;
 
 public class DataSourceConditionRequiredValueIsEmptyException extends ApiRuntimeException {
-    public DataSourceConditionRequiredValueIsEmptyException(DataSourceConditionVo condition) {
+    public DataSourceConditionRequiredValueIsEmptyException(DataSourceParamVo condition) {
         super("数据源条件“" + condition.getLabel() + "”的值不能为空");
     }
 }

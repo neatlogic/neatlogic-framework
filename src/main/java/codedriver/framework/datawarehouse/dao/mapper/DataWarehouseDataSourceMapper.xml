@@ -51,6 +51,13 @@
             <result column="fieldAggregate" property="aggregate"/>
             <result column="fieldConfigStr" property="configStr"/>
         </collection>
+        <collection property="paramList" ofType="codedriver.framework.datawarehouse.dto.DataSourceParamVo">
+            <id column="paramId" property="id"/>
+            <result column="paramName" property="name"/>
+            <result column="paramLabel" property="label"/>
+            <result column="paramDefaultValue" property="defaultValue"/>
+            <result column="paramCurrentValue" property="currentValue"/>
+        </collection>
     </resultMap>
 
     <select id="getDataSourceByIdList" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
@@ -92,9 +99,15 @@
                b.is_key          as fieldIsKey,
                b.is_condition    as fieldIsCondition,
                b.aggregate       as fieldAggregate,
-               b.config          as fieldConfigStr
+               b.config          as fieldConfigStr,
+               c.id              as paramId,
+               c.name            as paramName,
+               c.label           as paramLabel,
+               c.default_value   as paramDefaultValue,
+               c.current_value   as paramCurrentValue
         from datawarehouse_datasource a
                  left join datawarehouse_datasource_field b on a.id = b.datasource_id
+                 left join datawarehouse_datasource_param c on a.id = c.datasource_id
         where a.id = #{value}
     </select>
 
@@ -202,7 +215,7 @@
     </update>
 
     <update id="updateReportDataSourceConditionValue"
-            parameterType="codedriver.framework.datawarehouse.dto.DataSourceConditionVo">
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceParamVo">
         update datawarehouse_datasource_condition
         set value = #{value}
         where id = #{id}
@@ -215,6 +228,20 @@
         where id = #{id}
     </update>
 
+    <update id="updateDataSourceParam" parameterType="codedriver.framework.datawarehouse.dto.DataSourceParamVo">
+        update datawarehouse_datasource_param
+        set label         = #{label},
+            default_value = #{defaultValue}
+        where id = #{id}
+    </update>
+
+    <update id="updateDataSourceParamCurrentValue"
+            parameterType="codedriver.framework.datawarehouse.dto.DataSourceParamVo">
+        update datawarehouse_datasource_param
+        set current_value = #{currentValue}
+        where id = #{id}
+    </update>
+
     <update id="updateDataSourceFieldCondition"
             parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
         update datawarehouse_datasource_field
@@ -224,6 +251,11 @@
         where id = #{id}
     </update>
 
+    <insert id="insertDataSourceParam" parameterType="codedriver.framework.datawarehouse.dto.DataSourceParamVo">
+        insert into datawarehouse_datasource_param
+            (id, datasource_id, name, label, default_value)
+        values (#{id}, #{dataSourceId}, #{name}, #{label}, #{defaultValue})
+    </insert>
 
     <insert id="insertDataSourceField"
             parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
@@ -282,9 +314,9 @@
         where id = #{value}
     </delete>
 
-    <!-- <delete id="deleteReportDataSourceConditionByDataSourceId" parameterType="java.lang.Long">
-         delete
-         from datawarehouse_datasource_condition
-         where datasource_id = #{value}
-     </delete>-->
+    <delete id="deleteDataSourceParamById" parameterType="java.lang.Long">
+        delete
+        from datawarehouse_datasource_param
+        where id = #{value}
+    </delete>
 </mapper>

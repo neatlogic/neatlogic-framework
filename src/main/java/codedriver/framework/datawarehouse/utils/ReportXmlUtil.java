@@ -5,7 +5,7 @@
 
 package codedriver.framework.datawarehouse.utils;
 
-import codedriver.framework.datawarehouse.dto.DataSourceConditionVo;
+import codedriver.framework.datawarehouse.dto.DataSourceParamVo;
 import codedriver.framework.datawarehouse.dto.DataSourceFieldVo;
 import codedriver.framework.datawarehouse.dto.DataSourceVo;
 import codedriver.framework.datawarehouse.dto.ResultMapVo;
@@ -19,27 +19,34 @@ import java.util.*;
 public class ReportXmlUtil {
     //static Logger logger = LoggerFactory.getLogger(ReportXmlUtil.class);
 
-    private static void generateConditionFromXml(List<Element> elementList, Set<String> checkSet, List<DataSourceConditionVo> conditionList) {
+    private static void generateParamFromXml(List<Element> elementList, Set<String> checkSet, List<DataSourceParamVo> paramList) {
         for (Element sub : elementList) {
-            if (sub.getName().equals("condition")) {
-                String name = sub.attributeValue("name");
+            if (sub.getName().equals("param")) {
+                String name = sub.attributeValue("column");
                 String label = sub.attributeValue("label");
-                String type = sub.attributeValue("type");
-                String isRequired = sub.attributeValue("isRequired");
-                if (StringUtils.isBlank(sub.attributeValue("name"))) {
-                    throw new DataSourceXmlIrregularException("“" + sub.getName() + "”节点必须定义唯一的“name”属性");
-                } else {
-                    if (checkSet.contains(sub.attributeValue("name"))) {
-                        throw new DataSourceXmlIrregularException("name=" + sub.attributeValue("name") + "的" + sub.getName() + "节点已存在");
-                    } else {
-                        checkSet.add(sub.attributeValue("name"));
+                String defaultValue = sub.attributeValue("default");
+                Long defaultValueLong = null;
+                if (StringUtils.isNotBlank(defaultValue)) {
+                    try {
+                        defaultValueLong = Long.parseLong(defaultValue);
+                    } catch (Exception ex) {
+                        throw new DataSourceXmlIrregularException("“" + sub.getName() + "”节点的default属性需要是整形");
                     }
                 }
-                DataSourceConditionVo condition = new DataSourceConditionVo(name, label, type);
-                if (StringUtils.isNotBlank(isRequired)) {
-                    condition.setIsRequired(isRequired.equals("1") || isRequired.equalsIgnoreCase("true") ? 1 : 0);
+                if (StringUtils.isBlank(name)) {
+                    throw new DataSourceXmlIrregularException("“" + sub.getName() + "”节点必须定义唯一的“column”属性");
+                } else {
+                    if (checkSet.contains(name)) {
+                        throw new DataSourceXmlIrregularException("column=" + name + "的" + sub.getName() + "节点已存在");
+                    } else {
+                        checkSet.add(name);
+                    }
                 }
-                conditionList.add(condition);
+                DataSourceParamVo param = new DataSourceParamVo();
+                param.setName(name);
+                param.setLabel(label);
+                param.setDefaultValue(defaultValueLong);
+                paramList.add(param);
             }
         }
     }
@@ -79,6 +86,7 @@ public class ReportXmlUtil {
 
 
         Element fieldsElement = root.element("fields");
+        Element paramsElement = root.element("params");
         //Element conditionsElement = root.element("conditions");
         Element selectElement = root.element("select");
         if (fieldsElement == null) {
@@ -95,17 +103,17 @@ public class ReportXmlUtil {
             }
         }
 
-        /*if (conditionsElement != null) {
-            List<Element> conditionElList = conditionsElement.elements();
+        if (paramsElement != null) {
+            List<Element> paramElList = paramsElement.elements();
             Set<String> conditionCheckSet = new HashSet<>();
-            if (CollectionUtils.isNotEmpty(conditionElList)) {
-                List<DataSourceConditionVo> conditionList = new ArrayList<>();
-                generateConditionFromXml(conditionElList, conditionCheckSet, conditionList);
-                reportDataSourceVo.setConditionList(conditionList);
+            if (CollectionUtils.isNotEmpty(paramElList)) {
+                List<DataSourceParamVo> paramList = new ArrayList<>();
+                generateParamFromXml(paramElList, conditionCheckSet, paramList);
+                reportDataSourceVo.setParamList(paramList);
             } else {
-                throw new DataSourceXmlIrregularException("conditions节点必须包含condition节点");
+                throw new DataSourceXmlIrregularException("params节点必须包含param节点");
             }
-        }*/
+        }
 
         if (selectElement == null) {
             throw new DataSourceXmlIrregularException("请定义一个“select”节点");

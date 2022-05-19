@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -66,7 +66,7 @@ public class GlobalSearchManager {
                 }
                 if (CollectionUtils.isNotEmpty(pDocumentList)) {
                     BatchRunner<DocumentVo> runner = new BatchRunner<>();
-                    runner.execute(pDocumentList, pDocumentList.size(), item -> {
+                    runner.execute(pDocumentList, 3, item -> {
                         List<DocumentVo> documentList = documentMapper.searchDocument(item);
                         if (CollectionUtils.isNotEmpty(documentList)) {
                             IFullTextIndexHandler handler = FullTextIndexHandlerFactory.getHandler(item.getType());

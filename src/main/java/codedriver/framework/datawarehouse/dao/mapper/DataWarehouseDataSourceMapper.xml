@@ -116,7 +116,7 @@
             <if test="keyword != null and keyword != ''">
                 AND (`name` like concat('%',#{keyword},'%')
                 or `label` like concat('%', #{keyword}, '%')
-                or `description` like concat('%' ,#{keyword},'%')
+                or `description` like concat('%' ,#{keyword},'%'))
             </if>
             <if test="isActive != null">
                 and is_active = #{isActive}

@@ -154,23 +154,49 @@
           AND `uuid` != #{uuid}
     </select>
 
+    <sql id="searchJobAuditCondition">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and job_uuid LIKE concat('%', #{keyword}, '%')
+            </if>
+            <choose>
+                <when test="jobUuid != null and jobUuid != ''">
+                    and job_uuid = #{jobUuid}
+                </when>
+                <otherwise><!--如果不提供jobuuid，则搜索内部作业-->
+                    and not exists (select 1 from schedule_job sj where sj.uuid = job_uuid)
+                </otherwise>
+            </choose>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="startTimeRange != null and startTimeRange.size() == 2">
+                and (
+                start_time &gt;= FROM_UNIXTIME(#{startTimeRange[0]})
+                and
+                start_time &lt;= FROM_UNIXTIME(#{startTimeRange[1]})
+                )
+            </if>
+        </where>
+    </sql>
+
     <select id="searchJobAuditCount" parameterType="codedriver.framework.scheduler.dto.JobAuditVo" resultType="int">
         SELECT count(1)
         FROM schedule_job_audit
-        WHERE job_uuid = #{jobUuid}
+        <include refid="searchJobAuditCondition"/>
     </select>
 
     <select id="searchJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo"
             resultType="codedriver.framework.scheduler.dto.JobAuditVo">
         SELECT id,
-               `job_uuid`   AS jobUuid,
-               `start_time` AS startTime,
-               `end_time`   AS endTime,
-               `status`,
-               server_id    AS serverId,
-               content_hash AS contentHash
+        `job_uuid` AS jobUuid,
+        `start_time` AS startTime,
+        `end_time` AS endTime,
+        `status`,
+        server_id AS serverId,
+        content_hash AS contentHash
         FROM `schedule_job_audit`
-        WHERE `job_uuid` = #{jobUuid}
+        <include refid="searchJobAuditCondition"/>
         ORDER BY `id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>

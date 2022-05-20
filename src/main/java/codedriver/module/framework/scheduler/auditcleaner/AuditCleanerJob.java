@@ -29,7 +29,7 @@ public class AuditCleanerJob extends JobBase {
 
     @Override
     public String getGroupName() {
-        return TenantContext.get().getTenantUuid() + "-AUDIT-CLEANER";
+        return TenantContext.get().getTenantUuid() + "-SCHEDULER-AUDIT";
     }
 
     @Override

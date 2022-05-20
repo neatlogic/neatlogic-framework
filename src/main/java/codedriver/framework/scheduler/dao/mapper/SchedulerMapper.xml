@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
   ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
   -->
 
@@ -172,7 +172,7 @@
         FROM `schedule_job_audit`
         WHERE `job_uuid` = #{jobUuid}
         ORDER BY `id` DESC
-            LIMIT #{startNum}, #{pageSize}
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <select id="checkJobAuditDetailIsExists" parameterType="java.lang.String" resultType="int">
@@ -224,7 +224,7 @@
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
             FOR
-                UPDATE
+        UPDATE
     </select>
 
     <select id="getJobLockByServerId" parameterType="java.lang.Integer"
@@ -337,13 +337,10 @@
     </insert>
 
     <insert id="insertJobProp">
-        INSERT
-        schedule_job_prop (job_uuid, prop_name, prop_value)
-        VALUES (
-        #{jobUuid},
-        #{name},
-        #{value}
-        )
+        INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
+        VALUES (#{jobUuid},
+                #{name},
+                #{value})
     </insert>
 
     <insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
@@ -400,5 +397,12 @@
         FROM `schedule_job_lock`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
+    </delete>
+
+    <delete id="deleteAuditByDayBefore" parameterType="int">
+        <!--确保作业执行完毕，所以使用end_time作为判断条件-->
+        delete
+        from schedule_job_audit
+        where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
 </mapper>

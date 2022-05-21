@@ -1,91 +1,136 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.file.dao.mapper.FileMapper">
+    <sql id="searchFileCondition">
+        <where>
+            <if test="uploadTimeRange != null and uploadTimeRange.size() == 2">
+                and (
+                upload_time &gt;= FROM_UNIXTIME(#{uploadTimeRange[0]})
+                and
+                upload_time &lt;= FROM_UNIXTIME(#{uploadTimeRange[1]})
+                )
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and name like concat('%',#{keyword}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+        </where>
+    </sql>
 
-	<select id="getFileById" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
-		SELECT
-		`id`,
-		`name`,
-		`size`,
-		`user_uuid` AS userUuid,
-		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
-		`type`,
-		content_type AS contentType,
-		`path`
-		FROM
-		`file`
-		WHERE `id` = #{value}
-	</select>
+    <select id="searchFileCount" parameterType="codedriver.framework.file.dto.FileVo" resultType="int">
+        SELECT count(1)
+        FROM file
+        <include refid="searchFileCondition"></include>
+    </select>
 
-	<select id="getFileTypeConfigByType" parameterType="java.lang.String" resultType="codedriver.framework.file.dto.FileTypeVo">
-		SELECT
-		`name`,
-		`config`
-		FROM
-		`filetype_config`
-		WHERE name = #{value}
-	</select>
+    <select id="searchFile" parameterType="codedriver.framework.file.dto.FileVo"
+            resultType="codedriver.framework.file.dto.FileVo">
+        SELECT id,
+        NAME,
+        size,
+        user_uuid as userUuid,
+        upload_time AS uploadTime,
+        type,
+        content_type AS contentType,
+        path
+        FROM file
+        <include refid="searchFileCondition"></include>
+        <choose>
+            <when test="sortList!=null and sortList.size() > 0">
+                order by
+                <foreach collection="sortList" item="sort" separator=",">
+                    ${sort.key} ${sort.type}
+                </foreach>
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        limit #{startNum}, #{pageSize}
+    </select>
 
-	<select id="getFileListByIdList" parameterType="java.util.List" resultType="codedriver.framework.file.dto.FileVo">
-		SELECT
-		`id`,
-		`name`,
-		`size`,
-		`user_uuid` AS userUuid,
-		DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
-		`type`,
-		content_type AS contentType,
-		`path`
-		FROM `file`
-		WHERE `id` IN
-		<foreach collection="list" item ="id" open="(" close=")" separator=",">
-		#{id}
-		</foreach>
-	</select>
-    <select id="getFileListByProcessTaskId" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
-		SELECT
-		    a.`id`,
-		    a.`name`,
-		    a.`size`,
-		    a.`user_uuid` as userUuid,
-		    a.`upload_time` as uploadTime,
-		    a.`type`,
-		    a.`content_type` as contentType,
-		    a.`path`
-		FROM
-		    `file` a
-		    JOIN `processtask_file` b ON a.`id` = b.`file_id`
-		WHERE
-		    `processtask_id` = #{value}
-	</select>
+    <select id="getFileById" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
+        SELECT `id`,
+               `name`,
+               `size`,
+               `user_uuid`                                     AS userUuid,
+               DATE_FORMAT(`upload_time`, '%Y-%m-%d %H:%i:%s') AS uploadTime,
+               `type`,
+               content_type                                    AS contentType,
+               `path`
+        FROM `file`
+        WHERE `id` = #{value}
+    </select>
 
-	<insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
-		INSERT INTO `file` (
-		`id`,
-		`name`,
-		`size`,
-		`user_uuid`,
-		`upload_time`,
-		`type`,
-		`content_type`,
-		`path`
-		)
-		VALUES
-		(
-		#{id},
-		#{name},
-		#{size},
-		#{userUuid},
-		NOW(3),
-		#{type},
-		#{contentType},
-		#{path}
-		)
-	</insert>
+    <select id="getFileTypeConfigByType" parameterType="java.lang.String"
+            resultType="codedriver.framework.file.dto.FileTypeVo">
+        SELECT `name`,
+               `config`
+        FROM `filetype_config`
+        WHERE name = #{value}
+    </select>
 
-	<delete id="deleteFile" parameterType="java.lang.Long">
-		DELETE FROM `file`
-		WHERE `id` = #{fileId}
-	</delete>
+    <select id="getFileListByIdList" parameterType="java.util.List" resultType="codedriver.framework.file.dto.FileVo">
+        SELECT
+        `id`,
+        `name`,
+        `size`,
+        `user_uuid` AS userUuid,
+        DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
+        `type`,
+        content_type AS contentType,
+        `path`
+        FROM `file`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="getFileListByProcessTaskId" parameterType="java.lang.Long"
+            resultType="codedriver.framework.file.dto.FileVo">
+        SELECT a.`id`,
+               a.`name`,
+               a.`size`,
+               a.`user_uuid`    as userUuid,
+               a.`upload_time`  as uploadTime,
+               a.`type`,
+               a.`content_type` as contentType,
+               a.`path`
+        FROM `file` a
+                 JOIN `processtask_file` b ON a.`id` = b.`file_id`
+        WHERE `processtask_id` = #{value}
+    </select>
+
+    <insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
+        INSERT INTO `file` (`id`,
+                            `name`,
+                            `size`,
+                            `user_uuid`,
+                            `upload_time`,
+                            `type`,
+                            `content_type`,
+                            `path`)
+        VALUES (#{id},
+                #{name},
+                #{size},
+                #{userUuid},
+                NOW(3),
+                #{type},
+                #{contentType},
+                #{path})
+    </insert>
+
+    <delete id="deleteFile" parameterType="java.lang.Long">
+        DELETE
+        FROM `file`
+        WHERE `id` = #{fileId}
+    </delete>
 </mapper>
 

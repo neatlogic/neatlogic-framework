@@ -111,14 +111,19 @@ public class JobAuditVo extends BasePageVo {
                 endTime = System.currentTimeMillis() / 1000;
                 int tr = Integer.parseInt(timeRange);
                 Calendar now = Calendar.getInstance();
-                if (unit.equals("day")) {
-                    now.add(Calendar.DAY_OF_YEAR, -tr);
-                } else if (unit.equals("week")) {
-                    now.add(Calendar.WEEK_OF_YEAR, -tr);
-                } else if (unit.equals("month")) {
-                    now.add(Calendar.MONTH, -tr);
-                } else if (unit.equals("year")) {
-                    now.add(Calendar.YEAR, -tr);
+                switch (unit) {
+                    case "day":
+                        now.add(Calendar.DAY_OF_YEAR, -tr);
+                        break;
+                    case "week":
+                        now.add(Calendar.WEEK_OF_YEAR, -tr);
+                        break;
+                    case "month":
+                        now.add(Calendar.MONTH, -tr);
+                        break;
+                    case "year":
+                        now.add(Calendar.YEAR, -tr);
+                        break;
                 }
                 startTime = now.getTimeInMillis() / 1000;
             } else if (st > 0 && et > 0) {

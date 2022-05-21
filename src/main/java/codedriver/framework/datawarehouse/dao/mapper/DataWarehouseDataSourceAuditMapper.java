@@ -19,4 +19,6 @@ public interface DataWarehouseDataSourceAuditMapper {
     void updateReportDataSourceAudit(DataSourceAuditVo reportDataSourceAuditVo);
 
     void deleteReportDataSourceAuditByDatasourceId(Long datasourceId);
+
+    void deleteAuditByDayBefore(int dayBefore);
 }

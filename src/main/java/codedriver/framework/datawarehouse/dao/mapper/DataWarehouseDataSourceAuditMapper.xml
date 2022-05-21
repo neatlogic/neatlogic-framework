@@ -58,4 +58,10 @@
         from datawarehouse_datasource_audit
         where datasource_id = #{value}
     </delete>
+
+    <delete id="deleteAuditByDayBefore" parameterType="int">
+        delete
+        from datawarehouse_datasource_audit
+        where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
 </mapper>

@@ -301,7 +301,7 @@
     <delete id="deleteAuditByDayBefore" parameterType="int">
         delete
         from api_audit
-        where start_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+        where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
 
 </mapper>

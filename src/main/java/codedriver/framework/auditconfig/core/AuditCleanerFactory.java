@@ -7,10 +7,12 @@ package codedriver.framework.auditconfig.core;
 
 import codedriver.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
+import codedriver.framework.common.RootComponent;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@RootComponent
 public class AuditCleanerFactory extends ModuleInitializedListenerBase {
     private static final Map<String, IAuditCleaner> cleanerMap = new HashMap<>();
 

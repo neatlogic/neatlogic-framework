@@ -52,6 +52,8 @@ public interface FormMapper {
 
     List<FormVersionVo> getFormVersionListByFormConfigLikeKeyword(String value);
 
+    List<FormVersionVo> getFormVersionList();
+
     public int insertForm(FormVo formVo);
 
     public int insertFormAttributeMatrix(FormAttributeMatrixVo componentVo);

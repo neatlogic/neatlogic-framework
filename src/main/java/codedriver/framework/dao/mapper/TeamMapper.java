@@ -15,7 +15,7 @@ public interface TeamMapper {
 
     int checkTeamIsExists(String uuid);
 
-    List<String> checkTeamUuidListIsExists(List<String> uuidList);
+    List<String> getTeamUuidListByUuidList(List<String> uuidList);
 
     TeamVo getTeamByUuid(String uuid);
 

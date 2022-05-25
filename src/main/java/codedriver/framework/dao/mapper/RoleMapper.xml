@@ -308,13 +308,6 @@
         GROUP BY a.role_uuid
     </select>
 
-    <select id="checkRoleUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String">
-        select `uuid` from `role` where `uuid` in
-        <foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
-
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
         VALUES (#{id}, #{uuid}, #{name}, #{description})

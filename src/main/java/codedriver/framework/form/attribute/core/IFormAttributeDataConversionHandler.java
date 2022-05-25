@@ -19,6 +19,13 @@ import java.util.List;
 public interface IFormAttributeDataConversionHandler {
 
     /**
+     * 组件英文名
+     *
+     * @return
+     */
+    String getHandler();
+
+    /**
      * @param attributeDataVo
      * @param configObj
      * @return Object

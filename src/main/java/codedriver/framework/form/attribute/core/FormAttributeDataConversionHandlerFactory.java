@@ -12,30 +12,23 @@ import codedriver.framework.common.RootComponent;
 import java.util.*;
 
 @RootComponent
-public class FormAttributeHandlerFactory extends ModuleInitializedListenerBase {
-    private static final Map<String, IFormAttributeHandler> handlerMap = new HashMap<>();
-    private static final List<IFormAttributeHandler> handlerList = new ArrayList<>();
+public class FormAttributeDataConversionHandlerFactory extends ModuleInitializedListenerBase {
+    private static final Map<String, IFormAttributeDataConversionHandler> handlerMap = new HashMap<>();
 
-    public static IFormAttributeHandler getHandler(String type) {
+    public static IFormAttributeDataConversionHandler getHandler(String type) {
         return handlerMap.get(type);
-    }
-
-    public static List<IFormAttributeHandler> getHandlerList() {
-        handlerList.sort(Comparator.comparingInt(IFormAttributeHandler::getSort));
-        return handlerList;
     }
 
     @Override
     public void onInitialized(CodedriverWebApplicationContext context) {
-        Map<String, IFormAttributeHandler> myMap = context.getBeansOfType(IFormAttributeHandler.class);
-        for (Map.Entry<String, IFormAttributeHandler> entry : myMap.entrySet()) {
-            IFormAttributeHandler handler = entry.getValue();
+        Map<String, IFormAttributeDataConversionHandler> myMap = context.getBeansOfType(IFormAttributeDataConversionHandler.class);
+        for (Map.Entry<String, IFormAttributeDataConversionHandler> entry : myMap.entrySet()) {
+            IFormAttributeDataConversionHandler handler = entry.getValue();
             if (handler.getHandler() != null) {
                 if (handlerMap.containsKey(handler.getHandler())) {
                     System.err.println("表单插件：" + handler.getHandler() + "已存在，请检查代码");
                 } else {
                     handlerMap.put(handler.getHandler(), handler);
-                    handlerList.add(handler);
                 }
             }
         }

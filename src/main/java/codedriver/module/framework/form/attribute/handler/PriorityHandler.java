@@ -15,8 +15,6 @@ import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.ControlHandlerBase;
 
-import java.util.List;
-
 @Component
 public class PriorityHandler extends ControlHandlerBase {
 
@@ -27,26 +25,6 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
-        return null;
-    }
-
-    @Override
-    public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
-    }
-
-    @Override
-    public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
-    }
-
-    @Override
-    public Object textConversionValue(List<String> values, JSONObject config) {
-        return null;
-    }
-
-    @Override
-    public JSONObject getDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
     }
 
@@ -115,8 +93,4 @@ public class PriorityHandler extends ControlHandlerBase {
         return null;
     }
 
-    @Override
-    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
-    }
 }

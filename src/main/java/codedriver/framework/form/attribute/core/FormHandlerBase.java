@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FormHandlerBase implements IFormAttributeHandler {
+public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAttributeDataConversionHandler {
 
     public enum ConversionType {
 

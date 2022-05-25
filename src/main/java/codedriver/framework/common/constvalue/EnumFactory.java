@@ -56,7 +56,12 @@ public class EnumFactory {
      * @Returns: java.lang.Class<? extends codedriver.framework.common.constvalue.IEnum>
      **/
     public static Class<? extends IEnum> getEnumClass(String enumClass) {
-        return enumMap.get(enumClass);
+        for(String key : enumMap.keySet()) {
+            if (key.endsWith(enumClass)) {
+                return enumMap.get(key);
+            }
+        }
+        return null;
     }
 
     public static List<ValueTextVo> searchEnumClassByName(String name) {

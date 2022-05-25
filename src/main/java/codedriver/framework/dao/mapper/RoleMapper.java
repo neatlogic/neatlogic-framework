@@ -16,6 +16,8 @@ public interface RoleMapper {
 
     int checkRoleIsExists(String uuid);
 
+    List<String> checkRoleUuidListIsExists(List<String> list);
+
     List<RoleVo> searchRole(RoleVo roleVo);
 
     List<RoleVo> getRoleListByAuthName(String auth);

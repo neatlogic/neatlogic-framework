@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     public Set<String> getUserUuidSetByUserUuidListAndTeamUuidList(List<String> userUuidList, List<String> teamUuidList) {
         Set<String> uuidList = new HashSet<>();
         if (CollectionUtils.isNotEmpty(userUuidList)) {
-            List<String> existUserUuidList = userMapper.checkUserUuidListIsExists(userUuidList, 1);
+            List<String> existUserUuidList = userMapper.getUserUuidListByUuidListAndIsActive(userUuidList, 1);
             if (CollectionUtils.isNotEmpty(existUserUuidList)) {
                 uuidList.addAll(new HashSet<>(existUserUuidList));
             }

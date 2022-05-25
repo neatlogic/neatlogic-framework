@@ -15,4 +15,8 @@ public class ParamRepeatsException extends ApiRuntimeException {
         super("参数“" + param + "”重复");
     }
 
+    public ParamRepeatsException(int index, String keyName) {
+        super("第：" + index + "个参数的'" + keyName + "'重复");
+    }
+
 }

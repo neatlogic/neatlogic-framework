@@ -92,7 +92,7 @@ public interface UserMapper {
 
     List<UserVo> getUserListByUserUuidList(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
-    List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
+    List<String> getUserUuidListByUuidListAndIsActive(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
     UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 

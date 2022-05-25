@@ -225,7 +225,7 @@
         WHERE `uuid` = #{uuid}
     </select>
 
-    <select id="checkTeamUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String"
+    <select id="getTeamUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String"
             useCache="false">
         SELECT
         distinct `uuid`

@@ -718,7 +718,7 @@
         </if>
     </select>
 
-    <select id="checkUserUuidListIsExists" resultType="java.lang.String" useCache="false">
+    <select id="getUserUuidListByUuidListAndIsActive" resultType="java.lang.String" useCache="false">
         SELECT
         DISTINCT `uuid`
         FROM `user`

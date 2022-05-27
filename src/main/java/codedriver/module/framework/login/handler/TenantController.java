@@ -44,9 +44,11 @@ public class TenantController {
         TenantContext tenantContext = TenantContext.init(tenant);
         ThemeVo theme = themeMapper.getTenantTheme(tenantContext.getDbName());
         JSONObject data = new JSONObject();
+        JSONObject themeConfig = new JSONObject();
         if (theme != null) {
-            data.put("config", theme.getConfig());
+            themeConfig = theme.getConfig();
         }
+        data.put("themeConfig", themeConfig);
         ReturnJson.success(data, response);
     }
 }

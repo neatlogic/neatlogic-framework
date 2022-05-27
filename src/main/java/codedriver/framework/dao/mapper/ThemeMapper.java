@@ -14,5 +14,4 @@ public interface ThemeMapper {
 
     void deleteTheme();
 
-    ThemeVo getTenantTheme(String dbName);
 }

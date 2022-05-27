@@ -14,6 +14,14 @@
         from theme
     </select>
 
+    <select id="getTenantTheme" resultType="codedriver.framework.dto.ThemeVo">
+        select id,
+               config as configStr,
+               fcd,
+               fcu
+        from ${dbName}.theme
+    </select>
+
     <insert id="insertTheme" parameterType="codedriver.framework.dto.ThemeVo">
         insert into theme(id, config, fcd, fcu)
         values (#{id}, #{configStr}, now(3), #{fcu})

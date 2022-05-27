@@ -41,8 +41,8 @@ public class TenantController {
                 ReturnJson.error("租户" + tenant + "不存在或已被禁用", response);
             }
         }
-        TenantContext tenantContext = TenantContext.init(tenant);
-        ThemeVo theme = themeMapper.getTenantTheme(tenantContext.getDbName());
+        TenantContext.init().switchTenant(tenant);
+        ThemeVo theme = themeMapper.getTheme();
         JSONObject data = new JSONObject();
         JSONObject themeConfig = new JSONObject();
         if (theme != null) {

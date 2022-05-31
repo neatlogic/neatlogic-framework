@@ -25,4 +25,10 @@
         ON DUPLICATE KEY
             UPDATE `config` = #{configStr}
     </insert>
+
+    <delete id="deleteAuditConfig" parameterType="java.lang.String">
+        delete
+        from audit_config
+        where `name` = #{value}
+    </delete>
 </mapper>

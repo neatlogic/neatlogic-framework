@@ -15,4 +15,6 @@ public interface AuditConfigMapper {
     AuditConfigVo getAuditConfigByName(String name);
 
     void saveAuditConfig(AuditConfigVo auditConfigVo);
+
+    void deleteAuditConfig(String name);
 }

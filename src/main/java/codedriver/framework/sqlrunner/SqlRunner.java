@@ -5,15 +5,14 @@
 
 package codedriver.framework.sqlrunner;
 
+import codedriver.framework.dao.plugin.PageInterceptor;
+import codedriver.framework.dao.plugin.PageRowBounds;
 import codedriver.framework.dao.plugin.SqlCostInterceptor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.mapping.*;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.session.*;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +61,7 @@ public class SqlRunner {
 
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());
+        configuration.addInterceptor(new PageInterceptor());
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();
@@ -105,49 +105,6 @@ public class SqlRunner {
     }
 
     /**
-     * 执行mapper中所有select语句
-     *
-     * @param paramMap
-     * @return
-     */
-    public Map<String, List> runAllSql(Map<String, Object> paramMap) {
-        return runAllSql(namespace, paramMap);
-    }
-
-    /**
-     * 执行mapper中所有select语句
-     *
-     * @param paramMap
-     * @return
-     */
-    public Map<String, List> runAllSql(String namespace, Map<String, Object> paramMap) {
-        Map<String, List> resultMap = new HashMap<>();
-        List<String> selectIdList = new ArrayList<>();
-        Collection<MappedStatement> mappedStatementList = configuration.getMappedStatements();
-        for (MappedStatement mappedStatement : mappedStatementList) {
-            if (!Objects.equals(mappedStatement.getResource(), namespace)) {
-                continue;
-            }
-            if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
-                String selectId = mappedStatement.getId();
-                if (!selectIdList.contains(selectId)) {
-                    selectIdList.add(selectId);
-                }
-            }
-        }
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        try {
-            for (String selectId : selectIdList) {
-                List reportTypeList = sqlSession.selectList(selectId, paramMap);
-                resultMap.put(selectId.substring(namespace.length() + 1), reportTypeList);
-            }
-        } finally {
-            sqlSession.close();
-        }
-        return resultMap;
-    }
-
-    /**
      * 执行mapper中特定某个select语句
      *
      * @param sqlInfo
@@ -165,6 +122,29 @@ public class SqlRunner {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
             return sqlSession.selectList(sqlInfo.getNamespace() + "." + sqlInfo.getId(), paramMap);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    /**
+     * 执行mapper中特定某个select语句
+     *
+     * @param sqlInfo
+     * @param paramMap
+     * @return
+     */
+    public <E> List<E>  runSqlById(SqlInfo sqlInfo, Map<String, Object> paramMap, PageRowBounds rowBounds) {
+        MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getNamespace() + "." + sqlInfo.getId());
+        if (mappedStatement == null) {
+            return new ArrayList<>();
+        }
+        if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
+            return new ArrayList<>();
+        }
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            return sqlSession.selectList(sqlInfo.getNamespace() + "." + sqlInfo.getId(), paramMap, rowBounds);
         } finally {
             sqlSession.close();
         }

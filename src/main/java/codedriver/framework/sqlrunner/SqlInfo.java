@@ -44,6 +44,14 @@ public class SqlInfo {
      * sql语句中参数列表
      */
     private List<String> parameterList;
+    /**
+     * 是否需要分页
+     */
+    private Boolean needPage = false;
+    /**
+     * 每页条数
+     */
+    private Integer pageSize = 20;
 
     public String getId() {
         return id;
@@ -115,5 +123,21 @@ public class SqlInfo {
 
     public void setParameterList(List<String> parameterList) {
         this.parameterList = parameterList;
+    }
+
+    public Boolean getNeedPage() {
+        return needPage;
+    }
+
+    public void setNeedPage(boolean needPage) {
+        this.needPage = needPage;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

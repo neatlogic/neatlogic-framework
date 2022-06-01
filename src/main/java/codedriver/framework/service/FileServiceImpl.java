@@ -39,6 +39,9 @@ public class FileServiceImpl implements FileService {
     public void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Long id = paramObj.getLong("id");
         FileVo fileVo = fileMapper.getFileById(id);
+        if (fileVo == null) {
+            throw new FileNotFoundException(id);
+        }
         String tenantUuid = TenantContext.get().getTenantUuid();
         if (StringUtils.isBlank(tenantUuid)) {
             throw new NoTenantException();

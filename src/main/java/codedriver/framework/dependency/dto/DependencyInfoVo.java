@@ -30,9 +30,9 @@ public class DependencyInfoVo {
 //    @JSONField(serialize = false)
 //    private String pathFormat;
     @JSONField(serialize = false)
-    private String lastName;
+    private final String lastName;
     @JSONField(serialize = false)
-    private List<String> pathList;
+    private final List<String> pathList;
     @JSONField(serialize = false)
     private final String urlFormat;
 

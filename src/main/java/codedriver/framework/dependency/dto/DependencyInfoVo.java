@@ -74,16 +74,6 @@ public class DependencyInfoVo {
 
     public String getPath() {
         if (path == null) {
-//            if (StringUtils.isNotBlank(pathFormat) && MapUtils.isNotEmpty(config)) {
-//                try {
-//                    path = FreemarkerUtil.transform(config, pathFormat);
-//                } catch (FreemarkerTransformException e) {
-//                    path = pathFormat;
-//                }
-//                if (StringUtils.isNotBlank(groupName)) {
-//                    path = groupName + "-" + path;
-//                }
-//            }
             if (StringUtils.isNotBlank(lastName) && CollectionUtils.isNotEmpty(pathList)) {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("<span>");

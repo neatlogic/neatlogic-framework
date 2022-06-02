@@ -9,8 +9,11 @@ import codedriver.framework.exception.util.FreemarkerTransformException;
 import codedriver.framework.util.FreemarkerUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 /**
  * @author linbq
@@ -22,17 +25,30 @@ public class DependencyInfoVo {
     private String path;
     private String url;
     private JSONObject config;
-    final private String groupName;
+    private final String groupName;
 
+//    @JSONField(serialize = false)
+//    private String pathFormat;
     @JSONField(serialize = false)
-    final String pathFormat;
+    private final String lastName;
     @JSONField(serialize = false)
-    final String urlFormat;
+    private final List<String> pathList;
+    @JSONField(serialize = false)
+    private final String urlFormat;
 
-    public DependencyInfoVo(Object value, JSONObject config, String pathFormat, String urlFormat, String groupName) {
+//    public DependencyInfoVo(Object value, JSONObject config, String pathFormat, String urlFormat, String groupName) {
+//        this.value = value;
+//        this.config = config;
+//        this.pathFormat = pathFormat;
+//        this.urlFormat = urlFormat;
+//        this.groupName = groupName;
+//    }
+
+    public DependencyInfoVo(Object value, JSONObject config, String lastName, List<String> pathList, String urlFormat, String groupName) {
         this.value = value;
         this.config = config;
-        this.pathFormat = pathFormat;
+        this.lastName = lastName;
+        this.pathList = pathList;
         this.urlFormat = urlFormat;
         this.groupName = groupName;
     }
@@ -57,14 +73,20 @@ public class DependencyInfoVo {
     }
 
     public String getPath() {
-        if (path == null && StringUtils.isNotBlank(pathFormat) && MapUtils.isNotEmpty(config)) {
-            try {
-                path = FreemarkerUtil.transform(config, pathFormat);
-            } catch (FreemarkerTransformException e) {
-                path = pathFormat;
-            }
-            if (StringUtils.isNotBlank(groupName)) {
-                path = groupName + "-" + path;
+        if (path == null) {
+            if (StringUtils.isNotBlank(lastName) && CollectionUtils.isNotEmpty(pathList)) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("<span>");
+                stringBuilder.append(lastName);
+                stringBuilder.append("</span>");
+                stringBuilder.append("<span class='text-tip'>");
+                stringBuilder.append(" [");
+                stringBuilder.append(groupName);
+                stringBuilder.append(" / ");
+                stringBuilder.append(String.join(" / ", pathList));
+                stringBuilder.append("]");
+                stringBuilder.append("</span>");
+                path = stringBuilder.toString();
             }
         }
         return path;
@@ -99,10 +121,6 @@ public class DependencyInfoVo {
 
     public String getGroupName() {
         return groupName;
-    }
-
-    public String getPathFormat() {
-        return pathFormat;
     }
 
     public String getUrlFormat() {

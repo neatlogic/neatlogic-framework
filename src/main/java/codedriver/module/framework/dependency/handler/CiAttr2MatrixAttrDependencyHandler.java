@@ -22,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 矩阵属性引用cmdbci模型属性或关系
@@ -58,15 +60,14 @@ public class CiAttr2MatrixAttrDependencyHandler extends FixedTableDependencyHand
                                             dependencyInfoConfig.put("matrixName", matrixVo.getName());
                                             dependencyInfoConfig.put("matrixType", matrixVo.getType());
                                             String toName = showAttributeObj.getString("name");
-                                            dependencyInfoConfig.put("attributeName", toName);
-                                            String pathFormat = "矩阵-${DATA.matrixName}-${DATA.attributeName}";
+//                                            dependencyInfoConfig.put("attributeName", toName);
+                                            List<String> pathList = new ArrayList<>();
+                                            pathList.add("矩阵管理");
+                                            pathList.add(matrixVo.getName());
+                                            String lastName = toName;
+//                                            String pathFormat = "矩阵-${DATA.matrixName}-${DATA.attributeName}";
                                             String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";
-                                            return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
-//                                            DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-//                                            dependencyInfoVo.setValue(matrixVo.getUuid());
-//                                            dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-view-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s-%s</a>",
-//                                                    TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName(), toName));
-//                                            return dependencyInfoVo;
+                                            return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, lastName, pathList, urlFormat, this.getGroupName());
                                         }
                                     }
                                 }

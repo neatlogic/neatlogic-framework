@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public final class RegexUtils {
     private static Logger logger = LoggerFactory.getLogger(RegexUtils.class);
     public static final String NAME = "^[A-Za-z_\\d\\u4e00-\\u9fa5]+$";
+    public static final String NAME_WITH_SLASH = "^[A-Za-z_\\d\\u4e00-\\u9fa5/]+$";
     public static final String ENGLISH_NUMBER_NAME = "^[a-zA-Z0-9_\\.]+$";
     public static final String ENGLISH_NAME = "^[A-Za-z]+$";
     public static final String API_TOKEN = "^[A-Za-z_\\{\\}\\d/]+$";

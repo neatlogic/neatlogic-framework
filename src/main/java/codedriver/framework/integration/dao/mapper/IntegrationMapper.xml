@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.integration.dao.mapper.IntegrationMapper">
 	<sql id="searchIntegrationAuditCondition">
 		<where>
+			`start_time` &gt;= #{startTime}
+			AND `end_time` &lt;= #{endTime}
 			<if test="integrationUuid != null and integrationUuid != ''">
 				AND integration_uuid = #{integrationUuid}
 			</if>
+			<if test="userUuidList != null and userUuidList.size() > 0">
+				AND `user_uuid` IN
+				<foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
+					#{uuid}
+				</foreach>
+			</if>
+			<if test="statusList != null and statusList.size() > 0">
+				AND `status` IN
+				<foreach collection="statusList" item="status" open="(" separator="," close=")">
+					#{status}
+				</foreach>
+			</if>
 		</where>
 	</sql>
+
 
 	<select id="searchIntegrationAudit" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="codedriver.framework.integration.dto.IntegrationAuditVo">
 		SELECT
@@ -33,7 +53,7 @@
 		</if>
 	</select>
 
-	<select id="searchIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
+	<select id="getIntegrationAuditCount" parameterType="codedriver.framework.integration.dto.IntegrationAuditVo" resultType="int">
 		SELECT
 		COUNT(1)
 		FROM
@@ -236,24 +256,28 @@
 		)
 		VALUES
 		(
-		#{id},
-		#{integrationUuid},
-		#{userUuid},
-		#{requestFrom},
-		#{serverId},
-		#{startTime},
-		#{endTime},
-		#{status},
-		#{paramFilePath},
-		#{resultFilePath},
-		#{errorFilePath}
-		)
+			#{id},
+			#{integrationUuid},
+			#{userUuid},
+			#{requestFrom},
+			#{serverId},
+			#{startTime},
+			#{endTime},
+			#{status},
+			#{paramFilePath},
+			#{resultFilePath},
+			#{errorFilePath})
 	</insert>
 
 	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">
 		DELETE
-		FROM
-		`integration`
+		FROM `integration`
 		WHERE `uuid` = #{value}
+	</delete>
+
+	<delete id="deleteAuditByDayBefore" parameterType="int">
+		delete
+		from integration_audit
+		where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
 	</delete>
 </mapper>

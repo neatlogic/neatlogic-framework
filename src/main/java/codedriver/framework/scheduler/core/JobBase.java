@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -158,6 +158,7 @@ public abstract class JobBase implements IJob {
             // 如果作业存在并且设置为需要审计
             if (isAudit) {
                 JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
+                auditVo.setStatus(JobAuditVo.Status.RUNNING.getValue());
                 schedulerMapper.insertJobAudit(auditVo);
                 jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
                 try {

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.dao.mapper.TeamMapper">
-    <cache type="codedriver.framework.dao.cache.CodeDriverCache" flushInterval="30000" size="100"/>
+    <cache-ref namespace="codedriver.framework.dao.mapper.UserMapper"/>
+
     <resultMap id="teamMap" type="codedriver.framework.dto.TeamVo">
         <id property="uuid" column="uuid"/>
         <result property="id" column="id"/>
@@ -219,7 +225,7 @@
         WHERE `uuid` = #{uuid}
     </select>
 
-    <select id="checkTeamUuidListIsExists" parameterType="java.util.List" resultType="java.lang.String"
+    <select id="getTeamUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String"
             useCache="false">
         SELECT
         distinct `uuid`
@@ -338,7 +344,7 @@
             useCache="true">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
-                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+        JOIN team t ON t.`uuid` = ut.`team_uuid`
         WHERE ut.`user_uuid` in
         <foreach collection="list" separator="," open="(" close=")" item="userUuid">
             #{userUuid}
@@ -564,6 +570,7 @@
             <result property="userInfo" column="userInfo"/>
         </collection>
     </resultMap>
+
     <select id="getTeamUserTitleListByTeamUuid" resultMap="teamUserTitleMap">
         SELECT tut.`team_uuid` AS teamUuid,
                u.`user_name`   AS userName,
@@ -615,11 +622,11 @@
         ORDER BY t.lft DESC
     </select>
 
-    <select id="getTeamUserTitleListByUserUuid" parameterType="java.lang.String" resultType="codedriver.framework.dto.TeamUserTitleVo">
-        SELECT
-            `team_uuid` AS teamUuid,
-            `user_uuid` AS userUuid,
-            `title_id` AS titleId
+    <select id="getTeamUserTitleListByUserUuid" parameterType="java.lang.String"
+            resultType="codedriver.framework.dto.TeamUserTitleVo">
+        SELECT `team_uuid` AS teamUuid,
+               `user_uuid` AS userUuid,
+               `title_id`  AS titleId
         FROM `team_user_title`
         WHERE `user_uuid` = #{value}
     </select>
@@ -751,19 +758,19 @@
     <update id="updateUpwardUuidPathByLftRht">
         UPDATE `team` d
         JOIN (
-            SELECT b.`uuid` AS `uuid`, GROUP_CONCAT(a.`uuid` ORDER BY a.`lft`) AS upward_uuid_path
-            FROM `team` a
-            JOIN `team` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
-            <where>
-                <if test="lft != null">
-                    AND b.`lft` &gt;= #{lft}
-                </if>
-                <if test="rht != null">
-                    AND b.`rht` &lt;= #{rht}
-                </if>
-            </where>
-            GROUP BY b.`uuid`
-            ) c ON c.`uuid` = d.`uuid`
+        SELECT b.`uuid` AS `uuid`, GROUP_CONCAT(a.`uuid` ORDER BY a.`lft`) AS upward_uuid_path
+        FROM `team` a
+        JOIN `team` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
+        <where>
+            <if test="lft != null">
+                AND b.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND b.`rht` &lt;= #{rht}
+            </if>
+        </where>
+        GROUP BY b.`uuid`
+        ) c ON c.`uuid` = d.`uuid`
         SET d.`upward_uuid_path` = c.`upward_uuid_path`
     </update>
 

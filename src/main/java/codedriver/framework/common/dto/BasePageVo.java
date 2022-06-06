@@ -20,6 +20,7 @@ import java.util.Set;
 public class BasePageVo implements Serializable {
     //以当前页起最多展示页码数
     private static final int OFFSET_SIZE = 5;
+    private static final long serialVersionUID = 6550790567158160404L;
     @JSONField(serialize = false)
     private boolean needPage = true;
     @JSONField(serialize = false)

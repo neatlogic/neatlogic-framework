@@ -7,6 +7,7 @@ package codedriver.framework.util.excel;
 
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.ArrayList;
@@ -95,7 +96,14 @@ public class SheetBuilder {
             for (String column : columnList) {
                 Cell cell = row.createCell(j);
                 makeupBody(cell);
-                cell.setCellValue(dataMap.get(column) == null ? null : dataMap.get(column).toString());
+                String cellValue = null;
+                if (dataMap.get(column) != null) {
+                    cellValue = dataMap.get(column).toString();
+                    if (cellValue.length() > SpreadsheetVersion.EXCEL2007.getMaxTextLength()) {
+                        cellValue = cellValue.substring(0, SpreadsheetVersion.EXCEL2007.getMaxTextLength() - 3) + "...";
+                    }
+                }
+                cell.setCellValue(cellValue);
                 j++;
             }
         } else {

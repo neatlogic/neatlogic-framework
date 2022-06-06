@@ -10,15 +10,15 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author linbq
@@ -27,8 +27,8 @@ import java.util.List;
 @Component
 public class AccountsHandler extends FormHandlerBase {
 
-    private final static JSONArray theadList = new JSONArray();
-    static {
+    private final JSONArray theadList = new JSONArray();
+    {
         JSONObject name = new JSONObject();
         name.put("title", "资产名");
         name.put("key", "name");
@@ -153,7 +153,8 @@ public class AccountsHandler extends FormHandlerBase {
     public Object textConversionValue(List<String> values, JSONObject config) {
         return null;
     }
-//表单组件配置信息
+
+    //表单组件配置信息
 //    {
 //        "handler": "formaccounts",
 //        "label": "账号组件_1",
@@ -289,5 +290,56 @@ public class AccountsHandler extends FormHandlerBase {
             }
         }
         return tableObj;
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject tableObj = new JSONObject();
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        tableObj.put("value", dataObj);
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray selectedDataList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(selectedDataList)) {
+                tableObj.put("theadList", theadList);
+                JSONArray tbodyList = new JSONArray();
+                for (int i = 0; i < selectedDataList.size(); i++) {
+                    JSONObject tbodyObj = selectedDataList.getJSONObject(i);
+                    tbodyObj.remove("actionType");
+                    tbodyObj.remove("fcu");
+                    tbodyObj.remove("lcu");
+                    tbodyObj.remove("fcuVo");
+                    tbodyObj.remove("lcuVo");
+                    Set<Map.Entry<String, Object>> entrySet = tbodyObj.entrySet();
+                    JSONObject obj = new JSONObject();
+                    for (Map.Entry<String, Object> entry : entrySet) {
+                        obj.put(entry.getKey(), new JSONObject() {
+                            {
+                                this.put("text", entry.getValue());
+                            }
+                        });
+                    }
+                    tbodyList.add(obj);
+                }
+                tableObj.put("tbodyList", tbodyList);
+            }
+        }
+        return tableObj;
+    }
+
+    @Override
+    public int getExcelHeadLength(JSONObject configObj) {
+        return theadList.size();
+    }
+
+    @Override
+    public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray tbodyList = dataObj.getJSONArray("selectedDataList");
+            if (CollectionUtils.isNotEmpty(tbodyList)) {
+                return tbodyList.size() + 1;
+            }
+        }
+        return 1;
     }
 }

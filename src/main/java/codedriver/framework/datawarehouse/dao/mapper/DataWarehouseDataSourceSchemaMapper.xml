@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceSchemaMapper">
+    <insert id="createDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
+        CREATE TABLE IF NOT EXISTS ${tableName}
+        (
+        <foreach collection="fieldList" item="item">
+            `${item.id}`
+            <choose>
+                <when test="item.type == 'number'">
+                    decimal(50,4)
+                </when>
+                <when test="item.type == 'date'">
+                    date
+                </when>
+                <when test="item.type == 'time'">
+                    time
+                </when>
+                <when test="item.type == 'datetime'">
+                    datetime
+                </when>
+                <otherwise>TEXT</otherwise>
+            </choose>
+            NULL COMMENT '${item.label}-${item.name}',
+            `${item.id}_hash` char(32) NULL COMMENT '${item.label}-${item.name}哈希值',
+        </foreach>
+        `expire_time` timestamp NULL COMMENT '过期时间',
+        `insert_time` timestamp(3) COMMENT '更新时间',
+        `id` bigint NOT NULL COMMENT 'id',
+        <foreach collection="fieldList" item="item">
+            <if test="item.type == 'number' or item.type == 'date' or item.type == 'time' or item.type == 'datetime'">
+                KEY `idx_${item.id}` (`${item.id}`) USING BTREE,
+            </if>
+        </foreach>
+        KEY `idx_insert_time` (`insert_time`) USING BTREE,
+        KEY `idx_expire_time` (`expire_time`) USING BTREE,
+        <if test="keyList != null and keyList.size() > 0">
+            UNIQUE KEY `uk`
+            <foreach collection="keyList" item="item" open="(" close=")" separator=",">
+                `${item}_hash`
+            </foreach>
+            USING BTREE,
+        </if>
+        PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE = INNODB
+        DEFAULT CHARSET = utf8mb4
+    </insert>
+
+    <delete id="deleteDataSourceTable" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
+        DROP TABLE IF EXISTS ${tableName}
+    </delete>
+</mapper>

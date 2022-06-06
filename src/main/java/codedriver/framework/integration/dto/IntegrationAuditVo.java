@@ -3,13 +3,17 @@ package codedriver.framework.integration.dto;
 import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	@EntityField(name = "id", type = ApiParamType.LONG)
@@ -44,6 +48,11 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	private String resultFilePath;
 	@EntityField(name = "错误内容文件路径", type = ApiParamType.STRING)
 	private String errorFilePath;
+	@JSONField(serialize = false)
+	private List<String> userUuidList;
+	@JSONField(serialize = false)
+	private List<String> statusList;
+
 
 	public Long getId() {
 		if (id == null) {
@@ -65,6 +74,11 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	}
 
 	public String getUserUuid() {
+		if (StringUtils.isNotBlank(userUuid)) {
+			if (userUuid.contains("#")) {
+				userUuid = userUuid.split("#")[1];
+			}
+		}
 		return userUuid;
 	}
 
@@ -193,4 +207,24 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	public void setErrorFilePath(String errorFilePath) {
 		this.errorFilePath = errorFilePath;
 	}
+
+    public List<String> getUserUuidList() {
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+			userUuidList = userUuidList.stream().map(GroupSearch::removePrefix).collect(Collectors.toList());
+        }
+        return userUuidList;
+	}
+
+	public void setUserUuidList(List<String> userUuidList) {
+		this.userUuidList = userUuidList;
+	}
+
+	public List<String> getStatusList() {
+		return statusList;
+	}
+
+	public void setStatusList(List<String> statusList) {
+		this.statusList = statusList;
+	}
+
 }

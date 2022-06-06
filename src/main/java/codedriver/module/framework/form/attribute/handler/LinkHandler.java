@@ -40,7 +40,7 @@ public class LinkHandler extends FormHandlerBase {
         String value = configObj.getString("value");
         String text = configObj.getString("text");
         String target = configObj.getString("target");
-        return "<a href='" + value + "' target='"+ target +"'>" + text + "</a>";
+        return "<a href='" + value + "' target='" + target + "'>" + text + "</a>";
     }
 
     @Override
@@ -150,7 +150,12 @@ public class LinkHandler extends FormHandlerBase {
         JSONObject resultObj = new JSONObject();
         resultObj.put("value", value);
         resultObj.put("text", text);
-        resultObj.put("label", "<a href='" + value + "' target='"+ target +"'>" + text + "</a>");
+        resultObj.put("label", "<a href='" + value + "' target='" + target + "'>" + text + "</a>");
         return resultObj;
+    }
+
+    @Override
+    public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        return configObj.getString("value");
     }
 }

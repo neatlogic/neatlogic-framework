@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -38,9 +38,9 @@ public class CommonGroupHandler implements IGroupSearchHandler {
 		List<String> includeStrList = includeList.stream().map(object -> object.toString()).collect(Collectors.toList());
 		List<String> userTypeList = new ArrayList<String>();
 		for (UserType s : UserType.values()) {
-			if((s.getIsDefultShow()||(!s.getIsDefultShow()&&includeStrList.contains(getHeader()+s.getValue())))&&s.getText().contains(jsonObj.getString("keyword"))) {
-				userTypeList.add(s.getValue());
-			}
+			if ((s.getIsDefaultShow() || (!s.getIsDefaultShow() && includeStrList.contains(getHeader() + s.getValue()))) && s.getText().contains(jsonObj.getString("keyword"))) {
+                userTypeList.add(s.getValue());
+            }
 		}
 		return (List<T>) userTypeList;
 	}

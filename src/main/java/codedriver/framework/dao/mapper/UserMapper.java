@@ -92,7 +92,7 @@ public interface UserMapper {
 
     List<UserVo> getUserListByUserUuidList(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
-    List<String> checkUserUuidListIsExists(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
+    List<String> getUserUuidListByUuidListAndIsActive(@Param("list") List<String> userUuidList, @Param("isActive") Integer isActive);
 
     UserDataVo getUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 
@@ -152,6 +152,12 @@ public interface UserMapper {
      */
     List<UserVo> getActiveUserListExcludeRoleInfoByUserUuidList(List<String> uuidList);
 
+    int getUserTeamCountByUserUuid(String userUuid);
+
+    List<String> getActiveUserEmailListByUserUuidList(List<String> userUuidList);
+
+    List<String> getActiveUserEmailListByTeamUuid(String teamUuid);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);
@@ -181,6 +187,8 @@ public interface UserMapper {
     int updateUserInfo(UserVo userVo);
 
     int updateUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId, @Param("config") String config);
+
+    int updateUserTeamByUserUuid(TeamUserVo vo);
 
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 

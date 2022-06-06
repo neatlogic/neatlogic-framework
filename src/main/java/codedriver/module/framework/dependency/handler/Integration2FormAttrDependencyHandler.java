@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,13 +53,18 @@ public class Integration2FormAttrDependencyHandler extends FixedTableDependencyH
                                 if (Objects.equals(formAttributeVo.getUuid(), dependencyVo.getTo())) {
                                     JSONObject dependencyInfoConfig = new JSONObject();
                                     dependencyInfoConfig.put("formUuid", formVo.getUuid());
-                                    dependencyInfoConfig.put("formName", formVo.getName());
-                                    dependencyInfoConfig.put("formVersion", formVersionVo.getVersion());
+//                                    dependencyInfoConfig.put("formName", formVo.getName());
+//                                    dependencyInfoConfig.put("formVersion", formVersionVo.getVersion());
                                     dependencyInfoConfig.put("formVersionUuid", formVersionVo.getUuid());
-                                    dependencyInfoConfig.put("attributeLabel", formAttributeVo.getLabel());
-                                    String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
+//                                    dependencyInfoConfig.put("attributeLabel", formAttributeVo.getLabel());
+                                    List<String> pathList = new ArrayList<>();
+                                    pathList.add("表单管理");
+                                    pathList.add(formVo.getName());
+                                    pathList.add(formVersionVo.getVersion().toString());
+                                    String lastName = formAttributeVo.getLabel();
+//                                    String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
                                     String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formUuid}&currentVersionUuid=${DATA.formVersionUuid}";
-                                    return new DependencyInfoVo(formAttributeVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
+                                    return new DependencyInfoVo(formAttributeVo.getUuid(), dependencyInfoConfig, lastName, pathList, urlFormat, this.getGroupName());
                                 }
                             }
                         }

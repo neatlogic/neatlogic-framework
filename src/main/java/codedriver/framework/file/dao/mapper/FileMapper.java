@@ -1,20 +1,29 @@
-package codedriver.framework.file.dao.mapper;
+/*
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
 
-import java.util.List;
+package codedriver.framework.file.dao.mapper;
 
 import codedriver.framework.file.dto.FileTypeVo;
 import codedriver.framework.file.dto.FileVo;
 
+import java.util.List;
+
 public interface FileMapper {
-	FileVo getFileById(Long id);
+    int searchFileCount(FileVo fileVo);
 
-	FileTypeVo getFileTypeConfigByType(String name);
+    List<FileVo> searchFile(FileVo fileVo);
 
-	List<FileVo> getFileListByIdList(List<Long> idList);
+    FileVo getFileById(Long id);
 
-	List<FileVo> getFileListByProcessTaskId(Long processTaskId);
+    FileTypeVo getFileTypeConfigByType(String name);
 
-	int insertFile(FileVo fileVo);
+    List<FileVo> getFileListByIdList(List<Long> idList);
 
-	void deleteFile(Long fileId);
+    List<FileVo> getFileListByProcessTaskId(Long processTaskId);
+
+    int insertFile(FileVo fileVo);
+
+    void deleteFile(Long fileId);
 }

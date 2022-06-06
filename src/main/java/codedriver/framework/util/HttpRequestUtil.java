@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -17,11 +17,11 @@ import codedriver.framework.integration.authentication.core.IAuthenticateHandler
 import codedriver.framework.integration.authentication.enums.AuthenticateType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.uwyn.jhighlight.tools.ExceptionUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -413,7 +413,7 @@ public class HttpRequestUtil {
             return connection;
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            this.error = ExceptionUtils.getExceptionStackTrace(ex);
+            this.error = ExceptionUtils.getStackTrace(ex);
         }
         return null;
     }
@@ -432,6 +432,11 @@ public class HttpRequestUtil {
                         OutputStreamHandlerMap.get(this.contentType).execute(out, this);
                         out.flush();
                     }
+                }
+                //默认使用原来的Content-Disposition，保留原来文件名
+                String contentDisPosition = connection.getHeaderField("Content-Disposition");
+                if (StringUtils.isNotBlank(contentDisPosition)) {
+                    UserContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
                 }
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
@@ -457,10 +462,10 @@ public class HttpRequestUtil {
                 this.error = e.getMessage();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                this.error = ExceptionUtils.getExceptionStackTrace(e);
+                this.error = ExceptionUtils.getStackTrace(e);
             } finally {
                 connection.disconnect();
-                if(UserContext.get() != null && UserContext.get().getResponse() != null) {
+                if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
                     UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
                 }
             }

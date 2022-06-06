@@ -7,6 +7,7 @@ package codedriver.framework.restful.dto;
 
 import codedriver.framework.common.audit.AuditVoHandler;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.ModuleGroupVo;
@@ -16,11 +17,13 @@ import codedriver.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
@@ -106,6 +109,10 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     private String logPath;
     @JSONField(serialize = false)
     private String tenant;
+    @JSONField(serialize = false)
+    private List<String> userUuidList;
+    @JSONField(serialize = false)
+    private List<String> statusList;
 
     public ApiAuditVo() {
         this.setPageSize(20);
@@ -379,5 +386,24 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setErrorFilePath(String errorFilePath) {
         this.errorFilePath = errorFilePath;
+    }
+
+    public List<String> getUserUuidList() {
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+            userUuidList = userUuidList.stream().map(GroupSearch::removePrefix).collect(Collectors.toList());
+        }
+        return userUuidList;
+    }
+
+    public void setUserUuidList(List<String> userUuidList) {
+        this.userUuidList = userUuidList;
+    }
+
+    public List<String> getStatusList() {
+        return statusList;
+    }
+
+    public void setStatusList(List<String> statusList) {
+        this.statusList = statusList;
     }
 }

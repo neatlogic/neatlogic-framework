@@ -22,6 +22,8 @@ public interface FormMapper {
 
     public List<FormVo> searchFormList(FormVo formVo);
 
+    public List<FormVo> getFormListByUuidList(List<String> uuid);
+
     public List<ValueTextVo> searchFormListForSelect(FormVo formVo);
 
     public int searchFormCount(FormVo formVo);
@@ -49,6 +51,8 @@ public interface FormMapper {
     public List<FormAttributeMatrixVo> getFormAttributeMatrixByMatrixUuid(@Param("matrixUuid") String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
 
     List<FormVersionVo> getFormVersionListByFormConfigLikeKeyword(String value);
+
+    List<FormVersionVo> getFormVersionList();
 
     public int insertForm(FormVo formVo);
 

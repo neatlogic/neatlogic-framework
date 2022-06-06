@@ -3,6 +3,7 @@ package codedriver.framework.matrix.dto;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.BasePageVo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
@@ -26,18 +27,13 @@ public class MatrixDataVo extends BasePageVo {
     private String uuid;
     private String attrType;
     private List<String> attributeValueList;
-//    private String attributeUuid;
     private JSONArray filterList;
     List<String> arrayColumnList;
-//    private String targetColumn;
-//
-//    public String getTargetColumn() {
-//        return targetColumn;
-//    }
-//
-//    public void setTargetColumn(String targetColumn) {
-//        this.targetColumn = targetColumn;
-//    }
+    //表单编辑页引用配置项矩阵时的保存过滤条件数据
+    private JSONArray attrFilterList;
+    private JSONArray relFilterList;
+    private Long filterCiEntityId;
+    private Long filterCiId;
 
     public String getMatrixUuid() {
         return matrixUuid;
@@ -56,6 +52,9 @@ public class MatrixDataVo extends BasePageVo {
     }
 
     public List<MatrixColumnVo> getSourceColumnList() {
+        if (sourceColumnList == null) {
+            sourceColumnList = new ArrayList<>();
+        }
         return sourceColumnList;
     }
 
@@ -129,13 +128,6 @@ public class MatrixDataVo extends BasePageVo {
         this.attributeValueList = attributeValueList;
     }
 
-//    public String getAttributeUuid() {
-//        return attributeUuid;
-//    }
-//
-//    public void setAttributeUuid(String attributeUuid) {
-//        this.attributeUuid = attributeUuid;
-//    }
 
     public JSONArray getFilterList() {
         return filterList;
@@ -155,5 +147,37 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setArrayColumnList(List<String> arrayColumnList) {
         this.arrayColumnList = arrayColumnList;
+    }
+
+    public JSONArray getAttrFilterList() {
+        return attrFilterList;
+    }
+
+    public void setAttrFilterList(JSONArray attrFilterList) {
+        this.attrFilterList = attrFilterList;
+    }
+
+    public JSONArray getRelFilterList() {
+        return relFilterList;
+    }
+
+    public void setRelFilterList(JSONArray relFilterList) {
+        this.relFilterList = relFilterList;
+    }
+
+    public Long getFilterCiEntityId() {
+        return filterCiEntityId;
+    }
+
+    public void setFilterCiEntityId(Long filterCiEntityId) {
+        this.filterCiEntityId = filterCiEntityId;
+    }
+
+    public Long getFilterCiId() {
+        return filterCiId;
+    }
+
+    public void setFilterCiId(Long filterCiId) {
+        this.filterCiId = filterCiId;
     }
 }

@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,13 +84,12 @@ public class IntegrationMatrixDependencyHandler extends CustomTableDependencyHan
                 dependencyInfoConfig.put("matrixUuid", matrixVo.getUuid());
                 dependencyInfoConfig.put("matrixName", matrixVo.getName());
                 dependencyInfoConfig.put("matrixType", matrixVo.getType());
-                String pathFormat = "矩阵-${DATA.matrixName}";
+                List<String> pathList = new ArrayList<>();
+                pathList.add("矩阵管理");
+                String lastName = matrixVo.getName();
+//                String pathFormat = "矩阵-${DATA.matrixName}";
                 String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/matrix-view-edit?uuid=${DATA.matrixUuid}&name=${DATA.matrixName}&type=${DATA.matrixType}";
-                return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, pathFormat, urlFormat, this.getGroupName());
-//                DependencyInfoVo dependencyInfoVo = new DependencyInfoVo();
-//                dependencyInfoVo.setValue(matrixVo.getUuid());
-//                dependencyInfoVo.setText(String.format("<a href=\"/%s/framework.html#/matrix-external-edit?uuid=%s&name=%s&type=%s\" target=\"_blank\">矩阵-%s</a>", TenantContext.get().getTenantUuid(), matrixVo.getUuid(), matrixVo.getName(), matrixVo.getType(), matrixVo.getName()));
-//                return dependencyInfoVo;
+                return new DependencyInfoVo(matrixVo.getUuid(), dependencyInfoConfig, lastName, pathList, urlFormat, this.getGroupName());
             }
         }
         return null;

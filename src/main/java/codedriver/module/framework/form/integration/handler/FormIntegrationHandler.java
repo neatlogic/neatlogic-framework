@@ -55,10 +55,6 @@ public class FormIntegrationHandler extends IntegrationHandlerBase {
         sourceColumnList.addChild(new PatternVo("expression", "input", ApiParamType.STRING, 0, "表达式"));
         sourceColumnList.addChild(new PatternVo("value", "input", ApiParamType.STRING, 0, "过滤参数值"));
         jsonList.add(sourceColumnList);
-        PatternVo filterList = new PatternVo("filterList", "input", ApiParamType.JSONARRAY, 0, "过滤参数列表2");
-        filterList.addChild(new PatternVo("uuid", "input", ApiParamType.STRING, 0, "过滤参数名称"));
-        filterList.addChild(new PatternVo("valueList", "input", ApiParamType.JSONARRAY, 0, "过滤参数值列表"));
-        jsonList.add(filterList);
         return jsonList;
     }
 

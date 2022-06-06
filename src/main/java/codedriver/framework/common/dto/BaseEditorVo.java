@@ -22,6 +22,7 @@ import java.util.Objects;
  * 之后修改数据时只需更新lcu与lcd字段值，fcu与fcd字段值不变。
  */
 public class BaseEditorVo extends BasePageVo {
+    private static final long serialVersionUID = -3871232273093802236L;
     @EntityField(name = "创建者", type = ApiParamType.STRING)
     private String fcu;
     @EntityField(name = "创建者中文名", type = ApiParamType.STRING)

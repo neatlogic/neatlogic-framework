@@ -3,9 +3,8 @@ package codedriver.framework.matrix.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
-
-import codedriver.framework.matrix.constvalue.MatrixAttributeType;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @program: codedriver
@@ -14,16 +13,24 @@ import codedriver.framework.matrix.constvalue.MatrixAttributeType;
  **/
 public class MatrixColumnVo {
     private String column;
-    private Object value;
+    private List<String> valueList;
     private String expression;
     private String type;
-
+	private List<String> defaultValue;
+	private boolean isFilterList;
+	@JSONField(serialize = false)
+	private String value;
     public MatrixColumnVo() {
 	}
 
-	public MatrixColumnVo(String column, Object value) {
+	public MatrixColumnVo(String column, String value) {
 		this.column = column;
-		this.value = value;
+		this.valueList = new ArrayList<>();
+		this.valueList.add(value);
+	}
+	public MatrixColumnVo(String column, List<String> valueList) {
+		this.column = column;
+		this.valueList = valueList;
 	}
 
 	public String getColumn() {
@@ -34,39 +41,24 @@ public class MatrixColumnVo {
         this.column = column;
     }
 
-    public Object getValue() {
-    	if(value != null && type != null) {
-    		if(value instanceof JSONArray) {
-    			JSONArray valueArray = (JSONArray)value;
-    			List<String> valueList = new ArrayList<>();
-    			for(int i = 0; i < valueArray.size(); i++) {
-    				if(MatrixAttributeType.USER.getValue().equals(type)) {
-    					valueList.add(valueArray.getString(i).split("#")[1]);
-        			}else if(MatrixAttributeType.TEAM.getValue().equals(type)) {
-        				valueList.add(valueArray.getString(i).split("#")[1]);
-        			}else if(MatrixAttributeType.ROLE.getValue().equals(type)) {
-        				valueList.add(valueArray.getString(i).split("#")[1]);
-        			}else {
-        				valueList.add(valueArray.getString(i));
-        			}
-    			}
-    			return valueList;
-    		}else if(value instanceof String){
-    			if(MatrixAttributeType.USER.getValue().equals(type)) {
-    				return value.toString().split("#")[1];
-    			}else if(MatrixAttributeType.TEAM.getValue().equals(type)) {
-    				return value.toString().split("#")[1];
-    			}else if(MatrixAttributeType.ROLE.getValue().equals(type)) {
-    				return value.toString().split("#")[1];
-    			}
-    		}
+    public String getValue() {
+    	if(value == null && CollectionUtils.isNotEmpty(valueList)) {
+    		value = valueList.get(0);
     	}
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
+
+	public List<String> getValueList() {
+		return valueList;
+	}
+
+	public void setValueList(List<String> valueList) {
+		this.valueList = valueList;
+	}
 
 	public String getExpression() {
 		return expression;
@@ -82,5 +74,21 @@ public class MatrixColumnVo {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public List<String> getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(List<String> defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public boolean getIsFilterList() {
+		return isFilterList;
+	}
+
+	public void setIsFilterList(boolean isFilterList) {
+		isFilterList = isFilterList;
 	}
 }

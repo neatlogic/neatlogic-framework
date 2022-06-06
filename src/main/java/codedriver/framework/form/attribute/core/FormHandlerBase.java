@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FormHandlerBase implements IFormAttributeHandler {
+public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAttributeDataConversionHandler {
 
     public enum ConversionType {
 
@@ -53,9 +53,10 @@ public abstract class FormHandlerBase implements IFormAttributeHandler {
     protected MatrixMapper matrixMapper;
 
     @Resource
-    public void setMatrixMapper(MatrixMapper _matrixMapper){
+    public void setMatrixMapper(MatrixMapper _matrixMapper) {
         this.matrixMapper = _matrixMapper;
     }
+
     @Override
     public final String getType() {
         return "form";

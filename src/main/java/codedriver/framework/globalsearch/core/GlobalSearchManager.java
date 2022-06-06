@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class GlobalSearchManager {
     public static List<DocumentTypeVo> searchDocument(DocumentVo documentVo) {
         //获取当前租户拥有索引类型的模块列表
         List<String> moduleIdList = FullTextIndexHandlerFactory.getModuleIdList();
-        List<DocumentTypeVo> documentTypeList = new ArrayList<>();
+        List<DocumentTypeVo> documentTypeList = Collections.synchronizedList(new ArrayList<>());
         if (CollectionUtils.isNotEmpty(moduleIdList) && CollectionUtils.isNotEmpty(documentVo.getTypeList()) && StringUtils.isNotBlank(documentVo.getKeyword()) && CollectionUtils.isNotEmpty(documentVo.getWordList())) {
             //根据分词加过查询是否有命中分词
             List<FullTextIndexWordVo> wordList = wordMapper.searchWord(new ArrayList<>(documentVo.getWordList()));
@@ -66,7 +67,7 @@ public class GlobalSearchManager {
                 }
                 if (CollectionUtils.isNotEmpty(pDocumentList)) {
                     BatchRunner<DocumentVo> runner = new BatchRunner<>();
-                    runner.execute(pDocumentList, pDocumentList.size(), item -> {
+                    runner.execute(pDocumentList, 3, item -> {
                         List<DocumentVo> documentList = documentMapper.searchDocument(item);
                         if (CollectionUtils.isNotEmpty(documentList)) {
                             IFullTextIndexHandler handler = FullTextIndexHandlerFactory.getHandler(item.getType());

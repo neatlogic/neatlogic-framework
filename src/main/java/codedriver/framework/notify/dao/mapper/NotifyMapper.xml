@@ -13,8 +13,39 @@
 	`lcd`,
 	`lcu`
 	FROM `notify_policy`
-	WHERE `id` = #{id}
+	WHERE `id` = #{value}
 	FOR UPDATE
+	</select>
+
+	<select id="getNotifyPolicyByName" parameterType="java.lang.String" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `name` = #{value}
+	Limit 1
+	</select>
+
+	<select id="getNotifyPolicyListByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.notify.dto.NotifyPolicyVo">
+	SELECT
+	`id`,
+	`name`,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `id` IN
+	<foreach collection="list" item="id" open="(" separator="," close=")">
+		#{id}
+	</foreach>
 	</select>
 
 	<select id="checkNotifyPolicyNameIsRepeat" parameterType="codedriver.framework.notify.dto.NotifyPolicyVo" resultType="int">

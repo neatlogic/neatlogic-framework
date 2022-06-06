@@ -68,11 +68,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     // 将自己的计数器清零
                     serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
                     // 查出正常服务器及计数器加一后的值
-                    List<ServerCounterVo> serverCounterList = serverMapper.getServerCounterIncreaseByFromServerId(Config.SCHEDULE_SERVER_ID);
-                    for (ServerCounterVo serverCounter : serverCounterList) {
-                        // 重新插入数据
-                        serverMapper.replaceServerCounter(serverCounter);
-                    }
+                    serverMapper.updateServerCounterIncrementByOneByFromServerId(Config.SCHEDULE_SERVER_ID);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
@@ -95,7 +91,6 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                 if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
                     serverVo.setStatus(ServerClusterVo.STOP);
                     serverMapper.updateServerByServerId(serverVo);
-                    serverMapper.deleteCounterByServerId(serverVo.getServerId());
                     returnVal = true;
                 }
             }
@@ -103,6 +98,10 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             TransactionUtil.rollbackTx(transactionStatus);
+        }
+        if (returnVal) {
+            // `server_counter`是内存表，不支持事务，不能与其他支持事务的表在同个事务里更新数据
+            serverMapper.deleteCounterByServerId(serverId);
         }
         return returnVal;
     }

@@ -6,7 +6,6 @@
 package codedriver.module.framework.matrix.handler;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
-import codedriver.framework.common.constvalue.ExportFileType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.ValueTextVo;
@@ -31,10 +30,8 @@ import codedriver.framework.util.ExcelUtil;
 import codedriver.framework.util.TableResultUtil;
 import codedriver.framework.util.TimeUtil;
 import codedriver.framework.util.UuidUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -388,6 +384,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (CollectionUtils.isNotEmpty(dafaultValue)) {
                 dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return returnObj;
+                }
                 int rowNum = matrixDataMapper.getDynamicTableDataCountForTable(dataVo);
                 if (rowNum > 0) {
                     dataVo.setRowNum(rowNum);
@@ -439,17 +438,17 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         }
                         String keyword = split[1];
                         if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
-                            String config = matrixAttribute.getConfig();
-                            if (StringUtils.isNotBlank(config)) {
-                                JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                            JSONObject config = matrixAttribute.getConfig();
+                            if (MapUtils.isNotEmpty(config)) {
+                                JSONArray dataArray = config.getJSONArray("dataList");
                                 if (CollectionUtils.isNotEmpty(dataArray)) {
-                                    JSONArray valueList = new JSONArray();
+                                    List<String> valueList = new ArrayList<>();
                                     List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
                                     for (ValueTextVo e : dataList) {
                                         String text = e.getText();
                                         if (StringUtils.isNotBlank(text)) {
                                             if (Objects.equals(e.getText(), keyword)) {
-                                                valueList.add(e.getValue());
+                                                valueList.add((String)e.getValue());
                                             }
                                         }
                                     }
@@ -472,7 +471,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setSourceColumnList(sourceColumnList);
                         List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
                         if (CollectionUtils.isNotEmpty(dataMapList)) {
+                            //对dataMapList去重
+                            List<Map<String, String>> distinctList = new ArrayList<>();
                             for (Map<String, String> dataMap : dataMapList) {
+                                if(distinctList.contains(dataMap)){
+                                    continue;
+                                }
+                                distinctList.add(dataMap);
                                 Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
                                 for (Map.Entry<String, String> entry : dataMap.entrySet()) {
                                     String attributeUuid = entry.getKey();
@@ -484,6 +489,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
             } else {
+                if (!mergeFilterListAndSourceColumnList(dataVo)) {
+                    return resultList;
+                }
                 String keywordColumn = dataVo.getKeywordColumn();
                 String keyword = dataVo.getKeyword();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
@@ -492,22 +500,22 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }
                     if (MatrixAttributeType.SELECT.getValue().equals(matrixAttribute.getType())) {
-                        String config = matrixAttribute.getConfig();
-                        if (StringUtils.isNotBlank(config)) {
-                            JSONArray dataArray = (JSONArray) JSONPath.read(config, "dataList");
+                        JSONObject config = matrixAttribute.getConfig();
+                        if (MapUtils.isNotEmpty(config)) {
+                            JSONArray dataArray = config.getJSONArray("dataList");
                             if (CollectionUtils.isNotEmpty(dataArray)) {
-                                JSONArray valueList = new JSONArray();
+                                List<String> valueList = new ArrayList<>();
                                 List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
                                 for (ValueTextVo e : dataList) {
                                     String text = e.getText();
                                     if (StringUtils.isNotBlank(text)) {
                                         if (text.contains(keyword)) {
-                                            valueList.add(e.getValue());
+                                            valueList.add((String)e.getValue());
                                         }
                                     }
                                 }
                                 if (CollectionUtils.isNotEmpty(valueList)) {
-                                    List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
+                                    List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                                     MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, valueList);
                                     matrixColumnVo.setExpression(Expression.INCLUDE.getExpression());
                                     sourceColumnList.add(matrixColumnVo);
@@ -523,14 +531,37 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         dataVo.setKeywordExpression(Expression.LIKE.getExpression());
                     }
                 }
-                List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
-                for (Map<String, String> dataMap : dataMapList) {
-                    Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-                    for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                        String attributeUuid = entry.getKey();
-                        resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                //对dataMapList去重
+                List<Map<String, String>> distinctList = new ArrayList<>(100);
+                int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
+                if (rowNum > 0) {
+                    dataVo.setRowNum(rowNum);
+                    int pageCount = dataVo.getPageCount();
+                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                        dataVo.setCurrentPage(currentPage);
+                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+                        if (CollectionUtils.isEmpty(dataMapList)) {
+                            break;
+                        }
+                        for (Map<String, String> dataMap : dataMapList) {
+                            if(distinctList.contains(dataMap)){
+                                continue;
+                            }
+                            distinctList.add(dataMap);
+                            Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
+                            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+                                String attributeUuid = entry.getKey();
+                                resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
+                            }
+                            resultList.add(resultMap);
+                            if (resultList.size() >= dataVo.getPageSize()) {
+                                break;
+                            }
+                        }
+                        if (resultList.size() >= dataVo.getPageSize()) {
+                            break;
+                        }
                     }
-                    resultList.add(resultMap);
                 }
             }
         }
@@ -662,10 +693,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
      * @param selectValueList
      */
     private void decodeDataConfig(MatrixAttributeVo attributeVo, List<String> selectValueList) {
-        if (StringUtils.isNotBlank(attributeVo.getConfig())) {
-            String config = attributeVo.getConfig();
-            JSONObject configObj = JSONObject.parseObject(config);
-            JSONArray dataList = configObj.getJSONArray("dataList");
+            JSONObject config = attributeVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            JSONArray dataList = config.getJSONArray("dataList");
             if (CollectionUtils.isNotEmpty(dataList)) {
                 for (int i = 0; i < dataList.size(); i++) {
                     JSONObject dataObj = dataList.getJSONObject(i);
@@ -692,12 +722,14 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (type.equals(MatrixAttributeType.INPUT.getValue())) {
             return true;
         } else if (type.equals(MatrixAttributeType.SELECT.getValue())) {
-            String config = matrixAttributeVo.getConfig();
-            JSONArray dataList = (JSONArray) JSONPath.read(config, "dataList");
-            for (int i = 0; i < dataList.size(); i++) {
-                JSONObject dataObj = dataList.getJSONObject(i);
-                if (value.equals(dataObj.getString("value"))) {
-                    return true;
+            JSONObject config = matrixAttributeVo.getConfig();
+            if (MapUtils.isNotEmpty(config)) {
+                JSONArray dataList = config.getJSONArray("dataList");
+                for (int i = 0; i < dataList.size(); i++) {
+                    JSONObject dataObj = dataList.getJSONObject(i);
+                    if (value.equals(dataObj.getString("value"))) {
+                        return true;
+                    }
                 }
             }
         } else if (type.equals(MatrixAttributeType.DATE.getValue())) {
@@ -757,10 +789,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         resultObj.put("text", value);
         if (MatrixAttributeType.SELECT.getValue().equals(type)) {
             if (matrixAttribute != null) {
-                String config = matrixAttribute.getConfig();
-                if (StringUtils.isNotBlank(config)) {
-                    JSONObject configObj = JSON.parseObject(config);
-                    JSONArray dataList = configObj.getJSONArray("dataList");
+                JSONObject config = matrixAttribute.getConfig();
+                if (MapUtils.isNotEmpty(config)) {
+                    JSONArray dataList = config.getJSONArray("dataList");
                     if (CollectionUtils.isNotEmpty(dataList)) {
                         for (int i = 0; i < dataList.size(); i++) {
                             JSONObject data = dataList.getJSONObject(i);

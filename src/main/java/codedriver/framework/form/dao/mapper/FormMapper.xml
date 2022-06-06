@@ -49,6 +49,20 @@
         </if>
     </select>
 
+    <select id="getFormListByUuidList" parameterType="java.lang.String"
+            resultType="codedriver.framework.form.dto.FormVo">
+        SELECT
+        `uuid`,
+        `name`,
+        `is_active` AS isActive
+        FROM `form`
+        WHERE `uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+        ORDER BY `fcd` DESC
+    </select>
+
     <select id="searchFormListForSelect" parameterType="codedriver.framework.form.dto.FormVo"
             resultType="codedriver.framework.common.dto.ValueTextVo">
         SELECT
@@ -210,8 +224,8 @@
             c.`uuid` AS formUuid,
             c.`name` AS formName
         FROM `form_attribute_matrix` a
-        LEFT JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
-        LEFT JOIN form c ON c.`uuid` = b.`form_uuid`
+        JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+        JOIN form c ON c.`uuid` = b.`form_uuid`
         WHERE a.`matrix_uuid` = #{matrixUuid}
         LIMIT #{startNum}, #{pageSize}
     </select>
@@ -229,6 +243,21 @@
             a.`lcu`
         FROM `form_version` a
         WHERE a.`form_config` LIKE CONCAT('%',#{value},'%')
+        ORDER BY a.`form_uuid`
+    </select>
+
+    <select id="getFormVersionList" resultType="codedriver.framework.form.dto.FormVersionVo">
+        SELECT
+            a.`uuid`,
+            a.`version`,
+            a.`is_active` AS isActive,
+            a.`form_uuid` AS formUuid,
+            a.`form_config` AS formConfig,
+            a.`fcd`,
+            a.`fcu`,
+            a.`lcd`,
+            a.`lcu`
+        FROM `form_version` a
         ORDER BY a.`form_uuid`
     </select>
 

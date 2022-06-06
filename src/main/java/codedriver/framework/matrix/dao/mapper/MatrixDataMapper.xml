@@ -91,9 +91,9 @@
                     <when test="sourceColumn.expression == 'less-than'">
                         AND `${sourceColumn.column}` &lt; #{sourceColumn.value}
                     </when>
-                    <when test="sourceColumn.expression == 'include' and sourceColumn.value != null and sourceColumn.value.size() > 0">
+                    <when test="sourceColumn.expression == 'include' and sourceColumn.valueList != null and sourceColumn.valueList.size() > 0">
                         AND `${sourceColumn.column}` IN
-                        <foreach collection="sourceColumn.value" item="item" open="(" close=")" separator=",">
+                        <foreach collection="sourceColumn.valueList" item="item" open="(" close=")" separator=",">
                             #{item}
                         </foreach>
                     </when>
@@ -101,16 +101,6 @@
                         AND `${sourceColumn.column}` = #{sourceColumn.value}
                     </otherwise>
                 </choose>
-            </foreach>
-        </if>
-        <if test="filterList != null and filterList.size() > 0">
-            <foreach collection="filterList" item="filter" separator=" ">
-                <if test="filter.valueList != null and filter.valueList.size() > 0">
-                    and `${filter.uuid}` in
-                    <foreach collection="filter.valueList" item="value" open="(" separator="," close=")">
-                        '${value}'
-                    </foreach>
-                </if>
             </foreach>
         </if>
     </sql>
@@ -142,16 +132,7 @@
         </if>
     </select>
 
-    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
-            resultType="java.util.LinkedHashMap">
-        select
-        DISTINCT e.*
-        from (
-        SELECT
-        <foreach collection="columnList" item="column" separator=",">
-            a.`${column}`
-        </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+    <sql id="searchDynamicTableDataForSelectSql">
         <choose>
             <when test="attrType == 'user'">
                 JOIN `user` b ON b.`uuid` = a.`${keywordColumn}`
@@ -160,7 +141,7 @@
                 JOIN `team` c ON c.`uuid` = a.`${keywordColumn}`
             </when>
             <when test="attrType == 'role'">
-                JOIN `role` d ON d.`name` = a.`${keywordColumn}`
+                JOIN `role` d ON d.`uuid` = a.`${keywordColumn}`
             </when>
         </choose>
         <where>
@@ -179,7 +160,7 @@
                     </when>
                     <when test="attrType == 'user'">
                         <if test="keywordExpression == 'like'">
-                        and (b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (b.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR b.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (b.`user_id` = #{keyword} OR b.`user_name` = #{keyword})
@@ -187,7 +168,7 @@
                     </when>
                     <when test="attrType == 'team'">
                         <if test="keywordExpression == 'like'">
-                        and (c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (c.`uuid` LIKE CONCAT('%', #{keyword}, '%') OR c.`name` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (c.`uuid` = #{keyword} OR c.`name` = #{keyword})
@@ -195,7 +176,7 @@
                     </when>
                     <when test="attrType == 'role'">
                         <if test="keywordExpression == 'like'">
-                        and (d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%'))
+                            and (d.`name` LIKE CONCAT('%', #{keyword}, '%') OR d.`description` LIKE CONCAT('%', #{keyword}, '%'))
                         </if>
                         <if test="keywordExpression == 'equal'">
                             and (d.`name` = #{keyword} OR d.`description` = #{keyword})
@@ -205,8 +186,25 @@
             </if>
             <include refid="searchDynamicTableDataSql"/>
         </where>
+    </sql>
+
+    <select id="getDynamicTableDataCountForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        <include refid="searchDynamicTableDataForSelectSql"/>
+    </select>
+
+    <select id="getDynamicTableDataForSelect" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.LinkedHashMap">
+        SELECT
+        <foreach collection="columnList" item="column" separator=",">
+            a.`${column}`
+        </foreach>
+        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        <include refid="searchDynamicTableDataForSelectSql"/>
         ORDER BY a.`id` DESC
-        ) e
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

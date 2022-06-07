@@ -14,6 +14,8 @@ import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.dto.license.LicenseVo;
+import codedriver.framework.exception.core.LicenseInvalidException;
+import codedriver.framework.license.LicenseManager;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -102,18 +104,22 @@ public class AuthActionChecker {
         //先判断租户license 是否有该auth
         List<String> licenseActionList;
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        List<UserAuthVo> licenseUserAuthList = AuthActionChecker.getAuthListByLicenseAuth(licenseVo);
-        if(licenseVo.getHasAllAuth()){
+        if(licenseVo == null){
+            throw new LicenseInvalidException();
+        }
+        boolean isExpired = licenseVo.getExpireTime().getTime() < System.currentTimeMillis();
+        if ((!isExpired && licenseVo.getHasAllAuth()) || (isExpired && licenseVo.getExpiredHasAllAuth())) {
             licenseActionList = actionList;
         }else{
+            List<UserAuthVo> licenseUserAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
             licenseActionList = actionList.stream().filter(o -> licenseUserAuthList.stream().anyMatch(l -> Objects.equals(l.getAuth(), o))).collect(Collectors.toList());
         }
         if ( CollectionUtils.isEmpty(licenseActionList)) {
             return false;
         }
+        //判断从数据库查询的用户权限是否满足
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
-        //判断从数据库查询的用户权限是否满足
         List<String> contains = userAuthList.stream().filter(licenseActionList::contains).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(contains)) {
             return true;
@@ -168,29 +174,7 @@ public class AuthActionChecker {
         }
     }
 
-    /**
-     * 根据用户权限穿透获取所有权限
-     *
-     * @param licenseVo license
-     */
-    public static List<UserAuthVo> getAuthListByLicenseAuth(LicenseVo licenseVo) {
-        List<UserAuthVo> userAuthList = new ArrayList<>();
-        if (licenseVo != null && licenseVo.getAuth() != null) {
-            List<String> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
-            List<String> authActionList = licenseVo.getAuth().getAuthActionList();
-            authActionList.addAll(AuthFactory.getAuthActionListByAuthGroupList(moduleGroupList));
-            if (CollectionUtils.isNotEmpty(authActionList)) {
-                for (String s : authActionList) {
-                    AuthBase authBase = AuthFactory.getAuthInstance(s);
-                    if (authBase != null) {
-                        userAuthList.add(new UserAuthVo(authBase));
-                        getAuthListByAuth(authBase, userAuthList);
-                    }
-                }
-            }
-        }
-        return userAuthList;
-    }
+
 
     /**
      * 递归穿透获取权限
@@ -198,7 +182,7 @@ public class AuthActionChecker {
      * @param authBase     权限对象
      * @param userAuthList 用户对应权限
      */
-    private static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
+    public static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
         if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {

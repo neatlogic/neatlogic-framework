@@ -279,6 +279,13 @@ public class ApiValidateAndHelpBase {
             } else {
                 isAuth = true;
             }
+            //校验OperationType
+            if(isAuth) {
+                OperationType[] operationTypes = apiClass.getAnnotationsByType(OperationType.class);
+                if (operationTypes.length > 0) {
+
+                }
+            }
 
             if (!isAuth) {
                 throw new PermissionDeniedException(authNameList);

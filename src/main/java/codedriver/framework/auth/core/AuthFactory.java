@@ -10,6 +10,7 @@ import codedriver.framework.common.util.ModuleUtil;
 import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.exception.auth.NoAuthGroupException;
+import codedriver.framework.license.LicenseManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,8 +67,9 @@ public class AuthFactory {
         //过滤出对应租户license 权限
         Map<String, List<AuthBase>> licenseAuthGroupMap = new HashMap<>();
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        if(!licenseVo.getHasAllAuth()) {
-            List<UserAuthVo> licenseUserAuth = AuthActionChecker.getAuthListByLicenseAuth(licenseVo);
+        boolean isExpired = licenseVo.getExpireTime().getTime() < System.currentTimeMillis();
+        if ((!isExpired && !licenseVo.getHasAllAuth()) || (isExpired && !licenseVo.getExpiredHasAllAuth())) {
+            List<UserAuthVo> licenseUserAuth = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
             for (Map.Entry<String, List<AuthBase>> authGroupEntry : authGroupMap.entrySet()) {
                 List<AuthBase> authBaseList = authGroupEntry.getValue();
                 List<AuthBase> licenseAuthBaseList = new ArrayList<>();

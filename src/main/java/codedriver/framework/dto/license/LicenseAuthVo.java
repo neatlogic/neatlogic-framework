@@ -12,23 +12,13 @@ import java.util.List;
 
 public class LicenseAuthVo {
     @EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
-    private List<String> moduleGroupList;
-    @EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
-    private List<String> authActionList;
+    private List<LicenseAuthModuleVo> moduleList;
 
-    public List<String> getModuleGroupList() {
-        return moduleGroupList;
+    public List<LicenseAuthModuleVo> getModuleList() {
+        return moduleList;
     }
 
-    public void setModuleGroupList(List<String> moduleGroupList) {
-        this.moduleGroupList = moduleGroupList;
-    }
-
-    public List<String> getAuthActionList() {
-        return authActionList;
-    }
-
-    public void setAuthActionList(List<String> authActionList) {
-        this.authActionList = authActionList;
+    public void setModuleList(List<LicenseAuthModuleVo> moduleList) {
+        this.moduleList = moduleList;
     }
 }

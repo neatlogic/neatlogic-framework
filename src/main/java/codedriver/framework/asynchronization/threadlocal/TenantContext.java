@@ -12,6 +12,7 @@ import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
 import codedriver.framework.dto.license.LicenseVo;
+import codedriver.framework.license.LicenseManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -127,7 +128,7 @@ public class TenantContext implements Serializable {
                 }
             }
             // 查询对应租户的license
-            this.licenseVo = LicenseVo.getInstance(licenseMapper.getTenantLicenseByTenantUuid(tenantUuid));
+            this.licenseVo = LicenseManager.tenantLicenseMap.get(tenantUuid);
             // 还原回租户库
             this.setUseDefaultDatasource(false);
             activeModuleMap = new HashMap<>();

@@ -8,5 +8,15 @@
                       ON tl.`tenant_id` = t.`id`
         WHERE t.`uuid` = #{value}
     </select>
+    <select id="getTenantLicenseByTenantUuidList" resultType="codedriver.framework.dto.license.LicenseVo">
+        SELECT tl.license licenseStr,t.uuid as tenant
+        FROM `tenant_license` tl
+        JOIN `tenant` t
+        ON tl.`tenant_id` = t.`id`
+        WHERE t.`uuid` in
+        <foreach collection="list" item="tenantUuid" separator="," open="(" close=")">
+            #{tenantUuid}
+        </foreach>
+    </select>
 </mapper>
 

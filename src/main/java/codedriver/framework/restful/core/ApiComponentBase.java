@@ -86,7 +86,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
-                validApi(targetClass, paramObj, JSONObject.class);
+                validApi(targetClass, paramObj, apiVo, JSONObject.class);
                 boolean canRun = false;
                 if (apiVo.getIsActive().equals(0)) {
                     Method method = proxy.getClass().getMethod("myDoTest", JSONObject.class);
@@ -113,7 +113,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     }
                 }
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
-                validApi(this.getClass(), paramObj, JSONObject.class);
+                validApi(this.getClass(), paramObj, apiVo, JSONObject.class);
                 boolean canRun = false;
                 if (apiVo.getIsActive().equals(0)) {
                     result = myDoTest(paramObj);
@@ -146,7 +146,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
-            if( TenantContext.get() != null){
+            if (TenantContext.get() != null) {
                 TenantContext.get().setUseDefaultDatasource(false);//防止上游异常导致后续审计没有还原原来的租户
             }
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来

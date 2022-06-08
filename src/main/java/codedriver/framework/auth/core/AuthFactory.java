@@ -7,7 +7,6 @@ package codedriver.framework.auth.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.exception.auth.NoAuthGroupException;
 import codedriver.framework.license.LicenseManager;
@@ -69,16 +68,18 @@ public class AuthFactory {
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
         boolean isExpired = licenseVo.getExpireTime().getTime() < System.currentTimeMillis();
         if ((!isExpired && !licenseVo.getHasAllAuth()) || (isExpired && !licenseVo.getExpiredHasAllAuth())) {
-            List<UserAuthVo> licenseUserAuth = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
-            for (Map.Entry<String, List<AuthBase>> authGroupEntry : authGroupMap.entrySet()) {
-                List<AuthBase> authBaseList = authGroupEntry.getValue();
-                List<AuthBase> licenseAuthBaseList = new ArrayList<>();
-                authBaseList.forEach(authBase -> {
-                    if (licenseUserAuth.stream().anyMatch(u -> Objects.equals(u.getAuth(), authBase.getAuthName()))) {
-                        licenseAuthBaseList.add(authBase);
-                    }
-                });
-                licenseAuthGroupMap.put(authGroupEntry.getKey(), licenseAuthBaseList);
+            List<String> licenseAuth = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
+            if(CollectionUtils.isNotEmpty(licenseAuth)) {
+                for (Map.Entry<String, List<AuthBase>> authGroupEntry : authGroupMap.entrySet()) {
+                    List<AuthBase> authBaseList = authGroupEntry.getValue();
+                    List<AuthBase> licenseAuthBaseList = new ArrayList<>();
+                    authBaseList.forEach(authBase -> {
+                        if (licenseAuth.stream().anyMatch(u -> Objects.equals(u.toUpperCase(Locale.ROOT), authBase.getAuthName()))) {
+                            licenseAuthBaseList.add(authBase);
+                        }
+                    });
+                    licenseAuthGroupMap.put(authGroupEntry.getKey(), licenseAuthBaseList);
+                }
             }
         }else{
             licenseAuthGroupMap = authGroupMap;

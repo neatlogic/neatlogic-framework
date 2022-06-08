@@ -102,7 +102,7 @@ public class AuthActionChecker {
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         //先判断租户license 是否有该auth
-        List<String> licenseActionList;
+        List<String> licenseActionList = null;
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
         if(licenseVo == null){
             throw new LicenseInvalidException();
@@ -111,8 +111,10 @@ public class AuthActionChecker {
         if ((!isExpired && licenseVo.getHasAllAuth()) || (isExpired && licenseVo.getExpiredHasAllAuth())) {
             licenseActionList = actionList;
         }else{
-            List<UserAuthVo> licenseUserAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
-            licenseActionList = actionList.stream().filter(o -> licenseUserAuthList.stream().anyMatch(l -> Objects.equals(l.getAuth(), o))).collect(Collectors.toList());
+            List<String> licenseAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
+            if(CollectionUtils.isNotEmpty(licenseAuthList)) {
+                licenseActionList = actionList.stream().filter(o -> licenseAuthList.stream().anyMatch(l -> Objects.equals(l.toUpperCase(Locale.ROOT), o))).collect(Collectors.toList());
+            }
         }
         if ( CollectionUtils.isEmpty(licenseActionList)) {
             return false;
@@ -169,7 +171,7 @@ public class AuthActionChecker {
         for (int i = 0; i < userAuthList.size(); i++) {
             AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
             if (authBase != null) {
-                getAuthListByAuth(authBase, userAuthList);
+                getUserAuthListByAuth(authBase, userAuthList);
             }
         }
     }
@@ -182,18 +184,35 @@ public class AuthActionChecker {
      * @param authBase     权限对象
      * @param userAuthList 用户对应权限
      */
-    public static void getAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
+    public static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
         if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
                     AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
                     userAuthList.add(new UserAuthVo(auth));
-                    getAuthListByAuth(auth, userAuthList);
+                    getUserAuthListByAuth(auth, userAuthList);
                 }
             }
         }
     }
 
-
+    /**
+     * 递归穿透获取权限
+     *
+     * @param authBase     权限对象
+     * @param authList 权限
+     */
+    public static void getAuthListByAuth(AuthBase authBase, List<String> authList) {
+        if (authBase != null) {
+            List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
+            for (Class<? extends AuthBase> authClass : authClassList) {
+                if (authList.stream().noneMatch(o -> Objects.equals(o, authClass.getSimpleName()))) {//防止回环
+                    AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
+                    authList.add(auth.getAuthName());
+                    getAuthListByAuth(auth, authList);
+                }
+            }
+        }
+    }
 }

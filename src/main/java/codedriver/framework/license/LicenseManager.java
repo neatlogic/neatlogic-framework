@@ -15,15 +15,14 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.dao.mapper.DatasourceMapper;
 import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dto.DatasourceVo;
-import codedriver.framework.dto.UserAuthVo;
-import codedriver.framework.dto.license.LicenseAuthModuleVo;
+import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
 import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.util.RSAUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,16 +30,16 @@ import java.util.stream.Collectors;
 public class LicenseManager extends ModuleInitializedListenerBase {
     public static final Map<String, LicenseVo> tenantLicenseMap = new HashMap<>();
 
-    public static final Map<String, List<UserAuthVo>> tenantLicenseAuthListMap = new HashMap<>();
+    public static final Map<String, List<String>> tenantLicenseAuthListMap = new HashMap<>();
 
-    public static final Map<String, List<String>> tenantOperationListMap = new HashMap<>();
+    public static final Map<String, Map<String,List<String>>> tenantOperationListMap = new HashMap<>();
 
     private static boolean isExpired;
 
-    @Autowired
+    @Resource
     private LicenseMapper licenseMapper;
 
-    @Autowired
+    @Resource
     private DatasourceMapper datasourceMapper;
 
     @Override
@@ -79,19 +78,6 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         tenantLicenseMap.put(tenantUuid, licenseVo);
         //获取租户所有权限map
         tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
-        //获取租户所有操作map
-        tenantOperationListMap.put(tenantUuid,getOperationTypeListByLicenseAuth(licenseVo));
-    }
-
-    /**
-     * 根据license获取operationTypeList
-     * @param licenseVo license
-     * @return operationList
-     */
-    private List<String> getOperationTypeListByLicenseAuth(LicenseVo licenseVo) {
-        List<String> operationTypeList = new ArrayList<>();
-        if(licenseVo != null && licenseVo.getAuth() != null && CollectionUtils.isNotEmpty(licenseVo.getAuth().getModuleList())){}
-        return operationTypeList;
     }
 
     /**
@@ -99,20 +85,20 @@ public class LicenseManager extends ModuleInitializedListenerBase {
      *
      * @param licenseVo license
      */
-    private static List<UserAuthVo> getAuthListByLicenseAuth(LicenseVo licenseVo) {
-        List<UserAuthVo> userAuthVoList = new ArrayList<>();
+    private static List<String> getAuthListByLicenseAuth(LicenseVo licenseVo) {
+        List<String> authList = new ArrayList<>();
         List<String> authActionList = new ArrayList<>();
         if (licenseVo != null && licenseVo.getAuth() != null) {
-            List<LicenseAuthModuleVo> moduleGroupList = licenseVo.getAuth().getModuleList();
+            List<LicenseAuthModuleGroupVo> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
             //判断数据库连接串是否匹配
             if(!Config.DB_URL().startsWith(licenseVo.getDbUrl())){
-                return userAuthVoList;
+                return authList;
             }
             if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {
-                moduleGroupList = licenseVo.getExpiredAuth().getModuleList();
+                moduleGroupList = licenseVo.getExpiredAuth().getModuleGroupList();
             }
             if (CollectionUtils.isNotEmpty(moduleGroupList)) {
-                for (LicenseAuthModuleVo authModuleVo : moduleGroupList) {
+                for (LicenseAuthModuleGroupVo authModuleVo : moduleGroupList) {
                     if (CollectionUtils.isNotEmpty(authModuleVo.getAuthList())) {
                         if (authModuleVo.getAuthList().stream().anyMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL"))) {
                             authActionList.addAll(AuthFactory.getAuthActionListByAuthGroupList(Collections.singletonList(authModuleVo.getName())));
@@ -126,13 +112,13 @@ public class LicenseManager extends ModuleInitializedListenerBase {
                 for (String s : authActionList) {
                     AuthBase authBase = AuthFactory.getAuthInstance(s);
                     if (authBase != null) {
-                        userAuthVoList.add(new UserAuthVo(authBase));
-                        AuthActionChecker.getAuthListByAuth(authBase, userAuthVoList);
+                        authList.add(authBase.getAuthName());
+                        AuthActionChecker.getAuthListByAuth(authBase, authList);
                     }
                 }
             }
         }
-        return userAuthVoList;
+        return authActionList;
     }
 
 }

@@ -10,13 +10,13 @@ import codedriver.framework.restful.annotation.EntityField;
 
 import java.util.List;
 
-public class LicenseAuthModuleVo {
+public class LicenseAuthModuleGroupVo {
     @EntityField(name = "模块名", type = ApiParamType.STRING)
     private String name;
     @EntityField(name = "权限列表", type = ApiParamType.JSONARRAY)
     private List<String> authList;
     @EntityField(name = "操作列表", type = ApiParamType.JSONARRAY)
-    private List<String> actionList;
+    private List<String> operationTypeList;
 
     public String getName() {
         return name;
@@ -34,11 +34,11 @@ public class LicenseAuthModuleVo {
         this.authList = authList;
     }
 
-    public List<String> getActionList() {
-        return actionList;
+    public List<String> getOperationTypeList() {
+        return operationTypeList;
     }
 
-    public void setActionList(List<String> actionList) {
-        this.actionList = actionList;
+    public void setOperationTypeList(List<String> operationTypeList) {
+        this.operationTypeList = operationTypeList;
     }
 }

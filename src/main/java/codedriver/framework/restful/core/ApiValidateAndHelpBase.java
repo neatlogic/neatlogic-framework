@@ -15,6 +15,12 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dto.api.CacheControlVo;
+import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
+import codedriver.framework.dto.license.LicenseAuthVo;
+import codedriver.framework.dto.license.LicenseVo;
+import codedriver.framework.exception.core.LicenseAuthFailedWithoutModuleGroupException;
+import codedriver.framework.exception.core.LicenseAuthFailedWithoutOperationTypeException;
+import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.*;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
@@ -37,10 +43,7 @@ import org.springframework.aop.framework.AopContext;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
@@ -257,7 +260,7 @@ public class ApiValidateAndHelpBase {
         }
     }
 
-    protected void validApi(Class<?> apiClass, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
+    protected void validApi(Class<?> apiClass, JSONObject paramObj, ApiVo apiVo, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
         // 获取目标类
         boolean isAuth = false;
         List<String> authNameList = new ArrayList<>();
@@ -280,10 +283,25 @@ public class ApiValidateAndHelpBase {
                 isAuth = true;
             }
             //校验OperationType
-            if(isAuth) {
-                OperationType[] operationTypes = apiClass.getAnnotationsByType(OperationType.class);
-                if (operationTypes.length > 0) {
-
+            OperationType[] operationTypes = apiClass.getAnnotationsByType(OperationType.class);
+            if (operationTypes.length > 0) {
+                LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+                if (licenseVo == null) {
+                    throw new LicenseInvalidException();
+                }
+                LicenseAuthVo licenseAuthVo = licenseVo.getAuth();
+                if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {
+                    licenseAuthVo = licenseVo.getExpiredAuth();
+                }
+                List<LicenseAuthModuleGroupVo> authModuleList = licenseAuthVo.getModuleGroupList();
+                Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+                if (authModuleVoOptional.isPresent()) {
+                    List<String> operationTypeList = authModuleVoOptional.get().getOperationTypeList();
+                    if (!operationTypeList.contains(operationTypes[0].type().getValue())) {
+                        throw new LicenseAuthFailedWithoutOperationTypeException(operationTypes[0].type().getValue());
+                    }
+                } else {
+                    throw new LicenseAuthFailedWithoutModuleGroupException(apiVo.getModuleGroup());
                 }
             }
 

@@ -87,7 +87,7 @@ public class LicenseVo implements Serializable {
 
     public Boolean getHasAllAuth() {
         //如果moduleList name存在 all，则拥有所有权限
-        if(isHasAllAuth != null && auth != null && CollectionUtils.isNotEmpty(auth.getModuleList()) && auth.getModuleList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
+        if(isHasAllAuth != null && auth != null && CollectionUtils.isNotEmpty(auth.getModuleGroupList()) && auth.getModuleGroupList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
             isHasAllAuth = true;
         }
         return isHasAllAuth;
@@ -95,7 +95,7 @@ public class LicenseVo implements Serializable {
 
     public Boolean getExpiredHasAllAuth() {
         //如果moduleList name存在 all，则拥有所有权限
-        if(isExpiredHasAllAuth != null && expiredAuth != null && CollectionUtils.isNotEmpty(expiredAuth.getModuleList()) && expiredAuth.getModuleList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
+        if(isExpiredHasAllAuth != null && expiredAuth != null && CollectionUtils.isNotEmpty(expiredAuth.getModuleGroupList()) && expiredAuth.getModuleGroupList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
             isExpiredHasAllAuth = true;
         }
         return isExpiredHasAllAuth;

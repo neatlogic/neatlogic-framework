@@ -62,6 +62,10 @@ public class AuthFactory {
         return authMap.get(authName);
     }
 
+    public static List<AuthBase> getAuthList() {
+        return new ArrayList<>(authMap.values());
+    }
+
     public static Map<String, List<AuthBase>> getAuthGroupMap() {
         //过滤出对应租户license 权限
         Map<String, List<AuthBase>> licenseAuthGroupMap = new HashMap<>();

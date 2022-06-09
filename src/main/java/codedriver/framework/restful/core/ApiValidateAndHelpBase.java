@@ -26,6 +26,7 @@ import codedriver.framework.exception.type.*;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.restful.annotation.*;
 import codedriver.framework.restful.audit.ApiAuditSaveThread;
+import codedriver.framework.restful.constvalue.OperationTypeEnum;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.util.Md5Util;
@@ -294,11 +295,14 @@ public class ApiValidateAndHelpBase {
                     licenseAuthVo = licenseVo.getExpiredAuth();
                 }
                 List<LicenseAuthModuleGroupVo> authModuleList = licenseAuthVo.getModuleGroupList();
-                Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+                Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals("ALL", o.getName().toUpperCase(Locale.ROOT))).findFirst();
+                if(!authModuleVoOptional.isPresent()) {
+                    authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+                }
                 if (authModuleVoOptional.isPresent()) {
                     List<String> operationTypeList = authModuleVoOptional.get().getOperationTypeList();
                     if (!operationTypeList.contains(operationTypes[0].type().getValue())) {
-                        throw new LicenseAuthFailedWithoutOperationTypeException(operationTypes[0].type().getValue());
+                        throw new LicenseAuthFailedWithoutOperationTypeException(authModuleVoOptional.get().getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
                     }
                 } else {
                     throw new LicenseAuthFailedWithoutModuleGroupException(apiVo.getModuleGroup());

@@ -98,6 +98,10 @@ public class LicenseManager extends ModuleInitializedListenerBase {
                 moduleGroupList = licenseVo.getExpiredAuth().getModuleGroupList();
             }
             if (CollectionUtils.isNotEmpty(moduleGroupList)) {
+                //如果moduleGroup 为all 则表示拥有所有模块的权限
+                if (moduleGroupList.stream().anyMatch(o -> Objects.equals(o.getName().toUpperCase(Locale.ROOT), "ALL"))) {
+                    return AuthFactory.getAuthList().stream().map(AuthBase::getAuthName).collect(Collectors.toList());
+                }
                 for (LicenseAuthModuleGroupVo authModuleVo : moduleGroupList) {
                     if (CollectionUtils.isNotEmpty(authModuleVo.getAuthList())) {
                         if (authModuleVo.getAuthList().stream().anyMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL"))) {
@@ -118,7 +122,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
                 }
             }
         }
-        return authActionList;
+        return authList;
     }
 
 }

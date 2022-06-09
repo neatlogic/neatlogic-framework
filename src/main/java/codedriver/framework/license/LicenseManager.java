@@ -104,6 +104,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
                 }
                 for (LicenseAuthModuleGroupVo authModuleVo : moduleGroupList) {
                     if (CollectionUtils.isNotEmpty(authModuleVo.getAuthList())) {
+                        //如果auth 为all 则表示拥有这个模块所有权限
                         if (authModuleVo.getAuthList().stream().anyMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL"))) {
                             authActionList.addAll(AuthFactory.getAuthActionListByAuthGroupList(Collections.singletonList(authModuleVo.getName())));
                         } else {

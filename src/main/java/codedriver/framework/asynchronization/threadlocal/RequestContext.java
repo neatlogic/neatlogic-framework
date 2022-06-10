@@ -15,7 +15,8 @@ public class RequestContext implements Serializable {
     private static final ThreadLocal<RequestContext> instance = new ThreadLocal<>();
     private String url;
     private HttpServletRequest request;
-
+    //访问速率
+    private Double rate;
     public String getUrl() {
         return url;
     }
@@ -30,6 +31,14 @@ public class RequestContext implements Serializable {
 
     public void setRequest(HttpServletRequest request) {
         this.request = request;
+    }
+
+    public Double getRate() {
+        return rate;
+    }
+
+    public void setRate(Double rate) {
+        this.rate = rate;
     }
 
     public static RequestContext init(RequestContext _requestContext) {

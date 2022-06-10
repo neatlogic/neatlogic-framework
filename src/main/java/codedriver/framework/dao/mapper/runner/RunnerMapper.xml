@@ -487,6 +487,20 @@
         </foreach>
     </select>
 
+    <select id="getRunnerByRunnerMapId" resultType="codedriver.framework.dto.runner.RunnerMapVo">
+        SELECT p.`id` AS id,
+               p.`name` AS name,
+               p.`url` AS url,
+               p.`access_key` AS accessKey,
+               p.`access_secret` AS accessSecret,
+               p.`auth_type` AS authType,
+               p.is_delete AS isDelete,
+               p.`host`,
+               p.`port`
+        FROM runner p left join runner_map rm on p.id = rm.runner_id
+        where rm.id = #{value}
+    </select>
+
     <insert id="replaceRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         REPLACE INTO runner(
         `id`,`name`,`host`,`port` ,`url`,

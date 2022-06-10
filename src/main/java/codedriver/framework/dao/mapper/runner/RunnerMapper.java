@@ -31,6 +31,8 @@ public interface RunnerMapper {
 
     List<RunnerMapVo> getRunnerByRunnerMapIdList(List<Long> runnerMapIdList);
 
+    RunnerMapVo getRunnerByRunnerMapId(Long runnerId);
+
     List<RunnerVo> searchRunner(RunnerVo runnerVo);
 
     int searchRunnerGroupCount(RunnerGroupVo groupVo);
@@ -80,5 +82,4 @@ public interface RunnerMapper {
     void deleteRunnerGroupRunnerByRunnerId(Long runnerId);
 
     void deleteRunnerGroupRunnerByGroupIdAndRunnerId(@Param("groupId") Long groupId, @Param("runnerId") Long runnerId);
-
 }

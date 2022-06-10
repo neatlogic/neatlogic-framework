@@ -18,5 +18,12 @@
             #{tenantUuid}
         </foreach>
     </select>
+
+    <update id="insertLicenseByTenantUuid">
+        insert into `tenant_license` (`tenant_id`, `tenant_uuid`, `license`)
+        values (#{tenantId}, #{tenantUuid}, #{licenseStr})
+        ON DUPLiCATE KEY
+        UPDATE `license` = #{licenseStr};
+    </update>
 </mapper>
 

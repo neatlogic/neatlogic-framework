@@ -32,7 +32,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
 
     public static final Map<String, List<String>> tenantLicenseAuthListMap = new HashMap<>();
 
-    public static final Map<String, Map<String,List<String>>> tenantOperationListMap = new HashMap<>();
+    public static final Map<String, Map<String, List<String>>> tenantOperationListMap = new HashMap<>();
 
     private static boolean isExpired;
 
@@ -59,7 +59,13 @@ public class LicenseManager extends ModuleInitializedListenerBase {
 
     }
 
-    private void getLicenseVo(String tenantUuid, String licenseStr) {
+    /**
+     * 根据租户设置license
+     *
+     * @param tenantUuid 租户
+     * @param licenseStr license串
+     */
+    public static void getLicenseVo(String tenantUuid, String licenseStr) {
         if (StringUtils.isBlank(licenseStr)) {
             return;
         }
@@ -91,7 +97,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         if (licenseVo != null && licenseVo.getAuth() != null) {
             List<LicenseAuthModuleGroupVo> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
             //判断数据库连接串是否匹配
-            if(!Config.DB_URL().startsWith(licenseVo.getDbUrl())){
+            if (!Config.DB_URL().startsWith(licenseVo.getDbUrl())) {
                 return authList;
             }
             if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {

@@ -82,5 +82,4 @@ public interface RunnerMapper {
     void deleteRunnerGroupRunnerByRunnerId(Long runnerId);
 
     void deleteRunnerGroupRunnerByGroupIdAndRunnerId(@Param("groupId") Long groupId, @Param("runnerId") Long runnerId);
-
 }

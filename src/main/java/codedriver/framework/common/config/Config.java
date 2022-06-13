@@ -37,7 +37,7 @@ public class Config {
     private static boolean ES_ENABLE;
     private static String DB_HOST;
     private static Integer DB_PORT;
-    private static String DB_DRIVER;
+    private static String DB_URL;
     private static String DATA_HOME;// 存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
@@ -83,6 +83,7 @@ public class Config {
     private static String WECHAT_ACCESS_TOKEN_URL;//获取企业微信token链接
     private static String WECHAT_USERINFO_URL;//获取企业微信user链接
 
+    public static String LICENSE_PK; //license 公钥
 
     static {
         CODEDRIVER_HOME = System.getenv("CODEDRIVER_HOME");
@@ -151,7 +152,6 @@ public class Config {
     public static boolean ES_ENABLE() {
         return ES_ENABLE;
     }
-
     public static String DB_HOST() {
         return DB_HOST;
     }
@@ -160,10 +160,9 @@ public class Config {
         return DB_PORT;
     }
 
-    public static String DB_DRIVER() {
-        return DB_DRIVER;
+    public static String DB_URL() {
+        return DB_URL;
     }
-
 
     public static String MONGO_HOST() {
         return MONGO_HOST;
@@ -301,6 +300,10 @@ public class Config {
         return WECHAT_APP_AGENT_ID;
     }
 
+    public static String LICENSE_PK() {
+        return LICENSE_PK;
+    }
+
     @PostConstruct
     public void init() {
         try {
@@ -340,10 +343,9 @@ public class Config {
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
+            DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
-            DB_DRIVER = prop.getProperty("db.driverClassName", "com.mysql.jdbc.Driver");
-
             MONGO_HOST = prop.getProperty("mongo.host", "localhost:27017");
             MONGO_USERNAME = prop.getProperty("mongo.username", "root");
             MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
@@ -370,6 +372,8 @@ public class Config {
             WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
             WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
             WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
+
+            LICENSE_PK = prop.getProperty("license.pk");
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

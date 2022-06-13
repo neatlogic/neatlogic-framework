@@ -5,7 +5,6 @@
 
 package codedriver.framework.dto;
 
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
@@ -120,9 +119,6 @@ public class MongoDbVo {
     }
 
     public String getHost() {
-        if (StringUtils.isBlank(host)) {
-            host = Config.DB_HOST();
-        }
         return host;
     }
 

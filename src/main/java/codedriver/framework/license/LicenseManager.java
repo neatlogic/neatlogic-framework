@@ -21,6 +21,8 @@ import codedriver.framework.util.RSAUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -28,11 +30,10 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class LicenseManager extends ModuleInitializedListenerBase {
+    static Logger logger = LoggerFactory.getLogger(LicenseManager.class);
     public static final Map<String, LicenseVo> tenantLicenseMap = new HashMap<>();
 
     public static final Map<String, List<String>> tenantLicenseAuthListMap = new HashMap<>();
-
-    public static final Map<String, Map<String, List<String>>> tenantOperationListMap = new HashMap<>();
 
     private static boolean isExpired;
 
@@ -67,23 +68,33 @@ public class LicenseManager extends ModuleInitializedListenerBase {
      */
     public static void getLicenseVo(String tenantUuid, String licenseStr) {
         if (StringUtils.isBlank(licenseStr)) {
+            logger.error("license invalid (blank) : " + licenseStr);
             return;
         }
-        //license = license.replaceAll(System.lineSeparator(),StringUtils.EMPTY);
-        String[] licenses = licenseStr.split("\n=========================\n");
-        if (licenses.length != 2) {
-            return;
+        try {
+            String[] licenses = licenseStr.split("\n=========================\n");
+            if (licenses.length != 2) {
+                logger.error("license invalid (length) : " + licenseStr);
+                return;
+            }
+            String sign = licenses[1];
+            byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
+            if (StringUtils.isBlank(Config.LICENSE_PK)) {
+                logger.error("license pk is blank");
+                return;
+            }
+            if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
+                logger.error("license invalid (verify): " + licenseStr);
+                return;
+            }
+            String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
+            LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
+            tenantLicenseMap.put(tenantUuid, licenseVo);
+            //获取租户所有权限map
+            tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
+        } catch (Exception e) {
+            logger.error("license invalid : " + e.getMessage(), e);
         }
-        String sign = licenses[1];
-        byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
-        if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
-            return;
-        }
-        String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
-        LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
-        tenantLicenseMap.put(tenantUuid, licenseVo);
-        //获取租户所有权限map
-        tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
     }
 
     /**
@@ -98,6 +109,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
             List<LicenseAuthModuleGroupVo> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
             //判断数据库连接串是否匹配
             if (!Config.DB_URL().startsWith(licenseVo.getDbUrl())) {
+                logger.error("license invalid (dbUrl) : " + licenseVo.getDbUrl());
                 return authList;
             }
             if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {

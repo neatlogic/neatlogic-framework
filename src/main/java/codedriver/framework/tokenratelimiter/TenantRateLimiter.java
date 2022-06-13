@@ -21,8 +21,6 @@ public class TenantRateLimiter {
 
     private final String tenantUuid;
     private final RateLimiter rateLimiter;
-//    private final ConcurrentMap<String, RateLimiter> apiRateLimiterMap = new ConcurrentHashMap<>();
-//    private final Map<String, RateLimiter> apiRateLimiterMap = new HashMap<>();
     private final SoftReferenceCache<RateLimiter> apiRateLimiterMap = new SoftReferenceCache<>(new HashMap<>());
     private Double permitsPerSecond;
     public TenantRateLimiter(Double permitsPerSecond) {

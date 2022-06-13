@@ -15,7 +15,9 @@ import java.util.Map;
  */
 public class SoftReferenceCache<T> {
 
+    //可以通过构造方法传入一个HashMap或者ConcurrentHashMap
     private final Map<Object, SoftEntry<T>> cacheMap;
+    //被GC回收的SoftEntry集合
     private final ReferenceQueue<T> queueOfGarbageCollectedEntries;
 
     public SoftReferenceCache(Map cacheMap) {
@@ -54,6 +56,9 @@ public class SoftReferenceCache<T> {
         cacheMap.clear();
     }
 
+    /**
+     * 移除已经被GC回收的SoftEntity
+     */
     private void removeGarbageCollectedItems() {
         SoftEntry<T> entry;
         while ((entry = (SoftEntry<T>) queueOfGarbageCollectedEntries.poll()) != null) {

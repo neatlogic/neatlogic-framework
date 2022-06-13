@@ -5,15 +5,14 @@
 
 package codedriver.framework.dto.license;
 
+import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 public class LicenseVo implements Serializable {
     private static final long serialVersionUID = -4515626151148587123L;
@@ -29,10 +28,8 @@ public class LicenseVo implements Serializable {
     private LicenseAuthVo expiredAuth;
     @EntityField(name = "创建时间", type = ApiParamType.STRING)
     private Date createTime;
-    @EntityField(name = "是否拥有所有权限", type = ApiParamType.BOOLEAN)
-    private Boolean isHasAllAuth = false;
-    @EntityField(name = "是否超时后拥有所有权限", type = ApiParamType.BOOLEAN)
-    private Boolean isExpiredHasAllAuth = false;
+    @EntityField(name = "dbUrl是否合法", type = ApiParamType.BOOLEAN)
+    private Boolean isDbUrlValid = false;
     @JSONField(serialize = false)
     @EntityField(name = "加密后的license", type = ApiParamType.STRING)
     private String licenseStr;
@@ -85,20 +82,32 @@ public class LicenseVo implements Serializable {
         this.createTime = createTime;
     }
 
-    public Boolean getHasAllAuth() {
+    /**
+     * 超时则获取超时包含all的moduleGroup ，不超时则获取不超时包含all的moduleGroup
+     * @return moduleGroup
+     */
+    public LicenseAuthModuleGroupVo getAllAuthGroup() {
         //如果moduleList name存在 all，则拥有所有权限
-        if(isHasAllAuth != null && auth != null && CollectionUtils.isNotEmpty(auth.getModuleGroupList()) && auth.getModuleGroupList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
-            isHasAllAuth = true;
+        List<LicenseAuthModuleGroupVo> moduleGroupVos = getModuleGroupVoList();
+        if(CollectionUtils.isNotEmpty(moduleGroupVos)){
+            Optional<LicenseAuthModuleGroupVo> licenseAuthModuleGroupVo = moduleGroupVos.stream().filter(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL")).findFirst();
+            if(licenseAuthModuleGroupVo.isPresent()){
+                return licenseAuthModuleGroupVo.get();
+            }
         }
-        return isHasAllAuth;
+        return null;
     }
-
-    public Boolean getExpiredHasAllAuth() {
+    /**
+     * 超时则获取超时moduleGroupList ，不超时则获取不超时的moduleGroupList
+     * @return moduleGroupList
+     */
+    public List<LicenseAuthModuleGroupVo> getModuleGroupVoList() {
         //如果moduleList name存在 all，则拥有所有权限
-        if(isExpiredHasAllAuth != null && expiredAuth != null && CollectionUtils.isNotEmpty(expiredAuth.getModuleGroupList()) && expiredAuth.getModuleGroupList().stream().anyMatch(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL"))){
-            isExpiredHasAllAuth = true;
+        List<LicenseAuthModuleGroupVo> moduleGroupVos = auth.getModuleGroupList();
+        if (expireTime.getTime() < System.currentTimeMillis()) {
+            moduleGroupVos = expiredAuth.getModuleGroupList();
         }
-        return isExpiredHasAllAuth;
+        return moduleGroupVos;
     }
 
     public String getLicenseStr() {
@@ -107,5 +116,12 @@ public class LicenseVo implements Serializable {
 
     public void setLicenseStr(String licenseStr) {
         this.licenseStr = licenseStr;
+    }
+
+    public Boolean getIsDbUrlValid(){
+        if(isDbUrlValid != null && Config.DB_URL().startsWith(this.dbUrl)){
+            isDbUrlValid = true;
+        }
+        return isDbUrlValid;
     }
 }

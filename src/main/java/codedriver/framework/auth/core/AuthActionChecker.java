@@ -107,8 +107,7 @@ public class AuthActionChecker {
         if(licenseVo == null){
             throw new LicenseInvalidException();
         }
-        boolean isExpired = licenseVo.getExpireTime().getTime() < System.currentTimeMillis();
-        if ((!isExpired && licenseVo.getHasAllAuth()) || (isExpired && licenseVo.getExpiredHasAllAuth())) {
+        if (licenseVo.getAllAuthGroup() != null) {
             licenseActionList = actionList;
         }else{
             List<String> licenseAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());

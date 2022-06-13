@@ -70,8 +70,7 @@ public class AuthFactory {
         //过滤出对应租户license 权限
         Map<String, List<AuthBase>> licenseAuthGroupMap = new HashMap<>();
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        boolean isExpired = licenseVo.getExpireTime().getTime() < System.currentTimeMillis();
-        if ((!isExpired && !licenseVo.getHasAllAuth()) || (isExpired && !licenseVo.getExpiredHasAllAuth())) {
+        if (licenseVo.getAllAuthGroup() == null) {
             List<String> licenseAuth = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
             if(CollectionUtils.isNotEmpty(licenseAuth)) {
                 for (Map.Entry<String, List<AuthBase>> authGroupEntry : authGroupMap.entrySet()) {

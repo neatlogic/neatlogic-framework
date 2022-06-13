@@ -16,7 +16,6 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
-import codedriver.framework.dto.license.LicenseAuthVo;
 import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.exception.core.LicenseAuthFailedWithoutModuleGroupException;
 import codedriver.framework.exception.core.LicenseAuthFailedWithoutOperationTypeException;
@@ -34,6 +33,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -290,19 +290,22 @@ public class ApiValidateAndHelpBase {
                 if (licenseVo == null) {
                     throw new LicenseInvalidException();
                 }
-                LicenseAuthVo licenseAuthVo = licenseVo.getAuth();
-                if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {
-                    licenseAuthVo = licenseVo.getExpiredAuth();
+                if(!licenseVo.getIsDbUrlValid()){
+                    throw new LicenseInvalidException("license dbUrl invalid");
                 }
-                List<LicenseAuthModuleGroupVo> authModuleList = licenseAuthVo.getModuleGroupList();
-                Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals("ALL", o.getName().toUpperCase(Locale.ROOT))).findFirst();
-                if(!authModuleVoOptional.isPresent()) {
-                    authModuleVoOptional = authModuleList.stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+
+                LicenseAuthModuleGroupVo authModuleGroupVo = licenseVo.getAllAuthGroup();
+                if(authModuleGroupVo == null){
+                    Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = licenseVo.getModuleGroupVoList().stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+                    if(authModuleVoOptional.isPresent()){
+                        authModuleGroupVo = authModuleVoOptional.get();
+                    }
                 }
-                if (authModuleVoOptional.isPresent()) {
-                    List<String> operationTypeList = authModuleVoOptional.get().getOperationTypeList();
-                    if (!operationTypeList.contains(operationTypes[0].type().getValue())) {
-                        throw new LicenseAuthFailedWithoutOperationTypeException(authModuleVoOptional.get().getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
+
+                if ( authModuleGroupVo != null) {
+                    List<String> operationTypeList = authModuleGroupVo.getOperationTypeList();
+                    if (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue())) {
+                        throw new LicenseAuthFailedWithoutOperationTypeException(authModuleGroupVo.getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
                     }
                 } else {
                     throw new LicenseAuthFailedWithoutModuleGroupException(apiVo.getModuleGroup());

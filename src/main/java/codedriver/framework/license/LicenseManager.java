@@ -106,21 +106,17 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         List<String> authList = new ArrayList<>();
         List<String> authActionList = new ArrayList<>();
         if (licenseVo != null && licenseVo.getAuth() != null) {
-            List<LicenseAuthModuleGroupVo> moduleGroupList = licenseVo.getAuth().getModuleGroupList();
             //判断数据库连接串是否匹配
-            if (!Config.DB_URL().startsWith(licenseVo.getDbUrl())) {
+            if (!licenseVo.getIsDbUrlValid()) {
                 logger.error("license invalid (dbUrl) : " + licenseVo.getDbUrl());
                 return authList;
             }
-            if (licenseVo.getExpireTime().getTime() < System.currentTimeMillis()) {
-                moduleGroupList = licenseVo.getExpiredAuth().getModuleGroupList();
-            }
-            if (CollectionUtils.isNotEmpty(moduleGroupList)) {
+            if (CollectionUtils.isNotEmpty(licenseVo.getModuleGroupVoList())) {
                 //如果moduleGroup 为all 则表示拥有所有模块的权限
-                if (moduleGroupList.stream().anyMatch(o -> Objects.equals(o.getName().toUpperCase(Locale.ROOT), "ALL"))) {
+                if (licenseVo.getAllAuthGroup() != null) {
                     return AuthFactory.getAuthList().stream().map(AuthBase::getAuthName).collect(Collectors.toList());
                 }
-                for (LicenseAuthModuleGroupVo authModuleVo : moduleGroupList) {
+                for (LicenseAuthModuleGroupVo authModuleVo : licenseVo.getModuleGroupVoList()) {
                     if (CollectionUtils.isNotEmpty(authModuleVo.getAuthList())) {
                         //如果auth 为all 则表示拥有这个模块所有权限
                         if (authModuleVo.getAuthList().stream().anyMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL"))) {

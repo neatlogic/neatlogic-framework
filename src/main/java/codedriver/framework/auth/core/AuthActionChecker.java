@@ -107,6 +107,10 @@ public class AuthActionChecker {
         if (licenseVo == null) {
             throw new LicenseInvalidException();
         }
+        //校验租户是否匹配
+        if (!Objects.equals(licenseVo.getTenant(), TenantContext.get().getTenantUuid())) {
+            throw new LicenseInvalidException("license tenant invalid");
+        }
         if (!licenseVo.getIsDbUrlValid()) {
             throw new LicenseInvalidException("license dbUrl invalid");
         }

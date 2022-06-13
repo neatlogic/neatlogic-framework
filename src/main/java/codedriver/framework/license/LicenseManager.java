@@ -68,32 +68,42 @@ public class LicenseManager extends ModuleInitializedListenerBase {
      */
     public static void getLicenseVo(String tenantUuid, String licenseStr) {
         if (StringUtils.isBlank(licenseStr)) {
-            logger.error("license invalid (blank) : " + licenseStr);
+            logger.error(tenantUuid + ": license invalid (blank) : " + licenseStr);
             return;
         }
         try {
             String[] licenses = licenseStr.split("\n=========================\n");
             if (licenses.length != 2) {
-                logger.error("license invalid (length) : " + licenseStr);
+                logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
                 return;
             }
             String sign = licenses[1].replaceAll(System.lineSeparator(), StringUtils.EMPTY);
             byte[] decodeData = Base64.getDecoder().decode(licenses[0].replaceAll(System.lineSeparator(), StringUtils.EMPTY));
             if (StringUtils.isBlank(Config.LICENSE_PK)) {
-                logger.error("license pk is blank");
+                logger.error(tenantUuid + ": license pk is blank");
                 return;
             }
             if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
-                logger.error("license invalid (verify): " + licenseStr);
+                logger.error(tenantUuid + ": license invalid (verify): " + licenseStr);
                 return;
             }
             String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
             LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
+            //校验租户是否匹配
+            if (!Objects.equals(licenseVo.getTenant(), tenantUuid)) {
+                logger.error(tenantUuid + ": license invalid (tenant): " + licenseStr);
+                return;
+            }
+            //判断数据库连接串是否匹配
+            if (!licenseVo.getIsDbUrlValid()) {
+                logger.error("license invalid (dbUrl) : " + licenseStr);
+                return;
+            }
             tenantLicenseMap.put(tenantUuid, licenseVo);
             //获取租户所有权限map
             tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
         } catch (Exception e) {
-            logger.error("license invalid : " + e.getMessage(), e);
+            logger.error(tenantUuid + ": license invalid : " + e.getMessage(), e);
         }
     }
 
@@ -105,12 +115,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
     private static List<String> getAuthListByLicenseAuth(LicenseVo licenseVo) {
         List<String> authList = new ArrayList<>();
         List<String> authActionList = new ArrayList<>();
-        if (licenseVo != null && licenseVo.getAuth() != null) {
-            //判断数据库连接串是否匹配
-            if (!licenseVo.getIsDbUrlValid()) {
-                logger.error("license invalid (dbUrl) : " + licenseVo.getDbUrl());
-                return authList;
-            }
+        if (licenseVo.getAuth() != null) {
             if (CollectionUtils.isNotEmpty(licenseVo.getModuleGroupVoList())) {
                 //如果moduleGroup 为all 则表示拥有所有模块的权限
                 if (licenseVo.getAllAuthGroup() != null) {

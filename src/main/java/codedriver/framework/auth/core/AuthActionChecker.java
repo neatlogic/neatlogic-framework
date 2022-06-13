@@ -104,18 +104,21 @@ public class AuthActionChecker {
         //先判断租户license 是否有该auth
         List<String> licenseActionList = null;
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        if(licenseVo == null){
+        if (licenseVo == null) {
             throw new LicenseInvalidException();
+        }
+        if (!licenseVo.getIsDbUrlValid()) {
+            throw new LicenseInvalidException("license dbUrl invalid");
         }
         if (licenseVo.getAllAuthGroup() != null) {
             licenseActionList = actionList;
-        }else{
+        } else {
             List<String> licenseAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
-            if(CollectionUtils.isNotEmpty(licenseAuthList)) {
+            if (CollectionUtils.isNotEmpty(licenseAuthList)) {
                 licenseActionList = actionList.stream().filter(o -> licenseAuthList.stream().anyMatch(l -> Objects.equals(l.toUpperCase(Locale.ROOT), o))).collect(Collectors.toList());
             }
         }
-        if ( CollectionUtils.isEmpty(licenseActionList)) {
+        if (CollectionUtils.isEmpty(licenseActionList)) {
             return false;
         }
         //判断从数据库查询的用户权限是否满足
@@ -176,7 +179,6 @@ public class AuthActionChecker {
     }
 
 
-
     /**
      * 递归穿透获取权限
      *
@@ -199,7 +201,7 @@ public class AuthActionChecker {
     /**
      * 递归穿透获取权限
      *
-     * @param authBase     权限对象
+     * @param authBase 权限对象
      * @param authList 权限
      */
     public static void getAuthListByAuth(AuthBase authBase, List<String> authList) {

@@ -290,19 +290,19 @@ public class ApiValidateAndHelpBase {
                 if (licenseVo == null) {
                     throw new LicenseInvalidException();
                 }
-                if(!licenseVo.getIsDbUrlValid()){
+                if (!licenseVo.getIsDbUrlValid()) {
                     throw new LicenseInvalidException("license dbUrl invalid");
                 }
 
                 LicenseAuthModuleGroupVo authModuleGroupVo = licenseVo.getAllAuthGroup();
-                if(authModuleGroupVo == null){
+                if (authModuleGroupVo == null) {
                     Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = licenseVo.getModuleGroupVoList().stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
-                    if(authModuleVoOptional.isPresent()){
+                    if (authModuleVoOptional.isPresent()) {
                         authModuleGroupVo = authModuleVoOptional.get();
                     }
                 }
 
-                if ( authModuleGroupVo != null) {
+                if (authModuleGroupVo != null) {
                     List<String> operationTypeList = authModuleGroupVo.getOperationTypeList();
                     if (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue())) {
                         throw new LicenseAuthFailedWithoutOperationTypeException(authModuleGroupVo.getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));

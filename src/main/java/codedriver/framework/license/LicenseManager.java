@@ -77,8 +77,8 @@ public class LicenseManager extends ModuleInitializedListenerBase {
                 logger.error("license invalid (length) : " + licenseStr);
                 return;
             }
-            String sign = licenses[1].replaceAll(System.lineSeparator(),StringUtils.EMPTY);
-            byte[] decodeData = Base64.getDecoder().decode(licenses[0].replaceAll(System.lineSeparator(),StringUtils.EMPTY));
+            String sign = licenses[1].replaceAll(System.lineSeparator(), StringUtils.EMPTY);
+            byte[] decodeData = Base64.getDecoder().decode(licenses[0].replaceAll(System.lineSeparator(), StringUtils.EMPTY));
             if (StringUtils.isBlank(Config.LICENSE_PK)) {
                 logger.error("license pk is blank");
                 return;

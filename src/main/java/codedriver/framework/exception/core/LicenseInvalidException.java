@@ -8,4 +8,8 @@ public class LicenseInvalidException extends ApiRuntimeException {
         super("当前租户没有license授权或license无效");
     }
 
+    public LicenseInvalidException(String tenant) {
+        super("当前租户没有license授权");
+    }
+
 }

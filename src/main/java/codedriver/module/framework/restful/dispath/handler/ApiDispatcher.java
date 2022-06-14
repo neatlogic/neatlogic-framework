@@ -115,7 +115,7 @@ public class ApiDispatcher {
             response.setStatus(429);
 //            returnObj.put("Message", "系统繁忙，请稍后重试");
             JSONObject returnV = new JSONObject();
-            returnV.put("rejectSource", RequestContext.get().getRejectSource());
+            returnV.put("rejectSource", RequestContext.get().getRejectSource().getValue());
             returnV.put("apiRate", RequestContext.get().getApiRate());
             returnV.put("tenantRate", RequestContext.get().getTenantRate());
             returnObj.put("Return", returnV);

@@ -5,6 +5,8 @@
 
 package codedriver.framework.asynchronization.threadlocal;
 
+import codedriver.framework.restful.constvalue.RejectSource;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 
@@ -16,7 +18,7 @@ public class RequestContext implements Serializable {
     private String url;
     private HttpServletRequest request;
     //接口访问拒绝来源，租户或接口
-    private String rejectSource;
+    private RejectSource rejectSource;
     //接口访问速率
     private Double apiRate;
     //租户接口访问总速率
@@ -46,11 +48,11 @@ public class RequestContext implements Serializable {
         this.apiRate = apiRate;
     }
 
-    public String getRejectSource() {
+    public RejectSource getRejectSource() {
         return rejectSource;
     }
 
-    public void setRejectSource(String rejectSource) {
+    public void setRejectSource(RejectSource rejectSource) {
         this.rejectSource = rejectSource;
     }
 

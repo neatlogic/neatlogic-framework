@@ -7,6 +7,7 @@ package codedriver.framework.restful.ratelimiter;
 
 import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.restful.constvalue.RejectSource;
 import com.google.common.util.concurrent.RateLimiter;
 
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public class TenantRateLimiter {
             flag = rateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
         }
         if (!flag) {
-            requestContext.setRejectSource("tenant");
+            requestContext.setRejectSource(RejectSource.TENANT);
             return false;
         }
         String token = requestContext.getUrl();
@@ -90,7 +91,7 @@ public class TenantRateLimiter {
         }
         flag = apiRateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
         if (!flag) {
-            requestContext.setRejectSource("api");
+            requestContext.setRejectSource(RejectSource.API);
         }
         return flag;
     }

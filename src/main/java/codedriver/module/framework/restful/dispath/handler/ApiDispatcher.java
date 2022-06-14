@@ -119,7 +119,7 @@ public class ApiDispatcher {
             returnV.put("apiRate", RequestContext.get().getApiRate());
             returnV.put("tenantRate", RequestContext.get().getTenantRate());
             returnObj.put("Return", returnV);
-            returnObj.put("Status", "OK");
+            returnObj.put("Status", "ERROR");
             return;
         }
         //如果只是接口校验入参

@@ -149,7 +149,7 @@ public class PublicApiDispatcher {
             returnV.put("apiRate", RequestContext.get().getApiRate());
             returnV.put("tenantRate", RequestContext.get().getTenantRate());
             returnObj.put("Return", returnV);
-            returnObj.put("Status", "OK");
+            returnObj.put("Status", "ERROR");
             return;
         }
         /*认证，如果是查看帮助接口，则不需要认证*/

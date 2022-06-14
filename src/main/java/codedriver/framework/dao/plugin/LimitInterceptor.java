@@ -35,8 +35,6 @@ import java.util.*;
         )
 )
 public class LimitInterceptor implements Interceptor {
-
-//    private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
     private Field additionalParametersField;
 
     @Override
@@ -47,14 +45,6 @@ public class LimitInterceptor implements Interceptor {
         Object parameterObject = args[1];
         RowBounds rowBounds = (RowBounds) args[2];
         ResultHandler resultHandler = (ResultHandler) args[3];
-//        // 判断是否需要进行分页
-//        // 没有RowBounds参数时，会使用RowBounds.DEFAULT作为默认值
-//        if (rowBounds == RowBounds.DEFAULT) {
-//            return invocation.proceed();
-//        }
-//        if (!(rowBounds instanceof PageRowBounds)) {
-//            return invocation.proceed();
-//        }
         //当前的目标对象
         Executor executor = (Executor) invocation.getTarget();
         /*
@@ -103,29 +93,8 @@ public class LimitInterceptor implements Interceptor {
             throw new RuntimeException(ex);
         }
 
-//        //根据当前的MappedStatement创建一个返回值为Integer类型的MappedStatement
-//        MappedStatement rowNumMs = newMappedStatement(ms, Integer.class);
-//        //创建rowNum查询缓存key
-//        CacheKey rowNumKey = executor.createCacheKey(rowNumMs, parameterObject, RowBounds.DEFAULT, boundSql);
-//        //拼装rowNumSql
-//        String rowNumSql = "select count(1) from (" + boundSql.getSql() + ") temp";
-//        BoundSql rowNumBoundSql = new BoundSql(ms.getConfiguration(), rowNumSql, boundSql.getParameterMappings(), parameterObject);
-//        // 当使用动态Sql时，可能会产生临时的参数
-//        // 这些参数需要手动设置到新的BoundSql中
-//        for (String key : additionalParameters.keySet()) {
-//            rowNumBoundSql.setAdditionalParameter(key, additionalParameters.get(key));
-//        }
-//        // 执行rowNum查询
-//        Object rowNumResultList = executor.query(rowNumMs, parameterObject, RowBounds.DEFAULT, resultHandler, rowNumKey, rowNumBoundSql);
-//        Integer rowNum = (Integer) ((List) rowNumResultList).get(0);
-//        if (rowNum == 0) {
-//            return new ArrayList<>();
-//        }
-        // 处理rowNum
-//        ((PageRowBounds) rowBounds).setRowNum(rowNum);
-        // 进行分页查询
+        // sql末尾增加 limit 10000
         CacheKey pageKey = executor.createCacheKey(ms, parameterObject, RowBounds.DEFAULT, boundSql);
-//        String pageSql = boundSql.getSql() + " limit " + rowBounds.getOffset() + "," + rowBounds.getLimit();
         String pageSql = boundSql.getSql() + " limit 10000";
         BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameterObject);
         for (String key : additionalParameters.keySet()) {
@@ -134,32 +103,4 @@ public class LimitInterceptor implements Interceptor {
         return executor.query(ms, parameterObject, RowBounds.DEFAULT, resultHandler, pageKey, pageBoundSql);
     }
 
-//    private MappedStatement newMappedStatement(MappedStatement ms, Class<?> resultType) {
-//        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId() + "_RowNum", ms.getSqlSource(), ms.getSqlCommandType());
-//        builder.resource(ms.getResource())
-//                .fetchSize(ms.getFetchSize())
-//                .statementType(ms.getStatementType())
-//                .keyGenerator(ms.getKeyGenerator())
-//                .timeout(ms.getTimeout())
-//                .parameterMap(ms.getParameterMap())
-//                .resultSetType(ms.getResultSetType())
-//                .cache(ms.getCache())
-//                .flushCacheRequired(ms.isFlushCacheRequired())
-//                .useCache(ms.isUseCache());
-//        String[] keyProperties = ms.getKeyProperties();
-//        if (keyProperties != null && keyProperties.length > 0) {
-//            StringBuilder stringBuilder = new StringBuilder();
-//            for (String keyProperty : keyProperties) {
-//                stringBuilder.append(keyProperty).append(",");
-//            }
-//            stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
-//            builder.keyProperty(stringBuilder.toString());
-//        }
-//
-//        List<ResultMap> resultMaps = new ArrayList<ResultMap>();
-//        ResultMap resultMap = new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULTMAPPING).build();
-//        resultMaps.add(resultMap);
-//        builder.resultMaps(resultMaps);
-//        return builder.build();
-//    }
 }

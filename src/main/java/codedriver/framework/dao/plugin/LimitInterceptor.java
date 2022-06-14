@@ -95,7 +95,7 @@ public class LimitInterceptor implements Interceptor {
 
         // sql末尾增加 limit 10000
         CacheKey pageKey = executor.createCacheKey(ms, parameterObject, RowBounds.DEFAULT, boundSql);
-        String pageSql = boundSql.getSql() + " limit 1";
+        String pageSql = boundSql.getSql() + " limit 10000";
         BoundSql pageBoundSql = new BoundSql(ms.getConfiguration(), pageSql, boundSql.getParameterMappings(), parameterObject);
         for (String key : additionalParameters.keySet()) {
             pageBoundSql.setAdditionalParameter(key, additionalParameters.get(key));

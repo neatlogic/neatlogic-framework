@@ -28,6 +28,7 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.enums.ApiType;
+import codedriver.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.StringUtils;
@@ -76,6 +77,24 @@ public class AnonymousApiDispatcher {
             }
         } else {
             throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+        }
+        Double qps = interfaceVo.getQps();
+        ApiVo apiVo = apiMapper.getApiByToken(token);
+        if (apiVo != null) {
+            qps = apiVo.getQps();
+        }
+        RequestContext.get().setApiRate(qps);
+        //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
+        if (!RateLimiterTokenBucket.tryAcquire()) {
+            response.setStatus(429);
+//            returnObj.put("Message", "系统繁忙，请稍后重试");
+            JSONObject returnV = new JSONObject();
+            returnV.put("rejectSource", RequestContext.get().getRejectSource().getValue());
+            returnV.put("apiRate", RequestContext.get().getApiRate());
+            returnV.put("tenantRate", RequestContext.get().getTenantRate());
+            returnObj.put("Return", returnV);
+            returnObj.put("Status", "ERROR");
+            return;
         }
         //如果只是接口校验入参
         String validField = request.getHeader("codedriver-validfield");

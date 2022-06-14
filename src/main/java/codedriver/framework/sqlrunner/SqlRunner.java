@@ -5,6 +5,7 @@
 
 package codedriver.framework.sqlrunner;
 
+import codedriver.framework.dao.plugin.LimitInterceptor;
 import codedriver.framework.dao.plugin.PageInterceptor;
 import codedriver.framework.dao.plugin.PageRowBounds;
 import codedriver.framework.dao.plugin.SqlCostInterceptor;
@@ -62,6 +63,7 @@ public class SqlRunner {
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());
         configuration.addInterceptor(new PageInterceptor());
+        configuration.addInterceptor(new LimitInterceptor());
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();

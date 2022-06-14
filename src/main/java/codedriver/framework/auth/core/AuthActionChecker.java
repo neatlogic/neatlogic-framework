@@ -107,7 +107,6 @@ public class AuthActionChecker {
         if (licenseVo == null) {
             throw new LicenseInvalidException();
         }
-        //校验租户是否匹配
         if (licenseVo.getAllAuthGroup() != null) {
             licenseActionList = actionList;
         } else {

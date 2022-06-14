@@ -79,7 +79,7 @@ public class LimitInterceptor implements Interceptor {
         } else {
             limited = false;
         }
-
+        //如果sql语句有limit限制，就不用增加limit 10000了
         if (limited) {
             return invocation.proceed();
         }

@@ -62,8 +62,8 @@ public class SqlRunner {
 
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new SqlCostInterceptor());
-        configuration.addInterceptor(new PageInterceptor());
         configuration.addInterceptor(new LimitInterceptor());
+        configuration.addInterceptor(new PageInterceptor());
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
         StringBuilder stringBuilder = new StringBuilder();

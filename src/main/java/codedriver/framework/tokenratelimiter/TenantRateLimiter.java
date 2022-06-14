@@ -12,9 +12,6 @@ import com.google.common.util.concurrent.RateLimiter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class TenantRateLimiter {
@@ -63,26 +60,18 @@ public class TenantRateLimiter {
         Date end = null;
         double rate2 = 0L;
         if (permitsPerSecond != null && permitsPerSecond.doubleValue() != 0 && rateLimiter != null) {
-            start = new Date();
             flag = rateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
-            rate2 = rateLimiter.getRate();
-            end = new Date();
         }
         if (!flag) {
-//            System.out.println(Thread.currentThread() + "-" + tenantUuid + "租户级别-失败");
             return false;
         }
-//        System.out.println(Thread.currentThread() + "-"+ rate2 + "-" + tenantUuid + "租户级别-成功-" + sdf.format(end) + "-" + sdf.format(start));
-//        return true;
         RequestContext requestContext = RequestContext.get();
         String token = requestContext.getUrl();
         Double rate = requestContext.getRate();
         if (rate == null || rate.doubleValue() == 0) {
-            System.out.println(Thread.currentThread() + "-" + tenantUuid + "-" + requestContext.getUrl() + "-rate=null");
             return true;
         }
 
-//        System.out.println("newRate=" + rate.doubleValue());
         RateLimiter apiRateLimiter = apiRateLimiterMap.get(token);
         //如果这是接口的第一次请求，则新建一个接口限速器对象
         if (apiRateLimiter == null) {
@@ -95,9 +84,7 @@ public class TenantRateLimiter {
                 }
             }
         } else {
-//            System.out.println("oldRate=" + apiRateLimiter.getRate());
             if (apiRateLimiter.getRate() != rate.doubleValue()) {
-//                System.out.println("oldRate!=newRate");
                 synchronized (this) {
                     apiRateLimiter = apiRateLimiterMap.get(token);
                     if (apiRateLimiter.getRate() != rate.doubleValue()) {
@@ -107,12 +94,6 @@ public class TenantRateLimiter {
                 }
             }
         }
-        start = new Date();
-        boolean result = apiRateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
-        end = new Date();
-        if (result) {
-//            System.out.println(Thread.currentThread() + "-"+ apiRateLimiter.getRate() + "-" + tenantUuid + "-" + token + "请求级别-成功-" + sdf.format(end) + "-" + sdf.format(start));
-        }
-        return result;
+        return apiRateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
     }
 }

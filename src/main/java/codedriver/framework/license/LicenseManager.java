@@ -72,13 +72,20 @@ public class LicenseManager extends ModuleInitializedListenerBase {
             return;
         }
         try {
-            String[] licenses = licenseStr.split("\n=========================\n");
+            //linux生成的license
+            String lineSeparator = "\\n";
+            String[] licenses = licenseStr.split(lineSeparator+"========================="+lineSeparator);
             if (licenses.length != 2) {
-                logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
-                return;
+                //兼容windows生成的license
+                lineSeparator = "\\r\\n";
+                licenses = licenseStr.split(lineSeparator+"========================="+lineSeparator);
+                if (licenses.length != 2) {
+                    logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
+                    return;
+                }
             }
-            String sign = licenses[1].replaceAll(System.lineSeparator(), StringUtils.EMPTY);
-            byte[] decodeData = Base64.getDecoder().decode(licenses[0].replaceAll(System.lineSeparator(), StringUtils.EMPTY));
+            String sign = licenses[1];
+            byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
             if (StringUtils.isBlank(Config.LICENSE_PK)) {
                 logger.error(tenantUuid + ": license pk is blank");
                 return;
@@ -96,7 +103,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
             }
             //判断数据库连接串是否匹配
             if (!licenseVo.getIsDbUrlValid()) {
-                logger.error("license invalid (dbUrl) : " + licenseStr);
+                logger.error(tenantUuid + ":license invalid (dbUrl) : " + licenseStr);
                 return;
             }
             tenantLicenseMap.put(tenantUuid, licenseVo);

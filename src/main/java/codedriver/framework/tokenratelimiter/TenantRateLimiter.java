@@ -9,8 +9,6 @@ import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import com.google.common.util.concurrent.RateLimiter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -55,10 +53,6 @@ public class TenantRateLimiter {
      */
     public boolean tryAcquire() {
         boolean flag = true;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
-        Date start = null;
-        Date end = null;
-        double rate2 = 0L;
         if (permitsPerSecond != null && permitsPerSecond.doubleValue() != 0 && rateLimiter != null) {
             flag = rateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
         }
@@ -80,7 +74,6 @@ public class TenantRateLimiter {
                 if (apiRateLimiter == null) {
                     apiRateLimiter = RateLimiter.create(rate.doubleValue());
                     apiRateLimiterMap.put(token, apiRateLimiter);
-                    System.out.println(Thread.currentThread() + "-新建请求限速器：" + token + "-" + apiRateLimiter.getRate());
                 }
             }
         } else {
@@ -88,7 +81,6 @@ public class TenantRateLimiter {
                 synchronized (this) {
                     apiRateLimiter = apiRateLimiterMap.get(token);
                     if (apiRateLimiter.getRate() != rate.doubleValue()) {
-                        System.out.println(Thread.currentThread() + "-"+ apiRateLimiter.getRate()+ "-"+ rate.doubleValue() + "-" + tenantUuid + "-" + token + "改变-" + sdf.format(new Date()));
                         apiRateLimiter.setRate(rate.doubleValue());
                     }
                 }

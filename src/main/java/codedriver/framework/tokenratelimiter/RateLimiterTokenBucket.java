@@ -48,7 +48,6 @@ public class RateLimiterTokenBucket {
                 if (tenantRateLimiter == null) {
                     tenantRateLimiter = new TenantRateLimiter(apiQPS);
                     tenantRateLimiterMap.put(tenantUuid, tenantRateLimiter);
-                    System.out.println(Thread.currentThread() + "-新建租户限速器：" + tenantUuid + "-" + tenantRateLimiter.getPermitsPerSecond());
                 }
             }
         } else {

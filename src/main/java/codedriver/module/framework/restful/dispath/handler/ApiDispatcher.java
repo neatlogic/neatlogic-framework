@@ -26,7 +26,7 @@ import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.enums.ApiType;
-import codedriver.framework.tokenratelimiter.RateLimiterTokenBucket;
+import codedriver.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import codedriver.framework.util.mongodb.IJsonSerializer;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;

@@ -58,33 +58,33 @@ public class RateLimiterTokenBucket {
         return tenantRateLimiter.tryAcquire();
     }
 
-    // -Xms10m -Xmx10m -XX:+PrintGCDetails
-    public static void main(String[] args) {
-        List<String> tenantUuidList = Arrays.asList("develop", "test", "szbank");
-        Map<String, Double> tenantRateMap = new HashMap<>();
-        tenantRateMap.put("develop", 10.0);
-        tenantRateMap.put("test", 20.0);
-        tenantRateMap.put("szbank", 30.0);
-        for (int i = 0; i < 100; i++) {
-            new Thread(() -> {
-                for (int j = 0; j < 12; j++) {
-                    String tenantUuid = tenantUuidList.get(j % tenantUuidList.size());
-                    TenantContext.init(tenantUuid);
-                    RequestContext requestContext = RequestContext.init(null, "a");
-                    String name = Thread.currentThread().getName();
-                    double nameDouble = Double.parseDouble(name);
-                    nameDouble *= 100;
-                    requestContext.setRate(nameDouble + j);
-                    if(RateLimiterTokenBucket.tryAcquire()) {
-//                        System.out.println(Thread.currentThread().getName() + "-" + tenantUuid + "-的第" + j + "次-成功");
-                    } else {
-//                        System.out.println(Thread.currentThread().getName() + "-" + tenantUuid + "-的第" + j + "次-失败");
-                    }
-
-//                    byte[] b = new byte[1024 * (4096-3580)];
-//                    System.gc();
-                }
-            }, i + "").start();
-        }
-    }
+//    // -Xms10m -Xmx10m -XX:+PrintGCDetails
+//    public static void main(String[] args) {
+//        List<String> tenantUuidList = Arrays.asList("develop", "test", "szbank");
+//        Map<String, Double> tenantRateMap = new HashMap<>();
+//        tenantRateMap.put("develop", 10.0);
+//        tenantRateMap.put("test", 20.0);
+//        tenantRateMap.put("szbank", 30.0);
+//        for (int i = 0; i < 100; i++) {
+//            new Thread(() -> {
+//                for (int j = 0; j < 12; j++) {
+//                    String tenantUuid = tenantUuidList.get(j % tenantUuidList.size());
+//                    TenantContext.init(tenantUuid);
+//                    RequestContext requestContext = RequestContext.init(null, "a");
+//                    String name = Thread.currentThread().getName();
+//                    double nameDouble = Double.parseDouble(name);
+//                    nameDouble *= 100;
+//                    requestContext.setRate(nameDouble + j);
+//                    if(RateLimiterTokenBucket.tryAcquire()) {
+////                        System.out.println(Thread.currentThread().getName() + "-" + tenantUuid + "-的第" + j + "次-成功");
+//                    } else {
+////                        System.out.println(Thread.currentThread().getName() + "-" + tenantUuid + "-的第" + j + "次-失败");
+//                    }
+//
+////                    byte[] b = new byte[1024 * (4096-3580)];
+////                    System.gc();
+//                }
+//            }, i + "").start();
+//        }
+//    }
 }

@@ -5,13 +5,18 @@
 
 package codedriver.framework.auth.core;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dto.license.LicenseVo;
 import codedriver.framework.exception.auth.NoAuthGroupException;
+import codedriver.framework.license.LicenseManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AuthFactory {
     private static final Log logger = LogFactory.getLog(AuthFactory.class);
@@ -42,11 +47,46 @@ public class AuthFactory {
         }
     }
 
+    public static List<String> getAuthActionListByAuthGroupList(List<String> authGroupList) {
+        List<String> authActionList = new ArrayList<>();
+        for (String authGroup : authGroupList) {
+            List<AuthBase> authBaseList = authGroupMap.get(authGroup);
+            if (CollectionUtils.isNotEmpty(authBaseList)) {
+                authActionList.addAll(authBaseList.stream().map(AuthBase::getAuthName).collect(Collectors.toList()));
+            }
+        }
+        return authActionList;
+    }
+
     public static AuthBase getAuthInstance(String authName) {
         return authMap.get(authName);
     }
 
+    public static List<AuthBase> getAuthList() {
+        return new ArrayList<>(authMap.values());
+    }
+
     public static Map<String, List<AuthBase>> getAuthGroupMap() {
-        return authGroupMap;
+        //过滤出对应租户license 权限
+        Map<String, List<AuthBase>> licenseAuthGroupMap = new HashMap<>();
+        LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+        if (licenseVo.getAllAuthGroup() == null) {
+            List<String> licenseAuth = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
+            if(CollectionUtils.isNotEmpty(licenseAuth)) {
+                for (Map.Entry<String, List<AuthBase>> authGroupEntry : authGroupMap.entrySet()) {
+                    List<AuthBase> authBaseList = authGroupEntry.getValue();
+                    List<AuthBase> licenseAuthBaseList = new ArrayList<>();
+                    authBaseList.forEach(authBase -> {
+                        if (licenseAuth.stream().anyMatch(u -> Objects.equals(u.toUpperCase(Locale.ROOT), authBase.getAuthName()))) {
+                            licenseAuthBaseList.add(authBase);
+                        }
+                    });
+                    licenseAuthGroupMap.put(authGroupEntry.getKey(), licenseAuthBaseList);
+                }
+            }
+        }else{
+            licenseAuthGroupMap = authGroupMap;
+        }
+        return licenseAuthGroupMap;
     }
 }

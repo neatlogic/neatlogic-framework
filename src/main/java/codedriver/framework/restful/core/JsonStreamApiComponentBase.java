@@ -35,12 +35,12 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
 			try {
 				Object proxy = AopContext.currentProxy();
 				Class<?> targetClass = AopUtils.getTargetClass(proxy);
-				validApi(targetClass, paramObj, JSONObject.class, JSONReader.class);
+				validApi(targetClass, paramObj, apiVo, JSONObject.class, JSONReader.class);
 				validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
 				Method method = proxy.getClass().getMethod("myDoService", JSONObject.class, JSONReader.class);
 				result = method.invoke(proxy, paramObj, jsonReader);
 			} catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
-				validApi(this.getClass(), paramObj, JSONObject.class, JSONReader.class);
+				validApi(this.getClass(), paramObj, apiVo, JSONObject.class, JSONReader.class);
 				validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
 				result = myDoService(paramObj, jsonReader);
 			} catch (Exception ex) {

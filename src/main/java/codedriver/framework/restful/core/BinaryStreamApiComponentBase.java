@@ -36,7 +36,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
-                validApi(targetClass, paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 Method method = proxy.getClass().getMethod("myDoService", JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header
@@ -47,7 +47,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 result = method.invoke(proxy, paramObj, request, response);
 
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
-                validApi(this.getClass(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+                validApi(this.getClass(), paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header
                 CacheControlVo cacheControlVo = getCacheControl(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);

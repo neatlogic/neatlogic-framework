@@ -172,7 +172,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.OBJECT.getValue());
                     apiVo.setModuleId(context.getId());
-                    // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
@@ -244,7 +244,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.STREAM.getValue());
                     apiVo.setModuleId(context.getId());
-                    // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
@@ -316,7 +316,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.BINARY.getValue());
                     apiVo.setModuleId(context.getId());
-                    // apiVo.getModuleGroup(context.getId());//根据moduleId设置moduleGroup
+                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);

@@ -68,6 +68,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     appContext.setModuleId(moduleId);
                     appContext.setModuleName(moduleName);
                     appContext.setGroupName(groupName);
+                    appContext.setGroup(group);
 
                     ModuleVo moduleVo = new ModuleVo();
                     moduleVo.setId(moduleId);

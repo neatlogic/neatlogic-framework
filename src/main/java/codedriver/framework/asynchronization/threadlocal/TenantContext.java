@@ -7,9 +7,12 @@ package codedriver.framework.asynchronization.threadlocal;
 
 import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
+import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.dto.license.LicenseVo;
+import codedriver.framework.license.LicenseManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,12 +33,19 @@ public class TenantContext implements Serializable {
     private Map<String, ModuleVo> activeModuleMap;
     private Boolean isData = false;
     private final String dataDbName = "";
+    private LicenseVo licenseVo;
 
     private static ModuleMapper moduleMapper;
+    private static LicenseMapper licenseMapper;
 
     @Autowired
     public void setModuleMapper(ModuleMapper _moduleMapper) {
         moduleMapper = _moduleMapper;
+    }
+
+    @Autowired
+    public void setLicenseMapper(LicenseMapper _licenseMapper) {
+        licenseMapper = _licenseMapper;
     }
 
     public static TenantContext init() {
@@ -49,6 +59,7 @@ public class TenantContext implements Serializable {
         if (_tenantContext != null) {
             context.setTenantUuid(_tenantContext.getTenantUuid());
             context.setActiveModuleList(_tenantContext.getActiveModuleList());
+            context.setLicenseVo(_tenantContext.getLicenseVo());
         }
         instance.set(context);
         return context;
@@ -116,7 +127,8 @@ public class TenantContext implements Serializable {
                     this.activeModuleGroupList.add(groupVo);
                 }
             }
-
+            // 查询对应租户的license
+            this.licenseVo = LicenseManager.tenantLicenseMap.get(tenantUuid);
             // 还原回租户库
             this.setUseDefaultDatasource(false);
             activeModuleMap = new HashMap<>();
@@ -171,4 +183,11 @@ public class TenantContext implements Serializable {
         return activeModuleMap.containsKey(moduleId);
     }
 
+    public LicenseVo getLicenseVo() {
+        return licenseVo;
+    }
+
+    public void setLicenseVo(LicenseVo licenseVo) {
+        this.licenseVo = licenseVo;
+    }
 }

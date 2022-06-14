@@ -11,6 +11,7 @@ public class CodedriverWebApplicationContext extends XmlWebApplicationContext {
     private String moduleId;
     private String groupName;
     private String moduleName;
+    private String group;
 
     public String getGroupName() {
         return groupName;
@@ -34,5 +35,13 @@ public class CodedriverWebApplicationContext extends XmlWebApplicationContext {
 
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

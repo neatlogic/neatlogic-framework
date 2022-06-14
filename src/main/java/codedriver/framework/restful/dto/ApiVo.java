@@ -74,8 +74,8 @@ public class ApiVo extends BasePageVo implements Serializable {
     private Integer needAudit = 0;
     @EntityField(name = "接口数据类型，stream,rest,binary", type = ApiParamType.STRING)
     private String dataType;
-    @EntityField(name = "访问频率", type = ApiParamType.INTEGER)
-    private Integer qps = 0;
+    @EntityField(name = "访问频率", type = ApiParamType.DOUBLE)
+    private Double qps = 0.0;
     @EntityField(name = "是否能删除", type = ApiParamType.INTEGER)
     private Integer isDeletable = 1;
     @EntityField(name = "是否是私有接口", type = ApiParamType.BOOLEAN)
@@ -328,11 +328,11 @@ public class ApiVo extends BasePageVo implements Serializable {
         this.needAudit = needAudit;
     }
 
-    public Integer getQps() {
+    public Double getQps() {
         return qps;
     }
 
-    public void setQps(Integer qps) {
+    public void setQps(Double qps) {
         this.qps = qps;
     }
 

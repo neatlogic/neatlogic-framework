@@ -5,7 +5,11 @@
 
 package codedriver.framework.dto;
 
-public class ConfigVo {
+import java.io.Serializable;
+
+public class ConfigVo implements Serializable {
+    private static final long serialVersionUID = 2541167837356991978L;
+
     private String key;
     private String value;
     private String description;

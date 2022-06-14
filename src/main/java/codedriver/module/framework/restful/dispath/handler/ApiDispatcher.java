@@ -104,16 +104,21 @@ public class ApiDispatcher {
         } else {
             throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
         }
-        Integer qps = interfaceVo.getQps();
+        Double qps = interfaceVo.getQps();
         ApiVo apiVo = apiMapper.getApiByToken(token);
         if (apiVo != null) {
             qps = apiVo.getQps();
         }
-        RequestContext.get().setRate(Double.valueOf(qps));
+        RequestContext.get().setApiRate(qps);
         //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
         if (!RateLimiterTokenBucket.tryAcquire()) {
             response.setStatus(429);
-            returnObj.put("Message", "系统繁忙，请稍后重试");
+//            returnObj.put("Message", "系统繁忙，请稍后重试");
+            JSONObject returnV = new JSONObject();
+            returnV.put("rejectSource", RequestContext.get().getRejectSource());
+            returnV.put("apiRate", RequestContext.get().getApiRate());
+            returnV.put("tenantRate", RequestContext.get().getTenantRate());
+            returnObj.put("Return", returnV);
             returnObj.put("Status", "OK");
             return;
         }

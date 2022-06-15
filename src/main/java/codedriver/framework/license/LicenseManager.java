@@ -73,7 +73,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         }
         try {
             //linux生成的license
-            licenseStr = licenseStr.replaceAll("\\n", StringUtils.EMPTY).replaceAll("\\r\\n", StringUtils.EMPTY).trim();
+            licenseStr = licenseStr.replaceAll("\\r\\n", StringUtils.EMPTY).replaceAll("\\n", StringUtils.EMPTY).trim();
             String[] licenses = licenseStr.split("#");
             if (licenses.length != 2) {
                 logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);

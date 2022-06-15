@@ -73,16 +73,11 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         }
         try {
             //linux生成的license
-            String lineSeparator = "\\n";
-            String[] licenses = licenseStr.split(lineSeparator+"========================="+lineSeparator);
+            licenseStr = licenseStr.replaceAll("\\n", StringUtils.EMPTY).replaceAll("\\r\\n", StringUtils.EMPTY).trim();
+            String[] licenses = licenseStr.split("#");
             if (licenses.length != 2) {
-                //兼容windows生成的license
-                lineSeparator = "\\r\\n";
-                licenses = licenseStr.split(lineSeparator+"========================="+lineSeparator);
-                if (licenses.length != 2) {
-                    logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
-                    return;
-                }
+                logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
+                return;
             }
             String sign = licenses[1];
             byte[] decodeData = Base64.getDecoder().decode(licenses[0]);

@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -22,6 +22,10 @@ public class SqlAuditVo extends BasePageVo {
     private Date runTime;
     @EntityField(name = "记录条数", type = ApiParamType.INTEGER)
     private int recordCount = 0;
+    @EntityField(name = "租户", type = ApiParamType.STRING)
+    private String tenant;
+    @EntityField(name = "用户", type = ApiParamType.STRING)
+    private String userId;
 
     public String getId() {
         return id;
@@ -29,6 +33,22 @@ public class SqlAuditVo extends BasePageVo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public Long getTimeCost() {

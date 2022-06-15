@@ -1,10 +1,12 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.dao.plugin;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
+import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.dto.healthcheck.SqlAuditVo;
 import codedriver.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
@@ -85,6 +87,12 @@ public class SqlCostInterceptor implements Interceptor {
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
                 if (SqlIdMap.isExists(sqlId)) {
                     sqlAuditVo = new SqlAuditVo();
+                    if (TenantContext.get() != null) {
+                        sqlAuditVo.setTenant(TenantContext.get().getTenantUuid());
+                    }
+                    if (UserContext.get() != null) {
+                        sqlAuditVo.setUserId(UserContext.get().getUserId());
+                    }
                     starttime = System.currentTimeMillis();
                     Object parameter = null;
                     // 获取参数，if语句成立，表示sql语句有参数，参数格式是map形式
@@ -111,6 +119,7 @@ public class SqlCostInterceptor implements Interceptor {
         if (sqlAuditVo != null) {
             sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
             sqlAuditVo.setRunTime(new Date());
+
             if (val != null) {
                 if (val instanceof List) {
                     sqlAuditVo.setRecordCount(((List) val).size());

@@ -174,11 +174,18 @@
                 #{timeout},
                 #{needAudit},
                 now(3))
-        ON DUPLICATE KEY UPDATE type        = #{type},
-                                handler     = #{handler},
-                                name        = #{name},
-                                description = #{description},
-                                module_id   = #{moduleId}
+        ON DUPLICATE KEY UPDATE `type`        = #{type},
+                                `handler`     = #{handler},
+                                `name`        = #{name},
+                                `description` = #{description},
+                                `module_id`   = #{moduleId},
+                                `is_active`   = #{isActive},
+                                `username`   = #{username},
+                                `password`   = #{password},
+                                `authtype`   = #{authtype},
+                                `qps`   = #{qps},
+                                `timeout`   = #{timeout},
+                                `need_audit`   = #{needAudit}
     </insert>
 
     <delete id="deleteApiByToken" parameterType="java.lang.String">

@@ -113,8 +113,8 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     /**
      * 解析数据，拼装跳转url，返回引用下拉列表一个选项数据结构
      *
-     * @param dependencyVo 引用关系数据
+     * @param dependencyObj 引用关系数据
      * @return
      */
-    protected abstract DependencyInfoVo parse(DependencyVo dependencyVo);
+    protected abstract DependencyInfoVo parse(DependencyVo dependencyObj);
 }

@@ -37,7 +37,7 @@ public class EmailUtil {
      * @param content       邮件正文
      * @param to            收件人
      * @param cc            抄送人
-     * @param attachmentMap 附件(key:文件名;value:流)
+     * @param attachmentMap 附件(key:文件名;value:流)，根据附件名后缀自动匹配MimeType，如果没有后缀名或未匹配到MimeType，则默认为application/octet-stream
      */
     public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();

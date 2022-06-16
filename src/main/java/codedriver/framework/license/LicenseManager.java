@@ -66,40 +66,47 @@ public class LicenseManager extends ModuleInitializedListenerBase {
      * @param tenantUuid 租户
      * @param licenseStr license串
      */
-    public static void getLicenseVo(String tenantUuid, String licenseStr) {
+    public static String getLicenseVo(String tenantUuid, String licenseStr) {
+        String errorLog = StringUtils.EMPTY;
         if (StringUtils.isBlank(licenseStr)) {
-            logger.error(tenantUuid + ": license invalid (blank) : " + licenseStr);
-            return;
+            errorLog = tenantUuid + ": license invalid (blank) : " + licenseStr;
+            logger.error(errorLog);
+            return errorLog;
         }
         try {
             //linux生成的license
             licenseStr = licenseStr.replaceAll("\\r\\n", StringUtils.EMPTY).replaceAll("\\n", StringUtils.EMPTY).trim();
             String[] licenses = licenseStr.split("#");
             if (licenses.length != 2) {
-                logger.error(tenantUuid + ": license invalid (length) : " + licenseStr);
-                return;
+                errorLog = tenantUuid + ": license invalid (length) : " + licenseStr;
+                logger.error(errorLog);
+                return errorLog;
             }
             String sign = licenses[1];
             byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
             if (StringUtils.isBlank(Config.LICENSE_PK)) {
-                logger.error(tenantUuid + ": license pk is blank");
-                return;
+                errorLog = tenantUuid + ": license pk is blank";
+                logger.error(errorLog);
+                return errorLog;
             }
             if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
-                logger.error(tenantUuid + ": license invalid (verify): " + licenseStr);
-                return;
+                errorLog = tenantUuid + ": license invalid (verify): " + licenseStr;
+                logger.error(errorLog);
+                return errorLog;
             }
             String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
             LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
             //校验租户是否匹配
             if (!Objects.equals(licenseVo.getTenant(), tenantUuid)) {
-                logger.error(tenantUuid + ": license invalid (tenant): " + licenseStr);
-                return;
+                errorLog = tenantUuid + ": license invalid (tenant): " + licenseStr;
+                logger.error(errorLog);
+                return errorLog;
             }
             //判断数据库连接串是否匹配
             if (!licenseVo.getIsDbUrlValid()) {
-                logger.error(tenantUuid + ":license invalid (dbUrl) : " + licenseStr);
-                return;
+                errorLog = tenantUuid + ":license invalid (dbUrl) : " + licenseStr;
+                logger.error(errorLog);
+                return errorLog;
             }
             tenantLicenseMap.put(tenantUuid, licenseVo);
             //获取租户所有权限map
@@ -107,6 +114,7 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         } catch (Exception e) {
             logger.error(tenantUuid + ": license invalid : " + e.getMessage(), e);
         }
+        return errorLog;
     }
 
     /**

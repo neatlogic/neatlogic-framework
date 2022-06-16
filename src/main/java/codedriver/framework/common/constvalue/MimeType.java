@@ -7,6 +7,7 @@ public enum MimeType {
     GIF("image/gif", ".gif"),
     STREAM("application/octet-stream", ""),
     DOC("application/msword", ".doc"),
+    DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"),
     PDF("application/pdf", ".pdf"),
     XLS("application/vnd.ms-excel", ".xls"),
     XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"),
@@ -43,5 +44,14 @@ public enum MimeType {
             }
         }
         return "";
+    }
+
+    public static MimeType getMimeType(String suffix) {
+        for (MimeType type : values()) {
+            if (type.suffix.equals(suffix)) {
+                return type;
+            }
+        }
+        return null;
     }
 }

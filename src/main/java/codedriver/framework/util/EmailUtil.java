@@ -38,9 +38,8 @@ public class EmailUtil {
      * @param to            收件人
      * @param cc            抄送人
      * @param attachmentMap 附件(key:文件名;value:流)
-     * @param mimeType      MimeType
      */
-    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap, MimeType mimeType) throws MessagingException, IOException {
+    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
         if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
             /** 开启邮箱服务器连接会话 */
@@ -78,11 +77,19 @@ public class EmailUtil {
             /** 设置附件 */
             if (MapUtils.isNotEmpty(attachmentMap)) {
                 for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {
+                    MimeType mimeType = null;
+                    String key = entry.getKey();
+                    if (key.contains(".")) {
+                        mimeType = MimeType.getMimeType(key.substring(key.lastIndexOf(".")));
+                    }
+                    if (mimeType == null) {
+                        mimeType = MimeType.STREAM;
+                    }
                     MimeBodyPart messageBodyPart = new MimeBodyPart();
                     DataSource dataSource = new ByteArrayDataSource(entry.getValue(), mimeType.getValue());
                     DataHandler dataHandler = new DataHandler(dataSource);
                     messageBodyPart.setDataHandler(dataHandler);
-                    messageBodyPart.setFileName(MimeUtility.encodeText(entry.getKey()) + mimeType.getSuffix());
+                    messageBodyPart.setFileName(MimeUtility.encodeText(key));
                     multipart.addBodyPart(messageBodyPart);
                 }
             }
@@ -95,6 +102,6 @@ public class EmailUtil {
     }
 
     public static void sendHtmlEmail(String title, String content, String to, String cc) throws MessagingException, IOException {
-        sendEmailWithFile(title, content, to, cc, null, null);
+        sendEmailWithFile(title, content, to, cc, null);
     }
 }

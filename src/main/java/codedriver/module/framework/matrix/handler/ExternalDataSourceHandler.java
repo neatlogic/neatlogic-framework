@@ -374,6 +374,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                 String keywordColumn = dataVo.getKeywordColumn();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
+                    paramObj.put("keyword", dataVo.getKeyword());
                     if (!attributeList.contains(keywordColumn)) {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }

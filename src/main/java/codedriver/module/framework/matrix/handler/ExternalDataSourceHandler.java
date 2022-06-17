@@ -210,7 +210,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 columnList.add(key);
             }
         }
-        returnObj.put("tbodyList", getExternalDataTbodyList(resultVo, columnList));
+        returnObj.put("tbodyList", getExternalDataTbodyList(resultVo, columnList, dataVo));
         return returnObj;
     }
 
@@ -262,7 +262,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         throw new MatrixExternalAccessException();
                     }
                     handler.validate(resultVo);
-                    List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList());
+                    List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
                     for (Map<String, JSONObject> tbody : externalDataTbodyList) {
                         JSONObject valueObj = tbody.get(uuidColumn);
                         if (MapUtils.isNotEmpty(valueObj)) {
@@ -296,7 +296,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 returnObj.put("pageSize", transformedResult.get("pageSize"));
                 returnObj.put("pageCount", transformedResult.get("pageCount"));
                 returnObj.put("rowNum", transformedResult.get("rowNum"));
-                tbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList());
+                tbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
                 returnObj.put("tbodyList", tbodyList);
             }
             JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, dataVo.getColumnList());
@@ -362,7 +362,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                             logger.error(resultVo.getError());
                             throw new MatrixExternalAccessException();
                         }
-                        resultList.addAll(getExternalDataTbodyList(resultVo, columnList));
+                        resultList.addAll(getExternalDataTbodyList(resultVo, columnList, dataVo));
                     }
                 }
                 deduplicateData(columnList, resultList);
@@ -374,6 +374,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
                 String keywordColumn = dataVo.getKeywordColumn();
                 if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
+                    paramObj.put("keyword", dataVo.getKeyword());
                     if (!attributeList.contains(keywordColumn)) {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }
@@ -385,29 +386,21 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     matrixColumnVo.setValueList(valueList);
                     sourceColumnList.add(matrixColumnVo);
                 }
-                int currentPage = 1;
-                int pageSize = dataVo.getPageSize();
-                while (resultList.size() < pageSize) {
-                    paramObj.put("currentPage", currentPage);
-                    paramObj.put("pageSize", pageSize);
-                    paramObj.put("sourceColumnList", sourceColumnList);
-                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-                    if (StringUtils.isNotBlank(resultVo.getError())) {
-                        logger.error(resultVo.getError());
-                        throw new MatrixExternalAccessException();
-                    }
-                    List<Map<String, JSONObject>> list = getExternalDataTbodyList(resultVo, columnList);
-                    if (CollectionUtils.isEmpty(list)) {
-                        break;
-                    }
-                    deduplicateData(columnList, exsited, list);
-                    resultList.addAll(list);
-                    pageSize -= list.size();
-                    currentPage++;
-                    if (currentPage >= 10) {
-                        break;
-                    }
+                //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
+                paramObj.put("currentPage", dataVo.getCurrentPage());
+                paramObj.put("pageSize", dataVo.getPageSize());
+                paramObj.put("sourceColumnList", sourceColumnList);
+                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+                if (StringUtils.isNotBlank(resultVo.getError())) {
+                    logger.error(resultVo.getError());
+                    throw new MatrixExternalAccessException();
                 }
+                List<Map<String, JSONObject>> list = getExternalDataTbodyList(resultVo, columnList, dataVo);
+                if (CollectionUtils.isEmpty(list)) {
+                    return resultList;
+                }
+                deduplicateData(columnList, exsited, list);
+                resultList.addAll(list);
             }
         }
         return resultList;
@@ -471,11 +464,13 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         return matrixAttributeList;
     }
 
-    private List<Map<String, JSONObject>> getExternalDataTbodyList(IntegrationResultVo resultVo, List<String> columnList) {
+    private List<Map<String, JSONObject>> getExternalDataTbodyList(IntegrationResultVo resultVo, List<String> columnList, MatrixDataVo dataVo) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
         if (resultVo != null && StringUtils.isNotBlank(resultVo.getTransformedResult())) {
             JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
             if (MapUtils.isNotEmpty(transformedResult)) {
+                Integer rowNum = transformedResult.getInteger("rowNum");
+                dataVo.setRowNum(rowNum);
                 JSONArray tbodyList = transformedResult.getJSONArray("tbodyList");
                 if (CollectionUtils.isNotEmpty(tbodyList)) {
                     for (int i = 0; i < tbodyList.size(); i++) {

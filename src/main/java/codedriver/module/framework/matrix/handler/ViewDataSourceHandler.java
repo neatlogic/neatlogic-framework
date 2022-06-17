@@ -322,34 +322,61 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     sourceColumnList.add(matrixColumnVo);
                     dataVo.setSourceColumnList(sourceColumnList);
                 }
-                List<Map<String, Object>> distinctList = new ArrayList<>(100);
+                //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
                 int rowNum = matrixViewDataMapper.getDynamicTableDataCountForSelect(dataVo);
-                if (rowNum > 0) {
-                    dataVo.setRowNum(rowNum);
-                    int pageCount = dataVo.getPageCount();
-                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
-                        dataVo.setCurrentPage(currentPage);
-                        List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
-                        List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
-                        if (CollectionUtils.isEmpty(dataMapList)) {
-                            break;
-                        }
-                        for (Map<String, Object> dataMap : dataMapList) {
-                            if(distinctList.contains(dataMap)){
-                                continue;
-                            }
-                            distinctDataMapList.add(dataMap);
-                            distinctList.add(dataMap);
-                            if (distinctList.size() >= dataVo.getPageSize()) {
-                                break;
-                            }
-                        }
-                        resultList.addAll(matrixTableDataValueHandle(distinctDataMapList));
-                        if (resultList.size() >= dataVo.getPageSize()) {
-                            break;
-                        }
+                if (rowNum == 0) {
+                    return resultList;
+                }
+                dataVo.setRowNum(rowNum);
+                if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
+                    return resultList;
+                }
+                List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                if (CollectionUtils.isEmpty(dataMapList)) {
+                    return resultList;
+                }
+                List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
+                List<Map<String, Object>> distinctList = new ArrayList<>(100);
+                for (Map<String, Object> dataMap : dataMapList) {
+                    if(distinctList.contains(dataMap)){
+                        continue;
+                    }
+                    distinctDataMapList.add(dataMap);
+                    distinctList.add(dataMap);
+                    if (distinctList.size() >= dataVo.getPageSize()) {
+                        break;
                     }
                 }
+                resultList.addAll(matrixTableDataValueHandle(distinctDataMapList));
+                //下面逻辑适用于下拉框只显示一页数据，没有滚动加载，可以搜索
+//                List<Map<String, Object>> distinctList = new ArrayList<>(100);
+//                int rowNum = matrixViewDataMapper.getDynamicTableDataCountForSelect(dataVo);
+//                if (rowNum > 0) {
+//                    dataVo.setRowNum(rowNum);
+//                    int pageCount = dataVo.getPageCount();
+//                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+//                        dataVo.setCurrentPage(currentPage);
+//                        List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
+//                        List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+//                        if (CollectionUtils.isEmpty(dataMapList)) {
+//                            break;
+//                        }
+//                        for (Map<String, Object> dataMap : dataMapList) {
+//                            if(distinctList.contains(dataMap)){
+//                                continue;
+//                            }
+//                            distinctDataMapList.add(dataMap);
+//                            distinctList.add(dataMap);
+//                            if (distinctList.size() >= dataVo.getPageSize()) {
+//                                break;
+//                            }
+//                        }
+//                        resultList.addAll(matrixTableDataValueHandle(distinctDataMapList));
+//                        if (resultList.size() >= dataVo.getPageSize()) {
+//                            break;
+//                        }
+//                    }
+//                }
             }
         }
         return resultList;

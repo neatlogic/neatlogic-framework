@@ -401,31 +401,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
                 deduplicateData(columnList, exsited, list);
                 resultList.addAll(list);
-
-                //下面逻辑适用于下拉框只显示一页数据，没有滚动加载，可以搜索
-//                int currentPage = 1;
-//                int pageSize = dataVo.getPageSize();
-//                while (resultList.size() < pageSize) {
-//                    paramObj.put("currentPage", currentPage);
-//                    paramObj.put("pageSize", pageSize);
-//                    paramObj.put("sourceColumnList", sourceColumnList);
-//                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-//                    if (StringUtils.isNotBlank(resultVo.getError())) {
-//                        logger.error(resultVo.getError());
-//                        throw new MatrixExternalAccessException();
-//                    }
-//                    List<Map<String, JSONObject>> list = getExternalDataTbodyList(resultVo, columnList);
-//                    if (CollectionUtils.isEmpty(list)) {
-//                        break;
-//                    }
-//                    deduplicateData(columnList, exsited, list);
-//                    resultList.addAll(list);
-//                    pageSize -= list.size();
-//                    currentPage++;
-//                    if (currentPage >= 10) {
-//                        break;
-//                    }
-//                }
             }
         }
         return resultList;

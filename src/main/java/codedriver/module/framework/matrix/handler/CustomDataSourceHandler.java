@@ -557,40 +557,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                     resultList.add(resultMap);
                 }
-
-                //下面逻辑适用于下拉框只显示一页数据，没有滚动加载，可以搜索
-                //对dataMapList去重
-//                List<Map<String, String>> distinctList = new ArrayList<>(100);
-//                int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
-//                if (rowNum > 0) {
-//                    dataVo.setRowNum(rowNum);
-//                    int pageCount = dataVo.getPageCount();
-//                    for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
-//                        dataVo.setCurrentPage(currentPage);
-//                        List<Map<String, String>> dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
-//                        if (CollectionUtils.isEmpty(dataMapList)) {
-//                            break;
-//                        }
-//                        for (Map<String, String> dataMap : dataMapList) {
-//                            if(distinctList.contains(dataMap)){
-//                                continue;
-//                            }
-//                            distinctList.add(dataMap);
-//                            Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-//                            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-//                                String attributeUuid = entry.getKey();
-//                                resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
-//                            }
-//                            resultList.add(resultMap);
-//                            if (resultList.size() >= dataVo.getPageSize()) {
-//                                break;
-//                            }
-//                        }
-//                        if (resultList.size() >= dataVo.getPageSize()) {
-//                            break;
-//                        }
-//                    }
-//                }
             }
         }
         return resultList;

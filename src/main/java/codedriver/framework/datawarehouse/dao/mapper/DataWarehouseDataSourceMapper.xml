@@ -152,10 +152,15 @@
 
     <select id="updateDataSource" parameterType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         update datawarehouse_datasource
-        set label       = #{label},
-            description = #{description},
-            data_count  = #{dataCount},
-            xml         = #{xml,typeHandler=CompressHandler}
+        set label           = #{label},
+            description     = #{description},
+            data_count      = #{dataCount},
+            cron_expression = #{cronExpression},
+            mode            = #{mode},
+            expire_count    = #{expireCount},
+            expire_unit     = #{expireUnit},
+            is_active       = #{isActive},
+            xml             = #{xml,typeHandler=CompressHandler}
         where id = #{id}
     </select>
 
@@ -182,12 +187,20 @@
                                               name,
                                               label,
                                               description,
+                                              cron_expression,
+                                              mode,
+                                              expire_count,
+                                              expire_unit,
                                               xml,
                                               is_active)
         values (#{id},
                 #{name},
                 #{label},
                 #{description},
+                #{cronExpression},
+                #{mode},
+                #{expireCount},
+                #{expireUnit},
                 #{xml,typeHandler=CompressHandler},
                 #{isActive})
     </select>

@@ -5,8 +5,10 @@
 
 package codedriver.module.framework.auditconfig.handler;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.auditconfig.core.AuditCleanerBase;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceAuditMapper;
+import codedriver.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -15,6 +17,8 @@ import javax.annotation.Resource;
 public class DataWarehouseAuditCleaner extends AuditCleanerBase {
     @Resource
     private DataWarehouseDataSourceAuditMapper dataWarehouseDataSourceAuditMapper;
+    @Resource
+    private DatabaseFragmentMapper databaseFragmentMapper;
 
     @Override
     public String getName() {
@@ -24,5 +28,6 @@ public class DataWarehouseAuditCleaner extends AuditCleanerBase {
     @Override
     protected void myClean(int dayBefore) {
         dataWarehouseDataSourceAuditMapper.deleteAuditByDayBefore(dayBefore);
+        databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "datawarehouse_datasource_audit");
     }
 }

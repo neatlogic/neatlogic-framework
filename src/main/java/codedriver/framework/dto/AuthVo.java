@@ -8,9 +8,29 @@ public class AuthVo {
     private String name;
     private String displayName;
     private String description;
+    private String authGroupName;
     private int userCount;
     private int roleCount;
     private int sort;
+
+    public AuthVo() {
+
+    }
+
+    public AuthVo(String name, String displayName, String description, int sort) {
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.sort = sort;
+    }
+
+    public AuthVo(String name, String displayName, String description, String authGroupName, int sort) {
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.authGroupName = authGroupName;
+        this.sort = sort;
+    }
 
     public String getDescription() {
         return description;
@@ -58,5 +78,13 @@ public class AuthVo {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public String getAuthGroupName() {
+        return authGroupName;
+    }
+
+    public void setAuthGroupName(String authGroupName) {
+        this.authGroupName = authGroupName;
     }
 }

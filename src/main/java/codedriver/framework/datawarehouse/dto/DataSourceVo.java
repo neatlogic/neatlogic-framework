@@ -53,13 +53,13 @@ public class DataSourceVo extends BasePageVo {
     @EntityField(name = "有效时间单位", type = ApiParamType.ENUM, member = ExpireUnit.class)
     private String expireUnit;
     @EntityField(name = "字段列表", type = ApiParamType.JSONARRAY)
-    private List<DataSourceFieldVo> fieldList;
+    private List<DataSourceFieldVo> fieldList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
     @EntityField(name = "数据连接id", type = ApiParamType.LONG)
     private Long connectionId;
     @JSONField(serialize = false)//数据列表
     private List<DataSourceDataVo> dataList;
     @EntityField(name = "参数列表", type = ApiParamType.JSONARRAY)
-    private List<DataSourceParamVo> paramList;
+    private List<DataSourceParamVo> paramList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
 
     public DataSourceVo() {
 

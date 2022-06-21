@@ -5,7 +5,9 @@
 
 package codedriver.module.framework.auditconfig.handler;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.auditconfig.core.AuditCleanerBase;
+import codedriver.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import javax.annotation.Resource;
 public class ScheduleAuditCleaner extends AuditCleanerBase {
     @Resource
     private SchedulerMapper schedulerMapper;
+    @Resource
+    private DatabaseFragmentMapper databaseFragmentMapper;
 
     @Override
     public String getName() {
@@ -24,5 +28,7 @@ public class ScheduleAuditCleaner extends AuditCleanerBase {
     @Override
     protected void myClean(int dayBefore) {
         schedulerMapper.deleteAuditByDayBefore(dayBefore);
+        databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "schedule_job_audit");
+
     }
 }

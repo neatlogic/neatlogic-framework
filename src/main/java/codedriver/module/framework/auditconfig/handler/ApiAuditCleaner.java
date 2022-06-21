@@ -5,7 +5,9 @@
 
 package codedriver.module.framework.auditconfig.handler;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.auditconfig.core.AuditCleanerBase;
+import codedriver.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import javax.annotation.Resource;
 public class ApiAuditCleaner extends AuditCleanerBase {
     @Resource
     private ApiAuditMapper apiAuditMapper;
+    @Resource
+    private DatabaseFragmentMapper databaseFragmentMapper;
 
     @Override
     public String getName() {
@@ -24,5 +28,6 @@ public class ApiAuditCleaner extends AuditCleanerBase {
     @Override
     protected void myClean(int dayBefore) {
         apiAuditMapper.deleteAuditByDayBefore(dayBefore);
+        databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "api_audit");
     }
 }

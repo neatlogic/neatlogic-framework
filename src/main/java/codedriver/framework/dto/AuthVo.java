@@ -8,6 +8,7 @@ public class AuthVo {
     private String name;
     private String displayName;
     private String description;
+    private String authGroupName;
     private int userCount;
     private int roleCount;
     private int sort;
@@ -58,5 +59,13 @@ public class AuthVo {
 
     public void setSort(int sort) {
         this.sort = sort;
+    }
+
+    public String getAuthGroupName() {
+        return authGroupName;
+    }
+
+    public void setAuthGroupName(String authGroupName) {
+        this.authGroupName = authGroupName;
     }
 }

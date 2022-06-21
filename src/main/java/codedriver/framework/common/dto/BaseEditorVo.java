@@ -110,14 +110,14 @@ public class BaseEditorVo extends BasePageVo {
 
     public final UserVo getFcuVo() {
         if (fcuVo == null && StringUtils.isNotBlank(fcu)) {
-            fcuVo = new UserVo(fcu);
+            fcuVo = new UserVo(fcu, false);
         }
         return fcuVo;
     }
 
     public final UserVo getLcuVo() {
         if (lcuVo == null && StringUtils.isNotBlank(lcu)) {
-            lcuVo = new UserVo(lcu);
+            lcuVo = new UserVo(lcu, false);
         }
         return lcuVo;
     }

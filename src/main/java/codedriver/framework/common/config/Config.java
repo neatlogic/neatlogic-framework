@@ -66,7 +66,9 @@ public class Config {
     private static int NEW_MESSAGE_EXPIRED_DAY;
     private static int HISTORY_MESSAGE_EXPIRED_DAY;
 
-    private static Boolean ENABLE_SUPERADMIN;//是否激活超级管理员，超级管理员用户名是techsure，是虚拟用户，免密登录，拥有管理员权限，可以授权给其他真实用户
+    private static Boolean ENABLE_SUPERADMIN;//是否激活超级管理员，超级管理员用户名是administrator，是虚拟用户，免密登录，拥有管理员权限，可以授权给其他真实用户
+    private static String SUPERADMIN;//超级管理员账号
+    private static String SUPERADMIN_PASSWORD;//超级管理员密码
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
@@ -304,6 +306,15 @@ public class Config {
         return LICENSE_PK;
     }
 
+    public static String SUPERADMIN(){
+        return SUPERADMIN;
+    }
+    public static String SUPERADMIN_PASSWORD(){
+        return SUPERADMIN_PASSWORD;
+    }
+
+
+
     @PostConstruct
     public void init() {
         try {
@@ -374,6 +385,8 @@ public class Config {
             WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
 
             LICENSE_PK = prop.getProperty("license.pk");
+            SUPERADMIN = prop.getProperty("superadmin","administrator");
+            SUPERADMIN_PASSWORD = prop.getProperty("superadmin.password","RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

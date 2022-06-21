@@ -11,6 +11,7 @@ import codedriver.framework.auth.label.AUTHORITY_MODIFY;
 import codedriver.framework.auth.label.ROLE_MODIFY;
 import codedriver.framework.auth.label.TEAM_MODIFY;
 import codedriver.framework.auth.label.USER_MODIFY;
+import codedriver.framework.common.config.Config;
 import codedriver.framework.dto.UserAuthVo;
 import codedriver.framework.dto.UserVo;
 
@@ -24,13 +25,12 @@ import java.util.Set;
  * @Package codedriver.framework.auth.init
  * @Description:
  * 维护模式下（config文件 is.maintenance.mode = true）
- * techsure 厂商维护用户可拥有 用户、角色、组织架构、权限的维护权限。上生产后请关闭维护模式 即设置为false
+ * administrator 厂商维护用户可拥有 用户、角色、组织架构、权限的维护权限。上生产后请关闭维护模式 即设置为false
  * @Author: 89770
  * @Date: 2021/1/5 14:50
  **/
 public class MaintenanceMode {
     public static final Set<String> maintenanceAuthSet = new HashSet<>();
-    public static final String MAINTENANCE_USER = "techsure";
 
     static {
         maintenanceAuthSet.add(USER_MODIFY.class.getSimpleName());
@@ -48,8 +48,8 @@ public class MaintenanceMode {
      **/
     public static UserVo getMaintenanceUser(){
         UserVo userVo = new UserVo();
-        userVo.setUuid(MAINTENANCE_USER);
-        userVo.setUserId(MAINTENANCE_USER);
+        userVo.setUuid(Config.SUPERADMIN());
+        userVo.setUserId(Config.SUPERADMIN());
         userVo.setUserName("厂商维护人员");
         userVo.setIsActive(1);
         userVo.setVipLevel(0);

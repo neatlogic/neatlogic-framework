@@ -43,7 +43,7 @@ public class AuthActionChecker {
             actionList.add(action.getSimpleName());
         }
         //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
-        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
             return true;
         }
 
@@ -61,7 +61,7 @@ public class AuthActionChecker {
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
         //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
-        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(MaintenanceMode.MAINTENANCE_USER) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
             return true;
         }
 

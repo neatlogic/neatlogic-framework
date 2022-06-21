@@ -10,8 +10,10 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
+import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.util.CommonUtil;
+import codedriver.framework.common.util.RC4Util;
 import codedriver.framework.dao.mapper.LoginMapper;
 import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dao.mapper.UserSessionMapper;
@@ -28,6 +30,7 @@ import codedriver.framework.filter.core.LoginAuthHandlerBase;
 import codedriver.framework.login.core.ILoginPostProcessor;
 import codedriver.framework.login.core.LoginPostProcessorFactory;
 import codedriver.framework.service.TenantService;
+import codedriver.framework.util.Md5Util;
 import codedriver.framework.util.UuidUtil;
 import codedriver.module.framework.service.LoginService;
 import com.alibaba.fastjson.JSONObject;
@@ -99,8 +102,15 @@ public class LoginController {
             userVo.setTenant(tenant);
 
             UserVo checkUserVo = null;
-            if (Config.ENABLE_SUPERADMIN() && MaintenanceMode.MAINTENANCE_USER.equals(userVo.getUserId())) {
-                checkUserVo = MaintenanceMode.getMaintenanceUser();
+            if (Config.ENABLE_SUPERADMIN() && Config.SUPERADMIN().equals(userVo.getUserId())) {
+                String superadminPsw = Config.SUPERADMIN_PASSWORD();
+                if (superadminPsw.startsWith(CiphertextPrefix.RC4.getValue())) {
+                    superadminPsw = RC4Util.decrypt(superadminPsw.substring(4));
+                }
+                superadminPsw = "{MD5}" + Md5Util.encryptMD5(superadminPsw);
+                if (password.equals(superadminPsw)) {
+                    checkUserVo = MaintenanceMode.getMaintenanceUser();
+                }
             } else {
                 if (Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
@@ -132,7 +142,7 @@ public class LoginController {
             } else {
                 throw new UserAuthFailedException();
             }
-        }catch (LicenseInvalidException ex) {
+        } catch (LicenseInvalidException ex) {
             response.setStatus(525);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);

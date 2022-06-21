@@ -112,6 +112,8 @@ public class UserVo extends BasePageVo implements Serializable {
     private String name;
 
     private int isMaintenanceMode;
+    @JSONField(serialize = false)
+    private Boolean isAutoGenerateId = true;
 
     public UserVo() {
 
@@ -124,6 +126,11 @@ public class UserVo extends BasePageVo implements Serializable {
 
     public UserVo(String uuid) {
         this.uuid = uuid;
+    }
+
+    public UserVo(String uuid, boolean isAutoGenerateId) {
+        this.uuid = uuid;
+        this.isAutoGenerateId = isAutoGenerateId;
     }
 
     public List<UserAuthVo> getUserAuthList() {
@@ -151,7 +158,7 @@ public class UserVo extends BasePageVo implements Serializable {
     }
 
     public Long getId() {
-        if (id == null) {
+        if (id == null && isAutoGenerateId) {
             id = SnowflakeUtil.uniqueLong();
         }
         return id;

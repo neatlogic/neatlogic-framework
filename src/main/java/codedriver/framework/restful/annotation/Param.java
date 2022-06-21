@@ -34,4 +34,7 @@ public @interface Param {
 
     int minLength() default -1;
 
+    int maxSize() default -1;
+
+    int minSize() default -1;
 }

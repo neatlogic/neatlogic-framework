@@ -389,10 +389,39 @@ public class ApiValidateAndHelpBase {
                             throw new ParamValueTooLongException(p.name(), paramValue.toString().length(), p.maxLength());
                         }
                     }
+                    if (p.maxSize() > 0) {
+                        if(paramValue instanceof JSONArray ){
+                            JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                            if (paramArray.size() > p.maxSize()) {
+                                throw new ParamValueTooLongException(p.name(), paramArray.size(), p.maxSize());
+                            }
+                        }
+                        if(paramValue instanceof JSONObject ){
+                            JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                            if (paramJson.size() > p.maxSize()) {
+                                throw new ParamValueTooLongException(p.name(), paramJson.size(), p.maxSize());
+                            }
+                        }
+                    }
+
                     // 判断最小长度
                     if (p.minLength() > 0 && paramValue instanceof String) {
                         if (paramValue.toString().trim().length() < p.minLength()) {
                             throw new ParamValueTooShortException(p.name(), paramValue.toString().length(), p.minLength());
+                        }
+                    }
+                    if (p.minSize() > 0) {
+                        if(paramValue instanceof JSONArray ){
+                            JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                            if (paramArray.size() < p.minSize()) {
+                                throw new ParamValueTooShortException(p.name(), paramArray.size(), p.minSize());
+                            }
+                        }
+                        if(paramValue instanceof JSONObject ){
+                            JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                            if (paramJson.size() < p.minSize()) {
+                                throw new ParamValueTooShortException(p.name(), paramJson.size(), p.minSize());
+                            }
                         }
                     }
                     if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {

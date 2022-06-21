@@ -40,7 +40,7 @@ public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
 
     public enum ContentType {
-        CONTENT_TYPE_APPLICATION_JSON("application/json"), CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY), CONTENT_TYPE_TEXT_HTML("text/html"), CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded");
+        CONTENT_TYPE_APPLICATION_JSON("application/json"), CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY), CONTENT_TYPE_TEXT_HTML("text/html"), CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded"), CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY);
         private final String value;
 
         ContentType(String value) {
@@ -76,6 +76,8 @@ public class HttpRequestUtil {
     private OutputStream outputStream;
     //附件列表
     private List<FileVo> fileList;
+    //文件流map(文件名 -> InputStream)
+    private Map<String, InputStream> fileStreamMap;
     //认证方式
     private AuthenticateType authType;
     //用户名
@@ -174,6 +176,49 @@ public class HttpRequestUtil {
                         out.write(bufferOut, 0, bytes);
                     }
                     if (i < num - 1) {
+                        out.write(endBoundary.getBytes(_this.charset));
+                    }
+                    in.close();
+                }
+            }
+            out.write(endBoundary.getBytes(StandardCharsets.UTF_8));
+        });
+
+        OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM, (out, _this) -> {
+            StringBuilder dataBuilder = new StringBuilder("\r\n");
+            String endBoundary = "\r\n--" + FORM_DATA_BOUNDARY + "--\r\n";
+            // strParams 1:key 2:value
+            if (MapUtils.isNotEmpty(_this.formData)) {
+                Set<String> keySet = _this.formData.keySet();
+                for (String key : keySet) {
+                    String value = _this.formData.getString(key);
+                    dataBuilder.append("Content-Disposition: form-data; name=").append(key).append("\r\n").append("\r\n").append(value).append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("\r\n");
+                }
+            }
+            String boundaryMessage = dataBuilder.toString();
+
+            out.write(("--" + FORM_DATA_BOUNDARY + boundaryMessage).getBytes(_this.charset));
+
+            dataBuilder = new StringBuilder();
+            if (MapUtils.isNotEmpty(_this.fileStreamMap)) {
+                Set<Map.Entry<String, InputStream>> entrySet = _this.fileStreamMap.entrySet();
+                Iterator<Map.Entry<String, InputStream>> iterator = entrySet.iterator();
+                int i = 0;
+                while (iterator.hasNext()) {
+                    Map.Entry<String, InputStream> next = iterator.next();
+                    String fileName = next.getKey();
+                    InputStream inputStream = next.getValue();
+                    dataBuilder.append("Content-Disposition: form-data; name=").append(fileName).append("; filename=").append(fileName).append("\r\n").append("Content-Type:multipart/form-data ").append("\r\n\r\n");
+
+                    out.write(dataBuilder.toString().getBytes(_this.charset));
+                    // 开始写文件
+                    DataInputStream in = new DataInputStream(inputStream);
+                    int bytes;
+                    byte[] bufferOut = new byte[1024 * 5];
+                    while ((bytes = in.read(bufferOut)) != -1) {
+                        out.write(bufferOut, 0, bytes);
+                    }
+                    if (i < entrySet.size() - 1) {
                         out.write(endBoundary.getBytes(_this.charset));
                     }
                     in.close();
@@ -304,6 +349,17 @@ public class HttpRequestUtil {
      */
     public HttpRequestUtil setFileList(List<FileVo> fileList) {
         this.fileList = fileList;
+        return this;
+    }
+
+    /**
+     * 设置需要上传的文件
+     *
+     * @param fileStreamMap 文件流map
+     * @return
+     */
+    public HttpRequestUtil setFileStreamMap(Map<String, InputStream> fileStreamMap) {
+        this.fileStreamMap = fileStreamMap;
         return this;
     }
 

@@ -13,6 +13,25 @@ public class AuthVo {
     private int roleCount;
     private int sort;
 
+    public AuthVo() {
+
+    }
+
+    public AuthVo(String name, String displayName, String description, int sort) {
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.sort = sort;
+    }
+
+    public AuthVo(String name, String displayName, String description, String authGroupName, int sort) {
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.authGroupName = authGroupName;
+        this.sort = sort;
+    }
+
     public String getDescription() {
         return description;
     }

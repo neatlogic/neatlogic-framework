@@ -177,6 +177,15 @@ public class TimeUtil {
         }
     }
 
+    public static String addDateByDay(Date date, int day,String format) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        for (int i = 0; i < day; i++) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return TimeUtil.convertDateToString(calendar.getTime(), format);
+    }
+
     public static String addDateByWorkDay(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

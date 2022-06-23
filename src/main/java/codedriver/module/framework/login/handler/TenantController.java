@@ -70,7 +70,7 @@ public class TenantController {
             long diffTime = licenseVo.getExpireTime().getTime() - System.currentTimeMillis();
             license.put("expiredTime", TimeUtil.convertDateToString(licenseVo.getExpireTime(), TimeUtil.YYYY_MM_DD));
             license.put("stopServiceTime", TimeUtil.addDateByDay(licenseVo.getExpireTime(), licenseVo.getExpiredDay(), TimeUtil.YYYY_MM_DD));
-            license.put("willStopServiceDay", licenseVo.getCurrentExpireDay(diffTime));
+            //license.put("willStopServiceDay", licenseVo.getCurrentExpireDay(diffTime));
             license.put("isExpired", licenseVo.isExpiredOutOfDay(diffTime));
             if (license.getBoolean("isExpired")) {
                 isValid = false;

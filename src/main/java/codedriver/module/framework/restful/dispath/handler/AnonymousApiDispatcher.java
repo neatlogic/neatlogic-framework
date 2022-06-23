@@ -14,6 +14,7 @@ import codedriver.framework.common.util.RC4Util;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
+import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.AnonymousExceptionMessage;
 import codedriver.framework.exception.type.ApiNotFoundException;
@@ -31,12 +32,14 @@ import codedriver.framework.restful.enums.ApiType;
 import codedriver.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
@@ -47,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 @Controller
 @RequestMapping("anonymous/api/")
@@ -231,6 +235,100 @@ public class AnonymousApiDispatcher {
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(returnObj);
         }
+    }
+
+    @RequestMapping(value = "/rest/**", method = RequestMethod.POST)
+    public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        RequestContext.init(request, token);
+        String decryptData;
+        try {
+            decryptData = RC4Util.decrypt(token);
+        }catch (Exception ex){
+            decryptData = token;
+        }
+        String[] split = decryptData.split("\\?", 2);
+        token = split[0].substring(0, split[0].lastIndexOf("/"));
+        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+        if (TenantUtil.hasTenant(tenant)) {
+            TenantContext.init();
+            TenantContext.get().switchTenant(tenant);
+            UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+        }
+        JSONObject returnObj = new JSONObject();
+        try {
+            JSONObject paramObj;
+            if (StringUtils.isNotBlank(jsonStr)) {
+                try {
+                    paramObj = JSONObject.parseObject(jsonStr);
+                } catch (Exception e) {
+                    throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                }
+            } else {
+                paramObj = new JSONObject();
+            }
+
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
+            }
+
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+
+        } catch (LicenseInvalidException ex) {
+            response.setStatus(525);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            response.setStatus(500);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
+            logger.error(ex.getMessage(), ex);
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
+        }
+
     }
 
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)

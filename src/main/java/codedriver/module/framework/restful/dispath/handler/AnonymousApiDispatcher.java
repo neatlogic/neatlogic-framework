@@ -16,6 +16,7 @@ import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
+import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.type.AnonymousExceptionMessage;
 import codedriver.framework.exception.type.ApiNotFoundException;
 import codedriver.framework.exception.type.ComponentNotFoundException;
@@ -245,20 +246,22 @@ public class AnonymousApiDispatcher {
         String decryptData;
         try {
             decryptData = RC4Util.decrypt(token);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             decryptData = token;
         }
         String[] split = decryptData.split("\\?", 2);
         token = split[0].substring(0, split[0].lastIndexOf("/"));
-        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-        if (TenantUtil.hasTenant(tenant)) {
-            TenantContext.init();
-            TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
-        }
         JSONObject returnObj = new JSONObject();
+        JSONObject paramObj;
         try {
-            JSONObject paramObj;
+            String tenant = request.getHeader("Tenant");
+            if (TenantUtil.hasTenant(tenant)) {
+                TenantContext.init();
+                TenantContext.get().switchTenant(tenant);
+                UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+            } else {
+                throw new TenantNotFoundException(tenant);
+            }
             if (StringUtils.isNotBlank(jsonStr)) {
                 try {
                     paramObj = JSONObject.parseObject(jsonStr);

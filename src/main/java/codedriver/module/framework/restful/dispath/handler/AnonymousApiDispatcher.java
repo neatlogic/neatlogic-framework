@@ -243,14 +243,6 @@ public class AnonymousApiDispatcher {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
         RequestContext.init(request, token);
-        String decryptData;
-        try {
-            decryptData = RC4Util.decrypt(token);
-        } catch (Exception ex) {
-            decryptData = token;
-        }
-        String[] split = decryptData.split("\\?", 2);
-        token = split[0].substring(0, split[0].lastIndexOf("/"));
         JSONObject returnObj = new JSONObject();
         JSONObject paramObj;
         try {

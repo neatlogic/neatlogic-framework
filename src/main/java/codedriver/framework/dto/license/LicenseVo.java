@@ -22,6 +22,10 @@ public class LicenseVo implements Serializable {
     private String dbUrl;
     @EntityField(name = "到期时间", type = ApiParamType.STRING)
     private Date expireTime;
+    @EntityField(name = "到期后仍可以使用天数", type = ApiParamType.INTEGER)
+    private Integer expiredDay = 30;
+    @EntityField(name = "即将到期前提醒天数", type = ApiParamType.INTEGER)
+    private Integer willExpiredDay = 30;
     @EntityField(name = "权限列表", type = ApiParamType.JSONOBJECT)
     private LicenseAuthVo auth;
     @EntityField(name = "超时权限列表", type = ApiParamType.JSONOBJECT)
@@ -89,25 +93,57 @@ public class LicenseVo implements Serializable {
     public LicenseAuthModuleGroupVo getAllAuthGroup() {
         //如果moduleList name存在 all，则拥有所有权限
         List<LicenseAuthModuleGroupVo> moduleGroupVos = getModuleGroupVoList();
-        if(CollectionUtils.isNotEmpty(moduleGroupVos)){
-            Optional<LicenseAuthModuleGroupVo> licenseAuthModuleGroupVo = moduleGroupVos.stream().filter(o-> Objects.equals(o.getName().toUpperCase(Locale.ROOT),"ALL")).findFirst();
-            if(licenseAuthModuleGroupVo.isPresent()){
+        if (CollectionUtils.isNotEmpty(moduleGroupVos)) {
+            Optional<LicenseAuthModuleGroupVo> licenseAuthModuleGroupVo = moduleGroupVos.stream().filter(o -> Objects.equals(o.getName().toUpperCase(Locale.ROOT), "ALL")).findFirst();
+            if (licenseAuthModuleGroupVo.isPresent()) {
                 return licenseAuthModuleGroupVo.get();
             }
         }
         return null;
     }
+
     /**
      * 超时则获取超时moduleGroupList ，不超时则获取不超时的moduleGroupList
+     *
      * @return moduleGroupList
      */
     public List<LicenseAuthModuleGroupVo> getModuleGroupVoList() {
-        //如果moduleList name存在 all，则拥有所有权限
-        List<LicenseAuthModuleGroupVo> moduleGroupVos = auth.getModuleGroupList();
-        if (expireTime.getTime() < System.currentTimeMillis()) {
-            moduleGroupVos = expiredAuth.getModuleGroupList();
+        List<LicenseAuthModuleGroupVo> moduleGroupVos = new ArrayList<>();
+        //超过截止时间并超过超时后天数后才使用超时后权限
+        long diffTime = expireTime.getTime() - System.currentTimeMillis();
+        if (expireTime.getTime() < System.currentTimeMillis() && isExpiredOutOfDay(diffTime)) {
+            if(expiredAuth != null) {
+                moduleGroupVos = expiredAuth.getModuleGroupList();
+            }
+        }else{
+            moduleGroupVos = auth.getModuleGroupList();
         }
         return moduleGroupVos;
+    }
+
+    public boolean isExpiredOutOfDay(Long diffTime) {
+        if (diffTime < 0) {
+            return (-diffTime / (1000L * 24 * 60 * 60)) >= expiredDay;
+        }
+        return false;
+    }
+
+    public Long getCurrentWillExpireDay(Long diffTime) {
+        if (diffTime > 0) {
+            long day = diffTime / (1000L * 24 * 60 * 60);
+            if (day < willExpiredDay)
+                return willExpiredDay - day;
+        }
+        return null;
+    }
+
+    public Long getCurrentExpireDay(Long diffTime) {
+        if (diffTime < 0) {
+            long day = -diffTime / (1000L * 24 * 60 * 60);
+            if (day < expiredDay)
+                return expiredDay - day;
+        }
+        return null;
     }
 
     public String getLicenseStr() {
@@ -118,10 +154,27 @@ public class LicenseVo implements Serializable {
         this.licenseStr = licenseStr;
     }
 
-    public Boolean getIsDbUrlValid(){
-        if(isDbUrlValid != null && Config.DB_URL().startsWith(this.dbUrl)){
+    public Boolean getIsDbUrlValid() {
+        if (isDbUrlValid != null && Config.DB_URL().startsWith(this.dbUrl)) {
             isDbUrlValid = true;
         }
         return isDbUrlValid;
     }
+
+    public Integer getExpiredDay() {
+        return expiredDay;
+    }
+
+    public void setExpiredDay(Integer expiredDay) {
+        this.expiredDay = expiredDay;
+    }
+
+    public Integer getWillExpiredDay() {
+        return willExpiredDay;
+    }
+
+    public void setWillExpiredDay(Integer willExpiredDay) {
+        this.willExpiredDay = willExpiredDay;
+    }
+
 }

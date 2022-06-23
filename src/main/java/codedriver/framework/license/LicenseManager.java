@@ -32,10 +32,7 @@ import java.util.stream.Collectors;
 public class LicenseManager extends ModuleInitializedListenerBase {
     static Logger logger = LoggerFactory.getLogger(LicenseManager.class);
     public static final Map<String, LicenseVo> tenantLicenseMap = new HashMap<>();
-
     public static final Map<String, List<String>> tenantLicenseAuthListMap = new HashMap<>();
-
-    private static boolean isExpired;
 
     @Resource
     private LicenseMapper licenseMapper;

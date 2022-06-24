@@ -300,7 +300,7 @@ public class ApiValidateAndHelpBase {
 
                 if (authModuleGroupVo != null) {
                     List<String> operationTypeList = authModuleGroupVo.getOperationTypeList();
-                    if (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue())) {
+                    if (operationTypeList.stream().noneMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL")) && (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue()))) {
                         throw new LicenseAuthFailedWithoutOperationTypeException(authModuleGroupVo.getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
                     }
                 } else {
@@ -390,13 +390,13 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     if (p.maxSize() > 0) {
-                        if(paramValue instanceof JSONArray ){
+                        if (paramValue instanceof JSONArray) {
                             JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
                             if (paramArray.size() > p.maxSize()) {
                                 throw new ParamValueTooLongException(p.name(), paramArray.size(), p.maxSize());
                             }
                         }
-                        if(paramValue instanceof JSONObject ){
+                        if (paramValue instanceof JSONObject) {
                             JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
                             if (paramJson.size() > p.maxSize()) {
                                 throw new ParamValueTooLongException(p.name(), paramJson.size(), p.maxSize());
@@ -411,13 +411,13 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     if (p.minSize() > 0) {
-                        if(paramValue instanceof JSONArray ){
+                        if (paramValue instanceof JSONArray) {
                             JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
                             if (paramArray.size() < p.minSize()) {
                                 throw new ParamValueTooShortException(p.name(), paramArray.size(), p.minSize());
                             }
                         }
-                        if(paramValue instanceof JSONObject ){
+                        if (paramValue instanceof JSONObject) {
                             JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
                             if (paramJson.size() < p.minSize()) {
                                 throw new ParamValueTooShortException(p.name(), paramJson.size(), p.minSize());

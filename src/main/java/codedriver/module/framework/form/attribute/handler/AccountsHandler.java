@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONArray;
@@ -28,6 +29,7 @@ import java.util.Set;
 public class AccountsHandler extends FormHandlerBase {
 
     private final JSONArray theadList = new JSONArray();
+
     {
         JSONObject name = new JSONObject();
         name.put("title", "资产名");
@@ -57,12 +59,12 @@ public class AccountsHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formaccounts";
+        return FormHandler.FORMACCOUNTS.getHandler();
     }
 
     @Override
     public String getHandlerName() {
-        return "账号组件";
+        return FormHandler.FORMACCOUNTS.getHandlerName();
     }
 
     @Override

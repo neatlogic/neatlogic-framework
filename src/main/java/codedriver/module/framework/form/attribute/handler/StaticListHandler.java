@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
@@ -25,7 +26,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formstaticlist";
+        return FormHandler.FORMSTATICLIST.getHandler();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class StaticListHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "表格输入组件";
+        return FormHandler.FORMSTATICLIST.getHandlerName();
     }
 
     @Override

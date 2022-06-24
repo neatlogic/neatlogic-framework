@@ -7,6 +7,7 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
@@ -21,12 +22,12 @@ public class TextareaHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formtextarea";
+        return FormHandler.FORMTEXTAREA.getHandler();
     }
 
     @Override
     public String getHandlerName() {
-        return "文本域";
+        return FormHandler.FORMTEXTAREA.getHandlerName();
     }
 
     @Override

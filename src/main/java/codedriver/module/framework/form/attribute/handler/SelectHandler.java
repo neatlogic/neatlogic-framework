@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.form.exception.AttributeValidException;
@@ -28,7 +29,7 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formselect";
+        return FormHandler.FORMSELECT.getHandler();
     }
 
     @Override
@@ -38,7 +39,7 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "下拉框";
+        return FormHandler.FORMSELECT.getHandlerName();
     }
 
     @Override

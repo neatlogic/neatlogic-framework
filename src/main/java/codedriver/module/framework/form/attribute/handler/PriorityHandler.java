@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -20,7 +21,7 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formpriority";
+        return FormHandler.FORMPRIORITY.getHandler();
     }
 
     @Override
@@ -30,7 +31,7 @@ public class PriorityHandler extends ControlHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "修改优先级";
+        return FormHandler.FORMPRIORITY.getHandlerName();
     }
 
     @Override

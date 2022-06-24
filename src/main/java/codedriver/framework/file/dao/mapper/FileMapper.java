@@ -21,7 +21,7 @@ public interface FileMapper {
 
     List<FileVo> getFileListByIdList(List<Long> idList);
 
-    List<FileVo> getFileListByProcessTaskId(Long processTaskId);
+    List<FileVo> getFileDetailListByIdList(List<Long> idList);
 
     int insertFile(FileVo fileVo);
 

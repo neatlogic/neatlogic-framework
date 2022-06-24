@@ -15,36 +15,37 @@ import codedriver.framework.dao.mapper.UserMapper;
 import codedriver.framework.dto.RoleVo;
 import codedriver.framework.dto.TeamVo;
 import codedriver.framework.dto.UserVo;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class UserSelectHandler extends FormHandlerBase {
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private TeamMapper teamMapper;
 
-    @Autowired
+    @Resource
     private RoleMapper roleMapper;
 
     @Override
     public String getHandler() {
-        return "formuserselect";
+        return FormHandler.FORMUSERSELECT.getHandler();
     }
 
     @Override
@@ -196,7 +197,7 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "用户选择器";
+        return FormHandler.FORMUSERSELECT.getHandlerName();
     }
 
     @Override

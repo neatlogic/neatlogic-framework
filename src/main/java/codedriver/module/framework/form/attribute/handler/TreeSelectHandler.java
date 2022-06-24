@@ -8,6 +8,7 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.treeselect.core.ITreeSelectDataSourceHandler;
@@ -27,12 +28,12 @@ import java.util.List;
 public class TreeSelectHandler extends FormHandlerBase {
     @Override
     public String getHandler() {
-        return "formtreeselect";
+        return FormHandler.FORMTREESELECT.getHandler();
     }
 
     @Override
     public String getHandlerName() {
-        return "下拉树组件";
+        return FormHandler.FORMTREESELECT.getHandlerName();
     }
 
     @Override

@@ -7,15 +7,16 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
+import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
+import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
+import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.matrix.core.IMatrixDataSourceHandler;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import codedriver.framework.matrix.dto.MatrixColumnVo;
-import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
-import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.matrix.dto.MatrixDataVo;
 import codedriver.framework.matrix.dto.MatrixVo;
 import codedriver.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
@@ -35,12 +36,12 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formcascadelist";
+        return FormHandler.FORMCASCADELIST.getHandler();
     }
 
     @Override
     public String getHandlerName() {
-        return "级联下拉";
+        return FormHandler.FORMCASCADELIST.getHandlerName();
     }
 
     @Override

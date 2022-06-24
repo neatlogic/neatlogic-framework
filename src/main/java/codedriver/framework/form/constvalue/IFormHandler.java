@@ -6,22 +6,9 @@
 package codedriver.framework.form.constvalue;
 
 public interface IFormHandler {
-    /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:2020年11月10日
-     * @Description: 控件
-     */
+
     String getHandler();
 
-    /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:2020年11月10日
-     * @Description: 中文名
-     */
     String getHandlerName();
 
 }

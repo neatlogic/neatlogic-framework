@@ -7,7 +7,6 @@ package codedriver.framework.asynchronization.threadlocal;
 
 import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dao.mapper.ModuleMapper;
 import codedriver.framework.dto.ModuleGroupVo;
 import codedriver.framework.dto.ModuleVo;
@@ -36,16 +35,10 @@ public class TenantContext implements Serializable {
     private LicenseVo licenseVo;
 
     private static ModuleMapper moduleMapper;
-    private static LicenseMapper licenseMapper;
 
     @Autowired
     public void setModuleMapper(ModuleMapper _moduleMapper) {
         moduleMapper = _moduleMapper;
-    }
-
-    @Autowired
-    public void setLicenseMapper(LicenseMapper _licenseMapper) {
-        licenseMapper = _licenseMapper;
     }
 
     public static TenantContext init() {

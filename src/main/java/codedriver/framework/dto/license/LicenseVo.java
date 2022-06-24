@@ -16,12 +16,16 @@ import java.util.*;
 
 public class LicenseVo implements Serializable {
     private static final long serialVersionUID = -4515626151148587123L;
+    @EntityField(name = "客户名", type = ApiParamType.STRING)
+    private String purchaser;
     @EntityField(name = "租户", type = ApiParamType.STRING)
     private String tenant;
     @EntityField(name = "数据库链接url", type = ApiParamType.STRING)
     private String dbUrl;
     @EntityField(name = "到期时间", type = ApiParamType.STRING)
     private Date expireTime;
+    @EntityField(name = "签发时间", type = ApiParamType.STRING)
+    private Date issueTime;
     @EntityField(name = "到期后仍可以使用天数", type = ApiParamType.INTEGER)
     private Integer expiredDay = 30;
     @EntityField(name = "即将到期前提醒天数", type = ApiParamType.INTEGER)
@@ -177,4 +181,19 @@ public class LicenseVo implements Serializable {
         this.willExpiredDay = willExpiredDay;
     }
 
+    public String getPurchaser() {
+        return purchaser;
+    }
+
+    public void setPurchaser(String purchaser) {
+        this.purchaser = purchaser;
+    }
+
+    public Date getIssueTime() {
+        return issueTime;
+    }
+
+    public void setIssueTime(Date issueTime) {
+        this.issueTime = issueTime;
+    }
 }

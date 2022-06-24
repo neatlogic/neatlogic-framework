@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +23,7 @@ public class DivideHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formdivider";
+        return FormHandler.FORMDIVIDER.getHandler();
     }
 
     @Override
@@ -47,7 +48,7 @@ public class DivideHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "分割线";
+        return FormHandler.FORMDIVIDER.getHandlerName();
     }
 
     @Override

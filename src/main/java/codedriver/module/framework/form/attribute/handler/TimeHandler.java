@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class TimeHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formtime";
+        return FormHandler.FORMTIME.getHandler();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class TimeHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "时间";
+        return FormHandler.FORMTIME.getHandlerName();
     }
 
     @Override

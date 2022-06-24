@@ -7,6 +7,7 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.FormAttributeVo;
 import codedriver.framework.matrix.core.IMatrixDataSourceHandler;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerFactory;
@@ -44,7 +45,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formdynamiclist";
+        return FormHandler.FORMDYNAMICLIST.getHandler();
     }
 
     @Override
@@ -861,7 +862,7 @@ public class DynamicListHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "表格选择组件";
+        return FormHandler.FORMDYNAMICLIST.getHandlerName();
     }
 
     @Override

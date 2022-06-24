@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +23,7 @@ public class LinkHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formlink";
+        return FormHandler.FORMLINK.getHandler();
     }
 
     @Override
@@ -50,7 +51,7 @@ public class LinkHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "链接";
+        return FormHandler.FORMLINK.getHandlerName();
     }
 
     @Override

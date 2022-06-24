@@ -10,6 +10,7 @@ import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.DateRange;
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.worktime.dao.mapper.WorktimeMapper;
@@ -43,7 +44,7 @@ public class DateHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formdate";
+        return FormHandler.FORMDATE.getHandler();
     }
 
     @Override
@@ -142,7 +143,7 @@ public class DateHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "日期";
+        return FormHandler.FORMDATE.getHandlerName();
     }
 
     @Override

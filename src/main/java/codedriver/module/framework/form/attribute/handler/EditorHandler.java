@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.form.constvalue.FormHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class EditorHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "formeditor";
+        return FormHandler.FORMEDITOR.getHandler();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class EditorHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "富文本框";
+        return FormHandler.FORMEDITOR.getHandlerName();
     }
 
     @Override

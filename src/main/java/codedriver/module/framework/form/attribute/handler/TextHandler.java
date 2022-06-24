@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.constvalue.FormConditionModel;
+import codedriver.framework.form.constvalue.FormHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class TextHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return "forminput";
+        return FormHandler.FORMINPUT.getHandler();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class TextHandler extends FormHandlerBase {
 
     @Override
     public String getHandlerName() {
-        return "文本框";
+        return FormHandler.FORMINPUT.getHandlerName();
     }
 
     @Override

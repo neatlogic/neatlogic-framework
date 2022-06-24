@@ -23,18 +23,6 @@ public interface FileMapper {
 
     List<FileVo> getFileDetailListByIdList(List<Long> idList);
 
-    List<FileVo> getFileListByProcessTaskId(Long processTaskId);
-
-    List<FileVo> getFileDetailListByProcessTaskId(Long processTaskId);
-
-    /**
-     * 根据工单ID查询所有子任务附件
-     *
-     * @param processTaskId 工单ID
-     * @return
-     */
-    List<FileVo> getProcessTaskStepTaskFileListByProcessTaskId(Long processTaskId);
-
     int insertFile(FileVo fileVo);
 
     void deleteFile(Long fileId);

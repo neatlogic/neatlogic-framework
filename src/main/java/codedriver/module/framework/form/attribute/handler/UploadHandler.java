@@ -23,6 +23,9 @@ import java.util.List;
 
 @Component
 public class UploadHandler extends FormHandlerBase {
+
+    public static String handler = "formupload";
+
     @Override
     public String getHandler() {
         return "formupload";
@@ -136,7 +139,8 @@ public class UploadHandler extends FormHandlerBase {
     public void makeupFormAttribute(FormAttributeVo formAttributeVo) {
 
     }
-//表单组件配置信息
+
+    //表单组件配置信息
 //{
 //	"handler": "formupload",
 //	"label": "附件上传_1",

@@ -159,6 +159,27 @@
         WHERE `processtask_id` = #{value}
     </select>
 
+    <select id="getProcessTaskStepTaskFileListByProcessTaskId" parameterType="java.lang.Long"
+            resultMap="fileVoMap">
+        SELECT a.`id`,
+               a.`name`,
+               a.`size`,
+               a.`type`,
+               a.`upload_time`  as uploadTime,
+               a.`content_type` as contentType,
+               a.`path`,
+               a.`user_uuid`    as userUuid,
+               b.`user_name`    as userName
+        FROM `file` a
+        LEFT JOIN `user` b on a.`user_uuid` = b.`uuid`
+        WHERE a.`id` in (
+            SELECT c.`file_id`
+            FROM `processtask_step_task_user_file` c
+            JOIN `processtask_step_task` d ON d.`id` = c.`processtask_step_task_id`
+            WHERE d.`processtask_id` = #{value}
+        )
+    </select>
+
     <insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
         INSERT INTO `file` (`id`,
                             `name`,

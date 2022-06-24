@@ -93,6 +93,7 @@
             #{id}
         </foreach>
     </select>
+
     <select id="getFileListByProcessTaskId" parameterType="java.lang.Long"
             resultType="codedriver.framework.file.dto.FileVo">
         SELECT a.`id`,
@@ -105,6 +106,56 @@
                a.`path`
         FROM `file` a
                  JOIN `processtask_file` b ON a.`id` = b.`file_id`
+        WHERE `processtask_id` = #{value}
+    </select>
+
+    <resultMap id="fileVoMap" type="codedriver.framework.file.dto.FileVo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="size" property="size"/>
+        <result column="uploadTime" property="uploadTime"/>
+        <result column="contentType" property="contentType"/>
+        <result column="path" property="path"/>
+        <association property="fcuVo" javaType="codedriver.framework.dto.UserVo">
+            <result property="uuid" column="userUuid"/>
+            <result property="userName" column="userName"/>
+        </association>
+    </resultMap>
+
+    <select id="getFileDetailListByIdList" parameterType="java.util.List" resultMap="fileVoMap">
+        SELECT
+        a.`id`,
+        a.`name`,
+        a.`size`,
+        a.`user_uuid` AS userUuid,
+        a.`upload_time` AS uploadTime,
+        a.`type`,
+        a.`content_type` AS contentType,
+        a.`path`,
+        b.`user_name` AS userName
+        FROM `file` a
+        LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
+        WHERE a.`id` IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getFileDetailListByProcessTaskId" parameterType="java.lang.Long"
+            resultMap="fileVoMap">
+        SELECT a.`id`,
+               a.`name`,
+               a.`size`,
+               a.`type`,
+               a.`upload_time`  as uploadTime,
+               a.`content_type` as contentType,
+               a.`path`,
+               a.`user_uuid`    as userUuid,
+               c.`user_name`    as userName
+        FROM `file` a
+                 JOIN `processtask_file` b ON a.`id` = b.`file_id`
+                 LEFT JOIN `user` c ON a.`user_uuid` = c.`uuid`
         WHERE `processtask_id` = #{value}
     </select>
 

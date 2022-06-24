@@ -6,7 +6,7 @@
 package codedriver.framework.file.dto;
 
 import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.dto.BaseEditorVo;
 import codedriver.framework.file.core.FileTypeHandlerFactory;
 import codedriver.framework.file.core.IFileTypeHandler;
 import codedriver.framework.restful.annotation.EntityField;
@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class FileVo extends BasePageVo {
+public class FileVo extends BaseEditorVo {
     @EntityField(name = "附件id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "附件保存路径", type = ApiParamType.STRING)

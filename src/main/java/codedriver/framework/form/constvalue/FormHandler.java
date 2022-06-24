@@ -26,21 +26,21 @@ public enum FormHandler implements IFormHandler {
     FORMUSERSELECT("formuserselect", "用户选择器"),
     ;
 
-    private String handler;
-    private String handlerName;
+    private final String handler;
+    private final String handlerName;
 
-    FormHandler(String value, String text) {
-        handler = value;
-        handlerName = text;
+    FormHandler(String handler, String handlerName) {
+        this.handler = handler;
+        this.handlerName = handlerName;
     }
 
     @Override
     public String getHandler() {
-        return null;
+        return handler;
     }
 
     @Override
     public String getHandlerName() {
-        return null;
+        return handlerName;
     }
 }

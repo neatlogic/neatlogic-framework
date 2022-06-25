@@ -92,6 +92,7 @@ public class LicenseVo implements Serializable {
 
     /**
      * 超时则获取超时包含all的moduleGroup ，不超时则获取不超时包含all的moduleGroup
+     *
      * @return moduleGroup
      */
     public LicenseAuthModuleGroupVo getAllAuthGroup() {
@@ -116,10 +117,10 @@ public class LicenseVo implements Serializable {
         //超过截止时间并超过超时后天数后才使用超时后权限
         long diffTime = expireTime.getTime() - System.currentTimeMillis();
         if (expireTime.getTime() < System.currentTimeMillis() && isExpiredOutOfDay(diffTime)) {
-            if(expiredAuth != null) {
+            if (expiredAuth != null) {
                 moduleGroupVos = expiredAuth.getModuleGroupList();
             }
-        }else{
+        } else {
             moduleGroupVos = auth.getModuleGroupList();
         }
         return moduleGroupVos;
@@ -132,7 +133,7 @@ public class LicenseVo implements Serializable {
         return false;
     }
 
-    public Long getCurrentWillExpireDay(Long diffTime) {
+    public Long getCurrentWillExpiredDay(Long diffTime) {
         if (diffTime > 0) {
             long day = diffTime / (1000L * 24 * 60 * 60);
             if (day < willExpiredDay)

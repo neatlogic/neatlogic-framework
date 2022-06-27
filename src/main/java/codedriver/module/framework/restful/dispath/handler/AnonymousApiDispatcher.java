@@ -14,7 +14,6 @@ import codedriver.framework.common.util.RC4Util;
 import codedriver.framework.common.util.TenantUtil;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.type.AnonymousExceptionMessage;
@@ -284,14 +283,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
 
-        } catch (LicenseInvalidException ex) {
-            response.setStatus(525);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);

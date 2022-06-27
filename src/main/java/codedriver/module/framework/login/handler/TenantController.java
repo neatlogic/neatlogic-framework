@@ -13,7 +13,6 @@ import codedriver.framework.dao.mapper.ThemeMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.ThemeVo;
 import codedriver.framework.dto.license.LicenseVo;
-import codedriver.framework.license.LicenseManager;
 import codedriver.framework.service.TenantService;
 import codedriver.framework.util.TimeUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -62,9 +61,6 @@ public class TenantController {
         LicenseVo licenseVo = TenantContext.get().getLicenseVo();
         boolean isValid = true;
         if (licenseVo == null) {
-            TenantContext.get().setUseDefaultDatasource(true);
-            String licenseStr = licenseMapper.getTenantLicenseByTenantUuid(tenant);
-            license.put("errorMsg", LicenseManager.getLicenseVo(tenant, licenseStr));
             isValid = false;
         } else {
             long diffTime = licenseVo.getExpireTime().getTime() - System.currentTimeMillis();

@@ -9,7 +9,11 @@ public class LicenseInvalidException extends ApiRuntimeException {
     }
 
     public LicenseInvalidException(String msg) {
-        super("当前租户没有license授权: "+msg);
+        super("当前租户没有license授权: " + msg);
+    }
+
+    public LicenseInvalidException(String tenantUuid, String msg, String licenseStr) {
+        super(tenantUuid + " : " + msg + " : " + licenseStr);
     }
 
 }

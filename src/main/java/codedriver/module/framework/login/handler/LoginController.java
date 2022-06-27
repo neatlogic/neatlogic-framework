@@ -22,7 +22,6 @@ import codedriver.framework.dto.TenantVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.dto.captcha.LoginCaptchaVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
-import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.tenant.TenantNotFoundException;
 import codedriver.framework.exception.tenant.TenantUnActiveException;
 import codedriver.framework.exception.user.UserAuthFailedException;
@@ -142,14 +141,6 @@ public class LoginController {
             } else {
                 throw new UserAuthFailedException();
             }
-        } catch (LicenseInvalidException ex) {
-            response.setStatus(525);
-            if (logger.isWarnEnabled()) {
-                logger.warn(ex.getMessage(), ex);
-            }
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-            ReturnJson.error(ex.getMessage(), returnObj, response);
         } catch (ApiRuntimeException ex) {
             ReturnJson.error(ex.getMessage(), resultJson, response);
         } catch (Exception ex) {

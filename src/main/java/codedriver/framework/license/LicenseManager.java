@@ -17,6 +17,7 @@ import codedriver.framework.dao.mapper.LicenseMapper;
 import codedriver.framework.dto.DatasourceVo;
 import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
 import codedriver.framework.dto.license.LicenseVo;
+import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.util.RSAUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,7 +52,11 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         if (CollectionUtils.isNotEmpty(datasourceList)) {
             List<LicenseVo> licenseVos = licenseMapper.getTenantLicenseByTenantUuidList(datasourceList.stream().map(DatasourceVo::getTenantUuid).collect(Collectors.toList()));
             for (LicenseVo license : licenseVos) {
-                getLicenseVo(license.getTenant(), license.getLicenseStr());
+                try {
+                    initLicenseVo(license.getTenant(), license.getLicenseStr());
+                } catch (Exception e) {
+                    logger.error(license.getTenant() + ": license invalid : " + e.getMessage(), e);
+                }
             }
         }
 
@@ -63,55 +68,38 @@ public class LicenseManager extends ModuleInitializedListenerBase {
      * @param tenantUuid 租户
      * @param licenseStr license串
      */
-    public static String getLicenseVo(String tenantUuid, String licenseStr) {
+    public static void initLicenseVo(String tenantUuid, String licenseStr) {
         String errorLog = StringUtils.EMPTY;
         if (StringUtils.isBlank(licenseStr)) {
-            errorLog = tenantUuid + ": license invalid (blank) : " + licenseStr;
-            logger.error(errorLog);
-            return errorLog;
+            throw new LicenseInvalidException(tenantUuid, "license invalid (blank)", licenseStr);
         }
-        try {
-            //linux生成的license
-            licenseStr = licenseStr.replaceAll("\\r\\n", StringUtils.EMPTY).replaceAll("\\n", StringUtils.EMPTY).trim();
-            String[] licenses = licenseStr.split("#");
-            if (licenses.length != 2) {
-                errorLog = tenantUuid + ": license invalid (length) : " + licenseStr;
-                logger.error(errorLog);
-                return errorLog;
-            }
-            String sign = licenses[1];
-            byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
-            if (StringUtils.isBlank(Config.LICENSE_PK)) {
-                errorLog = tenantUuid + ": license pk is blank";
-                logger.error(errorLog);
-                return errorLog;
-            }
-            if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
-                errorLog = tenantUuid + ": license invalid (verify): " + licenseStr;
-                logger.error(errorLog);
-                return errorLog;
-            }
-            String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
-            LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
-            //校验租户是否匹配
-            if (!Objects.equals(licenseVo.getTenant(), tenantUuid)) {
-                errorLog = tenantUuid + ": license invalid (tenant): " + licenseStr;
-                logger.error(errorLog);
-                return errorLog;
-            }
-            //判断数据库连接串是否匹配
-            if (!licenseVo.getIsDbUrlValid()) {
-                errorLog = tenantUuid + ":license invalid (dbUrl) : " + licenseStr;
-                logger.error(errorLog);
-                return errorLog;
-            }
-            tenantLicenseMap.put(tenantUuid, licenseVo);
-            //获取租户所有权限map
-            tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
-        } catch (Exception e) {
-            logger.error(tenantUuid + ": license invalid : " + e.getMessage(), e);
+        //linux生成的license
+        licenseStr = licenseStr.replaceAll("\\r\\n", StringUtils.EMPTY).replaceAll("\\n", StringUtils.EMPTY).trim();
+        String[] licenses = licenseStr.split("#");
+        if (licenses.length != 2) {
+            throw new LicenseInvalidException(tenantUuid, "license invalid (length)", licenseStr);
         }
-        return errorLog;
+        String sign = licenses[1];
+        byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
+        if (StringUtils.isBlank(Config.LICENSE_PK)) {
+            throw new LicenseInvalidException(tenantUuid, "license pk is blank", licenseStr);
+        }
+        if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
+            throw new LicenseInvalidException(tenantUuid, "license invalid (verify)", licenseStr);
+        }
+        String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
+        LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
+        //校验租户是否匹配
+        if (!Objects.equals(licenseVo.getTenant(), tenantUuid)) {
+            throw new LicenseInvalidException(tenantUuid, "license invalid (tenant)", licenseStr);
+        }
+        //判断数据库连接串是否匹配
+        if (!licenseVo.getIsDbUrlValid()) {
+            throw new LicenseInvalidException(tenantUuid, "license invalid (dbUrl)", licenseStr);
+        }
+        tenantLicenseMap.put(tenantUuid, licenseVo);
+        //获取租户所有权限map
+        tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));
     }
 
     /**

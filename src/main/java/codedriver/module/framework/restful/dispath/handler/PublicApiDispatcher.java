@@ -251,11 +251,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -305,11 +301,7 @@ public class PublicApiDispatcher {
             }
 
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -348,11 +340,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.STREAM, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (TenantNotFoundException ex) {
+        }catch (TenantNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             response.setStatus(521);
             returnObj.put("Status", "ERROR");
@@ -397,11 +385,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -440,11 +424,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -484,11 +464,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        } catch (AuthenticateException ex) {
-            response.setStatus(525);
-            returnObj.put("Status", "ERROR");
-            returnObj.put("Message", ex.getMessage());
-        } catch (ApiRuntimeException ex) {
+        }catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());

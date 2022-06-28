@@ -97,6 +97,12 @@ public class LicenseManager extends ModuleInitializedListenerBase {
         if (!licenseVo.getIsDbUrlValid()) {
             throw new LicenseInvalidException(tenantUuid, "license invalid (dbUrl)", licenseStr);
         }
+        //判断是否停止服务
+        long diffTime = licenseVo.getExpireTime().getTime() - System.currentTimeMillis();
+        if (licenseVo.isExpiredOutOfDay(diffTime)) {
+            throw new LicenseInvalidException(tenantUuid, "license is expired", licenseStr);
+        }
+
         tenantLicenseMap.put(tenantUuid, licenseVo);
         //获取租户所有权限map
         tenantLicenseAuthListMap.put(tenantUuid, getAuthListByLicenseAuth(licenseVo));

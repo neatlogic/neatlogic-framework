@@ -203,6 +203,10 @@
 		</where>
 	</select>
 
+	<select id="getYearListByWorktimeUuid" parameterType="java.lang.String" resultType="java.lang.Integer" useCache="false">
+		SELECT `year` FROM `worktime_range` WHERE `worktime_uuid` = #{value}
+	</select>
+
 	<insert id="insertWorktime" parameterType="codedriver.framework.worktime.dto.WorktimeVo">
 		INSERT INTO `worktime` ( `uuid`, `name`, `is_active`, `lcu`, `lcd`, `config`, `is_delete` )
 		VALUES ( #{uuid}, #{name}, #{isActive}, #{lcu}, now(3), #{config}, 0)

@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,14 +81,14 @@ public class LicenseManager extends ModuleInitializedListenerBase {
             throw new LicenseInvalidException(tenantUuid, "license invalid (length)", licenseStr);
         }
         String sign = licenses[1];
-        byte[] decodeData = Base64.getDecoder().decode(licenses[0]);
+        byte[] decodeData = Base64.getDecoder().decode(licenses[0].getBytes(Charset.forName("GBK")));
         if (StringUtils.isBlank(Config.LICENSE_PK)) {
             throw new LicenseInvalidException(tenantUuid, "license pk is blank", licenseStr);
         }
         if (!RSAUtils.verify(decodeData, Config.LICENSE_PK, sign)) {
             throw new LicenseInvalidException(tenantUuid, "license invalid (verify)", licenseStr);
         }
-        String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())));
+        String licenseData = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, Config.LICENSE_PK())),Charset.forName("GBK"));
         LicenseVo licenseVo = JSONObject.parseObject(licenseData).toJavaObject(LicenseVo.class);
         //校验租户是否匹配
         if (!Objects.equals(licenseVo.getTenant(), tenantUuid)) {

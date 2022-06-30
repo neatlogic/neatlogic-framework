@@ -21,5 +21,6 @@
         <!-- <plugin interceptor="codedriver.framework.dao.plugin.FulltextIndexInterceptor"/>-->
         <plugin interceptor="codedriver.framework.dao.plugin.SqlCostInterceptor"/>
         <plugin interceptor="codedriver.framework.dao.plugin.SqlSessionCacheClearInterceptor"/>
+        <plugin interceptor="codedriver.framework.dao.plugin.ExceptionCatchInterceptor"/>
     </plugins>
 </configuration>

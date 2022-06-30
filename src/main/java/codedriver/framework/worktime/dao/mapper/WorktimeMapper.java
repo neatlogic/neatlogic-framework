@@ -47,6 +47,8 @@ public interface WorktimeMapper {
 
     public List<WorktimeVo> getYearListByWorktimeUuidList(List<String> worktimeUuidList);
 
+    List<Integer> getYearListByWorktimeUuid(String worktimeUuid);
+
     public int insertWorktime(WorktimeVo worktimeVo);
 
     public int insertBatchWorktimeRange(List<WorktimeRangeVo> worktimeRangeList);
@@ -58,5 +60,4 @@ public interface WorktimeMapper {
     public int deleteWorktimeByUuid(String uuid);
 
     public int deleteWorktimeRange(WorktimeRangeVo worktimeRangeVo);
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -15,6 +15,7 @@ import codedriver.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import codedriver.framework.restful.dao.mapper.ApiMapper;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
@@ -112,7 +113,8 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                         }
                     }
                 }
-            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
+            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
+                     SecurityException ex) {
                 validApi(this.getClass(), paramObj, apiVo, JSONObject.class);
                 boolean canRun = false;
                 if (apiVo.getIsActive().equals(0)) {
@@ -174,7 +176,12 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
 
     @Override
     public final JSONObject help() {
-        return getApiComponentHelp(JSONObject.class);
+        JSONObject helpObj = getApiComponentHelp(JSONObject.class);
+        JSONObject example = this.example();
+        if (MapUtils.isNotEmpty(example)) {
+            helpObj.put("example", example);
+        }
+        return helpObj;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -70,6 +70,15 @@ public interface IApiComponent {
      * @return 帮助信息json
      */
     JSONObject help();
+
+    /**
+     * 获取参数范例
+     *
+     * @return 参数范例json
+     */
+    default JSONObject example() {
+        return null;
+    }
 
     /**
      * 校验入参特殊规则，如：去重

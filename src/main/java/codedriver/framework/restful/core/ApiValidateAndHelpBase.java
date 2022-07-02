@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -355,7 +355,7 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     // 判断是否必填
-                    if (p.isRequired()) {
+                    if (p.isRequired() && !p.type().equals(ApiParamType.FILE)) {
                         if (!paramObj.containsKey(p.name())) {
                             throw new ParamNotExistsException(p.name());
                         } else {

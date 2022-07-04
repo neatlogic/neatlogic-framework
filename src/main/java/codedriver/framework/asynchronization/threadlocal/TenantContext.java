@@ -60,6 +60,7 @@ public class TenantContext implements Serializable {
 
     public static TenantContext init(String _tenantUuid) {
         TenantContext context = new TenantContext(_tenantUuid);
+        context.setLicenseVo(LicenseManager.tenantLicenseMap.get(_tenantUuid));
         instance.set(context);
         return context;
     }

@@ -5,9 +5,9 @@
 
 package codedriver.framework.dto.license;
 
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+import codedriver.framework.store.mysql.DatasourceManager;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -160,7 +160,9 @@ public class LicenseVo implements Serializable {
     }
 
     public Boolean getIsDbUrlValid() {
-        if (isDbUrlValid != null && Config.DB_URL().startsWith(this.dbUrl)) {
+        if (isDbUrlValid != null && DatasourceManager.getDatasource(tenant) != null
+                && DatasourceManager.getDatasource(tenant).getJdbcUrl() != null
+                && DatasourceManager.getDatasource(tenant).getJdbcUrl().startsWith(this.dbUrl)) {
             isDbUrlValid = true;
         }
         return isDbUrlValid;

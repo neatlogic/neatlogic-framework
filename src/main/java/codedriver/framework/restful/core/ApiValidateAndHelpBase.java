@@ -542,15 +542,15 @@ public class ApiValidateAndHelpBase {
                         String content = example.example();
                         if (StringUtils.isNotBlank(content)) {
                             try {
-                                content = JSONObject.parseObject(content).toString();
+                                jsonObj.put("example", JSONObject.parseObject(content));
                             } catch (Exception ex) {
                                 try {
-                                    content = JSONArray.parseArray(content).toString();
+                                    jsonObj.put("example", JSONArray.parseArray(content));
                                 } catch (Exception ignored) {
 
                                 }
                             }
-                            jsonObj.put("example", content);
+
                         }
                     }
                 }

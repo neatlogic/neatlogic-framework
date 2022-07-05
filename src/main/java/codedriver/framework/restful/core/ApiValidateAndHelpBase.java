@@ -13,6 +13,7 @@ import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.auth.core.AuthFactory;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
@@ -424,8 +425,17 @@ public class ApiValidateAndHelpBase {
                             }
                         }
                     }
-                    if (paramValue != null && !ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, p.rule())) {
-                        throw new ParamIrregularException(p.desc() + "（" + p.name() + "）");
+                    if (paramValue != null) {
+                        String rule;
+                        // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
+                        if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                            rule = getEnumMember(p);
+                        } else {
+                            rule = p.rule();
+                        }
+                        if (!ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, rule)) {
+                            throw new ParamIrregularException(p.desc() + "（" + p.name() + "）");
+                        }
                     }
                 }
             }
@@ -490,8 +500,15 @@ public class ApiValidateAndHelpBase {
                                 paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
                                 paramObj.put("isRequired", p.isRequired());
                                 String description = p.desc();
-                                if (StringUtils.isNotBlank(p.rule())) {
-                                    description = description + "，合法输入：" + p.rule();
+                                String rule;
+                                // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
+                                if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                                    rule = getEnumMember(p);
+                                } else {
+                                    rule = p.rule();
+                                }
+                                if (StringUtils.isNotBlank(rule)) {
+                                    description = description + "，合法输入：" + rule;
                                 }
                                 paramObj.put("description", description);
                                 inputList.add(paramObj);
@@ -615,6 +632,31 @@ public class ApiValidateAndHelpBase {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
             targetException.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取注解中引用的枚举值
+     *
+     * @param p
+     * @return
+     */
+    private String getEnumMember(Param p) {
+        try {
+            Object[] objects = p.member().getEnumConstants();
+            List<String> valueList = new ArrayList<>();
+            for (Object object : objects) {
+                String value = ((IEnum) object).getValue();
+                if (value != null) {
+                    valueList.add(value);
+                }
+            }
+            if (valueList.size() > 0) {
+                return String.join(",", valueList);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
         return null;
     }

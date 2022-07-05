@@ -636,7 +636,7 @@ public class ApiValidateAndHelpBase {
      * @return
      */
     private String getEnumMember(Param p) {
-        if (p.member() != NotDefinedEnum.class) {
+        if (p.member() != NotDefined.class) {
             try {
                 Object[] objects = p.member().getEnumConstants();
                 Method getValue = p.member().getMethod("getValue");

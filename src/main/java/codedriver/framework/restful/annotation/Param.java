@@ -6,6 +6,7 @@
 package codedriver.framework.restful.annotation;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.IEnum;
 
 import java.lang.annotation.*;
 
@@ -37,4 +38,6 @@ public @interface Param {
     int maxSize() default -1;
 
     int minSize() default -1;
+
+    Class<? extends IEnum> member() default NotDefined.class;// 枚举类，引用枚举作为入参合法值时要求该枚举实现IEunm接口并重写getValue方法
 }

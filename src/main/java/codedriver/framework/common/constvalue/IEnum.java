@@ -16,6 +16,10 @@ public interface IEnum<T> {
      */
     List<T> getValueTextList();
 
+    default String getValue() {
+        return null;
+    }
+
     default String getEnumName() {
         return "";
     }

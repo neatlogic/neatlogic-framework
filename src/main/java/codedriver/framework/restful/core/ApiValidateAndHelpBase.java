@@ -13,6 +13,7 @@ import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.auth.core.AuthFactory;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
@@ -425,8 +426,11 @@ public class ApiValidateAndHelpBase {
                         }
                     }
                     if (paramValue != null) {
-                        String rule = getEnumMember(p); // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
-                        if (rule == null) {
+                        String rule;
+                        // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
+                        if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                            rule = getEnumMember(p);
+                        } else {
                             rule = p.rule();
                         }
                         if (!ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, rule)) {
@@ -496,8 +500,11 @@ public class ApiValidateAndHelpBase {
                                 paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
                                 paramObj.put("isRequired", p.isRequired());
                                 String description = p.desc();
-                                String rule = getEnumMember(p);
-                                if (rule == null) {
+                                String rule;
+                                // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
+                                if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                                    rule = getEnumMember(p);
+                                } else {
                                     rule = p.rule();
                                 }
                                 if (StringUtils.isNotBlank(rule)) {
@@ -636,23 +643,20 @@ public class ApiValidateAndHelpBase {
      * @return
      */
     private String getEnumMember(Param p) {
-        if (p.member() != NotDefined.class) {
-            try {
-                Object[] objects = p.member().getEnumConstants();
-                Method getValue = p.member().getMethod("getValue");
-                List<String> valueList = new ArrayList<>();
-                for (Object object : objects) {
-                    Object invoke = getValue.invoke(object);
-                    if (invoke != null) {
-                        valueList.add(invoke.toString());
-                    }
+        try {
+            Object[] objects = p.member().getEnumConstants();
+            List<String> valueList = new ArrayList<>();
+            for (Object object : objects) {
+                String value = ((IEnum) object).getValue();
+                if (value != null) {
+                    valueList.add(value);
                 }
-                if (valueList.size() > 0) {
-                    return String.join(",", valueList);
-                }
-            } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                logger.error(e.getMessage(), e);
             }
+            if (valueList.size() > 0) {
+                return String.join(",", valueList);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
         return null;
     }

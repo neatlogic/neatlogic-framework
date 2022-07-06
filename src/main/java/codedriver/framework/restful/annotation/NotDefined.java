@@ -1,5 +1,13 @@
 package codedriver.framework.restful.annotation;
 
-public class NotDefined {
+import codedriver.framework.common.constvalue.IEnum;
 
+import java.util.List;
+
+public class NotDefined implements IEnum {
+
+    @Override
+    public List getValueTextList() {
+        return null;
+    }
 }

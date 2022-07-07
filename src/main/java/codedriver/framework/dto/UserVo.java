@@ -133,6 +133,15 @@ public class UserVo extends BasePageVo implements Serializable {
         this.isAutoGenerateId = isAutoGenerateId;
     }
 
+    public UserVo(String uuid, String userId, String userName, String phone, String email, Integer isActive) {
+        this.uuid = uuid;
+        this.userId = userId;
+        this.userName = userName;
+        this.phone = phone;
+        this.email = email;
+        this.isActive = isActive;
+    }
+
     public List<UserAuthVo> getUserAuthList() {
         return userAuthList;
     }

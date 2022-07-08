@@ -1200,8 +1200,9 @@
     </insert>
 
     <insert id="batchInsertUserRole" parameterType="java.util.List">
-        REPLACE INTO `user_role` (`user_uuid`, `role_uuid`)
-        VALUES
+        INSERT ignore INTO `user_role` (
+        `user_uuid`, `role_uuid`
+        ) VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.userUuid}, #{item.roleUuid})
         </foreach>

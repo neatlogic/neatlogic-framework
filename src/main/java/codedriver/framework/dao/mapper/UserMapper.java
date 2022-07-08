@@ -158,13 +158,13 @@ public interface UserMapper {
 
     List<String> getActiveUserEmailListByTeamUuid(String teamUuid);
 
+    List<String> getUserIdByUserIdList(List<String> userIdList);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);
 
     int insertUserPassword(UserVo userVo);
-
-    int updateUserPasswordActive(String userUuid);
 
     int insertUserRole(@Param("userUuid") String userUuid, @Param("roleUuid") String roleUuid);
 
@@ -177,6 +177,14 @@ public interface UserMapper {
 //    int insertUserAgent(UserAgentVo userAgentVo);
 
     int insertUserTitle(UserTitleVo userTitleVo);
+
+    int batchInsertUser(List<UserVo> list);
+
+    int batchInsertUserTeam(List<TeamUserVo> list);
+
+    int batchInsertUserRole(List<RoleUserVo> list);
+
+    int updateUserPasswordActive(String userUuid);
 
     int updateUser(UserVo userVo);
 

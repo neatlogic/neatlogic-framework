@@ -5,8 +5,8 @@
 
 package codedriver.framework.common.util;
 
-import codedriver.framework.dto.ModuleGroupVo;
-import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.dto.module.ModuleGroupVo;
+import codedriver.framework.dto.module.ModuleVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +87,7 @@ public class ModuleUtil {
                     moduleGroup.setGroupName(moduleVo.getGroupName());
                     moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
                     moduleGroup.setGroupSort(moduleVo.getGroupSort());
+
                     List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
                     moduleList.add(moduleVo);
                     moduleGroup.setModuleList(moduleList);

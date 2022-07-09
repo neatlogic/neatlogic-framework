@@ -10,7 +10,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dto.ModuleGroupVo;
+import codedriver.framework.dto.module.ModuleGroupVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.restful.annotation.ExcelField;
 import codedriver.framework.util.SnowflakeUtil;

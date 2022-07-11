@@ -9,25 +9,25 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
 
 public class ImportResultVo {
-    @EntityField(name = "表名", type = ApiParamType.STRING)
-    private String tableName;
+    @EntityField(name = "对象名", type = ApiParamType.STRING)
+    private String name;
     @EntityField(name = "状态", type = ApiParamType.STRING)
     private String status;
     @EntityField(name = "异常", type = ApiParamType.STRING)
     private String error;
 
-    public ImportResultVo(String _tableName, String _status, String _error) {
-        this.tableName = _tableName;
+    public ImportResultVo(String _name, String _status, String _error) {
+        this.name = _name;
         this.status = _status;
         this.error = _error;
     }
 
-    public String getTableName() {
-        return tableName;
+    public String getName() {
+        return name;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStatus() {

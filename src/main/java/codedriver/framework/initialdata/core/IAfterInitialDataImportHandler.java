@@ -11,5 +11,7 @@ package codedriver.framework.initialdata.core;
 public interface IAfterInitialDataImportHandler {
     String getModuleId();
 
+    String getDescription();
+
     void execute();
 }

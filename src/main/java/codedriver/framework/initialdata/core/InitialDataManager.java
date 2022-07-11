@@ -5,6 +5,7 @@
 
 package codedriver.framework.initialdata.core;
 
+import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.module.ImportResultVo;
 import codedriver.framework.exception.module.TableIsNotEmptyException;
 import org.apache.commons.io.IOUtils;
@@ -61,12 +62,17 @@ public class InitialDataManager {
         return moduleTableMap.containsKey(moduleId);
     }
 
-    public static List<String> validData(InputStream is) throws IOException {
+    public static List<ValueTextVo> validData(String moduleId, InputStream is) throws IOException {
         ZipInputStream zin = new ZipInputStream(is);
         ZipEntry entry;
-        List<String> sqlList = new ArrayList<>();
+        List<ValueTextVo> sqlList = new ArrayList<>();
         while ((entry = zin.getNextEntry()) != null) {
-            sqlList.add(entry.getName().replace(".sql", ""));
+            String tableName = entry.getName().replace(".sql", "");
+            sqlList.add(new ValueTextVo(tableName, "导入" + tableName + "数据"));
+        }
+        IAfterInitialDataImportHandler handler = AfterInitialDataImportHandlerFactory.getHandler(moduleId);
+        if (handler != null) {
+            sqlList.add(new ValueTextVo("#afterall", handler.getDescription()));
         }
         return sqlList;
     }
@@ -128,7 +134,12 @@ public class InitialDataManager {
         if (!isFailed) {
             IAfterInitialDataImportHandler handler = AfterInitialDataImportHandlerFactory.getHandler(moduleId);
             if (handler != null) {
-                handler.execute();
+                try {
+                    handler.execute();
+                    resultList.add(new ImportResultVo("#afterall", "success", ""));
+                } catch (Exception ex) {
+                    resultList.add(new ImportResultVo("#afterall", "failed", ex.getMessage()));
+                }
             }
         }
         return resultList;

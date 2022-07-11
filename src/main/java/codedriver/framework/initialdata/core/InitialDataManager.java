@@ -7,7 +7,9 @@ package codedriver.framework.initialdata.core;
 
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.dto.module.ImportResultVo;
+import codedriver.framework.exception.module.InitialDataFileIrregularException;
 import codedriver.framework.exception.module.TableIsNotEmptyException;
+import codedriver.framework.util.Md5Util;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.ant.filters.StringInputStream;
@@ -66,9 +68,22 @@ public class InitialDataManager {
         ZipInputStream zin = new ZipInputStream(is);
         ZipEntry entry;
         List<ValueTextVo> sqlList = new ArrayList<>();
+        boolean isValid = false;
         while ((entry = zin.getNextEntry()) != null) {
-            String tableName = entry.getName().replace(".sql", "");
-            sqlList.add(new ValueTextVo(tableName, "导入" + tableName + "数据"));
+            if (entry.getName().equals("checksum")) {
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(zin, writer, StandardCharsets.UTF_8.name());
+                String checksum = writer.toString();
+                if (StringUtils.isNotBlank(checksum) && checksum.equals(Md5Util.encryptMD5(moduleId))) {
+                    isValid = true;
+                }
+            } else {
+                String tableName = entry.getName().replace(".sql", "");
+                sqlList.add(new ValueTextVo(tableName, "导入" + tableName + "数据"));
+            }
+        }
+        if (!isValid) {
+            throw new InitialDataFileIrregularException();
         }
         IAfterInitialDataImportHandler handler = AfterInitialDataImportHandlerFactory.getHandler(moduleId);
         if (handler != null) {
@@ -90,27 +105,40 @@ public class InitialDataManager {
             conn = getConnection();
             defaultAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
+            boolean isValid = false;
             while ((entry = zin.getNextEntry()) != null) {
-                String table = entry.getName().replace(".sql", "");
-                currentTable = table;
-                StringWriter writer = new StringWriter();
-                IOUtils.copy(zin, writer, StandardCharsets.UTF_8.name());
-                String sql = writer.toString();
-                String checkSql = getCheckSql(table);
-                stmt = conn.prepareStatement(checkSql);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    if (rs.getInt(1) > 0) {
-                        throw new TableIsNotEmptyException(table);
+                if (entry.getName().equals("checksum")) {
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(zin, writer, StandardCharsets.UTF_8.name());
+                    String checksum = writer.toString();
+                    if (StringUtils.isNotBlank(checksum) && checksum.equals(Md5Util.encryptMD5(moduleId))) {
+                        isValid = true;
                     }
+                } else {
+                    String table = entry.getName().replace(".sql", "");
+                    currentTable = table;
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(zin, writer, StandardCharsets.UTF_8.name());
+                    String sql = writer.toString();
+                    String checkSql = getCheckSql(table);
+                    stmt = conn.prepareStatement(checkSql);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        if (rs.getInt(1) > 0) {
+                            throw new TableIsNotEmptyException(table);
+                        }
+                    }
+                    rs.close();
+                    if (StringUtils.isNotBlank(sql)) {
+                        stmt = conn.prepareStatement(sql);
+                        stmt.execute();
+                        stmt.close();
+                    }
+                    resultList.add(new ImportResultVo(table, "success", ""));
                 }
-                rs.close();
-                if (StringUtils.isNotBlank(sql)) {
-                    stmt = conn.prepareStatement(sql);
-                    stmt.execute();
-                    stmt.close();
-                }
-                resultList.add(new ImportResultVo(table, "success", ""));
+            }
+            if (!isValid) {
+                throw new InitialDataFileIrregularException();
             }
             conn.commit();
         } catch (Exception ex) {
@@ -154,6 +182,11 @@ public class InitialDataManager {
         if (moduleTableMap.containsKey(moduleId)) {
             String[] tables = moduleTableMap.get(moduleId);
             if (tables != null && tables.length > 0) {
+                //加入checksum文件
+                InputStream checksumIs = new StringInputStream(Md5Util.encryptMD5(moduleId), "utf-8");
+                zos.putNextEntry(new ZipEntry("checksum"));
+                IOUtils.copy(checksumIs, zos);
+                zos.closeEntry();
                 for (String table : tables) {
                     List<String> sqlList = exportTable(table);
                     InputStream is = new StringInputStream(String.join("", sqlList), "utf-8");

@@ -25,7 +25,7 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
 
     @Override
     public JSONObject cancelLock(Long lockId, JSONObject paramJson) {
-        if(lockId == null){
+        if (lockId == null) {
             throw new ParamIrregularException("lockId");
         }
         return myCancelLock(lockId, paramJson);
@@ -38,6 +38,10 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
 
     @Override
     public boolean getIsCanInsertLock(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
+        return getMyIsCanInsertLock(globalLockVoList, globalLockVo);
+    }
+
+    protected boolean getMyIsCanInsertLock(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
         return true;
     }
 }

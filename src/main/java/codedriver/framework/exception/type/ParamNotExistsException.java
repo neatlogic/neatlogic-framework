@@ -7,6 +7,8 @@ package codedriver.framework.exception.type;
 
 import codedriver.framework.exception.core.ApiRuntimeException;
 
+import java.util.List;
+
 public class ParamNotExistsException extends ApiRuntimeException {
 
     public ParamNotExistsException(String paramNames) {
@@ -23,5 +25,9 @@ public class ParamNotExistsException extends ApiRuntimeException {
 
     public ParamNotExistsException(String... paramNames) {
         super("参数：“" + String.join("、", paramNames) + "”不能同时为空");
+    }
+
+    public ParamNotExistsException(List<String> eitherParamList, List<String> orParamList) {
+        super("必须在[" + String.join("、", eitherParamList) + "]与[" + String.join("、", orParamList) + "]两组参数中选择一组填写");
     }
 }

@@ -66,7 +66,9 @@ public class GlobalLockManager {
     public static GlobalLockVo getLock(GlobalLockVo globalLockVo) {
         //预先加入锁队列
         insertLock(globalLockVo);
-        lock(globalLockVo);
+        if(globalLockVo.getIsLock() != 1) {
+            lock(globalLockVo);
+        }
         return globalLockVo;
     }
 

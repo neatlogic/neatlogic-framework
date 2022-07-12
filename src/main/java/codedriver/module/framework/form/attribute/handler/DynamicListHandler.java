@@ -189,9 +189,19 @@ public class DynamicListHandler extends FormHandlerBase {
         if (MapUtils.isNotEmpty(resultObj)) {
             JSONArray theadList = resultObj.getJSONArray("theadList");
             JSONArray tbodyList = resultObj.getJSONArray("tbodyList");
+            List<String> keyList = new ArrayList<>();
+            for (int i = 0; i < theadList.size(); i++) {
+                JSONObject theadObj = theadList.getJSONObject(i);
+                keyList.add(theadObj.getString("key"));
+            }
             if (CollectionUtils.isNotEmpty(tbodyList)) {
                 for (int i = 0; i < tbodyList.size(); i++) {
                     JSONObject tbodyObj = tbodyList.getJSONObject(i);
+                    for (String key : keyList) {
+                        if (!tbodyObj.containsKey(key)) {
+                            tbodyObj.put(key, new JSONObject());
+                        }
+                    }
                     tbodyObj.put("_isSelected", true);
                 }
             }

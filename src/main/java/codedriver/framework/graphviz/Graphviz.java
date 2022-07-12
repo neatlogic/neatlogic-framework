@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -31,8 +31,8 @@ public class Graphviz {
         str.append("layout=").append(this.layout.getValue()).append(";\n");
         str.append("overlap=false;\n");
         str.append("bgcolor=\"transparent\";\n");
-        str.append("Node [fontname=Arial, shape=\"ellipse\", fixedsize=\"true\", width=\"1.1\", height=\"1.1\", color=\"transparent\" ,fontsize=12];\n");
-        str.append("Edge [fontname=Arial, minlen=\"1\", color=\"#7f8fa6\", fontsize=10];\n");
+        //str.append("Node [fontname=Arial, shape=\"ellipse\", fixedsize=\"true\", width=\"1.1\", height=\"1.1\", color=\"transparent\" ,fontsize=12];\n");
+        //str.append("Edge [fontname=Arial, minlen=\"1\", color=\"#7f8fa6\", fontsize=10];\n");
         str.append("ranksep = 1.1;\n");
         str.append("nodesep=.7;\n");
         str.append("size = \"11,8\";\n");

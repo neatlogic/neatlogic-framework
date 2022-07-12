@@ -339,15 +339,6 @@
                 #{auth})
     </insert>
 
-    <insert id="batchInsertUserRole" parameterType="codedriver.framework.dto.RoleUserVo">
-        INSERT ignore INTO `user_role` (
-            `user_uuid`, `role_uuid`
-        ) VALUES
-        <foreach collection="list" item="item" separator=",">
-            (#{item.userUuid}, #{item.roleUuid})
-        </foreach>
-    </insert>
-
     <update id="updateRole" parameterType="codedriver.framework.dto.RoleVo">
         UPDATE `role`
         SET `name`        = #{name},

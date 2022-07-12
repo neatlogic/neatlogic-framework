@@ -87,7 +87,8 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
             }
         }
 
-        String sign = user + "#" + request.getRequestURI() + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
+        String queryString = StringUtils.isNotBlank(request.getQueryString()) ? "?" + request.getQueryString() : StringUtils.EMPTY;
+        String sign = user + "#" + request.getRequestURI() + queryString + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
         String result = SHA256Util.encrypt(token, sign);
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;

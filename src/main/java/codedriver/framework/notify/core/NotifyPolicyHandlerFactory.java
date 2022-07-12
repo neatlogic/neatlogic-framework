@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -10,7 +10,7 @@ import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.util.ModuleUtil;
-import codedriver.framework.dto.ModuleVo;
+import codedriver.framework.dto.module.ModuleVo;
 import codedriver.framework.notify.dto.NotifyPolicyHandlerVo;
 import codedriver.framework.notify.dto.NotifyTreeVo;
 import codedriver.framework.notify.dto.NotifyTriggerVo;

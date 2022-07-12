@@ -16,6 +16,7 @@ import codedriver.framework.restful.groupsearch.core.IGroupSearchHandler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -166,8 +167,8 @@ public class TeamGroupHandler implements IGroupSearchHandler {
                             team.setParentPathList(pathNameList);
                         }
                     }
-                    /** 如果有重名的分组，找出其父分组的名称 **/
-                    if (map.get(team.getName()) > 1) {
+                    /* 如果有重名的分组，找出其父分组的名称 */
+                    if (MapUtils.isNotEmpty(map) && map.get(team.getName()) > 1) {
                         TeamVo parent = teamMapper.getTeamByUuid(team.getParentUuid());
                         if (parent != null) {
                             team.setParentName(parent.getName());

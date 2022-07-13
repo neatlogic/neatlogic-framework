@@ -120,8 +120,8 @@ public class FileVo extends BaseEditorVo {
                 }
                 startTime = now.getTimeInMillis() / 1000;
             } else if (st > 0 && et > 0) {
-                startTime = st;
-                endTime = et;
+                startTime = st / 1000;
+                endTime = et / 1000;
             }
         }
         List<Long> uploadTimeRange = new ArrayList<>();

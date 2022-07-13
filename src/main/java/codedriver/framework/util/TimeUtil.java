@@ -2,6 +2,7 @@ package codedriver.framework.util;
 
 import codedriver.framework.exception.type.ParamIrregularException;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
@@ -820,5 +821,45 @@ public class TimeUtil {
         json.put("endTime", endTime);
 
         return json;
+    }
+
+    public static List<Long> getTimeRangeList(JSONObject timeRangeObj) {
+        long startTime = 0L;
+        long endTime = 0L;
+        if (MapUtils.isNotEmpty(timeRangeObj)) {
+            String unit = timeRangeObj.getString("timeUnit");
+            String timeRange = timeRangeObj.getString("timeRange");
+            long st = timeRangeObj.getLongValue("startTime");
+            long et = timeRangeObj.getLongValue("endTime");
+            if (StringUtils.isNotBlank(unit) && StringUtils.isNotBlank(timeRange)) {
+                endTime = System.currentTimeMillis() / 1000;
+                int tr = Integer.parseInt(timeRange);
+                Calendar now = Calendar.getInstance();
+                switch (unit) {
+                    case "day":
+                        now.add(Calendar.DAY_OF_YEAR, -tr);
+                        break;
+                    case "week":
+                        now.add(Calendar.WEEK_OF_YEAR, -tr);
+                        break;
+                    case "month":
+                        now.add(Calendar.MONTH, -tr);
+                        break;
+                    case "year":
+                        now.add(Calendar.YEAR, -tr);
+                        break;
+                }
+                startTime = now.getTimeInMillis() / 1000;
+            } else if (st > 0 && et > 0) {
+                startTime = st / 1000;
+                endTime = et / 1000;
+            }
+        }
+        List<Long> timeRangeList = new ArrayList<>();
+        if (startTime > 0 && endTime > 0 && startTime <= endTime) {
+            timeRangeList.add(startTime);
+            timeRangeList.add(endTime);
+        }
+        return timeRangeList;
     }
 }

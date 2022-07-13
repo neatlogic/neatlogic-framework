@@ -11,13 +11,15 @@ import codedriver.framework.file.core.FileTypeHandlerFactory;
 import codedriver.framework.file.core.IFileTypeHandler;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import codedriver.framework.util.TimeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class FileVo extends BaseEditorVo {
     @EntityField(name = "附件id", type = ApiParamType.LONG)
@@ -93,43 +95,7 @@ public class FileVo extends BaseEditorVo {
     }
 
     public List<Long> getUploadTimeRange() {
-        long startTime = 0L;
-        long endTime = 0L;
-        if (MapUtils.isNotEmpty(this.uploadTimeRange)) {
-            String unit = this.uploadTimeRange.getString("timeUnit");
-            String timeRange = this.uploadTimeRange.getString("timeRange");
-            long st = this.uploadTimeRange.getLongValue("startTime");
-            long et = this.uploadTimeRange.getLongValue("endTime");
-            if (StringUtils.isNotBlank(unit) && StringUtils.isNotBlank(timeRange)) {
-                endTime = System.currentTimeMillis() / 1000;
-                int tr = Integer.parseInt(timeRange);
-                Calendar now = Calendar.getInstance();
-                switch (unit) {
-                    case "day":
-                        now.add(Calendar.DAY_OF_YEAR, -tr);
-                        break;
-                    case "week":
-                        now.add(Calendar.WEEK_OF_YEAR, -tr);
-                        break;
-                    case "month":
-                        now.add(Calendar.MONTH, -tr);
-                        break;
-                    case "year":
-                        now.add(Calendar.YEAR, -tr);
-                        break;
-                }
-                startTime = now.getTimeInMillis() / 1000;
-            } else if (st > 0 && et > 0) {
-                startTime = st / 1000;
-                endTime = et / 1000;
-            }
-        }
-        List<Long> uploadTimeRange = new ArrayList<>();
-        if (startTime > 0 && endTime > 0 && startTime <= endTime) {
-            uploadTimeRange.add(startTime);
-            uploadTimeRange.add(endTime);
-        }
-        return uploadTimeRange;
+        return TimeUtil.getTimeRangeList(this.uploadTimeRange);
     }
 
     public void setUploadTimeRange(JSONObject uploadTimeRange) {

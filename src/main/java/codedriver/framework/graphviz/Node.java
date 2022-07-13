@@ -29,11 +29,14 @@ public class Node {
         if (CollectionUtils.isNotEmpty(builder.className)) {
             propMap.put("class", String.join(" ", builder.className));
         }
-        if (StringUtils.isNotBlank(builder.fontColor)) {
-            propMap.put("fontcolor", builder.fontColor);
+        if (StringUtils.isNotBlank(builder.fontcolor)) {
+            propMap.put("fontcolor", builder.fontcolor);
         }
         if (StringUtils.isNotBlank(builder.image)) {
             propMap.put("image", builder.image);
+        }
+        if (StringUtils.isNotBlank(builder.fontname)) {
+            propMap.put("fontname", builder.fontname);
         }
         this.segment = builder.segment;
     }
@@ -81,10 +84,11 @@ public class Node {
         private String label;
         private String tooltip;
         private List<String> className = new ArrayList<>();
-        private String fontColor;
+        private String fontcolor;
         private String image;
         private String icon;
         private int segment;
+        private String fontname = "PingFangSC-Regular";
 
 
         public Builder(String _id) {
@@ -137,7 +141,12 @@ public class Node {
         }
 
         public Builder withFontColor(String _fontcolor) {
-            this.fontColor = _fontcolor;
+            this.fontcolor = _fontcolor;
+            return this;
+        }
+
+        public Builder withFontName(String _fontname) {
+            this.fontname = _fontname;
             return this;
         }
 

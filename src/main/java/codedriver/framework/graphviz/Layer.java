@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -29,8 +29,11 @@ public class Layer {
         if (StringUtils.isNotBlank(builder.tooltip)) {
             propMap.put("tooltip", builder.tooltip);
         }
-        if (StringUtils.isNotBlank(builder.fontColor)) {
-            propMap.put("fontcolor", builder.fontColor);
+        if (StringUtils.isNotBlank(builder.fontcolor)) {
+            propMap.put("fontcolor", builder.fontcolor);
+        }
+        if (StringUtils.isNotBlank(builder.fontName)) {
+            propMap.put("fontname", builder.fontName);
         }
     }
 
@@ -66,10 +69,17 @@ public class Layer {
         private String label;
         private String className = "layer";
         private String tooltip;
-        private String fontColor;
+        private String fontcolor;
+
+        private String fontName = "PingFangSC-Regular";
+
+        public Builder withFontName(String _fontname) {
+            this.fontName = _fontname;
+            return this;
+        }
 
         public Builder withFontColor(String _fontcolor) {
-            this.fontColor = _fontcolor;
+            this.fontcolor = _fontcolor;
             return this;
         }
 
@@ -102,5 +112,7 @@ public class Layer {
         public Layer build() {
             return new Layer(this);
         }
+
+
     }
 }

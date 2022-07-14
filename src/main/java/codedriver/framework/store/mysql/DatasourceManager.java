@@ -30,7 +30,6 @@ public class DatasourceManager {
         datasource = _datasource;
     }
 
-    //private static CodeDriverRoutingDataSource instance;
 
     @Resource(name = "dataSourceMaster")
     private CodeDriverBasicDataSource masterDatasource;
@@ -120,9 +119,6 @@ public class DatasourceManager {
                 TenantUtil.addTenant(datasourceVo.getTenantUuid());
             }
         }
-        /*if (instance == null && datasource != null) {
-            instance = datasource;
-        }*/
         if (!datasourceMap.isEmpty()) {
             datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
@@ -135,13 +131,10 @@ public class DatasourceManager {
     public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource) {
         if (!datasourceMap.containsKey(tenantUuid)) {
             datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
-            //instance.setTargetDataSources(datasourceMap);
             datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
-                //instance.setDefaultTargetDataSource(datasourceMap.get("master"));
                 datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
             }
-            //instance.afterPropertiesSet();
             datasource.afterPropertiesSet();
         }
     }

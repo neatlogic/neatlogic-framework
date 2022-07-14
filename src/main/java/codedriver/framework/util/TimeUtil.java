@@ -178,7 +178,7 @@ public class TimeUtil {
         }
     }
 
-    public static String addDateByDay(Date date, int day,String format) {
+    public static String addDateByDay(Date date, int day, String format) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         for (int i = 0; i < day; i++) {
@@ -212,7 +212,7 @@ public class TimeUtil {
         return sdf.format(date);
     }
 
-    public static Date convertStringToDate(String dataStr, String format) throws ParseException {
+    public static Date convertStringToDate(String dataStr, String format) {
         Date date = null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -742,14 +742,10 @@ public class TimeUtil {
         if (startTime.compareTo(endTime) > 0) {
             return false;
         }
-        try {
-            Date _startTime = convertStringToDate(startTime, format);
-            Date _endTime = convertStringToDate(endTime, format);
-        } catch (ParseException e) {
-            return false;
-        }
 
-        return true;
+        Date _startTime = convertStringToDate(startTime, format);
+        Date _endTime = convertStringToDate(endTime, format);
+        return _startTime != null && _endTime != null;
     }
 
     /**

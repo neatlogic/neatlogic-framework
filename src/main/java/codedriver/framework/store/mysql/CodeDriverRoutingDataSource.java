@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -20,7 +20,11 @@ public class CodeDriverRoutingDataSource extends AbstractRoutingDataSource {
             if (logger.isInfoEnabled()) {
                 logger.info("ThreadName:" + Thread.currentThread().getName() + " Tenant:" + TenantContext.get().getTenantUuid());
             }
-            return TenantContext.get().getTenantUuid();
+            String key = TenantContext.get().getTenantUuid();
+            if (TenantContext.get().isData()) {
+                key += "_DATA";
+            }
+            return key;
         } else {
             return null;
         }

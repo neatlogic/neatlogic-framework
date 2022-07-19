@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -40,6 +40,9 @@ public class Link {
         if (builder.style != null) {
             propMap.put("style", builder.style);
         }
+        if (builder.fontname != null) {
+            propMap.put("fontname", builder.fontname);
+        }
     }
 
     public String toString() {
@@ -70,9 +73,16 @@ public class Link {
         private String fontcolor;
         private String style;
 
+        private String fontname = "PingFangSC-Regular";
+
         public Builder(String _from, String _to) {
             this.from = _from;
             this.to = _to;
+        }
+
+        public Builder withFontName(String _fontname) {
+            this.fontname = _fontname;
+            return this;
         }
 
         public Builder withHeadLabel(String _headLabel) {

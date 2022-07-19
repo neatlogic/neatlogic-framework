@@ -7,16 +7,15 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
-public class RUNNER_MODIFY extends AuthBase {
-
+public class MODULE_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {
-        return "自动化执行器管理权限";
+        return "系统模块管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "对自动化执行器进行添加、修改和删除";
+        return "查看模块版本信息，导入导出模块初始化数据文件";
     }
 
     @Override
@@ -26,6 +25,6 @@ public class RUNNER_MODIFY extends AuthBase {
 
     @Override
     public Integer getSort() {
-        return 3;
+        return 27;
     }
 }

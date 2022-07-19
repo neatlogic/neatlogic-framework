@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -30,7 +30,6 @@ public class DatasourceManager {
         datasource = _datasource;
     }
 
-    //private static CodeDriverRoutingDataSource instance;
 
     @Resource(name = "dataSourceMaster")
     private CodeDriverBasicDataSource masterDatasource;
@@ -86,21 +85,20 @@ public class DatasourceManager {
 
                 datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
 
-                /*
-                一个数据源足够了，直接增加前缀来查data库
+
+                //一个数据源足够了，直接增加前缀来查data库
                 // 创建OLAP库
                 CodeDriverBasicDataSource tenantDatasourceData = new CodeDriverBasicDataSource();
                 String urlOlap = datasourceVo.getUrl();
                 urlOlap = urlOlap.replace("{host}", datasourceVo.getHost());
                 urlOlap = urlOlap.replace("{port}", datasourceVo.getPort().toString());
                 urlOlap = urlOlap.replace("{dbname}", "codedriver_" + datasourceVo.getTenantUuid() + "_data");
-                //tenantDatasourceData.setUrl(urlOlap);
                 tenantDatasourceData.setJdbcUrl(urlOlap);
                 tenantDatasourceData.setDriverClassName(datasourceVo.getDriver());
                 tenantDatasourceData.setUsername(datasourceVo.getUsername());
                 tenantDatasourceData.setPassword(datasourceVo.getPasswordPlain());
                 tenantDatasourceData.setPoolName("HikariCP_DATA_" + datasourceVo.getTenantUuid());
-
+                tenantDatasourceData.setMaximumPoolSize(20);
                 //以下是针对Mysql的参数优化
                 //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
                 tenantDatasourceData.addDataSourceProperty("prepStmtCacheSize", 250);
@@ -116,14 +114,11 @@ public class DatasourceManager {
                 tenantDatasourceData.addDataSourceProperty("cacheServerConfiguration", true);
                 tenantDatasourceData.addDataSourceProperty("elideSetAutoCommits", true);
                 tenantDatasourceData.addDataSourceProperty("maintainTimeStats", false);
+
                 datasourceMap.put(datasourceVo.getTenantUuid() + "_DATA", tenantDatasourceData);
-                */
                 TenantUtil.addTenant(datasourceVo.getTenantUuid());
             }
         }
-        /*if (instance == null && datasource != null) {
-            instance = datasource;
-        }*/
         if (!datasourceMap.isEmpty()) {
             datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
@@ -136,13 +131,10 @@ public class DatasourceManager {
     public static void addDynamicDataSource(String tenantUuid, CodeDriverBasicDataSource codeDriverBasicDataSource) {
         if (!datasourceMap.containsKey(tenantUuid)) {
             datasourceMap.put(tenantUuid, codeDriverBasicDataSource);
-            //instance.setTargetDataSources(datasourceMap);
             datasource.setTargetDataSources(datasourceMap);
             if (datasourceMap.containsKey("master")) {
-                //instance.setDefaultTargetDataSource(datasourceMap.get("master"));
                 datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
             }
-            //instance.afterPropertiesSet();
             datasource.afterPropertiesSet();
         }
     }

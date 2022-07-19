@@ -1075,6 +1075,13 @@
         SELECT a.`email` FROM `user` a JOIN `user_team` b ON a.`uuid` = b.`user_uuid` WHERE a.`is_active` = 1 AND b.`team_uuid` = #{value}
     </select>
 
+    <select id="getUserIdByUserIdList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+        select `user_id` from `user` where `user_id` in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,
@@ -1149,6 +1156,56 @@
     <insert id="insertUserTitle">
         INSERT INTO `user_title` (`id`, `name`)
         VALUES (#{id}, #{name});
+    </insert>
+
+    <insert id="batchInsertUser" parameterType="java.util.List">
+        insert into `user` (
+        `id`,
+        `uuid`,
+        `user_id`,
+        `user_name`,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active`,
+        `user_info`
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.uuid},
+            #{item.userId},
+            #{item.userName},
+            #{item.email},
+            #{item.phone},
+            #{item.pinyin},
+            #{item.isActive},
+            #{item.userInfo}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertUserTeam" parameterType="java.util.List">
+        INSERT INTO `user_team` (
+        `team_uuid`,
+        `user_uuid`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.teamUuid},
+            #{item.userUuid}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertUserRole" parameterType="java.util.List">
+        INSERT ignore INTO `user_role` (
+        `user_uuid`, `role_uuid`
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userUuid}, #{item.roleUuid})
+        </foreach>
     </insert>
 
     <update id="updateUser" parameterType="codedriver.framework.dto.UserVo">

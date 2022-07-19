@@ -127,6 +127,25 @@ public class DependencyManager {
     }
 
     /**
+     * 查询引用列表
+     *
+     * @param clazz 处理器
+     * @param from  被引用者（上游）值（如：服务时间窗口uuid）
+     * @return
+     */
+    public static List<DependencyInfoVo> getDependencyList(Class<? extends IDependencyHandler> clazz, Object from) {
+        List<DependencyInfoVo> resultList = new ArrayList<>();
+        IDependencyHandler handler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
+        int pageSize = 100;
+        int count = handler.getDependencyCount(from);
+        for (int startNum = 0; startNum < count; startNum += pageSize) {
+            List<DependencyInfoVo> toList = handler.getDependencyList(from, startNum, pageSize);
+            resultList.addAll(toList);
+        }
+        return resultList;
+    }
+
+    /**
      * 查询引用个数
      *
      * @param fromType    被引用者（上游）类型

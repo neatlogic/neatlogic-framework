@@ -5,7 +5,6 @@
 
 package codedriver.framework.common.config;
 
-import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -78,9 +77,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
         String mongoUser = this.getProperty("mongo.username", "root");
         String mongoPwd = this.getProperty("mongo.password", "root");
         String mongoDb = this.getProperty("mongo.database", "admin");
-        if (mongoPwd.startsWith(CiphertextPrefix.RC4.getValue())) {
-            mongoPwd = RC4Util.decrypt(mongoPwd.substring(4));
-        }
+        mongoPwd = RC4Util.decrypt(mongoPwd);
         paramMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
         paramMap.put("jms.url", this.getProperty("jms.url", "tcp://localhost:8161"));
         propertySources.addLast(new MapPropertySource("localconfig", paramMap));

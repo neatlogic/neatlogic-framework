@@ -28,4 +28,6 @@ public interface ApiMapper {
 
     int replaceApi(ApiVo apiVo);
 
+    int updatePasswordByToken(@Param("token")String token,@Param("password")String password);
+
 }

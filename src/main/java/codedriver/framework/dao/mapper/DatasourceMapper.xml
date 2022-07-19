@@ -22,6 +22,25 @@
                           AND b.is_active = 1
     </select>
 
+    <select id="getAllTenantDatasource" resultType="codedriver.framework.dto.DatasourceVo">
+        SELECT
+                tenant_id as tenantId,
+               `tenant_uuid` AS `tenantUuid`,
+               `url`,
+               `username`,
+               `password`    AS passwordCipher,
+               `driver`,
+               `host`,
+               `port`
+        FROM `datasource`
+    </select>
+
+    <update id="updateDatasourcePasswordByTenantId">
+        update `datasource`
+        set `password` = #{password}
+        where `tenant_id` = #{tenantId}
+    </update>
+
     <insert id="insertDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
         INSERT INTO `datasource` (`tenant_id`,
                                   `tenant_uuid`,

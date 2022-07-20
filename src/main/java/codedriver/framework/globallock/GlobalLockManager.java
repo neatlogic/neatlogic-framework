@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RootConfiguration
@@ -133,6 +134,10 @@ public class GlobalLockManager {
         }
         globalLockVo = globalLockTmp;
         return lock(globalLockVo);
+    }
+
+    public static boolean getIsBeenLocked(GlobalLockVo globalLockVo) {
+        return globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid()).stream().anyMatch(o -> Objects.equals(o.getIsLock(), 1));
     }
 
 }

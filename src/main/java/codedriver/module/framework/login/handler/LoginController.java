@@ -10,7 +10,6 @@ import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
 import codedriver.framework.common.ReturnJson;
 import codedriver.framework.common.config.Config;
-import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.constvalue.DeviceType;
 import codedriver.framework.common.util.CommonUtil;
 import codedriver.framework.common.util.RC4Util;
@@ -103,9 +102,7 @@ public class LoginController {
             UserVo checkUserVo = null;
             if (Config.ENABLE_SUPERADMIN() && Config.SUPERADMIN().equals(userVo.getUserId())) {
                 String superadminPsw = Config.SUPERADMIN_PASSWORD();
-                if (superadminPsw.startsWith(CiphertextPrefix.RC4.getValue())) {
-                    superadminPsw = RC4Util.decrypt(superadminPsw.substring(4));
-                }
+                superadminPsw = RC4Util.decrypt(superadminPsw);
                 superadminPsw = "{MD5}" + Md5Util.encryptMD5(superadminPsw);
                 if (password.equals(superadminPsw)) {
                     checkUserVo = MaintenanceMode.getMaintenanceUser();

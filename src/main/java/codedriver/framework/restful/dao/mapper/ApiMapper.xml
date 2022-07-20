@@ -139,6 +139,11 @@
         </foreach>
 
     </update>
+    <update id="updatePasswordByToken">
+        update api
+        set password = #{password}
+        where token = #{token}
+    </update>
 
     <insert id="replaceApi" parameterType="codedriver.framework.restful.dto.ApiVo">
         INSERT INTO `api`
@@ -180,12 +185,12 @@
                                 `description` = #{description},
                                 `module_id`   = #{moduleId},
                                 `is_active`   = #{isActive},
-                                `username`   = #{username},
-                                `password`   = #{password},
-                                `authtype`   = #{authtype},
-                                `qps`   = #{qps},
-                                `timeout`   = #{timeout},
-                                `need_audit`   = #{needAudit}
+                                `username`    = #{username},
+                                `password`    = #{password},
+                                `authtype`    = #{authtype},
+                                `qps`         = #{qps},
+                                `timeout`     = #{timeout},
+                                `need_audit`  = #{needAudit}
     </insert>
 
     <delete id="deleteApiByToken" parameterType="java.lang.String">

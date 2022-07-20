@@ -1,13 +1,18 @@
 package codedriver.framework.dao.mapper;
 
+import codedriver.framework.dto.DatasourceVo;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
-import codedriver.framework.dto.DatasourceVo;
-
 public interface DatasourceMapper {
-	public List<DatasourceVo> getAllActiveTenantDatasource();
+	List<DatasourceVo> getAllActiveTenantDatasource();
 
-	public int insertDatasource(DatasourceVo datasourceVo);
+	List<DatasourceVo> getAllTenantDatasource();
 
-	public int createDatasource(DatasourceVo datasourceVo);
+	int updateDatasourcePasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
+
+	int insertDatasource(DatasourceVo datasourceVo);
+
+	int createDatasource(DatasourceVo datasourceVo);
 }

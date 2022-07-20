@@ -5,23 +5,49 @@
 
 package codedriver.framework.common.util;
 
+import codedriver.framework.common.constvalue.CiphertextPrefix;
+
 public class RC4Util {
 
-    private static final String RC4_KEY = "6fdff97dcb1a3f50809dc6a020283db507b501eb4bed9a28f16a2fba7b9e364a47b2cf7eb02f0ae9cca7c8054f8b116a07591797729e00f7366b486d59e9f93a";
+    private static final String KEY = "r3MQiqvyDaEocb4zl8YJ3ebbZcpKoo7E";
+
+    public static final String PRE_OLD = CiphertextPrefix.RC4.getValue();
+
+    public static final String PRE = "{RC4}";
 
     public static String encrypt(final String plaintext) {
-        return byte2HexStr(encrypt(RC4_KEY.getBytes(), plaintext.getBytes()));
+        if (!plaintext.startsWith(PRE) && !plaintext.startsWith(PRE_OLD)) {
+            return PRE + byte2HexStr(encrypt(KEY.getBytes(), plaintext.getBytes()));
+        }
+        return plaintext;
     }
 
-    public static String decrypt(final String ciphertext) {
-        return new String(decrypt(RC4_KEY.getBytes(), hexStr2Bytes(ciphertext)));
+    public static String decrypt(String ciphertext) {
+        if (ciphertext.startsWith(PRE)) {
+            ciphertext = ciphertext.substring(5);
+        } else if (ciphertext.startsWith(PRE_OLD)) {
+            ciphertext = ciphertext.substring(4);
+        } else {
+            return ciphertext;
+        }
+        return new String(decrypt(KEY.getBytes(), hexStr2Bytes(ciphertext)));
     }
 
-    public static String encrypt(final String key, final String plaintext) {
-        return byte2HexStr(encrypt(key.getBytes(), plaintext.getBytes()));
-    }
+    /*public static String encrypt(final String key, final String plaintext) {
+        if (!plaintext.startsWith(PRE) && !plaintext.startsWith(PRE_OLD)) {
+            return byte2HexStr(encrypt(key.getBytes(), plaintext.getBytes()));
+        }
+        return plaintext;
+    }*/
 
-    public static String decrypt(final String key, final String ciphertext) {
+    public static String decrypt(final String key, String ciphertext) {
+        if (ciphertext.startsWith(PRE)) {
+            ciphertext = ciphertext.substring(5);
+        } else if (ciphertext.startsWith(PRE_OLD)) {
+            ciphertext = ciphertext.substring(4);
+        } else {
+            return ciphertext;
+        }
         return new String(decrypt(key.getBytes(), hexStr2Bytes(ciphertext)));
     }
 

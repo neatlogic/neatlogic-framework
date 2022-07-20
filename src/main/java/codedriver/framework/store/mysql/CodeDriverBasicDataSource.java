@@ -6,7 +6,6 @@
 package codedriver.framework.store.mysql;
 
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.common.constvalue.CiphertextPrefix;
 import codedriver.framework.common.util.RC4Util;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
@@ -43,11 +42,7 @@ public class CodeDriverBasicDataSource extends HikariDataSource {//替换dbcp2�
 
     @Override
     public void setPassword(String password) {
-        String prefix = CiphertextPrefix.RC4.getValue();
-        if (password.startsWith(prefix)) {
-            password = password.substring(prefix.length());
-            password = RC4Util.decrypt(password);
-        }
+        password = RC4Util.decrypt(password);
         super.setPassword(password);
     }
 }

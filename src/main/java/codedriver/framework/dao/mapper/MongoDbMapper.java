@@ -6,9 +6,14 @@
 package codedriver.framework.dao.mapper;
 
 import codedriver.framework.dto.MongoDbVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface MongoDbMapper {
     List<MongoDbVo> getAllActiveTenantMongoDb();
+
+    List<MongoDbVo> getAllTenantMongoDb();
+
+    int updateTenantMongoDbPasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
 }

@@ -19,4 +19,21 @@
                       ON a.tenant_uuid = b.uuid
                           AND b.is_active = 1
     </select>
+
+    <select id="getAllTenantMongoDb" resultType="codedriver.framework.dto.MongoDbVo">
+        SELECT tenant_id   AS tenantId,
+               tenant_uuid AS tenantUuid,
+               `database`,
+               username,
+               `password`  AS passwordCipher,
+               `host`,
+               `option`
+        FROM mongodb
+    </select>
+
+    <update id="updateTenantMongoDbPasswordByTenantId">
+        update mongodb
+        set `password` = #{password}
+        where `tenant_id` = #{tenantId}
+    </update>
 </mapper>

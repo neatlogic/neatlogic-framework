@@ -31,6 +31,11 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
         return myCancelLock(lockId, paramJson);
     }
 
+    @Override
+    public boolean getIsBeenLocked(JSONObject paramJson) {
+        return getMyIsBeenLocked(paramJson);
+    }
+
     protected JSONObject myCancelLock(Long lockId, JSONObject paramJson) {
         GlobalLockManager.cancelLock(lockId, paramJson);
         return null;
@@ -43,5 +48,9 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
 
     protected boolean getMyIsCanInsertLock(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
         return true;
+    }
+
+    protected boolean getMyIsBeenLocked(JSONObject paramJson) {
+        return false;
     }
 }

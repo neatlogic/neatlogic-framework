@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RootConfiguration
@@ -47,16 +48,17 @@ public class GlobalLockManager {
             //执行mode 策略 验证是否允许上锁
             if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanInsertLock(globalLockVoList, globalLockVo)) {
                 TransactionUtil.commitTx(transactionStatus);
-            }else{
+            } else {
                 TransactionUtil.rollbackTx(transactionStatus);
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(),ex);
+            logger.error(ex.getMessage(), ex);
             //如果wait lock timeout 则仅加入队列，等待notify
             TransactionUtil.rollbackTx(transactionStatus);
             throw new ApiRuntimeException(ex.getMessage());
         }
     }
+
     /**
      * 获取锁
      *
@@ -66,7 +68,7 @@ public class GlobalLockManager {
     public static GlobalLockVo getLock(GlobalLockVo globalLockVo) {
         //预先加入锁队列
         insertLock(globalLockVo);
-        if(globalLockVo.getIsLock() != 1) {
+        if (globalLockVo.getIsLock() != 1) {
             lock(globalLockVo);
         }
         return globalLockVo;
@@ -78,7 +80,7 @@ public class GlobalLockManager {
      * @param globalLockVo 锁入参
      * @return lockId
      */
-    private static GlobalLockVo lock(GlobalLockVo globalLockVo){
+    private static GlobalLockVo lock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
             //获取所有该key的锁和未上锁的队列 for update
@@ -90,7 +92,7 @@ public class GlobalLockManager {
             }
             TransactionUtil.commitTx(transactionStatus);
         } catch (Exception ex) {
-            logger.error(ex.getMessage(),ex);
+            logger.error(ex.getMessage(), ex);
             //如果wait lock timeout 则仅加入队列，等待notify
             TransactionUtil.rollbackTx(transactionStatus);
             globalLockVo.setWaitReason(ex.getMessage());
@@ -109,11 +111,11 @@ public class GlobalLockManager {
                 //获取对应uuid队列中下一个lockId notify
                 GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
                 TransactionUtil.commitTx(transactionStatus);
-                if(nextGlobalLockVo != null){
-                    GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo,paramJson);
+                if (nextGlobalLockVo != null) {
+                    GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo, paramJson);
                 }
             } catch (Exception ex) {
-                logger.error(ex.getMessage(),ex);
+                logger.error(ex.getMessage(), ex);
                 TransactionUtil.rollbackTx(transactionStatus);
                 throw new ApiRuntimeException(ex.getMessage());
             }
@@ -122,15 +124,20 @@ public class GlobalLockManager {
 
     /**
      * 重试获取锁
+     *
      * @param lockId 锁 id
      */
-    public static GlobalLockVo retryLock(GlobalLockVo globalLockVo){
+    public static GlobalLockVo retryLock(GlobalLockVo globalLockVo) {
         GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
         if (globalLockTmp == null) {
             insertLock(globalLockVo);
         }
-        globalLockVo = globalLockTmp ;
+        globalLockVo = globalLockTmp;
         return lock(globalLockVo);
+    }
+
+    public static boolean getIsBeenLocked(GlobalLockVo globalLockVo) {
+        return globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid()).stream().anyMatch(o -> Objects.equals(o.getIsLock(), 1));
     }
 
 }

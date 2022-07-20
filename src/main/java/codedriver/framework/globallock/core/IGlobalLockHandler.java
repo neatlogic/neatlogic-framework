@@ -80,8 +80,6 @@ public interface IGlobalLockHandler {
      * @param paramJson
      * @return
      */
-    default boolean getIsBeenLocked(JSONObject paramJson) {
-        return false;
-    }
+    boolean getIsBeenLocked(JSONObject paramJson);
 
 }

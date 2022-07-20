@@ -74,13 +74,4 @@ public interface IGlobalLockHandler {
      */
     JSONObject retryLock(Long lockId, JSONObject paramJson);
 
-    /**
-     * 是否已上锁
-     *
-     * @param paramJson
-     * @return
-     */
-    default boolean hasLocked(JSONObject paramJson) {
-        return false;
-    }
 }

@@ -479,6 +479,7 @@
         p.`auth_type` AS authType,
         p.is_delete AS isDelete,
         p.`host`,
+        rm.id as runnerMapId,
         p.`port`
         FROM runner p left join runner_map rm on p.id = rm.runner_id
         where rm.id in

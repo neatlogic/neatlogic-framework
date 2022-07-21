@@ -63,7 +63,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     private DataWarehouseDataSourceAuditMapper dataSourceAuditMapper;
 
     private static boolean evaluateExpression(String expression, Map<String, Object> paramMap) {
-        ScriptEngine engine = JavascriptUtil.getEngine("-strict", "-doe", "--no-java");
+        ScriptEngine engine = JavascriptUtil.getEngine();
         for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
             engine.put(entry.getKey(), entry.getValue());
         }

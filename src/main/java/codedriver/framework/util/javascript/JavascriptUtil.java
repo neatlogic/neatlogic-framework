@@ -21,8 +21,8 @@ public class JavascriptUtil {
     //private static final ScriptEngineManager sem = new ScriptEngineManager();
     private static final NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 
-    public static ScriptEngine getEngine(String... options) {
-        return factory.getScriptEngine(options);
+    public static ScriptEngine getEngine() {
+        return factory.getScriptEngine(new ScriptClassFilter());
     }
 
     public static ScriptEngine getEngine(ScriptClassFilter classFilter) {
@@ -125,7 +125,7 @@ public class JavascriptUtil {
             }
         }
         //ScriptEngine se = sem.getEngineByName("nashorn");
-        ScriptEngine se = getEngine("-strict", "-doe", "--no-java");
+        ScriptEngine se = getEngine();
         if (sw != null) {
             se.getContext().setWriter(sw);
         }

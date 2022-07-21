@@ -17,7 +17,7 @@ public class RunScriptUtil {
                 "return " + expression + ";\n" +
                 "}";
 
-        ScriptEngine se = JavascriptUtil.getEngine("-strict", "-doe", "--no-java");
+        ScriptEngine se = JavascriptUtil.getEngine();
         se.eval(script);
         Invocable invocableEngine = (Invocable) se;
         Object callbackvalue = invocableEngine.invokeFunction("run");

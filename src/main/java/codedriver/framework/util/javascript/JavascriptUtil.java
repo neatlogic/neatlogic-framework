@@ -21,6 +21,14 @@ public class JavascriptUtil {
     //private static final ScriptEngineManager sem = new ScriptEngineManager();
     private static final NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 
+    public static ScriptEngine getEngine(String... options) {
+        return factory.getScriptEngine(options);
+    }
+
+    public static ScriptEngine getEngine(ScriptClassFilter classFilter) {
+        return factory.getScriptEngine(classFilter);
+    }
+
     public static String transform(Object paramObj, String script) throws ScriptException, NoSuchMethodException {
         return transform(paramObj, script, null);
     }
@@ -35,7 +43,8 @@ public class JavascriptUtil {
     public static boolean runExpression(JSONObject paramObj, String expression) throws ScriptException, NoSuchMethodException {
         //处理is-null和is-not-null两种表达式
         expression = expression.replace("-", "");
-        ScriptEngine se = factory.getScriptEngine("-strict");
+        //ScriptEngine se = getEngine("-strict");
+        ScriptEngine se = getEngine(new ScriptClassFilter("codedriver.framework.util.javascript.expressionHandler."));
         //ScriptEngine se = sem.getEngineByName("nashorn");
         if (MapUtils.isNotEmpty(paramObj)) {
             for (String key : paramObj.keySet()) {
@@ -116,7 +125,7 @@ public class JavascriptUtil {
             }
         }
         //ScriptEngine se = sem.getEngineByName("nashorn");
-        ScriptEngine se = factory.getScriptEngine("-strict", "-doe", "--no-java");
+        ScriptEngine se = getEngine("-strict", "-doe", "--no-java");
         if (sw != null) {
             se.getContext().setWriter(sw);
         }

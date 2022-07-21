@@ -17,6 +17,7 @@ import codedriver.framework.datawarehouse.exceptions.ReportDataSourceIsSyncingEx
 import codedriver.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
 import codedriver.framework.transaction.core.AfterTransactionJob;
 import codedriver.framework.transaction.core.EscapeTransactionJob;
+import codedriver.framework.util.javascript.JavascriptUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -63,8 +63,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     private DataWarehouseDataSourceAuditMapper dataSourceAuditMapper;
 
     private static boolean evaluateExpression(String expression, Map<String, Object> paramMap) {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("nashorn");
+        ScriptEngine engine = JavascriptUtil.getEngine();
         for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
             engine.put(entry.getKey(), entry.getValue());
         }

@@ -168,7 +168,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
                         }
                     }
                     /* 如果有重名的分组，找出其父分组的名称 */
-                    if (MapUtils.isNotEmpty(map) && map.get(team.getName()) > 1) {
+                    if (MapUtils.isNotEmpty(map) && map.get(team.getName()) != null && map.get(team.getName()) > 1) {
                         TeamVo parent = teamMapper.getTeamByUuid(team.getParentUuid());
                         if (parent != null) {
                             team.setParentName(parent.getName());

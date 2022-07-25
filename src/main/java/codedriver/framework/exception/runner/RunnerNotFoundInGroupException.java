@@ -6,6 +6,8 @@
 package codedriver.framework.exception.runner;
 
 public class RunnerNotFoundInGroupException extends RuntimeException {
+    private static final long serialVersionUID = 4760150017764148841L;
+
     public RunnerNotFoundInGroupException(Long runnerGroupId) {
         super("在id为：" + runnerGroupId + "的runner组里找不到runner");
     }

@@ -5,13 +5,13 @@
 
 package codedriver.framework.common.util;
 
-import codedriver.framework.common.constvalue.CiphertextPrefix;
-
 public class RC4Util {
 
     private static final String KEY = "r3MQiqvyDaEocb4zl8YJ3ebbZcpKoo7E";
 
-    public static final String PRE_OLD = CiphertextPrefix.RC4.getValue();
+    private static final String PRE_TAGENT = "{ENCRYPTED}";
+
+    public static final String PRE_OLD = "RC4:";
 
     public static final String PRE = "{RC4}";
 
@@ -27,6 +27,8 @@ public class RC4Util {
             ciphertext = ciphertext.substring(5);
         } else if (ciphertext.startsWith(PRE_OLD)) {
             ciphertext = ciphertext.substring(4);
+        } else if (ciphertext.startsWith(PRE_TAGENT)) {
+            ciphertext = ciphertext.substring(11);
         } else {
             return ciphertext;
         }
@@ -45,6 +47,8 @@ public class RC4Util {
             ciphertext = ciphertext.substring(5);
         } else if (ciphertext.startsWith(PRE_OLD)) {
             ciphertext = ciphertext.substring(4);
+        } else if (ciphertext.startsWith(PRE_TAGENT)) {
+            ciphertext = ciphertext.substring(11);
         } else {
             return ciphertext;
         }

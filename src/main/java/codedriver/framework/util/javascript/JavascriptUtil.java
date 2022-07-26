@@ -15,18 +15,85 @@ import org.slf4j.LoggerFactory;
 
 import javax.script.*;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JavascriptUtil {
-    static Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
+    static class CacheItem {
+
+        private final String script;
+        private final CompiledScript compiledScript;
+
+        public CacheItem(String script) throws ScriptException {
+            this.script = script;
+            ScriptEngine engine = JavascriptUtil.getEngine("--global-per-engine");
+            Compilable compilable = ((Compilable) engine);
+            this.compiledScript = compilable.compile(script);
+        }
+
+        public CompiledScript getCompiledScript() {
+            return this.compiledScript;
+        }
+
+        public String getScript() {
+            return script;
+        }
+
+
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
+    private static final ThreadLocal<List<CacheItem>> engineCache = new ThreadLocal<>();
+
     //private static final ScriptEngineManager sem = new ScriptEngineManager();
     private static final NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 
+    public static ScriptEngine getEngine(ScriptClassFilter classFilter, String... options) {
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        if (ccl == null) {
+            ccl = NashornScriptEngineFactory.class.getClassLoader();
+        }
+        return factory.getScriptEngine(options, ccl, classFilter);
+    }
+
+    public static ScriptEngine getEngine(String... options) {
+        return factory.getScriptEngine(options);
+    }
+
     public static ScriptEngine getEngine() {
-        return factory.getScriptEngine(new ScriptClassFilter());
+        //默认禁用所有java引用
+        return factory.getScriptEngine("--no-java");
     }
 
     public static ScriptEngine getEngine(ScriptClassFilter classFilter) {
         return factory.getScriptEngine(classFilter);
+    }
+
+    private static CompiledScript getCompiledScript(String script) throws ScriptException {
+        List<CacheItem> engineList = engineCache.get();
+        if (engineList == null) {
+            engineList = new ArrayList<>();
+            engineCache.set(engineList);
+        }
+        CacheItem item = null;
+        for (int i = 0; i < engineList.size(); i++) {
+            if (engineList.get(i).getScript().equals(script)) {
+                item = engineList.get(i);
+                engineList.remove(i);
+                break;
+            }
+        }
+        if (item == null) {
+            item = new CacheItem(script);
+        }
+        engineList.add(item);
+        if (engineList.size() > 10) {
+            engineList.remove(10);
+        }
+        //System.out.println("size:" + engineList.size());
+        return item.getCompiledScript();
     }
 
     public static String transform(Object paramObj, String script) throws ScriptException, NoSuchMethodException {
@@ -94,26 +161,66 @@ public class JavascriptUtil {
         System.out.println(runExpression(paramObj, expression));
     }
 
-    /*public static void main(String[] v) throws ScriptException {
 
-        for (int i = 0; i < 100; i++) {
+    public static void main(String[] v) throws ScriptException, InterruptedException {
+        /*ScriptEngine se = getEngine("--global-per-engine");
+        Compilable compilable = ((Compilable) se);
+        CompiledScript script = compilable.compile(
+                "function run(a,m,n){  var x = param.a + 1; \n" +
+                        "  var y = x * 2 + param.m;\n" +
+                        "  var z = y * 3 - param.n;\n" +
+                        "  z;\n" +
+                        "return z;} run(param.a,param.m,param.n);\n");*/
+        long s = System.currentTimeMillis();
+        AtomicInteger counter = new AtomicInteger();
+        CountDownLatch latch = new CountDownLatch(1000);
+        for (int i = 1; i <= 1000; i++) {
             int finalI = i;
-            Runnable r = () -> {
-                ScriptEngine se = factory.getScriptEngine("-strict", "-doe", "--no-java");
-                se.put("a", finalI);
-                se.put("b", 2);
-                se.put("c", 2);
+            Runnable runner = () -> {
+                CompiledScript script = null;
                 try {
-                    System.out.println("result" + finalI + ":" + se.eval("function calFunction(a, b, c){return a+b+c;}calFunction(a,b,c);"));
+                    script = getCompiledScript("function run(a,m,n){  var x = param.a + 1;\n" +
+                            "var y = x * 2 + param.m;\n" +
+                            "var z = y * 3 - param.n;\n" +
+                            "return z;} run(param.a,param.m,param.n);\n");
                 } catch (ScriptException e) {
                     throw new RuntimeException(e);
                 }
+                Bindings params = new SimpleBindings();
+                params.put("param", new JSONObject() {{
+                    this.put("a", finalI);
+                    this.put("m", finalI + 1);
+                    this.put("n", finalI + 2);
+                }});
+                //params.put("a", finalI);
+                //params.put("m", finalI + 1);
+                //params.put("n", finalI + 2);
+                try {
+                    double exp = Double.parseDouble(Integer.toString(expect(finalI, finalI + 1, finalI + 2)));
+                    double act = (Double) script.eval(params);
+                    if ((exp == act)) {
+                        System.out.println("OK" + " " + System.currentTimeMillis());
+                    } else {
+                        System.out.println("FILED," + exp + " vs " + act + " " + System.currentTimeMillis());
+                    }
+                    counter.incrementAndGet();
+                } catch (ScriptException e) {
+                    throw new RuntimeException(e);
+                }
+                latch.countDown();
             };
-            Thread t = new Thread(r);
+            Thread t = new Thread(runner);
             t.start();
         }
-        System.out.println("======done!");
-    }*/
+        latch.await();
+        System.out.println("done,cost:" + (System.currentTimeMillis() - s) + "ms");
+    }
+
+    private static int expect(int a, int m, int n) {
+        int x = a + 1;
+        int y = x * 2 + m;
+        return y * 3 - n;
+    }
 
 
     public static String transform(Object paramObj, String script, StringWriter sw) throws ScriptException, NoSuchMethodException {

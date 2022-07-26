@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -22,7 +22,7 @@ public class TenantRateLimiter {
     public TenantRateLimiter(Double permitsPerSecond) {
         this.permitsPerSecond = permitsPerSecond;
         this.tenantUuid = TenantContext.get().getTenantUuid();
-        if (permitsPerSecond != null && permitsPerSecond.doubleValue() != 0) {
+        if (permitsPerSecond != null && permitsPerSecond != 0) {
             this.rateLimiter = RateLimiter.create(permitsPerSecond);
         } else {
             this.rateLimiter = null;
@@ -43,7 +43,7 @@ public class TenantRateLimiter {
 
     public void setPermitsPerSecond(Double permitsPerSecond) {
         this.permitsPerSecond = permitsPerSecond;
-        if (permitsPerSecond != null && permitsPerSecond.doubleValue() != 0) {
+        if (permitsPerSecond != null && permitsPerSecond != 0) {
             this.rateLimiter.setRate(permitsPerSecond);
         }
     }
@@ -56,7 +56,7 @@ public class TenantRateLimiter {
         RequestContext requestContext = RequestContext.get();
         requestContext.setTenantRate(permitsPerSecond);
         boolean flag = true;
-        if (permitsPerSecond != null && permitsPerSecond.doubleValue() != 0 && rateLimiter != null) {
+        if (permitsPerSecond != null && permitsPerSecond != 0 && rateLimiter != null) {
             flag = rateLimiter.tryAcquire(999, TimeUnit.MILLISECONDS);
         }
         if (!flag) {
@@ -65,7 +65,7 @@ public class TenantRateLimiter {
         }
         String token = requestContext.getUrl();
         Double rate = requestContext.getApiRate();
-        if (rate == null || rate.doubleValue() == 0) {
+        if (rate == null || rate == 0) {
             return true;
         }
 
@@ -75,7 +75,7 @@ public class TenantRateLimiter {
             synchronized (this) {
                 apiRateLimiter = apiRateLimiterMap.get(token);
                 if (apiRateLimiter == null) {
-                    apiRateLimiter = RateLimiter.create(rate.doubleValue());
+                    apiRateLimiter = RateLimiter.create(rate);
                     apiRateLimiterMap.put(token, apiRateLimiter);
                 }
             }
@@ -83,7 +83,7 @@ public class TenantRateLimiter {
             if (apiRateLimiter.getRate() != rate.doubleValue()) {
                 synchronized (this) {
                     apiRateLimiter = apiRateLimiterMap.get(token);
-                    if (apiRateLimiter.getRate() != rate.doubleValue()) {
+                    if (apiRateLimiter.getRate() != rate) {
                         apiRateLimiter.setRate(rate.doubleValue());
                     }
                 }

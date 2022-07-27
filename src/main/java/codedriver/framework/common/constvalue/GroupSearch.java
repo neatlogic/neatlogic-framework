@@ -64,6 +64,15 @@ public enum GroupSearch implements IEnum {
         return _value;
     }
 
+    public static String getPrefix(String _value) {
+        for (GroupSearch gs : GroupSearch.values()) {
+            if (_value.startsWith(gs.getValuePlugin())) {
+                return gs.value;
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public List getValueTextList() {

@@ -26,6 +26,7 @@ import codedriver.framework.restful.dto.ApiHandlerVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.restful.enums.ApiType;
 import codedriver.framework.restful.ratelimiter.RateLimiterTokenBucket;
+import codedriver.framework.util.HttpRequestUtil;
 import codedriver.framework.util.mongodb.IJsonSerializer;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
@@ -49,8 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/")
@@ -456,11 +456,7 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             if (UserContext.get() != null) {
-                int responseStatus =  UserContext.get().getResponse().getStatus();
-                if (UserContext.get().getResponse() != null) {
-                    UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
-                    UserContext.get().getResponse().setStatus(responseStatus);
-                }
+                HttpRequestUtil.resetResponse(response);
             }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             if (returnObj.containsKey("_disableDetect")) {
@@ -532,11 +528,7 @@ public class ApiDispatcher {
         }
         if (!response.isCommitted()) {
             if (UserContext.get() != null) {
-                int responseStatus =  UserContext.get().getResponse().getStatus();
-                if (UserContext.get().getResponse() != null) {
-                    UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
-                    UserContext.get().getResponse().setStatus(responseStatus);
-                }
+                HttpRequestUtil.resetResponse(response);
             }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             if (returnObj.containsKey("_disableDetect")) {

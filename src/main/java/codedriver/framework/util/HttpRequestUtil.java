@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -243,6 +244,22 @@ public class HttpRequestUtil {
         HttpRequestUtil httpRequestUtil = new HttpRequestUtil(url);
         httpRequestUtil.method = "GET";
         return httpRequestUtil;
+    }
+
+    public static void resetResponse(HttpServletResponse response) {
+        if(response != null) {
+            int responseStatus = response.getStatus();
+            Map<String, String> headerMap = new HashMap<>();
+            Collection<String> headerNames = response.getHeaderNames();
+            for (String headerName : headerNames) {
+                headerMap.put(headerName, response.getHeader(headerName));
+            }
+            response.reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
+            response.setStatus(responseStatus);
+            for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+                response.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     /**
@@ -496,12 +513,12 @@ public class HttpRequestUtil {
                 if (StringUtils.isNotBlank(contentDisPosition)) {
                     UserContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
                 }
-                if(CollectionUtils.isNotEmpty(responseHeaderList)){
-                    Map<String,List<String>> headersMap = connection.getHeaderFields();
-                    for(String header : responseHeaderList){
+                if (CollectionUtils.isNotEmpty(responseHeaderList)) {
+                    Map<String, List<String>> headersMap = connection.getHeaderFields();
+                    for (String header : responseHeaderList) {
                         List<String> buildStatusList = headersMap.get(header);
-                        if(CollectionUtils.isNotEmpty(buildStatusList)){
-                            UserContext.get().getResponse().setHeader(header,buildStatusList.get(0));
+                        if (CollectionUtils.isNotEmpty(buildStatusList)) {
+                            UserContext.get().getResponse().setHeader(header, buildStatusList.get(0));
                         }
                     }
                 }
@@ -533,7 +550,7 @@ public class HttpRequestUtil {
             } finally {
                 connection.disconnect();
                 if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
-                    UserContext.get().getResponse().resetBuffer();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
+                    resetResponse(UserContext.get().getResponse());
                 }
             }
         }
@@ -549,7 +566,7 @@ public class HttpRequestUtil {
         return error;
     }
 
-    public HttpRequestUtil setResponseHeaders(List<String> responseHeaderList){
+    public HttpRequestUtil setResponseHeaders(List<String> responseHeaderList) {
         this.responseHeaderList = responseHeaderList;
         return this;
     }

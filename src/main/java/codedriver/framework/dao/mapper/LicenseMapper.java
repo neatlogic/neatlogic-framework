@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LicenseMapper {
 
-    String getTenantLicenseByTenantUuid(String tenantUuid);
+    String getTenantLicenseByTenantUuid(@Param("tenantUuid") String tenantUuid);
 
     List<LicenseVo> getTenantLicenseByTenantUuidList(List<String> tenantUuidList);
 

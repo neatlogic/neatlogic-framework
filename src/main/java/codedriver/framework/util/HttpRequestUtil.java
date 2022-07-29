@@ -477,6 +477,8 @@ public class HttpRequestUtil {
     private String result;
     private String error;
     private int responseCode;
+    //用于将请求的response的header 设置到当前上下文response中
+    private List<String> responseHeaderList;
 
 
     public HttpRequestUtil sendRequest() {
@@ -493,6 +495,15 @@ public class HttpRequestUtil {
                 String contentDisPosition = connection.getHeaderField("Content-Disposition");
                 if (StringUtils.isNotBlank(contentDisPosition)) {
                     UserContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
+                }
+                if(CollectionUtils.isNotEmpty(responseHeaderList)){
+                    Map<String,List<String>> headersMap = connection.getHeaderFields();
+                    for(String header : responseHeaderList){
+                        List<String> buildStatusList = headersMap.get(header);
+                        if(CollectionUtils.isNotEmpty(buildStatusList)){
+                            UserContext.get().getResponse().setHeader(header,buildStatusList.get(0));
+                        }
+                    }
                 }
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
@@ -522,7 +533,7 @@ public class HttpRequestUtil {
             } finally {
                 connection.disconnect();
                 if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
-                    UserContext.get().getResponse().reset();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
+                    UserContext.get().getResponse().resetBuffer();//解决 "getOutputStream和getWriter一起用，导致 '当前响应已经调用了方法getOutputStream()' 异常" 问题
                 }
             }
         }
@@ -536,6 +547,11 @@ public class HttpRequestUtil {
 
     public String getError() {
         return error;
+    }
+
+    public HttpRequestUtil setResponseHeaders(List<String> responseHeaderList){
+        this.responseHeaderList = responseHeaderList;
+        return this;
     }
 
     public int getResponseCode() {

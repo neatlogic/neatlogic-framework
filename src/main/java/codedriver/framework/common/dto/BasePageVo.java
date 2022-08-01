@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -32,6 +32,9 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     @EntityField(name = "页数", type = ApiParamType.INTEGER)
     private Integer pageCount = 0;
+
+    @JSONField(serialize = false)//数据页范围，用于查询一定范围内的数据
+    private Integer[] pageRange;
     @JSONField(serialize = false)
     private Integer startNum;
     @JSONField(serialize = false)
@@ -78,11 +81,33 @@ public class BasePageVo implements Serializable {
         this.needPage = needPage;
     }
 
-    public Integer getPageSize() {
-        if (!this.needPage) {
-            pageSize = 100;
+    public Integer[] getPageRange() {
+        return pageRange;
+    }
+
+    public void setPageRange(Integer[] pageRange) {
+        if (pageRange != null && pageRange.length == 2 && pageRange[0] >= 1 && pageRange[1] >= 1 && pageRange[1] >= pageRange[0]) {
+            this.pageRange = pageRange;
         }
-        return pageSize;
+    }
+
+    public Integer getCurrentPage() {
+        if (pageRange == null) {
+            return currentPage;
+        } else {
+            return pageRange[0];
+        }
+    }
+
+    public Integer getPageSize() {
+        if (pageRange == null) {
+            if (!this.needPage) {
+                pageSize = 100;
+            }
+            return pageSize;
+        } else {
+            return pageSize * (pageRange[1] - pageRange[0] + 1);
+        }
     }
 
     public void setPageSize(Integer pageSize) {
@@ -93,11 +118,6 @@ public class BasePageVo implements Serializable {
 
     public Integer getPageSizePlus() {
         return this.getPageSize() + 1;
-    }
-
-
-    public Integer getCurrentPage() {
-        return currentPage;
     }
 
     public void setCurrentPage(Integer currentPage) {

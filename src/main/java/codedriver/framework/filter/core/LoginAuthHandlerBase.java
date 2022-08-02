@@ -111,6 +111,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
         // 压缩cookie内容
         String c = "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign;
+        checkUserVo.setAuthorization(c);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bos);
         gzipOutputStream.write(c.getBytes());

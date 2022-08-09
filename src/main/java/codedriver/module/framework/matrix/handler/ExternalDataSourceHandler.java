@@ -232,8 +232,8 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
             List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
-            JSONArray dafaultValue = dataVo.getDefaultValue();
-            if (CollectionUtils.isNotEmpty(dafaultValue)) {
+            JSONArray defaultValue = dataVo.getDefaultValue();
+            if (CollectionUtils.isNotEmpty(defaultValue)) {
                 String uuidColumn = dataVo.getUuidColumn();
                 boolean uuidColumnExist = false;
                 for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
@@ -244,36 +244,45 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 if (!uuidColumnExist) {
                     throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), uuidColumn);
                 }
-                List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-                MatrixColumnVo sourceColumnVo = new MatrixColumnVo();
-                sourceColumnVo.setColumn(uuidColumn);
-                List<String> uuidList = dafaultValue.toJavaList(String.class);
-                for (String uuidValue : uuidList) {
-                    List<String> valueList = new ArrayList<>();
-                    valueList.add(uuidValue);
-                    sourceColumnVo.setValueList(valueList);
-                    sourceColumnVo.setExpression(Expression.EQUAL.getExpression());
-                    sourceColumnList.clear();
-                    sourceColumnList.add(sourceColumnVo);
-                    integrationVo.getParamObj().put("sourceColumnList", sourceColumnList);
-                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-                    if (StringUtils.isNotBlank(resultVo.getError())) {
-                        logger.error(resultVo.getError());
-                        throw new MatrixExternalAccessException();
-                    }
-                    handler.validate(resultVo);
-                    List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
-                    for (Map<String, JSONObject> tbody : externalDataTbodyList) {
-                        JSONObject valueObj = tbody.get(uuidColumn);
-                        if (MapUtils.isNotEmpty(valueObj)) {
-                            String value = valueObj.getString("value");
-                            if (Objects.equals(value, uuidValue)) {
-                                tbodyList.add(tbody);
-                                break;
-                            }
-                        }
-                    }
+//                List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
+//                MatrixColumnVo sourceColumnVo = new MatrixColumnVo();
+//                sourceColumnVo.setColumn(uuidColumn);
+//                List<String> uuidList = dafaultValue.toJavaList(String.class);
+//                for (String uuidValue : uuidList) {
+//                    List<String> valueList = new ArrayList<>();
+//                    valueList.add(uuidValue);
+//                    sourceColumnVo.setValueList(valueList);
+//                    sourceColumnVo.setExpression(Expression.EQUAL.getExpression());
+//                    sourceColumnList.clear();
+//                    sourceColumnList.add(sourceColumnVo);
+//                    integrationVo.getParamObj().put("sourceColumnList", sourceColumnList);
+//                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+//                    if (StringUtils.isNotBlank(resultVo.getError())) {
+//                        logger.error(resultVo.getError());
+//                        throw new MatrixExternalAccessException();
+//                    }
+//                    handler.validate(resultVo);
+//                    List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
+//                    for (Map<String, JSONObject> tbody : externalDataTbodyList) {
+//                        JSONObject valueObj = tbody.get(uuidColumn);
+//                        if (MapUtils.isNotEmpty(valueObj)) {
+//                            String value = valueObj.getString("value");
+//                            if (Objects.equals(value, uuidValue)) {
+//                                tbodyList.add(tbody);
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+                integrationVo.getParamObj().put("defaultValue", defaultValue);
+                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+                if (StringUtils.isNotBlank(resultVo.getError())) {
+                    logger.error(resultVo.getError());
+                    throw new MatrixExternalAccessException();
                 }
+                handler.validate(resultVo);
+                List<Map<String, JSONObject>> externalDataTbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
+                tbodyList.addAll(externalDataTbodyList);
                 returnObj.put("tbodyList", tbodyList);
             } else {
                 if (!mergeFilterListAndSourceColumnList(dataVo)) {

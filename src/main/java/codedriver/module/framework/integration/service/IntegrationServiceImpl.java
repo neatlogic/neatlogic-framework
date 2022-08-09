@@ -200,31 +200,40 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
             }
             JSONArray defaultValue = jsonObj.getJSONArray("defaultValue");
             if (CollectionUtils.isNotEmpty(defaultValue)) {
-                List<SourceColumnVo> sourceColumnList = new ArrayList<>();
-                SourceColumnVo sourceColumnVo = new SourceColumnVo();
-                sourceColumnVo.setColumn(uuidColumn);
+//                List<SourceColumnVo> sourceColumnList = new ArrayList<>();
+//                SourceColumnVo sourceColumnVo = new SourceColumnVo();
+//                sourceColumnVo.setColumn(uuidColumn);
                 List<Map<String, Object>> tbodyArray = new ArrayList<>();
-                for (Object uuidValue : defaultValue) {
-                    List<String> valueList = new ArrayList<>();
-                    valueList.add(uuidValue.toString());
-                    sourceColumnVo.setValueList(valueList);
-                    sourceColumnList.clear();
-                    sourceColumnList.add(sourceColumnVo);
-                    integrationVo.getParamObj().put("sourceColumnList", sourceColumnList);
-                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.FORM);
-                    if (StringUtils.isNotBlank(resultVo.getError())) {
-                        logger.error(resultVo.getError());
-                        throw new IntegrationSendRequestException(integrationVo.getName());
-                    }
-                    handler.validate(resultVo);
-                    List<Map<String, Object>> tbodyList = getTbodyList(resultVo, columnList);
-                    for (Map<String, Object> tbodyObj : tbodyList) {
-                        if (Objects.equals(uuidValue, tbodyObj.get(uuidColumn))) {
-                            tbodyArray.add(tbodyObj);
-                            break;
-                        }
-                    }
+//                for (Object uuidValue : defaultValue) {
+//                    List<String> valueList = new ArrayList<>();
+//                    valueList.add(uuidValue.toString());
+//                    sourceColumnVo.setValueList(valueList);
+//                    sourceColumnList.clear();
+//                    sourceColumnList.add(sourceColumnVo);
+//                    integrationVo.getParamObj().put("sourceColumnList", sourceColumnList);
+//                    IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.FORM);
+//                    if (StringUtils.isNotBlank(resultVo.getError())) {
+//                        logger.error(resultVo.getError());
+//                        throw new IntegrationSendRequestException(integrationVo.getName());
+//                    }
+//                    handler.validate(resultVo);
+//                    List<Map<String, Object>> tbodyList = getTbodyList(resultVo, columnList);
+//                    for (Map<String, Object> tbodyObj : tbodyList) {
+//                        if (Objects.equals(uuidValue, tbodyObj.get(uuidColumn))) {
+//                            tbodyArray.add(tbodyObj);
+//                            break;
+//                        }
+//                    }
+//                }
+                integrationVo.getParamObj().put("defaultValue", defaultValue);
+                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.FORM);
+                if (StringUtils.isNotBlank(resultVo.getError())) {
+                    logger.error(resultVo.getError());
+                    throw new IntegrationSendRequestException(integrationVo.getName());
                 }
+                handler.validate(resultVo);
+                List<Map<String, Object>> tbodyList = getTbodyList(resultVo, columnList);
+                tbodyArray.addAll(tbodyList);
                 returnObj.put("tbodyList", tbodyArray);
             } else {
                 JSONArray searchColumnArray = jsonObj.getJSONArray("searchColumnList");

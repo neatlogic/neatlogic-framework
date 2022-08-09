@@ -45,6 +45,7 @@ public class MatrixIntegrationHandler extends IntegrationHandlerBase {
     public List<PatternVo> getInputPattern() {
         List<PatternVo> jsonList = new ArrayList<>();
         jsonList.add(new PatternVo("keyword", "input", ApiParamType.STRING, 0, "关键字"));
+        jsonList.add(new PatternVo("defaultValue", "input", ApiParamType.JSONARRAY, 0, "唯一标识数组，用于回显数据"));
         jsonList.add(new PatternVo("currentPage", "input", ApiParamType.INTEGER, 0, "当前页"));
         jsonList.add(new PatternVo("pageSize", "input", ApiParamType.INTEGER, 0, "每页大小"));
         jsonList.add(new PatternVo("needPage", "input", ApiParamType.BOOLEAN, 0, "是否分页"));

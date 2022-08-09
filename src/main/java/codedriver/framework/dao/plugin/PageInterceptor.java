@@ -5,7 +5,6 @@
 
 package codedriver.framework.dao.plugin;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -18,7 +17,6 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Intercepts(
         @Signature(

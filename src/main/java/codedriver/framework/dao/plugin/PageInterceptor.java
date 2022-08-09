@@ -66,25 +66,12 @@ public class PageInterceptor implements Interceptor {
             throw new RuntimeException(ex);
         }
 
-        String countArg = "1";
-        List<String> idColumnList = new ArrayList<>();
-        List<ResultMap> resultMaps = ms.getResultMaps();
-        if (CollectionUtils.isNotEmpty(resultMaps)) {
-            ResultMap resultMap = resultMaps.get(0);
-            List<ResultMapping> resultMappingList = resultMap.getIdResultMappings();
-            if (CollectionUtils.isNotEmpty(resultMappingList)) {
-                idColumnList = resultMappingList.stream().map(ResultMapping::getColumn).collect(Collectors.toList());
-            }
-        }
-        if (CollectionUtils.isNotEmpty(idColumnList)) {
-            countArg = "DISTINCT " + String.join(", ", idColumnList);
-        }
         //根据当前的MappedStatement创建一个返回值为Integer类型的MappedStatement
         MappedStatement rowNumMs = newMappedStatement(ms, Integer.class);
         //创建rowNum查询缓存key
         CacheKey rowNumKey = executor.createCacheKey(rowNumMs, parameterObject, RowBounds.DEFAULT, boundSql);
         //拼装rowNumSql
-        String rowNumSql = "select count(" + countArg + ") from (" + boundSql.getSql() + ") temp";
+        String rowNumSql = "select count(1) from (" + boundSql.getSql() + ") temp";
         BoundSql rowNumBoundSql = new BoundSql(ms.getConfiguration(), rowNumSql, boundSql.getParameterMappings(), parameterObject);
         // 当使用动态Sql时，可能会产生临时的参数
         // 这些参数需要手动设置到新的BoundSql中

@@ -43,6 +43,12 @@ public class TableResultUtil {
         return returnObj;
     }
 
+    public static JSONObject getResult(List resultList) {
+        JSONObject returnObj = new JSONObject();
+        returnObj.put("tbodyList", resultList);
+        return returnObj;
+    }
+
     public static JSONObject getOffsetResult(List theadList, List tbodyList, BasePageVo vo) {
         JSONObject returnObj = new JSONObject();
         returnObj.put("pageSize", vo.getPageSize());

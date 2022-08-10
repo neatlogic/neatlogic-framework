@@ -8,6 +8,8 @@ package codedriver.framework.restful.core;
 import codedriver.framework.dto.FieldValidResultVo;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +21,7 @@ public interface IApiComponent {
      *
      * @return 实现类全名
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default String getClassName() {
         return ClassUtils.getUserClass(this.getClass()).getName();
     }
@@ -28,6 +31,7 @@ public interface IApiComponent {
      *
      * @return true false
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean isRaw() {
         return false;
     }
@@ -37,6 +41,7 @@ public interface IApiComponent {
      *
      * @return 中文名
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getName();
 
     /**
@@ -44,6 +49,7 @@ public interface IApiComponent {
      *
      * @return 配置json
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getConfig();
 
     /**
@@ -51,6 +57,7 @@ public interface IApiComponent {
      *
      * @return true false
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     int needAudit();
 
     /**
@@ -69,6 +76,7 @@ public interface IApiComponent {
      *
      * @return 帮助信息json
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     JSONObject help();
 
     /**
@@ -76,6 +84,7 @@ public interface IApiComponent {
      *
      * @return 参数范例json
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default JSONObject example() {
         return null;
     }
@@ -89,6 +98,7 @@ public interface IApiComponent {
      * @return 校验结果
      * @throws Exception 异常
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     FieldValidResultVo doValid(ApiVo interfaceVo, JSONObject paramObj, String validField) throws Exception;
 
     /**
@@ -96,6 +106,7 @@ public interface IApiComponent {
      *
      * @return true false
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean supportAnonymousAccess() {
         return false;
     }
@@ -105,6 +116,7 @@ public interface IApiComponent {
      *
      * @return true false
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean disableReturnCircularReferenceDetect() {
         return false;
     }

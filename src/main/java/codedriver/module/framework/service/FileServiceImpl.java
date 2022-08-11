@@ -1,9 +1,15 @@
-package codedriver.framework.service;
+/*
+ * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
+package codedriver.module.framework.service;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.common.util.FileUtil;
+import codedriver.framework.crossover.IFileCrossoverService;
 import codedriver.framework.exception.file.FileAccessDeniedException;
 import codedriver.framework.exception.file.FileNotFoundException;
 import codedriver.framework.exception.file.FileTypeHandlerNotFoundException;
@@ -30,7 +36,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Service
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl implements FileService, IFileCrossoverService {
 
     @Resource
     private FileMapper fileMapper;
@@ -100,6 +106,21 @@ public class FileServiceImpl implements FileService {
             }
         } else {
             throw new FileNotFoundException(id);
+        }
+    }
+
+    @Override
+    public void deleteFile(Long fileId, JSONObject paramObj) throws Exception {
+        FileVo fileVo = fileMapper.getFileById(fileId);
+        if (fileVo == null) {
+            return;
+        }
+        IFileTypeHandler fileTypeHandler = FileTypeHandlerFactory.getHandler(fileVo.getType());
+        if (fileTypeHandler == null) {
+            return;
+        }
+        if (fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
+            fileTypeHandler.deleteFile(fileVo, paramObj);
         }
     }
 }

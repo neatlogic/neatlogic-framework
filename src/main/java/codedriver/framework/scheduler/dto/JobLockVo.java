@@ -7,13 +7,10 @@ package codedriver.framework.scheduler.dto;
 
 import codedriver.framework.common.config.Config;
 
-import java.util.Objects;
-
 public class JobLockVo {
     public final static String RUNNING = "running";
     public final static String WAITING = "waiting";
 
-    private Integer id;
     private String jobName;
     private String jobGroup;
     private String jobHandler;
@@ -25,23 +22,11 @@ public class JobLockVo {
 
     }
 
-    public JobLockVo(String _jobName, String _jobGroup) {
-        jobName = _jobName;
-        jobGroup = _jobGroup;
-    }
 
     public JobLockVo(String _jobName, String _jobGroup, String _jobHandler) {
         jobName = _jobName;
         jobGroup = _jobGroup;
         jobHandler = _jobHandler;
-    }
-
-    public Integer getId() {
-        return Objects.hash(this.jobName, this.jobGroup);
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getLock() {

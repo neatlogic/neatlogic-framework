@@ -77,7 +77,7 @@ public abstract class JobBase implements IJob {
     private JobLockVo getJobLock(String jobName, String jobGroup) {
         // 开启事务，获取作业锁
         TransactionStatus ts = transactionUtil.openTx();
-        JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(new JobLockVo(jobName, jobGroup));
+        JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
 
         if (jobLockVo != null) {
             // 如果锁的状态是running状态，证明其他节点已经在执行，直接返回

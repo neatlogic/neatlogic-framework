@@ -240,15 +240,15 @@
     </select>
 
 
-    <select id="getJobLockByJobNameGroup" parameterType="codedriver.framework.scheduler.dto.JobLockVo"
-            resultType="codedriver.framework.scheduler.dto.JobLockVo">
+    <select id="getJobLockByJobNameGroup" resultType="codedriver.framework.scheduler.dto.JobLockVo">
         SELECT `job_name`    as jobName,
                `job_group`   as jobGroup,
                `job_handler` as jobHandler,
                `lock`,
                `server_id`   as serverId
         FROM `schedule_job_lock`
-        WHERE id = #{id}
+        WHERE job_name = #{jobName}
+          AND job_group = #{jobGroup}
             FOR
         UPDATE
     </select>
@@ -297,6 +297,7 @@
         UPDATE schedule_job_status
         SET next_fire_time = #{nextFireTime}
         WHERE job_name = #{jobName}
+          and job_group = #{jobGroup}
     </update>
 
     <update id="updateJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
@@ -311,7 +312,8 @@
         UPDATE `schedule_job_lock`
         SET `server_id` = #{serverId},
             `lock`      = #{lock}
-        WHERE id = #{id}
+        WHERE job_name = #{jobName}
+          AND job_group = #{jobGroup}
     </update>
 
     <update id="updateJobLockByServerId">
@@ -374,14 +376,12 @@
     </insert>
 
     <insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">
-        INSERT INTO `schedule_job_lock` (`id`,
-                                         `job_name`,
+        INSERT INTO `schedule_job_lock` (`job_name`,
                                          `job_group`,
                                          `job_handler`,
                                          `lock`,
                                          `server_id`)
-        VALUES (#{id},
-                #{jobName},
+        VALUES (#{jobName},
                 #{jobGroup},
                 #{jobHandler},
                 #{lock},
@@ -422,8 +422,10 @@
     <delete id="deleteJobLock">
         DELETE
         FROM `schedule_job_lock`
-        WHERE id = #{id}
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
     </delete>
+
 
     <delete id="deleteAuditByDayBefore" parameterType="int">
         <!--确保作业执行完毕，所以使用end_time作为判断条件-->

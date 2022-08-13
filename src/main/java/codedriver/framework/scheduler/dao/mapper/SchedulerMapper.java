@@ -34,7 +34,7 @@ public interface SchedulerMapper {
 
     List<JobAuditVo> getJobAuditByUuid(String uuid);
 
-    JobLockVo getJobLockByJobNameGroup(JobLockVo jobLockVo);
+    JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 

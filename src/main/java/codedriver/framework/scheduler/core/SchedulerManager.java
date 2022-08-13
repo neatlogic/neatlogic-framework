@@ -102,7 +102,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             }
 
             try {
-                JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(new JobLockVo(jobName, jobGroup));
+                JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
                 if (jobLockVo == null) {
                     jobLockVo = new JobLockVo(jobName, jobGroup, className);
                     schedulerMapper.insertJobLock(jobLockVo);

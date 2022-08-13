@@ -240,15 +240,15 @@
     </select>
 
 
-    <select id="getJobLockByJobNameGroup" resultType="codedriver.framework.scheduler.dto.JobLockVo">
+    <select id="getJobLockByJobNameGroup" parameterType="codedriver.framework.scheduler.dto.JobLockVo"
+            resultType="codedriver.framework.scheduler.dto.JobLockVo">
         SELECT `job_name`    as jobName,
                `job_group`   as jobGroup,
                `job_handler` as jobHandler,
                `lock`,
                `server_id`   as serverId
         FROM `schedule_job_lock`
-        WHERE job_name = #{jobName}
-          AND job_group = #{jobGroup}
+        WHERE id = #{id}
             FOR
         UPDATE
     </select>
@@ -311,8 +311,7 @@
         UPDATE `schedule_job_lock`
         SET `server_id` = #{serverId},
             `lock`      = #{lock}
-        WHERE job_name = #{jobName}
-          AND job_group = #{jobGroup}
+        WHERE id = #{id}
     </update>
 
     <update id="updateJobLockByServerId">
@@ -375,12 +374,14 @@
     </insert>
 
     <insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">
-        INSERT INTO `schedule_job_lock` (`job_name`,
+        INSERT INTO `schedule_job_lock` (`id`,
+                                         `job_name`,
                                          `job_group`,
                                          `job_handler`,
                                          `lock`,
                                          `server_id`)
-        VALUES (#{jobName},
+        VALUES (#{id},
+                #{jobName},
                 #{jobGroup},
                 #{jobHandler},
                 #{lock},
@@ -421,8 +422,7 @@
     <delete id="deleteJobLock">
         DELETE
         FROM `schedule_job_lock`
-        WHERE `job_name` = #{jobName}
-          AND `job_group` = #{jobGroup}
+        WHERE id = #{id}
     </delete>
 
     <delete id="deleteAuditByDayBefore" parameterType="int">

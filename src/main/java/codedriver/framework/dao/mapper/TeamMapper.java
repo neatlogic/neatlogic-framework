@@ -21,7 +21,7 @@ public interface TeamMapper {
 
     List<TeamVo> getTeamByParentUuid(String parentUuid);
 
-    List<TeamVo> getDepartmentTeamUuidByTeamList(@Param("list") List<TeamVo> teamList);
+    List<TeamVo> getTeamUuidByLevelListAndTeamList(@Param("teamList") List<TeamVo> teamList,@Param("levelList") List<String> levelList);
 
     List<TeamVo> getAllSonTeamByParentTeamList(@Param("list") List<TeamVo> list);
 

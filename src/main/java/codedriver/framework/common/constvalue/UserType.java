@@ -11,7 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum UserType implements IUserType {
-    ALL("alluser", "所有人", true), LOGIN_USER("loginuser", "当前登录人", false), LOGIN_TEAM("loginteam", "当前登录人所在组", false), LOGIN_DEPARTMENT("logindepartment", "当前登录人所在部", false), VIP_USER("vipuser", "vip用户", false);
+    ALL("alluser", "所有人", true),
+    LOGIN_USER("loginuser", "当前登录人", false),
+    LOGIN_TEAM("loginteam", "当前登录人所在组", false),
+    LOGIN_DEPARTMENT("logindepartment", "当前登录人所在部", false),
+    LOGIN_CENTER("logincenter", "当前登录人所在中心", false),
+    VIP_USER("vipuser", "vip用户", false);
 
     private final String status;
     private final String text;

@@ -275,7 +275,7 @@
         FROM `team` a
         WHERE
         `level` in
-        <foreach collection="levelList" item="item" separator=") or (" open="(" close=")">
+        <foreach collection="levelList" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
         and (

@@ -45,35 +45,5 @@ public interface ILineHandler {
      * @return
      */
     boolean needCompare();
-//    /**
-//     * 将contend 转为 html
-//     *
-//     * @param line 行对象
-//     * @return html
-//     */
-//    String convertContentToHtml(BaseLineVo line);
-//
-//    /**
-//     * 将html 转为content
-//     *
-//     * @param element element
-//     * @return 知识内容
-//     */
-//    String convertHtmlToContent(Element element);
-//
-//
-//    /**
-//     * 将html 转为config
-//     *
-//     * @param element element
-//     * @return 知识内容
-//     */
-//    String convertHtmlToConfig(Element element);
-//
-//    /**
-//     * 获取实际的组件 兼容figure 等情况
-//     *
-//     * @return 组件英文名
-//     */
-//    String getRealHandler(Element element);
+
 }

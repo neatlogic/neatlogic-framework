@@ -33,7 +33,7 @@ public class LineHandlerFactory extends ModuleInitializedListenerBase {
             ILineHandler handler = entry.getValue();
             if (handler.getHandler() != null) {
                 if (handlerMap.containsKey(handler.getHandler())) {
-                    System.err.println("知识插件：" + handler.getHandler() + "已存在，请检查代码");
+                    System.err.println("组件：" + handler.getHandler() + "已存在，请检查代码");
                 } else {
                     handlerMap.put(handler.getHandler(), handler);
                     handlerList.add(handler);

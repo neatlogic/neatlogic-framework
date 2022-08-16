@@ -148,7 +148,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
-             if (TenantContext.get() != null) {
+            if (TenantContext.get() != null) {
                 TenantContext.get().setUseDefaultDatasource(false);//防止上游异常导致后续审计没有还原原来的租户
             }
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
@@ -156,7 +156,11 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                 target = ((InvocationTargetException) target).getTargetException();
             }
             error = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
-            throw (Exception) target;
+            if (target instanceof Exception) {
+                throw (Exception) target;
+            } else if (target instanceof Error) {
+                throw (Error) target;
+            }
         } finally {
             long endTime = System.currentTimeMillis();
             ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());

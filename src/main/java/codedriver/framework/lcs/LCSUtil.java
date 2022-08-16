@@ -5,6 +5,9 @@
 
 package codedriver.framework.lcs;
 
+import codedriver.framework.lcs.exception.LineHandlerNotFoundException;
+import codedriver.framework.lcs.linehandler.core.ILineHandler;
+import codedriver.framework.lcs.linehandler.core.LineHandlerFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -954,6 +957,238 @@ public class LCSUtil {
         } else {
             return evenRowsArray[targetCount - 1];
         }
+    }
+
+
+    /**
+     * @param oldDataList   旧数据列表
+     * @param newDataList   新数据列表
+     * @param oldResultList 重组后旧数据列表
+     * @param newResultList 重组后新数据列表
+     * @param segmentPair
+     * @return void
+     * @Time:2020年10月22日
+     * @Description: 根据LCS算法比较结果，进行新旧数据的重组，体现两份数据的差异处
+     */
+    public static void regroupLineList(List<BaseLineVo> oldDataList, List<BaseLineVo> newDataList, List<BaseLineVo> oldResultList, List<BaseLineVo> newResultList, SegmentPair segmentPair) {
+        List<BaseLineVo> oldSubList = oldDataList.subList(segmentPair.getOldBeginIndex(), segmentPair.getOldEndIndex());
+        List<BaseLineVo> newSubList = newDataList.subList(segmentPair.getNewBeginIndex(), segmentPair.getNewEndIndex());
+        if (segmentPair.isMatch()) {
+            /** 分段对匹配时，行数据不能做标记，直接添加到重组后的数据列表中 **/
+            oldResultList.addAll(oldSubList);
+            newResultList.addAll(newSubList);
+        } else {
+            /** 分段对不匹配时，分成下列四种情况 **/
+            if (CollectionUtils.isEmpty(newSubList)) {
+                /** 删除行 **/
+                for (BaseLineVo lineVo : oldSubList) {
+                    lineVo.setChangeType("delete");
+                    oldResultList.add(lineVo);
+                    newResultList.add(createFillBlankLine(lineVo));
+                }
+            } else if (CollectionUtils.isEmpty(oldSubList)) {
+                /** 插入行 **/
+                for (BaseLineVo lineVo : newSubList) {
+                    oldResultList.add(createFillBlankLine(lineVo));
+                    lineVo.setChangeType("insert");
+                    newResultList.add(lineVo);
+                }
+            } else if (oldSubList.size() == 1 && newSubList.size() == 1) {
+                /** 修改一行 **/
+                BaseLineVo oldLine = oldSubList.get(0);
+                BaseLineVo newLine = newSubList.get(0);
+                if (oldLine.getHandler().equals(newLine.getHandler())) {
+                    /** 行组件相同，才是修改行数据 **/
+                    oldLine.setChangeType("update");
+                    newLine.setChangeType("update");
+                    String handler = oldLine.getHandler();
+                    ILineHandler lineHandler = LineHandlerFactory.getHandler(handler);
+                    if (lineHandler == null) {
+                        throw new LineHandlerNotFoundException(handler);
+                    }
+                    String oldMainBody = lineHandler.getMainBody(oldLine);
+                    String newMainBody = lineHandler.getMainBody(newLine);
+                    if (lineHandler.needCompare()) {
+                        if (StringUtils.length(oldMainBody) == 0) {
+                            lineHandler.setMainBody(newLine, "<span class='insert'>" + newMainBody + "</span>");
+                        } else if (StringUtils.length(newMainBody) == 0) {
+                            lineHandler.setMainBody(oldLine, "<span class='delete'>" + oldMainBody + "</span>");
+                        } else {
+                            List<SegmentRange> oldSegmentRangeList = new ArrayList<>();
+                            List<SegmentRange> newSegmentRangeList = new ArrayList<>();
+                            List<SegmentPair> segmentPairList = LCSUtil.LCSCompare(oldMainBody, newMainBody);
+                            for (SegmentPair segmentpair : segmentPairList) {
+                                oldSegmentRangeList.add(new SegmentRange(segmentpair.getOldBeginIndex(), segmentpair.getOldEndIndex(), segmentpair.isMatch()));
+                                newSegmentRangeList.add(new SegmentRange(segmentpair.getNewBeginIndex(), segmentpair.getNewEndIndex(), segmentpair.isMatch()));
+                            }
+                            lineHandler.setMainBody(oldLine, LCSUtil.wrapChangePlace(oldMainBody, oldSegmentRangeList, "<span class='delete'>", "</span>"));
+                            lineHandler.setMainBody(newLine, LCSUtil.wrapChangePlace(newMainBody, newSegmentRangeList, "<span class='insert'>", "</span>"));
+                        }
+                    }
+                    oldResultList.add(oldLine);
+                    newResultList.add(newLine);
+                } else {
+                    /** 行组件不相同，说明删除一行，再添加一行，根据行号大小判断加入重组后数据列表顺序 **/
+                    if (oldLine.getLineNumber() <= newLine.getLineNumber()) {
+                        oldLine.setChangeType("delete");
+                        oldResultList.add(oldLine);
+                        newResultList.add(createFillBlankLine(oldLine));
+
+                        oldResultList.add(createFillBlankLine(newLine));
+                        newLine.setChangeType("insert");
+                        newResultList.add(newLine);
+                    } else {
+                        oldResultList.add(createFillBlankLine(newLine));
+                        newLine.setChangeType("insert");
+                        newResultList.add(newLine);
+
+                        oldLine.setChangeType("delete");
+                        oldResultList.add(oldLine);
+                        newResultList.add(createFillBlankLine(oldLine));
+                    }
+                }
+
+            } else {
+                /** 修改多行，多行间需要做最优匹配 **/
+                List<SegmentPair> segmentPairList = differenceBestMatchForBaseLineVo(oldSubList, newSubList);
+                for (SegmentPair segmentpair : segmentPairList) {
+                    /** 递归 **/
+                    regroupLineList(oldSubList, newSubList, oldResultList, newResultList, segmentpair);
+                }
+            }
+        }
+    }
+
+    private static BaseLineVo createFillBlankLine(BaseLineVo line) {
+        BaseLineVo fillBlankLine = new BaseLineVo();
+        fillBlankLine.setChangeType("fillblank");
+        fillBlankLine.setHandler(line.getHandler());
+        fillBlankLine.setConfig(line.getConfigStr());
+        fillBlankLine.setContent(line.getContent());
+        return fillBlankLine;
+    }
+
+    /**
+     * @Description: 通过最短编辑距离算法，对不匹配段之间进行最佳匹配
+     * @Author: linbq
+     * @Date: 2021/3/5 17:32
+     * @Params:[source, target]
+     * @Returns:java.util.List<codedriver.module.knowledge.lcs.SegmentPair>
+     **/
+    private static List<SegmentPair> differenceBestMatchForBaseLineVo(List<BaseLineVo> source, List<BaseLineVo> target) {
+        int sourceCount = source.size();
+        int targetCount = target.size();
+        NodePool nodePool = new NodePool(sourceCount, targetCount);
+        for (int i = sourceCount - 1; i >= 0; i--) {
+            for (int j = targetCount - 1; j >= 0; j--) {
+                Node currentNode = new Node(i, j);
+                BaseLineVo oldLine = source.get(i);
+                BaseLineVo newLine = target.get(j);
+                String oldHandler = oldLine.getHandler();
+                ILineHandler oldLineHandler = LineHandlerFactory.getHandler(oldHandler);
+                if (oldLineHandler == null) {
+                    throw new LineHandlerNotFoundException(oldHandler);
+                }
+                String newHandler = newLine.getHandler();
+                ILineHandler newLineHandler = LineHandlerFactory.getHandler(newHandler);
+                if (newLineHandler == null) {
+                    throw new LineHandlerNotFoundException(newHandler);
+                }
+                String oldMainBody = oldLineHandler.getMainBody(oldLine);
+                String newMainBody = newLineHandler.getMainBody(newLine);
+                int oldLineContentLength = StringUtils.length(oldMainBody);
+                int newLineContentLength = StringUtils.length(newMainBody);
+                int minEditDistance = 0;
+                if (oldLine.getHandler().equals(newLine.getHandler())) {
+                    if (oldLineHandler.needCompare() && oldLineContentLength > 0 && newLineContentLength > 0) {
+                        minEditDistance = LCSUtil.minEditDistance(oldMainBody, newMainBody);
+                    } else {
+                        minEditDistance = oldLineContentLength + newLineContentLength;
+                    }
+                } else {
+                    minEditDistance = oldLineContentLength + newLineContentLength;
+                }
+                currentNode.setMinEditDistance(minEditDistance);
+                int left = 0;
+                int top = 0;
+                int upperLeft = 0;
+                Node upperLeftNode = nodePool.getOldNode(i + 1, j + 1);
+                if (upperLeftNode != null) {
+                    upperLeft = upperLeftNode.getTotalMatchLength();
+                }
+                Node leftNode = nodePool.getOldNode(i, j + 1);
+                if (leftNode != null) {
+                    left = leftNode.getTotalMatchLength();
+                }
+                Node topNode = nodePool.getOldNode(i + 1, j);
+                if (topNode != null) {
+                    top = topNode.getTotalMatchLength();
+                }
+                if (i + 1 == sourceCount && j + 1 == targetCount) {
+                    currentNode.setTotalMatchLength(minEditDistance);
+                } else if (i + 1 == sourceCount) {
+                    currentNode.setTotalMatchLength(minEditDistance + left);
+                    currentNode.setNext(leftNode);
+                } else if (j + 1 == targetCount) {
+                    currentNode.setTotalMatchLength(minEditDistance + top);
+                    currentNode.setNext(topNode);
+                } else {
+                    if (upperLeft <= left) {
+                        if (upperLeft <= top) {
+                            currentNode.setTotalMatchLength(minEditDistance + upperLeft);
+                            currentNode.setNext(upperLeftNode);
+                        } else {
+                            currentNode.setTotalMatchLength(minEditDistance + top);
+                            currentNode.setNext(topNode);
+                        }
+                    } else if (top <= left) {
+                        currentNode.setTotalMatchLength(minEditDistance + top);
+                        currentNode.setNext(topNode);
+                    } else {
+                        currentNode.setTotalMatchLength(minEditDistance + left);
+                        currentNode.setNext(leftNode);
+                    }
+                }
+
+                nodePool.addNode(currentNode);
+            }
+        }
+        List<Node> nodeList = new ArrayList<>();
+        Node previous = null;
+        Node node = nodePool.getOldNode(0, 0);
+        while (node != null) {
+            if (previous != null) {
+                if (previous.getOldIndex() == node.getOldIndex() || previous.getNewIndex() == node.getNewIndex()) {
+                    if (previous.getMinEditDistance() > node.getMinEditDistance()) {
+                        previous = node;
+                    }
+                } else {
+                    nodeList.add(previous);
+                    previous = node;
+                }
+            } else {
+                previous = node;
+            }
+            node = node.getNext();
+        }
+        if (previous != null) {
+            nodeList.add(previous);
+        }
+        List<SegmentPair> segmentPairList = new ArrayList<>();
+        int lastOldEndIndex = 0;
+        int lastNewEndIndex = 0;
+        for (Node n : nodeList) {
+            if (n.getOldIndex() != lastOldEndIndex || n.getNewIndex() != lastNewEndIndex) {
+                segmentPairList.add(new SegmentPair(lastOldEndIndex, n.getOldIndex(), lastNewEndIndex, n.getNewIndex(), false));
+            }
+            lastOldEndIndex = n.getOldIndex() + 1;
+            lastNewEndIndex = n.getNewIndex() + 1;
+            segmentPairList.add(new SegmentPair(n.getOldIndex(), lastOldEndIndex, n.getNewIndex(), lastNewEndIndex, false));
+        }
+        if (lastOldEndIndex != sourceCount || lastNewEndIndex != targetCount) {
+            segmentPairList.add(new SegmentPair(lastOldEndIndex, sourceCount, lastNewEndIndex, targetCount, false));
+        }
+        return segmentPairList;
     }
 
     public static void main(String[] args) {

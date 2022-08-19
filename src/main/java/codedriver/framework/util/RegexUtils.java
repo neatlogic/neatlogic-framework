@@ -26,9 +26,11 @@ public final class RegexUtils {
     public static final String PASSWORD = "PASSWORD";
     public static final String CONNECT_URL = "CONNECT_URL";
     public static final String ORDER_BY = "ORDER_BY";
+    public static final String ORDER_BY1 = "ORDER_BY1";
 
     public static final Map<String, Pattern> regexPatternMap = new HashMap<String, Pattern>() {
         private static final long serialVersionUID = -960685874597441494L;
+
         {
             put(NAME, Pattern.compile("^[A-Za-z_\\.\\-\\d\\u4e00-\\u9fa5]+$"));
             put(NAME_WITH_SLASH, Pattern.compile("^[A-Za-z_\\.\\-\\d\\u4e00-\\u9fa5/]+$"));
@@ -39,6 +41,9 @@ public final class RegexUtils {
             put(PASSWORD, Pattern.compile("^(?!.*[\\u4E00-\\u9FA5\\s])(?!^[a-zA-Z]+$)(?!^[\\d]+$)(?!^[^a-zA-Z\\d]+$)^.{8,20}$"));
             put(CONNECT_URL, Pattern.compile("^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+)|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"));
             put(ORDER_BY, Pattern.compile("^((\\+?-?\\w+(\\.\\w+)?),?\\s*)+\\s+((DESC)|(desc)|(ASC)|(asc))$"));
+//            put(ORDER_BY1, Pattern.compile("^((?!\\.).)*$"));不含有点
+//            put(ORDER_BY1, Pattern.compile("^[^.].*[^-_.]$"));不以点开头结束
+            put(ORDER_BY1, Pattern.compile("(^[^.].*[^-_.]$)"));
         }
     };
 

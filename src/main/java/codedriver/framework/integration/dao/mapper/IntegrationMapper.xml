@@ -249,7 +249,8 @@
 		`status`,
 		`param_file_path`,
 		`result_file_path`,
-		`error_file_path`
+		`error_file_path`,
+		`headers`
 -- 		`param_hash`,
 -- 		`result_hash`,
 -- 		`error_hash`
@@ -266,7 +267,8 @@
 			#{status},
 			#{paramFilePath},
 			#{resultFilePath},
-			#{errorFilePath})
+			#{errorFilePath},
+		    #{headersStr})
 	</insert>
 
 	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">

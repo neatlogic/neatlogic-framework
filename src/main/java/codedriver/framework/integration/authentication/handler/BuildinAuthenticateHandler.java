@@ -8,8 +8,8 @@ package codedriver.framework.integration.authentication.handler;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.exception.integration.AuthenticateException;
-import codedriver.framework.integration.authentication.enums.AuthenticateType;
 import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
+import codedriver.framework.integration.authentication.enums.AuthenticateType;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -58,6 +58,9 @@ public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 			connection.addRequestProperty("Authorization", authorization);
 			connection.addRequestProperty("Tenant", TenantContext.get().getTenantUuid());
 		} else {
+			//打印堆栈信息
+			Exception ex = new Exception("无法获取用户登录信息");
+			logger.error(ex.getMessage(),ex);
 			throw new AuthenticateException("无法获取用户登录信息");
 		}
 	}

@@ -24,6 +24,7 @@ import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.util.javascript.JavascriptUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -283,6 +284,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         }
         if (StringUtils.isBlank(integrationAuditVo.getStatus())) {
             integrationAuditVo.setStatus("succeed");
+        }
+        if (connection != null && MapUtils.isNotEmpty(connection.getHeaderFields())) {
+            integrationAuditVo.setHeaders(JSONObject.parseObject(JSONObject.toJSONString(connection.getHeaderFields())));
         }
         integrationAuditVo.setEndTime(new Date());
         CodeDriverThread thread = new IntegrationAuditSaveThread(integrationAuditVo);

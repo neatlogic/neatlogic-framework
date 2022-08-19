@@ -7,8 +7,10 @@ import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.SnowflakeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -52,7 +54,10 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 	private List<String> userUuidList;
 	@JSONField(serialize = false)
 	private List<String> statusList;
-
+	@EntityField(name = "请求头", type = ApiParamType.JSONOBJECT)
+	private JSONObject headers;
+	@EntityField(name = "请求头字符串", type = ApiParamType.STRING)
+	private String headersStr;
 
 	public Long getId() {
 		if (id == null) {
@@ -227,4 +232,18 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
 		this.statusList = statusList;
 	}
 
+	public JSONObject getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(JSONObject headers) {
+		this.headers = headers;
+	}
+
+	public String getHeadersStr() {
+		if(MapUtils.isNotEmpty(headers)){
+			return headers.toJSONString();
+		}
+		return null;
+	}
 }

@@ -51,16 +51,13 @@ public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
 				}
-				authorization = new String(out.toByteArray());
+				authorization = out.toString();
 			}else if (token.startsWith("Bearer_")) {
 				authorization = token;
 			}
 			connection.addRequestProperty("Authorization", authorization);
 			connection.addRequestProperty("Tenant", TenantContext.get().getTenantUuid());
 		} else {
-			//打印堆栈信息
-			Exception ex = new Exception("无法获取用户登录信息");
-			logger.error(ex.getMessage(),ex);
 			throw new AuthenticateException("无法获取用户登录信息");
 		}
 	}

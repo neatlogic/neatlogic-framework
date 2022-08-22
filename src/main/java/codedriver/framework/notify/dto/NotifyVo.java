@@ -25,7 +25,6 @@ public class NotifyVo {
     private String fromUserEmail;
     private JSONObject data;
     private MessageHandlerAndRecipientVo messageHandlerAndRecipientVo;
-    private List<String> exceptionNotifyUserUuidList;
     private StringBuilder errorBuilder;
     private String exception;// 记录通知发生异常时的异常信息
     private Integer isSendExceptionNotify = 1;// 通知发生异常时是否需要发送通知
@@ -36,7 +35,6 @@ public class NotifyVo {
         this.notifyPolicyHandler = builder.notifyPolicyHandler;
         this.data = builder.data;
         this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
-        this.exceptionNotifyUserUuidList = builder.exceptionNotifyUserUuidList;
         this.fcd = builder.fcd;
         this.fileList = builder.fileList;
         try {
@@ -93,10 +91,6 @@ public class NotifyVo {
 
     public List<String> getToRoleUuidList() {
         return messageHandlerAndRecipientVo.toRoleUuidList;
-    }
-
-    public List<String> getExceptionNotifyUserUuidList() {
-        return exceptionNotifyUserUuidList;
     }
 
     public String getError() {
@@ -164,8 +158,6 @@ public class NotifyVo {
         private List<String> toUserUuidList = new ArrayList<>();
         private List<String> toTeamUuidList = new ArrayList<>();
         private List<String> toRoleUuidList = new ArrayList<>();
-
-        private List<String> exceptionNotifyUserUuidList = new ArrayList<>();
 
         private INotifyTriggerType triggerType;
         private Class<? extends IMessageHandler> messageHandlerClass;
@@ -248,11 +240,6 @@ public class NotifyVo {
             if (CollectionUtils.isNotEmpty(fileList)) {
                 this.fileList.addAll(fileList);
             }
-            return this;
-        }
-
-        public Builder setExceptionNotifyUserUuidList(List<String> exceptionNotifyUserUuidList) {
-            this.exceptionNotifyUserUuidList = exceptionNotifyUserUuidList;
             return this;
         }
     }

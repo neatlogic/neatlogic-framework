@@ -49,8 +49,6 @@ public class NotifyPolicyUtil {
             Object callerData,
             List<FileVo> fileList
     ) throws Exception {
-        /** 异常通知用户uuid列表 **/
-        List<String> adminUserUuidList = policyConfig.getAdminUserUuidList();
         /** 触发动作列表 **/
         List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
         for (NotifyTriggerVo triggerObj : triggerList) {
@@ -107,10 +105,7 @@ public class NotifyPolicyUtil {
                                     throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
                                 }
                                 NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
-                                /** 设置异常通知接收人 **/
-                                if (CollectionUtils.isNotEmpty(adminUserUuidList)) {
-                                    notifyBuilder.setExceptionNotifyUserUuidList(adminUserUuidList);
-                                }
+
                                 /** 设置通知模板 **/
                                 Long templateId = actionObj.getTemplateId();
                                 if (templateId != null) {

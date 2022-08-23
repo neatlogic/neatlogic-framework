@@ -29,6 +29,7 @@ public class NotifyVo {
     private String exception;// 记录通知发生异常时的异常信息
     private Integer isSendExceptionNotify = 1;// 通知发生异常时是否需要发送通知
     private Date fcd;
+    private List<String> actualRecipientList;
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
@@ -147,6 +148,14 @@ public class NotifyVo {
 
     public Date getFcd() {
         return fcd;
+    }
+
+    public List<String> getActualRecipientList() {
+        return actualRecipientList;
+    }
+
+    public void setActualRecipientList(List<String> actualRecipientList) {
+        this.actualRecipientList = actualRecipientList;
     }
 
     public static class Builder {

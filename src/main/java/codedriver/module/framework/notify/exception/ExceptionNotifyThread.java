@@ -56,7 +56,7 @@ public class ExceptionNotifyThread extends CodeDriverThread {
                     exception.printStackTrace(new PrintWriter(writer, true));
                     notifyVo.setException(writer.toString().replaceAll("\r\n\t", "<br>&nbsp;&nbsp;&nbsp;&nbsp;"));
                     String notifyPolicyHandler = notifyPolicyVo.getHandler();
-                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, policyConfig, null, null, null, notifyVo, null);
+                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, notifyPolicyVo, null, null, null, notifyVo, null, "");
                 }
             }
 

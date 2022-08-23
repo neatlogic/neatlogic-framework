@@ -17,7 +17,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyHandlerBase.class);
 
-    public final void execute(NotifyVo notifyVo) throws Exception {
+    public final boolean execute(NotifyVo notifyVo) throws Exception {
 
         if (StringUtils.isNotBlank(notifyVo.getError())) {
             logger.error(notifyVo.getError());
@@ -25,11 +25,12 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
                 notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
                 CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, new RuntimeException(notifyVo.getError()), ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
             }
+            return false;
         } else {
-            myExecute(notifyVo);
+            return myExecute(notifyVo);
         }
 
     }
 
-    protected abstract void myExecute(NotifyVo notifyVo) throws Exception;
+    protected abstract boolean myExecute(NotifyVo notifyVo) throws Exception;
 }

@@ -55,9 +55,10 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
     private MailServerMapper mailServerMapper;
 
     @Override
-    public void myExecute(NotifyVo notifyVo) {
+    public boolean myExecute(NotifyVo notifyVo) {
         try {
             sendEmail(notifyVo);
+            return true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             if (!(e instanceof EmailServerNotFoundException)) {
@@ -66,6 +67,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
                     CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
                 }
             }
+            return false;
         }
     }
 
@@ -115,6 +117,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         if (CollectionUtils.isEmpty(toEmailList)) {
             throw new NotifyNoReceiverException();
         }
+        notifyVo.setActualRecipientList(toEmailList);
         if (StringUtils.isNotBlank(notifyVo.getFromUser())) {
             UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyVo.getFromUser());
             if (userVo != null && StringUtils.isNotBlank(userVo.getEmail())) {

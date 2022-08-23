@@ -60,12 +60,13 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
             sendEmail(notifyVo);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            if (notifyVo.getIsSendExceptionNotify() == 1) {
-                notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
-                CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+            if (!(e instanceof EmailServerNotFoundException)) {
+                if (notifyVo.getIsSendExceptionNotify() == 1) {
+                    notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
+                    CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+                }
             }
         }
-
     }
 
     @Override

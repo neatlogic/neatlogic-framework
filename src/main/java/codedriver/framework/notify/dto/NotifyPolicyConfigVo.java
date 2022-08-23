@@ -7,20 +7,10 @@ import codedriver.framework.dto.ConditionParamVo;
 
 public class NotifyPolicyConfigVo {
 
-    private List<String> adminUserUuidList = new ArrayList<>();
     private List<NotifyTriggerVo> triggerList = new ArrayList<>();
-    private List<String> userList = new ArrayList<>();
     private List<ConditionParamVo> paramList = new ArrayList<>();
     private List<NotifyTemplateVo> templateList = new ArrayList<>();
     private List<ConditionParamVo> conditionOptionList = new ArrayList<>();
-
-    public List<String> getAdminUserUuidList() {
-        return adminUserUuidList;
-    }
-
-    public void setAdminUserUuidList(List<String> adminUserUuidList) {
-        this.adminUserUuidList = adminUserUuidList;
-    }
 
     public List<NotifyTriggerVo> getTriggerList() {
         return triggerList;
@@ -28,14 +18,6 @@ public class NotifyPolicyConfigVo {
 
     public void setTriggerList(List<NotifyTriggerVo> triggerList) {
         this.triggerList = triggerList;
-    }
-
-    public List<String> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<String> userList) {
-        this.userList = userList;
     }
 
     public List<ConditionParamVo> getParamList() {

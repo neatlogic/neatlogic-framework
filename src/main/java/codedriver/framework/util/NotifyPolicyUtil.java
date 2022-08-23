@@ -69,8 +69,7 @@ public class NotifyPolicyUtil {
         }
         INotifyPolicyHandler policyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyHandler);
         if (policyHandler == null) {
-//                    throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
-            return;
+            throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
         }
         List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
         List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());

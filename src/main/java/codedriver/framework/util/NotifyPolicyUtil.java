@@ -251,12 +251,18 @@ public class NotifyPolicyUtil {
         stringBuilder.append(notifyAuditMessage);
         stringBuilder.append("\n");
 
-        stringBuilder.append("用户：" + String.join(",", notifyVo.getToUserUuidList()));
-        stringBuilder.append("\n");
-        stringBuilder.append("用户组：" + String.join(",", notifyVo.getToTeamUuidList()));
-        stringBuilder.append("\n");
-        stringBuilder.append("角色：" + String.join(",", notifyVo.getToRoleUuidList()));
-        stringBuilder.append("\n");
+        if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
+            stringBuilder.append("用户：" + String.join(",", notifyVo.getToUserUuidList()));
+            stringBuilder.append("\n");
+        }
+        if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
+            stringBuilder.append("用户组：" + String.join(",", notifyVo.getToTeamUuidList()));
+            stringBuilder.append("\n");
+        }
+        if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
+            stringBuilder.append("角色：" + String.join(",", notifyVo.getToRoleUuidList()));
+            stringBuilder.append("\n");
+        }
 
         List<String> actualRecipientList = notifyVo.getActualRecipientList();
         if (CollectionUtils.isNotEmpty(actualRecipientList)) {

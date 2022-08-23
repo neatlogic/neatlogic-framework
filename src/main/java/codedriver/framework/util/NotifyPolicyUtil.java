@@ -118,7 +118,7 @@ public class NotifyPolicyUtil {
                 String notifyHandler = actionObj.getNotifyHandler();
                 INotifyHandler handler = NotifyHandlerFactory.getHandler(notifyHandler);
                 if (handler == null) {
-//                    throw new NotifyHandlerNotFoundException(notifyHandler);
+                    logger.error("通知处理器：'" + notifyHandler + "'不存在");
                     continue;
                 }
                 NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);

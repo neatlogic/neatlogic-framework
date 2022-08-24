@@ -76,7 +76,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
 
         InputStream input = request.getInputStream();
-        System.out.println(request.getContentType());
+        //System.out.println(request.getContentType());
         StringBuilder sb = new StringBuilder();
         if (StringUtils.isBlank(request.getContentType()) || (request.getContentType() != null && !request.getContentType().toLowerCase().startsWith("multipart/form-data"))) {
             //如果是multipart，则跳过对body内容的抽取，避免文件内容过大时导致内存溢出

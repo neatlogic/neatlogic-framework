@@ -43,7 +43,13 @@ public interface INotifyHandler {
     /**
      * @Description: 处理通知
      */
-    void execute(NotifyVo notifyVo) throws Exception;
+    /**
+     * 处理通知
+     * @param notifyVo 通知信息
+     * @return 通知发送成功返回true，失败返回false
+     * @throws Exception 异常
+     */
+    boolean execute(NotifyVo notifyVo) throws Exception;
 
     String getType();
 

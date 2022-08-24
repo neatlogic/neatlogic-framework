@@ -38,10 +38,9 @@ public class ExceptionNotifyThread extends CodeDriverThread {
         super("EXCEPTION-NOTIFY");
     }
 
-    public ExceptionNotifyThread(NotifyVo _notifyVo, Exception _exception, INotifyTriggerType _trigger) {
+    public ExceptionNotifyThread(NotifyVo _notifyVo, INotifyTriggerType _trigger) {
         super("EXCEPTION-NOTIFY" + (_notifyVo != null ? "-" + _notifyVo.getTitle() : ""));
         notifyVo = _notifyVo;
-        exception = _exception;
         notifyTriggerType = _trigger;
     }
 
@@ -52,11 +51,8 @@ public class ExceptionNotifyThread extends CodeDriverThread {
             if (notifyPolicyVo != null) {
                 NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
                 if (policyConfig != null) {
-                    StringWriter writer = new StringWriter();
-                    exception.printStackTrace(new PrintWriter(writer, true));
-                    notifyVo.setException(writer.toString().replaceAll("\r\n\t", "<br>&nbsp;&nbsp;&nbsp;&nbsp;"));
                     String notifyPolicyHandler = notifyPolicyVo.getHandler();
-                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, policyConfig, null, null, null, notifyVo, null);
+                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, notifyPolicyVo, null, null, null, notifyVo, null, "");
                 }
             }
 

@@ -97,8 +97,6 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;
         }
-
-
         return null;
     }
 

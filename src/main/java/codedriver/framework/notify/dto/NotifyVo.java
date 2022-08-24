@@ -16,19 +16,57 @@ import codedriver.framework.notify.core.INotifyTriggerType;
 import codedriver.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
+    /**
+     * 触发点
+     */
     private INotifyTriggerType triggerType;
+    /**
+     * 通知策略处理器
+     */
     private String notifyPolicyHandler;
+    /**
+     * 邮件标题
+     */
     private String title;
+    /**
+     * 邮件内容
+     */
     private String content;
+    /**
+     * 附件列表
+     */
     private List<FileVo> fileList;
+    /**
+     * 发送者
+     */
     private String fromUser;
+    /**
+     * 发送者邮箱地址
+     */
     private String fromUserEmail;
+    /**
+     * 用于FreeMarker替换的变量数据
+     */
     private JSONObject data;
+    /**
+     * 消息处理器和接收者信息
+     */
     private MessageHandlerAndRecipientVo messageHandlerAndRecipientVo;
+    /**
+     * freeMarker模板替换时出现的异常信息
+     */
     private StringBuilder errorBuilder;
-    private String exception;// 记录通知发生异常时的异常信息
-    private Integer isSendExceptionNotify = 1;// 通知发生异常时是否需要发送通知
+    /**
+     * 通知发生异常时是否需要发送通知
+     */
+    private Integer isSendExceptionNotify = 1;
+    /**
+     * 发送时间
+     */
     private Date fcd;
+    /**
+     * 实际接收对象列表
+     */
     private List<String> actualRecipientList;
 
     private NotifyVo(Builder builder) {
@@ -108,14 +146,6 @@ public class NotifyVo {
             }
             errorBuilder.append(errorInfo);
         }
-    }
-
-    public String getException() {
-        return exception;
-    }
-
-    public void setException(String exception) {
-        this.exception = exception;
     }
 
     public Integer getIsSendExceptionNotify() {

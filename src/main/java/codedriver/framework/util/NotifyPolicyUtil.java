@@ -248,6 +248,10 @@ public class NotifyPolicyUtil {
         stringBuilder.append(title);
         stringBuilder.append("\n");
 
+        stringBuilder.append("发送时间：");
+        stringBuilder.append(notifyVo.getFcd());
+        stringBuilder.append("\n");
+
         stringBuilder.append(notifyAuditMessage);
         stringBuilder.append("\n");
 
@@ -273,12 +277,6 @@ public class NotifyPolicyUtil {
         if (StringUtils.isNotBlank(error)) {
             stringBuilder.append("异常信息：");
             stringBuilder.append(error);
-            stringBuilder.append("\n");
-        }
-        String exception = notifyVo.getException();
-        if (StringUtils.isNotBlank(exception)) {
-            stringBuilder.append("异常信息：");
-            stringBuilder.append(exception);
             stringBuilder.append("\n");
         }
         Logger notifyAuditLogger = LoggerFactory.getLogger("notifyAudit");

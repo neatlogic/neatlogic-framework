@@ -23,7 +23,7 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
             logger.error(notifyVo.getError());
             if (notifyVo.getIsSendExceptionNotify() == 1) {
                 notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
-                CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, new RuntimeException(notifyVo.getError()), ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+                CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
             }
             return false;
         } else {

@@ -33,6 +33,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -64,7 +66,10 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
             if (!(e instanceof EmailServerNotFoundException)) {
                 if (notifyVo.getIsSendExceptionNotify() == 1) {
                     notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
-                    CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, e, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
+                    StringWriter writer = new StringWriter();
+                    e.printStackTrace(new PrintWriter(writer, true));
+                    notifyVo.appendError(writer.toString().replaceAll("\r\n\t", "<br>&nbsp;&nbsp;&nbsp;&nbsp;"));
+                    CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
                 }
             }
             return false;

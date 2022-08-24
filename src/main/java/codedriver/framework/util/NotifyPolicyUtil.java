@@ -14,6 +14,7 @@ import codedriver.framework.notify.exception.NotifyHandlerNotFoundException;
 import codedriver.framework.notify.exception.NotifyPolicyNotFoundException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +28,13 @@ public class NotifyPolicyUtil {
     private static Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
 
     /**
-     * @param policyConfig       通知策略配置信息
+     * @param notifyPolicyVo       通知策略信息
      * @param paramMappingList   引用通知策略时参数映射
      * @param notifyTriggerType  触发类型
      * @param conditionParamData 条件参数数据
      * @param receiverMap        可能用到的通知接收对象集合
      * @param fileList           可能存在的文件列表
+     * @param notifyAuditMessage 通知审计信息
      * @return void
      * @Author: linbq
      * @Time:2020年7月2日
@@ -42,13 +44,18 @@ public class NotifyPolicyUtil {
             String notifyPolicyHandler,
             INotifyTriggerType notifyTriggerType,
             Class<? extends IMessageHandler> newsHandlerClass,
-            NotifyPolicyConfigVo policyConfig,
+            NotifyPolicyVo notifyPolicyVo,
             List<ParamMappingVo> paramMappingList,
             JSONObject conditionParamData,
             Map<String, List<NotifyReceiverVo>> receiverMap,
             Object callerData,
-            List<FileVo> fileList
+            List<FileVo> fileList,
+            String notifyAuditMessage
     ) throws Exception {
+        NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
+        if (policyConfig == null) {
+            return;
+        }
         NotifyTriggerVo triggerVo = null;
         /** 触发动作列表 **/
         List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
@@ -194,8 +201,85 @@ public class NotifyPolicyUtil {
                     notifyVo.setIsSendExceptionNotify(((NotifyVo) callerData).getIsSendExceptionNotify());
                 }
                 /** 发送通知 **/
-                handler.execute(notifyVo);
+                boolean isSentSuccessfully = handler.execute(notifyVo);
+                audit(policyHandler.getName(), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
             }
         }
+    }
+
+    /**
+     * 通过logback将通知审计输出到notifyAudit.log文件中
+     * @param policyHandlerName 通知策略处理器名
+     * @param notifyPolicyName 通知策略名
+     * @param triggerType 触发点
+     * @param notifyHandlerName 通知类型
+     * @param isSentSuccessfully 是否发送成功
+     * @param title 邮件标题
+     * @param notifyAuditMessage 通知审计信息
+     * @param notifyVo 通知信息
+     */
+    private static void audit(
+            String policyHandlerName,
+            String notifyPolicyName,
+            String triggerType,
+            String notifyHandlerName,
+            boolean isSentSuccessfully,
+            String title,
+            String notifyAuditMessage,
+            NotifyVo notifyVo
+    ) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(policyHandlerName);
+        stringBuilder.append(" ");
+
+        stringBuilder.append(notifyPolicyName);
+        stringBuilder.append(" ");
+
+        stringBuilder.append(triggerType);
+        stringBuilder.append(" ");
+
+        stringBuilder.append(notifyHandlerName);
+        stringBuilder.append(" ");
+
+        stringBuilder.append(isSentSuccessfully ? "成功" : "失败");
+        stringBuilder.append("\n");
+
+        stringBuilder.append("邮件标题：");
+        stringBuilder.append(title);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("发送时间：");
+        stringBuilder.append(notifyVo.getFcd());
+        stringBuilder.append("\n");
+
+        stringBuilder.append(notifyAuditMessage);
+        stringBuilder.append("\n");
+
+        if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
+            stringBuilder.append("用户：" + String.join(",", notifyVo.getToUserUuidList()));
+            stringBuilder.append("\n");
+        }
+        if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
+            stringBuilder.append("用户组：" + String.join(",", notifyVo.getToTeamUuidList()));
+            stringBuilder.append("\n");
+        }
+        if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
+            stringBuilder.append("角色：" + String.join(",", notifyVo.getToRoleUuidList()));
+            stringBuilder.append("\n");
+        }
+
+        List<String> actualRecipientList = notifyVo.getActualRecipientList();
+        if (CollectionUtils.isNotEmpty(actualRecipientList)) {
+            stringBuilder.append("实际接收对象：" + String.join(",", notifyVo.getActualRecipientList()));
+            stringBuilder.append("\n");
+        }
+        String error = notifyVo.getError();
+        if (StringUtils.isNotBlank(error)) {
+            stringBuilder.append("异常信息：");
+            stringBuilder.append(error);
+            stringBuilder.append("\n");
+        }
+        Logger notifyAuditLogger = LoggerFactory.getLogger("notifyAudit");
+        notifyAuditLogger.info(stringBuilder.toString());
     }
 }

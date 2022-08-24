@@ -22,6 +22,6 @@ public class ExceptionStackParamHandler extends ExceptionNotifyParamHandlerBase 
 
     @Override
     public Object getMyText(NotifyVo notifyVo) {
-        return notifyVo.getException();
+        return notifyVo.getError();
     }
 }

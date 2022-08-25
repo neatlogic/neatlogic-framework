@@ -12,7 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 
 public class TableResultUtil {
-    public static JSONObject getResult(List<? extends BasePageVo> resultList, BasePageVo vo) {
+    public static JSONObject getResult(List resultList, BasePageVo vo) {
         JSONObject returnObj = new JSONObject();
         returnObj.put("pageSize", vo.getPageSize());
         returnObj.put("pageCount", vo.getPageCount());

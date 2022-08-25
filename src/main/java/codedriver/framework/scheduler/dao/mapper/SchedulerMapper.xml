@@ -376,11 +376,11 @@
     </insert>
 
     <insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">
-        INSERT INTO `schedule_job_lock` (`job_name`,
-                                         `job_group`,
-                                         `job_handler`,
-                                         `lock`,
-                                         `server_id`)
+        INSERT IGNORE INTO `schedule_job_lock` (`job_name`,
+                                                `job_group`,
+                                                `job_handler`,
+                                                `lock`,
+                                                `server_id`)
         VALUES (#{jobName},
                 #{jobGroup},
                 #{jobHandler},

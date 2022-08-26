@@ -1417,32 +1417,37 @@ public class StaticListHandler extends FormHandlerBase {
         if (CollectionUtils.isNotEmpty(attributeArray)) {
             for (int i = 0; i < attributeArray.size(); i++) {
                 JSONObject attributeObj = attributeArray.getJSONObject(i);
-                if (MapUtils.isNotEmpty(attributeObj)) {
-                    JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
-                    if (MapUtils.isNotEmpty(attrConfig)) {
+                if (MapUtils.isEmpty(attributeObj)) {
+                    continue;
+                }
+                JSONObject attrConfig = attributeObj.getJSONObject("attrConfig");
+                if (MapUtils.isEmpty(attrConfig)) {
+                    continue;
+                }
+                String type = attributeObj.getString("type");
+                if ("table".equals(type)) {
+                    attributeArray = attrConfig.getJSONArray("attributeList");
+                    if (CollectionUtils.isEmpty(attributeArray)) {
+                        continue;
+                    }
+                    for (int j = 0; j < attributeArray.size(); j++) {
+                        attributeObj = attributeArray.getJSONObject(i);
+                        if (MapUtils.isEmpty(attributeObj)) {
+                            continue;
+                        }
+                        attrConfig = attributeObj.getJSONObject("attrConfig");
+                        if (MapUtils.isEmpty(attrConfig)) {
+                            continue;
+                        }
                         String dataSource = attrConfig.getString("dataSource");
                         if ("matrix".equals(dataSource)) {
                             parseExtendAttribute(attrConfig, matrixUuidSet, matrixUuidAttributeUuidSetMap);
-                        } else {
-                            String type = attrConfig.getString("type");
-                            if ("table".equals(type)) {
-                                attributeArray = attrConfig.getJSONArray("attributeList");
-                                if (CollectionUtils.isNotEmpty(attributeArray)) {
-                                    for (int j = 0; j < attributeArray.size(); j++) {
-                                        attributeObj = attributeArray.getJSONObject(i);
-                                        if (MapUtils.isNotEmpty(attributeObj)) {
-                                            attrConfig = attributeObj.getJSONObject("attrConfig");
-                                            if (MapUtils.isNotEmpty(attrConfig)) {
-                                                dataSource = attrConfig.getString("dataSource");
-                                                if ("matrix".equals(dataSource)) {
-                                                    parseExtendAttribute(attrConfig, matrixUuidSet, matrixUuidAttributeUuidSetMap);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         }
+                    }
+                } else {
+                    String dataSource = attrConfig.getString("dataSource");
+                    if ("matrix".equals(dataSource)) {
+                        parseExtendAttribute(attrConfig, matrixUuidSet, matrixUuidAttributeUuidSetMap);
                     }
                 }
             }

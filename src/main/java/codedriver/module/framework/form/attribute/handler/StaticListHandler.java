@@ -1426,22 +1426,22 @@ public class StaticListHandler extends FormHandlerBase {
                 }
                 String type = attributeObj.getString("type");
                 if ("table".equals(type)) {
-                    attributeArray = attrConfig.getJSONArray("attributeList");
-                    if (CollectionUtils.isEmpty(attributeArray)) {
+                    JSONArray attributeList = attrConfig.getJSONArray("attributeList");
+                    if (CollectionUtils.isEmpty(attributeList)) {
                         continue;
                     }
-                    for (int j = 0; j < attributeArray.size(); j++) {
-                        attributeObj = attributeArray.getJSONObject(i);
-                        if (MapUtils.isEmpty(attributeObj)) {
+                    for (int j = 0; j < attributeList.size(); j++) {
+                        JSONObject attribute = attributeList.getJSONObject(j);
+                        if (MapUtils.isEmpty(attribute)) {
                             continue;
                         }
-                        attrConfig = attributeObj.getJSONObject("attrConfig");
-                        if (MapUtils.isEmpty(attrConfig)) {
+                        JSONObject attrConfigObj = attribute.getJSONObject("attrConfig");
+                        if (MapUtils.isEmpty(attrConfigObj)) {
                             continue;
                         }
-                        String dataSource = attrConfig.getString("dataSource");
+                        String dataSource = attrConfigObj.getString("dataSource");
                         if ("matrix".equals(dataSource)) {
-                            parseExtendAttribute(attrConfig, matrixUuidSet, matrixUuidAttributeUuidSetMap);
+                            parseExtendAttribute(attrConfigObj, matrixUuidSet, matrixUuidAttributeUuidSetMap);
                         }
                     }
                 } else {

@@ -1,6 +1,7 @@
 package codedriver.framework.globallock.dao.mapper;
 
 import codedriver.framework.dto.globallock.GlobalLockVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,4 +19,9 @@ public interface GlobalLockMapper {
 
     void deleteLock(Long id);
 
+    List<GlobalLockVo> searchLock(GlobalLockVo globalLockVo);
+
+    List<GlobalLockVo> getLockListByKeyListAndHandler(@Param("keyList") List<String> keyList,@Param("handler") String handler);
+
+    Integer getLockCount(GlobalLockVo globalLockVo);
 }

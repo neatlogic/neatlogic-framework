@@ -8,6 +8,7 @@ package codedriver.framework.globallock.core;
 import codedriver.framework.dto.globallock.GlobalLockVo;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.globallock.GlobalLockManager;
+import codedriver.framework.util.TableResultUtil;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
@@ -52,5 +53,11 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
 
     protected boolean getMyIsBeenLocked(JSONObject paramJson) {
         return false;
+    }
+
+
+    @Override
+    public JSONObject getSearchResult(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
+        return TableResultUtil.getResult(globalLockVoList, globalLockVo);
     }
 }

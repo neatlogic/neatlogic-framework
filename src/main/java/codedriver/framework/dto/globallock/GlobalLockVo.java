@@ -6,6 +6,7 @@
 package codedriver.framework.dto.globallock;
 
 import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.Md5Util;
 import codedriver.framework.util.SnowflakeUtil;
@@ -16,7 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-public class GlobalLockVo {
+public class GlobalLockVo extends BasePageVo {
+    private static final long serialVersionUID = 6246879548347033138L;
     @EntityField(name = "锁id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "key md5", type = ApiParamType.STRING)
@@ -43,23 +45,27 @@ public class GlobalLockVo {
     public GlobalLockVo() {
 
     }
-    public GlobalLockVo( String handler, String jobId, String handlerParamStr) {
-        init(null,handler,jobId,handlerParamStr,null);
-    }
-    public GlobalLockVo( String handler, String jobId, String handlerParamStr,String description) {
-        init(null,handler,jobId,handlerParamStr,description);
-    }
-    public GlobalLockVo( Long lockId,String handler, String jobId, String handlerParamStr,String description) {
-        init(lockId,handler,jobId,handlerParamStr,description);
-    }
-    public GlobalLockVo(Long lockId, String handler, String jobId, String handlerParamStr) {
-        init(lockId,handler,jobId,handlerParamStr,null);
+
+    public GlobalLockVo(String handler, String key, String handlerParamStr) {
+        init(null, handler, key, handlerParamStr, null);
     }
 
-    private void init(Long lockId,String handler, String jobId, String handlerParamStr,String description){
+    public GlobalLockVo(String handler, String key, String handlerParamStr, String description) {
+        init(null, handler, key, handlerParamStr, description);
+    }
+
+    public GlobalLockVo(Long lockId, String handler, String key, String handlerParamStr, String description) {
+        init(lockId, handler, key, handlerParamStr, description);
+    }
+
+    public GlobalLockVo(Long lockId, String handler, String key, String handlerParamStr) {
+        init(lockId, handler, key, handlerParamStr, null);
+    }
+
+    private void init(Long lockId, String handler, String key, String handlerParamStr, String description) {
         this.id = lockId;
         this.handler = handler;
-        this.key = jobId;
+        this.key = key;
         this.handlerParamStr = handlerParamStr;
         this.description = description;
     }
@@ -77,8 +83,8 @@ public class GlobalLockVo {
     }
 
     public String getUuid() {
-        if(StringUtils.isNotBlank(key)) {
-           uuid = Md5Util.encryptMD5(key);
+        if (StringUtils.isNotBlank(key)) {
+            uuid = Md5Util.encryptMD5(key);
         }
         return uuid;
     }
@@ -140,7 +146,7 @@ public class GlobalLockVo {
     }
 
     public JSONObject getHandlerParam() {
-        if(MapUtils.isEmpty(handlerParam) && StringUtils.isNotBlank(handlerParamStr)){
+        if (MapUtils.isEmpty(handlerParam) && StringUtils.isNotBlank(handlerParamStr)) {
             handlerParam = JSONObject.parseObject(handlerParamStr);
         }
         return handlerParam;

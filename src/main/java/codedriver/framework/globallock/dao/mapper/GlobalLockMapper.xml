@@ -13,7 +13,7 @@
                `key`,
                `handler`,
                `handler_param` as handlerParamStr,
-               `is_lock` as isLock,
+               `is_lock`       as isLock,
                `description`,
                `fcd`
         FROM `global_lock`
@@ -27,7 +27,7 @@
                `key`,
                `handler`,
                `handler_param` as handlerParamStr,
-               `is_lock` as isLock,
+               `is_lock`       as isLock,
                `description`,
                `fcd`
         FROM `global_lock`
@@ -40,7 +40,7 @@
                `key`,
                `handler`,
                `handler_param` as handlerParamStr,
-               `is_lock` as isLock,
+               `is_lock`       as isLock,
                `description`,
                `fcd`
         FROM `global_lock`
@@ -48,6 +48,57 @@
           and `is_lock` = 0
         order by `id` asc
         limit 1
+    </select>
+    <select id="searchLock" resultType="codedriver.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+        `uuid`,
+        `key`,
+        `handler`,
+        `handler_param` as handlerParamStr,
+        `is_lock` as isLock,
+        `description`,
+        `fcd`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+        </where>
+        order by is_lock desc,`fcd` desc
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+
+    </select>
+
+    <select id="getLockListByKeyListAndHandler" resultType="codedriver.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+        `uuid`,
+        `key`,
+        `handler`,
+        `handler_param` as handlerParamStr,
+        `is_lock` as isLock,
+        `description`,
+        `fcd`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            and
+            <foreach collection="keyList" item="key" separator="or" open="(" close=")">
+                `key` like CONCAT('%',#{key}, '%')
+            </foreach>
+        </where>
+    </select>
+    <select id="getLockCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+        </where>
     </select>
 
     <update id="updateToLockById">

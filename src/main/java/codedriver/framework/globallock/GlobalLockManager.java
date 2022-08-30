@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -125,7 +126,7 @@ public class GlobalLockManager {
     /**
      * 重试获取锁
      *
-     * @param lockId 锁 id
+     * @param globalLockVo 锁 id
      */
     public static GlobalLockVo retryLock(GlobalLockVo globalLockVo) {
         GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
@@ -138,6 +139,16 @@ public class GlobalLockManager {
 
     public static boolean getIsBeenLocked(GlobalLockVo globalLockVo) {
         return globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid()).stream().anyMatch(o -> Objects.equals(o.getIsLock(), 1));
+    }
+
+    public static JSONObject searchGlobalLock(GlobalLockVo globalLockVo) {
+        List<GlobalLockVo> globalLockVoList = new ArrayList<>();
+        int count = globalLockMapper.getLockCount(globalLockVo);
+        if (count > 0) {
+            globalLockVo.setRowNum(count);
+            globalLockVoList = globalLockMapper.searchLock(globalLockVo);
+        }
+        return GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getSearchResult(globalLockVoList, globalLockVo);
     }
 
 }

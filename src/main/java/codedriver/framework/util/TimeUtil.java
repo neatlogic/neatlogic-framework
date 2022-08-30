@@ -636,10 +636,6 @@ public class TimeUtil {
         return cal1.getTime();
     }
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println(firstDayOfMonth(new Date()));
-    }
-
     /**
      * 获取本周一开始时间
      *

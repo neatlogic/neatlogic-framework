@@ -82,4 +82,5 @@ public interface IGlobalLockHandler {
      */
     boolean getIsBeenLocked(JSONObject paramJson);
 
+    JSONObject getSearchResult(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo);
 }

@@ -214,7 +214,7 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public boolean isConditionable() {
-        return true;
+        return false;
     }
 
     @Override

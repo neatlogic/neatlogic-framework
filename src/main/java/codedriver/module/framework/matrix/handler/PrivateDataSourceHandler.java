@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
-public class FixedDataSourceHandler extends MatrixDataSourceHandlerBase {
+public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
     private UserMapper userMapper;

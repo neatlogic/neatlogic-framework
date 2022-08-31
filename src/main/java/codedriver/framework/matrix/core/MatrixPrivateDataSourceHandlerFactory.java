@@ -33,6 +33,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
 
     /**
      * 根据uuid获取单个矩阵对象信息
+     *
      * @param uuid 唯一标识
      * @return 单个矩阵对象信息
      */
@@ -47,6 +48,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
 
     /**
      * 根据搜索条件统计符合条件矩阵总数
+     *
      * @param searchVo 搜索条件
      * @return 矩阵总数
      */
@@ -56,6 +58,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
 
     /**
      * 根据搜索条件统计符合条件矩阵列表（分页）
+     *
      * @param searchVo 搜索条件
      * @return 矩阵列表
      */
@@ -77,6 +80,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
 
     /**
      * 根据搜索条件统计符合条件矩阵列表（不分页）
+     *
      * @param searchVo 搜索条件
      * @return 矩阵列表
      */
@@ -108,7 +112,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
             String uuid = matrixFixedDataSourceHandler.getUuid();
             String name = matrixFixedDataSourceHandler.getName();
             if (map.containsKey(uuid)) {
-                logger.error("私有类型矩阵：" + name +"（" + uuid + "）" + "已存在，请检查代码，不要重复");
+                logger.error("私有类型矩阵：" + name + "（" + uuid + "）" + "已存在，请检查代码，不要重复");
                 System.exit(1);
             }
             map.put(uuid, matrixFixedDataSourceHandler);

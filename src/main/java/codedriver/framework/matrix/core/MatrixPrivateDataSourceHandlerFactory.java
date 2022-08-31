@@ -108,19 +108,19 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
     protected void onInitialized(CodedriverWebApplicationContext context) {
         Map<String, IMatrixPrivateDataSourceHandler> myMap = context.getBeansOfType(IMatrixPrivateDataSourceHandler.class);
         for (Map.Entry<String, IMatrixPrivateDataSourceHandler> entry : myMap.entrySet()) {
-            IMatrixPrivateDataSourceHandler matrixFixedDataSourceHandler = entry.getValue();
-            String uuid = matrixFixedDataSourceHandler.getUuid();
-            String name = matrixFixedDataSourceHandler.getName();
+            IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = entry.getValue();
+            String uuid = matrixPrivateDataSourceHandler.getUuid();
+            String name = matrixPrivateDataSourceHandler.getName();
             if (map.containsKey(uuid)) {
                 logger.error("私有类型矩阵：" + name + "（" + uuid + "）" + "已存在，请检查代码，不要重复");
                 System.exit(1);
             }
-            map.put(uuid, matrixFixedDataSourceHandler);
+            map.put(uuid, matrixPrivateDataSourceHandler);
 
             MatrixVo matrixVo = new MatrixVo();
             matrixVo.setUuid(uuid);
             matrixVo.setName(name);
-            matrixVo.setLabel(matrixFixedDataSourceHandler.getLabel());
+            matrixVo.setLabel(matrixPrivateDataSourceHandler.getLabel());
             matrixVo.setType(MatrixType.PRIVATE.getValue());
             list.add(matrixVo);
         }

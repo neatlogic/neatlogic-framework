@@ -83,8 +83,8 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected List<MatrixAttributeVo> myGetAttributeList(MatrixVo matrixVo) {
-        IMatrixPrivateDataSourceHandler matrixFixedDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(matrixVo.getUuid());
-        return matrixFixedDataSourceHandler.getAttributeList();
+        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(matrixVo.getUuid());
+        return matrixPrivateDataSourceHandler.getAttributeList();
     }
 
     @Override
@@ -94,9 +94,9 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-        IMatrixPrivateDataSourceHandler matrixFixedDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
-        List<MatrixAttributeVo> attributeVoList = matrixFixedDataSourceHandler.getAttributeList();
-        List<Map<String, String>> dataList = matrixFixedDataSourceHandler.getTableData(dataVo);
+        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
+        List<MatrixAttributeVo> attributeVoList = matrixPrivateDataSourceHandler.getAttributeList();
+        List<Map<String, String>> dataList = matrixPrivateDataSourceHandler.getTableData(dataVo);
         List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
         JSONArray theadList = getTheadList(attributeVoList);
         return TableResultUtil.getResult(theadList, tbodyList, dataVo);
@@ -104,9 +104,9 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
-        IMatrixPrivateDataSourceHandler matrixFixedDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
-        List<MatrixAttributeVo> attributeVoList = matrixFixedDataSourceHandler.getAttributeList();
-        List<Map<String, String>> dataList = matrixFixedDataSourceHandler.searchTableData(dataVo);
+        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
+        List<MatrixAttributeVo> attributeVoList = matrixPrivateDataSourceHandler.getAttributeList();
+        List<Map<String, String>> dataList = matrixPrivateDataSourceHandler.searchTableData(dataVo);
         List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
         JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), attributeVoList, dataVo.getColumnList());
         return TableResultUtil.getResult(theadList, tbodyList, dataVo);
@@ -115,8 +115,8 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
-        IMatrixPrivateDataSourceHandler matrixFixedDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
-        List<MatrixAttributeVo> attributeList = matrixFixedDataSourceHandler.getAttributeList();
+        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
+        List<MatrixAttributeVo> attributeList = matrixPrivateDataSourceHandler.getAttributeList();
         if (CollectionUtils.isEmpty(attributeList)) {
             return resultList;
         }
@@ -160,7 +160,7 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
                     matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
                     sourceColumnList.add(matrixColumnVo);
                     dataVo.setSourceColumnList(sourceColumnList);
-                    List<Map<String, String>> dataMapList = matrixFixedDataSourceHandler.getTableColumnDataForDefaultValue(dataVo);
+                    List<Map<String, String>> dataMapList = matrixPrivateDataSourceHandler.getTableColumnDataForDefaultValue(dataVo);
                     if (CollectionUtils.isNotEmpty(dataMapList)) {
                         //对dataMapList去重
                         List<Map<String, String>> distinctList = new ArrayList<>();
@@ -194,7 +194,7 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
                 dataVo.setKeywordExpression(Expression.LIKE.getExpression());
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
-            int rowNum = matrixFixedDataSourceHandler.getTableColumnDataCount(dataVo);
+            int rowNum = matrixPrivateDataSourceHandler.getTableColumnDataCount(dataVo);
             if (rowNum == 0) {
                 return resultList;
             }
@@ -202,7 +202,7 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
                 return resultList;
             }
-            List<Map<String, String>> dataMapList = matrixFixedDataSourceHandler.searchTableColumnData(dataVo);
+            List<Map<String, String>> dataMapList = matrixPrivateDataSourceHandler.searchTableColumnData(dataVo);
             if (CollectionUtils.isEmpty(dataMapList)) {
                 return resultList;
             }

@@ -73,7 +73,7 @@
 		<result property="lcd" column="lcd"/>
 	</resultMap>
 
-	<select id="searchMatrix" parameterType="codedriver.framework.matrix.dto.MatrixVo" resultMap="matrixMap">
+	<select id="searchMatrix" resultMap="matrixMap">
 			SELECT 
 			a.`id`,
 			a.`uuid`,
@@ -94,9 +94,7 @@
 				</if>
 			</where>
 			ORDER BY a.`id` desc
-			<if test="needPage == true">
-				LIMIT #{startNum}, #{pageSize}
-			</if>
+			LIMIT #{startNum}, #{pageSize}
 	</select>
 
 	<select id="getMatrixExternalByMatrixUuid" parameterType="string" resultType="codedriver.framework.matrix.dto.MatrixExternalVo">

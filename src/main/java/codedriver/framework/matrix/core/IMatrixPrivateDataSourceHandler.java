@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 矩阵固化数据源接口
+ * 矩阵私有类型数据源接口
  */
 public interface IMatrixPrivateDataSourceHandler {
 

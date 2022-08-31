@@ -235,8 +235,8 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         JSONArray attributeList = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
         if (CollectionUtils.isNotEmpty(attributeList)) {
             List<Map<String, Object>> dataMapList = null;
-            JSONArray dafaultValue = dataVo.getDefaultValue();
-            if (CollectionUtils.isNotEmpty(dafaultValue)) {
+            JSONArray defaultValue = dataVo.getDefaultValue();
+            if (CollectionUtils.isNotEmpty(defaultValue)) {
                 dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
             } else {
                 if (!mergeFilterListAndSourceColumnList(dataVo)) {

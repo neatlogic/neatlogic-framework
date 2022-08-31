@@ -247,7 +247,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 //                List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
 //                MatrixColumnVo sourceColumnVo = new MatrixColumnVo();
 //                sourceColumnVo.setColumn(uuidColumn);
-//                List<String> uuidList = dafaultValue.toJavaList(String.class);
+//                List<String> uuidList = defaultValue.toJavaList(String.class);
 //                for (String uuidValue : uuidList) {
 //                    List<String> valueList = new ArrayList<>();
 //                    valueList.add(uuidValue);

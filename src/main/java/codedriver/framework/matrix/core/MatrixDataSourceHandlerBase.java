@@ -66,11 +66,7 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract boolean mySaveMatrix(MatrixVo matrixVo) throws Exception;
 
     @Override
-    public MatrixVo getMatrix(String uuid) {
-        MatrixVo matrixVo = matrixMapper.getMatrixByUuid(uuid);
-        if (matrixVo == null) {
-            throw new MatrixNotFoundException(uuid);
-        }
+    public MatrixVo getMatrix(MatrixVo matrixVo) {
         myGetMatrix(matrixVo);
         return matrixVo;
     }

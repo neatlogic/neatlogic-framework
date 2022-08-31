@@ -4,6 +4,7 @@ import codedriver.framework.matrix.dto.MatrixCiVo;
 import codedriver.framework.matrix.dto.MatrixExternalVo;
 import codedriver.framework.matrix.dto.MatrixViewVo;
 import codedriver.framework.matrix.dto.MatrixVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,7 +22,12 @@ public interface MatrixMapper {
 
     int searchMatrixCount(MatrixVo matrixVo);
 
-    List<MatrixVo> searchMatrix(MatrixVo matrixVo);
+    List<MatrixVo> searchMatrix(
+            @Param("keyword") String keyword,
+            @Param("type") String type,
+            @Param("startNum") Integer startNum,
+            @Param("pageSize") Integer pageSize
+    );
 
     MatrixExternalVo getMatrixExternalByMatrixUuid(String matrixUuid);
 

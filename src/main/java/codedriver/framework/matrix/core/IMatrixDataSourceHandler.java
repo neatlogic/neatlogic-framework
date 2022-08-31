@@ -37,10 +37,10 @@ public interface IMatrixDataSourceHandler {
     /**
      * 查询矩阵信息
      *
-     * @param Uuid
+     * @param matrixVo
      * @return
      */
-    MatrixVo getMatrix(String Uuid);
+    MatrixVo getMatrix(MatrixVo matrixVo);
 
     /**
      * 删除矩阵信息

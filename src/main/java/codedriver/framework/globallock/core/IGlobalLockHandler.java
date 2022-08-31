@@ -51,12 +51,12 @@ public interface IGlobalLockHandler {
     JSONObject getLock(JSONObject paramJson);
 
     /**
-     * 解锁
+     * 解锁 需要notify
      *
      * @param lockId    cancel lockId
      * @param paramJson 入参
      */
-    JSONObject cancelLock(Long lockId, JSONObject paramJson);
+    JSONObject unLock(Long lockId, JSONObject paramJson);
 
     /**
      * 执行回调notify

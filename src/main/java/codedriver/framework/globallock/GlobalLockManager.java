@@ -101,7 +101,23 @@ public class GlobalLockManager {
         return globalLockVo;
     }
 
-    public static void cancelLock(Long lockId, JSONObject paramJson) {
+    public static void cancelLock(Long lockId) {
+        GlobalLockVo globalLockVo = globalLockMapper.getGlobalLockById(lockId);
+        if (globalLockVo != null) {
+            TransactionStatus transactionStatus = TransactionUtil.openTx();
+            try {
+                //获取所有该key的锁和未上锁的队列 for update
+                globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+                globalLockMapper.deleteLock(lockId);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+                TransactionUtil.rollbackTx(transactionStatus);
+                throw new ApiRuntimeException(ex.getMessage());
+            }
+        }
+    }
+
+    public static void unLock(Long lockId, JSONObject paramJson) {
         GlobalLockVo globalLockVo = globalLockMapper.getGlobalLockById(lockId);
         if (globalLockVo != null) {
             TransactionStatus transactionStatus = TransactionUtil.openTx();

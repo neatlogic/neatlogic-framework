@@ -25,20 +25,20 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
     }
 
     @Override
-    public JSONObject cancelLock(Long lockId, JSONObject paramJson) {
-        if (lockId == null) {
-            throw new ParamIrregularException("lockId");
-        }
-        return myCancelLock(lockId, paramJson);
-    }
-
-    @Override
     public boolean getIsBeenLocked(JSONObject paramJson) {
         return getMyIsBeenLocked(paramJson);
     }
 
-    protected JSONObject myCancelLock(Long lockId, JSONObject paramJson) {
-        GlobalLockManager.cancelLock(lockId, paramJson);
+    @Override
+    public JSONObject unLock(Long lockId, JSONObject paramJson) {
+        if (lockId == null) {
+            throw new ParamIrregularException("lockId");
+        }
+        return myUnLock(lockId, paramJson);
+    }
+
+    protected JSONObject myUnLock(Long lockId, JSONObject paramJson) {
+        GlobalLockManager.unLock(lockId, paramJson);
         return null;
     }
 

@@ -151,11 +151,6 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
                     if (matrixAttribute == null) {
                         throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                     }
-//                    String keyword = split[1];
-//                    dataVo.setKeyword(keyword);
-//                    dataVo.setKeywordColumn(keywordColumn);
-//                    dataVo.setAttrType(matrixAttribute.getType());
-//                    dataVo.setKeywordExpression(Expression.EQUAL.getExpression());
                     MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, split[1]);
                     matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
                     sourceColumnList.add(matrixColumnVo);

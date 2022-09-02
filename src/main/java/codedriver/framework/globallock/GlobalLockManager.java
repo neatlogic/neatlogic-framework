@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -101,6 +102,11 @@ public class GlobalLockManager {
         return globalLockVo;
     }
 
+    /**
+     * 取消等待锁
+     *
+     * @param lockId 锁id
+     */
     public static void cancelLock(Long lockId) {
         GlobalLockVo globalLockVo = globalLockMapper.getGlobalLockById(lockId);
         if (globalLockVo != null) {
@@ -109,6 +115,7 @@ public class GlobalLockManager {
                 //获取所有该key的锁和未上锁的队列 for update
                 globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
+                TransactionUtil.commitTx(transactionStatus);
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
                 TransactionUtil.rollbackTx(transactionStatus);
@@ -117,6 +124,12 @@ public class GlobalLockManager {
         }
     }
 
+    /**
+     * 解锁
+     *
+     * @param lockId    锁id
+     * @param paramJson 锁入参
+     */
     public static void unLock(Long lockId, JSONObject paramJson) {
         GlobalLockVo globalLockVo = globalLockMapper.getGlobalLockById(lockId);
         if (globalLockVo != null) {
@@ -132,12 +145,18 @@ public class GlobalLockManager {
                     GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo, paramJson);
                 }
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
                 TransactionUtil.rollbackTx(transactionStatus);
-                throw new ApiRuntimeException(ex.getMessage());
+                //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
+                Throwable target = ex;
+                while (target instanceof InvocationTargetException) {
+                    target = ((InvocationTargetException) target).getTargetException();
+                }
+                logger.error(target.getMessage(), target);
+                throw new ApiRuntimeException(target.getMessage());
             }
         }
     }
+
 
     /**
      * 重试获取锁

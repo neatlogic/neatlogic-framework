@@ -5,8 +5,6 @@
 
 package codedriver.framework.dao.plugin;
 
-import codedriver.framework.common.util.StringUtil;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -27,9 +25,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
@@ -38,7 +33,7 @@ import java.util.List;
 })
 public class ExceptionCatchInterceptor implements Interceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionCatchInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger("deallockAuditAppender");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -54,6 +49,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
             while (targetException instanceof InvocationTargetException) {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
+            logger.error(targetException.getMessage(), targetException);
             if ("MySQLTransactionRollbackException".equals(targetException.getClass().getSimpleName())) {
                 Configuration configuration = ms.getConfiguration();
                 Environment environment = configuration.getEnvironment();

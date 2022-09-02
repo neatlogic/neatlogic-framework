@@ -33,7 +33,7 @@ import java.sql.SQLException;
 })
 public class ExceptionCatchInterceptor implements Interceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger("deallockAuditAppender");
+    private static final Logger logger = LoggerFactory.getLogger("deallockAudit");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

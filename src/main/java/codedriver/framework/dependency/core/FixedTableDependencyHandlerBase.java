@@ -109,7 +109,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int getDependencyCount(Object to) {
-        return dependencyMapper.getDependencyCountByFrom(to,getHandler());
+        return dependencyMapper.getDependencyCountByFrom(to, getHandler());
     }
 
     public List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {

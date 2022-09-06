@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 固定表结构依赖关系处理器基类
@@ -40,11 +41,12 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
     /**
      * 插入一条引用关系数据
      *
      * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param to   引用者（下游）值（如：服务uuid）
      * @return
      */
     @Override
@@ -55,8 +57,8 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     /**
      * 插入一条引用关系数据
      *
-     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
-     * @param to 引用者（下游）值（如：服务uuid）
+     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param to     引用者（下游）值（如：服务uuid）
      * @param config 额外数据
      * @return
      */
@@ -81,7 +83,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     /**
      * 查询引用列表数据
      *
-     * @param from   被引用者（上游）值（如：服务时间窗口uuid）
+     * @param from     被引用者（上游）值（如：服务时间窗口uuid）
      * @param startNum 开始行号
      * @param pageSize 每页条数
      * @return
@@ -107,7 +109,11 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
      */
     @Override
     public int getDependencyCount(Object to) {
-        return dependencyMapper.getDependencyCountByFrom(to.toString());
+        return dependencyMapper.getDependencyCountByFrom(to, getHandler());
+    }
+
+    public List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {
+        return dependencyMapper.getBatchDependencyCountByFrom((List<Object>) fromList, getHandler());
     }
 
     /**

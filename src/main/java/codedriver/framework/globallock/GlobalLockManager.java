@@ -140,10 +140,10 @@ public class GlobalLockManager {
                 globalLockMapper.deleteLock(lockId);
                 //获取对应uuid队列中下一个lockId notify
                 GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
-                TransactionUtil.commitTx(transactionStatus);
                 if (nextGlobalLockVo != null) {
                     GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo, paramJson);
                 }
+                TransactionUtil.commitTx(transactionStatus);
             } catch (Exception ex) {
                 TransactionUtil.rollbackTx(transactionStatus);
                 //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来

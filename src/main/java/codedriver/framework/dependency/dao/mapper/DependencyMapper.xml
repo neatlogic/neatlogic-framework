@@ -58,10 +58,11 @@
         WHERE `${callerField}` = #{caller}
     </delete>
 
-    <select id="getDependencyCountByFrom" parameterType="java.lang.String" resultType="int">
+    <select id="getDependencyCountByFrom" resultType="int">
         SELECT COUNT(1)
         FROM `dependency`
-        WHERE `from` = #{value}
+        WHERE `from` = #{from}
+          and `type` = #{type}
     </select>
 
     <select id="getDependencyListByFrom" resultType="codedriver.framework.dependency.dto.DependencyVo">
@@ -73,6 +74,19 @@
         WHERE `from` = #{from}
           AND `type` = #{type} LIMIT #{startNum}
             , #{pageSize}
+    </select>
+
+    <select id="getBatchDependencyCountByFrom" resultType="java.util.Map">
+        SELECT
+        `from` as `caller`,
+        count(1) as callerCount
+        FROM `dependency`
+        WHERE `from` in
+        <foreach collection="fromList" open="(" separator="," close=")" item="from">
+            #{from}
+        </foreach>
+        and type = #{type}
+        GROUP BY `from`
     </select>
 
     <insert id="insertDependency" parameterType="codedriver.framework.dependency.dto.DependencyVo">

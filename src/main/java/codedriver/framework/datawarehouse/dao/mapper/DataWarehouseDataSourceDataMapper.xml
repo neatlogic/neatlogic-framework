@@ -93,7 +93,7 @@
             `${item.id}`,
             `${item.id}_hash`,
         </foreach>
-        id, insert_time<if test="expireMinute != null">, expire_time</if>)
+        id, insert_time<if test="expireMinute != null and expireMinute > 0">, expire_time</if>)
         values
         (
         <foreach collection="fieldList" item="item">
@@ -101,7 +101,7 @@
             #{item.value,typeHandler=Md5Handler},
         </foreach>
         #{id},now(3)
-        <if test="expireMinute != null">, DATE_ADD(now(),INTERVAL #{expireMinute} minute)</if>
+        <if test="expireMinute != null and expireMinute > 0">, DATE_ADD(now(),INTERVAL #{expireMinute} minute)</if>
         ) ON DUPLICATE KEY
         UPDATE
         <foreach collection="fieldList" item="item">
@@ -110,7 +110,9 @@
         </foreach>
         insert_time = now(3)
         <choose>
-            <when test="expireMinute != null">, expire_time = DATE_ADD(now(),INTERVAL #{expireMinute} minute)</when>
+            <when test="expireMinute != null and expireMinute > 0">, expire_time = DATE_ADD(now(),INTERVAL
+                #{expireMinute} minute)
+            </when>
             <otherwise>,expire_time = null</otherwise>
         </choose>
     </insert>

@@ -5,6 +5,7 @@
 
 package codedriver.framework.restful.core;
 
+import codedriver.framework.restful.constvalue.ApiAnonymousAccessSupportEnum;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 
@@ -43,8 +44,8 @@ public interface IJsonStreamApiComponent {
      * @return
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    default boolean supportAnonymousAccess() {
-        return false;
+    default ApiAnonymousAccessSupportEnum supportAnonymousAccess() {
+        return ApiAnonymousAccessSupportEnum.ANONYMOUS_ACCESS_FORBIDDEN;
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

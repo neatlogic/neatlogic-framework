@@ -115,8 +115,8 @@ public class AnonymousApiDispatcher {
             if (apiType.equals(ApiType.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().anonymousAccessIsSupported()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().tokenEncryptionIsRequired(), tokenHasEncrypted)) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -141,8 +141,8 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().anonymousAccessIsSupported()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().tokenEncryptionIsRequired(), tokenHasEncrypted)) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -167,8 +167,8 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().anonymousAccessIsSupported()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().tokenEncryptionIsRequired(), tokenHasEncrypted)) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {

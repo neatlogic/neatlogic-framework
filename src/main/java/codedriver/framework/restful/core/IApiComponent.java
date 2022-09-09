@@ -6,6 +6,7 @@
 package codedriver.framework.restful.core;
 
 import codedriver.framework.dto.FieldValidResultVo;
+import codedriver.framework.restful.constvalue.ApiAnonymousAccessSupportEnum;
 import codedriver.framework.restful.dto.ApiVo;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.transaction.annotation.Propagation;
@@ -107,8 +108,8 @@ public interface IApiComponent {
      * @return true false
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    default boolean supportAnonymousAccess() {
-        return false;
+    default ApiAnonymousAccessSupportEnum supportAnonymousAccess() {
+        return ApiAnonymousAccessSupportEnum.ANONYMOUS_ACCESS_FORBIDDEN;
     }
 
     /**

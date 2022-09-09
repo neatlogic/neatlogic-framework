@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("anonymous/api/")
@@ -60,7 +61,7 @@ public class AnonymousApiDispatcher {
     @Resource
     private ApiMapper apiMapper;
 
-    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+    private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
 
         if (interfaceVo == null) {
@@ -114,7 +115,8 @@ public class AnonymousApiDispatcher {
             if (apiType.equals(ApiType.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess()) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -139,7 +141,8 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess()) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -164,7 +167,8 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess()) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
                         throw new AnonymousExceptionMessage();
                     }
                     if (action.equals("doservice")) {
@@ -194,29 +198,48 @@ public class AnonymousApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        String tenant;
+        boolean tokenHasEncrypted = true;
+        JSONObject paramObj = new JSONObject();
+        if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
+            String decryptData = RC4Util.decrypt(token);
+            String[] split = decryptData.split("\\?", 2);
+            token = split[0].substring(0, split[0].lastIndexOf("/"));
+            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+            if (split.length == 2) {
+                String[] params = split[1].split("&");
+                for (String param : params) {
+                    String[] array = param.split("=", 2);
+                    if (array.length == 2) {
+                        paramObj.put(array[0], array[1]);
+                    }
+                }
+            }
+        } else {
+            tokenHasEncrypted = false;
+            String originToken = token;
+            token = token.substring(0, token.lastIndexOf("/"));
+            tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
+            }
+        }
         RequestContext.init(request, token);
-        String decryptData = RC4Util.decrypt(token);
-        String[] split = decryptData.split("\\?", 2);
-        token = split[0].substring(0, split[0].lastIndexOf("/"));
-        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
             UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
         }
-        JSONObject paramObj = new JSONObject();
-        if (split.length == 2) {
-            String[] params = split[1].split("&");
-            for (String param : params) {
-                String[] array = param.split("=", 2);
-                if (array.length == 2) {
-                    paramObj.put(array[0], array[1]);
-                }
-            }
-        }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
@@ -241,6 +264,11 @@ public class AnonymousApiDispatcher {
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        boolean tokenHasEncrypted = false;
+        if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
+            tokenHasEncrypted = true;
+            token = RC4Util.decrypt(token);
+        }
         RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         JSONObject paramObj;
@@ -274,7 +302,7 @@ public class AnonymousApiDispatcher {
                 }
             }
 
-            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             if (logger.isWarnEnabled()) {
@@ -283,7 +311,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
 
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
@@ -322,30 +350,48 @@ public class AnonymousApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        String tenant;
+        boolean tokenHasEncrypted = true;
+        JSONObject paramObj = new JSONObject();
+        if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
+            String decryptData = RC4Util.decrypt(token);
+            String[] split = decryptData.split("\\?", 2);
+            token = split[0].substring(0, split[0].lastIndexOf("/"));
+            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+            if (split.length == 2) {
+                String[] params = split[1].split("&");
+                for (String param : params) {
+                    String[] array = param.split("=", 2);
+                    if (array.length == 2) {
+                        paramObj.put(array[0], array[1]);
+                    }
+                }
+            }
+        } else {
+            tokenHasEncrypted = false;
+            String originToken = token;
+            token = token.substring(0, token.lastIndexOf("/"));
+            tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
+            }
+        }
         RequestContext.init(request, token);
-        String decryptData = RC4Util.decrypt(token);
-        String[] split = decryptData.split("\\?", 2);
-        token = split[0].substring(0, split[0].lastIndexOf("/"));
-        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
             UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
         }
-
-        JSONObject paramObj = new JSONObject();
-        if (split.length == 2) {
-            String[] params = split[1].split("&");
-            for (String param : params) {
-                String[] array = param.split("=", 2);
-                if (array.length == 2) {
-                    paramObj.put(array[0], array[1]);
-                }
-            }
-        }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
+            doIt(request, response, token, tokenHasEncrypted, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
             response.setStatus(524);
             returnObj.put("Status", "ERROR");

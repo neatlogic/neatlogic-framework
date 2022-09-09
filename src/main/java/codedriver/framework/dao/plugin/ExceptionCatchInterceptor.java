@@ -33,8 +33,6 @@ import java.sql.SQLException;
 })
 public class ExceptionCatchInterceptor implements Interceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger("deallockAudit");
-
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         //获取拦截方法的参数
@@ -49,6 +47,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
             while (targetException instanceof InvocationTargetException) {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
+            Logger logger = LoggerFactory.getLogger("deadlockAudit");
             logger.error(targetException.getMessage(), targetException);
             if ("MySQLTransactionRollbackException".equals(targetException.getClass().getSimpleName())) {
                 Configuration configuration = ms.getConfiguration();

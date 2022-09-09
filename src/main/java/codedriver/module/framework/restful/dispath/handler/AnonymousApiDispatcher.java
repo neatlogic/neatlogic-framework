@@ -269,11 +269,18 @@ public class AnonymousApiDispatcher {
             tokenHasEncrypted = true;
             token = RC4Util.decrypt(token);
         }
+        /* 为兼容gitlab webhook等场景下无法从header传入tenant的问题，
+         先从header里获取tenant，如果没有，则从token中获取，token形如（明文或解密后的token）：deploy/ci/gitlab/event/callback/develop，develop即为tenant
+        */
+        String tenant = request.getHeader("Tenant");
+        if (StringUtils.isBlank(tenant)) {
+            tenant = token.substring(token.lastIndexOf("/") + 1);
+            token = token.substring(0, token.lastIndexOf("/"));
+        }
         RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         JSONObject paramObj;
         try {
-            String tenant = request.getHeader("Tenant");
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);

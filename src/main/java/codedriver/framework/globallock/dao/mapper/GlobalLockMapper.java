@@ -13,6 +13,8 @@ public interface GlobalLockMapper {
 
     GlobalLockVo getNextGlobalLockByUuid(String uuid);
 
+    List<String> getGlobalLockUuidByKey(String jobId);
+
     void insertLock(GlobalLockVo globalLockVo);
 
     Integer updateToLockById(Long id);
@@ -24,4 +26,5 @@ public interface GlobalLockMapper {
     List<GlobalLockVo> getLockListByKeyListAndHandler(@Param("keyList") List<String> keyList,@Param("handler") String handler);
 
     Integer getLockCount(GlobalLockVo globalLockVo);
+
 }

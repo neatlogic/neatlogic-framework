@@ -83,4 +83,11 @@ public interface IGlobalLockHandler {
     boolean getIsBeenLocked(JSONObject paramJson);
 
     JSONObject getSearchResult(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo);
+
+    /**
+     * 初始化搜索入参
+     *
+     * @param globalLockVo 入参
+     */
+    void initSearchParam(GlobalLockVo globalLockVo);
 }

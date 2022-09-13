@@ -16,6 +16,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 public class GlobalLockVo extends BasePageVo {
     private static final long serialVersionUID = 6246879548347033138L;
@@ -41,6 +42,11 @@ public class GlobalLockVo extends BasePageVo {
     private Date lcd;
     @EntityField(name = "wait 原因", type = ApiParamType.STRING)
     private String waitReason;
+    @EntityField(name = "过滤关键词", type = ApiParamType.JSONOBJECT)
+    private JSONObject keywordParam;
+
+    @JSONField(serialize = false)
+    private List<String> uuidList;//用于过滤
 
     public GlobalLockVo() {
 
@@ -158,5 +164,21 @@ public class GlobalLockVo extends BasePageVo {
 
     public void setWaitReason(String waitReason) {
         this.waitReason = waitReason;
+    }
+
+    public JSONObject getKeywordParam() {
+        return keywordParam;
+    }
+
+    public void setKeywordParam(JSONObject keywordParam) {
+        this.keywordParam = keywordParam;
+    }
+
+    public List<String> getUuidList() {
+        return uuidList;
+    }
+
+    public void setUuidList(List<String> uuidList) {
+        this.uuidList = uuidList;
     }
 }

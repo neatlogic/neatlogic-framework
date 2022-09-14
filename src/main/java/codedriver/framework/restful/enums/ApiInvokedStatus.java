@@ -42,4 +42,13 @@ public enum ApiInvokedStatus implements IEnum {
         }
         return array;
     }
+
+    public static String getApiInvokedStatusText(String value) {
+        for (ApiInvokedStatus status : ApiInvokedStatus.values()) {
+            if (status.getValue().equals(value)) {
+                return status.getText();
+            }
+        }
+        return null;
+    }
 }

@@ -60,4 +60,9 @@ public abstract class GlobalLockHandlerBase implements IGlobalLockHandler {
     public JSONObject getSearchResult(List<GlobalLockVo> globalLockVoList, GlobalLockVo globalLockVo) {
         return TableResultUtil.getResult(globalLockVoList, globalLockVo);
     }
+
+    @Override
+    public void initSearchParam(GlobalLockVo globalLockVo) {
+
+    }
 }

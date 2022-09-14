@@ -9,6 +9,7 @@ import codedriver.framework.common.RootConfiguration;
 import codedriver.framework.dto.globallock.GlobalLockVo;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.globallock.core.GlobalLockHandlerFactory;
+import codedriver.framework.globallock.core.IGlobalLockHandler;
 import codedriver.framework.globallock.dao.mapper.GlobalLockMapper;
 import codedriver.framework.lock.core.LockManager;
 import codedriver.framework.transaction.util.TransactionUtil;
@@ -177,13 +178,15 @@ public class GlobalLockManager {
     }
 
     public static JSONObject searchGlobalLock(GlobalLockVo globalLockVo) {
+        IGlobalLockHandler globalLockHandler = GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler());
+        globalLockHandler.initSearchParam(globalLockVo);
         List<GlobalLockVo> globalLockVoList = new ArrayList<>();
         int count = globalLockMapper.getLockCount(globalLockVo);
         if (count > 0) {
             globalLockVo.setRowNum(count);
             globalLockVoList = globalLockMapper.searchLock(globalLockVo);
         }
-        return GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getSearchResult(globalLockVoList, globalLockVo);
+        return globalLockHandler.getSearchResult(globalLockVoList, globalLockVo);
     }
 
 }

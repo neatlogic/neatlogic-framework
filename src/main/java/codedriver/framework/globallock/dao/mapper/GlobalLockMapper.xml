@@ -64,6 +64,12 @@
             <if test="keyword !=null and keyword != ''">
                 and `key` like CONCAT('%',#{keyword}, '%')
             </if>
+            <if test="uuidList != null and uuidList.size() >0">
+                and `uuid` in
+                <foreach collection="uuidList" item="uuid" close=")" open="(" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
         </where>
         order by is_lock desc,`fcd` desc
         <if test="needPage == true">
@@ -92,6 +98,23 @@
     </select>
     <select id="getLockCount" resultType="java.lang.Integer">
         SELECT count(1)
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+            <if test="uuidList != null and uuidList.size() >0">
+                and `uuid` in
+                <foreach collection="uuidList" item="uuid" close=")" open="(" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getGlobalLockUuidByKey" resultType="java.lang.String">
+        SELECT
+        `uuid`
         FROM `global_lock`
         <where>
             handler = #{handler}

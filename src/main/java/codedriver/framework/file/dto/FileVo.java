@@ -38,6 +38,9 @@ public class FileVo extends BaseEditorVo {
     private Date uploadTime;
 
     @JSONField(serialize = false)
+    private String uniqueKey;
+
+    @JSONField(serialize = false)
     private JSONObject uploadTimeRange;//搜索条件上传时间范围
     @EntityField(name = "附件归属", type = ApiParamType.STRING)
     private String type;
@@ -69,6 +72,13 @@ public class FileVo extends BaseEditorVo {
         return typeText;
     }
 
+    public String getUniqueKey() {
+        return uniqueKey;
+    }
+
+    public void setUniqueKey(String uniqueKey) {
+        this.uniqueKey = uniqueKey;
+    }
 
     DecimalFormat decimalFormat = new DecimalFormat("0.##");
     String[] units = new String[]{"字节", "KB", "MB", "GB"};

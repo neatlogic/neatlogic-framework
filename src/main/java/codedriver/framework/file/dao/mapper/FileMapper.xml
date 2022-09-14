@@ -53,7 +53,22 @@
                 order by id desc
             </otherwise>
         </choose>
-        limit #{startNum}, #{pageSize}
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getFileByNameAndUniqueKey" resultType="codedriver.framework.file.dto.FileVo">
+        SELECT `id`,
+               `name`,
+               `size`,
+               `user_uuid`                                     AS userUuid,
+               DATE_FORMAT(`upload_time`, '%Y-%m-%d %H:%i:%s') AS uploadTime,
+               `type`,
+               content_type                                    AS contentType,
+               `path`
+        FROM `file`
+        WHERE `name` = #{name}
+          AND `unique_key` = #{uniqueKey}
+        LIMIT 1
     </select>
 
     <select id="getFileById" parameterType="java.lang.Long" resultType="codedriver.framework.file.dto.FileVo">
@@ -127,6 +142,18 @@
         </foreach>
     </select>
 
+    <update id="updateFile" parameterType="codedriver.framework.file.dto.FileVo">
+        UPDATE `file`
+        SET `name`         = #{name},
+            `size`         = #{size},
+            `user_uuid`    = #{userUuid},
+            `upload_time`  = NOW(3),
+            `type`         = #{type},
+            `content_type` = #{contentType},
+            `path`= #{path}
+        WHERE id = #{id}
+    </update>
+
     <insert id="insertFile" parameterType="codedriver.framework.file.dto.FileVo">
         INSERT INTO `file` (`id`,
                             `name`,
@@ -135,7 +162,8 @@
                             `upload_time`,
                             `type`,
                             `content_type`,
-                            `path`)
+                            `path`,
+                            `unique_key`)
         VALUES (#{id},
                 #{name},
                 #{size},
@@ -143,7 +171,8 @@
                 NOW(3),
                 #{type},
                 #{contentType},
-                #{path})
+                #{path},
+                #{uniqueKey})
     </insert>
 
     <delete id="deleteFile" parameterType="java.lang.Long">

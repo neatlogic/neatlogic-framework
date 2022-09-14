@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -13,9 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -52,7 +52,7 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
         InputStream in = null;
         File file = new File(path.substring(5));
         if (file.exists() && file.isFile()) {
-            in = new FileInputStream(file);
+            in = Files.newInputStream(file.toPath());
         }
         return in;
     }

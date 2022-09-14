@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -19,6 +19,23 @@ public interface IFileTypeHandler {
      * @return 是否允许访问
      */
     boolean valid(String userUuid, FileVo fileVo, JSONObject jsonObj) throws Exception;
+
+    /**
+     * 文件名是否唯一，如果返回true，相同名字的文件会被新文件覆盖
+     *
+     * @return 文件名是否唯一
+     */
+    default boolean isUnique() {
+        return false;
+    }
+
+    /**
+     * 获取唯一key
+     *
+     * @param key key原值
+     * @return key md5 hex
+     */
+    String getUniqueKey(String key);
 
     String getName();
 

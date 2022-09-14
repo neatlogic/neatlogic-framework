@@ -7,6 +7,7 @@ package codedriver.framework.file.dao.mapper;
 
 import codedriver.framework.file.dto.FileTypeVo;
 import codedriver.framework.file.dto.FileVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface FileMapper {
 
     List<FileVo> searchFile(FileVo fileVo);
 
+    FileVo getFileByNameAndUniqueKey(@Param("name") String name, @Param("uniqueKey") String uniqueKey);
+
     FileVo getFileById(Long id);
 
     FileTypeVo getFileTypeConfigByType(String name);
@@ -22,6 +25,8 @@ public interface FileMapper {
     List<FileVo> getFileListByIdList(List<Long> idList);
 
     List<FileVo> getFileDetailListByIdList(List<Long> idList);
+
+    void updateFile(FileVo fileVo);
 
     int insertFile(FileVo fileVo);
 

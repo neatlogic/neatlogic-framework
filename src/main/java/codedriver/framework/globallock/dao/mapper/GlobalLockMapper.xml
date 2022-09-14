@@ -114,7 +114,7 @@
     </select>
     <select id="getGlobalLockUuidByKey" resultType="java.lang.String">
         SELECT
-        `uuid`,
+        `uuid`
         FROM `global_lock`
         <where>
             handler = #{handler}

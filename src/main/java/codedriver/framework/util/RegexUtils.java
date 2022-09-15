@@ -22,7 +22,7 @@ public final class RegexUtils {
     public static final String NAME_WITH_SPACE = "NAME_WITH_SPACE";
     public static final String ENGLISH_NUMBER_NAME = "ENGLISH_NUMBER_NAME";
     public static final String ENGLISH_NAME = "ENGLISH_NAME";
-    public static final String ENGLISH_NAME_WHIT_UNDERLINE = "ENGLISH_NAME_WHIT_UNDERLINE";
+    public static final String ENGLISH_NUMBER_NAME_WHIT_UNDERLINE = "ENGLISH_NUMBER_NAME_WHIT_UNDERLINE";
     public static final String API_TOKEN = "API_TOKEN";
     public static final String DATE_TIME = "DATE_TIME";
     public static final String PASSWORD = "PASSWORD";
@@ -39,7 +39,7 @@ public final class RegexUtils {
             put(NAME_WITH_SPACE, Pattern.compile("^[A-Za-z_\\.\\-\\d\\s\\u4e00-\\u9fa5]+$"));
             put(ENGLISH_NUMBER_NAME, Pattern.compile("^[a-zA-Z0-9_\\-\\.]+$"));
             put(ENGLISH_NAME, Pattern.compile("^[A-Za-z\\.\\-]+$"));
-            put(ENGLISH_NAME_WHIT_UNDERLINE, Pattern.compile("^[A-Za-z_\\d]+$"));
+            put(ENGLISH_NUMBER_NAME_WHIT_UNDERLINE, Pattern.compile("^[A-Za-z0-9_]+$"));
             put(API_TOKEN, Pattern.compile("^[A-Za-z_\\{\\}\\d/]+$"));
             put(DATE_TIME, Pattern.compile("[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\\s+(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d"));
             put(PASSWORD, Pattern.compile("^(?!.*[\\u4E00-\\u9FA5\\s])(?!^[a-zA-Z]+$)(?!^[\\d]+$)(?!^[^a-zA-Z\\d]+$)^.{8,20}$"));

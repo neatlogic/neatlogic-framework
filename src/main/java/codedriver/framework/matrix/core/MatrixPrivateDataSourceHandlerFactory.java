@@ -87,10 +87,11 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
     private static List<MatrixVo> getNoPaginationList(MatrixVo searchVo) {
         List<MatrixVo> resultList = new ArrayList<>();
         String keyword = searchVo.getKeyword();
+        keyword = keyword.toLowerCase();
         String type = searchVo.getType();
         for (MatrixVo matrixVo : list) {
             if (StringUtils.isNotBlank(keyword)) {
-                if (!keyword.equals(matrixVo.getKeyword())) {
+                if (!matrixVo.getName().toLowerCase().contains(keyword)) {
                     continue;
                 }
             }

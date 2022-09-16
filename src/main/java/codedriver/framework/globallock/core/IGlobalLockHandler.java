@@ -90,4 +90,13 @@ public interface IGlobalLockHandler {
      * @param globalLockVo 入参
      */
     void initSearchParam(GlobalLockVo globalLockVo);
+
+    /**
+     * 获取是否有锁
+     * @param key 唯一键
+     * @return 是否存在
+     */
+    default boolean getIsHasLockByKey(String key){
+        return false;
+    };
 }

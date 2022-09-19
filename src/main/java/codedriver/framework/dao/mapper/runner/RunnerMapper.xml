@@ -504,7 +504,7 @@
         where rm.id = #{value}
     </select>
 
-    <select id="getRunnerListByIdList" resultType="codedriver.framework.dto.runner.RunnerVo">
+    <select id="getRunnerListByIdSet" resultType="codedriver.framework.dto.runner.RunnerVo">
         SELECT `id`,
         `name`,
         `url`,

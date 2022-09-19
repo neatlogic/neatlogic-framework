@@ -10,6 +10,7 @@ import codedriver.framework.dto.runner.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RunnerMapper {
 
@@ -34,6 +35,8 @@ public interface RunnerMapper {
     RunnerMapVo getRunnerMapByRunnerMapId(Long runnerId);
 
     List<RunnerVo> searchRunner(RunnerVo runnerVo);
+
+    List<RunnerVo> getRunnerListByIdList(@Param("runnerIdSet") Set<Long> runnerIdSet);
 
     int searchRunnerGroupCount(RunnerGroupVo groupVo);
 

@@ -504,6 +504,24 @@
         where rm.id = #{value}
     </select>
 
+    <select id="getRunnerListByIdSet" resultType="codedriver.framework.dto.runner.RunnerVo">
+        SELECT `id`,
+        `name`,
+        `url`,
+        `host`,
+        `port`,
+        `access_key` as accessKey,
+        `access_secret` as accessSecret,
+        `auth_type` as authType,
+        `public_key` as publicKey,
+        `private_key` as privateKey
+        FROM `runner` r
+        WHERE `id` in
+        <foreach collection="runnerIdSet" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
     <insert id="replaceRunner" parameterType="codedriver.framework.dto.runner.RunnerVo">
         REPLACE INTO runner(
         `id`,`name`,`host`,`port` ,`url`,

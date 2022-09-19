@@ -67,7 +67,15 @@
                `path`
         FROM `file`
         WHERE `name` = #{name}
-          AND `unique_key` = #{uniqueKey}
+        AND `unique_key`
+        <choose>
+            <when test="uniqueKey != null">
+                #{uniqueKey}
+            </when>
+            <otherwise>
+                is null
+            </otherwise>
+        </choose>
         LIMIT 1
     </select>
 

@@ -25,10 +25,12 @@ public class TimeSelectConditionHandler implements IDatasourceConditionHandler {
             String startTime = object.getString("startTime");
             String endTime = object.getString("endTime");
             SimpleDateFormat format = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
-            String startTime1 = "";
             if (timeRange != null && StringUtils.isNotBlank(timeUnit)) {
                 startTime = TimeUtil.timeTransfer(timeRange, timeUnit);
                 endTime = format.format(new Date());
+            } else {
+                startTime = format.format(new Date(Long.parseLong(String.valueOf(startTime))));
+                endTime = format.format(new Date(Long.parseLong(String.valueOf(endTime))));
             }
             return "`" + fieldId + "`" + ">= STR_TO_DATE('" + startTime + "','%Y-%m-%d %H:%i:%s')" + "and `" + fieldId + "`<= STR_TO_DATE('" + endTime + "','%Y-%m-%d %H:%i:%s')";
         }

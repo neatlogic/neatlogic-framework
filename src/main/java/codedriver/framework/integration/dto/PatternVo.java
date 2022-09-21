@@ -29,6 +29,15 @@ public class PatternVo implements Serializable {
         description = _description;
     }
 
+    public PatternVo(String _name, String _mode, ApiParamType _type, Integer _isRequired, String _description, Integer _isShow) {
+        name = _name;
+        type = _type.getValue();
+        mode = _mode;
+        isRequired = _isRequired;
+        description = _description;
+        isShow = _isShow;
+    }
+
     public PatternVo(String _name, String _mode, ApiParamType _type) {
         name = _name;
         mode = _mode;
@@ -52,6 +61,8 @@ public class PatternVo implements Serializable {
     private Integer isRequired;
     @EntityField(name = "描述", type = ApiParamType.STRING)
     private String description;
+    @EntityField(name = "是否显示", type = ApiParamType.INTEGER)
+    private Integer isShow = 1;
 
     public String getName() {
         return name;
@@ -123,4 +134,11 @@ public class PatternVo implements Serializable {
         this.mode = mode;
     }
 
+    public Integer getIsShow() {
+        return isShow;
+    }
+
+    public void setIsShow(Integer isShow) {
+        this.isShow = isShow;
+    }
 }

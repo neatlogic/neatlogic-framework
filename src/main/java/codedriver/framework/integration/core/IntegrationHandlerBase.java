@@ -293,6 +293,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
         CachedThreadPool.execute(thread);
 
+        resultVo.setAuditId(integrationAuditVo.getId());
         // connection.disconnect(); //Indicates that other requests to the
         // server are unlikely in the near future. Calling disconnect() should
         // not imply that this HttpURLConnection

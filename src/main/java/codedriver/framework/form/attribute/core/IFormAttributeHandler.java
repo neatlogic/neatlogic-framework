@@ -180,9 +180,7 @@ public interface IFormAttributeHandler {
      * @Time:2020年11月19日
      * @Description: 排序
      */
-    default int getSort() {
-        return 0;
-    }
+    int getSort();
 
     /**
      * 用于创建索引，不同的表单需根据自身规则分拆成多个field content

@@ -32,6 +32,11 @@ public class DivideHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 21;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
     }

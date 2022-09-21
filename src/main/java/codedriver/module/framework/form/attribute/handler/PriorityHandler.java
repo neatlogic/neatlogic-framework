@@ -30,6 +30,11 @@ public class PriorityHandler extends ControlHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 20;
+    }
+
+    @Override
     public String getHandlerName() {
         return FormHandler.FORMPRIORITY.getHandlerName();
     }

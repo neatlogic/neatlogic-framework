@@ -38,6 +38,11 @@ public class CheckboxHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 6;
+    }
+
+    @Override
     public String getHandlerType(FormConditionModel model) {
         if (model == FormConditionModel.CUSTOM) {
             return "select";

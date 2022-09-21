@@ -131,7 +131,7 @@ public class UploadHandler extends FormHandlerBase {
 
     @Override
     public int getSort() {
-        return 22;
+        return 18;
     }
 
     @Override

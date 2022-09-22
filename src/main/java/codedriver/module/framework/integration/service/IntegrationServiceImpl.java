@@ -64,6 +64,7 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
                                     columnVo.setUuid(theadObj.getString("key"));
                                     columnVo.setName(theadObj.getString("title"));
                                     columnVo.setType(theadObj.getString("type"));
+                                    columnVo.setUrlAttributeValue(theadObj.getString("urlAttributeValue"));
                                     columnVo.setPrimaryKey(theadObj.getInteger("primaryKey"));
                                     Integer isSearchable = theadObj.getInteger("isSearchable");
                                     isSearchable = (isSearchable == null || isSearchable.intValue() != 1) ? 0 : 1;

@@ -53,6 +53,11 @@ public class SelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 3;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {

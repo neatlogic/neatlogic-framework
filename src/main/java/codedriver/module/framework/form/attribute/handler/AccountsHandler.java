@@ -133,6 +133,11 @@ public class AccountsHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 16;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return "已更新";
     }

@@ -35,6 +35,11 @@ public class StaticListHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 12;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         if (!attributeDataVo.dataIsEmpty()) {
             return "已更新";

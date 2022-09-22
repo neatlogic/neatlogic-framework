@@ -55,6 +55,11 @@ public class CascadeHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 4;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         Object dataObj = attributeDataVo.getDataObj();
         if (dataObj != null) {

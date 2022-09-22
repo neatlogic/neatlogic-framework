@@ -54,6 +54,11 @@ public class DynamicListHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 11;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         if (!attributeDataVo.dataIsEmpty()) {
             return "已更新";

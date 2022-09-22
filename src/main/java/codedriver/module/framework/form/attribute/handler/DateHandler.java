@@ -93,6 +93,11 @@ public class DateHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 8;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         Object data = attributeDataVo.getDataObj();
         if (data == null) {

@@ -32,6 +32,11 @@ public class LinkHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 9;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getData();
     }

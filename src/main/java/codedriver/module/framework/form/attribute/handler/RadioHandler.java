@@ -38,6 +38,11 @@ public class RadioHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 5;
+    }
+
+    @Override
     public String getHandlerType(FormConditionModel model) {
         if (model == FormConditionModel.CUSTOM) {
             return "select";

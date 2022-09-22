@@ -129,7 +129,7 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public int getSort() {
-        return 16;
+        return 13;
     }
 
 //表单组件配置信息

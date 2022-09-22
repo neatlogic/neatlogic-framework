@@ -38,6 +38,11 @@ public class TextHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 0;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
     }

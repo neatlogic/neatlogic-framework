@@ -38,6 +38,11 @@ public class TimeHandler extends FormHandlerBase {
     }
 
     @Override
+    public int getSort() {
+        return 7;
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
     }

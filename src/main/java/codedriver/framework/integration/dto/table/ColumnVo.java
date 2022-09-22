@@ -9,10 +9,7 @@ import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.dto.BasePageVo;
 import codedriver.framework.dto.ExpressionVo;
-import codedriver.framework.matrix.constvalue.MatrixAttributeType;
 import codedriver.framework.restful.annotation.EntityField;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +46,8 @@ public class ColumnVo extends BasePageVo {
     private Boolean isPC;
     @EntityField(name = "是否在移动端显示", type = ApiParamType.BOOLEAN)
     private Boolean isMobile;
+    @EntityField( name = "链接跳转属性", type = ApiParamType.STRING)
+    private String urlAttributeValue;
 
     public String getUuid() {
         return uuid;
@@ -159,5 +158,13 @@ public class ColumnVo extends BasePageVo {
 
     public void setIsMobile(Boolean isMobile) {
         this.isMobile = isMobile;
+    }
+
+    public String getUrlAttributeValue() {
+        return urlAttributeValue;
+    }
+
+    public void setUrlAttributeValue(String urlAttributeValue) {
+        this.urlAttributeValue = urlAttributeValue;
     }
 }

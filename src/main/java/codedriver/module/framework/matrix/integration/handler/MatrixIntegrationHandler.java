@@ -76,13 +76,11 @@ public class MatrixIntegrationHandler extends IntegrationHandlerBase {
 
     @Override
     protected void beforeSend(IntegrationVo integrationVo) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected void afterReturn(IntegrationVo integrationVo) {
-        // TODO Auto-generated method stub
 
     }
 

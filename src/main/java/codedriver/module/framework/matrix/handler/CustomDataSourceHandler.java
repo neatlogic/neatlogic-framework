@@ -90,7 +90,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected void myDeleteMatrix(String uuid) {
         attributeMapper.deleteAttributeByMatrixUuid(uuid);
-        attributeMapper.dropMatrixDynamicTable(uuid, TenantContext.get().getDataDbName());
+        attributeMapper.dropMatrixDynamicTable(uuid);
     }
 
     @Override
@@ -110,10 +110,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 attributeVo.setUuid(targetAttributeUuid);
                 attributeMapper.insertMatrixAttribute(attributeVo);
             }
-            String schemaName = TenantContext.get().getDataDbName();
-            attributeMapper.createMatrixDynamicTable(attributeVoList, targetUuid, schemaName);
+            attributeMapper.createMatrixDynamicTable(attributeVoList, targetUuid);
             //数据拷贝
-            matrixDataMapper.insertDynamicTableDataForCopy(sourceUuid, sourceColumnList, targetUuid, targetColumnList, schemaName);
+            matrixDataMapper.insertDynamicTableDataForCopy(sourceUuid, sourceColumnList, targetUuid, targetColumnList);
         }
     }
 
@@ -186,11 +185,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 if (isNew) {
-                    matrixDataMapper.insertDynamicTableData(rowData, matrixUuid, TenantContext.get().getDataDbName());
+                    matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
                     insert++;
                     update++;
                 } else {
-                    matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid, TenantContext.get().getDataDbName());
+                    matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid);
                 }
             }
         } else {
@@ -273,7 +272,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (dataExist) {
             attributeMapper.deleteAttributeByMatrixUuid(matrixUuid);
         }
-        String schemaName = TenantContext.get().getDataDbName();
         if (CollectionUtils.isNotEmpty(attributeVoList)) {
             //有数据
             if (dataExist) {
@@ -297,12 +295,12 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
                 //添加新增字段
                 for (String attributeUuid : addAttributeUuidList) {
-                    attributeMapper.addMatrixDynamicTableColumn(attributeUuid, matrixUuid, schemaName);
+                    attributeMapper.addMatrixDynamicTableColumn(attributeUuid, matrixUuid);
                 }
                 //找出需要删除的属性uuid列表
                 oldAttributeUuidList.removeAll(existedAttributeUuidList);
                 for (String attributeUuid : oldAttributeUuidList) {
-                    attributeMapper.dropMatrixDynamicTableColumn(attributeUuid, matrixUuid, schemaName);
+                    attributeMapper.dropMatrixDynamicTableColumn(attributeUuid, matrixUuid);
                 }
             } else {
                 for (MatrixAttributeVo attributeVo : attributeVoList) {
@@ -310,13 +308,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     attributeVo.setUuid(UuidUtil.randomUuid());
                     attributeMapper.insertMatrixAttribute(attributeVo);
                 }
-                attributeMapper.createMatrixDynamicTable(attributeVoList, matrixUuid, schemaName);
+                attributeMapper.createMatrixDynamicTable(attributeVoList, matrixUuid);
             }
         } else {
             //无数据
             if (dataExist) {
                 // 删除动态表
-                attributeMapper.dropMatrixDynamicTable(matrixUuid, schemaName);
+                attributeMapper.dropMatrixDynamicTable(matrixUuid);
             }
         }
     }
@@ -326,7 +324,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         List<MatrixAttributeVo> matrixAttributeList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixVo.getUuid());
         if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
             List<String> attributeUuidList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-            Map<String, Long> attributeDataCountMap = matrixDataMapper.checkMatrixAttributeHasDataByAttributeUuidList(matrixVo.getUuid(), attributeUuidList, TenantContext.get().getDataDbName());
+            Map<String, Long> attributeDataCountMap = matrixDataMapper.checkMatrixAttributeHasDataByAttributeUuidList(matrixVo.getUuid(), attributeUuidList);
             for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
                 long count = attributeDataCountMap.get(matrixAttributeVo.getUuid());
                 matrixAttributeVo.setIsDeletable(count == 0 ? 1 : 0);
@@ -589,16 +587,15 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
             rowData.add(new MatrixColumnVo(matrixAttributeVo.getUuid(), value));
         }
-        String schemaName = TenantContext.get().getDataDbName();
         String uuidValue = rowDataObj.getString("uuid");
         if (uuidValue == null) {
             if (hasData) {
                 rowData.add(new MatrixColumnVo("uuid", UuidUtil.randomUuid()));
-                matrixDataMapper.insertDynamicTableData(rowData, matrixUuid, schemaName);
+                matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
             }
         } else {
             if (hasData) {
-                matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuidValue, matrixUuid, schemaName);
+                matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuidValue, matrixUuid);
             } else {
                 MatrixDataVo dataVo = new MatrixDataVo();
                 dataVo.setMatrixUuid(matrixUuid);

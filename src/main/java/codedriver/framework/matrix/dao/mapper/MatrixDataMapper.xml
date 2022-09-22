@@ -4,7 +4,7 @@
 
     <select id="getDynamicTableDataCountByUuid" resultType="int">
         SELECT COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         WHERE `uuid` = #{uuid}
     </select>
 
@@ -15,7 +15,7 @@
         <foreach collection="columnList" separator="," item="column">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         WHERE `uuid` = #{uuid}
     </select>
 
@@ -26,7 +26,7 @@
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <if test="defaultValue != null and defaultValue.size() > 0">
                 `uuid` in
@@ -41,7 +41,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <!--<where>
             <if test="keyword != null and keyword != ''">
                 <foreach collection="columnList" separator="OR" item="column">
@@ -58,7 +58,7 @@
         <foreach collection="columnList" separator="," item="column">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <!--<where>
             <if test="keyword != null and keyword != ''">
                 <foreach collection="columnList" separator="OR" item="column">
@@ -109,7 +109,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
@@ -122,7 +122,7 @@
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
@@ -192,7 +192,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataForSelectSql"/>
     </select>
 
@@ -202,7 +202,7 @@
         <foreach collection="columnList" item="column" separator=",">
             a.`${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}` a
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataForSelectSql"/>
         ORDER BY a.`id` DESC
         <if test="needPage == true">
@@ -215,11 +215,11 @@
         <foreach collection="attributeUuidList" item="attributeUuid" separator=",">
             COUNT(`${attributeUuid}`) AS `${attributeUuid}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
     </select>
 
     <insert id="insertDynamicTableData">
-        INSERT INTO `${schemaName}`.`matrix_${matrixUuid}`
+        INSERT INTO `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <foreach collection="rowData" open="(" close=")" item="columnData" separator=",">
             `${columnData.column}`
         </foreach>
@@ -230,7 +230,7 @@
     </insert>
 
     <insert id="insertDynamicTableDataForCopy">
-        INSERT INTO `${schemaName}`.`matrix_${targetMatrixUuid}`
+        INSERT INTO `@{DATA_SCHEMA}`.`matrix_${targetMatrixUuid}`
         (`uuid`,
         <foreach collection="targetColumnList" item="targetColumn" separator=",">
             `${targetColumn}`
@@ -241,12 +241,12 @@
         <foreach collection="sourceColumnList" item="sourceColumn" separator=",">
             `${sourceColumn}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${sourceMatrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${sourceMatrixUuid}`
         ORDER BY `id`
     </insert>
 
     <update id="updateDynamicTableDataByUuid">
-        UPDATE `${schemaName}`.`matrix_${matrixUuid}`
+        UPDATE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         SET
         <foreach collection="rowData" item="columnData" separator=",">
             `${columnData.column}` = #{columnData.value}
@@ -256,7 +256,7 @@
 
     <delete id="deleteDynamicTableDataByUuid">
         DELETE
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         WHERE `uuid` = #{uuid}
     </delete>
 </mapper>

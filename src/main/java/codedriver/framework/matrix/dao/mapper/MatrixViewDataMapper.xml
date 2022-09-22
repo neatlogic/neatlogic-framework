@@ -9,7 +9,7 @@
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <if test="defaultValue != null and defaultValue.size() > 0">
                 `uuid` in
@@ -24,7 +24,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
     </select>
 
     <select id="searchDynamicTableData" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
@@ -34,7 +34,7 @@
         <foreach collection="columnList" separator="," item="column">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         ORDER BY `id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -69,7 +69,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
@@ -82,7 +82,7 @@
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
@@ -96,7 +96,7 @@
             resultType="int">
         SELECT
         COUNT(1)
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <foreach collection="columnList" item="column" separator="AND">
                 `${column}` IS NOT NULL
@@ -111,7 +111,7 @@
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
-        FROM `${schemaName}`.`matrix_${matrixUuid}`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
             <foreach collection="columnList" item="column" separator="AND">
                 `${column}` IS NOT NULL

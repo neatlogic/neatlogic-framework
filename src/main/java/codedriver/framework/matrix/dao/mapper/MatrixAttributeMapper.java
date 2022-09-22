@@ -13,11 +13,11 @@ public interface MatrixAttributeMapper {
 
     void deleteAttributeByMatrixUuid(String matrixUuid);
 
-    void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void createMatrixDynamicTable(@Param("attributeList") List<MatrixAttributeVo> attributeList, @Param("matrixUuid") String matrixUuid);
 
-    void dropMatrixDynamicTable(@Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void dropMatrixDynamicTable(String matrixUuid);
 
-    void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid);
 
-    void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid, @Param("schemaName") String schemaName);
+    void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid);
 }

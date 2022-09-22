@@ -11,13 +11,11 @@ import codedriver.framework.matrix.dto.MatrixViewAttributeVo;
 import codedriver.framework.matrix.exception.*;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
@@ -28,9 +26,6 @@ public class MatrixViewSqlBuilder {
     private final String sql;
     private String viewName;
     private final Map<String, String> attrMap = new LinkedHashMap<>();
-//    private Map<String, Long> attrIdMap;
-    private final String dataSchema = TenantContext.get().getDataDbName();
-    private final String schema = TenantContext.get().getDbName();
 
     public MatrixViewSqlBuilder(String xml) {
         try {
@@ -63,10 +58,6 @@ public class MatrixViewSqlBuilder {
             throw new MatrixViewSettingFileIrregularException(ex);
         }
     }
-
-//    public void setAttrIdMap(Map<String, Long> _attrIdMap) {
-//        this.attrIdMap = _attrIdMap;
-//    }
 
     public void setViewName(String viewName) {
         this.viewName = viewName;
@@ -162,7 +153,6 @@ public class MatrixViewSqlBuilder {
         for (String attrName : attrMap.keySet()) {
             MatrixViewAttributeVo attrVo = new MatrixViewAttributeVo();
             attrVo.setType("text");
-//            attrVo.setInputType(InputType.MT.getValue());
             attrVo.setName(attrName);
             attrVo.setLabel(attrMap.get(attrName));
             attrList.add(attrVo);
@@ -177,125 +167,16 @@ public class MatrixViewSqlBuilder {
      */
     public String getCreateViewSql() {
         try {
-//            if (MapUtils.isEmpty(attrIdMap)) {
-//                throw new MatrixViewAttrIdMapEmptyException();
-//            }
             if (StringUtils.isBlank(viewName)) {
                 throw new MatrixViewNameEmptyException();
             }
-//            Statement stmt = CCJSqlParserUtil.parse(sql);
-//            Select selectStatement = (Select) stmt;
-//            fillUpSchema(selectStatement.getSelectBody());
-//            fillUpAlias(selectStatement.getSelectBody());
-            return "CREATE OR REPLACE VIEW " + dataSchema + "." + viewName + " AS " + sql;
+            return "CREATE OR REPLACE VIEW " + TenantContext.get().getDataDbName() + "." + viewName + " AS " + sql;
 
         } catch (ApiRuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new MatrixViewSqlIrregularException(ex);
         }
-    }
-
-    /**
-     * 补充列别名
-     *
-     * @param selectBody select主体
-     */
-//    private void fillUpAlias(SelectBody selectBody) {
-//        PlainSelect select = (PlainSelect) selectBody;
-//        List<SelectItem> newItemList = new ArrayList<>();
-//        for (SelectItem selectItem : select.getSelectItems()) {
-//            selectItem.accept(new SelectItemVisitor() {
-//                @Override
-//                public void visit(AllColumns allColumns) {
-//                }
-//
-//                @Override
-//                public void visit(AllTableColumns allTableColumns) {
-//                }
-//
-//                @Override
-//                public void visit(SelectExpressionItem selectExpressionItem) {
-//                    //替换列名的别名为attrId
-//                    if (MapUtils.isNotEmpty(attrIdMap)) {
-//                        //原来已经有别名
-//                        String alias;
-//                        SelectExpressionItem selectItem = new SelectExpressionItem();
-//                        if (selectExpressionItem.getAlias() != null) {
-//                            selectItem.setExpression(new Column("md5(" + selectExpressionItem.getExpression() + ")"));
-//                            alias = selectExpressionItem.getAlias().getName();
-//                        } else {
-//                            selectItem.setExpression(new Column("md5(" + selectExpressionItem + ")"));
-//                            alias = selectExpressionItem.toString();
-//                        }
-//                        if (attrIdMap.containsKey(alias)) {
-//                            selectItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "_hash`"));
-//                            selectExpressionItem.setAlias(new Alias("`" + attrIdMap.get(alias) + "`"));
-//                            newItemList.add(selectItem);
-//                        }
-//                    }
-//                }
-//            });
-//        }
-//        //补充ci列
-////        SelectExpressionItem selectItem = new SelectExpressionItem();
-////        selectItem.setExpression(new StringValue(ciId.toString()));
-////        selectItem.setAlias(new Alias("ci_id"));
-////        newItemList.add(selectItem);
-////        if (CollectionUtils.isNotEmpty(newItemList)) {
-////            select.addSelectItems(newItemList);
-////        }
-//
-//    }
-
-    /**
-     * 给SQL语句补充视图schema
-     *
-     * @param selectBody select主体
-     */
-    private void fillUpSchema(SelectBody selectBody) {
-        PlainSelect select = (PlainSelect) selectBody;
-        //处理from
-        FromItem fromItem = select.getFromItem();
-        if (fromItem instanceof Table) {
-            Table table = (Table) select.getFromItem();
-            table.setSchemaName(schema);
-        } else if (fromItem instanceof SubSelect) {
-            SubSelect subselect = (SubSelect) select.getFromItem();
-            fillUpSchema(subselect.getSelectBody());
-        }
-
-        //处理join
-        if (CollectionUtils.isNotEmpty(select.getJoins())) {
-            for (Join j : select.getJoins()) {
-                if (j.getRightItem() instanceof Table) {
-                    Table t = (Table) j.getRightItem();
-                    t.setSchemaName(schema);
-                } else if (j.getRightItem() instanceof SubSelect) {
-                    SubSelect subselect = (SubSelect) j.getRightItem();
-                    fillUpSchema(subselect.getSelectBody());
-                }
-            }
-        }
-    }
-
-    public static void main(String[] a) throws DocumentException {
-        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<ci id=\"user\">\n" +
-                "        <attrs>\n" +
-                "            <attr name=\"user_id\" label=\"用户id\"></attr>\n" +
-                "            <attr name=\"user_name\" label=\"用户名\"></attr>\n" +
-                "            <attr name=\"email\" label=\"邮件\"></attr>\n" +
-                "            <attr name=\"phone\" label=\"电话\"></attr>\n" +
-                "            <attr name=\"pinyin\" label=\"拼音\"></attr>\n" +
-                "        </attrs>\n" +
-                "        <sql>\n" +
-                "           INSERT INTO test (a) VALUES ('a')" +
-                "        </sql>\n" +
-                "</ci>\n" +
-                "\n";
-        MatrixViewSqlBuilder viewBuilder = new MatrixViewSqlBuilder(xml);
-        viewBuilder.valid();
     }
 
 }

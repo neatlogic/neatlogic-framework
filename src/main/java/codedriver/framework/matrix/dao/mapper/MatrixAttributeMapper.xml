@@ -39,7 +39,7 @@
     </insert>
 
     <update id="createMatrixDynamicTable">
-        CREATE table `${schemaName}`.`matrix_${matrixUuid}` (
+        CREATE table `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` (
         `id` bigint(20) NOT NULL AUTO_INCREMENT,
         `uuid` char(32) NOT NULL,
         <foreach collection="attributeList" item="attribute" separator="," index="index">
@@ -52,14 +52,14 @@
     </update>
 
     <update id="dropMatrixDynamicTable" parameterType="string">
-        DROP TABLE IF EXISTS `${schemaName}`.`matrix_${matrixUuid}`
+        DROP TABLE IF EXISTS `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
     </update>
 
     <update id="addMatrixDynamicTableColumn">
-        ALTER TABLE `${schemaName}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` VARCHAR (100)
+        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` VARCHAR (100)
     </update>
 
     <update id="dropMatrixDynamicTableColumn">
-        ALTER TABLE `${schemaName}`.`matrix_${matrixUuid}` DROP COLUMN `${columnName}`
+        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` DROP COLUMN `${columnName}`
     </update>
 </mapper>

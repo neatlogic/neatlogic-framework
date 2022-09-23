@@ -1,6 +1,5 @@
 package codedriver.framework.matrix.dto;
 
-import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.dto.BasePageVo;
 
 import java.util.ArrayList;
@@ -135,10 +134,6 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setFilterList(JSONArray filterList) {
         this.filterList = filterList;
-    }
-
-    public String getSchemaName() {
-        return TenantContext.get().getDataDbName();
     }
 
     public List<String> getArrayColumnList() {

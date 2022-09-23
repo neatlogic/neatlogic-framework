@@ -22,7 +22,8 @@ import java.util.Set;
  */
 public class between {
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+        String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
                 String dataValue = dataValueList.getString(0);
@@ -33,17 +34,18 @@ public class between {
                     if (range.length == 2) {
                         valueBefore = range[0];
                         valueAfter = range[1];
-                        return compare(dataValue, valueBefore, valueAfter);
+                        return compare(dataValue, valueBefore, valueAfter, label);
                     }
                 }
             } else {
-                return false;
+                throw new ApiRuntimeException(prefix + "值个数和条件值个数不一致");
             }
         }
-        return false;
+        throw new ApiRuntimeException(prefix + "值为空");
     }
 
-    private static boolean compare(String dataValue, String valueBefore, String valueAfter) {
+    private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label) {
+        String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         if (isNumber(dataValue)) {
             double transferValue = Double.parseDouble(dataValue);
             double transferValueBefore = Double.MIN_VALUE;
@@ -63,7 +65,7 @@ public class between {
                 }
             }
             if (!(transferValue >= transferValueBefore && transferValue <= transferValueAfter)) {
-                throw new ApiRuntimeException("值" + dataValue + "不在" + valueBefore + "和" + valueAfter + "范围内");
+                throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 和 " + valueAfter + " 范围内");
             }
             return true;
         } else if (isDate(dataValue) || isDateTime(dataValue) || isTime(dataValue)) {
@@ -93,24 +95,24 @@ public class between {
                 }
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        throw new ApiRuntimeException("值“" + dataValue + "”不在“" + valueBefore + "”和“" + valueAfter + "”范围内");
+                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 和 " + valueAfter + " 范围内");
                     }
                     return true;
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
-                        throw new ApiRuntimeException("值“" + dataValue + "”不在“" + valueBefore + "”之后");
+                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 之后");
                     }
                     return true;
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
-                        throw new ApiRuntimeException("值“" + dataValue + "”不在“" + valueAfter + "”之前");
+                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueAfter + " 之前");
                     }
                     return true;
                 }
             } catch (ParseException ignored) {
             }
         }
-        return false;
+        throw new ApiRuntimeException(prefix + "值不符合格式要求");
     }
 
     private final static Set<Character> numberCharSet = new HashSet<>();
@@ -185,5 +187,4 @@ public class between {
         String a = "~2";
         System.out.println(a.split("~")[0]);
     }
-
 }

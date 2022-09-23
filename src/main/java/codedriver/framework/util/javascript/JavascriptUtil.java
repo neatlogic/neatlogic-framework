@@ -103,7 +103,7 @@ public class JavascriptUtil {
     /**
      * 执行一个表达式，返回true或false
      *
-     * @param paramObj   参数，使用第一层key作为参数名
+     * @param paramObj   参数，包含data,condition和define三个属性
      * @param expression 表达式
      * @return 执行结果
      */
@@ -120,9 +120,9 @@ public class JavascriptUtil {
         }
         String script = "function run(){\n" + "return " + expression + ";\n" + "}\n";
 
-        script += "function calculate(expression, dataValue, conditionValue){\n";
+        script += "function calculate(expression, dataValue, conditionValue, label){\n";
         script += "var calculateClass = Java.type('codedriver.framework.util.javascript.expressionHandler.'+ expression); \n";
-        script += "var result = calculateClass.calculate(dataValue, conditionValue);\n";
+        script += "var result = calculateClass.calculate(dataValue, conditionValue, label);\n";
         script += "return result;\n";
         script += "}\n";
         se.eval(script);

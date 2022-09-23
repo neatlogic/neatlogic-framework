@@ -8,11 +8,14 @@ package codedriver.framework.util.javascript.expressionHandler;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class isnull {
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+        String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
+
         if (CollectionUtils.isNotEmpty(dataValueList)) {
-            throw new ApiRuntimeException("值需要为空");
+            throw new ApiRuntimeException(prefix + "值需要为空");
         }
         return true;
     }

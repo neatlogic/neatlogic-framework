@@ -5,11 +5,9 @@
 
 package codedriver.framework.util;
 
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**

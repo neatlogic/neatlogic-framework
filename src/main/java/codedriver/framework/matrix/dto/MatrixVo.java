@@ -35,8 +35,6 @@ public class MatrixVo extends BaseEditorVo {
     private Long fileId;
     @EntityField( name = "视图配置文件名称", type = ApiParamType.STRING)
     private String fileName;
-//    @EntityField( name = "视图配置文件信息", type = ApiParamType.JSONOBJECT)
-//    private FileVo fileVo;
     @EntityField( name = "ci模型id", type = ApiParamType.LONG)
     private Long ciId;
     @EntityField( name = "配置信息", type = ApiParamType.JSONOBJECT)

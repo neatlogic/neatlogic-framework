@@ -14,8 +14,6 @@ import com.alibaba.fastjson.annotation.JSONField;
  **/
 public class MatrixViewVo {
     private String matrixUuid;
-//    private Long fileId;
-//    private FileVo fileVo;
     private String fileName;
     private String xml;
     @JSONField(serialize = false)
@@ -27,22 +25,6 @@ public class MatrixViewVo {
     public void setMatrixUuid(String matrixUuid) {
         this.matrixUuid = matrixUuid;
     }
-
-//    public Long getFileId() {
-//        return fileId;
-//    }
-//
-//    public void setFileId(Long fileId) {
-//        this.fileId = fileId;
-//    }
-//
-//    public FileVo getFileVo() {
-//        return fileVo;
-//    }
-//
-//    public void setFileVo(FileVo fileVo) {
-//        this.fileVo = fileVo;
-//    }
 
     public String getFileName() {
         return fileName;

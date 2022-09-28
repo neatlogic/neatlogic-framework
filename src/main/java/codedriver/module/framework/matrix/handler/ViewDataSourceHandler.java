@@ -76,12 +76,6 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (fileVo == null) {
             throw new FileNotFoundException(fileId);
         }
-//        MatrixViewVo oldMatrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
-//        if (oldMatrixViewVo != null) {
-//            if (fileId.equals(oldMatrixViewVo.getFileId())) {
-//                return false;
-//            }
-//        }
         String xml = IOUtils.toString(FileUtil.getData(fileVo.getPath()), StandardCharsets.UTF_8);
 //            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ci><attrs><attr name=\"uuid\" label=\"用户uuid\"/><attr name=\"user_id\" label=\"用户id\"/><attr name=\"user_name\" label=\"用户名\"/><attr name=\"teamName\" label=\"分组\"/><attr name=\"vipLevel\" label=\"是否VIP\"/><attr name=\"phone\" label=\"电话\"/><attr name=\"email\" label=\"邮件\"/></attrs><sql>SELECT `u`.`uuid` AS uuid, `u`.`id` AS id, `u`.`user_id` as user_id, `u`.`user_name` as user_name, u.email as email, u.phone as phone, if(u.vip_level=0,'否','是') as vipLevel, group_concat( `t`.`name`) AS teamName FROM `user` `u` LEFT JOIN `user_team` `ut` ON `u`.`uuid` = `ut`.`user_uuid` LEFT JOIN `team` `t` ON `t`.`uuid` = `ut`.`team_uuid` GROUP BY u.uuid </sql></ci>";
         if (StringUtils.isBlank(xml)) {
@@ -117,11 +111,6 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             throw new MatrixViewNotFoundException(matrixVo.getName());
         }
         matrixVo.setFileName(matrixViewVo.getFileName());
-//        FileVo fileVo = fileMapper.getFileById(fileId);
-//        if (fileVo == null) {
-//            throw new FileNotFoundException(fileId);
-//        }
-//        matrixVo.setFileVo(fileVo);
     }
 
     @Override

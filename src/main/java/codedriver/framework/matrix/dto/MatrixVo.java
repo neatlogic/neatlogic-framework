@@ -1,6 +1,5 @@
 package codedriver.framework.matrix.dto;
 
-import codedriver.framework.file.dto.FileVo;
 import codedriver.framework.matrix.core.MatrixTypeFactory;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;

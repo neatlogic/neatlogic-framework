@@ -5,7 +5,6 @@
 
 package codedriver.framework.matrix.dto;
 
-import codedriver.framework.file.dto.FileVo;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**

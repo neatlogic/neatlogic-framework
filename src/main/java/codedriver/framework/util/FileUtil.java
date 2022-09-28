@@ -54,19 +54,20 @@ public class FileUtil {
      * Chrome浏览器userAgent：Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36
      * Edg浏览器userAgent：Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36 Edg/90.0.818.46
      *
-     * @param userAgent
      * @param fileName
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static String getEncodedFileName(String userAgent, String fileName) throws UnsupportedEncodingException {
-        if (userAgent.indexOf("Gecko") > 0) {
-            //chrome、firefox、edge浏览器下载文件
-            fileName = URLEncoder.encode(fileName, "UTF-8");
-            fileName = fileNameSpecialCharacterHandling(fileName);
-        } else {
-            fileName = new String(fileName.replace(" ", "").getBytes(StandardCharsets.UTF_8), "ISO8859-1");
-        }
+    public static String getEncodedFileName(String fileName) throws UnsupportedEncodingException {
+//        if (userAgent.indexOf("Gecko") > 0) {
+//            //chrome、firefox、edge浏览器下载文件
+//            fileName = URLEncoder.encode(fileName, "UTF-8");
+//            fileName = fileNameSpecialCharacterHandling(fileName);
+//        } else {
+//            fileName = new String(fileName.replace(" ", "").getBytes(StandardCharsets.UTF_8), "ISO8859-1");
+//        }
+        fileName = URLEncoder.encode(fileName, "UTF-8");
+        fileName = fileNameSpecialCharacterHandling(fileName);
         return fileName;
     }
 

@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 
 public interface IFileCrossoverService extends ICrossoverService {
     void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
@@ -21,12 +20,4 @@ public interface IFileCrossoverService extends ICrossoverService {
      * @throws Exception
      */
     void deleteFile(Long fileId, JSONObject paramObj) throws Exception;
-
-    /**
-     * 获取encode文件名
-     * @param request 请求
-     * @param fileName 文件名
-     * @return 文件名
-     */
-    String getFileNameEncode(HttpServletRequest request, String fileName) throws UnsupportedEncodingException;
 }

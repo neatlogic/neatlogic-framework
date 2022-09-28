@@ -39,7 +39,7 @@ public interface MatrixMapper {
 
     int replaceMatrixExternal(MatrixExternalVo matrixExternalVo);
 
-    int replaceMatrixView(MatrixViewVo matrixViewVo);
+    int insertMatrixView(MatrixViewVo matrixViewVo);
 
     int replaceMatrixCi(MatrixCiVo matrixCiVo);
 

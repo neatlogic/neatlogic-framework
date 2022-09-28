@@ -108,8 +108,9 @@
 	<select id="getMatrixViewByMatrixUuid" parameterType="string" resultType="codedriver.framework.matrix.dto.MatrixViewVo">
 		SELECT
 			`matrix_uuid` AS matrixUuid,
-			`file_id` AS fileId,
-			`config`
+			`file_name` AS fileName,
+			`config`,
+		    `xml`
 		FROM `matrix_view`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
@@ -159,16 +160,21 @@
 		)
 	</insert>
 
-	<insert id="replaceMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
-		REPLACE INTO `matrix_view`(
+	<insert id="insertMatrixView" parameterType="codedriver.framework.matrix.dto.MatrixViewVo">
+		INSERT INTO `matrix_view`(
 			`matrix_uuid`,
-			`file_id`,
-			`config`
+			`file_name`,
+			`config`,
+			`xml`
 		) VALUES (
-		#{matrixUuid},
-		#{fileId},
-		#{config}
-		)
+			#{matrixUuid},
+			#{fileName},
+			#{config},
+			#{xml}
+		) ON DUPLICATE KEY UPDATE
+		`file_name` = #{fileName},
+		`config` = #{config},
+		`xml` = #{xml}
 	</insert>
 
 	<insert id="replaceMatrixCi" parameterType="codedriver.framework.matrix.dto.MatrixCiVo">

@@ -31,7 +31,7 @@ public class MatrixViewFileHandler extends FileTypeHandlerBase {
 
     @Override
     protected boolean myDeleteFile(FileVo fileVo, JSONObject paramObj) {
-        return false;
+        return true;
     }
 
     @Override

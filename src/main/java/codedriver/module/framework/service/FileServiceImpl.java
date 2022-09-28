@@ -30,6 +30,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -122,5 +123,31 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
         if (fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
             fileTypeHandler.deleteFile(fileVo, paramObj);
         }
+    }
+
+    /**
+     * 获取encode文件名
+     * @param request 请求
+     * @param fileName 文件名
+     * @return 文件名
+     */
+    @Override
+    public String getFileNameEncode(HttpServletRequest request, String fileName) throws UnsupportedEncodingException {
+        String fileNameEncode;
+        boolean flag = request.getHeader("User-Agent").indexOf("Gecko") > 0;
+        if (request.getHeader("User-Agent").toLowerCase().indexOf("msie") > 0 || flag) {
+            fileNameEncode = URLEncoder.encode(fileName, "UTF-8");// IE浏览器
+            /* chrome、firefox、edge浏览器下载文件时，文件名包含~@#$&+=;这八个英文字符时会变成乱码_%40%23%24%26%2B%3D%3B，下面是对@#$&+=;这七个字符做特殊处理，对于~这个字符还是会出现乱码，暂无法处理 **/
+            fileNameEncode = fileNameEncode.replace("%40", "@");
+            fileNameEncode = fileNameEncode.replace("%23", "#");
+            fileNameEncode = fileNameEncode.replace("%24", "$");
+            fileNameEncode = fileNameEncode.replace("%26", "&");
+            fileNameEncode = fileNameEncode.replace("%2B", "+");
+            fileNameEncode = fileNameEncode.replace("%3D", "=");
+            fileNameEncode = fileNameEncode.replace("%3B", ";");
+        } else {
+            fileNameEncode = new String(fileName.replace(" ", "").getBytes(StandardCharsets.UTF_8), "ISO8859-1");
+        }
+        return fileNameEncode;
     }
 }

@@ -5,8 +5,9 @@
 
 package codedriver.framework.util;
 
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.io.*;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -59,18 +60,11 @@ public class FileUtil {
      * @throws UnsupportedEncodingException
      */
     public static String getEncodedFileName(String fileName) throws UnsupportedEncodingException {
-//        if (userAgent.indexOf("Gecko") > 0) {
-//            //chrome、firefox、edge浏览器下载文件
-//            fileName = URLEncoder.encode(fileName, "UTF-8");
-//            fileName = fileNameSpecialCharacterHandling(fileName);
-//        } else {
-//            fileName = new String(fileName.replace(" ", "").getBytes(StandardCharsets.UTF_8), "ISO8859-1");
-//        }
-        fileName = URLEncoder.encode(fileName, "UTF-8");
-        fileName = fileNameSpecialCharacterHandling(fileName);
-        return fileName;
+//        fileName = URLEncoder.encode(fileName, "UTF-8");
+//        fileName = fileNameSpecialCharacterHandling(fileName);
+//        return fileName;
+        return UriComponentsBuilder.fromUriString(fileName).build().encode().toUri().toString();
     }
-
 
     /**
      * 读取文件内容

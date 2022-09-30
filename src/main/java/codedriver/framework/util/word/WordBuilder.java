@@ -7,11 +7,18 @@ package codedriver.framework.util.word;
 import codedriver.framework.util.word.enums.TitleType;
 import codedriver.framework.util.word.table.TableBuilder;
 import org.apache.poi.ooxml.POIXMLDocument;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author longrf
@@ -57,6 +64,9 @@ public class WordBuilder {
 //    private FootnoteEndnoteIdManager footnoteIdManager = new FootnoteEndnoteIdManager(document);
 //    private XWPFHeaderFooterPolicy headerFooterPolicy;
 
+    void test() {
+//        HWPFDocument doc = new HWPFDocument(in);
+    }
 
     public WordBuilder() throws IOException {
         this.document = new XWPFDocument();
@@ -67,6 +77,24 @@ public class WordBuilder {
     }
 
     public XWPFDocument builder() {
+        return document;
+    }
+
+    public XWPFDocument write(OutputStream os) throws IOException {
+
+        OPCPackage p = document.getPackage();
+        if (p == null) {
+            throw new IOException("Cannot write data, document seems to have been closed already");
+        }
+
+        //force all children to commit their changes into the underlying OOXML Package
+        // TODO Shouldn't they be committing to the new one instead?
+        Set<PackagePart> context = new HashSet<>();
+
+        //save extended and custom properties
+        document.getProperties().commit();
+
+        p.save(os);
         return document;
     }
 
@@ -88,9 +116,20 @@ public class WordBuilder {
      * @param titleName 标题名称
      * @return XWPFDocument
      */
-    public XWPFDocument addTitle(TitleType titleType, String titleName) {
+    public WordBuilder addTitle(TitleType titleType, String titleName) {
         createXWPFTitle(document, titleType, titleName);
-        return document;
+        return this;
+    }
+
+    /**
+     * 添加表格
+     *
+     * @param tableHeaderMap 表头
+     * @return TableBuilder
+     */
+    public TableBuilder addTable(Map<Integer, String> tableHeaderMap) {
+        XWPFTable table = document.createTable();
+        return new TableBuilder(table, tableHeaderMap);
     }
 
     /**
@@ -104,7 +143,7 @@ public class WordBuilder {
     }
 
     /**
-     * 添加段落
+     * 添加空白段落
      *
      * @return ParagraphBuilder
      */
@@ -112,6 +151,16 @@ public class WordBuilder {
         XWPFParagraph xwpfParagraph = document.createParagraph();
         return new ParagraphBuilder(xwpfParagraph);
 
+    }
+
+    /**
+     * 添加段落
+     *
+     * @return ParagraphBuilder
+     */
+    public ParagraphBuilder addParagraph(String paragraph) {
+        XWPFParagraph xwpfParagraph = document.createParagraph();
+        return new ParagraphBuilder(xwpfParagraph, paragraph);
     }
 
     /**
@@ -195,21 +244,23 @@ public class WordBuilder {
     }
 
 
-//    /**
+    //    /**
 //     * 设置页面大小及纸张方向 landscape横向
 //     * @param document
 //     * @param width
 //     * @param height
 //     * @param stValue
 //     */
-//    public void setDocumentSize(XWPFDocument document, String width,String height, STPageOrientation stValue) {
-//        CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
-//        CTPages
+    public void setDocumentSize() {
+
+        CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+        sectPr.unsetPaperSrc();
+        ;
 //        CTPageSz pgsz = sectPr.isSetPgSz() ? sectPr.getPgSz() : sectPr.addNewPgSz();
 //        pgsz.setH(new BigInteger(height));
 //        pgsz.setW(new BigInteger(width));
 //        pgsz.setOrient(stValue);
-//    }
+    }
 
 //    /**
 //     * 设置页边距 (word中1厘米约等于567)
@@ -235,5 +286,60 @@ public class WordBuilder {
 //            ctpagemar.setBottom(new BigInteger(bottom));
 //        }
 //    }
+
+
+    /**
+     * 简单表格生成
+     *
+     * @param xdoc   XWPFDocument对象
+     * @param titles 表头表头
+     * @param values 表内容
+     */
+    public static void createSimpleTable(XWPFDocument xdoc, String[] titles, List<Map<String, String>> values) {
+        //行高
+        int rowHeight = 300;
+
+        //开始创建表格（默认有一行一列）
+        XWPFTable xTable = xdoc.createTable();
+        CTTbl ctTbl = xTable.getCTTbl();
+        CTTblPr tblPr = ctTbl.getTblPr() == null ? ctTbl.addNewTblPr() : ctTbl.getTblPr();
+        CTTblWidth tblWidth = tblPr.isSetTblW() ? tblPr.getTblW() : tblPr.addNewTblW();
+        tblWidth.setType(STTblWidth.DXA);
+//        tblWidth.setW(new BigInteger("8310"));//表格宽度
+
+        // 创建表头数据
+        XWPFTableRow titleRow = xTable.getRow(0);
+        titleRow.setHeight(rowHeight);
+        for (int i = 0; i < titles.length; i++) {
+            setCellText(i == 0 ? titleRow.getCell(0) : titleRow.createCell(), titles[i]);
+        }
+
+        // 创建表格内容
+        for (int i = 0; i < values.size(); i++) {
+            Map<String, String> stringStringMap = values.get(i);
+
+            //设置列内容
+            XWPFTableRow row = xTable.insertNewTableRow(i + 1);
+            row.setHeight(rowHeight);
+            for (String title : titles) {
+                setCellText(row.createCell(), stringStringMap.get(title));
+            }
+        }
+    }
+
+    /**
+     * 设置列内容
+     */
+    private static void setCellText(XWPFTableCell cell, String text) {
+        CTTc cttc = cell.getCTTc();
+        CTTcPr cellPr = cttc.addNewTcPr();
+        cellPr.addNewTcW().setW(new BigInteger("2100"));
+        cell.setColor("FFFFFF");
+        cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
+        CTTcPr ctPr = cttc.addNewTcPr();
+        ctPr.addNewVAlign().setVal(STVerticalJc.CENTER);
+        cttc.getPList().get(0).addNewPPr().addNewJc().setVal(STJc.CENTER);
+        cell.setText(text);
+    }
 
 }

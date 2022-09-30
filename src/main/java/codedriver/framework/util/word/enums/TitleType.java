@@ -10,10 +10,10 @@ package codedriver.framework.util.word.enums;
  */
 
 public enum TitleType {
-    H1("h1", "标题 1", true, "000000", "宋体", 20, 1),
-    H2("h2", "标题 2", true, "000000", "宋体", 18, 2),
-    H3("h3", "标题 3", true, "000000", "宋体", 16, 3),
-    TILE("centered_tile", "居中标题", true, "000000", "宋体", 20, 0),
+    H1("h1", "标题 1", true, "000000", "楷体", 18, 1),
+    H2("h2", "标题 2", true, "000000", "楷体", 15, 2),
+    H3("h3", "标题 3", true, "000000", "楷体", 14, 3),
+    TILE("centered_tile", "居中标题", true, "000000", "楷体", 15, 0),
     ;
 
     private final String value;

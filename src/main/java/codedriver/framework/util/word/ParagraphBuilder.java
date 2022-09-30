@@ -22,13 +22,25 @@ public class ParagraphBuilder {
         this.paragraph = paragraph;
     }
 
+
+    public ParagraphBuilder(XWPFParagraph paragraph ,String paragraphText) {
+        this.paragraph = paragraph;
+        run = paragraph.createRun();
+        run.setText(paragraphText);
+
+    }
+
+    public XWPFParagraph builder() {
+        return paragraph;
+    }
+
     /**
      * 设置段落内容
      *
      * @param context 段落内容
      * @return ParagraphBuilder
      */
-    public ParagraphBuilder setContext(String context) {
+    public ParagraphBuilder setText(String context) {
         if (run == null) {
             run = paragraph.createRun();
         }
@@ -98,7 +110,7 @@ public class ParagraphBuilder {
      * @param textPosition 行间距  默认是1.15倍
      * @return ParagraphBuilder
      */
-    public ParagraphBuilder setBold(Integer textPosition) {
+    public ParagraphBuilder setTextPosition(Integer textPosition) {
         if (run == null) {
             run = paragraph.createRun();
         }

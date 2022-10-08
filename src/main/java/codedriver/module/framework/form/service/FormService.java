@@ -6,6 +6,7 @@
 package codedriver.module.framework.form.service;
 
 import codedriver.framework.form.dto.FormAttributeVo;
+import com.alibaba.fastjson.JSONObject;
 
 public interface FormService {
     /**
@@ -13,4 +14,10 @@ public interface FormService {
      * @param formAttributeVo
      */
     void saveDependency(FormAttributeVo formAttributeVo);
+
+    /**
+     * 表格输入组件密码类型加密
+     * @param data
+     */
+    JSONObject staticListPasswordEncrypt(JSONObject data, JSONObject config);
 }

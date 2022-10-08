@@ -27,7 +27,6 @@ public class ParagraphBuilder {
         this.paragraph = paragraph;
         run = paragraph.createRun();
         run.setText(paragraphText);
-
     }
 
     public XWPFParagraph builder() {

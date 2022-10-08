@@ -7,6 +7,7 @@ package codedriver.framework.form.service;
 
 import codedriver.framework.crossover.ICrossoverService;
 import codedriver.framework.form.dto.FormAttributeVo;
+import com.alibaba.fastjson.JSONObject;
 
 public interface IFormCrossoverService extends ICrossoverService {
 
@@ -15,4 +16,10 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @param formAttributeVo
      */
     void saveDependency(FormAttributeVo formAttributeVo);
+
+    /**
+     * 表格输入组件密码类型加密
+     * @param data
+     */
+    JSONObject staticListPasswordEncrypt(JSONObject data, JSONObject config);
 }

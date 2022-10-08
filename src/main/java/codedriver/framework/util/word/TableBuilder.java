@@ -2,7 +2,7 @@
  * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
-package codedriver.framework.util.word.table;
+package codedriver.framework.util.word;
 
 import codedriver.framework.util.word.enums.FontFamily;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,6 +45,8 @@ public class TableBuilder {
         //表风格
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
+        table.setWidthType(TableWidthType.DXA);
+
         //默认表格宽度
         tblPr.getTblW().setW(new BigInteger("8310"));
     }
@@ -60,6 +62,8 @@ public class TableBuilder {
         //表风格
         CTTblPr tblPr = table.getCTTbl().getTblPr();
         tblPr.getTblW().setType(STTblWidth.DXA);
+        table.setWidthType(TableWidthType.DXA);
+
         //默认表格宽度
         tblPr.getTblW().setW(new BigInteger("8310"));
 
@@ -68,40 +72,6 @@ public class TableBuilder {
         for (int cellNum = 1; cellNum <= tableHeaderMap.size(); cellNum++) {
             XWPFTableCell cell = cellNum == 1 ? row.getCell(0) : row.addNewTableCell();
             setCellText(cell, tableHeaderMap.get(cellNum), table.getWidth() / tableHeaderMap.size());
-
-//            for (XWPFParagraph paragraph : xwpfTableCell.getParagraphs()) {
-//                ParagraphBuilder paragraphBuilder = new ParagraphBuilder(paragraph);
-//                paragraphBuilder.setTextPosition(2);
-//                paragraphBuilder.setColor(FontColor.RED.getValue());
-//                xwpfTableCell.setParagraph(paragraphBuilder.builder());
-//            }
-
-
-//for ()
-//            XWPFParagraph para = xwpfTableCell.getParagraphs();
-//            para.setSpacingBeforeLines(2);
-//            para.setSpacingAfterLines(2);
-//            for (XWPFRun run : para.getRuns()) {
-//                run.setTextPosition(2);
-//            }
-//            para.setSpacingBetween(2);
-
-////            //单元格风格 、 平分表格宽度
-//            CTTcPr tcpr = cell.getCTTc().addNewTcPr();
-////            CTTblWidth cellw = tcpr.addNewTcW();
-////            cellw.setType(STTblWidth.DXA);
-////            cellw.setW(BigInteger.valueOf(2077));
-////
-//            //垂直居中
-//            CTVerticalJc va = tcpr.addNewVAlign();
-//            va.setVal(STVerticalJc.CENTER);
-//
-//
-//            //水平居中
-//            List<XWPFParagraph> paragraphs = cell.getParagraphs();
-//            for (XWPFParagraph paragraph : paragraphs) {
-//                paragraph.setAlignment(ParagraphAlignment.CENTER);
-//            }
         }
     }
 
@@ -121,18 +91,10 @@ public class TableBuilder {
         CTTblPr tblPr = ctTbl.getTblPr() == null ? ctTbl.addNewTblPr() : ctTbl.getTblPr();
         CTTblWidth tblWidth = tblPr.isSetTblW() ? tblPr.getTblW() : tblPr.addNewTblW();
         tblWidth.setType(STTblWidth.DXA);
-        //默认表格宽度
-        tblWidth.setW(new BigInteger("8310"));
 
         XWPFTableRow titleRow = table.getRow(0);
-//            titleRow.setHeight(300);
         for (int cellNum = 1; cellNum <= tableHeaderMap.size(); cellNum++) {
-            XWPFTableCell cell;
-            if (cellNum == 1) {
-                cell = titleRow.getCell(0);
-            } else {
-                cell = titleRow.createCell();
-            }
+            XWPFTableCell cell = cellNum == 1 ? titleRow.getCell(0) : titleRow.createCell();
             setCellText(cell, tableHeaderMap.get(cellNum), table.getWidth() / tableHeaderMap.size());
         }
 
@@ -204,6 +166,7 @@ public class TableBuilder {
      * @param width 列宽
      */
     private void setCellText(XWPFTableCell cell, String text, int width) {
+
         cell.setWidthType(TableWidthType.DXA);
 
         CTTc cttc = cell.getCTTc();

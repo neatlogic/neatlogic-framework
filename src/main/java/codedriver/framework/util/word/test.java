@@ -46,7 +46,7 @@ public class test  extends PrivateBinaryStreamApiComponentBase {
     public Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        String fileName = FileUtil.getEncodedFileName(request.getHeader("User-Agent"), "222" + ".docx");
+        String fileName = FileUtil.getEncodedFileName( "222" + ".docx");
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setHeader("Content-Disposition", " attachment; filename=\"" + fileName + "\"");
 
@@ -72,7 +72,8 @@ public class test  extends PrivateBinaryStreamApiComponentBase {
             tableValueMap.put("ip", "192192192192192192192192192192192192192192");
 //            tableValueMap.put("ip", "192");
 
-            wordBuilder.addTitle(TitleType.TILE, "测试").addTitle(TitleType.H1, "测试").addTitle(TitleType.H2, "测试").addTitle(TitleType.H3, "测试");
+            wordBuilder.addTitle(TitleType.TILE, "测试");
+//                    .addTitle(TitleType.H1, "测试").addTitle(TitleType.H2, "测试").addTitle(TitleType.H3, "测试");
             wordBuilder.addBlankRow().addParagraph().setText("测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试")
                     .setCustom(false, FontColor.RED.getValue(), FontFamily.BLACK.getValue(), 12, 2, true, ParagraphAlignmentType.CENTER);
             wordBuilder.addBlankRow();

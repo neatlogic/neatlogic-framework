@@ -176,6 +176,9 @@ public class TableBuilder {
         //水平居中
         cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
         CTTcPr ctPr = cttc.addNewTcPr();
+        //防止列宽被挤
+        ctPr.addNewNoWrap();
+
         //垂直居中
         ctPr.addNewVAlign().setVal(STVerticalJc.CENTER);
         cttc.getPList().get(0).addNewPPr().addNewJc().setVal(STJc.CENTER);

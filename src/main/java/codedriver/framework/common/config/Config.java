@@ -29,6 +29,7 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
 
     public static final int SCHEDULE_SERVER_ID;
+    public static final String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
@@ -135,6 +136,14 @@ public class Config {
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
+            throw ex;
+        }
+
+        try {
+            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
+        } catch (Exception ex) {
+            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
+            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
             throw ex;
         }
     }

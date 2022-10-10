@@ -7,7 +7,7 @@ public class ServerClusterVo extends BasePageVo{
 	public final static String STARTUP = "startup";
 	public final static String STOP = "stop";
 	
-	private String ip;
+	private String host;
 	private Integer serverId;
 	private String status;
 	
@@ -17,16 +17,16 @@ public class ServerClusterVo extends BasePageVo{
 		this.serverId = serverId;
 		this.status = status;
 	}
-	public ServerClusterVo(String ip, Integer serverId, String status) {
-		this.ip = ip;
+	public ServerClusterVo(String host, Integer serverId, String status) {
+		this.host = host;
 		this.serverId = serverId;
 		this.status = status;
 	}
-	public String getIp() {
-		return ip;
+	public String getHost() {
+		return host;
 	}
-	public void setIp(String ip) {
-		this.ip = ip;
+	public void setHost(String host) {
+		this.host = host;
 	}
 	public Integer getServerId() {
 		return serverId;

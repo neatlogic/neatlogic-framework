@@ -13,13 +13,14 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
 import codedriver.framework.heartbeat.dto.ServerClusterVo;
-import codedriver.framework.heartbeat.dto.ServerCounterVo;
 import codedriver.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         // 服务器重启时，先重置与自己相关的数据
         getServerLock(Config.SCHEDULE_SERVER_ID);
         // 重新插入一条服务器信息
-        ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
-        serverMapper.replaceServer(server);
+        ServerClusterVo server = new ServerClusterVo(Config.SERVER_HOST, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
+        serverMapper.insertServer(server);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);

@@ -4,7 +4,7 @@
 
 	<select id="getInactivatedServer" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
-		scl.`ip`, scl.`server_id` AS serverId, scl.`status`
+		scl.`host`, scl.`server_id` AS serverId, scl.`status`
 		FROM server_status scl
 		JOIN server_counter scot ON scot.`to_server_id`=scl.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` >= #{threshold}
 		WHERE scl.`status`='startup'
@@ -12,14 +12,14 @@
 
 	<select id="getServerByStatus" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
-		scl.`ip`, scl.`server_id` AS serverId,scl.`status`
+		scl.`host`, scl.`server_id` AS serverId,scl.`status`
 		FROM server_status scl
 		WHERE scl.`status`=#{status}
 	</select>
 
 	<select id="getServerByServerId" resultType="codedriver.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
-		scl.`ip`, scl.`server_id` AS serverId,scl.`status`
+		scl.`host`, scl.`server_id` AS serverId,scl.`status`
 		FROM server_status scl
 		WHERE scl.`server_id`=#{serverId}
 		FOR UPDATE
@@ -36,14 +36,8 @@
 	<update id="updateServerByServerId">
 		UPDATE server_status
 		SET
-		<if test="ip != null">
-			ip=#{ip},
-		</if>
-		<if test="status != null">
-			status=#{status},
-		</if>
-		server_id=#{serverId}
-		WHERE server_id=#{serverId}
+			status = #{status}
+		WHERE server_id = #{serverId}
 	</update>
 
 	<update id="resetCounterByToServerId">
@@ -57,8 +51,12 @@
 		UPDATE `server_counter` SET `counter` = `counter` + 1 WHERE `from_server_id` = #{value};
 	</update>
 
-	<insert id="replaceServer">
-		REPLACE INTO server_status(ip, server_id, status) VALUES(#{ip}, #{serverId}, #{status})
+	<insert id="insertServer">
+		INSERT INTO server_status(host, server_id, status)
+		VALUES(#{host}, #{serverId}, #{status})
+		ON DUPLICATE KEY UPDATE
+		host = #{host},
+		status = #{status}
 	</insert>
 
 	<insert id="replaceServerCounter">

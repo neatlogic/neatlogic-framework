@@ -29,6 +29,8 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
 
     public static final int SCHEDULE_SERVER_ID;
+    public static final String SCHEDULE_SERVER_IP;
+    public static final int SCHEDULE_SERVER_PORT;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
     private static String JWT_SECRET = "techsure#codedriver$secret";
@@ -135,6 +137,23 @@ public class Config {
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
+            throw ex;
+        }
+
+        try {
+            SCHEDULE_SERVER_IP = getProperty(CONFIG_FILE, "schedule.server.ip", true);
+        } catch (Exception ex) {
+            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.ip变量");
+            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.ip变量");
+            throw ex;
+        }
+
+        try {
+            String sport = getProperty(CONFIG_FILE, "schedule.server.port", true);
+            SCHEDULE_SERVER_PORT = Integer.parseInt(sport);
+        } catch (Exception ex) {
+            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.port变量");
+            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.port变量");
             throw ex;
         }
     }

@@ -45,14 +45,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         // 服务器重启时，先重置与自己相关的数据
         getServerLock(Config.SCHEDULE_SERVER_ID);
         // 重新插入一条服务器信息
-        String ip = null;
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            ip = address.getHostAddress();
-        } catch (UnknownHostException e) {
-            logger.error(e.getMessage(), e);
-        }
-        ServerClusterVo server = new ServerClusterVo(ip, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
+        ServerClusterVo server = new ServerClusterVo(Config.SCHEDULE_SERVER_IP, Config.SCHEDULE_SERVER_PORT, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
         serverMapper.insertServer(server);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);

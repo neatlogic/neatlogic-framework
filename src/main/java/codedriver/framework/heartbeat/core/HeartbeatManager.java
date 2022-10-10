@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +46,15 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         // 服务器重启时，先重置与自己相关的数据
         getServerLock(Config.SCHEDULE_SERVER_ID);
         // 重新插入一条服务器信息
-        ServerClusterVo server = new ServerClusterVo(null, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
-        serverMapper.replaceServer(server);
+        String ip = null;
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            ip = address.getHostAddress();
+        } catch (UnknownHostException e) {
+            logger.error(e.getMessage(), e);
+        }
+        ServerClusterVo server = new ServerClusterVo(ip, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
+        serverMapper.insertServer(server);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);

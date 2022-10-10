@@ -21,7 +21,7 @@ public interface ServerMapper {
 	int updateServerCounterIncrementByOneByFromServerId(Integer fromServerId);
 	
 	//INSERT
-	int replaceServer(ServerClusterVo server);
+	int insertServer(ServerClusterVo server);
 	int replaceServerCounter(ServerCounterVo serverCounter);
 	
 	//DELETE

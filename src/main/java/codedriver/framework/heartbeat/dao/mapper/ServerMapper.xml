@@ -36,14 +36,8 @@
 	<update id="updateServerByServerId">
 		UPDATE server_status
 		SET
-		<if test="ip != null">
-			ip=#{ip},
-		</if>
-		<if test="status != null">
-			status=#{status},
-		</if>
-		server_id=#{serverId}
-		WHERE server_id=#{serverId}
+			status = #{status}
+		WHERE server_id = #{serverId}
 	</update>
 
 	<update id="resetCounterByToServerId">
@@ -57,8 +51,12 @@
 		UPDATE `server_counter` SET `counter` = `counter` + 1 WHERE `from_server_id` = #{value};
 	</update>
 
-	<insert id="replaceServer">
-		REPLACE INTO server_status(ip, server_id, status) VALUES(#{ip}, #{serverId}, #{status})
+	<insert id="insertServer">
+		INSERT INTO server_status(ip, server_id, status)
+		VALUES(#{ip}, #{serverId}, #{status})
+		ON DUPLICATE KEY UPDATE
+		ip = #{ip},
+		status = #{status}
 	</insert>
 
 	<insert id="replaceServerCounter">

@@ -13,7 +13,6 @@ import codedriver.framework.common.RootComponent;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.heartbeat.dao.mapper.ServerMapper;
 import codedriver.framework.heartbeat.dto.ServerClusterVo;
-import codedriver.framework.heartbeat.dto.ServerCounterVo;
 import codedriver.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -154,15 +154,12 @@ public class RollingFileAppender<E> extends FileAppender<E> {
         synchronized (triggeringPolicy) {
 //            System.out.println("triggeringPolicy:" + triggeringPolicy.getClass().getName());//ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
             if (triggeringPolicy.isTriggeringEvent(currentlyActiveFile, e)) {
-//                System.out.println("rollover()");
                 rollover();
                 rollover = true;
             }
         }
         long length = currentlyActiveFile.length();
-        System.out.println("before activeFileLength=" + currentlyActiveFile.length());
         super.subAppend(e);
-        System.out.println("after activeFileLength=" + currentlyActiveFile.length());
         if (e instanceof IEvent) {
             IEvent event = (IEvent) e;
             event.setBeforeAppendFileSize(length);

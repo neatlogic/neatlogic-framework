@@ -5,6 +5,7 @@
 
 package codedriver.framework.restful.dao.mapper;
 
+import codedriver.framework.restful.dto.ApiAuditPathVo;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 import org.apache.ibatis.annotations.Param;
@@ -41,6 +42,8 @@ public interface ApiAuditMapper {
 
     int insertApiAudit(ApiAuditVo apiAudit);
 
+    int insertApiAuditPath(ApiAuditPathVo apiAuditPath);
+
     /**
      * @param token
      * @param count
@@ -63,6 +66,7 @@ public interface ApiAuditMapper {
 
     int updateApiNeedAuditByToken(String token);
 
-    void deleteAuditByDayBefore(int dayBefore);
+    int updateApiAuditPathArchiveIndexIncrement();
 
+    void deleteAuditByDayBefore(int dayBefore);
 }

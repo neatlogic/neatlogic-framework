@@ -82,6 +82,13 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     @EntityField(name = "错误内容文件位置", type = ApiParamType.STRING)
     private String errorFilePath;
 
+    @EntityField(name = "参数内容文件路径ID", type = ApiParamType.LONG)
+    private Long paramPathId;
+    @EntityField(name = "结果内容文件位置ID", type = ApiParamType.LONG)
+    private Long resultPathId;
+    @EntityField(name = "错误内容文件位置ID", type = ApiParamType.LONG)
+    private Long errorPathId;
+
     @EntityField(name = "API所属模块", type = ApiParamType.STRING)
     private String moduleGroup;
     @EntityField(name = "模块group名称", type = ApiParamType.STRING)
@@ -405,5 +412,29 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setStatusList(List<String> statusList) {
         this.statusList = statusList;
+    }
+
+    public Long getParamPathId() {
+        return paramPathId;
+    }
+
+    public void setParamPathId(Long paramPathId) {
+        this.paramPathId = paramPathId;
+    }
+
+    public Long getResultPathId() {
+        return resultPathId;
+    }
+
+    public void setResultPathId(Long resultPathId) {
+        this.resultPathId = resultPathId;
+    }
+
+    public Long getErrorPathId() {
+        return errorPathId;
+    }
+
+    public void setErrorPathId(Long errorPathId) {
+        this.errorPathId = errorPathId;
     }
 }

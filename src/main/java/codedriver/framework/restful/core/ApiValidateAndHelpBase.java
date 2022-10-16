@@ -7,14 +7,13 @@ package codedriver.framework.restful.core;
 
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.auth.core.AuthAction;
 import codedriver.framework.auth.core.AuthActionChecker;
 import codedriver.framework.auth.core.AuthFactory;
-import codedriver.framework.common.config.Config;
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.IEnum;
 import codedriver.framework.common.util.IpUtil;
+import codedriver.framework.crossover.CrossoverServiceFactory;
 import codedriver.framework.dto.api.CacheControlVo;
 import codedriver.framework.dto.license.LicenseAuthModuleGroupVo;
 import codedriver.framework.dto.license.LicenseVo;
@@ -23,13 +22,17 @@ import codedriver.framework.exception.core.LicenseAuthFailedWithoutOperationType
 import codedriver.framework.exception.core.LicenseInvalidException;
 import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.*;
+import codedriver.framework.file.core.AuditType;
+import codedriver.framework.file.core.Event;
+import codedriver.framework.file.core.appender.Appender;
+import codedriver.framework.file.core.appender.AppenderManager;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.restful.annotation.*;
-import codedriver.framework.restful.audit.ApiAuditSaveThread;
 import codedriver.framework.restful.constvalue.OperationTypeEnum;
-import codedriver.framework.restful.dto.ApiAuditVo;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.util.Md5Util;
+import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
+import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,30 +54,30 @@ public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
 
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
-        ApiAuditVo audit = new ApiAuditVo();
-        audit.setToken(apiVo.getToken());
-        audit.setTenant(TenantContext.get().getTenantUuid());
-        audit.setStatus(StringUtils.isNotBlank(error) ? ApiAuditVo.FAILED : ApiAuditVo.SUCCEED);
-        audit.setServerId(Config.SCHEDULE_SERVER_ID);
-        audit.setStartTime(new Date(startTime));
-        audit.setEndTime(new Date(endTime));
-        audit.setTimeCost(endTime - startTime);
+
         UserContext userContext = UserContext.get();
-        audit.setUserUuid(userContext.getUserUuid());
         HttpServletRequest request = userContext.getRequest();
         String requestIp = IpUtil.getIpAddr(request);
-        audit.setIp(requestIp);
-        audit.setAuthtype(apiVo.getAuthtype());
-        if (paramObj != null) {
-            audit.setParam(paramObj.toJSONString());
-        }
-        if (error != null) {
-            audit.setError(error);
+        JSONObject data = new JSONObject();
+        data.put("token", apiVo.getToken());
+        data.put("authtype", apiVo.getAuthtype());
+        data.put("userUuid", userContext.getUserUuid());
+        data.put("ip", requestIp);
+        if (MapUtils.isNotEmpty(paramObj)) {
+            data.put("param", paramObj.toJSONString(SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
         }
         if (result != null) {
-            audit.setResult(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+            data.put("result", JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
         }
-        CachedThreadPool.execute(new ApiAuditSaveThread(audit));
+        if (StringUtils.isNotBlank(error)) {
+            data.put("error", error);
+        }
+        data.put("startTime", startTime);
+        data.put("endTime", endTime);
+        ApiAuditAppendPostProcessor appendPostProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPostProcessor.class);
+        ApiAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPreProcessor.class);
+        Appender appender = AppenderManager.getAppender(AuditType.API_AUDIT);
+        appender.doAppend(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor));
     }
 
     private static void escapeXss(JSONObject paramObj, String key) {

@@ -246,7 +246,6 @@
         where `hash` = #{value}
     </select>
 
-
     <update id="updateApiAccessCount">
         UPDATE `api_access_count`
         SET `count` = `count` + #{count}
@@ -257,6 +256,10 @@
         UPDATE `api`
         SET `need_audit` = 1 - `need_audit`
         WHERE `token` = #{value}
+    </update>
+
+    <update id="updateApiAuditPathArchiveIndexIncrement">
+        UPDATE `api_audit_path` SET `archive_index` = IFNULL(`archive_index`, 0) + 1
     </update>
 
     <insert id="insertApiAudit" parameterType="codedriver.framework.restful.dto.ApiAuditVo">
@@ -272,7 +275,10 @@
                                  `status`,
                                  `param_file_path`,
                                  `result_file_path`,
-                                 `error_file_path`)
+                                 `error_file_path`,
+                                 `param_path_id`,
+                                 `result_path_id`,
+                                 `error_path_id`)
         VALUES (#{id},
                 #{token},
                 #{userUuid},
@@ -285,7 +291,30 @@
                 #{status},
                 #{paramFilePath},
                 #{resultFilePath},
-                #{errorFilePath})
+                #{errorFilePath},
+                #{paramPathId},
+                #{resultPathId},
+                #{errorPathId})
+    </insert>
+
+    <insert id="insertApiAuditPath" parameterType="codedriver.framework.restful.dto.ApiAuditPathVo">
+        INSERT INTO `api_audit_path` (
+            `id`,
+            `path`,
+            `archive_index`,
+            `start_index`,
+            `offset`,
+            `server_id`
+        )
+        VALUES
+        (
+            #{id},
+            #{path},
+            #{archiveIndex},
+            #{startIndex},
+            #{offset},
+            #{serverId}
+        )
     </insert>
 
     <insert id="insertApiAccessCount">
@@ -303,5 +332,4 @@
         from api_audit
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
-
 </mapper>

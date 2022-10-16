@@ -60,7 +60,7 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
     @Override
     public void deleteData(String filePath) throws Exception {
         if (StringUtils.isNotBlank(filePath) && filePath.startsWith(LocalFileSystemHandler.NAME.toLowerCase() + ":")) {
-            File file = new File(Config.DATA_HOME() + filePath.substring(5));
+            File file = new File(filePath.substring(5));
             if (file.exists()) {
                 file.delete();
             }

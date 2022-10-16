@@ -46,9 +46,9 @@
         a.`end_time` AS endTime,
         a.`time_cost` AS timeCost,
         a.`status`,
-        a.`param_file_path` AS paramFilePath,
-        a.`result_file_path` AS resultFilePath,
-        a.`error_file_path` AS errorFilePath
+        a.`param_path_id` AS paramPathId,
+        a.`result_path_id` AS resultPathId,
+        a.`error_path_id` AS errorPathId
         <include refid="getApiAudit"></include>
         ORDER BY a.`start_time` DESC
         LIMIT #{startNum}, #{pageSize}
@@ -107,9 +107,9 @@
         `api_audit`.`end_time` as endTime,
         `api_audit`.`time_cost` as timeCost,
         `api_audit`.`status` as status,
-        `api_audit`.`param_file_path` as paramFilePath,
-        `api_audit`.`result_file_path` as resultFilePath,
-        `api_audit`.`error_file_path` as errorFilePath,
+        `api_audit`.`param_path_id` as paramPathId,
+        `api_audit`.`result_path_id` as resultPathId,
+        `api_audit`.`error_path_id` as errorPathId,
         `user`.`user_name` as userName
         from `api_audit` LEFT JOIN `user`
         on `api_audit`.`user_uuid` = `user`.`uuid`
@@ -193,13 +193,10 @@
         DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
         CONCAT(`api_audit`.`time_cost`,'') as timeCost,
         `api_audit`.`status` as status,
-        `api_audit`.`param_file_path` as paramFilePath,
-        `api_audit`.`result_file_path` as resultFilePath,
-        `api_audit`.`error_file_path` as errorFilePath,
+        `api_audit`.`param_path_id` as paramPathId,
+        `api_audit`.`result_path_id` as resultPathId,
+        `api_audit`.`error_path_id` as errorPathId,
         `user`.`user_name` as userName
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
         from `api_audit` LEFT JOIN `user`
         on `api_audit`.`user_uuid` = `user`.`uuid`
         <where>
@@ -273,9 +270,6 @@
                                  `end_time`,
                                  `time_cost`,
                                  `status`,
-                                 `param_file_path`,
-                                 `result_file_path`,
-                                 `error_file_path`,
                                  `param_path_id`,
                                  `result_path_id`,
                                  `error_path_id`)
@@ -289,9 +283,6 @@
                 #{endTime},
                 #{timeCost},
                 #{status},
-                #{paramFilePath},
-                #{resultFilePath},
-                #{errorFilePath},
                 #{paramPathId},
                 #{resultPathId},
                 #{errorPathId})

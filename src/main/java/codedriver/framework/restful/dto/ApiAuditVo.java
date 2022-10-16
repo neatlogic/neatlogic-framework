@@ -68,13 +68,6 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     @ExcelField(name = "结果")
     private Object result;
 
-    @EntityField(name = "参数内容hash", type = ApiParamType.STRING)
-    private String paramHash;
-    @EntityField(name = "错误内容hash", type = ApiParamType.STRING)
-    private String errorHash;
-    @EntityField(name = "结果内容hash", type = ApiParamType.STRING)
-    private String resultHash;
-
     @EntityField(name = "参数内容文件位置", type = ApiParamType.STRING)
     private String paramFilePath;
     @EntityField(name = "结果内容文件位置", type = ApiParamType.STRING)
@@ -251,39 +244,6 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getParamHash() {
-        if (StringUtils.isBlank(paramHash) && StringUtils.isNotBlank(param)) {
-            paramHash = DigestUtils.md5DigestAsHex(param.getBytes());
-        }
-        return paramHash;
-    }
-
-    public void setParamHash(String paramHash) {
-        this.paramHash = paramHash;
-    }
-
-    public String getErrorHash() {
-        if (StringUtils.isBlank(errorHash) && StringUtils.isNotBlank(error)) {
-            errorHash = DigestUtils.md5DigestAsHex(error.getBytes());
-        }
-        return errorHash;
-    }
-
-    public void setErrorHash(String errorHash) {
-        this.errorHash = errorHash;
-    }
-
-    public String getResultHash() {
-        if (StringUtils.isBlank(resultHash) && result != null) {
-            resultHash = DigestUtils.md5DigestAsHex(JSON.toJSONString(result).getBytes());
-        }
-        return resultHash;
-    }
-
-    public void setResultHash(String resultHash) {
-        this.resultHash = resultHash;
     }
 
     public String getModuleGroup() {

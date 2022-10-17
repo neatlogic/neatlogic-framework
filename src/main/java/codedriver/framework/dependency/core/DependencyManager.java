@@ -95,6 +95,42 @@ public class DependencyManager {
     }
 
     /**
+     * 删除引用关系
+     *
+     * @param fromType 被引用者（上游）类型
+     * @param to       引用者（下游）值（如：服务uuid）
+     * @return
+     */
+    public static int delete(IFromType fromType, Object to) {
+        int sum = 0;
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
+        if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
+            for (IDependencyHandler handler : dependencyHandlerList) {
+                sum = handler.delete(to);
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * 删除引用关系
+     *
+     * @param fromType 被引用者（上游）类型
+     * @param from     被引用者（上游）值
+     * @return
+     */
+    public static int deleteByFrom(IFromType fromType, Object from) {
+        int sum = 0;
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
+        if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
+            for (IDependencyHandler handler : dependencyHandlerList) {
+                sum = handler.deleteByFrom(from);
+            }
+        }
+        return sum;
+    }
+
+    /**
      * 查询引用列表
      *
      * @param fromType 被引用者（上游）类型

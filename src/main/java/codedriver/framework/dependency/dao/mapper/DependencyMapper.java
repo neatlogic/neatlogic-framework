@@ -62,5 +62,7 @@ public interface DependencyMapper {
 
     int deleteDependency(DependencyVo dependencyVo);
 
+    int deleteDependencyByFrom(DependencyVo dependencyVo);
+
     List<Map<Object, Integer>> getBatchDependencyCountByFrom(@Param("fromList") List<Object> fromList, @Param("type") String type);
 }

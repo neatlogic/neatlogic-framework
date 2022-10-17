@@ -101,4 +101,12 @@
           AND `to` = #{to}
     </delete>
 
+
+    <delete id="deleteDependencyByFrom" parameterType="codedriver.framework.dependency.dto.DependencyVo">
+        DELETE
+        FROM `dependency`
+        WHERE `type` = #{type}
+          AND `from` = #{from}
+    </delete>
+
 </mapper>

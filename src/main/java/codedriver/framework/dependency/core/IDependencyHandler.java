@@ -77,6 +77,14 @@ public interface IDependencyHandler {
     int delete(Object to);
 
     /**
+     * 删除引用关系
+     *
+     * @param from 引用者（下游）值（如：服务uuid）
+     * @return
+     */
+    int deleteByFrom(Object from);
+
+    /**
      * 查询引用列表数据
      *
      * @param from     被引用者（上游）值（如：服务时间窗口uuid）

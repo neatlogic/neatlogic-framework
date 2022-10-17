@@ -81,6 +81,18 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
     }
 
     /**
+     * 删除引用关系
+     *
+     * @param from 引用者（下游）值（如：服务uuid）
+     * @return
+     */
+    @Override
+    public int deleteByFrom(Object from) {
+        DependencyVo dependencyVo = new DependencyVo(getHandler(), from.toString(),"");
+        return dependencyMapper.deleteDependencyByFrom(dependencyVo);
+    }
+
+    /**
      * 查询引用列表数据
      *
      * @param from     被引用者（上游）值（如：服务时间窗口uuid）

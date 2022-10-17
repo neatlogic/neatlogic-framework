@@ -80,7 +80,7 @@ public interface IDependencyHandler {
      * 删除引用关系
      *
      * @param from 引用者（下游）值（如：服务uuid）
-     * @return
+     * @return 删除个数
      */
     int deleteByFrom(Object from);
 

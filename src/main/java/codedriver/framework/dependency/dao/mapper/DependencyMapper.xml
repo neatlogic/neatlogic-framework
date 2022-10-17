@@ -58,6 +58,12 @@
         WHERE `${callerField}` = #{caller}
     </delete>
 
+    <delete id="deleteDependencyByCallee">
+        DELETE
+        FROM `${tableName}`
+        WHERE `${calleeField}` = #{callee}
+    </delete>
+
     <select id="getDependencyCountByFrom" resultType="int">
         SELECT COUNT(1)
         FROM `dependency`

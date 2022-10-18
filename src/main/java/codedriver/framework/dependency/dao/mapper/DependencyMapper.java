@@ -54,6 +54,11 @@ public interface DependencyMapper {
             @Param("callerField") String callerField,
             @Param("caller") Object caller);
 
+    int deleteDependencyByCallee(
+            @Param("tableName") String tableName,
+            @Param("calleeField") String calleeField,
+            @Param("callee") Object callee);
+
     int getDependencyCountByFrom(@Param("from") Object from, @Param("type") String type);
 
     List<DependencyVo> getDependencyListByFrom(@Param("from") String from, @Param("type") String type, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
@@ -61,6 +66,8 @@ public interface DependencyMapper {
     int insertDependency(DependencyVo dependencyVo);
 
     int deleteDependency(DependencyVo dependencyVo);
+
+    int deleteDependencyByFrom(DependencyVo dependencyVo);
 
     List<Map<Object, Integer>> getBatchDependencyCountByFrom(@Param("fromList") List<Object> fromList, @Param("type") String type);
 }

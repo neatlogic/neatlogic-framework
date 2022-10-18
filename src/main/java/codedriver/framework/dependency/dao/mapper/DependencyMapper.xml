@@ -58,6 +58,12 @@
         WHERE `${callerField}` = #{caller}
     </delete>
 
+    <delete id="deleteDependencyByCallee">
+        DELETE
+        FROM `${tableName}`
+        WHERE `${calleeField}` = #{callee}
+    </delete>
+
     <select id="getDependencyCountByFrom" resultType="int">
         SELECT COUNT(1)
         FROM `dependency`
@@ -99,6 +105,14 @@
         FROM `dependency`
         WHERE `type` = #{type}
           AND `to` = #{to}
+    </delete>
+
+
+    <delete id="deleteDependencyByFrom" parameterType="codedriver.framework.dependency.dto.DependencyVo">
+        DELETE
+        FROM `dependency`
+        WHERE `type` = #{type}
+          AND `from` = #{from}
     </delete>
 
 </mapper>

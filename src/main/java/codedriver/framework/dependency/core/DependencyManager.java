@@ -95,6 +95,24 @@ public class DependencyManager {
     }
 
     /**
+     * 删除引用关系
+     *
+     * @param fromType 被引用者（上游）类型
+     * @param from     被引用者（上游）值
+     * @return 删除个数
+     */
+    public static int deleteByFrom(IFromType fromType, Object from) {
+        int sum = 0;
+        List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
+        if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
+            for (IDependencyHandler handler : dependencyHandlerList) {
+                sum += handler.deleteByFrom(from);
+            }
+        }
+        return sum;
+    }
+
+    /**
      * 查询引用列表
      *
      * @param fromType 被引用者（上游）类型

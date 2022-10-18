@@ -25,6 +25,12 @@ public class DependencyVo {
         this.type = type;
         this.to = to;
     }
+
+    public DependencyVo(String type, String from, String to) {
+        this.type = type;
+        this.from = from;
+        this.to = to;
+    }
     public DependencyVo(String from, String type, String to, JSONObject config) {
         this.from = from;
         this.type = type;

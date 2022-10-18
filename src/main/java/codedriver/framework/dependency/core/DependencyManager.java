@@ -106,7 +106,7 @@ public class DependencyManager {
         List<IDependencyHandler> dependencyHandlerList = DependencyHandlerFactory.getHandlerList(fromType);
         if (CollectionUtils.isNotEmpty(dependencyHandlerList)) {
             for (IDependencyHandler handler : dependencyHandlerList) {
-                sum = handler.deleteByFrom(from);
+                sum += handler.deleteByFrom(from);
             }
         }
         return sum;

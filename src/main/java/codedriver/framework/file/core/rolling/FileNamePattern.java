@@ -51,10 +51,8 @@ public class FileNamePattern {
         ConverterUtil.startConverters(this.headTokenConverter);
     }
 
-
     void parse() {
         try {
-            // http://jira.qos.ch/browse/LOGBACK-197
             // 为了进行解析，我们转义了“)”。请注意，原始模式被保留，因为它在状态消息中显示给用户。我们不希望转义版本泄露出去。
             String patternForParsing = escapeRightParantesis(pattern);
             Parser<Object> p = new Parser<Object>(patternForParsing, new AlmostAsIsEscapeUtil());
@@ -65,16 +63,6 @@ public class FileNamePattern {
             logger.error("无法分析模式“" + pattern + "”。");
             logger.error(sce.getMessage(), sce);
         }
-    }
-
-    public static void main(String[] args) {
-        FileNamePattern fileNamePattern = new FileNamePattern("aaaa.log.%i");
-        String regex = fileNamePattern.toRegex();
-        System.out.println("regex=" + regex);
-        String b = fileNamePattern.convertInt(6);
-        System.out.println("b=" + b);
-        IntegerTokenConverter itc = fileNamePattern.getIntegerTokenConverter();
-        System.out.println(itc);
     }
 
     String escapeRightParantesis(String in) {
@@ -111,24 +99,6 @@ public class FileNamePattern {
         return true;
     }
 
-
-//    public DateTokenConverter<Object> getPrimaryDateTokenConverter() {
-//        Converter<Object> p = headTokenConverter;
-//
-//        while (p != null) {
-//            if (p instanceof DateTokenConverter) {
-//                DateTokenConverter<Object> dtc = (DateTokenConverter<Object>) p;
-//                // only primary converters should be returned as
-//                if (dtc.isPrimary())
-//                    return dtc;
-//            }
-//
-//            p = p.getNext();
-//        }
-//
-//        return null;
-//    }
-
     public IntegerTokenConverter getIntegerTokenConverter() {
         Converter<Object> p = headTokenConverter;
 
@@ -141,30 +111,6 @@ public class FileNamePattern {
         }
         return null;
     }
-
-//    public boolean hasIntegerTokenCOnverter() {
-//        IntegerTokenConverter itc = getIntegerTokenConverter();
-//        return itc != null;
-//    }
-
-//    public String convertMultipleArguments(Object... objectList) {
-//        StringBuilder buf = new StringBuilder();
-//        Converter<Object> c = headTokenConverter;
-//        while (c != null) {
-//            if (c instanceof MonoTypedConverter) {
-//                MonoTypedConverter monoTyped = (MonoTypedConverter) c;
-//                for (Object o : objectList) {
-//                    if (monoTyped.isApplicable(o)) {
-//                        buf.append(c.convert(o));
-//                    }
-//                }
-//            } else {
-//                buf.append(c.convert(objectList));
-//            }
-//            c = c.getNext();
-//        }
-//        return buf.toString();
-//    }
 
     public String convert(Object o) {
         StringBuilder buf = new StringBuilder();
@@ -191,28 +137,6 @@ public class FileNamePattern {
     public String getPattern() {
         return pattern;
     }
-
-    /**
-     * Given date, convert this instance to a regular expression.
-     *
-     * Used to compute sub-regex when the pattern has both %d and %i, and the
-     * date is known.
-     */
-//    public String toRegexForFixedDate(Date date) {
-//        StringBuilder buf = new StringBuilder();
-//        Converter<Object> p = headTokenConverter;
-//        while (p != null) {
-//            if (p instanceof LiteralConverter) {
-//                buf.append(p.convert(null));
-//            } else if (p instanceof IntegerTokenConverter) {
-//                buf.append("(\\d{1,5})");
-//            } else if (p instanceof DateTokenConverter) {
-//                buf.append(p.convert(date));
-//            }
-//            p = p.getNext();
-//        }
-//        return buf.toString();
-//    }
 
     /**
      * 给定日期，将此实例转换为正则表达式

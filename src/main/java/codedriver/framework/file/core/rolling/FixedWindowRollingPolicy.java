@@ -52,11 +52,6 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
             throw new IllegalStateException(FNP_NOT_SET);
         }
 
-//        if (isParentPrudent()) {
-//            logger.error("FixedWindowRollingPolicy不支持谨慎模式。");
-//            throw new IllegalStateException("Prudent mode is not supported.");
-//        }
-
         if (getParentsRawFileProperty() == null) {
             logger.error("在使用此滚动策略之前，必须设置文件名属性。");
             throw new IllegalStateException("必须设置“文件”选项。");
@@ -77,11 +72,6 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
             throw new IllegalStateException("FileNamePattern [" + fileNamePattern.getPattern() + "] does not contain a valid IntegerToken");
         }
 
-//        if (compressionMode == CompressionMode.ZIP) {
-//            String zipEntryFileNamePatternStr = transformFileNamePatternFromInt2Date(fileNamePatternStr);
-//            zipEntryFileNamePattern = new FileNamePattern(zipEntryFileNamePatternStr, context);
-//        }
-//        compressor = new Compressor(compressionMode);
         super.start();
     }
 
@@ -92,12 +82,6 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
     protected int getMaxWindowSize() {
         return MAX_WINDOW_SIZE;
     }
-
-//    private String transformFileNamePatternFromInt2Date(String fileNamePatternStr) {
-//        String slashified = FileFilterUtil.slashify(fileNamePatternStr);
-//        String stemOfFileNamePattern = FileFilterUtil.afterLastSlash(slashified);
-//        return stemOfFileNamePattern.replace("%i", "%d{" + ZIP_ENTRY_DATE_PATTERN + "}");
-//    }
 
     public void rollover() throws RolloverFailure {
 

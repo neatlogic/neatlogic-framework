@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * 日志事件的内部表示形式。当做出记录的肯定决定时，将创建一个<code>LoggingEvent</code>实例。这个实例被传递给不同的logback经典组件。
  *
  * logback经典组件（如appenders）的编写者应该知道，某些LoggingEvent字段是延迟初始化的。因此，希望输出数据以供接收器稍后正确读取的附加程序必须在写出“惰性”字段之前对其进行初始化。
- * 有关确切列表，请参阅{@link#prepareForDeferredProcessing（）}方法。
+ * 有关确切列表，请参阅{@link#prepareForDeferredProcessing()}方法。
  */
 public class Event implements IEvent {
     /**
@@ -49,17 +49,6 @@ public class Event implements IEvent {
         this.postProcessor = postProcessor;
         this.timeStamp = timeStamp;
     }
-    public Event(String name, JSONObject data, Consumer preProcessor, Consumer postProcessor) {
-        this(name, System.currentTimeMillis(), data, preProcessor, postProcessor);
-    }
-
-    public Event(String name, String message) {
-        this.data = new JSONObject();
-        this.name = name;
-        this.message = message;
-
-        timeStamp = System.currentTimeMillis();
-    }
 
     @Override
     public String getName() {
@@ -74,16 +63,8 @@ public class Event implements IEvent {
         return threadName;
     }
 
-    public void setThreadName(String threadName) throws IllegalStateException {
-        if (this.threadName != null) {
-            throw new IllegalStateException("threadName has been already set");
-        }
-        this.threadName = threadName;
-    }
-
     /**
      * 应在序列化事件之前调用此方法。当使用异步或延迟日志记录时，也应该调用它。
-     * <p/>
      * <p/>
      * 注意，由于性能问题，此方法不提取调用方数据。呼叫者有责任提取呼叫者信息。
      */

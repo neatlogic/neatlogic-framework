@@ -38,7 +38,7 @@ public abstract class ResilientOutputStreamBase extends OutputStream {
         }
 
         try {
-//            System.out.println("A:" + os.getClass().getName());//java.io.BufferedOutputStream
+            //java.io.BufferedOutputStream
             os.write(b, off, len);
             postSuccessfulWrite();
         } catch (IOException e) {
@@ -85,12 +85,12 @@ public abstract class ResilientOutputStreamBase extends OutputStream {
     }
 
     public void postIOFailure(IOException e) {
-//        addStatusIfCountNotOverLimit(new ErrorStatus("IO failure while writing to " + getDescription(), this, e));
         presumedClean = false;
         if (recoveryCoordinator == null) {
             recoveryCoordinator = new RecoveryCoordinator();
         }
         logger.error("写入" + getDescription() + "时IO故障");
+        logger.error(e.getMessage(), e);
     }
 
     @Override
@@ -114,7 +114,8 @@ public abstract class ResilientOutputStreamBase extends OutputStream {
             os = openNewOutputStream();
             presumedClean = true;
         } catch (IOException e) {
-//            addStatusIfCountNotOverLimit(new ErrorStatus("Failed to open " + getDescription(), this, e));
+            logger.error("打开" + getDescription() + "时IO故障");
+            logger.error(e.getMessage(), e);
         }
     }
 

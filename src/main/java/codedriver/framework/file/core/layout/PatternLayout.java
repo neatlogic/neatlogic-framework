@@ -51,15 +51,6 @@ public class PatternLayout extends PatternLayoutBase<IEvent> {
         DEFAULT_CONVERTER_MAP.put("d", DateConverter.class.getName());
         DEFAULT_CONVERTER_MAP.put("date", DateConverter.class.getName());
         CONVERTER_CLASS_TO_KEY_MAP.put(DateConverter.class.getName(), "date");
-//
-//        DEFAULT_CONVERTER_MAP.put("t", ThreadConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("thread", ThreadConverter.class.getName());
-//        CONVERTER_CLASS_TO_KEY_MAP.put(ThreadConverter.class.getName(), "thread");
-//
-//        DEFAULT_CONVERTER_MAP.put("lo", LoggerConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("logger", LoggerConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("c", LoggerConverter.class.getName());
-//        CONVERTER_CLASS_TO_KEY_MAP.put(LoggerConverter.class.getName(), "logger");
 
         DEFAULT_CONVERTER_MAP.put("name", NameConverter.class.getName());
         CONVERTER_CLASS_TO_KEY_MAP.put(NameConverter.class.getName(), "name");
@@ -69,33 +60,7 @@ public class PatternLayout extends PatternLayoutBase<IEvent> {
         DEFAULT_CONVERTER_MAP.put("message", MessageConverter.class.getName());
         CONVERTER_CLASS_TO_KEY_MAP.put(MessageConverter.class.getName(), "message");
 
-//        DEFAULT_CONVERTER_MAP.put("nopex", NopThrowableInformationConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("nopexception", NopThrowableInformationConverter.class.getName());
-
-//        DEFAULT_CONVERTER_MAP.put("property", PropertyConverter.class.getName());
-
         DEFAULT_CONVERTER_MAP.put("n", LineSeparatorConverter.class.getName());
-
-//        DEFAULT_CONVERTER_MAP.put("black", BlackCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("red", RedCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("green", GreenCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("yellow", YellowCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("blue", BlueCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("magenta", MagentaCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("cyan", CyanCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("white", WhiteCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("gray", GrayCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldRed", BoldRedCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldGreen", BoldGreenCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldYellow", BoldYellowCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldBlue", BoldBlueCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldMagenta", BoldMagentaCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldCyan", BoldCyanCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("boldWhite", BoldWhiteCompositeConverter.class.getName());
-//        DEFAULT_CONVERTER_MAP.put("highlight", HighlightingCompositeConverter.class.getName());
-//
-//        DEFAULT_CONVERTER_MAP.put("lsn", LocalSequenceNumberConverter.class.getName());
-//        CONVERTER_CLASS_TO_KEY_MAP.put(LocalSequenceNumberConverter.class.getName(), "lsn");
 
     }
 

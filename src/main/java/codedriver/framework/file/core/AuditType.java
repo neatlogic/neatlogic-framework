@@ -6,7 +6,7 @@
 package codedriver.framework.file.core;
 
 public enum AuditType implements IAuditType {
-    API_AUDIT("apiaudit", true, 0, 256, "apiaudit.log", "1mb", "%name %d{yyyy-MM-dd HH:mm:ss.SSS} - %n%msg%n");
+    API_AUDIT("apiaudit", true, 0, 256, "apiaudit.log", "30mb", "%name %d{yyyy-MM-dd HH:mm:ss.SSS} - %n%msg%n");
     private String type;
     private boolean async;
     private int discardingThreshold;

@@ -86,7 +86,7 @@ public class ApiAuditCleaner extends AuditCleanerBase {
                         for (String path : pathList) {
                             try {
                                 if (!path.startsWith("file:")) {
-                                    path = path + "file:";
+                                    path = "file:" + path;
                                 }
                                 FileUtil.deleteData(path);
                             } catch (Exception e) {

@@ -14,20 +14,17 @@
 package codedriver.framework.file.core.pattern;
 
 /**
- * Implements this to perform post compile processing for a PatternLayout.
+ * 实现此功能以对PatternLayout执行编译后处理。
  *
- * For example, PatternLayout in the classic module should add a converter for
- * exception handling (otherwise exceptions would not be printed).
+ * 例如，经典模块中的PatternLayout应该添加一个用于异常处理的转换器（否则将不会打印异常）。
  *
- * @author Ceki Gulcu
  */
 public interface PostCompileProcessor<E> {
 
     /**
-     * Post compile processing of the converter chain.
+     * 转换器链的编译后处理。
      *
-     * @param head
-     *                The first converter in the chain
+     * @param head 链中的第一个转换器
      */
     void process(Converter<E> head);
 }

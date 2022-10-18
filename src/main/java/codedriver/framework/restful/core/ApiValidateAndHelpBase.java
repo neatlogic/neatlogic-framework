@@ -33,7 +33,6 @@ import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.util.Md5Util;
 import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -64,10 +63,10 @@ public class ApiValidateAndHelpBase {
         data.put("userUuid", userContext.getUserUuid());
         data.put("ip", requestIp);
         if (MapUtils.isNotEmpty(paramObj)) {
-            data.put("param", paramObj.toJSONString(SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
+            data.put("param", JSONObject.toJSONString(paramObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
         }
         if (result != null) {
-            data.put("result", JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            data.put("result", JSONObject.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
         }
         if (StringUtils.isNotBlank(error)) {
             data.put("error", error);
@@ -238,7 +237,7 @@ public class ApiValidateAndHelpBase {
             if (isDifferent) {
                 System.out.println("API:" + apiClass.getName());
                 System.out.println("返回参数：" + returnFormat.toJSONString());
-                System.out.println("接口配置：" + JSON.toJSONString(outputObj));
+                System.out.println("接口配置：" + JSONObject.toJSONString(outputObj));
                 System.out.println();
             }
         }

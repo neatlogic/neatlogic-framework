@@ -23,14 +23,6 @@ import java.net.URLConnection;
 
 public class FileUtil {
 
-    public static URL fileToURL(File file) {
-        try {
-            return file.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Unexpected exception on file [" + file + "]", e);
-        }
-    }
-
     /**
      * 创建文件的父目录。若在文件路径中并没有指定父目录，那个么什么也不做，这将正常返回。
      *
@@ -44,39 +36,6 @@ public class FileUtil {
         }
         parent.mkdirs();
         return parent.exists();
-    }
-
-    public String resourceAsString(ClassLoader classLoader, String resourceName) {
-        URL url = classLoader.getResource(resourceName);
-        if (url == null) {
-//            addError("Failed to find resource [" + resourceName + "]");
-            return null;
-        }
-
-        InputStreamReader isr = null;
-        try {
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setUseCaches(false);
-            isr = new InputStreamReader(urlConnection.getInputStream());
-            char[] buf = new char[128];
-            StringBuilder builder = new StringBuilder();
-            int count = -1;
-            while ((count = isr.read(buf, 0, buf.length)) != -1) {
-                builder.append(buf, 0, count);
-            }
-            return builder.toString();
-        } catch (IOException e) {
-//            addError("Failed to open " + resourceName, e);
-        } finally {
-            if (isr != null) {
-                try {
-                    isr.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
-        return null;
     }
 
     static final int BUF_SIZE = 32 * 1024;
@@ -100,7 +59,6 @@ public class FileUtil {
             bos = null;
         } catch (IOException ioe) {
             String msg = "Failed to copy [" + src + "] to [" + destination + "]";
-//            addError(msg, ioe);
             throw new RolloverFailure(msg);
         } finally {
             if (bis != null) {

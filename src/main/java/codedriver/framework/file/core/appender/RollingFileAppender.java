@@ -46,17 +46,6 @@ public class RollingFileAppender<E> extends FileAppender<E> {
             return;
         }
 
-//        if (isPrudent()) {
-//            if (rawFileProperty() != null) {
-//                logger.warn("由于谨慎模式，将“File”属性设置为null");
-//                setFile(null);
-//            }
-//            if (rollingPolicy.getCompressionMode() != CompressionMode.NONE) {
-//                logger.error("谨慎模式下不支持压缩。正在中止");
-//                return;
-//            }
-//        }
-
         currentlyActiveFile = new File(getFile());
         super.start();
     }
@@ -152,7 +141,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
         // 滚动检查必须在实际写入之前进行。这是时间驱动触发器的唯一正确行为。
         // 我们需要在triggeringPolicy上同步，以便一次只发生一次滚动
         synchronized (triggeringPolicy) {
-//            System.out.println("triggeringPolicy:" + triggeringPolicy.getClass().getName());//ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
+            //ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
             if (triggeringPolicy.isTriggeringEvent(currentlyActiveFile, e)) {
                 rollover();
                 rollover = true;

@@ -1,7 +1,7 @@
 package codedriver.framework.file.core.util;
 
 /**
- * Allows masking of interrupt flag if previously the flag is already set. Does nothing otherwise.
+ * 如果之前已经设置了中断标志，则允许屏蔽中断标志。不做其他事情。
  *
  * Typical use:
  *
@@ -19,8 +19,6 @@ package codedriver.framework.file.core.util;
  *   interruptUtil.unmaskInterruptFlag();
  * }
  * </pre>
- * @author Ceki Gulcu
- * @since 1.2.2
  */
 public class InterruptUtil {
 

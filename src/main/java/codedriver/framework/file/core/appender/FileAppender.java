@@ -32,8 +32,6 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
      */
     protected String fileName = null;
 
-//    private boolean prudent = false;
-
     private FileSize bufferSize = new FileSize(DEFAULT_BUFFER_SIZE);
 
     /**
@@ -65,12 +63,6 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     public void start() {
         int errors = 0;
         if (getFile() != null) {
-
-//            if (prudent) {
-//                if (!isAppend()) {
-//                    setAppend(true);
-//                }
-//            }
 
             // 仅当无冲突时才应打开文件
             try {
@@ -117,19 +109,6 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
         }
     }
 
-//    public boolean isPrudent() {
-//        return prudent;
-//    }
-//
-//    /**
-//     * 当谨慎设置为true时，来自多个JVM的文件追加器可以安全地写入同一个文件。
-//     *
-//     * @param prudent
-//     */
-//    public void setPrudent(boolean prudent) {
-//        this.prudent = prudent;
-//    }
-
     public void setAppend(boolean append) {
         this.append = append;
     }
@@ -137,47 +116,4 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
     public void setBufferSize(FileSize bufferSize) {
         this.bufferSize = bufferSize;
     }
-
-//    private void safeWrite(E event) throws IOException {
-//        ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) getOutputStream();
-//        FileChannel fileChannel = resilientFOS.getChannel();
-//        if (fileChannel == null) {
-//            return;
-//        }
-//
-//        // 清除任何当前中断
-//        boolean interrupted = Thread.interrupted();
-//
-//        FileLock fileLock = null;
-//        try {
-//            fileLock = fileChannel.lock();
-//            long position = fileChannel.position();
-//            long size = fileChannel.size();
-//            if (size != position) {
-//                fileChannel.position(size);
-//            }
-//            super.writeOut(event);
-//        } catch (IOException e) {
-//            // 主要用于捕获FileLockInterruptionExceptions
-//            resilientFOS.postIOFailure(e);
-//        } finally {
-//            if (fileLock != null && fileLock.isValid()) {
-//                fileLock.release();
-//            }
-//
-//            // 如果在中断状态下启动，请重新中断
-//            if (interrupted) {
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-//    }
-
-//    @Override
-//    protected void writeOut(E event) throws IOException {
-//        if (prudent) {
-//            safeWrite(event);
-//        } else {
-//            super.writeOut(event);
-//        }
-//    }
 }

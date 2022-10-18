@@ -20,9 +20,8 @@ import java.util.concurrent.BlockingQueue;
  *
  * @param <E>
  */
-public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// implements AppenderAttachable<E>
+public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {
     private Logger logger = LoggerFactory.getLogger(AsyncAppenderBase.class);
-//    AppenderAttachableImpl<E> aai = new AppenderAttachableImpl<E>();
     private Appender appender;
     BlockingQueue<E> blockingQueue;
 
@@ -34,7 +33,7 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// impl
 
     static final int UNDEFINED = -1;
     /**
-     *
+     * 丢弃阈值
      */
     int discardingThreshold = UNDEFINED;
     boolean neverBlock = false;
@@ -120,10 +119,6 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// impl
             interruptUtil.unmaskInterruptFlag();
         }
     }
-
-
-
-
 
     @Override
     protected void append(E eventObject) {
@@ -222,39 +217,6 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// impl
     public void setAppender(Appender appender) {
         this.appender = appender;
     }
-    //    public void addAppender(Appender<E> newAppender) {
-//        if (appenderCount == 0) {
-//            appenderCount++;
-//            aai.addAppender(newAppender);
-//        } else {
-//            logger.warn("只能有一个appender附加到AsyncAppender。");
-//            logger.warn("忽略名为[" + newAppender.getName() + "]的附加程序");
-//        }
-//    }
-//
-//    public Iterator<Appender<E>> iteratorForAppenders() {
-//        return aai.iteratorForAppenders();
-//    }
-//
-//    public Appender<E> getAppender(String name) {
-//        return aai.getAppender(name);
-//    }
-//
-//    public boolean isAttached(Appender<E> eAppender) {
-//        return aai.isAttached(eAppender);
-//    }
-//
-//    public void detachAndStopAllAppenders() {
-//        aai.detachAndStopAllAppenders();
-//    }
-//
-//    public boolean detachAppender(Appender<E> eAppender) {
-//        return aai.detachAppender(eAppender);
-//    }
-//
-//    public boolean detachAppender(String name) {
-//        return aai.detachAppender(name);
-//    }
 
     class Worker extends Thread {
 
@@ -266,14 +228,12 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// impl
         public void run() {
             TenantContext.init(tenantUuid);
             AsyncAppenderBase<E> parent = AsyncAppenderBase.this;
-//            AppenderAttachableImpl<E> aai = parent.aai;
 
             // 在父级启动时循环
             while (parent.isStarted()) {
                 try {
                     E e = parent.blockingQueue.take();
                     appender.doAppend(e);
-//                    aai.appendLoopOnAppenders(e);
                 } catch (InterruptedException ie) {
                     break;
                 }
@@ -282,11 +242,8 @@ public class AsyncAppenderBase<E> extends UnsynchronizedAppenderBase<E> {// impl
             logger.info("工作线程将在退出之前刷新剩余事件。");
             for (E e : parent.blockingQueue) {
                 appender.doAppend(e);
-//                aai.appendLoopOnAppenders(e);
                 parent.blockingQueue.remove(e);
             }
-
-//            aai.detachAndStopAllAppenders();
         }
     }
 }

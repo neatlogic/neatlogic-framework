@@ -89,8 +89,6 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
     protected void closeOutputStream() {
         if (this.outputStream != null) {
             try {
-                // 在关闭之前，我们必须输出布局的页脚
-//                encoderClose();
                 this.outputStream.close();
                 this.outputStream = null;
             } catch (IOException e) {
@@ -98,19 +96,6 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
             }
         }
     }
-
-//    void encoderClose() {
-//        if (encoder != null && this.outputStream != null) {
-//            try {
-//                byte[] footer = encoder.footerBytes();
-//                writeBytes(footer);
-//            } catch (IOException ioe) {
-//                this.started = false;
-//                logger.error("无法为名为[" + name + "]的追加器写入页脚。");
-//                logger.error(ioe.getMessage(), ioe);
-//            }
-//        }
-//    }
 
     /**
      * 设置一个已打开的输出流。
@@ -125,29 +110,10 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
                 logger.warn("尚未设置编码器。无法调用其init方法。");
                 return;
             }
-
-//            encoderInit();
         } finally {
             lock.unlock();
         }
     }
-
-//    void encoderInit() {
-//        if (encoder != null && this.outputStream != null) {
-//            try {
-//                byte[] header = encoder.headerBytes();
-//                writeBytes(header);
-//            } catch (IOException ioe) {
-//                this.started = false;
-//                logger.error("无法初始化名为[" + name + "]的追加器的编码器。");
-//                logger.error(ioe.getMessage(), ioe);
-//            }
-//        }
-//    }
-//    protected void writeOut(E event) throws IOException {
-//        byte[] byteArray = this.encoder.encode(event);
-//        writeBytes(byteArray);
-//    }
 
     private void writeBytes(byte[] byteArray) throws IOException {
 //        System.out.println(5);
@@ -156,7 +122,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
 
         lock.lock();
         try {
-//            System.out.println("out:" + this.outputStream.getClass().getName());//ch.qos.logback.core.recovery.ResilientFileOutputStream
+            //ch.qos.logback.core.recovery.ResilientFileOutputStream
             this.outputStream.write(byteArray);
             this.outputStream.flush();
         } finally {

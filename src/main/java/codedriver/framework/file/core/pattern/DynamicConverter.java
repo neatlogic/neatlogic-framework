@@ -23,8 +23,6 @@ import java.util.List;
  */
 abstract public class DynamicConverter<E> extends FormattingConverter<E> implements LifeCycle {
 
-//    ContextAwareBase cab = new ContextAwareBase(this);
-
     // Contains a list of option Strings.
     private List<String> optionList;
 
@@ -72,40 +70,4 @@ abstract public class DynamicConverter<E> extends FormattingConverter<E> impleme
     protected List<String> getOptionList() {
         return optionList;
     }
-
-//    public void setContext(Context context) {
-//        cab.setContext(context);
-//    }
-//
-//    public Context getContext() {
-//        return cab.getContext();
-//    }
-//
-//    public void addStatus(Status status) {
-//        cab.addStatus(status);
-//    }
-//
-//    public void addInfo(String msg) {
-//        cab.addInfo(msg);
-//    }
-//
-//    public void addInfo(String msg, Throwable ex) {
-//        cab.addInfo(msg, ex);
-//    }
-//
-//    public void addWarn(String msg) {
-//        cab.addWarn(msg);
-//    }
-//
-//    public void addWarn(String msg, Throwable ex) {
-//        cab.addWarn(msg, ex);
-//    }
-//
-//    public void addError(String msg) {
-//        cab.addError(msg);
-//    }
-//
-//    public void addError(String msg, Throwable ex) {
-//        cab.addError(msg, ex);
-//    }
 }

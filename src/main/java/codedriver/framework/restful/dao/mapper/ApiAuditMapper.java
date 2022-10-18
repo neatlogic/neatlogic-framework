@@ -40,6 +40,14 @@ public interface ApiAuditMapper {
 
     String getAuditFileByHash(String hash);
 
+    ApiAuditVo getLastApiAuditByDayBefore(int dayBefore);
+
+    List<ApiAuditPathVo> getDistinctPathAndArchiveIndexByIdBefore(Long id);
+
+    ApiAuditPathVo getApiAuditPathById(Long id);
+
+    List<ApiAuditPathVo> getApiAuditPathListByIdList(List<Long> idList);
+
     int insertApiAudit(ApiAuditVo apiAudit);
 
     int insertApiAuditPath(ApiAuditPathVo apiAuditPath);
@@ -69,4 +77,6 @@ public interface ApiAuditMapper {
     int updateApiAuditPathArchiveIndexIncrement();
 
     void deleteAuditByDayBefore(int dayBefore);
+
+    void deleteApiAuditPathByIdBefore(Long id);
 }

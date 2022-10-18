@@ -243,6 +243,63 @@
         where `hash` = #{value}
     </select>
 
+    <select id="getLastApiAuditByDayBefore" parameterType="java.lang.Integer" resultType="codedriver.framework.restful.dto.ApiAuditVo">
+        SELECT
+            `id`,
+            `token`,
+            `user_uuid` AS userUuid,
+            `authtype`,
+            `server_id` AS serverId,
+            `ip`,
+            `start_time` AS startTime,
+            `end_time` AS endTime,
+            `time_cost` AS timeCost,
+            `status`,
+            `param_path_id` AS paramPathId,
+            `result_path_id` AS resultPathId,
+            `error_path_id` AS errorPathId
+        FROM `api_audit`
+        WHERE (`param_path_id` IS NOT NULL OR `result_path_id` IS NOT NULL OR `error_path_id` IS NOT NULL)
+          AND `end_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+            LIMIT 1
+    </select>
+
+    <select id="getDistinctPathAndArchiveIndexByIdBefore" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
+        SELECT
+            DISTINCT
+            `path`,
+            `archive_index` AS archiveIndex
+        FROM `api_audit_path`
+        WHERE `id` &lt; #{id}
+    </select>
+
+    <select id="getApiAuditPathById" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
+        SELECT
+            `id`,
+            `path`,
+            `archive_index` AS archiveIndex,
+            `start_index` AS startIndex,
+            `offset`,
+            `server_id` AS serverId
+        FROM `api_audit_path`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getApiAuditPathListByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
+        SELECT
+            `id`,
+            `path`,
+            `archive_index` AS archiveIndex,
+            `start_index` AS startIndex,
+            `offset`,
+            `server_id` AS serverId
+        FROM `api_audit_path`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <update id="updateApiAccessCount">
         UPDATE `api_access_count`
         SET `count` = `count` + #{count}
@@ -322,5 +379,9 @@
         delete
         from api_audit
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
+
+    <delete id="deleteApiAuditPathByIdBefore" parameterType="java.lang.Long">
+        DELETE FROM `api_audit_path` WHERE `id` &lt; #{value}
     </delete>
 </mapper>

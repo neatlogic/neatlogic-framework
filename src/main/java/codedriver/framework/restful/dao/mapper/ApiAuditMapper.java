@@ -24,8 +24,6 @@ public interface ApiAuditMapper {
 
     List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
 
-    String getApiAuditDetailByHash(String hash);
-
     List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
     String getApiAccessCountLockByToken(String token);

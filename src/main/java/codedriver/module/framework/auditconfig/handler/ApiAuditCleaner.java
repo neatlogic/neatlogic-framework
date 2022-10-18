@@ -69,7 +69,7 @@ public class ApiAuditCleaner extends AuditCleanerBase {
                     List<String> pathList = new ArrayList<>();
                     for (ApiAuditPathVo auditPathVo : apiAuditPathList) {
                         String path = auditPathVo.getPath();
-                        Integer archiveIndex = apiAuditPathVo.getArchiveIndex();
+                        Integer archiveIndex = auditPathVo.getArchiveIndex();
                         if (archiveIndex != null) {
                             path = path + "." + archiveIndex;
                         }

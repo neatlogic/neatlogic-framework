@@ -67,13 +67,6 @@
         GROUP BY `token`
     </select>
 
-    <select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String"
-            useCache="false">
-        SELECT `content`
-        FROM `api_audit_detail`
-        WHERE hash = #{value}
-    </select>
-
     <select id="getApiAccessCountByTokenList" parameterType="java.lang.String"
             resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
         SELECT

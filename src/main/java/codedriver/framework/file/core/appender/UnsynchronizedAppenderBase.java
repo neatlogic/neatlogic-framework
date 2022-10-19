@@ -31,7 +31,7 @@ public abstract class UnsynchronizedAppenderBase<E> implements Appender<E> {
 
     public void doAppend(E eventObject) {
 //        System.out.println(1);
-        // 警告：保护检查必须是doAppend（）方法中的第一条语句。防止再次进入。
+        // 警告：保护检查必须是doAppend()方法中的第一条语句。防止再次进入。
         if (Boolean.TRUE.equals(guard.get())) {
             return;
         }

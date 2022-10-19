@@ -6,6 +6,7 @@
 package codedriver.framework.file.core.appender;
 
 import ch.qos.logback.core.util.FileSize;
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.file.core.IAuditType;
@@ -13,13 +14,33 @@ import codedriver.framework.file.core.IEvent;
 import codedriver.framework.file.core.encoder.PatternLayoutEncoder;
 import codedriver.framework.file.core.rolling.FixedWindowRollingPolicy;
 import codedriver.framework.file.core.rolling.SizeBasedTriggeringPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 public class AppenderManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppenderManager.class);
+
+    private static final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            1, 3,
+            60L, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.DiscardPolicy());
+    static {
+        // 如果阻塞队列中没有任务，线程池中活跃线程数降为0
+        threadPool.allowCoreThreadTimeOut(true);
+    }
     private static ConcurrentMap<String, Appender<IEvent>> appenderCache = new ConcurrentHashMap<>();
+
+    public static void execute(CodeDriverThread command) {
+        try {
+            threadPool.execute(command);
+        } catch (RejectedExecutionException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
 
     public static Appender<IEvent> getAppender(IAuditType auditType) {
         String tenantUuid = TenantContext.get().getTenantUuid();
@@ -30,9 +51,6 @@ public class AppenderManager {
                 appender = appenderCache.get(id);
                 if (appender == null) {
                     appender = new AppenderManager.Builder(auditType.getType(), auditType.getFileName(), auditType.getMessagePattern())
-                            .withAsync(auditType.getAsync())
-                            .withDiscardingThreshold(auditType.getDiscardingThreshold())
-                            .withQueueSize(auditType.getQueueSize())
                             .withMaxFileSize(auditType.getMaxFileSize())
                             .build();
                     appenderCache.put(id, appender);
@@ -44,9 +62,6 @@ public class AppenderManager {
 
     private static class Builder {
         private String auditType;
-        private boolean async;
-        private int discardingThreshold;
-        private int queueSize;
         private String fileName;
         private String maxFileSize;
         private String messagePattern;
@@ -55,21 +70,6 @@ public class AppenderManager {
             this.auditType = auditType;
             this.fileName = fileName;
             this.messagePattern = messagePattern;
-        }
-
-        public Builder withAsync(boolean async) {
-            this.async = async;
-            return this;
-        }
-
-        public Builder withDiscardingThreshold(int discardingThreshold) {
-            this.discardingThreshold = discardingThreshold;
-            return this;
-        }
-
-        public Builder withQueueSize(int queueSize) {
-            this.queueSize = queueSize;
-            return this;
         }
 
         public Builder withMaxFileSize(String maxFileSize) {
@@ -100,17 +100,7 @@ public class AppenderManager {
             sizeBasedTriggeringPolicy.start();
             fixedWindowRollingPolicy.start();
             rollingFileAppender.start();
-
-            if (async) {
-                AsyncAppender asyncAppender = new AsyncAppender();
-                asyncAppender.setDiscardingThreshold(discardingThreshold);
-                asyncAppender.setQueueSize(queueSize);
-                asyncAppender.setAppender(rollingFileAppender);
-                asyncAppender.start();
-                return asyncAppender;
-            } else {
-                return rollingFileAppender;
-            }
+            return rollingFileAppender;
         }
     }
 }

@@ -115,6 +115,11 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
         }
     }
 
+    protected void writeOut(E event) throws IOException {
+        byte[] byteArray = this.encoder.encode(event);//PatternLayoutEncoder
+        writeBytes(byteArray);
+    }
+
     private void writeBytes(byte[] byteArray) throws IOException {
 //        System.out.println(5);
         if(byteArray == null || byteArray.length == 0)
@@ -145,11 +150,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
                 event.preProcessor();
                 event.prepareForDeferredProcessing();
             }
-            // 同步可防止在写入时关闭OutputStream。它还可以防止多个线程进入同一转换器。转换器假定它们位于同步块中。
-            // lock.lock();
-
-            byte[] byteArray = this.encoder.encode(e);//PatternLayoutEncoder
-            writeBytes(byteArray);
+            writeOut(e);
 
         } catch (IOException ioe) {
             // 一旦发生异常，立即转到非启动状态。

@@ -75,8 +75,7 @@ public class ApiValidateAndHelpBase {
         data.put("endTime", endTime);
         ApiAuditAppendPostProcessor appendPostProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPostProcessor.class);
         ApiAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPreProcessor.class);
-        Appender appender = AppenderManager.getAppender(AuditType.API_AUDIT);
-        appender.doAppend(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor));
+        AppenderManager.execute(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor, AuditType.API_AUDIT));
     }
 
     private static void escapeXss(JSONObject paramObj, String key) {

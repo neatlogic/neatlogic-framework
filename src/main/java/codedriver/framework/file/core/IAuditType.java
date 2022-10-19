@@ -16,24 +16,6 @@ public interface IAuditType {
     String getType();
 
     /**
-     * 是否异步
-     * @return
-     */
-    boolean getAsync();
-
-    /**
-     * 丢弃阈值
-     * @return
-     */
-    int getDiscardingThreshold();
-
-    /**
-     * 阻塞队列大小
-     * @return
-     */
-    int getQueueSize();
-
-    /**
      * 文件名
      * @return
      */

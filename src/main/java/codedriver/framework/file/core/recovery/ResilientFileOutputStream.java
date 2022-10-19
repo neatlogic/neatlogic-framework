@@ -31,6 +31,13 @@ public class ResilientFileOutputStream extends ResilientOutputStreamBase {
         this.presumedClean = true;
     }
 
+    public FileChannel getChannel() {
+        if (os == null) {
+            return null;
+        }
+        return fos.getChannel();
+    }
+
     @Override
     OutputStream openNewOutputStream() throws IOException {
         // see LOGBACK-765

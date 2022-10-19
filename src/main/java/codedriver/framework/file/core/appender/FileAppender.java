@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 /**
  * FileAppender将日志事件附加到文件。
@@ -115,5 +117,44 @@ public class FileAppender<E> extends OutputStreamAppender<E> {
 
     public void setBufferSize(FileSize bufferSize) {
         this.bufferSize = bufferSize;
+    }
+
+    private void safeWrite(E event) throws IOException {
+        ResilientFileOutputStream resilientFOS = (ResilientFileOutputStream) getOutputStream();
+        FileChannel fileChannel = resilientFOS.getChannel();
+        if (fileChannel == null) {
+            return;
+        }
+
+        // 清除任何当前中断
+        boolean interrupted = Thread.interrupted();
+
+        FileLock fileLock = null;
+        try {
+            fileLock = fileChannel.lock();
+            long position = fileChannel.position();
+            long size = fileChannel.size();
+            if (size != position) {
+                fileChannel.position(size);
+            }
+            super.writeOut(event);
+        } catch (IOException e) {
+            // 主要用于捕获FileLockInterruptionExceptions
+            resilientFOS.postIOFailure(e);
+        } finally {
+            if (fileLock != null && fileLock.isValid()) {
+                fileLock.release();
+            }
+
+            // 如果在中断状态下启动，请重新中断
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @Override
+    protected void writeOut(E event) throws IOException {
+        safeWrite(event);
     }
 }

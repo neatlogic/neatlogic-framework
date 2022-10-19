@@ -5,6 +5,9 @@
 
 package codedriver.framework.file.core;
 
+import codedriver.framework.asynchronization.thread.CodeDriverThread;
+import codedriver.framework.file.core.appender.Appender;
+import codedriver.framework.file.core.appender.AppenderManager;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.function.Consumer;
@@ -15,7 +18,7 @@ import java.util.function.Consumer;
  * logback经典组件（如appenders）的编写者应该知道，某些LoggingEvent字段是延迟初始化的。因此，希望输出数据以供接收器稍后正确读取的附加程序必须在写出“惰性”字段之前对其进行初始化。
  * 有关确切列表，请参阅{@link#prepareForDeferredProcessing()}方法。
  */
-public class Event implements IEvent {
+public class Event extends CodeDriverThread implements IEvent {
     /**
      * 生成此日志记录事件的线程的名称。
      */
@@ -42,17 +45,28 @@ public class Event implements IEvent {
 
     private boolean rollover = false;
 
-    public Event(String name, long timeStamp, JSONObject data, Consumer preProcessor, Consumer postProcessor) {
+    private IAuditType auditType;
+
+    public Event(String name, long timeStamp, JSONObject data, Consumer preProcessor, Consumer postProcessor, IAuditType auditType) {
+        super("Event");
         this.name = name;
         this.data = data;
         this.preProcessor = preProcessor;
         this.postProcessor = postProcessor;
         this.timeStamp = timeStamp;
+        this.auditType = auditType;
+        this.threadName = (Thread.currentThread()).getName();
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    protected void execute() {
+        Appender<IEvent> appender = AppenderManager.getAppender(this.auditType);
+        appender.doAppend(this);
     }
 
     @Override

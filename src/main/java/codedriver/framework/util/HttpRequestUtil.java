@@ -545,7 +545,13 @@ public class HttpRequestUtil {
                     throw new ApiRuntimeException(writer.toString());
                 }
             } catch (ApiRuntimeException e) {
-                this.errorMsg = e.getMessage();
+                String message = e.getMessage();
+                try {
+                    JSONObject object = JSONObject.parseObject(message);
+                    message = object.getString("Message");
+                } catch (Exception ignored) {
+                }
+                this.errorMsg = message;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 this.error = ExceptionUtils.getStackTrace(e);

@@ -546,7 +546,7 @@ public class HttpRequestUtil {
                 }
             } catch (ApiRuntimeException e) {
                 this.error = e.getMessage();
-                // 以下适用于内部系统之间的接口调用
+                // 以下针对内部系统之间的接口调用
                 String message = e.getMessage();
                 try {
                     JSONObject object = JSONObject.parseObject(message);

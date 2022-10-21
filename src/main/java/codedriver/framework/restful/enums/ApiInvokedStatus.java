@@ -12,7 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.List;
 
 public enum ApiInvokedStatus implements IEnum {
-    SUCCEED("succeed", "成功"), FAILED("failed", "失败"), IGNORED("ignored", "已忽略");
+    SUCCEED("succeed", "成功"), FAILED("failed", "失败");
     private final String value;
     private final String text;
 

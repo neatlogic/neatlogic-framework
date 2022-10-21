@@ -111,6 +111,17 @@ public abstract class CustomTableDependencyHandlerBase implements IDependencyHan
     }
 
     /**
+     * 删除引用关系
+     *
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
+     * @return 删除个数
+     */
+    @Override
+    public int deleteByFrom(Object from) {
+        return dependencyMapper.deleteDependencyByCallee(getTableName(), getFromField(), from);
+    }
+
+    /**
      * 查询引用列表数据
      *
      * @param from     被引用者（上游）值（如：服务时间窗口uuid）

@@ -247,7 +247,7 @@ public class HttpRequestUtil {
     }
 
     public static void resetResponse(HttpServletResponse response) {
-        if(response != null) {
+        if (response != null) {
             int responseStatus = response.getStatus();
             Map<String, String> headerMap = new HashMap<>();
             Collection<String> headerNames = response.getHeaderNames();
@@ -487,12 +487,14 @@ public class HttpRequestUtil {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             this.error = ExceptionUtils.getStackTrace(ex);
+            this.errorMsg = ex.getMessage();
         }
         return null;
     }
 
     private String result;
     private String error;
+    private String errorMsg; // 异常的简略信息
     private int responseCode;
     //用于将请求的response的header 设置到当前上下文response中
     private List<String> responseHeaderList;
@@ -544,9 +546,18 @@ public class HttpRequestUtil {
                 }
             } catch (ApiRuntimeException e) {
                 this.error = e.getMessage();
+                // 以下针对内部系统之间的接口调用
+                String message = e.getMessage();
+                try {
+                    JSONObject object = JSONObject.parseObject(message);
+                    message = object.getString("Message");
+                } catch (Exception ignored) {
+                }
+                this.errorMsg = message;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 this.error = ExceptionUtils.getStackTrace(e);
+                this.errorMsg = e.getMessage();
             } finally {
                 connection.disconnect();
                 if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
@@ -564,6 +575,10 @@ public class HttpRequestUtil {
 
     public String getError() {
         return error;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
     }
 
     public HttpRequestUtil setResponseHeaders(List<String> responseHeaderList) {

@@ -30,14 +30,11 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
     int maxIndex;
     int minIndex;
     RenameUtil util = new RenameUtil();
-//    Compressor compressor;
-
-    public static final String ZIP_ENTRY_DATE_PATTERN = "yyyy-MM-dd_HHmm";
 
     /**
      * 窗户太大，比如说20多，几乎总是个坏主意。
      */
-    private static int MAX_WINDOW_SIZE = 20;
+    private static int MAX_WINDOW_SIZE = 4;
 
     public FixedWindowRollingPolicy() {
         minIndex = 1;
@@ -81,6 +78,20 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
      */
     protected int getMaxWindowSize() {
         return MAX_WINDOW_SIZE;
+    }
+
+    public int rollover(int currentIndex) throws RolloverFailure {
+        int nextIndex;
+        if (currentIndex < maxIndex) {
+            nextIndex = currentIndex + 1;
+        } else {
+            nextIndex = minIndex;
+        }
+        File file = new File(getParentsRawFileProperty() + "." + nextIndex);
+        if (file.exists()) {
+            file.delete();
+        }
+        return nextIndex;
     }
 
     public void rollover() throws RolloverFailure {

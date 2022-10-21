@@ -8,11 +8,16 @@ package codedriver.framework.file.core.appender;
 import ch.qos.logback.core.rolling.RolloverFailure;
 import codedriver.framework.file.core.IEvent;
 import codedriver.framework.file.core.rolling.*;
+import codedriver.framework.file.core.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class RollingFileAppender<E> extends FileAppender<E> {
     private Logger logger = LoggerFactory.getLogger(RollingFileAppender.class);
@@ -46,8 +51,51 @@ public class RollingFileAppender<E> extends FileAppender<E> {
             return;
         }
 
-        currentlyActiveFile = new File(getFile());
+        try {
+            // currentlyActiveFile如果存在，正常应该是软连接文件
+            currentlyActiveFile = new File(getFile());
+            Path linkPath = currentlyActiveFile.toPath();
+            if (currentlyActiveFile.exists() && Files.isSymbolicLink(linkPath)) {
+                Path targetPath = Files.readSymbolicLink(linkPath);
+                if (targetPath != null) {
+                    File targetFile = targetPath.toFile();
+                    if (!targetFile.exists()) {
+                        // 如果软链接的目标文件被删除，则新建一个文件
+                        targetFile.createNewFile();
+                    }
+                }
+            } else {
+                // 如果currentlyActiveFile文件不存在，则找到当前目标文件，并创建软链接
+                   File targetFile = getCurrentlyTargetFile();
+                   if (!targetFile.exists()) {
+                       targetFile.createNewFile();
+                   }
+                   Path targetPath = targetFile.toPath();
+                   Files.createSymbolicLink(linkPath, targetPath);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
         super.start();
+    }
+
+    /**
+     * 查找当前目标文件，
+     * 如果软链接文件所在的目录是空的，则目标文件下标是最小下标
+     * 如果软链接文件所在的目录不是空的，则目标文件是修改时间最晚的那个文件
+     * @return
+     */
+    private File getCurrentlyTargetFile() {
+        if (!currentlyActiveFile.exists()) {
+            FileUtil.createMissingParentDirectories(currentlyActiveFile);
+        }
+        File parentFile = currentlyActiveFile.getParentFile();
+        File[] listFiles = parentFile.listFiles();
+        if (listFiles == null || listFiles.length == 0) {
+            return new File(getFile() + "." + rollingPolicy.getMinIndex());
+        }
+        Arrays.sort(listFiles, Comparator.comparingLong(File::lastModified));
+        return listFiles[listFiles.length - 1];
     }
 
     /**
@@ -61,7 +109,6 @@ public class RollingFileAppender<E> extends FileAppender<E> {
             // 如果fileName或fileNamePattern为空，则检查没有用
             if (fileNamePattern != null && fileName != null) {
                 String regex = fileNamePattern.toRegex();
-                System.out.println("regex=" + regex);
                 return fileName.matches(regex);
             }
         }
@@ -102,18 +149,34 @@ public class RollingFileAppender<E> extends FileAppender<E> {
             // 注意：此方法需要同步，因为它需要在关闭后重新打开目标文件时进行独占访问。
             // 请确保关闭此处的活动日志文件！在窗口下重命名不适用于打开的文件。
             this.closeOutputStream();
-            attemptRollover();
-            attemptOpenFile();
+            int nextIndex = attemptRollover();
+            if (nextIndex != -1) {
+                attemptOpenFile(nextIndex);
+            }
         } finally {
             lock.unlock();
         }
     }
 
-    private void attemptOpenFile() {
+    /**
+     * 尝试打开新目标文件，并创建软链接
+     * @param currentIndex 新目标文件下标
+     */
+    private void attemptOpenFile(int currentIndex) {
         try {
             // 更新当前活动文件
             currentlyActiveFile = new File(rollingPolicy.getActiveFileName());
-
+            // 如果软链接已存在，一定要删除，否则会抛异常
+            if (currentlyActiveFile.exists()) {
+                currentlyActiveFile.delete();
+            }
+            File currentTargetFile = new File(rollingPolicy.getActiveFileName() + "." + currentIndex);
+            if (!currentTargetFile.exists()) {
+                currentTargetFile.createNewFile();
+            }
+            Path target = currentTargetFile.toPath();
+            Path link = currentlyActiveFile.toPath();
+            Files.createSymbolicLink(link, target);
             // 这也将关闭文件。这是正常的，因为多次关闭操作是安全的。
             this.openFile(rollingPolicy.getActiveFileName());
         } catch (IOException e) {
@@ -121,14 +184,29 @@ public class RollingFileAppender<E> extends FileAppender<E> {
         }
     }
 
-    private void attemptRollover() {
+    /**
+     * 尝试滚动归档
+     * @return 返回成功后，下一个目标文件的下标
+     */
+    private int attemptRollover() {
         try {
-            rollingPolicy.rollover();
-        } catch (RolloverFailure rf) {
+            Path path = currentlyActiveFile.toPath();
+            String absolutePath = path.toString();
+            if (Files.isSymbolicLink(path)) {
+                Path targetPath = Files.readSymbolicLink(path);
+                File targetFile = targetPath.toFile();
+                absolutePath = targetFile.getAbsolutePath();
+            }
+            int lastIndex = absolutePath.lastIndexOf(".");
+            String currentIndexStr = absolutePath.substring(lastIndex + 1);
+            int currentIndex = Integer.parseInt(currentIndexStr);
+            return rollingPolicy.rollover(currentIndex);
+        } catch (RolloverFailure | IOException rf) {
             logger.warn("发生RolloverFailure。推迟翻滚。");
             // 我们无法滚动，让我们不要截断并冒数据丢失的风险
             this.append = true;
         }
+        return -1;
     }
 
     /**
@@ -137,23 +215,31 @@ public class RollingFileAppender<E> extends FileAppender<E> {
     @Override
     protected void subAppend(E e) {
 //        System.out.println(3);
-        boolean rollover = false;
         // 滚动检查必须在实际写入之前进行。这是时间驱动触发器的唯一正确行为。
         // 我们需要在triggeringPolicy上同步，以便一次只发生一次滚动
         synchronized (triggeringPolicy) {
             //ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
             if (triggeringPolicy.isTriggeringEvent(currentlyActiveFile, e)) {
                 rollover();
-                rollover = true;
             }
         }
         long length = currentlyActiveFile.length();
         super.subAppend(e);
         if (e instanceof IEvent) {
+
+            Path linkPath = currentlyActiveFile.toPath();
+            String path = linkPath.toString();
+            if (Files.isSymbolicLink(linkPath)) {
+                try {
+                    Path targetPath = Files.readSymbolicLink(linkPath);
+                    path = targetPath.toString();
+                } catch (IOException ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
+            }
             IEvent event = (IEvent) e;
             event.setBeforeAppendFileSize(length);
-            event.setRollover(rollover);
-            event.getData().put("path", currentlyActiveFile.getAbsolutePath());
+            event.getData().put("path", path);
             event.postProcessor();
         }
     }

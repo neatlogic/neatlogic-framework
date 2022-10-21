@@ -31,6 +31,8 @@ public interface RollingPolicy extends LifeCycle {
      */
     void rollover() throws RolloverFailure;
 
+    int rollover(int currentIndex) throws RolloverFailure;
+
     /**
      * 获取活动日志文件的名称。
      *
@@ -47,4 +49,10 @@ public interface RollingPolicy extends LifeCycle {
      */
 
     void setParent(FileAppender<?> appender);
+
+    int getMaxIndex();
+
+    int getMinIndex();
+
+    void setMaxIndex(int maxIndex);
 }

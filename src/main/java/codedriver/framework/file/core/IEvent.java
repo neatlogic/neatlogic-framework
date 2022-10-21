@@ -77,14 +77,4 @@ public interface IEvent extends Runnable {
      * 记录追加写入前文件大小
      */
     void setBeforeAppendFileSize(long fileSize);
-
-    /**
-     * 是否发生归档滚动
-     * @return
-     */
-    boolean isRollover();
-    /**
-     * 记录是否发生归档滚动
-     */
-    void setRollover(boolean rollover);
 }

@@ -46,9 +46,9 @@
         a.`end_time` AS endTime,
         a.`time_cost` AS timeCost,
         a.`status`,
-        a.`param_path_id` AS paramPathId,
-        a.`result_path_id` AS resultPathId,
-        a.`error_path_id` AS errorPathId
+        a.`param_file_path` AS paramFilePath,
+        a.`result_file_path` AS resultFilePath,
+        a.`error_file_path` AS errorFilePath
         <include refid="getApiAudit"></include>
         ORDER BY a.`start_time` DESC
         LIMIT #{startNum}, #{pageSize}
@@ -100,9 +100,9 @@
         `api_audit`.`end_time` as endTime,
         `api_audit`.`time_cost` as timeCost,
         `api_audit`.`status` as status,
-        `api_audit`.`param_path_id` as paramPathId,
-        `api_audit`.`result_path_id` as resultPathId,
-        `api_audit`.`error_path_id` as errorPathId,
+        `api_audit`.`param_file_path` as paramFilePath,
+        `api_audit`.`result_file_path` as resultFilePath,
+        `api_audit`.`error_file_path` as errorFilePath,
         `user`.`user_name` as userName
         from `api_audit` LEFT JOIN `user`
         on `api_audit`.`user_uuid` = `user`.`uuid`
@@ -186,9 +186,9 @@
         DATE_FORMAT(`api_audit`.`end_time`,'%Y-%m-%d %H:%i:%s') as endTime,
         CONCAT(`api_audit`.`time_cost`,'') as timeCost,
         `api_audit`.`status` as status,
-        `api_audit`.`param_path_id` as paramPathId,
-        `api_audit`.`result_path_id` as resultPathId,
-        `api_audit`.`error_path_id` as errorPathId,
+        `api_audit`.`param_file_path` as paramFilePath,
+        `api_audit`.`result_file_path` as resultFilePath,
+        `api_audit`.`error_file_path` as errorFilePath,
         `user`.`user_name` as userName
         from `api_audit` LEFT JOIN `user`
         on `api_audit`.`user_uuid` = `user`.`uuid`
@@ -236,63 +236,6 @@
         where `hash` = #{value}
     </select>
 
-    <select id="getLastApiAuditByDayBefore" parameterType="java.lang.Integer" resultType="codedriver.framework.restful.dto.ApiAuditVo">
-        SELECT
-            `id`,
-            `token`,
-            `user_uuid` AS userUuid,
-            `authtype`,
-            `server_id` AS serverId,
-            `ip`,
-            `start_time` AS startTime,
-            `end_time` AS endTime,
-            `time_cost` AS timeCost,
-            `status`,
-            `param_path_id` AS paramPathId,
-            `result_path_id` AS resultPathId,
-            `error_path_id` AS errorPathId
-        FROM `api_audit`
-        WHERE (`param_path_id` IS NOT NULL OR `result_path_id` IS NOT NULL OR `error_path_id` IS NOT NULL)
-          AND `end_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
-            LIMIT 1
-    </select>
-
-    <select id="getDistinctPathAndArchiveIndexByIdBefore" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
-        SELECT
-            DISTINCT
-            `path`,
-            `archive_index` AS archiveIndex
-        FROM `api_audit_path`
-        WHERE `id` &lt; #{id}
-    </select>
-
-    <select id="getApiAuditPathById" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
-        SELECT
-            `id`,
-            `path`,
-            `archive_index` AS archiveIndex,
-            `start_index` AS startIndex,
-            `offset`,
-            `server_id` AS serverId
-        FROM `api_audit_path`
-        WHERE `id` = #{value}
-    </select>
-
-    <select id="getApiAuditPathListByIdList" parameterType="java.lang.Long" resultType="codedriver.framework.restful.dto.ApiAuditPathVo">
-        SELECT
-            `id`,
-            `path`,
-            `archive_index` AS archiveIndex,
-            `start_index` AS startIndex,
-            `offset`,
-            `server_id` AS serverId
-        FROM `api_audit_path`
-        WHERE `id` IN
-        <foreach collection="list" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </select>
-
     <update id="updateApiAccessCount">
         UPDATE `api_access_count`
         SET `count` = `count` + #{count}
@@ -303,10 +246,6 @@
         UPDATE `api`
         SET `need_audit` = 1 - `need_audit`
         WHERE `token` = #{value}
-    </update>
-
-    <update id="updateApiAuditPathArchiveIndexIncrement">
-        UPDATE `api_audit_path` SET `archive_index` = IFNULL(`archive_index`, 0) + 1
     </update>
 
     <insert id="insertApiAudit" parameterType="codedriver.framework.restful.dto.ApiAuditVo">
@@ -320,9 +259,9 @@
                                  `end_time`,
                                  `time_cost`,
                                  `status`,
-                                 `param_path_id`,
-                                 `result_path_id`,
-                                 `error_path_id`)
+                                 `param_file_path`,
+                                 `result_file_path`,
+                                 `error_file_path`)
         VALUES (#{id},
                 #{token},
                 #{userUuid},
@@ -333,29 +272,9 @@
                 #{endTime},
                 #{timeCost},
                 #{status},
-                #{paramPathId},
-                #{resultPathId},
-                #{errorPathId})
-    </insert>
-
-    <insert id="insertApiAuditPath" parameterType="codedriver.framework.restful.dto.ApiAuditPathVo">
-        INSERT INTO `api_audit_path` (
-            `id`,
-            `path`,
-            `archive_index`,
-            `start_index`,
-            `offset`,
-            `server_id`
-        )
-        VALUES
-        (
-            #{id},
-            #{path},
-            #{archiveIndex},
-            #{startIndex},
-            #{offset},
-            #{serverId}
-        )
+                #{paramFilePath},
+                #{resultFilePath},
+                #{errorFilePath})
     </insert>
 
     <insert id="insertApiAccessCount">
@@ -372,9 +291,5 @@
         delete
         from api_audit
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
-    </delete>
-
-    <delete id="deleteApiAuditPathByIdBefore" parameterType="java.lang.Long">
-        DELETE FROM `api_audit_path` WHERE `id` &lt; #{value}
     </delete>
 </mapper>

@@ -5,11 +5,11 @@
 
 package codedriver.module.framework.restful.apiaudit;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.common.config.Config;
 import codedriver.framework.crossover.ICrossoverService;
 import codedriver.framework.file.core.IEvent;
 import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
-import codedriver.framework.restful.dto.ApiAuditPathVo;
 import codedriver.framework.restful.dto.ApiAuditVo;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +28,6 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
     @Override
     public void accept(IEvent event) {
         JSONObject data = event.getData();
-        if (event.isRollover()) {
-            apiAuditMapper.updateApiAuditPathArchiveIndexIncrement();
-        }
         ApiAuditVo apiAuditVo = new ApiAuditVo();
         apiAuditVo.setToken(data.getString("token"));
         apiAuditVo.setUserUuid(data.getString("userUuid"));
@@ -44,7 +41,10 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
         apiAuditVo.setTimeCost(endTime - startTime);
 
         String path = data.getString("path");
-
+        String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
+        if (path.startsWith(dataHome)) {
+            path = path.substring(dataHome.length());
+        }
         long fileSize = event.getBeforeAppendFileSize();
         String finalMessage = event.getFinalMessage();
         String param = data.getString("param");
@@ -52,39 +52,24 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
         String error = data.getString("error");
         if (StringUtils.isNotBlank(param)) {
             int index = finalMessage.indexOf(param);
-            int paramStartIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
-            int paramOffset = param.getBytes(StandardCharsets.UTF_8).length;
-            ApiAuditPathVo apiAuditPathVo = new ApiAuditPathVo();
-            apiAuditPathVo.setServerId(Config.SCHEDULE_SERVER_ID);
-            apiAuditPathVo.setPath(path);
-            apiAuditPathVo.setStartIndex(fileSize + paramStartIndex);
-            apiAuditPathVo.setOffset(paramOffset);
-            apiAuditMapper.insertApiAuditPath(apiAuditPathVo);
-            apiAuditVo.setParamPathId(apiAuditPathVo.getId());
+            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int offset = param.getBytes(StandardCharsets.UTF_8).length;
+            String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
+            apiAuditVo.setParamFilePath(filePath);
         }
         if (StringUtils.isNotBlank(result)) {
             int index = finalMessage.indexOf(result);
-            int resultStartIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
-            int resultOffset = result.getBytes(StandardCharsets.UTF_8).length;
-            ApiAuditPathVo apiAuditPathVo = new ApiAuditPathVo();
-            apiAuditPathVo.setServerId(Config.SCHEDULE_SERVER_ID);
-            apiAuditPathVo.setPath(path);
-            apiAuditPathVo.setStartIndex(fileSize + resultStartIndex);
-            apiAuditPathVo.setOffset(resultOffset);
-            apiAuditMapper.insertApiAuditPath(apiAuditPathVo);
-            apiAuditVo.setResultPathId(apiAuditPathVo.getId());
+            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int offset = result.getBytes(StandardCharsets.UTF_8).length;
+            String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
+            apiAuditVo.setResultFilePath(filePath);
         }
         if (StringUtils.isNotBlank(error)) {
             int index = finalMessage.indexOf(error);
-            int errorStartIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
-            int errorOffset = error.getBytes(StandardCharsets.UTF_8).length;
-            ApiAuditPathVo apiAuditPathVo = new ApiAuditPathVo();
-            apiAuditPathVo.setServerId(Config.SCHEDULE_SERVER_ID);
-            apiAuditPathVo.setPath(path);
-            apiAuditPathVo.setStartIndex(fileSize + errorStartIndex);
-            apiAuditPathVo.setOffset(errorOffset);
-            apiAuditMapper.insertApiAuditPath(apiAuditPathVo);
-            apiAuditVo.setErrorPathId(apiAuditPathVo.getId());
+            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int offset = error.getBytes(StandardCharsets.UTF_8).length;
+            String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
+            apiAuditVo.setErrorFilePath(filePath);
             apiAuditVo.setStatus(ApiAuditVo.FAILED);
         } else {
             apiAuditVo.setStatus(ApiAuditVo.SUCCEED);

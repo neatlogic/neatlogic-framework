@@ -143,16 +143,6 @@ public class Event extends CodeDriverThread implements IEvent {
     }
 
     @Override
-    public boolean isRollover() {
-        return this.rollover;
-    }
-
-    @Override
-    public void setRollover(boolean rollover) {
-        this.rollover = rollover;
-    }
-
-    @Override
     public String toString() {
         return getFormattedMessage();
     }

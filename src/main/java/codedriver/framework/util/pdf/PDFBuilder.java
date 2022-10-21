@@ -20,16 +20,13 @@ public class PDFBuilder {
     private Document document;
     BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 
-    Font font = new Font(bfChinese, 12, Font.NORMAL);
-
-
     public PDFBuilder() throws DocumentException, IOException {
         this.document = new Document();
-        document.open();
     }
 
     /**
      * 设置页面横版
+     *
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeHorizontal() {
@@ -42,6 +39,7 @@ public class PDFBuilder {
 
     /**
      * 设置页面竖版
+     *
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeVertical() {
@@ -53,25 +51,65 @@ public class PDFBuilder {
     }
 
     /**
-     * 设置字体大小
-     * @param size 大小
+     * 设置页面竖版
+     *
      * @return PDFBuilder
      */
-    public PDFBuilder setFontSize(int size) {
-        font.setSize(size);
+    public PDFBuilder setMargins(float marginLeft, float marginRight, float marginTop, float marginBottom) {
+        document.setMargins(marginLeft, marginRight, marginTop, marginBottom);
         return this;
     }
 
     /**
-     * 设置字体颜色
-     * @param color 颜色
+     * 打开文档
+     *
      * @return PDFBuilder
      */
-    public PDFBuilder setFontColor( BaseColor color) {
-        font.setColor(color);
-        return this;
+    public Builder open() {
+        document.open();
+        return new Builder();
     }
 
+    public class Builder {
+
+        Font font = new Font(bfChinese, 12, Font.NORMAL);
+
+//        /**
+//         * 设置字体大小
+//         *
+//         * @param size 大小
+//         * @return PDFBuilder
+//         */
+//        public Builder setFontSize(int size) {
+//            font.setSize(size);
+//            return this;
+//        }
+//
+//        /**
+//         * 设置字体颜色
+//         *
+//         * @param color 颜色
+//         * @return PDFBuilder
+//         */
+//        public Builder setFontColor(BaseColor color) {
+//            font.setColor(color);
+//            return this;
+//        }
+
+        public Builder addParagraph(Paragraph paragraph) throws DocumentException {
+            document.add(paragraph);
+            return this;
+        }
+
+        public Document builder(){
+            return document;
+        }
+    }
+
+
+    public Document builder() {
+        return document;
+    }
 
 
 }

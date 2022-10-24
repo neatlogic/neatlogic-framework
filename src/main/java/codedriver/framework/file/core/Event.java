@@ -13,9 +13,9 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.function.Consumer;
 
 /**
- * 日志事件的内部表示形式。当做出记录的肯定决定时，将创建一个<code>LoggingEvent</code>实例。这个实例被传递给不同的logback经典组件。
+ * 日志事件的内部表示形式。当做出记录的肯定决定时，将创建一个Event实例。这个实例被传递给不同的组件。
  *
- * logback经典组件（如appenders）的编写者应该知道，某些LoggingEvent字段是延迟初始化的。因此，希望输出数据以供接收器稍后正确读取的附加程序必须在写出“惰性”字段之前对其进行初始化。
+ * 经典组件（如appenders）的编写者应该知道，某些Event字段是延迟初始化的。因此，希望输出数据以供接收器稍后正确读取的附加程序必须在写出“惰性”字段之前对其进行初始化。
  * 有关确切列表，请参阅{@link#prepareForDeferredProcessing()}方法。
  */
 public class Event extends CodeDriverThread implements IEvent {

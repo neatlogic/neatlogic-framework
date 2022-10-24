@@ -46,32 +46,39 @@ public class RollingFileAppender<E> extends FileAppender<E> {
             return;
         }
 
-        if (checkForFileAndPatternCollisions()) {
-            logger.error("File属性与fileNamePattern冲突。正在中止。");
-            return;
-        }
-
         try {
             // currentlyActiveFile如果存在，正常应该是软连接文件
             currentlyActiveFile = new File(getFile());
-            Path linkPath = currentlyActiveFile.toPath();
-            if (currentlyActiveFile.exists() && Files.isSymbolicLink(linkPath)) {
-                Path targetPath = Files.readSymbolicLink(linkPath);
-                if (targetPath != null) {
-                    File targetFile = targetPath.toFile();
+            if (currentlyActiveFile.exists()) {
+                Path linkPath = currentlyActiveFile.toPath();
+                if (Files.isSymbolicLink(linkPath)) {
+                    Path targetPath = Files.readSymbolicLink(linkPath);
+                    if (targetPath != null) {
+                        File targetFile = targetPath.toFile();
+                        if (!targetFile.exists()) {
+                            // 如果软链接的目标文件被删除，则新建一个文件
+                            targetFile.createNewFile();
+                        }
+                    }
+                } else {
+                    currentlyActiveFile.delete();
+                    // 如果currentlyActiveFile文件不存在，则找到当前目标文件，并创建软链接
+                    File targetFile = getCurrentlyTargetFile();
                     if (!targetFile.exists()) {
-                        // 如果软链接的目标文件被删除，则新建一个文件
                         targetFile.createNewFile();
                     }
+                    Path targetPath = targetFile.toPath();
+                    Files.createSymbolicLink(linkPath, targetPath);
                 }
             } else {
                 // 如果currentlyActiveFile文件不存在，则找到当前目标文件，并创建软链接
-                   File targetFile = getCurrentlyTargetFile();
-                   if (!targetFile.exists()) {
-                       targetFile.createNewFile();
-                   }
-                   Path targetPath = targetFile.toPath();
-                   Files.createSymbolicLink(linkPath, targetPath);
+                File targetFile = getCurrentlyTargetFile();
+                if (!targetFile.exists()) {
+                    targetFile.createNewFile();
+                }
+                Path targetPath = targetFile.toPath();
+                Path linkPath = currentlyActiveFile.toPath();
+                Files.createSymbolicLink(linkPath, targetPath);
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -96,23 +103,6 @@ public class RollingFileAppender<E> extends FileAppender<E> {
         }
         Arrays.sort(listFiles, Comparator.comparingLong(File::lastModified));
         return listFiles[listFiles.length - 1];
-    }
-
-    /**
-     * 检查文件和模式是否冲突
-     * @return
-     */
-    private boolean checkForFileAndPatternCollisions() {
-        if (triggeringPolicy instanceof RollingPolicyBase) {
-            final RollingPolicyBase base = (RollingPolicyBase) triggeringPolicy;
-            final FileNamePattern fileNamePattern = base.getFileNamePattern();
-            // 如果fileName或fileNamePattern为空，则检查没有用
-            if (fileNamePattern != null && fileName != null) {
-                String regex = fileNamePattern.toRegex();
-                return fileName.matches(regex);
-            }
-        }
-        return false;
     }
 
     @Override
@@ -218,7 +208,7 @@ public class RollingFileAppender<E> extends FileAppender<E> {
         // 滚动检查必须在实际写入之前进行。这是时间驱动触发器的唯一正确行为。
         // 我们需要在triggeringPolicy上同步，以便一次只发生一次滚动
         synchronized (triggeringPolicy) {
-            //ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
+            //SizeBasedTriggeringPolicy
             if (triggeringPolicy.isTriggeringEvent(currentlyActiveFile, e)) {
                 rollover();
             }

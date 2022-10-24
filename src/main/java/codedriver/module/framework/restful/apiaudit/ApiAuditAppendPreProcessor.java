@@ -11,10 +11,17 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
 @Component
 public class ApiAuditAppendPreProcessor implements Consumer<IEvent>, ICrossoverService {
+
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
     @Override
     public void accept(IEvent event) {
         JSONObject data = event.getData();
@@ -27,6 +34,12 @@ public class ApiAuditAppendPreProcessor implements Consumer<IEvent>, ICrossoverS
           偏移量为param的字节数(注意一定要用UTF-8格式，否则计算出来的偏移量不对)
          */
         StringBuilder sb = new StringBuilder();
+        sb.append(event.getName());
+        sb.append(" ");
+        Instant instant = Instant.ofEpochMilli(event.getTimeStamp());
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        sb.append(localDateTime.format(dateTimeFormatter));
+        sb.append("\n");
         if (StringUtils.isNotBlank(param)) {
             sb.append("param>>>>>>>>>");
             sb.append("\n");

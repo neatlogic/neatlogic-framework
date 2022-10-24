@@ -89,10 +89,37 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
     protected void closeOutputStream() {
         if (this.outputStream != null) {
             try {
+                encoderClose();
                 this.outputStream.close();
                 this.outputStream = null;
             } catch (IOException e) {
                 logger.error("无法关闭OutputStreamAppender的输出流。");
+            }
+        }
+    }
+
+    void encoderInit() {
+        if (encoder != null && this.outputStream != null) {
+            try {
+                byte[] header = encoder.headerBytes();
+                writeBytes(header);
+            } catch (IOException ioe) {
+                this.started = false;
+                logger.error("未能初始化名为[" + name + "]的追加器的编码器。");
+                logger.error(ioe.getMessage(), ioe);
+            }
+        }
+    }
+
+    void encoderClose() {
+        if (encoder != null && this.outputStream != null) {
+            try {
+                byte[] footer = encoder.footerBytes();
+                writeBytes(footer);
+            } catch (IOException ioe) {
+                this.started = false;
+                logger.error("无法为名为[" + name + "]的追加器写入页脚。");
+                logger.error(ioe.getMessage(), ioe);
             }
         }
     }
@@ -110,6 +137,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
                 logger.warn("尚未设置编码器。无法调用其init方法。");
                 return;
             }
+            encoderInit();
         } finally {
             lock.unlock();
         }
@@ -127,7 +155,7 @@ public class OutputStreamAppender<E> extends UnsynchronizedAppenderBase<E> {
 
         lock.lock();
         try {
-            //ch.qos.logback.core.recovery.ResilientFileOutputStream
+            //ResilientFileOutputStream
             this.outputStream.write(byteArray);
             this.outputStream.flush();
         } finally {

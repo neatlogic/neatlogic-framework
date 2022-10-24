@@ -11,26 +11,30 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.file.core.AuditType;
 import codedriver.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 
 @Component
 public class ApiAuditCleaner extends AuditCleanerBase {
 
-    private Logger logger = LoggerFactory.getLogger(ApiAuditCleaner.class);
+    private static Logger logger = LoggerFactory.getLogger(ApiAuditCleaner.class);
 
     @Resource
     private ApiAuditMapper apiAuditMapper;
     @Resource
     private DatabaseFragmentMapper databaseFragmentMapper;
 
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     @Override
     public String getName() {
         return "API-AUDIT";
@@ -44,14 +48,18 @@ public class ApiAuditCleaner extends AuditCleanerBase {
             File[] listFiles = dir.listFiles();
             Arrays.sort(listFiles, Comparator.comparing(File::lastModified));
             for (File file : listFiles) {
-//                try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
-//                    long fileLastPointer = randomAccessFile.length() - 1;
-//                    for (long filePointer = fileLastPointer; filePointer != -1; filePointer--) {
-//
-//                    }
-//                } catch (Exception e) {
-//
-//                }
+                try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
+                    String lastLine = rlfr.readLine();
+                    if (lastLine.startsWith("fileFooter##########") && lastLine.endsWith("##########fileFooter")) {
+                        String formatStr = lastLine.substring(20, lastLine.length() - 20);
+                        LocalDate endDate = LocalDate.parse(formatStr, dateTimeFormatter);
+                        if (LocalDate.now().toEpochDay() - endDate.toEpochDay() > dayBefore) {
+                            file.delete();
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
         apiAuditMapper.deleteAuditByDayBefore(dayBefore);

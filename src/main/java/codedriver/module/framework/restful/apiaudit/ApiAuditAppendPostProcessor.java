@@ -46,27 +46,27 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
             path = path.substring(dataHome.length());
         }
         long fileSize = event.getBeforeAppendFileSize();
-        String finalMessage = event.getFinalMessage();
+        String message = event.getFormattedMessage();
         String param = data.getString("param");
         String result = data.getString("result");
         String error = data.getString("error");
         if (StringUtils.isNotBlank(param)) {
-            int index = finalMessage.indexOf(param);
-            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int index = message.indexOf(param);
+            int startIndex = message.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
             int offset = param.getBytes(StandardCharsets.UTF_8).length;
             String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
             apiAuditVo.setParamFilePath(filePath);
         }
         if (StringUtils.isNotBlank(result)) {
-            int index = finalMessage.indexOf(result);
-            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int index = message.indexOf(result);
+            int startIndex = message.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
             int offset = result.getBytes(StandardCharsets.UTF_8).length;
             String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
             apiAuditVo.setResultFilePath(filePath);
         }
         if (StringUtils.isNotBlank(error)) {
-            int index = finalMessage.indexOf(error);
-            int startIndex = finalMessage.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
+            int index = message.indexOf(error);
+            int startIndex = message.substring(0, index).getBytes(StandardCharsets.UTF_8).length;
             int offset = error.getBytes(StandardCharsets.UTF_8).length;
             String filePath = path + "?startIndex=" + (fileSize + startIndex) + "&offset=" + offset + "&serverId=" + Config.SCHEDULE_SERVER_ID;
             apiAuditVo.setErrorFilePath(filePath);

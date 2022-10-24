@@ -41,16 +41,6 @@ public interface IEvent extends Runnable {
      * @param message
      */
     void setMessage(String message);
-    /**
-     * 记录最终写入消息
-     */
-    void setFinalMessage(String finalMessage);
-
-    /**
-     * 获取最终写入消息
-     * @return
-     */
-    String getFinalMessage();
 
     /**
      * 追加写入前置处理器

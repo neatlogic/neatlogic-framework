@@ -28,8 +28,6 @@ public class Event extends CodeDriverThread implements IEvent {
 
     private String message;
 
-    private String finalMessage;
-
     // 通过将formattedMessage标记为transient并在getFormattedMessage()中惰性地构造它，我们在序列化时获得了大量空间
     transient String formattedMessage;
 
@@ -42,8 +40,6 @@ public class Event extends CodeDriverThread implements IEvent {
     private final JSONObject data;
 
     private long beforeAppendFileSize;
-
-    private boolean rollover = false;
 
     private IAuditType auditType;
 
@@ -91,16 +87,6 @@ public class Event extends CodeDriverThread implements IEvent {
     @Override
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Override
-    public void setFinalMessage(String finalMessage) {
-        this.finalMessage = finalMessage;
-    }
-
-    @Override
-    public String getFinalMessage() {
-        return this.finalMessage;
     }
 
     @Override

@@ -5,7 +5,7 @@
 
 package codedriver.framework.file.core.encoder;
 
-import codedriver.framework.file.core.IEvent;
+import ch.qos.logback.core.CoreConstants;
 import codedriver.framework.file.core.layout.Layout;
 
 import java.nio.charset.Charset;
@@ -36,6 +36,35 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
         this.charset = charset;
     }
 
+    @Override
+    public byte[] headerBytes() {
+        if (layout == null)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        appendIfNotNull(sb, layout.getFileHeader());
+        if (sb.length() > 0) {
+            sb.append(CoreConstants.LINE_SEPARATOR);
+        }
+        return convertToBytes(sb.toString());
+    }
+
+    @Override
+    public byte[] footerBytes() {
+        if (layout == null)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        appendIfNotNull(sb, layout.getFileFooter());
+        return convertToBytes(sb.toString());
+    }
+
+    private void appendIfNotNull(StringBuilder sb, String s) {
+        if (s != null) {
+            sb.append(s);
+        }
+    }
+
     private byte[] convertToBytes(String s) {
         if (charset == null) {
             return s.getBytes();
@@ -47,9 +76,6 @@ public class LayoutWrappingEncoder<E> extends EncoderBase<E> {
     public byte[] encode(E e) {
 //        System.out.println("b1");
         String txt = layout.doLayout(e);//PatternLayout
-        if (e instanceof IEvent) {
-            ((IEvent) e).setFinalMessage(txt);
-        }
         return convertToBytes(txt);
     }
 

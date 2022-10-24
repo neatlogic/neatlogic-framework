@@ -20,21 +20,9 @@ import codedriver.framework.file.core.appender.FileAppender;
  */
 public abstract class RollingPolicyBase implements RollingPolicy {
 
-    FileNamePattern fileNamePattern;
-    // fileNamePatternStr始终被斜杠化，请参阅setter
-    protected String fileNamePatternStr;
-
     private FileAppender<?> parent;
 
     private boolean started;
-
-    public void setFileNamePattern(String fnp) {
-        fileNamePatternStr = fnp;
-    }
-
-    public FileNamePattern getFileNamePattern() {
-        return fileNamePattern;
-    }
 
     public boolean isStarted() {
         return started;

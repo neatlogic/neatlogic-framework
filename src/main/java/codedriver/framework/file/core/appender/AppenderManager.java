@@ -50,7 +50,7 @@ public class AppenderManager {
             synchronized (AppenderManager.class) {
                 appender = appenderCache.get(id);
                 if (appender == null) {
-                    appender = new AppenderManager.Builder(auditType.getType(), auditType.getFileName(), auditType.getMessagePattern())
+                    appender = new AppenderManager.Builder(auditType.getType(), auditType.getFileName())
                             .withMaxFileSize(auditType.getMaxFileSize())
                             .build();
                     appenderCache.put(id, appender);
@@ -64,12 +64,10 @@ public class AppenderManager {
         private String auditType;
         private String fileName;
         private String maxFileSize;
-        private String messagePattern;
 
-        public Builder(String auditType, String fileName, String messagePattern) {
+        public Builder(String auditType, String fileName) {
             this.auditType = auditType;
             this.fileName = fileName;
-            this.messagePattern = messagePattern;
         }
 
         public Builder withMaxFileSize(String maxFileSize) {
@@ -82,7 +80,6 @@ public class AppenderManager {
             RollingFileAppender<IEvent> rollingFileAppender = new RollingFileAppender<>();
             rollingFileAppender.setFile(path);
             FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
-            fixedWindowRollingPolicy.setFileNamePattern(path + ".%i");
             fixedWindowRollingPolicy.setMinIndex(1);
             fixedWindowRollingPolicy.setMaxIndex(100);
             fixedWindowRollingPolicy.setParent(rollingFileAppender);
@@ -93,7 +90,6 @@ public class AppenderManager {
             rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
 
             PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-            encoder.setPattern(messagePattern);
             encoder.start();
             rollingFileAppender.setEncoder(encoder);
 

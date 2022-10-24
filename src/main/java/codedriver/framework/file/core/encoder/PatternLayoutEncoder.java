@@ -21,7 +21,6 @@ public class PatternLayoutEncoder extends PatternLayoutEncoderBase<IEvent> {
     @Override
     public void start() {
         PatternLayout patternLayout = new PatternLayout();
-        patternLayout.setPattern(getPattern());
         patternLayout.start();
         this.layout = patternLayout;
         super.start();

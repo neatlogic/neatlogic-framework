@@ -22,15 +22,6 @@ import codedriver.framework.file.core.appender.FileAppender;
  */
 public interface RollingPolicy extends LifeCycle {
 
-    /**
-     * 根据实现策略滚动日志文件。
-     *
-     * 此方法由{@link RollingFileAppender}调用，通常是在其{@linkTriggeringPolicy}的要求下调用的。
-     *
-     * @throws RolloverFailure 如果滚动操作因任何原因失败，则引发此错误。
-     */
-    void rollover() throws RolloverFailure;
-
     int rollover(int currentIndex) throws RolloverFailure;
 
     /**

@@ -20,6 +20,18 @@ public interface Layout<E> extends LifeCycle {
     String doLayout(E event);
 
     /**
+     * 返回此布局的文件头。返回的值可能为空。
+     * @return The header.
+     */
+    String getFileHeader();
+
+    /**
+     * 返回此布局的文件页脚。返回的值可能为空。
+     * @return The footer.
+     */
+    String getFileFooter();
+
+    /**
      * 返回适用于实现的内容类型。
      *
      * @return

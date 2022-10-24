@@ -46,8 +46,8 @@ public class AuditCleanerJob extends JobBase {
     public void initJob(String tenantUuid) {
         //每天凌晨2点运行
         JobObject jobObject = new JobObject.Builder("AUDIT-CLEANER-JOB", this.getGroupName(), this.getClassName(), tenantUuid)
-                .withCron("0 0 2 * * ?")
-                //.withCron("0 * * * * ?")//测试用
+//                .withCron("0 0 2 * * ?")
+                .withCron("0 * * * * ?")//测试用
                 .build();
         this.reloadJob(jobObject);
     }

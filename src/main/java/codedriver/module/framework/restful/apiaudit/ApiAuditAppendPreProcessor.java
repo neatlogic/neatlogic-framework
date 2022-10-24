@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.restful.apiaudit;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.crossover.ICrossoverService;
 import codedriver.framework.file.core.IEvent;
 import codedriver.framework.util.TimeUtil;
@@ -40,6 +41,8 @@ public class ApiAuditAppendPreProcessor implements Consumer<IEvent>, ICrossoverS
         Instant instant = Instant.ofEpochMilli(event.getTimeStamp());
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         sb.append(localDateTime.format(dateTimeFormatter));
+        sb.append(" ");
+        sb.append(TenantContext.get().getTenantUuid());
         sb.append("\n");
         if (StringUtils.isNotBlank(param)) {
             sb.append("param>>>>>>>>>");

@@ -7,6 +7,7 @@ package codedriver.module.framework.restful.apiaudit;
 
 import codedriver.framework.crossover.ICrossoverService;
 import codedriver.framework.file.core.IEvent;
+import codedriver.framework.util.TimeUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
 @Component
 public class ApiAuditAppendPreProcessor implements Consumer<IEvent>, ICrossoverService {
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
 
     @Override
     public void accept(IEvent event) {

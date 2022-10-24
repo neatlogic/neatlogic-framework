@@ -26,10 +26,4 @@ public interface IAuditType {
      * @return
      */
     String getMaxFileSize();
-
-    /**
-     * 消息模式
-     * @return
-     */
-    String getMessagePattern();
 }

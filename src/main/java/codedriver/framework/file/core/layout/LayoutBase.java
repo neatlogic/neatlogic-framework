@@ -13,12 +13,14 @@
  */
 package codedriver.framework.file.core.layout;
 
+import codedriver.framework.util.TimeUtil;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 abstract public class LayoutBase<E> implements Layout<E> {
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
 
     protected boolean started;
 
@@ -40,11 +42,11 @@ abstract public class LayoutBase<E> implements Layout<E> {
 
     @Override
     public String getFileHeader() {
-        return "fileHeader##########" + LocalDateTime.now().format(dateTimeFormatter) + "#########fileHeader";
+        return "fileHeader##########" + LocalDateTime.now().format(dateTimeFormatter) + "##########fileHeader";
     }
 
     @Override
     public String getFileFooter() {
-        return "fileFooter##########" + LocalDateTime.now().format(dateTimeFormatter) + "#########fileFooter";
+        return "fileFooter##########" + LocalDateTime.now().format(dateTimeFormatter) + "##########fileFooter";
     }
 }

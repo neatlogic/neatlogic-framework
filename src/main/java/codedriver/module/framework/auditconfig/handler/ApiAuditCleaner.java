@@ -11,6 +11,7 @@ import codedriver.framework.common.config.Config;
 import codedriver.framework.file.core.AuditType;
 import codedriver.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import codedriver.framework.restful.dao.mapper.ApiAuditMapper;
+import codedriver.framework.util.TimeUtil;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class ApiAuditCleaner extends AuditCleanerBase {
     @Resource
     private DatabaseFragmentMapper databaseFragmentMapper;
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
     @Override
     public String getName() {
         return "API-AUDIT";

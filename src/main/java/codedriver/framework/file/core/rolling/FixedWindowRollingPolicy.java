@@ -14,8 +14,6 @@
 package codedriver.framework.file.core.rolling;
 
 import ch.qos.logback.core.rolling.RolloverFailure;
-import codedriver.framework.file.core.pattern.IntegerTokenConverter;
-import codedriver.framework.file.core.util.RenameUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +26,12 @@ public class FixedWindowRollingPolicy extends RollingPolicyBase {
     private Logger logger = LoggerFactory.getLogger(FixedWindowRollingPolicy.class);
     int maxIndex;
     int minIndex;
-    RenameUtil util = new RenameUtil();
 
-    /**
-     * 窗户太大，比如说20多，几乎总是个坏主意。
-     */
-    private static int MAX_WINDOW_SIZE = 4;
+    private static int MAX_WINDOW_SIZE = 100;
 
     public FixedWindowRollingPolicy() {
         minIndex = 1;
-        maxIndex = 7;
+        maxIndex = 20;
     }
 
     public void start() {

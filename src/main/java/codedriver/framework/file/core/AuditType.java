@@ -6,21 +6,18 @@
 package codedriver.framework.file.core;
 
 public enum AuditType implements IAuditType {
-    API_AUDIT("apiaudit", "apiaudit.log", "2mb", "%name %d{yyyy-MM-dd HH:mm:ss.SSS} - %n%msg%n");
+    API_AUDIT("apiaudit", "apiaudit.log", "10mb");
     private String type;
     private String fileName;
     private String maxFileSize;
-    private String messagePattern;
 
     AuditType(
             String type,
             String fileName,
-            String maxFileSize,
-            String messagePattern) {
+            String maxFileSize) {
         this.type = type;
         this.fileName = fileName;
         this.maxFileSize = maxFileSize;
-        this.messagePattern = messagePattern;
     }
 
     @Override
@@ -36,10 +33,5 @@ public enum AuditType implements IAuditType {
     @Override
     public String getMaxFileSize() {
         return maxFileSize;
-    }
-
-    @Override
-    public String getMessagePattern() {
-        return messagePattern;
     }
 }

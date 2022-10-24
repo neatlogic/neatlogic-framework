@@ -43,7 +43,7 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
         String path = data.getString("path");
         String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
         if (path.startsWith(dataHome)) {
-            path = path.substring(dataHome.length());
+            path = "${dataHome}" + path.substring(dataHome.length());
         }
         long fileSize = event.getBeforeAppendFileSize();
         String message = event.getFormattedMessage();

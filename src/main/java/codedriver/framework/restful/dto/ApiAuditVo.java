@@ -68,19 +68,25 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     @ExcelField(name = "结果")
     private Object result;
 
-    @EntityField(name = "参数内容hash", type = ApiParamType.STRING)
-    private String paramHash;
-    @EntityField(name = "错误内容hash", type = ApiParamType.STRING)
-    private String errorHash;
-    @EntityField(name = "结果内容hash", type = ApiParamType.STRING)
-    private String resultHash;
-
     @EntityField(name = "参数内容文件位置", type = ApiParamType.STRING)
     private String paramFilePath;
     @EntityField(name = "结果内容文件位置", type = ApiParamType.STRING)
     private String resultFilePath;
     @EntityField(name = "错误内容文件位置", type = ApiParamType.STRING)
     private String errorFilePath;
+
+    @EntityField(name = "参数内容文件路径ID", type = ApiParamType.LONG)
+    private Long paramPathId;
+    @EntityField(name = "结果内容文件位置ID", type = ApiParamType.LONG)
+    private Long resultPathId;
+    @EntityField(name = "错误内容文件位置ID", type = ApiParamType.LONG)
+    private Long errorPathId;
+    @EntityField(name = "参数内容文件路径", type = ApiParamType.JSONOBJECT)
+    private ApiAuditPathVo paramPath;
+    @EntityField(name = "结果内容文件位置", type = ApiParamType.JSONOBJECT)
+    private ApiAuditPathVo resultPath;
+    @EntityField(name = "错误内容文件位置", type = ApiParamType.JSONOBJECT)
+    private ApiAuditPathVo errorPath;
 
     @EntityField(name = "API所属模块", type = ApiParamType.STRING)
     private String moduleGroup;
@@ -246,39 +252,6 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
         this.id = id;
     }
 
-    public String getParamHash() {
-        if (StringUtils.isBlank(paramHash) && StringUtils.isNotBlank(param)) {
-            paramHash = DigestUtils.md5DigestAsHex(param.getBytes());
-        }
-        return paramHash;
-    }
-
-    public void setParamHash(String paramHash) {
-        this.paramHash = paramHash;
-    }
-
-    public String getErrorHash() {
-        if (StringUtils.isBlank(errorHash) && StringUtils.isNotBlank(error)) {
-            errorHash = DigestUtils.md5DigestAsHex(error.getBytes());
-        }
-        return errorHash;
-    }
-
-    public void setErrorHash(String errorHash) {
-        this.errorHash = errorHash;
-    }
-
-    public String getResultHash() {
-        if (StringUtils.isBlank(resultHash) && result != null) {
-            resultHash = DigestUtils.md5DigestAsHex(JSON.toJSONString(result).getBytes());
-        }
-        return resultHash;
-    }
-
-    public void setResultHash(String resultHash) {
-        this.resultHash = resultHash;
-    }
-
     public String getModuleGroup() {
         return moduleGroup;
     }
@@ -405,5 +378,53 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setStatusList(List<String> statusList) {
         this.statusList = statusList;
+    }
+
+    public Long getParamPathId() {
+        return paramPathId;
+    }
+
+    public void setParamPathId(Long paramPathId) {
+        this.paramPathId = paramPathId;
+    }
+
+    public Long getResultPathId() {
+        return resultPathId;
+    }
+
+    public void setResultPathId(Long resultPathId) {
+        this.resultPathId = resultPathId;
+    }
+
+    public Long getErrorPathId() {
+        return errorPathId;
+    }
+
+    public void setErrorPathId(Long errorPathId) {
+        this.errorPathId = errorPathId;
+    }
+
+    public ApiAuditPathVo getParamPath() {
+        return paramPath;
+    }
+
+    public void setParamPath(ApiAuditPathVo paramPath) {
+        this.paramPath = paramPath;
+    }
+
+    public ApiAuditPathVo getResultPath() {
+        return resultPath;
+    }
+
+    public void setResultPath(ApiAuditPathVo resultPath) {
+        this.resultPath = resultPath;
+    }
+
+    public ApiAuditPathVo getErrorPath() {
+        return errorPath;
+    }
+
+    public void setErrorPath(ApiAuditPathVo errorPath) {
+        this.errorPath = errorPath;
     }
 }

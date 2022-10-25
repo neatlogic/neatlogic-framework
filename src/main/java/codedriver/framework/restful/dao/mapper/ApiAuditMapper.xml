@@ -67,13 +67,6 @@
         GROUP BY `token`
     </select>
 
-    <select id="getApiAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String"
-            useCache="false">
-        SELECT `content`
-        FROM `api_audit_detail`
-        WHERE hash = #{value}
-    </select>
-
     <select id="getApiAccessCountByTokenList" parameterType="java.lang.String"
             resultType="codedriver.framework.restful.dto.ApiVo" useCache="false">
         SELECT
@@ -197,9 +190,6 @@
         `api_audit`.`result_file_path` as resultFilePath,
         `api_audit`.`error_file_path` as errorFilePath,
         `user`.`user_name` as userName
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`param_hash`) AS param,
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`result_hash`) AS result,
-        -- (SELECT aad.`content` from `api_audit_detail` aad WHERE aad.`hash` = `api_audit`.`error_hash`) AS error
         from `api_audit` LEFT JOIN `user`
         on `api_audit`.`user_uuid` = `user`.`uuid`
         <where>
@@ -245,7 +235,6 @@
         FROM `audit_file`
         where `hash` = #{value}
     </select>
-
 
     <update id="updateApiAccessCount">
         UPDATE `api_access_count`
@@ -303,5 +292,4 @@
         from api_audit
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
-
 </mapper>

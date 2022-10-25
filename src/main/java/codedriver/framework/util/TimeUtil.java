@@ -28,6 +28,7 @@ import static org.apache.commons.lang3.time.DateUtils.toCalendar;
 public class TimeUtil {
 
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final String YYYYMMDD_HHMMSS = "yyyyMMdd-HHmmss";
     public static final String FMT_yyyy_MM_dd = "yyyy-MM-dd";
     private static final String yyyyMMdd = "yyyyMMdd";

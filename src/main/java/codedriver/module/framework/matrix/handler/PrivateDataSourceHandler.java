@@ -106,9 +106,12 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
         List<MatrixAttributeVo> attributeVoList = matrixPrivateDataSourceHandler.getAttributeList();
+        JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), attributeVoList, dataVo.getColumnList());
+        if (!mergeFilterListAndSourceColumnList(dataVo)) {
+            return TableResultUtil.getResult(theadList, new ArrayList<>(), dataVo);
+        }
         List<Map<String, String>> dataList = matrixPrivateDataSourceHandler.searchTableData(dataVo);
         List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
-        JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), attributeVoList, dataVo.getColumnList());
         return TableResultUtil.getResult(theadList, tbodyList, dataVo);
     }
 

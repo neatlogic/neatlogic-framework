@@ -4,8 +4,10 @@
  */
 package codedriver.framework.util.pdf;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.lowagie.text.PageSize;
 
@@ -19,9 +21,8 @@ import java.io.IOException;
 public class PDFBuilder {
 
     private Document document;
-    private BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 
-    public PDFBuilder() throws DocumentException, IOException {
+    public PDFBuilder() throws IOException {
         this.document = new Document();
     }
 
@@ -63,6 +64,7 @@ public class PDFBuilder {
 
     /**
      * 打开文档
+     * open之前可以设置页面排版，open才可以添加文档内容
      *
      * @return PDFBuilder
      */
@@ -72,30 +74,6 @@ public class PDFBuilder {
     }
 
     public class Builder {
-
-        Font font = new Font(bfChinese, 12, Font.NORMAL);
-
-//        /**
-//         * 设置字体大小
-//         *
-//         * @param size 大小
-//         * @return PDFBuilder
-//         */
-//        public Builder setFontSize(int size) {
-//            font.setSize(size);
-//            return this;
-//        }
-//
-//        /**
-//         * 设置字体颜色
-//         *
-//         * @param color 颜色
-//         * @return PDFBuilder
-//         */
-//        public Builder setFontColor(BaseColor color) {
-//            font.setColor(color);
-//            return this;
-//        }
 
         /**
          * 添加段落
@@ -108,7 +86,6 @@ public class PDFBuilder {
             document.add(paragraph);
             return this;
         }
-
 
         /**
          * 添加段落
@@ -144,10 +121,16 @@ public class PDFBuilder {
         public Document builder() {
             return document;
         }
+
+        /**
+         * 关闭文档
+         */
+        public void close() {
+            document.close();
+        }
     }
 
     public Document builder() {
         return document;
     }
-
 }

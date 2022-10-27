@@ -25,7 +25,7 @@ public class TableBuilder {
     //单元格内容水平位置
     private int horizontalAlignment = 1;
     //单元格内容垂直位置
-    private int verticalAlignment = 1;
+    private int verticalAlignment = 5;
 
     /**
      * @param numColumns new PdfPTable必填入参， 将表格分成几等份
@@ -36,16 +36,21 @@ public class TableBuilder {
         this.cellNum = cellNum;
     }
 
+    /**
+     * 添加单元格
+     *
+     * @param paragraph 单元格内的段落
+     * @return TableBuilder
+     * @throws IOException e
+     */
     public TableBuilder addCell(Paragraph paragraph) throws IOException {
         PdfPCell cell = new PdfPCell(paragraph);
-
         //设置单元格的宽度
         cell.setColspan(table.getNumberOfColumns() / cellNum);
         // 设置内容水平位置，默认居中显示
         cell.setHorizontalAlignment(horizontalAlignment != 1 ? horizontalAlignment : 1);
         // 设置垂直位置，默认居中显示
-        cell.setVerticalAlignment(verticalAlignment != 1 ? verticalAlignment : 1);
-
+        cell.setVerticalAlignment(verticalAlignment != 5 ? verticalAlignment : 5);
         //设置单元格的高度
         if (cellHeight > 0) {
             cell.setFixedHeight(cellHeight);
@@ -101,5 +106,4 @@ public class TableBuilder {
     public PdfPTable builder() {
         return table;
     }
-
 }

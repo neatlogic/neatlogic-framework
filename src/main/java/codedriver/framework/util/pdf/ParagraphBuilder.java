@@ -19,10 +19,9 @@ import java.io.IOException;
 public class ParagraphBuilder {
 
     private Paragraph paragraph;
-
-    BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
-    Font font = new Font(bfChinese, 12, Font.NORMAL);
-
+    //字体规范
+    private BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+    private Font font = new Font(bfChinese, 12, Font.NORMAL);
 
     public ParagraphBuilder() throws DocumentException, IOException {
         paragraph = new Paragraph();
@@ -116,7 +115,6 @@ public class ParagraphBuilder {
         return this;
     }
 
-
     /**
      * 设置对齐方式  入参枚举：Element
      *
@@ -135,6 +133,8 @@ public class ParagraphBuilder {
             BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
             paragraph.setFont(new Font(bfChinese, 12, Font.NORMAL));
         }
+
+        //
         return paragraph;
     }
 }

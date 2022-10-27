@@ -5,11 +5,8 @@
 
 package codedriver.framework.integration.core;
 
-import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.common.util.IpUtil;
 import codedriver.framework.crossover.CrossoverServiceFactory;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
@@ -29,8 +26,6 @@ import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.util.javascript.JavascriptUtil;
 import codedriver.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
 import codedriver.module.framework.integration.audit.IntegrationAuditAppendPreProcessor;
-import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
-import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -41,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
-import javax.servlet.http.HttpServletRequest;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;

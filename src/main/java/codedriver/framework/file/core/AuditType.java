@@ -6,7 +6,8 @@
 package codedriver.framework.file.core;
 
 public enum AuditType implements IAuditType {
-    API_AUDIT("apiaudit", "apiaudit.log", "10mb");
+    INTEGRATION_AUDIT("integrationaudit", "integrationaudit.log", "30mb"),
+    API_AUDIT("apiaudit", "apiaudit.log", "30mb");
     private String type;
     private String fileName;
     private String maxFileSize;

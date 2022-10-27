@@ -27,6 +27,7 @@ import codedriver.framework.util.javascript.JavascriptUtil;
 import codedriver.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
 import codedriver.module.framework.integration.audit.IntegrationAuditAppendPreProcessor;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.collections4.MapUtils;
@@ -142,7 +143,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());// 用户非必填，因作业不存在登录用户
         integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
         integrationAuditVo.setStartTime(new Date());
-        integrationAuditVo.setParam(requestParamObj.toString());
+        if (MapUtils.isNotEmpty(requestParamObj)) {
+            integrationAuditVo.setParam(requestParamObj.toJSONString());
+        }
 
         IntegrationResultVo resultVo = new IntegrationResultVo();
         HttpURLConnection connection = null;
@@ -307,7 +310,13 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         }
         Object result = integrationAuditVo.getResult();
         if (result != null) {
-            data.put("result", JSONObject.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            String resultStr = (String) result;
+            try {
+                JSONObject resultObj = JSONObject.parseObject(resultStr);
+                data.put("result", JSONObject.toJSONString(resultObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            } catch (JSONException e) {
+                data.put("result", result);
+            }
         }
         String error = integrationAuditVo.getError();
         if (StringUtils.isNotBlank(error)) {

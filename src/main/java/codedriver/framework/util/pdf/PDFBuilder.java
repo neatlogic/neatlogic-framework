@@ -76,24 +76,15 @@ public class PDFBuilder {
         /**
          * 添加段落
          *
-         * @param paragraph 段落
+         * @param paragraphVo 段落
          * @return Builder
          * @throws DocumentException e
          */
-        public Builder addParagraph(Paragraph paragraph) throws DocumentException {
-            document.add(paragraph);
-            return this;
-        }
-
-        /**
-         * 添加段落
-         *
-         * @param text 段落内容
-         * @return Builder
-         * @throws DocumentException e
-         */
-        public Builder addParagraph(String text) throws DocumentException {
-            document.add(new Paragraph(text));
+        public Builder addParagraph(ParagraphVo paragraphVo) throws DocumentException, IOException {
+            if (paragraphVo == null || paragraphVo.getParagraph() == null) {
+                return this;
+            }
+            document.add(paragraphVo.getParagraph());
             return this;
         }
 
@@ -113,6 +104,19 @@ public class PDFBuilder {
             }
             //添加表格
             document.add(table);
+            return this;
+        }
+
+
+        public Builder addTable(TableVo tableVo, boolean isMerge) throws DocumentException, IOException {
+            if (!isMerge) {
+                //避免与上面段落重叠，添加表格前增加空白位置
+                Paragraph paragraph = new Paragraph();
+                paragraph.setSpacingAfter(5);
+                document.add(paragraph);
+            }
+            //添加表格
+            document.add(tableVo.getTable());
             return this;
         }
 

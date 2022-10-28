@@ -5,14 +5,16 @@
 
 package codedriver.framework.integration.core;
 
-import codedriver.framework.asynchronization.thread.CodeDriverThread;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
-import codedriver.framework.asynchronization.threadpool.CachedThreadPool;
 import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.crossover.CrossoverServiceFactory;
 import codedriver.framework.exception.core.ApiRuntimeException;
 import codedriver.framework.exception.integration.ParamTypeNotFoundException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.exception.type.ParamNotExistsException;
+import codedriver.framework.file.core.AuditType;
+import codedriver.framework.file.core.Event;
+import codedriver.framework.file.core.appender.AppenderManager;
 import codedriver.framework.integration.authentication.core.AuthenticateHandlerFactory;
 import codedriver.framework.integration.authentication.core.IAuthenticateHandler;
 import codedriver.framework.integration.dto.IntegrationAuditVo;
@@ -22,8 +24,12 @@ import codedriver.framework.integration.dto.PatternVo;
 import codedriver.framework.param.validate.core.ParamValidatorBase;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.util.javascript.JavascriptUtil;
+import codedriver.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
+import codedriver.module.framework.integration.audit.IntegrationAuditAppendPreProcessor;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -137,7 +143,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());// 用户非必填，因作业不存在登录用户
         integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
         integrationAuditVo.setStartTime(new Date());
-        integrationAuditVo.setParam(requestParamObj.toString());
+        if (MapUtils.isNotEmpty(requestParamObj)) {
+            integrationAuditVo.setParam(requestParamObj.toJSONString());
+        }
 
         IntegrationResultVo resultVo = new IntegrationResultVo();
         HttpURLConnection connection = null;
@@ -289,16 +297,39 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             integrationAuditVo.setHeaders(JSONObject.parseObject(JSONObject.toJSONString(connection.getHeaderFields())));
         }
         integrationAuditVo.setEndTime(new Date());
-        CodeDriverThread thread = new IntegrationAuditSaveThread(integrationAuditVo);
-        thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
-        CachedThreadPool.execute(thread);
-
         resultVo.setAuditId(integrationAuditVo.getId());
+//        CodeDriverThread thread = new IntegrationAuditSaveThread(integrationAuditVo);
+//        thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
+//        CachedThreadPool.execute(thread);
+
+        JSONObject data = new JSONObject();
+        data.put("integrationAudit", integrationAuditVo);
+        String param = integrationAuditVo.getParam();
+        if (StringUtils.isNotBlank(param)) {
+            data.put("param", param);
+        }
+        Object result = integrationAuditVo.getResult();
+        if (result != null) {
+            String resultStr = (String) result;
+            try {
+                JSONObject resultObj = JSONObject.parseObject(resultStr);
+                data.put("result", JSONObject.toJSONString(resultObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            } catch (JSONException e) {
+                data.put("result", result);
+            }
+        }
+        String error = integrationAuditVo.getError();
+        if (StringUtils.isNotBlank(error)) {
+            data.put("error", error);
+        }
+        IntegrationAuditAppendPostProcessor appendPostProcessor = CrossoverServiceFactory.getApi(IntegrationAuditAppendPostProcessor.class);
+        IntegrationAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(IntegrationAuditAppendPreProcessor.class);
+        AppenderManager.execute(new Event(integrationVo.getName(), integrationAuditVo.getStartTime().getTime(), data, appendPreProcessor, appendPostProcessor, AuditType.INTEGRATION_AUDIT));
+
         // connection.disconnect(); //Indicates that other requests to the
         // server are unlikely in the near future. Calling disconnect() should
         // not imply that this HttpURLConnection
         // instance can be reused for other requests.
         return resultVo;
     }
-
 }

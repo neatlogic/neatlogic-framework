@@ -8,7 +8,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfPTable;
 import com.lowagie.text.PageSize;
 
 import java.io.IOException;
@@ -91,23 +90,12 @@ public class PDFBuilder {
         /**
          * 添加表格
          *
-         * @param table 表格
+         * @param tableVo tableVo
+         * @param isMerge 是否需要合并
          * @return Builder
          * @throws DocumentException e
+         * @throws IOException       e
          */
-        public Builder addTable(PdfPTable table, boolean isMerge) throws DocumentException {
-            if (!isMerge) {
-                //避免与上面段落重叠，添加表格前增加空白位置
-                Paragraph paragraph = new Paragraph();
-                paragraph.setSpacingAfter(5);
-                document.add(paragraph);
-            }
-            //添加表格
-            document.add(table);
-            return this;
-        }
-
-
         public Builder addTable(TableVo tableVo, boolean isMerge) throws DocumentException, IOException {
             if (!isMerge) {
                 //避免与上面段落重叠，添加表格前增加空白位置

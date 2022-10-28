@@ -23,9 +23,6 @@ public class FontVo {
     //字体
     private Font font;
 
-    public FontVo() throws DocumentException, IOException {
-    }
-
     public FontVo(int fontSize) throws DocumentException, IOException {
         font = new Font(bfChinese, fontSize, Font.NORMAL);
     }

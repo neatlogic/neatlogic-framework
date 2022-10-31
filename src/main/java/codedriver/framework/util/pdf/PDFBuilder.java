@@ -4,10 +4,9 @@
  */
 package codedriver.framework.util.pdf;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.lowagie.text.PageSize;
 
 import java.io.IOException;
@@ -20,8 +19,9 @@ import java.io.IOException;
 public class PDFBuilder {
 
     private Document document;
+    private BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 
-    public PDFBuilder() throws IOException {
+    public PDFBuilder() throws DocumentException, IOException {
         this.document = new Document();
     }
 
@@ -31,6 +31,7 @@ public class PDFBuilder {
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeHorizontal() {
+        //横向
         Rectangle pageSize = new Rectangle(PageSize.A4.getHeight(), PageSize.A4.getWidth());
         pageSize.rotate();
         document.setPageSize(pageSize);
@@ -43,6 +44,7 @@ public class PDFBuilder {
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeVertical() {
+        //竖向
         Rectangle pageSize = new Rectangle(PageSize.A4.getWidth(), PageSize.A4.getHeight());
         pageSize.rotate();
         document.setPageSize(pageSize);
@@ -61,7 +63,6 @@ public class PDFBuilder {
 
     /**
      * 打开文档
-     * open之前可以设置页面排版，open才可以添加文档内容
      *
      * @return PDFBuilder
      */
@@ -72,31 +73,63 @@ public class PDFBuilder {
 
     public class Builder {
 
+        Font font = new Font(bfChinese, 12, Font.NORMAL);
+
+//        /**
+//         * 设置字体大小
+//         *
+//         * @param size 大小
+//         * @return PDFBuilder
+//         */
+//        public Builder setFontSize(int size) {
+//            font.setSize(size);
+//            return this;
+//        }
+//
+//        /**
+//         * 设置字体颜色
+//         *
+//         * @param color 颜色
+//         * @return PDFBuilder
+//         */
+//        public Builder setFontColor(BaseColor color) {
+//            font.setColor(color);
+//            return this;
+//        }
+
         /**
          * 添加段落
          *
-         * @param paragraphVo 段落
+         * @param paragraph 段落
          * @return Builder
          * @throws DocumentException e
          */
-        public Builder addParagraph(ParagraphVo paragraphVo) throws DocumentException, IOException {
-            if (paragraphVo == null || paragraphVo.getParagraph() == null) {
-                return this;
-            }
-            document.add(paragraphVo.getParagraph());
+        public Builder addParagraph(Paragraph paragraph) throws DocumentException {
+            document.add(paragraph);
+            return this;
+        }
+
+
+        /**
+         * 添加段落
+         *
+         * @param text 段落内容
+         * @return Builder
+         * @throws DocumentException e
+         */
+        public Builder addParagraph(String text) throws DocumentException {
+            document.add(new Paragraph(text));
             return this;
         }
 
         /**
          * 添加表格
          *
-         * @param tableVo tableVo
-         * @param isMerge 是否需要合并
+         * @param table 表格
          * @return Builder
          * @throws DocumentException e
-         * @throws IOException       e
          */
-        public Builder addTable(TableVo tableVo, boolean isMerge) throws DocumentException, IOException {
+        public Builder addTable(PdfPTable table, boolean isMerge) throws DocumentException {
             if (!isMerge) {
                 //避免与上面段落重叠，添加表格前增加空白位置
                 Paragraph paragraph = new Paragraph();
@@ -104,7 +137,7 @@ public class PDFBuilder {
                 document.add(paragraph);
             }
             //添加表格
-            document.add(tableVo.getTable());
+            document.add(table);
             return this;
         }
 
@@ -112,9 +145,6 @@ public class PDFBuilder {
             return document;
         }
 
-        /**
-         * 关闭文档
-         */
         public void close() {
             document.close();
         }

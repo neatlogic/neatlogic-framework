@@ -4,8 +4,10 @@
  */
 package codedriver.framework.util.pdf;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.lowagie.text.PageSize;
 
@@ -19,9 +21,7 @@ import java.io.IOException;
 public class PDFBuilder {
 
     private Document document;
-    private BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
-
-    public PDFBuilder() throws DocumentException, IOException {
+    public PDFBuilder() throws IOException {
         this.document = new Document();
     }
 

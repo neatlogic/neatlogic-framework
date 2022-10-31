@@ -8,8 +8,6 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 
-import java.io.IOException;
-
 /**
  * @author longrf
  * @date 2022/10/26 10:10
@@ -28,7 +26,7 @@ public class TableBuilder {
     private int verticalAlignment = 1;
 
     /**
-     * @param cellNum    一行的单元格个数
+     * @param cellNum 一行的单元格个数
      */
     public TableBuilder(int cellNum) {
         //new PdfPTable必填入参， 将表格分成几等份
@@ -36,7 +34,7 @@ public class TableBuilder {
         this.cellNum = cellNum;
     }
 
-    public TableBuilder addCell(Paragraph paragraph) throws IOException {
+    public TableBuilder addCell(Paragraph paragraph) {
         PdfPCell cell = new PdfPCell(paragraph);
 
         //设置单元格的宽度，份数为单位

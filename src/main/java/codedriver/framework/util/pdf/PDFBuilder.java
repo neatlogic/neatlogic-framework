@@ -103,13 +103,13 @@ public class PDFBuilder {
          * @return Builder
          * @throws DocumentException e
          */
-        public Builder addTable(PdfPTable table, boolean isMerge) throws DocumentException {
-            if (!isMerge) {
-                //避免与上面段落重叠，添加表格前增加空白位置
-                Paragraph paragraph = new Paragraph();
-                paragraph.setSpacingAfter(5);
-                document.add(paragraph);
-            }
+        public Builder addTable(PdfPTable table) throws DocumentException {
+
+            //避免与上面段落重叠，添加表格前增加空白位置
+            Paragraph paragraph = new Paragraph();
+            paragraph.setSpacingAfter(5);
+            document.add(paragraph);
+
             //添加表格
             document.add(table);
             return this;

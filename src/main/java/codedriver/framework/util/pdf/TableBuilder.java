@@ -28,18 +28,18 @@ public class TableBuilder {
     private int verticalAlignment = 1;
 
     /**
-     * @param numColumns new PdfPTable必填入参， 将表格分成几等份
      * @param cellNum    一行的单元格个数
      */
-    public TableBuilder(int numColumns, int cellNum) {
-        this.table = new PdfPTable(numColumns);
+    public TableBuilder(int cellNum) {
+        //new PdfPTable必填入参， 将表格分成几等份
+        this.table = new PdfPTable(cellNum);
         this.cellNum = cellNum;
     }
 
     public TableBuilder addCell(Paragraph paragraph) throws IOException {
         PdfPCell cell = new PdfPCell(paragraph);
 
-        //设置单元格的宽度
+        //设置单元格的宽度，份数为单位
         cell.setColspan(table.getNumberOfColumns() / cellNum);
         // 设置内容水平位置，默认居中显示
         cell.setHorizontalAlignment(horizontalAlignment != 1 ? horizontalAlignment : 1);

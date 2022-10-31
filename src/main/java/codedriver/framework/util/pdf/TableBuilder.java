@@ -101,5 +101,4 @@ public class TableBuilder {
     public PdfPTable builder() {
         return table;
     }
-
 }

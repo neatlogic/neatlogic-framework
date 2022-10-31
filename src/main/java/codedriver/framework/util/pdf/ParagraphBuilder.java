@@ -127,7 +127,6 @@ public class ParagraphBuilder {
     }
 
     public Paragraph builder() throws DocumentException, IOException {
-
         //默认字体，不设置字体会导出空文档
         if (paragraph.getFont() == null) {
             BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);

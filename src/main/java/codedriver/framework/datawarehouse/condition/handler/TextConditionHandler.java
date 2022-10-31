@@ -11,7 +11,7 @@ public class TextConditionHandler implements IDatasourceConditionHandler {
     @Override
     public String getExpression(Long fieldId, Object value) {
         if (value != null) {
-            return "`" + fieldId + "` like %" + value.toString() + "%";
+            return "`" + fieldId + "` like '%" + value.toString() + "%'";
         }
         return null;
     }

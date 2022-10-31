@@ -31,7 +31,6 @@ public class PDFBuilder {
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeHorizontal() {
-        //横向
         Rectangle pageSize = new Rectangle(PageSize.A4.getHeight(), PageSize.A4.getWidth());
         pageSize.rotate();
         document.setPageSize(pageSize);
@@ -44,7 +43,6 @@ public class PDFBuilder {
      * @return PDFBuilder
      */
     public PDFBuilder setPageSizeVertical() {
-        //竖向
         Rectangle pageSize = new Rectangle(PageSize.A4.getWidth(), PageSize.A4.getHeight());
         pageSize.rotate();
         document.setPageSize(pageSize);
@@ -72,30 +70,6 @@ public class PDFBuilder {
     }
 
     public class Builder {
-
-        Font font = new Font(bfChinese, 12, Font.NORMAL);
-
-//        /**
-//         * 设置字体大小
-//         *
-//         * @param size 大小
-//         * @return PDFBuilder
-//         */
-//        public Builder setFontSize(int size) {
-//            font.setSize(size);
-//            return this;
-//        }
-//
-//        /**
-//         * 设置字体颜色
-//         *
-//         * @param color 颜色
-//         * @return PDFBuilder
-//         */
-//        public Builder setFontColor(BaseColor color) {
-//            font.setColor(color);
-//            return this;
-//        }
 
         /**
          * 添加段落

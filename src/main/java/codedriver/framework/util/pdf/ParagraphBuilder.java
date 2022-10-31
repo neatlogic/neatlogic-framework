@@ -133,8 +133,6 @@ public class ParagraphBuilder {
             BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
             paragraph.setFont(new Font(bfChinese, 12, Font.NORMAL));
         }
-
-        //
         return paragraph;
     }
 }

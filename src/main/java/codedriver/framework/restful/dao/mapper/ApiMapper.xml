@@ -193,6 +193,43 @@
                                 `need_audit`  = #{needAudit}
     </insert>
 
+    <insert id="insertOrUpdateNeedAuditApi" parameterType="codedriver.framework.restful.dto.ApiVo">
+        INSERT INTO `api`
+        (`name`,
+         `module_id`,
+         `is_active`,
+         `handler`,
+         `config`,
+         `token`,
+         `description`,
+         `expire`,
+         `username`,
+         `password`,
+         `authtype`,
+         `type`,
+         `qps`,
+         `timeout`,
+         `need_audit`,
+         `create_time`)
+        VALUES (#{name},
+                #{moduleId},
+                #{isActive},
+                #{handler},
+                #{config},
+                #{token},
+                #{description},
+                #{expire},
+                #{username},
+                #{passwordCipher},
+                #{authtype},
+                #{type},
+                #{qps},
+                #{timeout},
+                #{needAudit},
+                now(3))
+        ON DUPLICATE KEY UPDATE `need_audit`  = #{needAudit}
+    </insert>
+
     <delete id="deleteApiByToken" parameterType="java.lang.String">
         DELETE
         FROM `api`

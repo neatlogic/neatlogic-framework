@@ -43,6 +43,11 @@ public class BaseEditorVo extends BasePageVo {
     @EntityField(name = "修改者VO")
     private UserVo lcuVo;
 
+    @JSONField(serialize = false)
+    private Boolean isNeedFcuVo = true;
+    @JSONField(serialize = false)
+    private Boolean isNeedLcuVo = true;
+
     @EntityField(name = "操作类型，创建或修改")
     private String actionType;
 
@@ -109,14 +114,14 @@ public class BaseEditorVo extends BasePageVo {
     }
 
     public final UserVo getFcuVo() {
-        if (fcuVo == null && StringUtils.isNotBlank(fcu)) {
+        if (isNeedFcuVo && fcuVo == null && StringUtils.isNotBlank(fcu)) {
             fcuVo = new UserVo(fcu, false);
         }
         return fcuVo;
     }
 
     public final UserVo getLcuVo() {
-        if (lcuVo == null && StringUtils.isNotBlank(lcu)) {
+        if (isNeedLcuVo && lcuVo == null && StringUtils.isNotBlank(lcu)) {
             lcuVo = new UserVo(lcu, false);
         }
         return lcuVo;
@@ -129,5 +134,13 @@ public class BaseEditorVo extends BasePageVo {
             actionType = "修改";
         }
         return actionType;
+    }
+
+    public void setIsNeedFcuVo(Boolean isNeedFcuVo) {
+        this.isNeedFcuVo = isNeedFcuVo;
+    }
+
+    public void setIsNeedLcuVo(Boolean isNeedLcuVo) {
+        this.isNeedLcuVo = isNeedLcuVo;
     }
 }

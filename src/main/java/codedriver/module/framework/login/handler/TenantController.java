@@ -48,7 +48,9 @@ public class TenantController {
                 if (tenantVo != null && tenantVo.getIsActive().equals(1)) {
                     TenantUtil.addTenant(tenant);
                 } else {
+                    response.setStatus(521);
                     ReturnJson.error("租户" + tenant + "不存在或已被禁用", response);
+                    return;//没有租户，后续代码无需执行
                 }
             }
             JSONObject data = new JSONObject();

@@ -30,6 +30,47 @@ public final class RegexUtils {
     public static final String ORDER_BY = "ORDER_BY";
     public static final String DB_SCHEMA = "DB_SCHEMA";
 
+    /**
+     * 字母
+     */
+    public static final String UNIQUE_IDENT = "unique_ident";
+    /**
+     * 小写字母
+     */
+    public static final String LOWERCASE = "lowercase";
+    /**
+     * 大写字母
+     */
+    public static final String UPPERCASE = "uppercase";
+    /**
+     * 数字
+     */
+    public static final String NUMBER = "number";
+    /**
+     * 字母和数字
+     */
+    public static final String ENCHAR = "enchar";
+    /**
+     * 邮箱地址
+     */
+    public static final String MAIL = "mail";
+    /**
+     * 电话号码
+     */
+    public static final String PHONE = "phone";
+    /**
+     * IP地址
+     */
+    public static final String IP = "ip";
+    /**
+     * 端口
+     */
+    public static final String PORT = "port";
+    /**
+     * URL
+     */
+    public static final String URL = "url";
+
     public static final Map<String, Pattern> regexPatternMap = new HashMap<String, Pattern>() {
         private static final long serialVersionUID = -960685874597441494L;
 
@@ -46,10 +87,26 @@ public final class RegexUtils {
             put(CONNECT_URL, Pattern.compile("^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+)|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"));
             put(ORDER_BY, Pattern.compile("^((\\+?-?\\w+(\\.\\w+)?),?\\s*)+\\s+((DESC)|(desc)|(ASC)|(asc))$"));
             put(DB_SCHEMA, Pattern.compile("([^.])+\\.([^.])+"));
+
+            // 以下正则表达式参考前端TsValidtor.js
+            put(UNIQUE_IDENT, Pattern.compile("^[a-zA-Z_][a-zA-Z\\_]*$"));
+            put(LOWERCASE, Pattern.compile("^[a-z]*$"));
+            put(UPPERCASE, Pattern.compile("^[A-Z]*$"));
+            put(NUMBER, Pattern.compile("^[0-9]\\d*$"));
+            put(ENCHAR, Pattern.compile("^[a-zA-Z\\d\\.\\_]*$"));
+            put(MAIL, Pattern.compile("^[_a-zA-Z0-9-]{1}([\\._a-zA-Z0-9-]+)(\\.[_a-zA-Z0-9-]+)*@[_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+){1,3}$"));
+            put(PHONE, Pattern.compile("^[1][3,4,5,7,8][0-9]{9}$"));
+            put(IP, Pattern.compile("^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$"));
+            put(PORT, Pattern.compile("^(6553[0-5]{1}|655[0-2]{1}[0-9]{1}|65[0-4]{1}[0-9]{0,2}|6[0-4]{1}[0-9]{0,3}|[0-5]*[0-9]{0,4})$"));
+            put(URL, Pattern.compile("^((https|http|ftp|rtsp|mms)?:\\/\\/)[^\\s]+$"));
         }
     };
 
     private RegexUtils() {
+    }
+
+    public static Pattern getPattern(String key) {
+        return regexPatternMap.get(key);
     }
 
     public static boolean isMatch(String source, String regex) {

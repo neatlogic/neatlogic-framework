@@ -25,6 +25,8 @@ public interface DataWarehouseDataSourceMapper {
 
     int searchDataSourceCount(DataSourceVo reportDataSourceVo);
 
+    List<Long> getExistIdListByIdList(List<Long> idList);
+
     void insertDataSource(DataSourceVo reportDataSourceVo);
 
     void insertDataSourceParam(DataSourceParamVo dataSourceParamVo);

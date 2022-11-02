@@ -205,6 +205,13 @@
                 #{isActive})
     </select>
 
+    <select id="getExistIdListByIdList" parameterType="java.util.List" resultType="java.lang.Long">
+        select `id` from datawarehouse_datasource where `id` in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <update id="resetReportDataSourceStatus">
         update datawarehouse_datasource
         set status = 'done'

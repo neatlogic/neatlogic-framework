@@ -11,4 +11,8 @@ public class DataSourceIsNotFoundException extends ApiRuntimeException {
     public DataSourceIsNotFoundException(Long id) {
         super("数据源" + id + "不存在");
     }
+
+    public DataSourceIsNotFoundException(String idListStr) {
+        super("数据源：“" + idListStr + "”不存在");
+    }
 }

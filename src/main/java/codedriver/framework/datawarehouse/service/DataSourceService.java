@@ -37,7 +37,7 @@ public interface DataSourceService {
      *
      * @param dataSourceVo 数据源vo
      */
-    void createDataSourceTSchema(DataSourceVo dataSourceVo);
+    void createDataSourceSchema(DataSourceVo dataSourceVo);
 
     /**
      * 加载或卸载报表数据源数据同步定时作业

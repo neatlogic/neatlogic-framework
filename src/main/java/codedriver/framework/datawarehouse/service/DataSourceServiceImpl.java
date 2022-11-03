@@ -531,7 +531,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     }
 
     @Override
-    public void createDataSourceTSchema(DataSourceVo dataSourceVo) {
+    public void createDataSourceSchema(DataSourceVo dataSourceVo) {
         //由于以下操作是DDL操作，所以需要使用EscapeTransactionJob避开当前事务，否则在进行DDL操作之前事务就会提交，如果DDL出错，则上面的事务就无法回滚了
         EscapeTransactionJob.State s = new EscapeTransactionJob(() -> {
             dataSourceSchemaMapper.deleteDataSourceTable(dataSourceVo);

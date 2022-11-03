@@ -5,19 +5,21 @@
 
 package codedriver.framework.datawarehouse.service;
 
+import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.datawarehouse.dao.mapper.*;
 import codedriver.framework.datawarehouse.dto.*;
 import codedriver.framework.datawarehouse.enums.AggregateType;
 import codedriver.framework.datawarehouse.enums.DatabaseVersion;
 import codedriver.framework.datawarehouse.enums.Mode;
 import codedriver.framework.datawarehouse.enums.Status;
-import codedriver.framework.datawarehouse.exceptions.DatabaseVersionNotFoundException;
-import codedriver.framework.datawarehouse.exceptions.DeleteDataSourceSchemaException;
-import codedriver.framework.datawarehouse.exceptions.ReportDataSourceIsSyncingException;
-import codedriver.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
+import codedriver.framework.datawarehouse.exceptions.*;
+import codedriver.framework.scheduler.core.IJob;
+import codedriver.framework.scheduler.core.SchedulerManager;
+import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.transaction.core.AfterTransactionJob;
 import codedriver.framework.transaction.core.EscapeTransactionJob;
 import codedriver.framework.util.javascript.JavascriptUtil;
+import codedriver.module.framework.scheduler.datawarehouse.ReportDataSourceJob;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +41,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class DataSourceServiceImpl implements DataSourceService {
@@ -61,6 +64,9 @@ public class DataSourceServiceImpl implements DataSourceService {
 
     @Resource
     private DataWarehouseDataSourceAuditMapper dataSourceAuditMapper;
+
+    @Resource
+    private SchedulerManager schedulerManager;
 
     private static boolean evaluateExpression(String expression, Map<String, Object> paramMap) {
         ScriptEngine engine = JavascriptUtil.getEngine();
@@ -407,7 +413,7 @@ public class DataSourceServiceImpl implements DataSourceService {
                         }
                     }
                 } catch (SQLException | DocumentException | InstantiationException | IllegalAccessException |
-                         ClassNotFoundException e) {
+                        ClassNotFoundException e) {
                     logger.error(e.getMessage(), e);
                     reportDataSourceAuditVo.setError(e.getMessage());
                     throw new ReportDataSourceSyncException(dataSourceVo, e);
@@ -432,6 +438,122 @@ public class DataSourceServiceImpl implements DataSourceService {
                     dataSourceAuditMapper.updateReportDataSourceAudit(reportDataSourceAuditVo);
                 }
             });
+        }
+    }
+
+    @Override
+    public void insertDataSource(DataSourceVo vo) {
+        dataSourceMapper.insertDataSource(vo);
+        if (CollectionUtils.isNotEmpty(vo.getFieldList())) {
+            for (DataSourceFieldVo field : vo.getFieldList()) {
+                field.setDataSourceId(vo.getId());
+                dataSourceMapper.insertDataSourceField(field);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(vo.getParamList())) {
+            for (DataSourceParamVo param : vo.getParamList()) {
+                param.setDataSourceId(vo.getId());
+                dataSourceMapper.insertDataSourceParam(param);
+            }
+        }
+    }
+
+    @Override
+    public void updateDataSource(DataSourceVo newVo, DataSourceVo newXmlConfig, DataSourceVo oldVo) {
+        List<DataSourceFieldVo> deleteFieldList = oldVo.getFieldList().stream().filter(d -> !newXmlConfig.getFieldList().contains(d)).collect(Collectors.toList());
+        List<DataSourceFieldVo> updateFieldList = newXmlConfig.getFieldList().stream().filter(d -> oldVo.getFieldList().contains(d)).collect(Collectors.toList());
+        List<DataSourceFieldVo> insertFieldList = newXmlConfig.getFieldList().stream().filter(d -> !oldVo.getFieldList().contains(d)).collect(Collectors.toList());
+        //用回旧的fieldId
+        if (CollectionUtils.isNotEmpty(updateFieldList)) {
+            for (DataSourceFieldVo field : updateFieldList) {
+                Optional<DataSourceFieldVo> op = oldVo.getFieldList().stream().filter(d -> d.equals(field)).findFirst();
+                op.ifPresent(dataSourceFieldVo -> field.setId(dataSourceFieldVo.getId()));
+            }
+        }
+        newVo.setFieldList(null);//清空旧数据
+        newVo.addField(insertFieldList);
+        newVo.addField(updateFieldList);
+
+        List<DataSourceParamVo> deleteParamList = oldVo.getParamList().stream().filter(d -> !newXmlConfig.getParamList().contains(d)).collect(Collectors.toList());
+        List<DataSourceParamVo> updateParamList = newXmlConfig.getParamList().stream().filter(d -> oldVo.getParamList().contains(d)).collect(Collectors.toList());
+        List<DataSourceParamVo> insertParamList = newXmlConfig.getParamList().stream().filter(d -> !oldVo.getParamList().contains(d)).collect(Collectors.toList());
+        //用回旧的paramId
+        if (CollectionUtils.isNotEmpty(updateParamList)) {
+            for (DataSourceParamVo param : updateParamList) {
+                Optional<DataSourceParamVo> op = oldVo.getParamList().stream().filter(d -> d.equals(param)).findFirst();
+                op.ifPresent(dataSourceParamVo -> param.setId(dataSourceParamVo.getId()));
+            }
+        }
+        newVo.setParamList(null);//清空旧数据
+        newVo.addParam(insertParamList);
+        newVo.addParam(updateParamList);
+
+        //FIXME 检查数据源是否被使用
+        dataSourceMapper.updateDataSource(newVo);
+
+        if (CollectionUtils.isNotEmpty(deleteFieldList)) {
+            for (DataSourceFieldVo field : deleteFieldList) {
+                dataSourceMapper.deleteDataSourceFieldById(field.getId());
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(updateFieldList)) {
+            for (DataSourceFieldVo field : updateFieldList) {
+                dataSourceMapper.updateDataSourceField(field);
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(insertFieldList)) {
+            for (DataSourceFieldVo field : insertFieldList) {
+                field.setDataSourceId(newVo.getId());
+                dataSourceMapper.insertDataSourceField(field);
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(deleteParamList)) {
+            for (DataSourceParamVo param : deleteParamList) {
+                dataSourceMapper.deleteDataSourceParamById(param.getId());
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(updateParamList)) {
+            for (DataSourceParamVo param : updateParamList) {
+                dataSourceMapper.updateDataSourceParam(param);
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(insertParamList)) {
+            for (DataSourceParamVo param : insertParamList) {
+                param.setDataSourceId(newVo.getId());
+                dataSourceMapper.insertDataSourceParam(param);
+            }
+        }
+    }
+
+    @Override
+    public void createDataSourceTSchema(DataSourceVo dataSourceVo) {
+        //由于以下操作是DDL操作，所以需要使用EscapeTransactionJob避开当前事务，否则在进行DDL操作之前事务就会提交，如果DDL出错，则上面的事务就无法回滚了
+        EscapeTransactionJob.State s = new EscapeTransactionJob(() -> {
+            dataSourceSchemaMapper.deleteDataSourceTable(dataSourceVo);
+            dataSourceSchemaMapper.createDataSourceTable(dataSourceVo);
+        }).execute();
+        if (!s.isSucceed()) {
+            throw new CreateDataSourceSchemaException(dataSourceVo);
+        }
+    }
+
+    @Override
+    public void loadOrUnloadReportDataSourceJob(DataSourceVo dataSourceVo) {
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        IJob jobHandler = SchedulerManager.getHandler(ReportDataSourceJob.class.getName());
+        JobObject jobObject = new JobObject.Builder(dataSourceVo.getId().toString(), jobHandler.getGroupName(), jobHandler.getClassName(), tenantUuid)
+                .withCron(dataSourceVo.getCronExpression())
+                .addData("datasourceId", dataSourceVo.getId())
+                .build();
+        if (StringUtils.isNotBlank(dataSourceVo.getCronExpression())) {
+            schedulerManager.loadJob(jobObject);
+        } else {
+            schedulerManager.unloadJob(jobObject);
         }
     }
 }

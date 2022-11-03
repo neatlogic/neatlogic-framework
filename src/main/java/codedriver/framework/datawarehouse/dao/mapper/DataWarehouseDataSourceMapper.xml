@@ -77,8 +77,7 @@
         <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
     </select>
 
-    <select id="getDataSourceById" parameterType="java.lang.Long"
-            resultMap="dataSourceResultMap">
+    <sql id="getDataSourceDetailSql">
         select a.id,
                a.`name`,
                a.label,
@@ -108,7 +107,18 @@
         from datawarehouse_datasource a
                  left join datawarehouse_datasource_field b on a.id = b.datasource_id
                  left join datawarehouse_datasource_param c on a.id = c.datasource_id
+    </sql>
+
+    <select id="getDataSourceById" parameterType="java.lang.Long"
+            resultMap="dataSourceResultMap">
+        <include refid="getDataSourceDetailSql"/>
         where a.id = #{value}
+    </select>
+
+    <select id="getDataSourceDetailByName" parameterType="java.lang.String"
+            resultMap="dataSourceResultMap">
+        <include refid="getDataSourceDetailSql"/>
+        where a.`name` = #{value}
     </select>
 
     <sql id="searchReportDataSourceSql">

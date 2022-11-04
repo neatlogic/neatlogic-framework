@@ -1,11 +1,74 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-  ~ Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
   ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.form.dao.mapper.FormMapper">
+    <select id="searchFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
+            resultType="codedriver.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+        name,
+        label,
+        is_active AS isActive,
+        icon,
+        config AS configStr
+        FROM form_customitem
+        <include refid="searchFormCustomItemCondition"/>
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchFormCustomItemCount" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
+            resultType="int">
+        SELECT
+        count(1)
+        FROM form_customitem
+        <include refid="searchFormCustomItemCondition"/>
+    </select>
+
+    <sql id="searchFormCustomItemCondition">
+        <where>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE concat('%',#{keyword},'%') OR label LIKE concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFormCustomItemByName" parameterType="java.lang.String"
+            resultType="codedriver.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+               name,
+               label,
+               icon,
+               is_active              AS isActive,
+               config                 AS configStr,
+               config_template_config AS configTemplateConfig,
+               config_template        AS configTemplate,
+               view_template          AS viewTemplate,
+               view_template_config   AS viewTemplateConfig
+        FROM form_customitem
+        WHERE name = #{value}
+    </select>
+
+    <select id="getFormCustomItemById" parameterType="java.lang.Long"
+            resultType="codedriver.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+               name,
+               label,
+               icon,
+               is_active              AS isActive,
+               config                 AS configStr,
+               config_template_config AS configTemplateConfig,
+               config_template        AS configTemplate,
+               view_template          AS viewTemplate,
+               view_template_config   AS viewTemplateConfig
+        FROM form_customitem
+        WHERE id = #{value}
+    </select>
 
     <select id="getActionFormVersionByFormUuid" parameterType="java.lang.String"
             resultType="codedriver.framework.form.dto.FormVersionVo">
@@ -100,7 +163,8 @@
     <select id="getMaxVersionByFormUuid" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT max(version)
         FROM `form_version`
-        WHERE form_uuid = #{value} FOR UPDATE
+        WHERE form_uuid = #{value} FOR
+        UPDATE
     </select>
 
     <select id="getFormVersionByUuid" parameterType="java.lang.String"
@@ -215,48 +279,46 @@
     </select>
 
     <select id="getFormAttributeMatrixByMatrixUuid" resultType="codedriver.framework.form.dto.FormAttributeMatrixVo">
-        select
-            a.`matrix_uuid` AS matrixUuid,
-            a.`form_version_uuid` AS formVersionUuid,
-            a.`form_attribute_label` AS formAttributeLabel,
-            a.`form_attribute_uuid` AS formAttributeUuid,
-            b.`version`,
-            c.`uuid` AS formUuid,
-            c.`name` AS formName
+        select a.`matrix_uuid`          AS matrixUuid,
+               a.`form_version_uuid`    AS formVersionUuid,
+               a.`form_attribute_label` AS formAttributeLabel,
+               a.`form_attribute_uuid`  AS formAttributeUuid,
+               b.`version`,
+               c.`uuid`                 AS formUuid,
+               c.`name`                 AS formName
         FROM `form_attribute_matrix` a
-        JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
-        JOIN form c ON c.`uuid` = b.`form_uuid`
+                 JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+                 JOIN form c ON c.`uuid` = b.`form_uuid`
         WHERE a.`matrix_uuid` = #{matrixUuid}
         LIMIT #{startNum}, #{pageSize}
     </select>
 
-    <select id="getFormVersionListByFormConfigLikeKeyword" parameterType="java.lang.String" resultType="codedriver.framework.form.dto.FormVersionVo">
-        SELECT
-            a.`uuid`,
-            a.`version`,
-            a.`is_active` AS isActive,
-            a.`form_uuid` AS formUuid,
-            a.`form_config` AS formConfig,
-            a.`fcd`,
-            a.`fcu`,
-            a.`lcd`,
-            a.`lcu`
+    <select id="getFormVersionListByFormConfigLikeKeyword" parameterType="java.lang.String"
+            resultType="codedriver.framework.form.dto.FormVersionVo">
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfig,
+               a.`fcd`,
+               a.`fcu`,
+               a.`lcd`,
+               a.`lcu`
         FROM `form_version` a
-        WHERE a.`form_config` LIKE CONCAT('%',#{value},'%')
+        WHERE a.`form_config` LIKE CONCAT('%', #{value}, '%')
         ORDER BY a.`form_uuid`
     </select>
 
     <select id="getFormVersionList" resultType="codedriver.framework.form.dto.FormVersionVo">
-        SELECT
-            a.`uuid`,
-            a.`version`,
-            a.`is_active` AS isActive,
-            a.`form_uuid` AS formUuid,
-            a.`form_config` AS formConfig,
-            a.`fcd`,
-            a.`fcu`,
-            a.`lcd`,
-            a.`lcu`
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfig,
+               a.`fcd`,
+               a.`fcu`,
+               a.`lcd`,
+               a.`lcu`
         FROM `form_version` a
         ORDER BY a.`form_uuid`
     </select>
@@ -277,7 +339,9 @@
     </update>
 
     <update id="updateFormVersionConfigByUuid" parameterType="codedriver.framework.form.dto.FormVersionVo">
-        UPDATE `form_version` SET `form_config` = #{formConfig} WHERE `uuid` = #{uuid}
+        UPDATE `form_version`
+        SET `form_config` = #{formConfig}
+        WHERE `uuid` = #{uuid}
     </update>
 
     <update id="resetFormVersionIsActiveByFormUuid" parameterType="java.lang.String">
@@ -358,17 +422,14 @@
     </insert>
 
     <insert id="insertFormAttributeMatrix" parameterType="codedriver.framework.form.dto.FormAttributeMatrixVo">
-        INSERT IGNORE INTO `form_attribute_matrix` (
-            `form_version_uuid`,
-            `matrix_uuid`,
-            `form_attribute_uuid`,
-            `form_attribute_label`
-        ) VALUES (
-                     #{formVersionUuid},
-                     #{matrixUuid},
-                     #{formAttributeUuid},
-                     #{formAttributeLabel}
-                 )
+        INSERT IGNORE INTO `form_attribute_matrix` (`form_version_uuid`,
+                                                    `matrix_uuid`,
+                                                    `form_attribute_uuid`,
+                                                    `form_attribute_label`)
+        VALUES (#{formVersionUuid},
+                #{matrixUuid},
+                #{formAttributeUuid},
+                #{formAttributeLabel})
     </insert>
 
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">

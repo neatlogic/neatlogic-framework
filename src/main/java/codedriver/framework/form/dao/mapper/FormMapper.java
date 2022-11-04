@@ -1,84 +1,89 @@
 /*
- * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.form.dao.mapper;
 
-import java.util.List;
-
 import codedriver.framework.common.dto.ValueTextVo;
-import codedriver.framework.form.dto.FormAttributeMatrixVo;
+import codedriver.framework.form.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
-import codedriver.framework.form.dto.FormAttributeVo;
-import codedriver.framework.form.dto.FormVersionVo;
-import codedriver.framework.form.dto.FormVo;
+import java.util.List;
 
 @Component("processFormMapper")
 public interface FormMapper {
-    public FormVersionVo getActionFormVersionByFormUuid(String formUuid);
 
-    public List<FormVo> searchFormList(FormVo formVo);
+    List<FormCustomItemVo> searchFormCustomItem(FormCustomItemVo formCustomItemVo);
 
-    public List<FormVo> getFormListByUuidList(List<String> uuid);
+    int searchFormCustomItemCount(FormCustomItemVo formCustomItemVo);
 
-    public List<ValueTextVo> searchFormListForSelect(FormVo formVo);
+    FormCustomItemVo getFormCustomItemByName(String name);
 
-    public int searchFormCount(FormVo formVo);
+    FormCustomItemVo getFormCustomItemById(Long id);
 
-    public FormVo getFormByUuid(String formUuid);
+    FormVersionVo getActionFormVersionByFormUuid(String formUuid);
 
-    public FormVersionVo getFormVersionByUuid(String formVersionUuid);
+    List<FormVo> searchFormList(FormVo formVo);
 
-    public List<FormVersionVo> getFormVersionByFormUuid(String formUuid);
+    List<FormVo> getFormListByUuidList(List<String> uuid);
 
-    public List<FormVersionVo> getFormVersionSimpleByFormUuid(String formUuid);
+    List<ValueTextVo> searchFormListForSelect(FormVo formVo);
 
-    public Integer getMaxVersionByFormUuid(String formUuid);
+    int searchFormCount(FormVo formVo);
 
-    public int checkFormIsExists(String uuid);
+    FormVo getFormByUuid(String formUuid);
 
-    public int checkFormNameIsRepeat(FormVo formVo);
+    FormVersionVo getFormVersionByUuid(String formVersionUuid);
 
-    public int checkFormVersionIsExists(String uuid);
+    List<FormVersionVo> getFormVersionByFormUuid(String formUuid);
 
-    public List<FormAttributeVo> getFormAttributeList(FormAttributeVo formAttributeVo);
+    List<FormVersionVo> getFormVersionSimpleByFormUuid(String formUuid);
 
-    public List<FormAttributeVo> getFormAttributeListByFormUuidList(List<String> formUuidList);
+    Integer getMaxVersionByFormUuid(String formUuid);
 
-    public List<FormAttributeMatrixVo> getFormAttributeMatrixByMatrixUuid(@Param("matrixUuid") String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
+    int checkFormIsExists(String uuid);
+
+    int checkFormNameIsRepeat(FormVo formVo);
+
+    int checkFormVersionIsExists(String uuid);
+
+    List<FormAttributeVo> getFormAttributeList(FormAttributeVo formAttributeVo);
+
+    List<FormAttributeVo> getFormAttributeListByFormUuidList(List<String> formUuidList);
+
+    List<FormAttributeMatrixVo> getFormAttributeMatrixByMatrixUuid(@Param("matrixUuid") String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
 
     List<FormVersionVo> getFormVersionListByFormConfigLikeKeyword(String value);
 
     List<FormVersionVo> getFormVersionList();
 
-    public int insertForm(FormVo formVo);
+    int insertForm(FormVo formVo);
 
-    public int insertFormAttributeMatrix(FormAttributeMatrixVo componentVo);
+    int insertFormAttributeMatrix(FormAttributeMatrixVo componentVo);
 
-    public int resetFormVersionIsActiveByFormUuid(String formUuid);
+    int resetFormVersionIsActiveByFormUuid(String formUuid);
 
-    public int updateFormVersion(FormVersionVo formVersionVo);
+    int updateFormVersion(FormVersionVo formVersionVo);
 
     int updateFormVersionConfigByUuid(FormVersionVo formVersionVo);
 
-    public void updateForm(FormVo formVo);
+    void updateForm(FormVo formVo);
 
     int updateFormAttributeConfig(FormAttributeVo formAttributeVo);
 
-    public int insertFormVersion(FormVersionVo formVersionVo);
+    int insertFormVersion(FormVersionVo formVersionVo);
 
-    public int insertFormAttribute(FormAttributeVo formAttributeVo);
+    int insertFormAttribute(FormAttributeVo formAttributeVo);
 
-    public int deleteFormAttributeByFormUuid(String formUuid);
+    int deleteFormAttributeByFormUuid(String formUuid);
 
-    public int deleteFormByUuid(String uuid);
+    int deleteFormByUuid(String uuid);
 
-    public int deleteFormVersionByFormUuid(String formUuid);
+    int deleteFormVersionByFormUuid(String formUuid);
 
-    public int deleteFormVersionByUuid(String uuid);
+    int deleteFormVersionByUuid(String uuid);
 
-    public int deleteFormAttributeMatrixByFormVersionUuid(String formVersionUuid);
+    int deleteFormAttributeMatrixByFormVersionUuid(String formVersionUuid);
 }

@@ -22,6 +22,8 @@ public class FormCustomItemVo extends BasePageVo {
     private String label;
     @EntityField(name = "配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
+    @EntityField(name = "图标", type = ApiParamType.STRING)
+    private String icon;
     @JSONField(serialize = false)
     private String configStr;
     @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
@@ -44,6 +46,14 @@ public class FormCustomItemVo extends BasePageVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String getName() {

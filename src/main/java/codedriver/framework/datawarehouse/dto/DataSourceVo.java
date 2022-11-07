@@ -60,6 +60,9 @@ public class DataSourceVo extends BasePageVo {
     private List<DataSourceDataVo> dataList;
     @EntityField(name = "参数列表", type = ApiParamType.JSONARRAY)
     private List<DataSourceParamVo> paramList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
+    @EntityField(name = "数据库类型", type = ApiParamType.STRING)
+    private String dbType;
+
 
     public DataSourceVo() {
 
@@ -281,5 +284,13 @@ public class DataSourceVo extends BasePageVo {
 
     public void setParamList(List<DataSourceParamVo> paramList) {
         this.paramList = paramList;
+    }
+
+    public String getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(String dbType) {
+        this.dbType = dbType;
     }
 }

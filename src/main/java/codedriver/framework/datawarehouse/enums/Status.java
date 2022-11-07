@@ -6,7 +6,7 @@
 package codedriver.framework.datawarehouse.enums;
 
 public enum Status {
-    DOING("doing", "同步数据中"), DONE("done", "同步完成");
+    DOING("doing", "同步数据中"), DONE("done", "同步完成"), FAILED("failed", "同步失败");
 
     private final String value;
     private final String text;

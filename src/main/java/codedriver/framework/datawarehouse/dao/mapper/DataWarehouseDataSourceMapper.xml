@@ -40,6 +40,7 @@
         <result column="expireUnit" property="expireUnit"/>
         <result column="isActive" property="isActive"/>
         <result column="dataCount" property="dataCount"/>
+        <result column="dbType" property="dbType"/>
         <collection property="fieldList" ofType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
             <id column="fieldId" property="id"/>
             <result column="fieldName" property="name"/>
@@ -90,6 +91,7 @@
                a.is_active       as isActive,
                a.status          as status,
                a.data_count      as dataCount,
+               a.db_type         as dbType,
                b.id              as fieldId,
                b.name            as fieldName,
                b.label           as fieldLabel,
@@ -170,6 +172,7 @@
             expire_count    = #{expireCount},
             expire_unit     = #{expireUnit},
             is_active       = #{isActive},
+            db_type         = #{dbType},
             xml             = #{xml,typeHandler=CompressHandler}
         where id = #{id}
     </select>
@@ -181,6 +184,7 @@
             mode            = #{mode},
             expire_count    = #{expireCount},
             expire_unit     = #{expireUnit},
+            db_type         = #{dbType},
             is_active       = #{isActive}
         where id = #{id}
     </select>
@@ -202,6 +206,7 @@
                                               expire_count,
                                               expire_unit,
                                               xml,
+                                              db_type,
                                               is_active)
         values (#{id},
                 #{name},
@@ -212,6 +217,7 @@
                 #{expireCount},
                 #{expireUnit},
                 #{xml,typeHandler=CompressHandler},
+                #{dbType},
                 #{isActive})
     </select>
 
@@ -254,7 +260,8 @@
     <update id="updateDataSourceField" parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
         update datawarehouse_datasource_field
         set label  = #{label},
-            is_key = #{isKey}
+            is_key = #{isKey},
+            aggregate = #{aggregate}
         where id = #{id}
     </update>
 

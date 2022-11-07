@@ -40,6 +40,12 @@ public enum InspectStatus implements IEnum {
         return cssClass;
     }
 
+
+    @Override
+    public String getEnumName() {
+        return "巡检状态";
+    }
+
     public static String getText(String _value) {
         for (InspectStatus s : InspectStatus.values()) {
             if (s.getValue().equalsIgnoreCase(_value)) {

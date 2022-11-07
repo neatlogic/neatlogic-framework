@@ -6,6 +6,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.form.dao.mapper.FormMapper">
+    <select id="checkFormCustomItemNameIsExists" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
+            resultType="int">
+        SELECT count(1)
+        FROM form_customitem
+        WHERE name = #{name}
+          AND id != #{id}
+    </select>
+
     <select id="searchFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
             resultType="codedriver.framework.form.dto.FormCustomItemVo">
         SELECT id,
@@ -500,5 +508,11 @@
         DELETE
         FROM `form_attribute_matrix`
         WHERE `form_version_uuid` = #{formVersionUuid}
+    </delete>
+
+    <delete id="deleteFormCustomItem" parameterType="java.lang.Long">
+        DELETE
+        FROM `form_customitem`
+        WHERE id = #{value}
     </delete>
 </mapper>

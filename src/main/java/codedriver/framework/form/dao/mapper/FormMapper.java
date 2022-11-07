@@ -14,6 +14,7 @@ import java.util.List;
 
 @Component("processFormMapper")
 public interface FormMapper {
+    int checkFormCustomItemNameIsExists(FormCustomItemVo formCustomItemVo);
 
     List<FormCustomItemVo> searchFormCustomItem(FormCustomItemVo formCustomItemVo);
 
@@ -90,4 +91,6 @@ public interface FormMapper {
     int deleteFormVersionByUuid(String uuid);
 
     int deleteFormAttributeMatrixByFormVersionUuid(String formVersionUuid);
+
+    void deleteFormCustomItem(Long id);
 }

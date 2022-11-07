@@ -6,6 +6,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="codedriver.framework.form.dao.mapper.FormMapper">
+    <select id="checkFormCustomItemNameIsExists" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
+            resultType="int">
+        SELECT count(1)
+        FROM form_customitem
+        WHERE name = #{name}
+          AND id != #{id}
+    </select>
+
     <select id="searchFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo"
             resultType="codedriver.framework.form.dto.FormCustomItemVo">
         SELECT id,
@@ -99,13 +107,14 @@
         fv.`lcd`
         FROM `form` f
         JOIN `form_version` fv ON fv.`form_uuid`=f.`uuid` AND fv.`is_active` = 1
-        WHERE 1=1
-        <if test="isActive != null">
-            AND f.`is_active` = #{isActive}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            AND f.`name` LIKE CONCAT('%', #{keyword},'%')
-        </if>
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
         ORDER BY f.`fcd` DESC
         <if test="needPage">
             LIMIT #{startNum}, #{pageSize}
@@ -132,13 +141,14 @@
         f.`uuid` as `value`,
         f.`name` as `text`
         FROM `form` f
-        WHERE 1=1
-        <if test="isActive != null">
-            AND f.`is_active` = #{isActive}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            AND f.`name` LIKE CONCAT('%', #{keyword},'%')
-        </if>
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
         ORDER BY f.`fcd` DESC
         <if test="needPage">
             LIMIT #{startNum}, #{pageSize}
@@ -151,13 +161,14 @@
         FROM
         `form` f
         JOIN `form_version` fv ON fv.`form_uuid`=f.`uuid` AND fv.`is_active` = 1
-        WHERE 1=1
-        <if test="isActive != null">
-            AND f.`is_active` = #{isActive}
-        </if>
-        <if test="keyword != null and keyword != ''">
-            AND f.`name` LIKE CONCAT('%', #{keyword},'%')
-        </if>
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
     </select>
 
     <select id="getMaxVersionByFormUuid" parameterType="java.lang.String" resultType="java.lang.Integer">
@@ -370,6 +381,43 @@
           AND `uuid` = #{uuid}
     </update>
 
+    <update id="updateFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo">
+        UPDATE form_customitem
+        SET name                   = #{name},
+            label                  = #{label},
+            icon=#{icon},
+            is_active              =#{isActive},
+            config                 = #{configStr},
+            config_template_config = #{configTemplateConfig},
+            config_template        = #{configTemplate},
+            view_template          = #{viewTemplate},
+            view_template_config   = #{viewTemplateConfig}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo">
+        INSERT INTO form_customitem (id,
+                                     name,
+                                     label,
+                                     icon,
+                                     is_active,
+                                     config,
+                                     config_template_config,
+                                     config_template,
+                                     view_template,
+                                     view_template_config)
+        VALUES (#{id},
+                #{name},
+                #{label},
+                #{icon},
+                #{isActive},
+                #{configStr},
+                #{configTemplateConfig},
+                #{configTemplate},
+                #{viewTemplate},
+                #{viewTemplateConfig})
+    </insert>
+
     <insert id="insertForm" parameterType="codedriver.framework.form.dto.FormVo">
         INSERT INTO `form` (`uuid`,
                             `name`,
@@ -460,5 +508,11 @@
         DELETE
         FROM `form_attribute_matrix`
         WHERE `form_version_uuid` = #{formVersionUuid}
+    </delete>
+
+    <delete id="deleteFormCustomItem" parameterType="java.lang.Long">
+        DELETE
+        FROM `form_customitem`
+        WHERE id = #{value}
     </delete>
 </mapper>

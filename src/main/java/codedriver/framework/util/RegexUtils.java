@@ -85,7 +85,6 @@ public final class RegexUtils {
             put(DATE_TIME, Pattern.compile("[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\\s+(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d"));
             put(PASSWORD, Pattern.compile("^(?!.*[\\u4E00-\\u9FA5\\s])(?!^[a-zA-Z]+$)(?!^[\\d]+$)(?!^[^a-zA-Z\\d]+$)^.{8,20}$"));
             put(CONNECT_URL, Pattern.compile("^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+)|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"));
-            put(ORDER_BY, Pattern.compile("^((\\+?-?\\w+(\\.\\w+)?),?\\s*)+\\s+((DESC)|(desc)|(ASC)|(asc))$"));
             put(DB_SCHEMA, Pattern.compile("([^.])+\\.([^.])+"));
 
             // 以下正则表达式参考前端TsValidtor.js
@@ -121,13 +120,5 @@ public final class RegexUtils {
         } else {
             return false;
         }
-    }
-
-    /**
-     * 是否匹配order by后面的字符串规则
-     */
-    public static boolean isMatchOrderBy(String source) {
-        return isMatch(source, ORDER_BY);
-
     }
 }

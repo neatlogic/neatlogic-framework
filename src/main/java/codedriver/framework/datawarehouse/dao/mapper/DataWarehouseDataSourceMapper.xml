@@ -228,6 +228,29 @@
         </foreach>
     </select>
 
+    <select id="getDataSourceNameListByIdList" parameterType="java.util.List" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
+        select
+        a.`id`,
+        a.`name`
+        from datawarehouse_datasource a
+        where a.id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDataSourceFieldNameListByIdList" parameterType="java.util.List"
+            resultType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
+        select
+        a.`id`,
+        a.`name`
+        from datawarehouse_datasource_field a
+        where a.id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <update id="resetReportDataSourceStatus">
         update datawarehouse_datasource
         set status = 'done'

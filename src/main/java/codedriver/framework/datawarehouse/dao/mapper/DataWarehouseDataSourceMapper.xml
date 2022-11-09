@@ -228,6 +228,16 @@
         </foreach>
     </select>
 
+    <select id="getDataSourceNameAndFieldNameListById" parameterType="java.lang.Long" resultMap="dataSourceResultMap">
+        select a.id,
+               a.`name`,
+               b.id   as fieldId,
+               b.name as fieldName
+        from datawarehouse_datasource a
+        left join datawarehouse_datasource_field b on a.id = b.datasource_id
+        where a.id = #{value}
+    </select>
+
     <select id="getDataSourceNameListByIdList" parameterType="java.util.List" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
         select
         a.`id`,
@@ -247,6 +257,29 @@
         from datawarehouse_datasource_field a
         where a.id in
         <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDataSourceNameListByNameList" parameterType="java.util.List" resultType="codedriver.framework.datawarehouse.dto.DataSourceVo">
+        select
+        a.`id`,
+        a.`name`
+        from datawarehouse_datasource a
+        where a.name in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDataSourceFieldNameListByDatasourceIdAndNameList"
+            resultType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
+        select
+        a.`id`,
+        a.`name`
+        from datawarehouse_datasource_field a
+        where a.datasource_id = #{datasourceId} and a.name in
+        <foreach collection="nameList" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>

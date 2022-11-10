@@ -47,9 +47,9 @@ public class ExceptionCatchInterceptor implements Interceptor {
             while (targetException instanceof InvocationTargetException) {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
-            Logger logger = LoggerFactory.getLogger("deadlockAudit");
-            logger.error(targetException.getMessage(), targetException);
             if ("MySQLTransactionRollbackException".equals(targetException.getClass().getSimpleName())) {
+                Logger logger = LoggerFactory.getLogger("deadlockAudit");
+                logger.error(targetException.getMessage(), targetException);
                 Configuration configuration = ms.getConfiguration();
                 Environment environment = configuration.getEnvironment();
                 DataSource dataSource = environment.getDataSource();

@@ -228,6 +228,29 @@
         </foreach>
     </select>
 
+    <select id="getDataSourceNameAndFieldNameListById" parameterType="java.lang.Long" resultMap="dataSourceResultMap">
+        select a.id,
+               a.`name`,
+               b.id   as fieldId,
+               b.name as fieldName
+        from datawarehouse_datasource a
+        left join datawarehouse_datasource_field b on a.id = b.datasource_id
+        where a.id = #{value}
+    </select>
+
+    <select id="getDataSourceListByNameList" parameterType="java.util.List" resultMap="dataSourceResultMap">
+        select a.id,
+        a.`name`,
+        b.id   as fieldId,
+        b.name as fieldName
+        from datawarehouse_datasource a
+        left join datawarehouse_datasource_field b on a.id = b.datasource_id
+        where a.name in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <update id="resetReportDataSourceStatus">
         update datawarehouse_datasource
         set status = 'done'

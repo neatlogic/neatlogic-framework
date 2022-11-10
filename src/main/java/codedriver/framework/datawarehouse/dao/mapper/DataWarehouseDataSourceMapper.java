@@ -29,6 +29,10 @@ public interface DataWarehouseDataSourceMapper {
 
     List<Long> getExistIdListByIdList(List<Long> idList);
 
+    DataSourceVo getDataSourceNameAndFieldNameListById(Long id);
+
+    List<DataSourceVo> getDataSourceListByNameList(List<String> nameList);
+
     void insertDataSource(DataSourceVo reportDataSourceVo);
 
     void insertDataSourceParam(DataSourceParamVo dataSourceParamVo);

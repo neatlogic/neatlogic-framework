@@ -308,6 +308,18 @@
         GROUP BY a.role_uuid
     </select>
 
+    <select id="getRoleUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String">
+        SELECT
+        DISTINCT
+        `uuid`
+        FROM `role`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
     <insert id="insertRole" parameterType="codedriver.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
         VALUES (#{id}, #{uuid}, #{name}, #{description})

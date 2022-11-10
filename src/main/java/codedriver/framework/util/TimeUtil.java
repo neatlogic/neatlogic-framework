@@ -33,7 +33,7 @@ public class TimeUtil {
     public static final String FMT_yyyy_MM_dd = "yyyy-MM-dd";
     private static final String yyyyMMdd = "yyyyMMdd";
     private static final String yyMMdd = "yyMMdd";
-    private static final String yyyyMMddHHmmss = "yyyyMMddHHmmss";
+    public static final String yyyyMMddHHmmss = "yyyyMMddHHmmss";
 
     public static final String HH_MM = "HH:mm";
     public static final String HH_MM_SS = "HH:mm:ss";

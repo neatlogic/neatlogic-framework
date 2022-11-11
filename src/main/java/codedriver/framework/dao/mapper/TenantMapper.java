@@ -1,52 +1,51 @@
 package codedriver.framework.dao.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import codedriver.framework.dto.TenantAuditVo;
 import codedriver.framework.dto.TenantModuleVo;
 import codedriver.framework.dto.TenantVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface TenantMapper {
 
-	public String getTenantAuditDetailByHash(String hash);
+    String getTenantAuditDetailByHash(String hash);
 
-	public List<TenantAuditVo> searchTenantAudit(TenantAuditVo tenantAuditVo);
+    List<TenantAuditVo> searchTenantAudit(TenantAuditVo tenantAuditVo);
 
-	public int searchTenantAuditCount(TenantAuditVo tenantAuditVo);
+    int searchTenantAuditCount(TenantAuditVo tenantAuditVo);
 
-	public int searchTenantCount(TenantVo tenantVo);
+    int searchTenantCount(TenantVo tenantVo);
 
-	public List<TenantVo> searchTenant(TenantVo tenantVo);
+    List<TenantVo> searchTenant(TenantVo tenantVo);
 
-	public List<String> getTenantModuleGroupByTenantId(Long tenantId);
+    List<String> getTenantModuleGroupByTenantId(Long tenantId);
 
-	public TenantVo getTenantByUuid(String tenantUuid);
+    TenantVo getTenantByUuid(String tenantUuid);
 
-	public TenantVo getTenantById(Long tenantId);
+    TenantVo getTenantById(Long tenantId);
 
-	public List<TenantVo> getAllActiveTenant();
+    List<TenantVo> getAllActiveTenant();
 
-	public int insertTenant(TenantVo tenantVo);
+    int insertTenant(TenantVo tenantVo);
 
-	public int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("moduleGroup") String moduleGroup);
+    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup);
 
-	public int insertTenantAudit(TenantAuditVo tenantAuditVo);
+    int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
-	public int insertTenantModule(TenantModuleVo tenantModuleVo);
+    int insertTenantModule(TenantModuleVo tenantModuleVo);
 
-	public int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
+    int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-	public int updateTenant(TenantVo tenantVo);
+    int updateTenant(TenantVo tenantVo);
 
-	public int updateTenantAudit(TenantAuditVo tenantAuditVo);
+    int updateTenantAudit(TenantAuditVo tenantAuditVo);
 
-	public int updateTenantStatus(TenantVo tenantVo);
+    int updateTenantStatus(TenantVo tenantVo);
 
-	public int updateTenantModule(TenantModuleVo tenantModuleVo);
+    int updateTenantModule(TenantModuleVo tenantModuleVo);
 
-	public int checkTenantUuidIsExists(TenantVo tenantVo);
+    int checkTenantUuidIsExists(TenantVo tenantVo);
 
-	public int deleteTenantModuleGroupByTenantId(Long tenantId);
+    int deleteTenantModuleGroupByTenantId(Long tenantId);
 }

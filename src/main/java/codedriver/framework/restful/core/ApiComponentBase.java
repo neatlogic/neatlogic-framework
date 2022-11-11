@@ -163,14 +163,16 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } finally {
             long endTime = System.currentTimeMillis();
-            ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
-            // 如果没有配置，则使用默认配置
-            if (apiConfigVo == null) {
-                apiConfigVo = apiVo;
-            }
-            if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
-                //TODO 对象冲突
-                saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+            if (!apiVo.getModuleId().equals("master")) {
+                ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
+                // 如果没有配置，则使用默认配置
+                if (apiConfigVo == null) {
+                    apiConfigVo = apiVo;
+                }
+                if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+                    //TODO 对象冲突
+                    saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+                }
             }
 
         }

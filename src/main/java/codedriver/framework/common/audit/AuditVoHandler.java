@@ -2,28 +2,28 @@ package codedriver.framework.common.audit;
 
 public interface AuditVoHandler {
 
-	public String getParam();
+	String getParam();
 
-	public void setParam(String param);
+	void setParam(String param);
 
-	public Object getResult();
+	Object getResult();
 
-	public void setResult(Object result);
+	void setResult(Object result);
 
-	public String getError();
+	String getError();
 
-	public void setError(String error);
+	void setError(String error);
 
-	public String getParamFilePath();
+	String getParamFilePath();
 
-	public void setParamFilePath(String paramFilePath);
+	void setParamFilePath(String paramFilePath);
 
-	public String getResultFilePath();
+	String getResultFilePath();
 
-	public void setResultFilePath(String resultFilePath);
+	void setResultFilePath(String resultFilePath);
 
-	public String getErrorFilePath();
+	String getErrorFilePath();
 
-	public void setErrorFilePath(String errorFilePath);
+	void setErrorFilePath(String errorFilePath);
 
 }

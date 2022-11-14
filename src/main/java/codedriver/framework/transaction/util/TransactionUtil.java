@@ -19,9 +19,23 @@ public class TransactionUtil {
 
     // 开启事务
     public static TransactionStatus openTx() {
+        return openTxWithPropagationBehavior(null);
+    }
+
+    public static TransactionStatus openNewTx() {
+        return openTxWithPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    }
+
+    /**
+     * 使用指定的传播行为开启事务，如果不指定，则默认使用PROPAGATION_REQUIRED
+     *
+     * @param propagationBehavior TransactionDefinition中定义的传播行为
+     * @return 事务
+     */
+    private static TransactionStatus openTxWithPropagationBehavior(Integer propagationBehavior) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        def.setPropagationBehavior(propagationBehavior != null ? propagationBehavior : TransactionDefinition.PROPAGATION_REQUIRED);
         return dataSourceTransactionManager.getTransaction(def);
     }
 

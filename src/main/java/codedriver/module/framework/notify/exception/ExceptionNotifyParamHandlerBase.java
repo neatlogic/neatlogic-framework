@@ -16,7 +16,10 @@ public abstract class ExceptionNotifyParamHandlerBase implements INotifyParamHan
 
     @Override
     public Object getText(Object object) {
-        return getMyText((NotifyVo) object);
+        if (object instanceof NotifyVo) {
+            return getMyText((NotifyVo) object);
+        }
+        return null;
     }
 
     public abstract Object getMyText(NotifyVo notifyVo);

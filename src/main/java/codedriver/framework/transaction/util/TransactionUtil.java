@@ -30,7 +30,7 @@ public class TransactionUtil {
      * 使用指定的传播行为开启事务，如果不指定，则默认使用PROPAGATION_REQUIRED
      *
      * @param propagationBehavior TransactionDefinition中定义的传播行为
-     * @return 事务
+     * @return TransactionStatus
      */
     private static TransactionStatus openTxWithPropagationBehavior(Integer propagationBehavior) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();

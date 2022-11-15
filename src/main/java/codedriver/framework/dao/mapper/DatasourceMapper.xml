@@ -23,8 +23,7 @@
     </select>
 
     <select id="getAllTenantDatasource" resultType="codedriver.framework.dto.DatasourceVo">
-        SELECT
-                tenant_id as tenantId,
+        SELECT tenant_id     as tenantId,
                `tenant_uuid` AS `tenantUuid`,
                `url`,
                `username`,
@@ -61,9 +60,11 @@
     </insert>
 
     <insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">
-        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}`;
-        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
-        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_olap`;
-        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_olap`.* to '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}` character set utf8mb4 COLLATE utf8mb4_general_ci;
+        DROP USER IF EXISTS '${tenantUuid}'@'%';
+        CREATE USER '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}`.* to '${tenantUuid}'@'%';
+        CREATE DATABASE IF NOT EXISTS `codedriver_${tenantUuid}_data` character set utf8mb4 COLLATE utf8mb4_general_ci;
+        GRANT ALL PRIVILEGES ON `codedriver_${tenantUuid}_data`.* to '${tenantUuid}'@'%';
     </insert>
 </mapper>

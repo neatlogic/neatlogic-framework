@@ -1,9 +1,9 @@
 package codedriver.framework.dto;
 
-import java.util.Date;
-
 import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.restful.annotation.EntityField;
+
+import java.util.Date;
 
 public class TenantModuleVo {
 

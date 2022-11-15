@@ -63,7 +63,7 @@ public class DatasourceVo {
 
     public String getUrl() {
         if (StringUtils.isBlank(url)) {
-            url = "jdbc:mysql://{host}:{port}/{dbname}?characterEncoding=UTF-8&jdbcCompliantTruncation=false&allowMultiQueries=true";
+            url = "jdbc:mysql://{host}:{port}/{dbname}?characterEncoding=UTF-8&jdbcCompliantTruncation=false&allowMultiQueries=true&useSSL=false&&serverTimeZone=Asia/Shanghai";
         }
         return url;
     }

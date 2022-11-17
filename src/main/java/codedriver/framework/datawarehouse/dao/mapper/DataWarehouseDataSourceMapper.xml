@@ -284,7 +284,10 @@
         update datawarehouse_datasource_field
         set label  = #{label},
             is_key = #{isKey},
-            aggregate = #{aggregate}
+            aggregate = #{aggregate},
+            is_condition = #{isCondition},
+            input_type = #{inputType},
+            config = #{configStr}
         where id = #{id}
     </update>
 

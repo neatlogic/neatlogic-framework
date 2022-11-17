@@ -320,6 +320,15 @@
         values (#{id}, #{dataSourceId}, #{name}, #{label}, #{defaultValue})
     </insert>
 
+    <insert id="batchInsertDataSourceParam" parameterType="java.util.List">
+        insert into datawarehouse_datasource_param
+            (id, datasource_id, name, label, default_value)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.dataSourceId}, #{item.name}, #{item.label}, #{item.defaultValue})
+        </foreach>
+    </insert>
+
     <insert id="insertDataSourceField"
             parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
         insert into datawarehouse_datasource_field
@@ -345,6 +354,36 @@
                 #{inputType},
                 #{configStr}
                 )
+    </insert>
+
+    <insert id="batchInsertDataSourceField" parameterType="java.util.List">
+        insert into datawarehouse_datasource_field
+        (id,
+         datasource_id,
+         name,
+         label,
+         type,
+         aggregate,
+         is_key,
+         is_condition,
+         input_type,
+         config
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.dataSourceId},
+                #{item.name},
+                #{item.label},
+                #{item.type},
+                #{item.aggregate},
+                #{item.isKey},
+                #{item.isCondition},
+                #{item.inputType},
+                #{item.configStr}
+            )
+        </foreach>
     </insert>
 
     <!-- <insert id="insertReportDataSourceCondition"
@@ -385,9 +424,34 @@
         where id = #{value}
     </delete>
 
+    <delete id="deleteDataSourceFieldByIdList" parameterType="java.util.List">
+        delete
+        from datawarehouse_datasource_field
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
     <delete id="deleteDataSourceParamById" parameterType="java.lang.Long">
         delete
         from datawarehouse_datasource_param
         where id = #{value}
     </delete>
+
+    <delete id="deleteDataSourceParamByIdList" parameterType="java.util.List">
+        delete
+        from datawarehouse_datasource_param
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDataSourceParamByDataSourceId" parameterType="java.lang.Long">
+        delete
+        from datawarehouse_datasource_param
+        where datasource_id = #{value}
+    </delete>
+
 </mapper>

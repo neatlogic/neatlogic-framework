@@ -37,7 +37,11 @@ public interface DataWarehouseDataSourceMapper {
 
     void insertDataSourceParam(DataSourceParamVo dataSourceParamVo);
 
+    void batchInsertDataSourceParam(List<DataSourceParamVo> list);
+
     void insertDataSourceField(DataSourceFieldVo dataSourceFieldVo);
+
+    void batchInsertDataSourceField(List<DataSourceFieldVo> list);
 
     // void insertReportDataSourceCondition(DataSourceConditionVo reportDataSourceConditionVo);
 
@@ -71,5 +75,11 @@ public interface DataWarehouseDataSourceMapper {
 
     void deleteDataSourceFieldById(Long id);
 
+    void deleteDataSourceFieldByIdList(List<Long> idList);
+
     void deleteDataSourceParamById(Long id);
+
+    void deleteDataSourceParamByIdList(List<Long> idList);
+
+    void deleteDataSourceParamByDataSourceId(Long dataSourceId);
 }

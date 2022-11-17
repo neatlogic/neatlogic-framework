@@ -15,6 +15,7 @@ import java.util.List;
 public class TransactionSynchronizationPool {
 
     private static final ThreadLocal<List<CodeDriverThread>> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<List<CodeDriverThread>> threadLocalAfterRollback = new ThreadLocal<>();
 
     public static void execute(CodeDriverThread thread) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -48,9 +49,43 @@ public class TransactionSynchronizationPool {
                     public void afterCompletion(int status) {
                         threadLocal.remove();
                     }
+
+
                 });
             }
             runnableList.add(thread);
+        } else {
+            /*
+              如果当前不存在事务，直接将任务存任务放入线程池
+             */
+            CachedThreadPool.execute(thread);
+        }
+    }
+
+
+    public static void executeAfterRollback(CodeDriverThread thread) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            /*
+              如果当前存在事务，先将任务存放在threadLocal中，等待当前事务提交成功再将任务放入线程池
+             */
+            List<CodeDriverThread> rollbackRunnableList = threadLocalAfterRollback.get();
+            if (rollbackRunnableList == null) {
+                rollbackRunnableList = new ArrayList<>();
+                threadLocalAfterRollback.set(rollbackRunnableList);
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        if(status == 1){
+                            List<CodeDriverThread> rollbackRunnableList = threadLocalAfterRollback.get();
+                            for (CodeDriverThread rollbackRunnable : rollbackRunnableList) {
+                                CachedThreadPool.execute(rollbackRunnable);
+                            }
+                        }
+                        threadLocalAfterRollback.remove();
+                    }
+                });
+            }
+            rollbackRunnableList.add(thread);
         } else {
             /*
               如果当前不存在事务，直接将任务存任务放入线程池

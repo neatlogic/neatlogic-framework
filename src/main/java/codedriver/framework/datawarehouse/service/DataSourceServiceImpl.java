@@ -212,4 +212,21 @@ public class DataSourceServiceImpl implements DataSourceService {
             schedulerManager.unloadJob(jobObject);
         }
     }
+
+    @Override
+    public List<DataSourceFieldVo> revertFieldCondition(List<DataSourceFieldVo> newFieldList, List<DataSourceFieldVo> oldFieldList) {
+        if (CollectionUtils.isNotEmpty(newFieldList) && CollectionUtils.isNotEmpty(oldFieldList)) {
+            for (DataSourceFieldVo fieldVo : newFieldList) {
+                Optional<DataSourceFieldVo> opt = oldFieldList.stream()
+                        .filter(o -> Objects.equals(fieldVo.getName(), o.getName()) && Objects.equals(o.getIsCondition(), 1)).findFirst();
+                if (opt.isPresent()) {
+                    DataSourceFieldVo oldField = opt.get();
+                    fieldVo.setIsCondition(1);
+                    fieldVo.setInputType(oldField.getInputType());
+                    fieldVo.setConfig(oldField.getConfig());
+                }
+            }
+        }
+        return newFieldList;
+    }
 }

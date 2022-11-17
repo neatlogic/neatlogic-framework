@@ -282,12 +282,19 @@
 
     <update id="updateDataSourceField" parameterType="codedriver.framework.datawarehouse.dto.DataSourceFieldVo">
         update datawarehouse_datasource_field
-        set label  = #{label},
+        set
+            <if test="isCondition != null">
+                is_condition = #{isCondition},
+            </if>
+            <if test="inputType != null">
+                input_type = #{inputType},
+            </if>
+            <if test="configStr != null">
+                config = #{configStr},
+            </if>
+            label  = #{label},
             is_key = #{isKey},
-            aggregate = #{aggregate},
-            is_condition = #{isCondition},
-            input_type = #{inputType},
-            config = #{configStr}
+            aggregate = #{aggregate}
         where id = #{id}
     </update>
 

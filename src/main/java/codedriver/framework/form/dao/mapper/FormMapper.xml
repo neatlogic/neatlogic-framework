@@ -373,14 +373,6 @@
         WHERE `uuid` = #{uuid};
     </update>
 
-<!--    <update id="updateFormAttributeConfig" parameterType="codedriver.framework.form.dto.FormAttributeVo">-->
-<!--        UPDATE `form_attribute`-->
-<!--        SET `config` = #{config}-->
-<!--        WHERE `form_uuid` = #{formUuid}-->
-<!--          AND `formversion_uuid` = #{formVersionUuid}-->
-<!--          AND `uuid` = #{uuid}-->
-<!--    </update>-->
-
     <update id="updateFormCustomItem" parameterType="codedriver.framework.form.dto.FormCustomItemVo">
         UPDATE form_customitem
         SET name                   = #{name},

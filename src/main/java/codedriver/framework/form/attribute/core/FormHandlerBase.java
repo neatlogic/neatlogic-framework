@@ -182,6 +182,6 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
 
     @Override
     public int getSort() {
-        return 0;
+        return 100;
     }
 }

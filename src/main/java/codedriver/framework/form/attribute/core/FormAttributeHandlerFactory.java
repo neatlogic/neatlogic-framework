@@ -21,6 +21,7 @@ public class FormAttributeHandlerFactory extends ModuleInitializedListenerBase {
     }
 
     public static List<IFormAttributeHandler> getHandlerList() {
+        handlerList.sort(Comparator.comparingInt(IFormAttributeHandler::getSort));
         return handlerList;
     }
 

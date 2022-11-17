@@ -6,8 +6,6 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.form.attribute.core.INewAttribute;
-import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -20,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class TextareaHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
+public class TextareaHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {

@@ -134,4 +134,54 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
     }
 
     protected abstract JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj);
+
+    @Override
+    public String getHandlerName() {
+        return null;
+    }
+
+    @Override
+    public String getIcon() {
+        return null;
+    }
+
+    @Override
+    public String getDataType() {
+        return null;
+    }
+
+    @Override
+    public boolean isShowable() {
+        return false;
+    }
+
+    @Override
+    public boolean isValueable() {
+        return false;
+    }
+
+    @Override
+    public boolean isFilterable() {
+        return false;
+    }
+
+    @Override
+    public boolean isExtendable() {
+        return false;
+    }
+
+    @Override
+    public boolean isForTemplate() {
+        return false;
+    }
+
+    @Override
+    public String getModule() {
+        return null;
+    }
+
+    @Override
+    public int getSort() {
+        return 0;
+    }
 }

@@ -7,8 +7,6 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
-import codedriver.framework.form.attribute.core.INewAttribute;
-import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -27,7 +25,7 @@ import java.util.List;
  * @since 2021/8/3 18:39
  **/
 @Component
-public class TreeSelectHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
+public class TreeSelectHandler extends FormHandlerBase {
     @Override
     public String getHandler() {
         return FormHandler.FORMTREESELECT.getHandler();

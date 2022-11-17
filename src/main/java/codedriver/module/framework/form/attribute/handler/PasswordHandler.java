@@ -7,7 +7,6 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
-import codedriver.framework.form.attribute.core.INewAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class PasswordHandler extends FormHandlerBase implements INewAttribute {
+public class PasswordHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
@@ -35,11 +34,6 @@ public class PasswordHandler extends FormHandlerBase implements INewAttribute {
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
         return null;
     }
-
-//    @Override
-//    public int getSort() {
-//        return 0;
-//    }
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {

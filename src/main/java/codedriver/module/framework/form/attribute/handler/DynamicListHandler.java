@@ -6,7 +6,6 @@
 package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.FormAttributeVo;
@@ -37,7 +36,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 @Component
-public class DynamicListHandler extends FormHandlerBase implements IOldAttribute {
+public class DynamicListHandler extends FormHandlerBase {
 
     private final static Logger logger = LoggerFactory.getLogger(DynamicListHandler.class);
 

@@ -8,7 +8,6 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.form.attribute.core.INewAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -35,7 +34,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 @Component
-public class TableSelectorHandler extends FormHandlerBase implements INewAttribute {
+public class TableSelectorHandler extends FormHandlerBase {
 
     private final static Logger logger = LoggerFactory.getLogger(TableSelectorHandler.class);
 

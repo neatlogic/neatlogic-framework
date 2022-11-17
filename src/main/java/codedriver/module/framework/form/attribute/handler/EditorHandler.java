@@ -5,7 +5,6 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
-import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import java.util.List;
 
 @Component
-public class EditorHandler extends FormHandlerBase implements IOldAttribute {
+public class EditorHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {

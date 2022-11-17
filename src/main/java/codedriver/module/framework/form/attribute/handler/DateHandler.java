@@ -8,8 +8,6 @@ package codedriver.module.framework.form.attribute.handler;
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
-import codedriver.framework.form.attribute.core.INewAttribute;
-import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.DateRange;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
@@ -33,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class DateHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
+public class DateHandler extends FormHandlerBase {
 
     @Resource
     private WorktimeMapper worktimeMapper;

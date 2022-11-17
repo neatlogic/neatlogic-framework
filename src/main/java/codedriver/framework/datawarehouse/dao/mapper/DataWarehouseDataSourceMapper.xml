@@ -326,14 +326,22 @@
          label,
          type,
          aggregate,
-         is_key)
+         is_key,
+         is_condition,
+         input_type,
+         config
+         )
         values (#{id},
                 #{dataSourceId},
                 #{name},
                 #{label},
                 #{type},
                 #{aggregate},
-                #{isKey})
+                #{isKey},
+                #{isCondition},
+                #{inputType},
+                #{configStr}
+                )
     </insert>
 
     <!-- <insert id="insertReportDataSourceCondition"

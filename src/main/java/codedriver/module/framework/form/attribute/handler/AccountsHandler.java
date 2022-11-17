@@ -7,6 +7,8 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
+import codedriver.framework.form.attribute.core.INewAttribute;
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -26,7 +28,7 @@ import java.util.Set;
  * @since 2021/8/24 14:13
  **/
 @Component
-public class AccountsHandler extends FormHandlerBase {
+public class AccountsHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
 
     private final JSONArray theadList = new JSONArray();
 

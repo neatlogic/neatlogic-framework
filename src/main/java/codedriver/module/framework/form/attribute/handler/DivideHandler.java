@@ -5,6 +5,8 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.form.attribute.core.INewAttribute;
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,7 @@ import codedriver.framework.form.attribute.core.FormHandlerBase;
 import java.util.List;
 
 @Component
-public class DivideHandler extends FormHandlerBase {
+public class DivideHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
 
     @Override
     public String getHandler() {

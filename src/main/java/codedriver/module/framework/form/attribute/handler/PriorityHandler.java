@@ -5,6 +5,7 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.form.attribute.core.ControlHandlerBase;
 
 @Component
-public class PriorityHandler extends ControlHandlerBase {
+public class PriorityHandler extends ControlHandlerBase implements IOldAttribute {
 
     @Override
     public String getHandler() {

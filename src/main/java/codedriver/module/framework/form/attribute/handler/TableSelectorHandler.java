@@ -1,15 +1,19 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
-import codedriver.framework.form.attribute.core.IOldAttribute;
+import codedriver.framework.form.attribute.core.INewAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
+import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.dto.FormAttributeVo;
+import codedriver.framework.form.exception.AttributeValidException;
 import codedriver.framework.matrix.core.IMatrixDataSourceHandler;
 import codedriver.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import codedriver.framework.matrix.dto.MatrixDataVo;
@@ -18,6 +22,7 @@ import codedriver.framework.matrix.exception.MatrixDataSourceHandlerNotFoundExce
 import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import codedriver.module.framework.integration.service.IntegrationService;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -26,37 +31,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
-import codedriver.framework.form.dto.AttributeDataVo;
-import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
-
 import javax.annotation.Resource;
 import java.util.*;
 
 @Component
-public class DynamicListHandler extends FormHandlerBase implements IOldAttribute {
+public class TableSelectorHandler extends FormHandlerBase implements INewAttribute {
 
-    private final static Logger logger = LoggerFactory.getLogger(DynamicListHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(TableSelectorHandler.class);
 
     @Resource
     private IntegrationService integrationService;
 
     @Override
     public String getHandler() {
-        return FormHandler.FORMDYNAMICLIST.getHandler();
+        return FormHandler.FORMTABLESELECTOR.getHandler();
     }
 
     @Override
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
         return null;
-    }
-
-    @Override
-    public int getSort() {
-        return 11;
     }
 
     @Override
@@ -886,57 +879,12 @@ public class DynamicListHandler extends FormHandlerBase implements IOldAttribute
     }
 
     @Override
-    public String getHandlerName() {
-        return FormHandler.FORMDYNAMICLIST.getHandlerName();
-    }
-
-    @Override
-    public String getIcon() {
-        return "tsfont-formdynamiclist";
-    }
-
-    @Override
     public ParamType getParamType() {
         return null;
     }
 
     @Override
-    public String getDataType() {
-        return null;
-    }
-
-    @Override
     public boolean isConditionable() {
-        return false;
-    }
-
-    @Override
-    public boolean isShowable() {
-        return true;
-    }
-
-    @Override
-    public boolean isValueable() {
-        return false;
-    }
-
-    @Override
-    public boolean isFilterable() {
-        return true;
-    }
-
-    @Override
-    public boolean isExtendable() {
-        return false;
-    }
-
-    @Override
-    public String getModule() {
-        return "framework";
-    }
-
-    @Override
-    public boolean isForTemplate() {
         return false;
     }
 

@@ -9,6 +9,7 @@ import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.IFormAttributeHandler;
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class CascadeHandler extends FormHandlerBase {
+public class CascadeHandler extends FormHandlerBase implements IOldAttribute {
 
     @Override
     public String getHandler() {

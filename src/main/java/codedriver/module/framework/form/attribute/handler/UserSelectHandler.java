@@ -16,6 +16,8 @@ import codedriver.framework.dto.RoleVo;
 import codedriver.framework.dto.TeamVo;
 import codedriver.framework.dto.UserVo;
 import codedriver.framework.form.attribute.core.FormHandlerBase;
+import codedriver.framework.form.attribute.core.INewAttribute;
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -32,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserSelectHandler extends FormHandlerBase {
+public class UserSelectHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
 
     @Resource
     private UserMapper userMapper;

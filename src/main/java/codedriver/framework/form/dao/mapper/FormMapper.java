@@ -72,7 +72,7 @@ public interface FormMapper {
 
     void updateForm(FormVo formVo);
 
-    int updateFormAttributeConfig(FormAttributeVo formAttributeVo);
+//    int updateFormAttributeConfig(FormAttributeVo formAttributeVo);
 
     void updateFormCustomItem(FormCustomItemVo formCustomItemVo);
 

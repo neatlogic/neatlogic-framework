@@ -7,6 +7,8 @@ package codedriver.module.framework.form.attribute.handler;
 
 import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.common.dto.ValueTextVo;
+import codedriver.framework.form.attribute.core.INewAttribute;
+import codedriver.framework.form.attribute.core.IOldAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
 import codedriver.framework.form.dto.AttributeDataVo;
@@ -25,7 +27,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class SelectHandler extends FormHandlerBase {
+public class SelectHandler extends FormHandlerBase implements IOldAttribute, INewAttribute {
 
     @Override
     public String getHandler() {

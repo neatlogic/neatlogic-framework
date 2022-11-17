@@ -1,36 +1,34 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2021 TechSureCo.,Ltd.AllRightsReserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.attribute.core.INewAttribute;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class TextHandler extends FormHandlerBase implements INewAttribute {
+public class CkEditorHandler extends FormHandlerBase implements INewAttribute {
 
     @Override
     public String getHandler() {
-        return FormHandler.FORMTEXT.getHandler();
+        return FormHandler.FORMCKEDITOR.getHandler();
     }
 
     @Override
     public String getHandlerType(FormConditionModel model) {
-        return "input";
+        return "input";//富文本不管是哪种模式下过滤都是input
     }
 
     @Override
@@ -61,36 +59,35 @@ public class TextHandler extends FormHandlerBase implements INewAttribute {
         return ParamType.STRING;
     }
 
-
     @Override
     public boolean isConditionable() {
         return true;
     }
-
 
     @Override
     public boolean isAudit() {
         return true;
     }
 
+    @Override
+    public Boolean isUseFormConfig() {
+        return false;
+    }
+
     //表单组件配置信息
 //{
-//	"handler": "forminput",
-//	"label": "文本框_1",
+//	"handler": "formeditor",
+//	"label": "富文本框_3",
 //	"type": "form",
-//	"uuid": "f3d875032f0649f7aca5af75d6c37e10",
+//	"uuid": "9b6e8d7342e44127b224af410fc1b5aa",
 //	"config": {
 //		"isRequired": false,
-//		"defaultValueList": "文本a",
+//		"editorMaxlength": "",
+//		"defaultValueList": "文本c",
 //		"ruleList": [],
-//		"validList": [],
-//		"textType": "none",
-//		"quoteUuid": "",
-//		"inputMaxlength": 50,
-//		"minNumber": "",
-//		"maxNumber": "",
-//		"decimalNumber": "",
 //		"width": "100%",
+//		"validList": [],
+//		"quoteUuid": "",
 //		"defaultValueType": "self",
 //		"placeholder": "请输入",
 //		"authorityConfig": [
@@ -99,10 +96,10 @@ public class TextHandler extends FormHandlerBase implements INewAttribute {
 //	}
 //}
     //保存数据结构
-//    "文本a"
+//    "文本c"
     //返回数据结构
 //{
-//	"value": "文本a"
+//	"value": "文本c"
 //}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {

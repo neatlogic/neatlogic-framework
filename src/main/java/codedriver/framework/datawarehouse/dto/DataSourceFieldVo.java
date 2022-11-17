@@ -40,7 +40,7 @@ public class DataSourceFieldVo extends BasePageVo {
     @EntityField(name = "是否主键", type = ApiParamType.INTEGER)
     private Integer isKey;
     @EntityField(name = "是否作为条件", type = ApiParamType.INTEGER)
-    private int isCondition;
+    private Integer isCondition;
     @EntityField(name = "条件输入控件配置", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
     @EntityField(name = "聚合算法", type = ApiParamType.ENUM, member = AggregateType.class)
@@ -92,7 +92,7 @@ public class DataSourceFieldVo extends BasePageVo {
         this.aggregate = aggregate;
     }
 
-    public int getIsCondition() {
+    public Integer getIsCondition() {
         return isCondition;
     }
 
@@ -107,7 +107,7 @@ public class DataSourceFieldVo extends BasePageVo {
         return null;
     }
 
-    public void setIsCondition(int isCondition) {
+    public void setIsCondition(Integer isCondition) {
         this.isCondition = isCondition;
     }
 

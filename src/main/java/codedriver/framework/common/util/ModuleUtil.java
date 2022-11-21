@@ -30,7 +30,7 @@ public class ModuleUtil {
             // master模块不允许用户添加
             if (!moduleVo.getId().equals("master")) {
                 if (!groupSet.contains(moduleVo.getGroup())) {
-                    if (StringUtils.isNotBlank(moduleVo.getGroup()) && StringUtils.isNotBlank(moduleVo.getGroupName()) && StringUtils.isNotBlank(moduleVo.getGroupDescription())) {
+                    if (StringUtils.isNotBlank(moduleVo.getGroup()) && StringUtils.isNotBlank(moduleVo.getGroupName())) {
                         ModuleGroupVo moduleGroup = new ModuleGroupVo();
                         moduleGroup.setGroup(moduleVo.getGroup());
                         moduleGroup.setGroupName(moduleVo.getGroupName());

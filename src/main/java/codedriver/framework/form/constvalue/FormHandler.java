@@ -6,6 +6,7 @@
 package codedriver.framework.form.constvalue;
 
 public enum FormHandler implements IFormHandler {
+    FORMLABEL("formlabel", "标签"),
     FORMACCOUNTS("formaccounts", "账号组件"),
     FORMCASCADELIST("formcascadelist", "级联下拉"),
     FORMCHECKBOX("formcheckbox", "复选框"),

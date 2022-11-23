@@ -5,6 +5,7 @@
 
 package codedriver.framework.restful.core;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.core.AuthAction;
@@ -24,7 +25,6 @@ import codedriver.framework.exception.resubmit.ResubmitException;
 import codedriver.framework.exception.type.*;
 import codedriver.framework.file.core.AuditType;
 import codedriver.framework.file.core.Event;
-import codedriver.framework.file.core.appender.Appender;
 import codedriver.framework.file.core.appender.AppenderManager;
 import codedriver.framework.param.validate.core.ParamValidatorFactory;
 import codedriver.framework.restful.annotation.*;
@@ -268,9 +268,13 @@ public class ApiValidateAndHelpBase {
         boolean isAuth = false;
         List<String> authNameList = new ArrayList<>();
         if (apiClass != null) {
+            ExemptLicense exemptLicense = apiClass.getAnnotation(ExemptLicense.class);
+            if (exemptLicense != null) {
+                RequestContext.get().setIsExemptLicense(true);
+            }
             //AuthAction action = apiClass.getAnnotation(AuthAction.class);
             AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
-            if (actions.length > 0) {
+            if (!Objects.equals(TenantContext.get().getTenantUuid(), "master") && actions.length > 0) {
                 for (AuthAction action : actions) {
                     if (StringUtils.isNotBlank(action.action().getSimpleName())) {
                         String actionName = action.action().getSimpleName();
@@ -285,28 +289,31 @@ public class ApiValidateAndHelpBase {
             } else {
                 isAuth = true;
             }
-            //校验OperationType
-            OperationType[] operationTypes = apiClass.getAnnotationsByType(OperationType.class);
-            if (operationTypes.length > 0) {
-                LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-                if (licenseVo == null) {
-                    throw new LicenseInvalidException();
-                }
-                LicenseAuthModuleGroupVo authModuleGroupVo = licenseVo.getAllAuthGroup();
-                if (authModuleGroupVo == null) {
-                    Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = licenseVo.getModuleGroupVoList().stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
-                    if (authModuleVoOptional.isPresent()) {
-                        authModuleGroupVo = authModuleVoOptional.get();
+            //判断是否需要豁免license
+            if (!RequestContext.get().getIsExemptLicense()) {
+                //校验OperationType
+                OperationType[] operationTypes = apiClass.getAnnotationsByType(OperationType.class);
+                if (operationTypes.length > 0) {
+                    LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+                    if (licenseVo == null) {
+                        throw new LicenseInvalidException();
                     }
-                }
+                    LicenseAuthModuleGroupVo authModuleGroupVo = licenseVo.getAllAuthGroup();
+                    if (authModuleGroupVo == null) {
+                        Optional<LicenseAuthModuleGroupVo> authModuleVoOptional = licenseVo.getModuleGroupVoList().stream().filter(o -> Objects.equals(apiVo.getModuleGroup(), o.getName())).findFirst();
+                        if (authModuleVoOptional.isPresent()) {
+                            authModuleGroupVo = authModuleVoOptional.get();
+                        }
+                    }
 
-                if (authModuleGroupVo != null) {
-                    List<String> operationTypeList = authModuleGroupVo.getOperationTypeList();
-                    if (operationTypeList.stream().noneMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL")) && (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue()))) {
-                        throw new LicenseAuthFailedWithoutOperationTypeException(authModuleGroupVo.getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
+                    if (authModuleGroupVo != null) {
+                        List<String> operationTypeList = authModuleGroupVo.getOperationTypeList();
+                        if (operationTypeList.stream().noneMatch(o -> Objects.equals(o.toUpperCase(Locale.ROOT), "ALL")) && (CollectionUtils.isEmpty(operationTypeList) || !operationTypeList.contains(operationTypes[0].type().getValue()))) {
+                            throw new LicenseAuthFailedWithoutOperationTypeException(authModuleGroupVo.getName(), String.format("%s(%s)", OperationTypeEnum.getText(operationTypes[0].type().getValue()), operationTypes[0].type().getValue()));
+                        }
+                    } else {
+                        throw new LicenseAuthFailedWithoutModuleGroupException(apiVo.getModuleGroup());
                     }
-                } else {
-                    throw new LicenseAuthFailedWithoutModuleGroupException(apiVo.getModuleGroup());
                 }
             }
 

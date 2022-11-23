@@ -5,6 +5,7 @@
 
 package codedriver.framework.auth.core;
 
+import codedriver.framework.asynchronization.threadlocal.RequestContext;
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.asynchronization.threadlocal.UserContext;
 import codedriver.framework.auth.init.MaintenanceMode;
@@ -42,8 +43,8 @@ public class AuthActionChecker {
         for (Class<? extends AuthBase> action : actionClass) {
             actionList.add(action.getSimpleName());
         }
-        //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
-        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+        //维护模式下且是维护用户 || ,指定权限不需要鉴权
+        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList) ) {
             return true;
         }
 
@@ -101,33 +102,32 @@ public class AuthActionChecker {
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
-        //先判断租户license 是否有该auth
-        List<String> licenseActionList = null;
-        LicenseVo licenseVo = TenantContext.get().getLicenseVo();
-        if (licenseVo == null) {
-            throw new LicenseInvalidException();
-        }
-        if (licenseVo.getAllAuthGroup() != null) {
-            licenseActionList = actionList;
-        } else {
-            List<String> licenseAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
-            if (CollectionUtils.isNotEmpty(licenseAuthList)) {
-                licenseActionList = actionList.stream().filter(o -> licenseAuthList.stream().anyMatch(l -> Objects.equals(l.toUpperCase(Locale.ROOT), o))).collect(Collectors.toList());
+        if(RequestContext.get() == null || !RequestContext.get().getIsExemptLicense()) {
+            //先判断租户license 是否有该auth
+            LicenseVo licenseVo = TenantContext.get().getLicenseVo();
+            if (licenseVo == null) {
+                throw new LicenseInvalidException();
             }
-        }
-        if (CollectionUtils.isEmpty(licenseActionList)) {
-            return false;
+            if (licenseVo.getAllAuthGroup() == null) {
+                List<String> licenseAuthList = LicenseManager.tenantLicenseAuthListMap.get(TenantContext.get().getTenantUuid());
+                if (CollectionUtils.isNotEmpty(licenseAuthList)) {
+                    actionList = actionList.stream().filter(o -> licenseAuthList.stream().anyMatch(l -> Objects.equals(l.toUpperCase(Locale.ROOT), o))).collect(Collectors.toList());
+                }
+            }
+            if (CollectionUtils.isEmpty(actionList)) {
+                return false;
+            }
         }
         //判断从数据库查询的用户权限是否满足
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
-        List<String> contains = userAuthList.stream().filter(licenseActionList::contains).collect(Collectors.toList());
+        List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(contains)) {
             return true;
         }
         //以上不满足，则遍历递归所有权限寻找
         for (int i = 0; i < userAuthList.size(); i++) { //只能用下标索引，否则会报java.util.ConcurrentModificationException 因为for循环里会add元素
-            if (checkAuthList(userAuthList.get(i), userAuthList, licenseActionList)) {
+            if (checkAuthList(userAuthList.get(i), userAuthList, actionList)) {
                 return true;
             }
         }

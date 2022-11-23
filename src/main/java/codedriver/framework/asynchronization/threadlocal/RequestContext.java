@@ -23,6 +23,8 @@ public class RequestContext implements Serializable {
     private Double apiRate;
     //租户接口访问总速率
     private Double tenantRate;
+    //接口是否豁免license
+    private Boolean isExemptLicense = false;
 
     public String getUrl() {
         return url;
@@ -62,6 +64,14 @@ public class RequestContext implements Serializable {
 
     public void setTenantRate(Double tenantRate) {
         this.tenantRate = tenantRate;
+    }
+
+    public Boolean getIsExemptLicense() {
+        return isExemptLicense;
+    }
+
+    public void setIsExemptLicense(Boolean isExemptLicense) {
+        this.isExemptLicense = isExemptLicense;
     }
 
     public static RequestContext init(RequestContext _requestContext) {

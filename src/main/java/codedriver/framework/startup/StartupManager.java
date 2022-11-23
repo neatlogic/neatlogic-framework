@@ -30,6 +30,11 @@ public class StartupManager extends ModuleInitializedListenerBase {
     private final static Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
     private final static List<IStartup> startupList = new ArrayList<>();
+
+    public static List<IStartup> getStartupList() {
+        return startupList;
+    }
+
     @Resource
     private TenantMapper tenantMapper;
 

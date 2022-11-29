@@ -60,12 +60,13 @@ public class MatrixIntegrationHandler extends IntegrationHandlerBase {
     @Override
     public List<PatternVo> getOutputPattern() {
         List<PatternVo> jsonList = new ArrayList<>();
-        PatternVo theadList = new PatternVo("theadList", "output", ApiParamType.JSONARRAY, 0, "表头列表");
-        theadList.addChild(new PatternVo("key", "output", ApiParamType.STRING, 0, "表头键值"));
-        theadList.addChild(new PatternVo("title", "output", ApiParamType.STRING, 0, "表头名称"));
-        theadList.addChild(new PatternVo("isSearchable", "output", ApiParamType.INTEGER, 0, "该字段是否可以搜索过滤"));
+        PatternVo theadList = new PatternVo("theadList", "output", ApiParamType.JSONARRAY, 1, "表头列表");
+        theadList.addChild(new PatternVo("key", "output", ApiParamType.STRING, 1, "表头键值"));
+        theadList.addChild(new PatternVo("title", "output", ApiParamType.STRING, 1, "表头名称"));
+        theadList.addChild(new PatternVo("isSearchable", "output", ApiParamType.INTEGER, 1, "该字段是否可以搜索过滤"));
+        theadList.addChild(new PatternVo("primaryKey", "output", ApiParamType.INTEGER, 1, "该字段是否是唯一主键"));
         jsonList.add(theadList);
-        PatternVo tbodyList = new PatternVo("tbodyList", "output", ApiParamType.JSONARRAY, 0, "数据列表");
+        PatternVo tbodyList = new PatternVo("tbodyList", "output", ApiParamType.JSONARRAY, 1, "数据列表");
         jsonList.add(tbodyList);
         jsonList.add(new PatternVo("currentPage", "output", ApiParamType.INTEGER, 0, "当前页"));
         jsonList.add(new PatternVo("rowNum", "output", ApiParamType.INTEGER, 0, "条目数量"));

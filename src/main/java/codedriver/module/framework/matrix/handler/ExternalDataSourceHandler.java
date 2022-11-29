@@ -240,16 +240,16 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             List<Map<String, JSONObject>> tbodyList = new ArrayList<>();
             JSONArray defaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(defaultValue)) {
-                String uuidColumn = dataVo.getUuidColumn();
-                boolean uuidColumnExist = false;
-                for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
-                    if (Objects.equals(matrixAttributeVo.getUuid(), uuidColumn)) {
-                        uuidColumnExist = true;
-                    }
-                }
-                if (!uuidColumnExist) {
-                    throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), uuidColumn);
-                }
+//                String uuidColumn = dataVo.getUuidColumn();
+//                boolean uuidColumnExist = false;
+//                for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
+//                    if (Objects.equals(matrixAttributeVo.getUuid(), uuidColumn)) {
+//                        uuidColumnExist = true;
+//                    }
+//                }
+//                if (!uuidColumnExist) {
+//                    throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), uuidColumn);
+//                }
 //                List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
 //                MatrixColumnVo sourceColumnVo = new MatrixColumnVo();
 //                sourceColumnVo.setColumn(uuidColumn);

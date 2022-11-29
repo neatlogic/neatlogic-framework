@@ -196,10 +196,12 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         handler.validate(resultVo);
         JSONObject returnObj = new JSONObject();
         JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+        Integer rowNum = transformedResult.getInteger("rowNum");
+        dataVo.setRowNum(rowNum);
         returnObj.put("currentPage", transformedResult.get("currentPage"));
         returnObj.put("pageSize", transformedResult.get("pageSize"));
         returnObj.put("pageCount", transformedResult.get("pageCount"));
-        returnObj.put("rowNum", transformedResult.get("rowNum"));
+        returnObj.put("rowNum", rowNum);
         JSONArray theadList = transformedResult.getJSONArray("theadList");
         returnObj.put("theadList", theadList);
         List<String> columnList = new ArrayList<>();
@@ -301,10 +303,12 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
                 handler.validate(resultVo);
                 JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+                Integer rowNum = transformedResult.getInteger("rowNum");
+                dataVo.setRowNum(rowNum);
                 returnObj.put("currentPage", transformedResult.get("currentPage"));
                 returnObj.put("pageSize", transformedResult.get("pageSize"));
                 returnObj.put("pageCount", transformedResult.get("pageCount"));
-                returnObj.put("rowNum", transformedResult.get("rowNum"));
+                returnObj.put("rowNum", rowNum);
                 tbodyList = getExternalDataTbodyList(resultVo, dataVo.getColumnList(), dataVo);
                 returnObj.put("tbodyList", tbodyList);
             }

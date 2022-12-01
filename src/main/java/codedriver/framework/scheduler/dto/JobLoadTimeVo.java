@@ -10,6 +10,7 @@ import java.util.Date;
 public class JobLoadTimeVo {
     private String jobName;
     private String jobGroup;
+    private String cron;
     private Date loadTime;
 
     public JobLoadTimeVo() {
@@ -17,12 +18,13 @@ public class JobLoadTimeVo {
     }
 
     public JobLoadTimeVo(String jobName, String jobGroup) {
-        this(jobName, jobGroup, null);
+        this(jobName, jobGroup, null, null);
     }
 
-    public JobLoadTimeVo(String jobName, String jobGroup, Date loadTime) {
+    public JobLoadTimeVo(String jobName, String jobGroup, String cron, Date loadTime) {
         this.jobName = jobName;
         this.jobGroup = jobGroup;
+        this.cron = cron;
         this.loadTime = loadTime;
     }
 
@@ -40,6 +42,14 @@ public class JobLoadTimeVo {
 
     public void setJobGroup(String jobGroup) {
         this.jobGroup = jobGroup;
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
     }
 
     public Date getLoadTime() {

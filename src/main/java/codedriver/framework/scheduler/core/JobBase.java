@@ -103,11 +103,14 @@ public abstract class JobBase implements IJob {
 
     @Override
     public final Boolean isHealthy(JobObject jobObject) {
-        Date lcd = schedulerMapper.getJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
-        if (lcd == null) {
+        JobLoadTimeVo jobLoadTime = schedulerMapper.getJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
+        if (jobLoadTime == null) {
             return false;
         }
-        if (!Objects.equals(lcd, jobObject.getLoadTime())) {
+        if (!Objects.equals(jobLoadTime.getCron(), jobObject.getCron())) {
+            return false;
+        }
+        if (!Objects.equals(jobLoadTime.getLoadTime(), jobObject.getLoadTime())) {
             return false;
         }
         return isMyHealthy(jobObject);
@@ -171,6 +174,8 @@ public abstract class JobBase implements IJob {
             if (isAudit) {
                 JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
                 auditVo.setStatus(JobAuditVo.Status.RUNNING.getValue());
+                auditVo.setCron(jobObject.getCron());
+                auditVo.setNextFireTime(context.getNextFireTime());
                 schedulerMapper.insertJobAudit(auditVo);
                 jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
                 try {

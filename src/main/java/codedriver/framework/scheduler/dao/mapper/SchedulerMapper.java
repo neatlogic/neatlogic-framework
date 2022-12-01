@@ -41,7 +41,7 @@ public interface SchedulerMapper {
 
     int checkJobNameIsExists(JobVo job);
 
-    Date getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
+    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
     // UPDATE
     int updateJob(JobVo jobVo);

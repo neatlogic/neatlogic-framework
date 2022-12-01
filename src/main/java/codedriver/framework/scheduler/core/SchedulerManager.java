@@ -144,7 +144,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
                 jobStatusVo.setNextFireTime(nextFireDate);
                 schedulerMapper.updateJobNextFireTime(jobStatusVo);
-                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getLoadTime()));
+                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getCron(), jobObject.getLoadTime()));
                 return nextFireDate;
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);

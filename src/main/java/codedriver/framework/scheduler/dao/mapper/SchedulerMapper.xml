@@ -194,7 +194,9 @@
         `end_time` AS endTime,
         `status`,
         server_id AS serverId,
-        content_hash AS contentHash
+        content_hash AS contentHash,
+        `cron`,
+        `next_fire_time` AS nextFireTime
         FROM `schedule_job_audit`
         <include refid="searchJobAuditCondition"/>
         ORDER BY `id` DESC
@@ -216,7 +218,9 @@
                `content_hash` AS contentHash,
                b.`content`,
                `status`,
-               `server_id`    AS serverId
+               `server_id`    AS serverId,
+               `cron`,
+               `next_fire_time` AS nextFireTime
         FROM `schedule_job_audit` a
                  LEFT JOIN
              `schedule_job_audit_detail` b ON a.content_hash = b.hash
@@ -232,7 +236,9 @@
                `content_hash` AS contentHash,
                b.`content`,
                `status`,
-               `server_id`    AS serverId
+               `server_id`    AS serverId,
+               `cron`,
+               `next_fire_time` AS nextFireTime
         FROM `schedule_job_audit` a
                  LEFT JOIN
              `schedule_job_audit_detail` b ON a.content_hash = b.hash
@@ -264,9 +270,12 @@
         WHERE server_id = #{value}
     </select>
 
-    <select id="getJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo" resultType="java.util.Date">
+    <select id="getJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo" resultType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
         SELECT
-            `load_time`
+            `job_name` AS jobName,
+            `job_group` AS jobGroup,
+            `cron`,
+            `load_time` AS loadTime
         FROM `schedule_job_load_time`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
@@ -379,8 +388,8 @@
     </insert>
 
     <insert id="insertJobAudit" parameterType="codedriver.framework.scheduler.dto.JobAuditVo">
-        INSERT INTO schedule_job_audit (id, job_uuid, start_time, status, server_id)
-        VALUES (#{id}, #{jobUuid}, now(3), #{status}, #{serverId})
+        INSERT INTO schedule_job_audit (id, job_uuid, start_time, status, server_id, cron, next_fire_time)
+        VALUES (#{id}, #{jobUuid}, now(3), #{status}, #{serverId}, #{cron}, #{nextFireTime})
     </insert>
 
     <insert id="insertJobLock" parameterType="codedriver.framework.scheduler.dto.JobLockVo">
@@ -397,9 +406,9 @@
     </insert>
 
     <insert id="insertJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
-        INSERT INTO `schedule_job_load_time` (`job_name`, `job_group`, `load_time`)
-        VALUES (#{jobName}, #{jobGroup}, #{loadTime})
-        ON DUPLICATE KEY UPDATE `load_time` = #{loadTime}
+        INSERT INTO `schedule_job_load_time` (`job_name`, `job_group`, `cron`, `load_time`)
+        VALUES (#{jobName}, #{jobGroup}, #{cron}, #{loadTime})
+        ON DUPLICATE KEY UPDATE `cron` = #{cron}, `load_time` = #{loadTime}
     </insert>
 
     <delete id="deleteUnusedJobStatus">

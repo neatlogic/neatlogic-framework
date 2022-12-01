@@ -10,7 +10,7 @@ import java.util.Date;
 public class JobLoadTimeVo {
     private String jobName;
     private String jobGroup;
-    private Date lcd;
+    private Date loadTime;
 
     public JobLoadTimeVo() {
 
@@ -20,10 +20,10 @@ public class JobLoadTimeVo {
         this(jobName, jobGroup, null);
     }
 
-    public JobLoadTimeVo(String jobName, String jobGroup, Date lcd) {
+    public JobLoadTimeVo(String jobName, String jobGroup, Date loadTime) {
         this.jobName = jobName;
         this.jobGroup = jobGroup;
-        this.lcd = lcd;
+        this.loadTime = loadTime;
     }
 
     public String getJobName() {
@@ -42,11 +42,11 @@ public class JobLoadTimeVo {
         this.jobGroup = jobGroup;
     }
 
-    public Date getLcd() {
-        return lcd;
+    public Date getLoadTime() {
+        return loadTime;
     }
 
-    public void setLcd(Date lcd) {
-        this.lcd = lcd;
+    public void setLoadTime(Date loadTime) {
+        this.loadTime = loadTime;
     }
 }

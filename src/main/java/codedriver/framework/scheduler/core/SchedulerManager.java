@@ -16,10 +16,7 @@ import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobClassVo;
-import codedriver.framework.scheduler.dto.JobLockVo;
-import codedriver.framework.scheduler.dto.JobObject;
-import codedriver.framework.scheduler.dto.JobStatusVo;
+import codedriver.framework.scheduler.dto.*;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -147,7 +144,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
                 jobStatusVo.setNextFireTime(nextFireDate);
                 schedulerMapper.updateJobNextFireTime(jobStatusVo);
-
+                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getLoadTime()));
                 return nextFireDate;
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
@@ -164,6 +161,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
      * @Description: 将定时作业从调度器中删除
      */
     public boolean unloadJob(JobObject jobObject) {
+        schedulerMapper.deleteJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(jobObject.getJobName(), jobObject.getJobGroup());

@@ -33,10 +33,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -102,6 +99,21 @@ public abstract class JobBase implements IJob {
         schedulerMapper.updateJobLock(jobLockVo);
         transactionUtil.commitTx(ts);
     }
+
+
+    @Override
+    public final Boolean isHealthy(JobObject jobObject) {
+        Date lcd = schedulerMapper.getJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
+        if (lcd == null) {
+            return false;
+        }
+        if (!Objects.equals(lcd, jobObject.getLoadTime())) {
+            return false;
+        }
+        return isMyHealthy(jobObject);
+    }
+
+    protected abstract Boolean isMyHealthy(JobObject jobObject);
 
     @Override
     public final void execute(JobExecutionContext context) throws JobExecutionException {

@@ -264,6 +264,14 @@
         WHERE server_id = #{value}
     </select>
 
+    <select id="getJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo" resultType="java.util.Date">
+        SELECT
+            `load_time`
+        FROM `schedule_job_load_time`
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
+    </select>
+
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
             `schedule_job_lock`
@@ -388,6 +396,12 @@
                 #{serverId})
     </insert>
 
+    <insert id="insertJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
+        INSERT INTO `schedule_job_load_time` (`job_name`, `job_group`, `load_time`)
+        VALUES (#{jobName}, #{jobGroup}, #{loadTime})
+        ON DUPLICATE KEY UPDATE `load_time` = #{loadTime}
+    </insert>
+
     <delete id="deleteUnusedJobStatus">
         DELETE
         FROM schedule_job_status
@@ -432,5 +446,12 @@
         delete
         from schedule_job_audit
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
+
+    <delete id="deleteJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
+        DELETE
+        FROM `schedule_job_load_time`
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
     </delete>
 </mapper>

@@ -8,7 +8,6 @@ package codedriver.framework.scheduler.dao.mapper;
 import codedriver.framework.scheduler.dto.*;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface SchedulerMapper {
@@ -41,8 +40,6 @@ public interface SchedulerMapper {
 
     int checkJobNameIsExists(JobVo job);
 
-    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
-
     // UPDATE
     int updateJob(JobVo jobVo);
 
@@ -71,8 +68,6 @@ public interface SchedulerMapper {
 
     int insertJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-    int insertJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
-
     // DELETE
     int deleteJobByUuid(String uuid);
 
@@ -88,5 +83,4 @@ public interface SchedulerMapper {
 
     void deleteAuditByDayBefore(int dayBefore);
 
-    int deleteJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 }

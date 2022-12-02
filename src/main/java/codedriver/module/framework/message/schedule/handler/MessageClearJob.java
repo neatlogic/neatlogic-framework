@@ -35,7 +35,7 @@ public class MessageClearJob extends JobBase {
     }
 
     @Override
-    public Boolean isMyHealthy(JobObject jobObject) {
+    public Boolean isHealthy(JobObject jobObject) {
         return true;
     }
 

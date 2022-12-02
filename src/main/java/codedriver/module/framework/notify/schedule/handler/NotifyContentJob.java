@@ -18,7 +18,6 @@ import codedriver.framework.notify.exception.NotifyHandlerNotFoundException;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-@DisallowConcurrentExecution
 public class NotifyContentJob extends JobBase {
 	static Logger logger = LoggerFactory.getLogger(NotifyContentJob.class);
 
@@ -37,7 +35,7 @@ public class NotifyContentJob extends JobBase {
     private NotifyJobMapper notifyJobMapper;
 
 	@Override
-    public Boolean isMyHealthy(JobObject jobObject) {
+    public Boolean isHealthy(JobObject jobObject) {
         NotifyJobVo jobVo = notifyJobMapper.getJobBaseInfoById(Long.valueOf(jobObject.getJobName()));
         if (jobVo != null) {
             if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {

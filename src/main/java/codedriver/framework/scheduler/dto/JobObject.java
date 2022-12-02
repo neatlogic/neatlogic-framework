@@ -19,8 +19,7 @@ public class JobObject implements Serializable {
 	private String tenantUuid;
 	private Integer intervalInSeconds;
 	private Integer repeatCount;
-	private Date loadTime = new Date();
-
+	
 	private Map<String, Object> dataMap;
 
 	private JobObject(Builder builder) {
@@ -78,10 +77,6 @@ public class JobObject implements Serializable {
 		return type;
 	}
 
-	public Date getLoadTime() {
-		return loadTime;
-	}
-
 	public static class Builder {
 		// 必要参数
 		private final String jobId;
@@ -135,7 +130,7 @@ public class JobObject implements Serializable {
 			intervalInSeconds = _intervalInSeconds;
 			return this;
 		}
-
+		
 		public Builder withRepeatCount(Integer _repeatCount) {
 			repeatCount = _repeatCount;
 			return this;
@@ -149,7 +144,7 @@ public class JobObject implements Serializable {
 			return this;
 		}
 
-		public JobObject build() {
+		public JobObject  build() {
 			return new JobObject(this);
 		}
 	}
@@ -168,4 +163,6 @@ public class JobObject implements Serializable {
 	public Integer getRepeatCount() {
 		return repeatCount;
 	}
+
+	
 }

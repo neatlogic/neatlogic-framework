@@ -22,8 +22,7 @@ import codedriver.framework.scheduler.dto.JobVo;
  */
 public abstract class PublicJobBase extends JobBase implements IPublicJob {
 
-	@Override
-	public Boolean isMyHealthy(JobObject jobObject) {
+	public Boolean isHealthy(JobObject jobObject) {
         JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
         if (jobVo != null) {
             if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {

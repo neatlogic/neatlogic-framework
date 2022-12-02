@@ -12,6 +12,7 @@ import codedriver.framework.auditconfig.dao.mapper.AuditConfigMapper;
 import codedriver.framework.auditconfig.dto.AuditConfigVo;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.List;
  * 清理审计日志作业
  */
 @Component
+@DisallowConcurrentExecution
 public class AuditCleanerJob extends JobBase {
 
     @Resource
@@ -33,7 +35,7 @@ public class AuditCleanerJob extends JobBase {
     }
 
     @Override
-    public Boolean isHealthy(JobObject jobObject) {
+    public Boolean isMyHealthy(JobObject jobObject) {
         return true;
     }
 

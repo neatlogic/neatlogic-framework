@@ -12,6 +12,7 @@ import codedriver.framework.datawarehouse.service.DataSourceService;
 import codedriver.framework.scheduler.core.JobBase;
 import codedriver.framework.scheduler.dto.JobObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
  * 报表数据源数据同步定时器
  */
 @Component
+@DisallowConcurrentExecution
 public class ReportDataSourceJob extends JobBase {
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);
 
@@ -35,7 +37,7 @@ public class ReportDataSourceJob extends JobBase {
 
 
     @Override
-    public Boolean isHealthy(JobObject jobObject) {
+    public Boolean isMyHealthy(JobObject jobObject) {
         DataSourceVo dataSourceVo = reportDataSourceMapper.getDataSourceById(Long.valueOf(jobObject.getJobName()));
         if (dataSourceVo != null) {
             return dataSourceVo.getIsActive().equals(1) && dataSourceVo.getCronExpression().equals(jobObject.getCron());

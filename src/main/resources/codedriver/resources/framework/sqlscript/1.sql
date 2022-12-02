@@ -5,7 +5,7 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE TABLE `codedriver`.`api`
+CREATE TABLE `api`
 (
     `token`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                      NOT NULL COMMENT 'token',
     `name`        varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                       NULL DEFAULT NULL COMMENT '名称',
@@ -29,7 +29,7 @@ CREATE TABLE `codedriver`.`api`
   COLLATE = utf8mb4_general_ci COMMENT = '接口表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`api_access_count`
+CREATE TABLE `api_access_count`
 (
     `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'token',
     `count` int                                                           NULL DEFAULT NULL COMMENT '访问次数',
@@ -39,7 +39,7 @@ CREATE TABLE `codedriver`.`api_access_count`
   COLLATE = utf8mb4_general_ci COMMENT = '接口访问次数表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`api_audit`
+CREATE TABLE `api_audit`
 (
     `id`               bigint                                                                     NOT NULL COMMENT '记录id',
     `token`            varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci              NOT NULL COMMENT '接口token',
@@ -62,7 +62,7 @@ CREATE TABLE `codedriver`.`api_audit`
   COLLATE = utf8mb4_general_ci COMMENT = '接口记录表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`api_audit_detail`
+CREATE TABLE `api_audit_detail`
 (
     `hash`    char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口记录内容hash',
     `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口记录内容',
@@ -72,7 +72,7 @@ CREATE TABLE `codedriver`.`api_audit_detail`
   COLLATE = utf8mb4_general_ci COMMENT = '接口记录详情表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`api_audit_path`
+CREATE TABLE `api_audit_path`
 (
     `id`            bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '自增唯一标识',
     `path`          varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '路径',
@@ -86,7 +86,7 @@ CREATE TABLE `codedriver`.`api_audit_path`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = DYNAMIC;
 
-CREATE TABLE `codedriver`.`audit_config`
+CREATE TABLE `audit_config`
 (
     `name`   varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '审计类型',
     `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci        NULL COMMENT '审计配置',
@@ -96,7 +96,7 @@ CREATE TABLE `codedriver`.`audit_config`
   COLLATE = utf8mb4_general_ci COMMENT = '控制所有审计的配置信息'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`audit_file`
+CREATE TABLE `audit_file`
 (
     `hash` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '文件hash',
     `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '日志文件路径',
@@ -106,7 +106,7 @@ CREATE TABLE `codedriver`.`audit_file`
   COLLATE = utf8mb4_general_ci COMMENT = '接口文件表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`file`
+CREATE TABLE `file`
 (
     `id`           bigint                                                        NOT NULL COMMENT 'id',
     `name`         varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件名称',
@@ -126,7 +126,7 @@ CREATE TABLE `codedriver`.`file`
   COLLATE = utf8mb4_general_ci COMMENT = '上传文件信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`filetype_config`
+CREATE TABLE `filetype_config`
 (
     `name`   varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
     `config` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NULL COMMENT 'jsong格式，进行允许扩展名等设置',
@@ -136,7 +136,7 @@ CREATE TABLE `codedriver`.`filetype_config`
   COLLATE = utf8mb4_general_ci COMMENT = '文件类型配置表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`form`
+CREATE TABLE `form`
 (
     `uuid`      char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '表单uuid',
     `name`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单名字',
@@ -148,7 +148,7 @@ CREATE TABLE `codedriver`.`form`
   COLLATE = utf8mb4_general_ci COMMENT = '表单'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`form_attribute`
+CREATE TABLE `form_attribute`
 (
     `form_uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '表单uuid',
     `formversion_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '表单版本uuid',
@@ -164,7 +164,7 @@ CREATE TABLE `codedriver`.`form_attribute`
   COLLATE = utf8mb4_general_ci COMMENT = '表单版本属性'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`form_attribute_matrix`
+CREATE TABLE `form_attribute_matrix`
 (
     `form_version_uuid`    char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '表单版本uuid',
     `matrix_uuid`          char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '矩阵uuid',
@@ -176,7 +176,7 @@ CREATE TABLE `codedriver`.`form_attribute_matrix`
   COLLATE = utf8mb4_general_ci COMMENT = '表单属性引用矩阵关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`form_customitem`
+CREATE TABLE `form_customitem`
 (
     `id`                     bigint                                                        NOT NULL COMMENT 'id',
     `name`                   varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '唯一标识',
@@ -195,7 +195,7 @@ CREATE TABLE `codedriver`.`form_customitem`
   COLLATE = utf8mb4_general_ci
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`form_version`
+CREATE TABLE `form_version`
 (
     `uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
     `version`     int                                                       NULL DEFAULT NULL COMMENT '表单版本',
@@ -213,7 +213,7 @@ CREATE TABLE `codedriver`.`form_version`
   COLLATE = utf8mb4_general_ci COMMENT = '表单版本'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`fulltextindex_rebuild_audit`
+CREATE TABLE `fulltextindex_rebuild_audit`
 (
     `type`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          NOT NULL COMMENT '类型',
     `status`     enum ('doing','done') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '状态',
@@ -228,7 +228,7 @@ CREATE TABLE `codedriver`.`fulltextindex_rebuild_audit`
   COLLATE = utf8mb4_general_ci COMMENT = '索引重建日志'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`fulltextindex_word`
+CREATE TABLE `fulltextindex_word`
 (
     `id`   bigint UNSIGNED                                               NOT NULL COMMENT 'id',
     `word` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'word',
@@ -240,7 +240,7 @@ CREATE TABLE `codedriver`.`fulltextindex_word`
   COLLATE = utf8mb4_general_ci COMMENT = 'wordbook'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`global_lock`
+CREATE TABLE `global_lock`
 (
     `id`            bigint                                                        NOT NULL COMMENT '主键id',
     `uuid`          char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NULL DEFAULT NULL COMMENT 'key 散列的唯一标识',
@@ -258,7 +258,7 @@ CREATE TABLE `codedriver`.`global_lock`
   COLLATE = utf8mb4_general_ci COMMENT = '全局锁'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`integration`
+CREATE TABLE `integration`
 (
     `uuid`      char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci            NOT NULL COMMENT '主键',
     `name`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci         NULL DEFAULT NULL COMMENT '名称',
@@ -280,7 +280,7 @@ CREATE TABLE `codedriver`.`integration`
   COLLATE = utf8mb4_general_ci COMMENT = '集成配置表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`integration_audit`
+CREATE TABLE `integration_audit`
 (
     `id`               bigint                                                                     NOT NULL COMMENT '记录id',
     `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                  NOT NULL COMMENT '接口token',
@@ -304,7 +304,7 @@ CREATE TABLE `codedriver`.`integration_audit`
   COLLATE = utf8mb4_general_ci COMMENT = 'integration_audit'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`integration_invoke`
+CREATE TABLE `integration_invoke`
 (
     `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci   NOT NULL COMMENT '集成配置uuid',
     `invoke_config`    mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'config',
@@ -316,7 +316,7 @@ CREATE TABLE `codedriver`.`integration_invoke`
   COLLATE = utf8mb4_general_ci COMMENT = '集成配置接口调用表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`lock`
+CREATE TABLE `lock`
 (
     `id` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'id',
     PRIMARY KEY (`id`) USING BTREE
@@ -325,7 +325,7 @@ CREATE TABLE `codedriver`.`lock`
   COLLATE = utf8mb4_general_ci COMMENT = '专门用来放锁的表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`login_captcha`
+CREATE TABLE `login_captcha`
 (
     `session_id`   char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '登录session_id',
     `code`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '验证码',
@@ -337,7 +337,7 @@ CREATE TABLE `codedriver`.`login_captcha`
   COLLATE = utf8mb4_general_ci COMMENT = '登录验证码表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`login_failed_count`
+CREATE TABLE `login_failed_count`
 (
     `user_id`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
     `failed_count` int                                                           NULL DEFAULT NULL COMMENT '错误次数',
@@ -347,7 +347,7 @@ CREATE TABLE `codedriver`.`login_failed_count`
   COLLATE = utf8mb4_general_ci COMMENT = '登录失败次数'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`mail_server`
+CREATE TABLE `mail_server`
 (
     `uuid`         char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '主键id',
     `name`         varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '名称',
@@ -363,7 +363,7 @@ CREATE TABLE `codedriver`.`mail_server`
   COLLATE = utf8mb4_general_ci COMMENT = '邮件服务器表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`matrix`
+CREATE TABLE `matrix`
 (
     `id`    bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '自增主键',
     `uuid`  char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NULL DEFAULT NULL COMMENT '唯一表示id',
@@ -383,7 +383,7 @@ CREATE TABLE `codedriver`.`matrix`
   COLLATE = utf8mb4_general_ci COMMENT = '矩阵信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`matrix_attribute`
+CREATE TABLE `matrix_attribute`
 (
     `id`          bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NULL DEFAULT NULL COMMENT '属性uuid',
@@ -401,7 +401,7 @@ CREATE TABLE `codedriver`.`matrix_attribute`
   COLLATE = utf8mb4_general_ci COMMENT = '矩阵自定义属性表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`matrix_ci`
+CREATE TABLE `matrix_ci`
 (
     `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
     `ci_id`       bigint                                                    NOT NULL COMMENT 'ci模型id',
@@ -412,7 +412,7 @@ CREATE TABLE `codedriver`.`matrix_ci`
   COLLATE = utf8mb4_general_ci COMMENT = 'cmdb模型矩阵'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`matrix_external`
+CREATE TABLE `matrix_external`
 (
     `matrix_uuid`      char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
     `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '插件类型',
@@ -422,7 +422,7 @@ CREATE TABLE `codedriver`.`matrix_external`
   COLLATE = utf8mb4_general_ci COMMENT = '矩阵外部数据源配置信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`matrix_view`
+CREATE TABLE `matrix_view`
 (
     `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '矩阵uuid',
     `file_id`     bigint                                                        NULL DEFAULT NULL COMMENT '配置文件',
@@ -435,7 +435,7 @@ CREATE TABLE `codedriver`.`matrix_view`
   COLLATE = utf8mb4_general_ci COMMENT = '矩阵视图表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`menu`
+CREATE TABLE `menu`
 (
     `id`          bigint                                                                NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `name`        varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci         NOT NULL COMMENT '菜单名称',
@@ -455,7 +455,7 @@ CREATE TABLE `codedriver`.`menu`
   COLLATE = utf8mb4_general_ci COMMENT = '菜单表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`menu_mobile`
+CREATE TABLE `menu_mobile`
 (
     `name`   varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单标识',
     `label`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '菜单名',
@@ -468,7 +468,7 @@ CREATE TABLE `codedriver`.`menu_mobile`
   COLLATE = utf8mb4_general_ci COMMENT = '移动菜单'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`menu_role`
+CREATE TABLE `menu_role`
 (
     `menu_id`   bigint                                                    NOT NULL COMMENT '菜单Id',
     `role_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色uuid(引用role的uuid)',
@@ -478,7 +478,7 @@ CREATE TABLE `codedriver`.`menu_role`
   COLLATE = utf8mb4_general_ci COMMENT = '菜单角色表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`message`
+CREATE TABLE `message`
 (
     `id`                    bigint                                                        NOT NULL COMMENT '主键id',
     `title`                 varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL     DEFAULT NULL COMMENT '标题',
@@ -495,7 +495,7 @@ CREATE TABLE `codedriver`.`message`
   COLLATE = utf8mb4_general_ci COMMENT = '消息详情表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`message_recipient`
+CREATE TABLE `message_recipient`
 (
     `message_id` bigint                                                                       NOT NULL COMMENT '消息id',
     `type`       enum ('user','team','role') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接收者类型，用户、组、角色',
@@ -506,7 +506,7 @@ CREATE TABLE `codedriver`.`message_recipient`
   COLLATE = utf8mb4_general_ci COMMENT = '消息接收者表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`message_subscribe`
+CREATE TABLE `message_subscribe`
 (
     `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                              NOT NULL COMMENT '订阅用户uuid',
     `handler`   varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                          NOT NULL COMMENT '消息类型处理器全类名',
@@ -519,7 +519,7 @@ CREATE TABLE `codedriver`.`message_subscribe`
   COLLATE = utf8mb4_general_ci COMMENT = '消息订阅表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`message_user`
+CREATE TABLE `message_user`
 (
     `user_uuid`    char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
     `message_id`   bigint                                                    NOT NULL COMMENT '消息id',
@@ -534,7 +534,7 @@ CREATE TABLE `codedriver`.`message_user`
   COLLATE = utf8mb4_general_ci COMMENT = '用户消息状态表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`mq_subscribe`
+CREATE TABLE `mq_subscribe`
 (
     `id`          bigint                                                                              NOT NULL COMMENT 'id',
     `name`        varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                        NOT NULL COMMENT '唯一标识',
@@ -555,7 +555,7 @@ CREATE TABLE `codedriver`.`mq_subscribe`
   COLLATE = utf8mb4_general_ci COMMENT = 'mq订阅表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`mq_topic`
+CREATE TABLE `mq_topic`
 (
     `name`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
     `is_active` tinyint(1)                                                   NULL DEFAULT NULL COMMENT '是否激活',
@@ -565,7 +565,7 @@ CREATE TABLE `codedriver`.`mq_topic`
   COLLATE = utf8mb4_general_ci COMMENT = 'mq主题表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`notify_job`
+CREATE TABLE `notify_job`
 (
     `id`             bigint                                                        NOT NULL COMMENT 'id',
     `name`           varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '任务名称',
@@ -584,19 +584,19 @@ CREATE TABLE `codedriver`.`notify_job`
   COLLATE = utf8mb4_general_ci COMMENT = '通知定时任务表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`notify_job_receiver`
+CREATE TABLE `notify_job_receiver`
 (
     `notify_job_id` bigint                                                                                                          NOT NULL COMMENT '通知定时任务ID',
     `receiver`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                                                   NOT NULL COMMENT '接收者、组、角色uuid或者邮箱',
     `type`          enum ('common','user','team','role','processUserType','email') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'receiver类型，区分是用户、组、角色的uuid还是邮箱',
-    `receive_type`  enum ('to','cc') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                                               NOT NULL COMMENT '接收者类型，to:收件人;cc:抄送人',
+    `receive_type`  enum ('to','cc') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                                               NOT NULL COMMENT '接收者类型，to:收件人；cc:抄送人',
     PRIMARY KEY (`notify_job_id`, `receiver`, `type`, `receive_type`) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '通知定时任务接收者表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`notify_policy`
+CREATE TABLE `notify_policy`
 (
     `id`      bigint                                                        NOT NULL COMMENT '主键',
     `name`    varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
@@ -612,7 +612,7 @@ CREATE TABLE `codedriver`.`notify_policy`
   COLLATE = utf8mb4_general_ci COMMENT = '通知策略信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`role`
+CREATE TABLE `role`
 (
     `id`          bigint                                                        NOT NULL COMMENT '自增ID',
     `uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT 'uuid',
@@ -625,7 +625,7 @@ CREATE TABLE `codedriver`.`role`
   COLLATE = utf8mb4_general_ci COMMENT = '角色表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`role_authority`
+CREATE TABLE `role_authority`
 (
     `id`         bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `role_uuid`  char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '角色名称',
@@ -641,7 +641,7 @@ CREATE TABLE `codedriver`.`role_authority`
   COLLATE = utf8mb4_general_ci COMMENT = '角色授权表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`runner`
+CREATE TABLE `runner`
 (
     `id`            bigint                                                                 NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name`          varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci           NULL     DEFAULT NULL COMMENT '名称',
@@ -668,7 +668,7 @@ CREATE TABLE `codedriver`.`runner`
   COLLATE = utf8mb4_general_ci COMMENT = 'autoexec_runner'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`runner_map`
+CREATE TABLE `runner_map`
 (
     `id`        bigint NOT NULL COMMENT '抽象id',
     `runner_id` bigint NOT NULL COMMENT 'runnerId',
@@ -679,7 +679,7 @@ CREATE TABLE `codedriver`.`runner_map`
   COLLATE = utf8mb4_general_ci COMMENT = 'autoexec_runner_map'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`runnergroup`
+CREATE TABLE `runnergroup`
 (
     `id`          bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '主键',
     `name`        varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NULL DEFAULT NULL COMMENT '组名称',
@@ -691,7 +691,7 @@ CREATE TABLE `codedriver`.`runnergroup`
   COLLATE = utf8mb4_general_ci COMMENT = 'runner组'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`runnergroup_network`
+CREATE TABLE `runnergroup_network`
 (
     `id`         bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '主键',
     `group_id`   bigint                                                       NULL DEFAULT NULL COMMENT '组id',
@@ -704,7 +704,7 @@ CREATE TABLE `codedriver`.`runnergroup_network`
   COLLATE = utf8mb4_general_ci COMMENT = 'autoexec_runnergroup_network'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`runnergroup_runner`
+CREATE TABLE `runnergroup_runner`
 (
     `runnergroup_id` bigint NULL DEFAULT NULL COMMENT 'runner组id',
     `runner_id`      bigint NULL DEFAULT NULL COMMENT 'runnerId'
@@ -713,7 +713,7 @@ CREATE TABLE `codedriver`.`runnergroup_runner`
   COLLATE = utf8mb4_general_ci COMMENT = 'runner组和runner关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job`
+CREATE TABLE `schedule_job`
 (
     `uuid`       varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '全局唯一id，跨环境导入用',
     `name`       varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL     DEFAULT NULL COMMENT '名称',
@@ -730,7 +730,7 @@ CREATE TABLE `codedriver`.`schedule_job`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job_audit`
+CREATE TABLE `schedule_job_audit`
 (
     `id`           bigint                                                                               NOT NULL COMMENT 'id',
     `job_uuid`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                        NULL DEFAULT NULL COMMENT '引用schedule_job的uuid',
@@ -747,7 +747,7 @@ CREATE TABLE `codedriver`.`schedule_job_audit`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业日志表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job_audit_detail`
+CREATE TABLE `schedule_job_audit_detail`
 (
     `hash`    char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'hash',
     `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '内容',
@@ -757,7 +757,7 @@ CREATE TABLE `codedriver`.`schedule_job_audit_detail`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业日志详情表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job_lock`
+CREATE TABLE `schedule_job_lock`
 (
     `job_name`    varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci               NOT NULL COMMENT 'schedule_job表的uuid',
     `job_group`   varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci               NOT NULL COMMENT 'job组',
@@ -771,7 +771,7 @@ CREATE TABLE `codedriver`.`schedule_job_lock`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业锁表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job_prop`
+CREATE TABLE `schedule_job_prop`
 (
     `id`         bigint                                                        NOT NULL AUTO_INCREMENT COMMENT 'id',
     `job_uuid`   char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '引用schedule_job的uuid',
@@ -785,7 +785,7 @@ CREATE TABLE `codedriver`.`schedule_job_prop`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业参数表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`schedule_job_status`
+CREATE TABLE `schedule_job_status`
 (
     `job_name`         varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job uuid',
     `job_group`        varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job组',
@@ -800,16 +800,16 @@ CREATE TABLE `codedriver`.`schedule_job_status`
   COLLATE = utf8mb4_general_ci COMMENT = '定时作业状态表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`system_notice`
+CREATE TABLE `system_notice`
 (
     `id`          bigint                                                                                  NOT NULL COMMENT 'id',
     `title`       varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                            NOT NULL COMMENT '标题',
     `content`     mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                             NOT NULL COMMENT '内容',
     `start_time`  timestamp(3)                                                                            NULL     DEFAULT NULL COMMENT '生效时间',
     `end_time`    timestamp(3)                                                                            NULL     DEFAULT NULL COMMENT '失效时间',
-    `status`      enum ('not_issued','issued','stopped') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'not_issued' COMMENT 'not_issued:未下发;issued:已下发;stopped:停用',
-    `pop_up`      enum ('longshow','close') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci              NULL     DEFAULT 'close' COMMENT 'longshow:持续弹窗;close:不弹窗',
-    `ignore_read` tinyint(1)                                                                              NULL     DEFAULT -1 COMMENT '是否忽略已读，1:是;0:否:-1:不设置',
+    `status`      enum ('not_issued','issued','stopped') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'not_issued' COMMENT 'not_issued:未下发；issued:已下发；stopped:停用',
+    `pop_up`      enum ('longshow','close') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci              NULL     DEFAULT 'close' COMMENT 'longshow:持续弹窗；close:不弹窗',
+    `ignore_read` tinyint(1)                                                                              NULL     DEFAULT -1 COMMENT '是否忽略已读，1:是；0:否:-1:不设置',
     `issue_time`  timestamp(3)                                                                            NULL     DEFAULT NULL COMMENT '最近一次下发时间',
     `fcd`         timestamp(3)                                                                            NULL     DEFAULT NULL COMMENT '创建时间',
     `fcu`         char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                               NULL     DEFAULT NULL COMMENT '创建人',
@@ -822,7 +822,7 @@ CREATE TABLE `codedriver`.`system_notice`
   COLLATE = utf8mb4_general_ci COMMENT = '系统公告表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`system_notice_recipient`
+CREATE TABLE `system_notice_recipient`
 (
     `system_notice_id` bigint                                                                                NOT NULL COMMENT '系统公告ID',
     `uuid`             char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                             NOT NULL COMMENT '通知对象uuid',
@@ -833,11 +833,11 @@ CREATE TABLE `codedriver`.`system_notice_recipient`
   COLLATE = utf8mb4_general_ci COMMENT = '系统公告通知对象表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`system_notice_user`
+CREATE TABLE `system_notice_user`
 (
     `system_notice_id` bigint                                                    NOT NULL COMMENT '系统公告ID',
     `user_uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
-    `is_read`          tinyint(1)                                                NOT NULL COMMENT '1:已读;0:未读',
+    `is_read`          tinyint(1)                                                NOT NULL COMMENT '1:已读；0:未读',
     PRIMARY KEY (`system_notice_id`, `user_uuid`) USING BTREE,
     INDEX `idx_system_notice_id` (`system_notice_id`) USING BTREE,
     INDEX `idx_user_uuid` (`user_uuid`) USING BTREE,
@@ -847,7 +847,7 @@ CREATE TABLE `codedriver`.`system_notice_user`
   COLLATE = utf8mb4_general_ci COMMENT = '系统公告用户接收表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`tag`
+CREATE TABLE `tag`
 (
     `id`   bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '标签名',
@@ -858,7 +858,7 @@ CREATE TABLE `codedriver`.`tag`
   COLLATE = utf8mb4_general_ci COMMENT = '标签表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`team`
+CREATE TABLE `team`
 (
     `id`               bigint                                                       NOT NULL COMMENT 'id',
     `uuid`             char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '全局唯一id，跨环境导入用',
@@ -881,7 +881,7 @@ CREATE TABLE `codedriver`.`team`
   COLLATE = utf8mb4_general_ci COMMENT = '分组信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`team_role`
+CREATE TABLE `team_role`
 (
     `team_uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用team的uuid',
     `role_uuid`        char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用role的uuid',
@@ -892,7 +892,7 @@ CREATE TABLE `codedriver`.`team_role`
   COLLATE = utf8mb4_general_ci COMMENT = '分组与角色关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`team_user_title`
+CREATE TABLE `team_user_title`
 (
     `team_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '组uuid',
     `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
@@ -904,7 +904,7 @@ CREATE TABLE `codedriver`.`team_user_title`
   COLLATE = utf8mb4_general_ci COMMENT = '分组领导职务关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`theme`
+CREATE TABLE `theme`
 (
     `id`     bigint                                                    NOT NULL COMMENT '主键 id',
     `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '主题配置',
@@ -916,7 +916,7 @@ CREATE TABLE `codedriver`.`theme`
   COLLATE = utf8mb4_general_ci COMMENT = '主题配置表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user`
+CREATE TABLE `user`
 (
     `id`        bigint                                                        NOT NULL COMMENT 'ID',
     `uuid`      char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '全局唯一id，跨环境导入用',
@@ -939,7 +939,7 @@ CREATE TABLE `codedriver`.`user`
   COLLATE = utf8mb4_general_ci COMMENT = '用户信息表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_agent`
+CREATE TABLE `user_agent`
 (
     `user_uuid`  char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '用户uuid',
     `agent_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '代理人uuid',
@@ -952,7 +952,7 @@ CREATE TABLE `codedriver`.`user_agent`
   COLLATE = utf8mb4_general_ci COMMENT = '用户授权代理表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_authority`
+CREATE TABLE `user_authority`
 (
     `id`         bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `user_uuid`  char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NULL DEFAULT NULL COMMENT '用户ID',
@@ -968,7 +968,7 @@ CREATE TABLE `codedriver`.`user_authority`
   COLLATE = utf8mb4_general_ci COMMENT = '用户授权表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_data`
+CREATE TABLE `user_data`
 (
     `user_uuid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
     `data`      longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NULL COMMENT '数据',
@@ -979,7 +979,7 @@ CREATE TABLE `codedriver`.`user_data`
   COLLATE = utf8mb4_general_ci COMMENT = '用户数据'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_password`
+CREATE TABLE `user_password`
 (
     `id`          bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '自增主键',
     `user_uuid`   char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '用户uuid',
@@ -994,7 +994,7 @@ CREATE TABLE `codedriver`.`user_password`
   COLLATE = utf8mb4_general_ci COMMENT = '用户密码表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_profile`
+CREATE TABLE `user_profile`
 (
     `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '用户uuid',
     `module_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块id',
@@ -1005,7 +1005,7 @@ CREATE TABLE `codedriver`.`user_profile`
   COLLATE = utf8mb4_general_ci COMMENT = '用户个性化配置'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_role`
+CREATE TABLE `user_role`
 (
     `id`        bigint                                                    NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
@@ -1019,7 +1019,7 @@ CREATE TABLE `codedriver`.`user_role`
   COLLATE = utf8mb4_general_ci COMMENT = '角色成员关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_session`
+CREATE TABLE `user_session`
 (
     `user_uuid`  char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
     `visit_time` timestamp(3)                                              NULL DEFAULT NULL COMMENT '访问时间',
@@ -1030,7 +1030,7 @@ CREATE TABLE `codedriver`.`user_session`
   COLLATE = utf8mb4_general_ci COMMENT = '用户session表'
   ROW_FORMAT = Fixed;
 
-CREATE TABLE `codedriver`.`user_team`
+CREATE TABLE `user_team`
 (
     `id`        bigint                                                       NOT NULL AUTO_INCREMENT COMMENT '自增id',
     `team_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NOT NULL COMMENT '引用flow_team的uuid',
@@ -1045,7 +1045,7 @@ CREATE TABLE `codedriver`.`user_team`
   COLLATE = utf8mb4_general_ci COMMENT = '分组成员关系表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`user_title`
+CREATE TABLE `user_title`
 (
     `id`   bigint                                                       NOT NULL COMMENT '唯一id',
     `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '头衔名，如果不被引用则自动删除',
@@ -1056,7 +1056,7 @@ CREATE TABLE `codedriver`.`user_title`
   COLLATE = utf8mb4_general_ci COMMENT = '用户职务表'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`worktime`
+CREATE TABLE `worktime`
 (
     `uuid`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'id',
     `name`      varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
@@ -1071,7 +1071,7 @@ CREATE TABLE `codedriver`.`worktime`
   COLLATE = utf8mb4_general_ci COMMENT = '服务窗口'
   ROW_FORMAT = Dynamic;
 
-CREATE TABLE `codedriver`.`worktime_range`
+CREATE TABLE `worktime_range`
 (
     `worktime_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'worktime表的uuid',
     `year`          int                                                          NOT NULL COMMENT '年份',
@@ -1083,5 +1083,89 @@ CREATE TABLE `codedriver`.`worktime_range`
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '服务窗口时间段范围表'
   ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `config`  (
+    `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置名',
+    `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '配置值',
+    `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '配置描述',
+    PRIMARY KEY (`key`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统配置表' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `datawarehouse_datasource`  (
+    `id` bigint NOT NULL COMMENT 'id',
+    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '唯一标识',
+    `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '中文名称',
+    `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '说明',
+    `xml` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'sql语句',
+    `is_active` tinyint(1) NULL DEFAULT NULL COMMENT '是否激活',
+    `cron_expression` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '定时策略',
+    `mode` enum('replace','append') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新模式，追加或替换',
+    `expire_count` int NULL DEFAULT NULL COMMENT '过期数值',
+    `module_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '所属模块',
+    `status` enum('doing','done','failed') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '同步状态',
+    `data_count` int NULL DEFAULT NULL COMMENT '数据量',
+    `expire_unit` enum('minute','hour','day','month','year') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期单位',
+    `db_type` enum('mysql','mongodb') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'mysql' COMMENT '数据库类型',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `uk_name`(`name`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `datawarehouse_datasource_audit`  (
+    `id` bigint NOT NULL COMMENT '自增id',
+    `datasource_id` bigint NULL DEFAULT NULL COMMENT '数据源id',
+    `start_time` datetime(3) NULL DEFAULT NULL COMMENT '开始时间',
+    `end_time` datetime(3) NULL DEFAULT NULL COMMENT '结束时间',
+    `data_count` int NULL DEFAULT NULL COMMENT '数据量',
+    `error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '异常',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_datasource_id`(`datasource_id`) USING BTREE,
+    INDEX `idx_end_time`(`end_time`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源审计' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `datawarehouse_datasource_condition`  (
+    `id` bigint NOT NULL COMMENT '主键',
+    `datasource_id` bigint NULL DEFAULT NULL COMMENT '数据源Id',
+    `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '唯一标识',
+    `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '名称',
+    `type` enum('text','datetime','time','date','number') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '数据类型',
+    `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '条件值',
+    `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '配置，例如下拉框需要配置',
+    `is_required` tinyint NULL DEFAULT NULL COMMENT '是否必填',
+    PRIMARY KEY (`id`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源-条件' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `datawarehouse_datasource_field`  (
+    `id` bigint NOT NULL COMMENT '主键',
+    `datasource_id` bigint NULL DEFAULT NULL COMMENT '数据源id',
+    `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '唯一标识',
+    `label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '名称',
+    `type` enum('text','number','datetime','date','time') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '类型',
+    `input_type` enum('text','userselect','enumselect','timeselect') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '作为条件时的输入方式',
+    `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '作为条件时的配置，例如下拉框',
+    `is_key` tinyint(1) NULL DEFAULT NULL COMMENT '是否主键',
+    `is_condition` tinyint(1) NULL DEFAULT NULL COMMENT '是否作为条件',
+    `aggregate` enum('count','sum') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '聚合函数',
+    PRIMARY KEY (`id`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源-字段' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `datawarehouse_datasource_param`  (
+    `id` bigint NOT NULL COMMENT '自增id',
+    `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '名称',
+    `label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '标签',
+    `default_value` bigint NULL DEFAULT NULL COMMENT '默认值',
+    `datasource_id` bigint NULL DEFAULT NULL COMMENT '数据源id',
+    `current_value` bigint NULL DEFAULT NULL COMMENT '当前值',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_datasource_id`(`datasource_id`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源-参数' ROW_FORMAT = Dynamic;
+  
+  CREATE TABLE `dependency`  (
+    `from` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '被引用方(上游)标识',
+    `type` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
+    `to` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '下游标识',
+    `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '额外信息',
+    PRIMARY KEY (`from`, `type`, `to`) USING BTREE,
+    INDEX `to_index`(`to`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '全局引用关系表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

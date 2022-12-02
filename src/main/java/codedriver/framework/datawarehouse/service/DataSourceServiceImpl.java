@@ -59,6 +59,7 @@ public class DataSourceServiceImpl implements DataSourceService {
     public void deleteReportDataSource(DataSourceVo reportDataSourceVo) {
         if (reportDataSourceVo != null) {
             dataSourceMapper.deleteDataSourceFieldByDataSourceId(reportDataSourceVo.getId());
+            dataSourceMapper.deleteDataSourceParamByDataSourceId(reportDataSourceVo.getId());
             dataSourceMapper.deleteReportDataSourceById(reportDataSourceVo.getId());
             dataSourceAuditMapper.deleteReportDataSourceAuditByDatasourceId(reportDataSourceVo.getId());
             //由于以下操作是DDL操作，所以需要使用EscapeTransactionJob避开当前事务，否则在进行DDL操作之前事务就会提交，如果DDL出错，则上面的事务就无法回滚了
@@ -87,10 +88,10 @@ public class DataSourceServiceImpl implements DataSourceService {
                 try {
                     dataSourceServiceHandler.syncData(dataSourceVo, reportDataSourceAuditVo);
                     dataSourceVo.setStatus(Status.DONE.getValue());
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     dataSourceVo.setStatus(Status.FAILED.getValue());
                     reportDataSourceAuditVo.setError(ex.getMessage());
-                }finally {
+                } finally {
                     int dataCount = dataSourceDataMapper.getDataSourceDataCount(new DataSourceDataVo(dataSourceVo.getId()));
                     dataSourceVo.setDataCount(dataCount);
                     dataSourceMapper.updateReportDataSourceStatus(dataSourceVo);
@@ -151,9 +152,7 @@ public class DataSourceServiceImpl implements DataSourceService {
         dataSourceMapper.updateDataSource(newVo);
 
         if (CollectionUtils.isNotEmpty(deleteFieldList)) {
-            for (DataSourceFieldVo field : deleteFieldList) {
-                dataSourceMapper.deleteDataSourceFieldById(field.getId());
-            }
+            dataSourceMapper.deleteDataSourceFieldByIdList(deleteFieldList.stream().map(DataSourceFieldVo::getId).collect(Collectors.toList()));
         }
 
         if (CollectionUtils.isNotEmpty(updateFieldList)) {
@@ -165,14 +164,12 @@ public class DataSourceServiceImpl implements DataSourceService {
         if (CollectionUtils.isNotEmpty(insertFieldList)) {
             for (DataSourceFieldVo field : insertFieldList) {
                 field.setDataSourceId(newVo.getId());
-                dataSourceMapper.insertDataSourceField(field);
             }
+            dataSourceMapper.batchInsertDataSourceField(insertFieldList);
         }
 
         if (CollectionUtils.isNotEmpty(deleteParamList)) {
-            for (DataSourceParamVo param : deleteParamList) {
-                dataSourceMapper.deleteDataSourceParamById(param.getId());
-            }
+            dataSourceMapper.deleteDataSourceParamByIdList(deleteParamList.stream().map(DataSourceParamVo::getId).collect(Collectors.toList()));
         }
 
         if (CollectionUtils.isNotEmpty(updateParamList)) {
@@ -184,8 +181,8 @@ public class DataSourceServiceImpl implements DataSourceService {
         if (CollectionUtils.isNotEmpty(insertParamList)) {
             for (DataSourceParamVo param : insertParamList) {
                 param.setDataSourceId(newVo.getId());
-                dataSourceMapper.insertDataSourceParam(param);
             }
+            dataSourceMapper.batchInsertDataSourceParam(insertParamList);
         }
     }
 
@@ -214,5 +211,22 @@ public class DataSourceServiceImpl implements DataSourceService {
         } else {
             schedulerManager.unloadJob(jobObject);
         }
+    }
+
+    @Override
+    public List<DataSourceFieldVo> revertFieldCondition(List<DataSourceFieldVo> newFieldList, List<DataSourceFieldVo> oldFieldList) {
+        if (CollectionUtils.isNotEmpty(newFieldList) && CollectionUtils.isNotEmpty(oldFieldList)) {
+            for (DataSourceFieldVo fieldVo : newFieldList) {
+                Optional<DataSourceFieldVo> opt = oldFieldList.stream()
+                        .filter(o -> Objects.equals(fieldVo.getName(), o.getName()) && Objects.equals(o.getIsCondition(), 1)).findFirst();
+                if (opt.isPresent()) {
+                    DataSourceFieldVo oldField = opt.get();
+                    fieldVo.setIsCondition(1);
+                    fieldVo.setInputType(oldField.getInputType());
+                    fieldVo.setConfig(oldField.getConfig());
+                }
+            }
+        }
+        return newFieldList;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2021 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -33,7 +33,7 @@ public class MatrixIntegrationHandler extends IntegrationHandlerBase {
 
     @Override
     public String getName() {
-        return "矩阵外部数据源查询";
+        return "矩阵数据规范";
     }
 
     @Override

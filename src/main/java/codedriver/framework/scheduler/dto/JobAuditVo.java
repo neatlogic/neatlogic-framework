@@ -85,8 +85,12 @@ public class JobAuditVo extends BasePageVo {
     private String status = null;
     @EntityField(name = "服务器id", type = ApiParamType.INTEGER)
     private Integer serverId;
-    @EntityField(name = "日志内容长度", type = ApiParamType.INTEGER)
+    @EntityField(name = "日志内容哈希", type = ApiParamType.INTEGER)
     private int contentLength;
+    @EntityField(name = "cron表达式", type = ApiParamType.STRING)
+    private String cron;
+    @EntityField(name = "下次激活时间", type = ApiParamType.LONG)
+    private Date nextFireTime;
 
     public JobAuditVo() {
         this.setPageSize(20);
@@ -190,5 +194,21 @@ public class JobAuditVo extends BasePageVo {
 
     public void setContentHash(String contentHash) {
         this.contentHash = contentHash;
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
+    }
+
+    public Date getNextFireTime() {
+        return nextFireTime;
+    }
+
+    public void setNextFireTime(Date nextFireTime) {
+        this.nextFireTime = nextFireTime;
     }
 }

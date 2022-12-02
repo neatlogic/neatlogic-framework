@@ -13,6 +13,7 @@ import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataMapper;
 import codedriver.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import java.util.List;
  * 报表数据源数据清理定时器
  */
 @Component
+@DisallowConcurrentExecution
 public class ReportDataExpireJob extends JobBase {
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);
 
@@ -33,7 +35,7 @@ public class ReportDataExpireJob extends JobBase {
     private DataWarehouseDataSourceDataMapper reportDataSourceDataMapper;
 
     @Override
-    public Boolean isHealthy(JobObject jobObject) {
+    public Boolean isMyHealthy(JobObject jobObject) {
         return true;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -11,6 +11,7 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import org.apache.commons.lang3.StringUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 @RootConfiguration
@@ -163,6 +165,7 @@ public class Config {
     public static boolean ES_ENABLE() {
         return ES_ENABLE;
     }
+
     public static String DB_HOST() {
         return DB_HOST;
     }
@@ -315,13 +318,13 @@ public class Config {
         return LICENSE_PK;
     }
 
-    public static String SUPERADMIN(){
+    public static String SUPERADMIN() {
         return SUPERADMIN;
     }
-    public static String SUPERADMIN_PASSWORD(){
+
+    public static String SUPERADMIN_PASSWORD() {
         return SUPERADMIN_PASSWORD;
     }
-
 
 
     @PostConstruct
@@ -329,17 +332,19 @@ public class Config {
         try {
             String propertiesString = configService.getConfig("config", "codedriver.framework", 3000);
             loadNacosProperties(propertiesString);
-            configService.addListener("config", "codedriver.framework", new Listener() {
-                @Override
-                public void receiveConfigInfo(String configInfo) {
-                    loadNacosProperties(configInfo);
-                }
+            if (StringUtils.isNotBlank(propertiesString)) {
+                configService.addListener("config", "codedriver.framework", new Listener() {
+                    @Override
+                    public void receiveConfigInfo(String configInfo) {
+                        loadNacosProperties(configInfo);
+                    }
 
-                @Override
-                public Executor getExecutor() {
-                    return null;
-                }
-            });
+                    @Override
+                    public Executor getExecutor() {
+                        return null;
+                    }
+                });
+            }
         } catch (NacosException e) {
             logger.error(e.getMessage(), e);
         }
@@ -394,9 +399,21 @@ public class Config {
             WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
 
             LICENSE_PK = prop.getProperty("license.pk");
-            SUPERADMIN = prop.getProperty("superadmin","administrator");
-            SUPERADMIN_PASSWORD = prop.getProperty("superadmin.password","RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
+            SUPERADMIN = prop.getProperty("superadmin", "administrator");
+            SUPERADMIN_PASSWORD = prop.getProperty("superadmin.password", "RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
 
+            //处理其他配置
+            Reflections reflections = new Reflections("codedriver");
+            Set<Class<? extends IConfigListener>> listeners = reflections.getSubTypesOf(IConfigListener.class);
+            for (Class<? extends IConfigListener> c : listeners) {
+                IConfigListener handler;
+                try {
+                    handler = c.newInstance();
+                    handler.loadConfig(prop);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }

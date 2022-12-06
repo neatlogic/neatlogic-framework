@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
   ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
   -->
 
@@ -28,33 +28,6 @@
     <nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
     <!--指定dataId,group-id, 不自动刷新 -->
     <nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="false"/>
-
-    <!-- com.alibaba.druid.pool.DruidDataSource有链接溢出问题 -->
-    <!-- org.apache.commons.dbcp2.BasicDataSource -->
-    <!--<bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
-        <property name="driverClassName">
-            <value>${db.driverClassName}</value>
-        </property>
-        <property name="url" value="${db.url}"/>
-        <property name="username">
-            <value>${db.username}</value>
-        </property>
-        <property name="password">
-            <value>${db.password}</value>
-        </property>
-        <property name="validationQuery">
-            <value>${conn.validationQuery}</value>
-        </property>
-        <property name="testOnBorrow">
-            <value>${conn.testOnBorrow}</value>
-        </property>
-        <property name="maxIdle">
-            <value>${conn.maxIdle}</value>
-        </property>
-        <property name="initialSize">
-            <value>${conn.initialSize}</value>
-        </property>
-    </bean>-->
 
     <bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
         <property name="driverClassName">

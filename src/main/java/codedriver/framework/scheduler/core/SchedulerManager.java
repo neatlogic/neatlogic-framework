@@ -144,7 +144,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
                 jobStatusVo.setNextFireTime(nextFireDate);
                 schedulerMapper.updateJobNextFireTime(jobStatusVo);
-                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getCron(), jobObject.getLoadTime()));
+//                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getCron(), jobObject.getLoadTime()));
                 return nextFireDate;
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
@@ -161,7 +161,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
      * @Description: 将定时作业从调度器中删除
      */
     public boolean unloadJob(JobObject jobObject) {
-        schedulerMapper.deleteJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
+//        schedulerMapper.deleteJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(jobObject.getJobName(), jobObject.getJobGroup());

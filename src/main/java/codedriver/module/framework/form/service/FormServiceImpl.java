@@ -42,7 +42,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         String formVersionUuid = formAttributeVo.getFormVersionUuid();
         IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
         if (formAttributeHandler == null) {
-            throw new FormAttributeHandlerNotFoundException(formAttributeVo.getHandler());
+//            throw new FormAttributeHandlerNotFoundException(formAttributeVo.getHandler());
+            return;
         }
         formAttributeHandler.makeupFormAttribute(formAttributeVo);
         Set<String> matrixUuidSet = formAttributeVo.getMatrixUuidSet();

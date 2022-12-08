@@ -10,6 +10,8 @@ import codedriver.framework.bootstrap.CodedriverWebApplicationContext;
 import codedriver.framework.common.RootComponent;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RootComponent
 public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
 
+    private Logger logger = LoggerFactory.getLogger(NotifyParamHandlerFactory.class);
     private static final Map<String, INotifyParamHandler> map = new HashMap<>();
 
     public static INotifyParamHandler getHandler(String handler) {
@@ -45,6 +48,10 @@ public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
             INotifyParamHandler paramHandler = entry.getValue();
             String value = paramHandler.getValue();
             if (StringUtils.isNotEmpty(value)) {
+                if (map.containsKey(value)) {
+                    logger.error("INotifyParamHandler '" + paramHandler.getClass().getSimpleName()+ "(" + value + ")' repeat");
+                    System.exit(1);
+                }
                 map.put(value, paramHandler);
             }
         }

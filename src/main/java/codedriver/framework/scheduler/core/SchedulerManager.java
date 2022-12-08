@@ -21,9 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @RootComponent
@@ -34,11 +34,11 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
 
-    @Autowired
+    @Resource
     private TenantMapper tenantMapper;
-    @Autowired
+    @Resource
     private SchedulerFactoryBean schedulerFactoryBean;
-    @Autowired
+    @Resource
     private SchedulerMapper schedulerMapper;
 
     private List<TenantVo> tenantList = new ArrayList<>();

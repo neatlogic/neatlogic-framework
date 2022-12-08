@@ -19,7 +19,7 @@ public class JobObject implements Serializable {
 	private String tenantUuid;
 	private Integer intervalInSeconds;
 	private Integer repeatCount;
-	private Date loadTime = new Date();
+//	private Date loadTime = new Date();
 
 	private Map<String, Object> dataMap;
 
@@ -78,9 +78,9 @@ public class JobObject implements Serializable {
 		return type;
 	}
 
-	public Date getLoadTime() {
-		return loadTime;
-	}
+//	public Date getLoadTime() {
+//		return loadTime;
+//	}
 
 	public static class Builder {
 		// 必要参数

@@ -103,16 +103,16 @@ public abstract class JobBase implements IJob {
 
     @Override
     public final Boolean isHealthy(JobObject jobObject) {
-        JobLoadTimeVo jobLoadTime = schedulerMapper.getJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
-        if (jobLoadTime == null) {
-            return false;
-        }
-        if (!Objects.equals(jobLoadTime.getCron(), jobObject.getCron())) {
-            return false;
-        }
-        if (!Objects.equals(jobLoadTime.getLoadTime(), jobObject.getLoadTime())) {
-            return false;
-        }
+//        JobLoadTimeVo jobLoadTime = schedulerMapper.getJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
+//        if (jobLoadTime == null) {
+//            return false;
+//        }
+//        if (!Objects.equals(jobLoadTime.getCron(), jobObject.getCron())) {
+//            return false;
+//        }
+//        if (!Objects.equals(jobLoadTime.getLoadTime(), jobObject.getLoadTime())) {
+//            return false;
+//        }
         return isMyHealthy(jobObject);
     }
 

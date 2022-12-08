@@ -7,6 +7,7 @@ package codedriver.framework.scheduler.dto;
 
 import java.util.Date;
 
+@Deprecated
 public class JobLoadTimeVo {
     private String jobName;
     private String jobGroup;

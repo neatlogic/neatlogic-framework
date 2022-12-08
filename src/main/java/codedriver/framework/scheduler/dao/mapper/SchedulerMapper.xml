@@ -270,7 +270,7 @@
         WHERE server_id = #{value}
     </select>
 
-    <select id="getJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo" resultType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
+    <!--<select id="getJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo" resultType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
         SELECT
             `job_name` AS jobName,
             `job_group` AS jobGroup,
@@ -279,7 +279,7 @@
         FROM `schedule_job_load_time`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
-    </select>
+    </select>-->
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
@@ -405,11 +405,11 @@
                 #{serverId})
     </insert>
 
-    <insert id="insertJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
+    <!--<insert id="insertJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
         INSERT INTO `schedule_job_load_time` (`job_name`, `job_group`, `cron`, `load_time`)
         VALUES (#{jobName}, #{jobGroup}, #{cron}, #{loadTime})
         ON DUPLICATE KEY UPDATE `cron` = #{cron}, `load_time` = #{loadTime}
-    </insert>
+    </insert>-->
 
     <delete id="deleteUnusedJobStatus">
         DELETE
@@ -457,10 +457,10 @@
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
 
-    <delete id="deleteJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
+    <!--<delete id="deleteJobLoadTime" parameterType="codedriver.framework.scheduler.dto.JobLoadTimeVo">
         DELETE
         FROM `schedule_job_load_time`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
-    </delete>
+    </delete>-->
 </mapper>

@@ -12,6 +12,7 @@ import codedriver.framework.exception.user.NoUserException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -253,4 +254,25 @@ public class UserContext implements Serializable {
     public void setAuthenticationInfoVo(AuthenticationInfoVo authenticationInfoVo) {
         this.authenticationInfoVo = authenticationInfoVo;
     }
+
+    /**
+     * 获取用户的所有user、role、team的uuid列表
+     * 用于sql校验数据权限
+     *
+     * @return 用户的所有user、role、team的uuid列表
+     */
+    public List<String> getUuidList() {
+        List<String> authUuidList = new ArrayList<>();
+        if (authenticationInfoVo != null) {
+            authUuidList.add(authenticationInfoVo.getUserUuid());
+            if (CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList())) {
+                authUuidList.addAll(authenticationInfoVo.getTeamUuidList());
+            }
+            if (CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())) {
+                authUuidList.addAll(authenticationInfoVo.getRoleUuidList());
+            }
+        }
+        return authUuidList;
+    }
+
 }

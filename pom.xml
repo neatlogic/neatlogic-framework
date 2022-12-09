@@ -1,12 +1,17 @@
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.techsure</groupId>
 		<artifactId>codedriver-parent</artifactId>
-		<version>[1.0.0, 2.0.0]</version>
+		<version>[1.0.0, 2.0.0)</version>
 	</parent>
 	<artifactId>codedriver-framework</artifactId>
-	<version>develop-formbuilder-SNAPSHOT</version>
+    <version>1.1.9</version>
 	<build>
 		<resources>
 			<resource>
@@ -15,31 +20,14 @@
 					<include>**/*.xml</include>
 					<include>META-INF/**</include>
 					<include>**/*.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**</include>
-				</includes>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>com.github.magese</groupId>
-			<artifactId>ik-analyzer</artifactId>
-			<version>8.1.0.techsure</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-</project> 
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>

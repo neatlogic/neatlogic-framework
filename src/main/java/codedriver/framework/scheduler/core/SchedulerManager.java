@@ -16,17 +16,14 @@ import codedriver.framework.common.constvalue.SystemUser;
 import codedriver.framework.dao.mapper.TenantMapper;
 import codedriver.framework.dto.TenantVo;
 import codedriver.framework.scheduler.dao.mapper.SchedulerMapper;
-import codedriver.framework.scheduler.dto.JobClassVo;
-import codedriver.framework.scheduler.dto.JobLockVo;
-import codedriver.framework.scheduler.dto.JobObject;
-import codedriver.framework.scheduler.dto.JobStatusVo;
+import codedriver.framework.scheduler.dto.*;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @RootComponent
@@ -37,11 +34,11 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
 
-    @Autowired
+    @Resource
     private TenantMapper tenantMapper;
-    @Autowired
+    @Resource
     private SchedulerFactoryBean schedulerFactoryBean;
-    @Autowired
+    @Resource
     private SchedulerMapper schedulerMapper;
 
     private List<TenantVo> tenantList = new ArrayList<>();
@@ -147,7 +144,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
                 jobStatusVo.setNextFireTime(nextFireDate);
                 schedulerMapper.updateJobNextFireTime(jobStatusVo);
-
+//                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getCron(), jobObject.getLoadTime()));
                 return nextFireDate;
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
@@ -164,6 +161,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
      * @Description: 将定时作业从调度器中删除
      */
     public boolean unloadJob(JobObject jobObject) {
+//        schedulerMapper.deleteJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
             JobKey jobKey = new JobKey(jobObject.getJobName(), jobObject.getJobGroup());

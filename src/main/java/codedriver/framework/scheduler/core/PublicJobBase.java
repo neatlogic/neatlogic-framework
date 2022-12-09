@@ -1,16 +1,16 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
 package codedriver.framework.scheduler.core;
 
-import java.util.List;
-
 import codedriver.framework.asynchronization.threadlocal.TenantContext;
 import codedriver.framework.scheduler.dto.JobClassVo;
 import codedriver.framework.scheduler.dto.JobObject;
 import codedriver.framework.scheduler.dto.JobVo;
+
+import java.util.List;
 
 /**
  * 1、所有外部作业必须继承此父类
@@ -22,12 +22,11 @@ import codedriver.framework.scheduler.dto.JobVo;
  */
 public abstract class PublicJobBase extends JobBase implements IPublicJob {
 
-	public Boolean isHealthy(JobObject jobObject) {
+	@Override
+	public Boolean isMyHealthy(JobObject jobObject) {
         JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
         if (jobVo != null) {
-            if (jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron())) {
-                return true;
-            }
+			return jobVo.getIsActive().equals(1) && jobVo.getCron().equals(jobObject.getCron());
         }
         return false;
     }

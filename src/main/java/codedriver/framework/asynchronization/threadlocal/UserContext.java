@@ -255,6 +255,12 @@ public class UserContext implements Serializable {
         this.authenticationInfoVo = authenticationInfoVo;
     }
 
+    /**
+     * 获取用户的所有user、role、team的uuid列表
+     * 用于sql校验数据权限
+     *
+     * @return 用户的所有user、role、team的uuid列表
+     */
     public List<String> getUuidList() {
         List<String> authUuidList = new ArrayList<>();
         if (authenticationInfoVo != null) {

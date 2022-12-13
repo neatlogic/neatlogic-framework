@@ -13,16 +13,11 @@ import codedriver.framework.dependency.core.DependencyManager;
 import codedriver.framework.exception.file.FileTypeNotSupportToExportException;
 import codedriver.framework.exception.type.ParamIrregularException;
 import codedriver.framework.matrix.dao.mapper.MatrixMapper;
-import codedriver.framework.matrix.dto.MatrixAttributeVo;
-import codedriver.framework.matrix.dto.MatrixColumnVo;
-import codedriver.framework.matrix.dto.MatrixDataVo;
-import codedriver.framework.matrix.dto.MatrixVo;
+import codedriver.framework.matrix.dto.*;
 import codedriver.framework.matrix.exception.MatrixAttributeNotFoundException;
-import codedriver.framework.matrix.exception.MatrixNotFoundException;
 import codedriver.framework.matrix.exception.MatrixReferencedCannotBeDeletedException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -194,6 +189,24 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo);
 
     @Override
+    public List<Map<String, JSONObject>> searchTableDataNew(MatrixDataVo dataVo) {
+        /** 属性集合去重 **/
+        List<String> distinctColumList = new ArrayList<>();
+        for (String column : dataVo.getColumnList()) {
+            if (!distinctColumList.contains(column)) {
+                distinctColumList.add(column);
+            }
+        }
+        dataVo.setColumnList(distinctColumList);
+        List<Map<String, JSONObject>> resultList = mySearchTableDataNew(dataVo);
+        return resultList;
+    }
+
+    protected List<Map<String, JSONObject>> mySearchTableDataNew(MatrixDataVo dataVo) {
+        return null;
+    }
+
+    @Override
     public void saveTableRowData(String matrixUuid, JSONObject rowData) {
         mySaveTableRowData(matrixUuid, rowData);
     }
@@ -260,26 +273,24 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
      * @param dataVo
      */
     protected boolean mergeFilterListAndSourceColumnList(MatrixDataVo dataVo) {
-        JSONArray filterArray = dataVo.getFilterList();
-        if (CollectionUtils.isEmpty(filterArray)) {
+        List<MatrixFilterVo> filterList = dataVo.getFilterList();
+        if (CollectionUtils.isEmpty(filterList)) {
             return true;
         }
         List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
         Map<String, MatrixColumnVo> sourceColumnMap = sourceColumnList.stream().collect(Collectors.toMap(e -> e.getColumn(), e -> e));
-        for (int i = 0; i < filterArray.size(); i++) {
-            JSONObject filterObj = filterArray.getJSONObject(i);
-            if (MapUtils.isEmpty(filterObj)) {
+        for (MatrixFilterVo matrixFilterVo : filterList) {
+            if (matrixFilterVo == null) {
                 continue;
             }
-            String uuid = filterObj.getString("uuid");
+            String uuid = matrixFilterVo.getUuid();
             if (StringUtils.isBlank(uuid)) {
                 continue;
             }
-            JSONArray valueArray = filterObj.getJSONArray("valueList");
-            if (CollectionUtils.isEmpty(valueArray)) {
+            List<String> filterValueList = matrixFilterVo.getValueList();
+            if (CollectionUtils.isEmpty(filterValueList)) {
                 continue;
             }
-            List<String> filterValueList = valueArray.toJavaList(String.class);
             MatrixColumnVo sourceColumnVo = sourceColumnMap.get(uuid);
             if (sourceColumnVo != null) {
                 List<String> valueList = sourceColumnVo.getValueList();

@@ -138,7 +138,8 @@ public abstract class JobBase implements IJob {
             throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
         }
         if (!jobHandler.isHealthy(jobObject)) {
-            schedulerManager.unloadJob(jobObject);
+            // not healthy 不能unloadJob 否则会删除作业状态和锁，导致正常接管的server也无法跑作业。例如：A Server 修改cron 每天0点跑作业。 然后B Server 修改cron每分钟跑。 当A Server 发现not healthy 则会unload 并删除status，lock。后续判断会导致B Server 也不会再跑作业。
+            //schedulerManager.unloadJob(jobObject);
             return;
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间

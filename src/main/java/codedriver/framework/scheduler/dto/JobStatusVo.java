@@ -1,14 +1,14 @@
 package codedriver.framework.scheduler.dto;
 
-import java.util.Date;
-
+import codedriver.framework.common.constvalue.ApiParamType;
+import codedriver.framework.common.dto.BaseEditorVo;
+import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
 
-import codedriver.framework.common.constvalue.ApiParamType;
-import codedriver.framework.restful.annotation.EntityField;
+import java.util.Date;
 
-public class JobStatusVo {
-
+public class JobStatusVo extends BaseEditorVo {
+	private static final long serialVersionUID = 2313591895745650036L;
 	@EntityField(name = "定时作业名称",
 			type = ApiParamType.STRING)
 	private String jobName;

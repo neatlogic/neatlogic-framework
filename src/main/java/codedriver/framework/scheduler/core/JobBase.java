@@ -74,30 +74,36 @@ public abstract class JobBase implements IJob {
     private JobLockVo getJobLock(String jobName, String jobGroup) {
         // 开启事务，获取作业锁
         TransactionStatus ts = transactionUtil.openTx();
-        JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
-
-        if (jobLockVo != null) {
-            // 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
-            if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
-                jobLockVo = null;
+        JobLockVo jobLockVo;
+        try {
+            jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
+            if (jobLockVo != null) {
+                // 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
+                if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+                    jobLockVo = null;
+                }
             }
+            if (jobLockVo != null) {
+                // 修改锁状态
+                jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                jobLockVo.setLock(JobLockVo.RUNNING);
+                schedulerMapper.updateJobLock(jobLockVo);
+            }
+        }finally {
+            transactionUtil.commitTx(ts);
         }
-        if (jobLockVo != null) {
-            // 修改锁状态
-            jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
-            jobLockVo.setLock(JobLockVo.RUNNING);
-            schedulerMapper.updateJobLock(jobLockVo);
-        }
-        transactionUtil.commitTx(ts);
         return jobLockVo;
     }
 
     private void updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {
         // 开启事务，获取作业锁
         TransactionStatus ts = transactionUtil.openTx();
-        schedulerMapper.updateJobStatus(jobStatusVo);
-        schedulerMapper.updateJobLock(jobLockVo);
-        transactionUtil.commitTx(ts);
+        try {
+            schedulerMapper.updateJobStatus(jobStatusVo);
+            schedulerMapper.updateJobLock(jobLockVo);
+        }finally {
+            transactionUtil.commitTx(ts);
+        }
     }
 
 

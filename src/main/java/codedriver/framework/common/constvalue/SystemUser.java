@@ -27,7 +27,7 @@ public enum SystemUser {
     private final String userName;
     private final String timezone = "+8:00";
 
-    private SystemUser(String userId, String userUuid, String userName) {
+    SystemUser(String userId, String userUuid, String userName) {
         this.userId = userId;
         this.userUuid = userUuid;
         this.userName = userName;
@@ -64,8 +64,6 @@ public enum SystemUser {
         }
         return userVo;
     }
-
-    ;
 
     public static String getUserName(String userUuid) {
         for (SystemUser user : values()) {

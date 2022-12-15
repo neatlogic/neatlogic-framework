@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSONArray;
 public class MatrixDataVo extends BasePageVo {
     private String matrixUuid;
     private List<String> columnList;
+    @Deprecated
     private List<MatrixColumnVo> sourceColumnList;
     /**
      * 这个字段被super.defaultValue替代
@@ -26,14 +27,27 @@ public class MatrixDataVo extends BasePageVo {
     private String uuid;
     private String attrType;
     private List<String> attributeValueList;
-    private JSONArray filterList;
+    private List<MatrixFilterVo> filterList;
     List<String> arrayColumnList;
     //表单编辑页引用配置项矩阵时的保存过滤条件数据
+    @Deprecated
     private JSONArray attrFilterList;
+    @Deprecated
     private JSONArray relFilterList;
+    @Deprecated
     private Long filterCiEntityId;
+    @Deprecated
     private Long filterCiId;
 
+    /**
+     * 用于下拉框默认值回显
+     */
+    private List<MatrixDefaultValueFilterVo> defaultValueFilterList;
+
+    /**
+     * 查询数据时不能为空的column列表
+     */
+    private List<String> NotNullColumnList;
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -49,14 +63,14 @@ public class MatrixDataVo extends BasePageVo {
     public void setColumnList(List<String> columnList) {
         this.columnList = columnList;
     }
-
+    @Deprecated
     public List<MatrixColumnVo> getSourceColumnList() {
         if (sourceColumnList == null) {
             sourceColumnList = new ArrayList<>();
         }
         return sourceColumnList;
     }
-
+    @Deprecated
     public void setSourceColumnList(List<MatrixColumnVo> sourceColumnList) {
         this.sourceColumnList = sourceColumnList;
     }
@@ -128,11 +142,11 @@ public class MatrixDataVo extends BasePageVo {
     }
 
 
-    public JSONArray getFilterList() {
+    public List<MatrixFilterVo> getFilterList() {
         return filterList;
     }
 
-    public void setFilterList(JSONArray filterList) {
+    public void setFilterList(List<MatrixFilterVo> filterList) {
         this.filterList = filterList;
     }
 
@@ -143,36 +157,52 @@ public class MatrixDataVo extends BasePageVo {
     public void setArrayColumnList(List<String> arrayColumnList) {
         this.arrayColumnList = arrayColumnList;
     }
-
+    @Deprecated
     public JSONArray getAttrFilterList() {
         return attrFilterList;
     }
-
+    @Deprecated
     public void setAttrFilterList(JSONArray attrFilterList) {
         this.attrFilterList = attrFilterList;
     }
-
+    @Deprecated
     public JSONArray getRelFilterList() {
         return relFilterList;
     }
-
+    @Deprecated
     public void setRelFilterList(JSONArray relFilterList) {
         this.relFilterList = relFilterList;
     }
-
+    @Deprecated
     public Long getFilterCiEntityId() {
         return filterCiEntityId;
     }
-
+    @Deprecated
     public void setFilterCiEntityId(Long filterCiEntityId) {
         this.filterCiEntityId = filterCiEntityId;
     }
-
+    @Deprecated
     public Long getFilterCiId() {
         return filterCiId;
     }
-
+    @Deprecated
     public void setFilterCiId(Long filterCiId) {
         this.filterCiId = filterCiId;
+    }
+
+    public List<MatrixDefaultValueFilterVo> getDefaultValueFilterList() {
+        return defaultValueFilterList;
+    }
+
+    public void setDefaultValueFilterList(List<MatrixDefaultValueFilterVo> defaultValueFilterList) {
+        this.defaultValueFilterList = defaultValueFilterList;
+    }
+
+    public List<String> getNotNullColumnList() {
+        return NotNullColumnList;
+    }
+
+    public void setNotNullColumnList(List<String> notNullColumnList) {
+        NotNullColumnList = notNullColumnList;
     }
 }

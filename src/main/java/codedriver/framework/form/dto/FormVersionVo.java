@@ -28,12 +28,8 @@ public class FormVersionVo extends BaseEditorVo {
     private Integer version;
     private Integer isActive;
     private String formConfig;
-//    private String editor;
-//    private Date editTime;
     @JSONField(serialize = false)
     private List<FormAttributeVo> formAttributeList;
-    @JSONField(serialize = false)
-    private List<FormAttributeMatrixVo> processMatrixFormComponentList;
 
     public synchronized String getUuid() {
         if (StringUtils.isBlank(uuid)) {
@@ -70,25 +66,6 @@ public class FormVersionVo extends BaseEditorVo {
         this.formConfig = formConfig;
     }
 
-//    public String getEditor() {
-//        if (StringUtils.isBlank(editor)) {
-//            editor = UserContext.get().getUserUuid();
-//        }
-//        return editor;
-//    }
-//
-//    public void setEditor(String editor) {
-//        this.editor = editor;
-//    }
-//
-//    public Date getEditTime() {
-//        return editTime;
-//    }
-//
-//    public void setEditTime(Date editTime) {
-//        this.editTime = editTime;
-//    }
-
     public Integer getVersion() {
         return version;
     }
@@ -100,14 +77,43 @@ public class FormVersionVo extends BaseEditorVo {
     public List<FormAttributeVo> getFormAttributeList() {
         if (formAttributeList == null) {
             if (StringUtils.isNotBlank(this.formConfig)) {
-                JSONArray controllerList = (JSONArray) JSONPath.read(this.formConfig, "controllerList");
-                if (CollectionUtils.isNotEmpty(controllerList)) {
+                String _type = (String) JSONPath.read(this.formConfig, "_type");
+                if ("new".equals(_type)) {
+                    JSONArray tableList = (JSONArray) JSONPath.read(this.formConfig, "tableList");
+                    if (CollectionUtils.isEmpty(tableList)) {
+                        return formAttributeList;
+                    }
                     formAttributeList = new ArrayList<>();
-                    for (int i = 0; i < controllerList.size(); i++) {
-                        JSONObject controllerObj = controllerList.getJSONObject(i);
-                        JSONObject config = controllerObj.getJSONObject("config");
+                    for (int i = 0; i < tableList.size(); i++) {
+                        JSONObject cellObj = tableList.getJSONObject(i);
+                        if (MapUtils.isEmpty(cellObj)) {
+                            continue;
+                        }
+                        JSONObject componentObj = cellObj.getJSONObject("component");
+                        if (MapUtils.isEmpty(componentObj)) {
+                            continue;
+                        }
+                        JSONObject config = componentObj.getJSONObject("config");
                         if (MapUtils.isNotEmpty(config)) {
-                            formAttributeList.add(new FormAttributeVo(this.getFormUuid(), this.getUuid(), controllerObj.getString("uuid"), controllerObj.getString("label"), controllerObj.getString("type"), controllerObj.getString("handler"), config.getBooleanValue("isRequired"), controllerObj.getString("config"), config.getString("defaultValueList")));
+                            String uuid = componentObj.getString("uuid");
+                            String label = componentObj.getString("label");
+                            String type = componentObj.getString("type");
+                            String handler = componentObj.getString("handler");
+                            boolean isRequired = config.getBooleanValue("isRequired");
+                            String defaultValue = config.getString("defaultValue");
+                            formAttributeList.add(new FormAttributeVo(this.getFormUuid(), this.getUuid(), uuid, label, type, handler, isRequired, componentObj.getString("config"), defaultValue));
+                        }
+                    }
+                } else {
+                    JSONArray controllerList = (JSONArray) JSONPath.read(this.formConfig, "controllerList");
+                    if (CollectionUtils.isNotEmpty(controllerList)) {
+                        formAttributeList = new ArrayList<>();
+                        for (int i = 0; i < controllerList.size(); i++) {
+                            JSONObject controllerObj = controllerList.getJSONObject(i);
+                            JSONObject config = controllerObj.getJSONObject("config");
+                            if (MapUtils.isNotEmpty(config)) {
+                                formAttributeList.add(new FormAttributeVo(this.getFormUuid(), this.getUuid(), controllerObj.getString("uuid"), controllerObj.getString("label"), controllerObj.getString("type"), controllerObj.getString("handler"), config.getBooleanValue("isRequired"), controllerObj.getString("config"), config.getString("defaultValueList")));
+                            }
                         }
                     }
                 }

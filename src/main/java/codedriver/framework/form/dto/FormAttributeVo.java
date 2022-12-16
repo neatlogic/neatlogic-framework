@@ -44,10 +44,10 @@ public class FormAttributeVo implements Serializable {
     private String data;
     @EntityField(name = "是否必填", type = ApiParamType.BOOLEAN)
     private boolean isRequired;
-    @EntityField(name = "表达式列表", type = ApiParamType.JSONARRAY)
-    List<ExpressionVo> expressionList;
-    @EntityField(name = "默认表达式", type = ApiParamType.JSONOBJECT)
-    ExpressionVo defaultExpression;
+//    @EntityField(name = "表达式列表", type = ApiParamType.JSONARRAY)
+//    List<ExpressionVo> expressionList;
+//    @EntityField(name = "默认表达式", type = ApiParamType.JSONOBJECT)
+//    ExpressionVo defaultExpression;
     @EntityField(name = "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config", type = ApiParamType.BOOLEAN)
     private boolean isUseFormConfig;
     @EntityField(name = "服务uuid，当表单属性作为工单中心搜索条件时需要使用此属性进行对应", type = ApiParamType.STRING)
@@ -173,50 +173,50 @@ public class FormAttributeVo implements Serializable {
         this.isRequired = isRequired;
     }
 
-    public ExpressionVo getDefaultExpression() {
-        if (defaultExpression != null) {
-            return defaultExpression;
-        }
-        if (handler == null) {
-            return null;
-        }
-        IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
-        if (formHandler != null && formHandler.getParamType() != null
-                && formHandler.getParamType().getDefaultExpression() != null) {
-            defaultExpression = new ExpressionVo(formHandler.getParamType().getDefaultExpression());
-        }
-        return defaultExpression;
-    }
-
-    public void setDefaultExpression(ExpressionVo defaultExpression) {
-        this.defaultExpression = defaultExpression;
-    }
-
-    public List<ExpressionVo> getExpressionList() {
-        if (CollectionUtils.isNotEmpty(expressionList)) {
-            return expressionList;
-        }
-        if (handler == null) {
-            return null;
-        }
-        List<Expression> processExpressionList = null;
-        IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
-        if (formHandler != null && formHandler.getParamType() != null) {
-            processExpressionList = formHandler.getParamType().getExpressionList();
-        }
-        if (CollectionUtils.isEmpty(processExpressionList)) {
-            return null;
-        }
-        expressionList = new ArrayList<>();
-        for (Expression processExpression : processExpressionList) {
-            expressionList.add(new ExpressionVo(processExpression));
-        }
-        return expressionList;
-    }
-
-    public void setExpressionList(List<ExpressionVo> expressionList) {
-        this.expressionList = expressionList;
-    }
+//    public ExpressionVo getDefaultExpression() {
+//        if (defaultExpression != null) {
+//            return defaultExpression;
+//        }
+//        if (handler == null) {
+//            return null;
+//        }
+//        IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
+//        if (formHandler != null && formHandler.getParamType() != null
+//                && formHandler.getParamType().getDefaultExpression() != null) {
+//            defaultExpression = new ExpressionVo(formHandler.getParamType().getDefaultExpression());
+//        }
+//        return defaultExpression;
+//    }
+//
+//    public void setDefaultExpression(ExpressionVo defaultExpression) {
+//        this.defaultExpression = defaultExpression;
+//    }
+//
+//    public List<ExpressionVo> getExpressionList() {
+//        if (CollectionUtils.isNotEmpty(expressionList)) {
+//            return expressionList;
+//        }
+//        if (handler == null) {
+//            return null;
+//        }
+//        List<Expression> processExpressionList = null;
+//        IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
+//        if (formHandler != null && formHandler.getParamType() != null) {
+//            processExpressionList = formHandler.getParamType().getExpressionList();
+//        }
+//        if (CollectionUtils.isEmpty(processExpressionList)) {
+//            return null;
+//        }
+//        expressionList = new ArrayList<>();
+//        for (Expression processExpression : processExpressionList) {
+//            expressionList.add(new ExpressionVo(processExpression));
+//        }
+//        return expressionList;
+//    }
+//
+//    public void setExpressionList(List<ExpressionVo> expressionList) {
+//        this.expressionList = expressionList;
+//    }
 
     public FormConditionModel getConditionModel() {
         return conditionModel;
@@ -226,15 +226,15 @@ public class FormAttributeVo implements Serializable {
         this.conditionModel = conditionModel;
     }
 
-    public String getHandlerName() {
-        if (handler != null) {
-            IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
-            if (formHandler != null) {
-                return formHandler.getHandlerName();
-            }
-        }
-        return null;
-    }
+//    public String getHandlerName() {
+//        if (handler != null) {
+//            IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
+//            if (formHandler != null) {
+//                return formHandler.getHandlerName();
+//            }
+//        }
+//        return null;
+//    }
 
     public String getHandlerType() {
         if (handler == null) {

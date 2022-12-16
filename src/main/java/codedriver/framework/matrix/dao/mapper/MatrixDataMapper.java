@@ -27,6 +27,10 @@ public interface MatrixDataMapper {
 
     List<Map<String, String>> getDynamicTableDataForSelect(MatrixDataVo dataVo);
 
+    int getDynamicTableDataListCount(MatrixDataVo dataVo);
+
+    List<Map<String, String>> getDynamicTableDataList(MatrixDataVo dataVo);
+
     Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList);
 
     int insertDynamicTableData(@Param("rowData") List<MatrixColumnVo> rowData, @Param("matrixUuid") String matrixUuid);

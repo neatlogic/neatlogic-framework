@@ -72,8 +72,6 @@ public interface FormMapper {
 
     void updateForm(FormVo formVo);
 
-    int updateFormAttributeConfig(FormAttributeVo formAttributeVo);
-
     void updateFormCustomItem(FormCustomItemVo formCustomItemVo);
 
     void insertFormCustomItem(FormCustomItemVo formCustomItemVo);

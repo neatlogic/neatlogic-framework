@@ -5,31 +5,29 @@
 
 package codedriver.module.framework.form.attribute.handler;
 
+import codedriver.framework.common.constvalue.ParamType;
+import codedriver.framework.form.attribute.core.FormHandlerBase;
 import codedriver.framework.form.constvalue.FormConditionModel;
 import codedriver.framework.form.constvalue.FormHandler;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson.JSONObject;
-
-import codedriver.framework.common.constvalue.ParamType;
 import codedriver.framework.form.dto.AttributeDataVo;
 import codedriver.framework.form.exception.AttributeValidException;
-import codedriver.framework.form.attribute.core.FormHandlerBase;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class TextHandler extends FormHandlerBase {
+public class LabelHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return FormHandler.FORMTEXT.getHandler();
+        return FormHandler.FORMLABEL.getHandler();
     }
 
     @Override
     public String getHandlerType(FormConditionModel model) {
-        return "input";
+        return null;
     }
 
     @Override
@@ -63,7 +61,7 @@ public class TextHandler extends FormHandlerBase {
 
     @Override
     public boolean isConditionable() {
-        return true;
+        return false;
     }
 
 
@@ -72,37 +70,6 @@ public class TextHandler extends FormHandlerBase {
         return true;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "forminput",
-//	"label": "文本框_1",
-//	"type": "form",
-//	"uuid": "f3d875032f0649f7aca5af75d6c37e10",
-//	"config": {
-//		"isRequired": false,
-//		"defaultValueList": "文本a",
-//		"ruleList": [],
-//		"validList": [],
-//		"textType": "none",
-//		"quoteUuid": "",
-//		"inputMaxlength": 50,
-//		"minNumber": "",
-//		"maxNumber": "",
-//		"decimalNumber": "",
-//		"width": "100%",
-//		"defaultValueType": "self",
-//		"placeholder": "请输入",
-//		"authorityConfig": [
-//			"common#alluser"
-//		]
-//	}
-//}
-    //保存数据结构
-//    "文本a"
-    //返回数据结构
-//{
-//	"value": "文本a"
-//}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

@@ -212,13 +212,13 @@
     <select id="getJobAuditById" parameterType="java.lang.Long"
             resultType="codedriver.framework.scheduler.dto.JobAuditVo">
         SELECT `id`,
-               `job_uuid`     AS jobUuid,
-               `start_time`   AS startTime,
-               `end_time`     AS endTime,
-               `content_hash` AS contentHash,
+               `job_uuid`       AS jobUuid,
+               `start_time`     AS startTime,
+               `end_time`       AS endTime,
+               `content_hash`   AS contentHash,
                b.`content`,
                `status`,
-               `server_id`    AS serverId,
+               `server_id`      AS serverId,
                `cron`,
                `next_fire_time` AS nextFireTime
         FROM `schedule_job_audit` a
@@ -230,13 +230,13 @@
     <select id="getJobAuditByUuid" parameterType="java.lang.String"
             resultType="codedriver.framework.scheduler.dto.JobAuditVo">
         SELECT `id`,
-               `job_uuid`     AS jobUuid,
-               `start_time`   AS startTime,
-               `end_time`     AS endTime,
-               `content_hash` AS contentHash,
+               `job_uuid`       AS jobUuid,
+               `start_time`     AS startTime,
+               `end_time`       AS endTime,
+               `content_hash`   AS contentHash,
                b.`content`,
                `status`,
-               `server_id`    AS serverId,
+               `server_id`      AS serverId,
                `cron`,
                `next_fire_time` AS nextFireTime
         FROM `schedule_job_audit` a
@@ -305,14 +305,16 @@
         SET next_fire_time   = #{nextFireTime},
             last_finish_time = #{lastFinishTime},
             last_fire_time   = #{lastFireTime},
-            exec_count       = #{execCount}
+            exec_count       = #{execCount},
+            `lcd` = NOW()
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
     </update>
 
     <update id="updateJobNextFireTime" parameterType="codedriver.framework.scheduler.dto.JobStatusVo">
         UPDATE schedule_job_status
-        SET next_fire_time = #{nextFireTime}
+        SET next_fire_time = #{nextFireTime},
+            `lcd` = NOW()
         WHERE job_name = #{jobName}
           and job_group = #{jobGroup}
     </update>
@@ -373,11 +375,13 @@
         (`job_name`,
          `job_group`,
          `handler`,
-         `next_fire_time`)
+         `next_fire_time`,
+         `fcd`)
         VALUES (#{jobName},
                 #{jobGroup},
                 #{handler},
-                #{nextFireTime})
+                #{nextFireTime},
+                NOW())
     </insert>
 
     <insert id="insertJobProp">

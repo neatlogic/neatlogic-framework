@@ -17,7 +17,7 @@ public enum ApiParamType {
     EMAIL("email", "邮箱"),
     REGEX("regex", "正则表达式"),
     DOUBLE("double", "双精度浮点数"),
-    NOAUTH("noAuth", "无需校验"),
+    NOAUTH("noAuth", "任意对象，无需校验"),
     FILE("file", "附件");
 
     private String name;

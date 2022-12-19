@@ -31,6 +31,7 @@ import codedriver.framework.restful.annotation.*;
 import codedriver.framework.restful.constvalue.OperationTypeEnum;
 import codedriver.framework.restful.dto.ApiVo;
 import codedriver.framework.util.Md5Util;
+import codedriver.framework.util.RegexUtils;
 import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import codedriver.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import com.alibaba.fastjson.JSONArray;
@@ -502,22 +503,24 @@ public class ApiValidateAndHelpBase {
                         Param[] params = input.value();
                         if (params.length > 0) {
                             for (Param p : params) {
-
+                                String description = p.desc();
                                 JSONObject paramObj = new JSONObject();
                                 paramObj.put("name", p.name());
-                                paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
-                                paramObj.put("isRequired", p.isRequired());
-                                String description = p.desc();
                                 String rule;
-                                // 如果注解中存在member字段，则以引用的枚举值作为合法输入值
-                                if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
-                                    rule = getEnumMember(p);
-                                } else {
+                                if(Objects.equals(p.type().getValue(),ApiParamType.REGEX.getValue())){
+                                    paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
                                     rule = p.rule();
+                                    description = description + "，需满足正则表达式：" + RegexUtils.regexPatternMap.get(rule).toString();
+                                }else if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                                    paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
+                                    rule = getEnumMember(p);
+                                    description = description + "，需满足枚举：" + rule;
+                                }else if(ApiParamType.NOAUTH.equals(p.type())){
+                                    paramObj.put("type",   "object[任意对象]");
+                                } else {
+                                    paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
                                 }
-                                if (StringUtils.isNotBlank(rule)) {
-                                    description = description + "，合法输入：" + rule;
-                                }
+                                paramObj.put("isRequired", p.isRequired());
                                 paramObj.put("description", description);
                                 inputList.add(paramObj);
                                 // }

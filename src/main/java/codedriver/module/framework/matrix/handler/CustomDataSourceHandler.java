@@ -590,7 +590,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     dataVo.setKeywordExpression(Expression.EQUAL.getExpression());
                 }
                 dataVo.setFilterList(filterList);
-                List<Map<String, String>> list = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+                List<Map<String, String>> list = matrixDataMapper.getDynamicTableDataList(dataVo);
                 if (CollectionUtils.isNotEmpty(list)) {
                     dataMapList.addAll(list);
                 }
@@ -616,7 +616,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
-            int rowNum = matrixDataMapper.getDynamicTableDataCountForSelect(dataVo);
+            int rowNum = matrixDataMapper.getDynamicTableDataListCount(dataVo);
             if (rowNum == 0) {
                 return resultList;
             }
@@ -624,7 +624,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
                 return resultList;
             }
-            dataMapList = matrixDataMapper.getDynamicTableDataForSelect(dataVo);
+            dataMapList = matrixDataMapper.getDynamicTableDataList(dataVo);
         }
         if (CollectionUtils.isEmpty(dataMapList)) {
             return resultList;

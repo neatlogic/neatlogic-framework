@@ -230,19 +230,19 @@
                 <foreach collection="filterList" item="filter">
                     <choose>
                         <when test="filter.expression == 'equal'">
-                            AND `${filter.uuid}` = #{filter.value[0]}
+                            AND `${filter.uuid}` = #{filter.valueList[0]}
                         </when>
                         <when test="filter.expression == 'unequal'">
-                            AND `${filter.uuid}` != #{filter.value[0]}
+                            AND `${filter.uuid}` != #{filter.valueList[0]}
                         </when>
                         <when test="filter.expression == 'like'">
-                            AND `${filter.uuid}` LIKE CONCAT('%', #{filter.value[0]}, '%')
+                            AND `${filter.uuid}` LIKE CONCAT('%', #{filter.valueList[0]}, '%')
                         </when>
                         <when test="filter.expression == 'greater-than'">
-                            AND `${filter.uuid}` &gt; #{filter.value[0]}
+                            AND `${filter.uuid}` &gt; #{filter.valueList[0]}
                         </when>
                         <when test="filter.expression == 'less-than'">
-                            AND `${filter.uuid}` &lt; #{filter.value[0]}
+                            AND `${filter.uuid}` &lt; #{filter.valueList[0]}
                         </when>
                         <when test="filter.expression == 'include' and filter.valueList != null and filter.valueList.size() > 0">
                             AND `${filter.uuid}` IN
@@ -251,7 +251,7 @@
                             </foreach>
                         </when>
                         <otherwise>
-                            AND `${filter.uuid}` = #{filter.value[0]}
+                            AND `${filter.uuid}` = #{filter.valueList[0]}
                         </otherwise>
                     </choose>
                 </foreach>

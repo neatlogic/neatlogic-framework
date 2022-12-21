@@ -4,6 +4,7 @@
  */
 package codedriver.framework.util.word;
 
+import codedriver.framework.util.word.enums.TableColor;
 import codedriver.framework.util.word.enums.TitleType;
 import org.apache.poi.ooxml.POIXMLDocument;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -43,6 +44,18 @@ public class WordBuilder {
      */
     public TitleBuilder addTitle(TitleType titleType, String titleName) {
         return new TitleBuilder(document, titleType, titleName);
+    }
+
+    /**
+     * 添加表格
+     *
+     * @param tableHeaderMap 表头
+     * @param tableColor     表头颜色
+     * @return TableBuilder
+     */
+    public TableBuilder addTable(Map<Integer, String> tableHeaderMap, TableColor tableColor) {
+        XWPFTable table = document.createTable();
+        return new TableBuilder(table, tableHeaderMap, tableColor);
     }
 
     /**

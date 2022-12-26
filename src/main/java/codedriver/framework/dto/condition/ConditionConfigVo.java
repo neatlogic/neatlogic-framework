@@ -5,12 +5,13 @@
 
 package codedriver.framework.dto.condition;
 
-import codedriver.framework.common.dto.BasePageVo;
+import codedriver.framework.common.dto.BaseEditorVo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ConditionConfigVo extends BasePageVo implements Serializable {
+public class ConditionConfigVo extends BaseEditorVo implements Serializable {
 
     private static final long serialVersionUID = 5439300427812355573L;
 
@@ -102,5 +103,71 @@ public class ConditionConfigVo extends BasePageVo implements Serializable {
             ConditionGroupVo conditionGroupVo = conditionGroupList.get(0);
             return conditionGroupVo.buildScript();
         }
+    }
+
+    public void buildConditionWhereSql(StringBuilder sqlSb, ConditionConfigVo conditionConfigVo) {
+        // 将group 以连接表达式 存 Map<fromUuid_toUuid,joinType>
+        Map<String, String> groupRelMap = new HashMap<>();
+        List<ConditionGroupRelVo> groupRelList = conditionConfigVo.getConditionGroupRelList();
+        if (CollectionUtils.isNotEmpty(groupRelList)) {
+            for (ConditionGroupRelVo groupRel : groupRelList) {
+                groupRelMap.put(groupRel.getFrom() + "_" + groupRel.getTo(), groupRel.getJoinType());
+            }
+        }
+        List<ConditionGroupVo> groupList = conditionConfigVo.getConditionGroupList();
+        if (CollectionUtils.isNotEmpty(groupList)) {
+            String fromGroupUuid = null;
+            String toGroupUuid = groupList.get(0).getUuid();
+            boolean isAddedAnd = false;
+            for (ConditionGroupVo groupVo : groupList) {
+                // 将condition 以连接表达式 存 Map<fromUuid_toUuid,joinType>
+                Map<String, String> conditionRelMap = new HashMap<>();
+                List<ConditionRelVo> conditionRelList = groupVo.getConditionRelList();
+                if (CollectionUtils.isNotEmpty(conditionRelList)) {
+                    for (ConditionRelVo conditionRel : conditionRelList) {
+                        conditionRelMap.put(conditionRel.getFrom() + "_" + conditionRel.getTo(),
+                                conditionRel.getJoinType());
+                    }
+                }
+                //append joinType
+                if (fromGroupUuid != null) {
+                    toGroupUuid = groupVo.getUuid();
+                    sqlSb.append(groupRelMap.get(fromGroupUuid + "_" + toGroupUuid));
+                }
+                List<ConditionVo> conditionVoList = groupVo.getConditionList();
+                if (!isAddedAnd && CollectionUtils.isNotEmpty((conditionVoList))) {
+                    //补充整体and 结束左括号
+                    sqlSb.append(" and (");
+                    isAddedAnd = true;
+                }
+                sqlSb.append(" ( ");
+                String fromConditionUuid = null;
+                String toConditionUuid;
+                for (int i = 0; i < conditionVoList.size(); i++) {
+                    ConditionVo conditionVo = conditionVoList.get(i);
+                    //append joinType
+                    toConditionUuid = conditionVo.getUuid();
+                    if (MapUtils.isNotEmpty(conditionRelMap) && StringUtils.isNotBlank(fromConditionUuid)) {
+                        sqlSb.append(conditionRelMap.get(fromConditionUuid + "_" + toConditionUuid));
+                    }
+                    //append condition
+                    String handler = conditionVo.getName();
+                    //如果是form
+                    buildMyConditionWhereSql(sqlSb, handler, conditionVoList, i);
+                    fromConditionUuid = toConditionUuid;
+                }
+                sqlSb.append(" ) ");
+                fromGroupUuid = toGroupUuid;
+
+            }
+            //补充整体and 结束右括号
+            if (isAddedAnd) {
+                sqlSb.append(" ) ");
+            }
+        }
+    }
+
+    public void buildMyConditionWhereSql(StringBuilder sqlSb, String handler, List<ConditionVo> conditionVoList, int conditionIndex) {
+
     }
 }

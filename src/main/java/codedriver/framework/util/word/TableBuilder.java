@@ -5,6 +5,7 @@
 package codedriver.framework.util.word;
 
 import codedriver.framework.util.word.enums.FontFamily;
+import codedriver.framework.util.word.enums.TableColor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,28 @@ public class TableBuilder {
      * @param tableHeaderMap 表头 1->列1 , 2->列2 , 3->列3
      */
     public TableBuilder(XWPFTable table, Map<Integer, String> tableHeaderMap) {
+        tableBuilder(table, tableHeaderMap, null);
+    }
+
+    /**
+     * 含有表头建表
+     *
+     * @param table          table
+     * @param tableHeaderMap 表头 1->列1 , 2->列2 , 3->列3
+     * @param tableColor     表头颜色
+     */
+    public TableBuilder(XWPFTable table, Map<Integer, String> tableHeaderMap, TableColor tableColor) {
+        tableBuilder(table, tableHeaderMap, tableColor);
+    }
+
+    /**
+     * 含有表头建表
+     *
+     * @param table          table
+     * @param tableHeaderMap 表头 1->列1 , 2->列2 , 3->列3
+     * @param tableColor     表头颜色
+     */
+    void tableBuilder(XWPFTable table, Map<Integer, String> tableHeaderMap, TableColor tableColor) {
         this.table = table;
         //表风格
         CTTblPr tblPr = table.getCTTbl().getTblPr();
@@ -71,6 +94,9 @@ public class TableBuilder {
         XWPFTableRow row = table.getRow(0);
         for (int cellNum = 1; cellNum <= tableHeaderMap.size(); cellNum++) {
             XWPFTableCell cell = cellNum == 1 ? row.getCell(0) : row.addNewTableCell();
+            if (tableColor != null) {
+                cell.setColor(tableColor.getValue());
+            }
             setCellText(cell, tableHeaderMap.get(cellNum), table.getWidth() / tableHeaderMap.size());
         }
     }

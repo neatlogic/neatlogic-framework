@@ -20,7 +20,7 @@ public interface IConditionHandler {
      * @return: java.lang.String
      * @Date: 2020/2/11
      */
-    public String getName();
+    String getName();
 
     /**
      * @Description: 条件显示名
@@ -28,7 +28,7 @@ public interface IConditionHandler {
      * @return: java.lang.String
      * @Date: 2020/2/11
      */
-    public String getDisplayName();
+    String getDisplayName();
 
     /**
      * @Description: 获取控件类型，
@@ -37,7 +37,7 @@ public interface IConditionHandler {
      * @return: java.lang.String
      * @Date: 2020/2/11
      */
-    public String getHandler(FormConditionModel processWorkcenterConditionType);
+    String getHandler(FormConditionModel processWorkcenterConditionType);
 
     /**
      * @Description: 获取类型
@@ -45,7 +45,7 @@ public interface IConditionHandler {
      * @return: java.lang.String
      * @Date: 2020/2/11
      */
-    public String getType();
+    String getType();
 
     /**
      * @param type 根据不同类型获取配置
@@ -53,7 +53,7 @@ public interface IConditionHandler {
      * @description 获取控件配置
      * @since 2020/2/11
      */
-    public JSONObject getConfig(Enum<?> type);
+    JSONObject getConfig(Enum<?> type);
 
     /**
      * @Description: 获取控件配置
@@ -61,7 +61,7 @@ public interface IConditionHandler {
      * @return: com.alibaba.fastjson.JSONObject
      * @Date: 2020/2/11
      */
-    public JSONObject getConfig();
+    JSONObject getConfig();
 
     /**
      * @Description: 获取控件页面显示排序，越小越靠前
@@ -69,7 +69,7 @@ public interface IConditionHandler {
      * @return: java.lang.Integer
      * @Date: 2020/2/11
      */
-    public Integer getSort();
+    Integer getSort();
 
     /**
      * @Description: 基本类型（表达式）
@@ -77,7 +77,7 @@ public interface IConditionHandler {
      * @return: java.lang.Integer
      * @Date: 2020/2/11
      */
-    public ParamType getParamType();
+    ParamType getParamType();
 
     /**
      * @param value  值
@@ -86,16 +86,16 @@ public interface IConditionHandler {
      * @Time:2020年7月9日
      * @Description: 将条件组合中表达式右边值转换成对应的文本，条件步骤流转生成活动中需要展示对应文本,比如用户uuid转换成userName,下拉框的value转换成对应的text
      */
-    public Object valueConversionText(Object value, JSONObject config);
+    Object valueConversionText(Object value, JSONObject config);
 
-    public default Expression getExpression() {
+    default Expression getExpression() {
         if (getParamType() != null) {
             return getParamType().getDefaultExpression();
         }
         return null;
     }
 
-    public default List<Expression> getExpressionList() {
+    default List<Expression> getExpressionList() {
         if (getParamType() != null) {
             return getParamType().getExpressionList();
         }

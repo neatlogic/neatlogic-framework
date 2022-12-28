@@ -13,7 +13,8 @@ public enum FormHandlerType {
 	TIMESELECT("timeselect"),
 	USERSELECT("userselect"),
 	TEAMSELECT("teamselect"),
-	CASCADELIST("cascadelist");
+	CASCADELIST("cascadelist"),
+	TREE("tree");
 	private String name;
 
 	private FormHandlerType(String _name) {

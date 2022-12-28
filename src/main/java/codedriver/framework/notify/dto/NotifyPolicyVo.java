@@ -14,6 +14,9 @@ public class NotifyPolicyVo extends BaseEditorVo {
     private Long id;
     @EntityField(name = "策略名", type = ApiParamType.STRING)
     private String name;
+
+    @EntityField(name = "策略路径", type = ApiParamType.STRING)
+    private String path;
     @EntityField(name = "被引用次数", type = ApiParamType.INTEGER)
     private int referenceCount;
     @EntityField(name = "配置项信息", type = ApiParamType.JSONOBJECT)
@@ -47,6 +50,14 @@ public class NotifyPolicyVo extends BaseEditorVo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public int getReferenceCount() {

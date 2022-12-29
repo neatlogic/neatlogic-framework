@@ -636,7 +636,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
             distinctList.add(dataMap);
         }
-        resultList = matrixTableDataValueHandle(attributeList, dataMapList);
+        resultList = matrixTableDataValueHandle(attributeList, distinctList);
         return resultList;
     }
 

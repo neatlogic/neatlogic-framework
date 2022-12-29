@@ -26,23 +26,7 @@ public interface IMatrixPrivateDataSourceHandler {
         return null;
     }
 
-    default List<Map<String, String>> getTableData(MatrixDataVo dataVo) {
-        return null;
-    }
-
     default List<Map<String, String>> searchTableData(MatrixDataVo dataVo) {
         return null;
-    }
-
-    default List<Map<String, String>> searchTableColumnData(MatrixDataVo dataVo) {
-        return null;
-    }
-
-    default List<Map<String, String>> getTableColumnDataForDefaultValue(MatrixDataVo dataVo) {
-        return null;
-    }
-
-    default int getTableColumnDataCount(MatrixDataVo dataVo) {
-        return 0;
     }
 }

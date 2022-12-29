@@ -124,4 +124,55 @@
         </if>
     </select>
 
+    <sql id="searchDynamicTableDataSqlNew">
+        <if test="filterList != null and filterList.size() > 0">
+            <foreach collection="filterList" item="filter">
+                <choose>
+                    <when test="filter.expression == 'equal'">
+                        AND `${filter.uuid}` = #{filter.valueList[0]}
+                    </when>
+                    <when test="filter.expression == 'like'">
+                        AND `${filter.uuid}` LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                    </when>
+                    <when test="filter.expression == 'include' and filter.valueList != null and filter.valueList.size() > 0">
+                        AND `${filter.uuid}` IN
+                        <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        AND `${filter.uuid}` = #{filter.valueList[0]}
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="getDynamicTableDataListCount" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        <where>
+            <include refid="searchDynamicTableDataSqlNew"/>
+        </where>
+    </select>
+
+    <select id="getDynamicTableDataList" parameterType="codedriver.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.LinkedHashMap">
+        SELECT
+        `uuid`,
+        <foreach collection="columnList" item="column" separator=",">
+            `${column}`
+        </foreach>
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        <where>
+            <include refid="searchDynamicTableDataSqlNew"/>
+        </where>
+        ORDER BY `id` DESC
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
 </mapper>

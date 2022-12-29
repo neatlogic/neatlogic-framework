@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright (c)  2022 TechSure Co.,Ltd.  All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -24,6 +24,7 @@ public class SheetBuilder {
     private Workbook workbook;
     private ExcelBuilder excelBuilder;
     private final Map<String, String[]> validationMap = new HashMap<>();
+    private CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
     SheetBuilder(String sheetName) {
         this.sheetName = sheetName;
@@ -41,6 +42,11 @@ public class SheetBuilder {
 
     public SheetBuilder withColumnList(List<String> columnList) {
         this.columnList = columnList;
+        return this;
+    }
+
+    public SheetBuilder withCellStyle(CellStyle cellStyle) {
+        this.cellStyle = cellStyle;
         return this;
     }
 
@@ -127,18 +133,7 @@ public class SheetBuilder {
 
     private void makeupBody(Cell cell) {
         if (workbook != null && excelBuilder != null) {
-            CellStyle style = workbook.createCellStyle();
-            if (this.excelBuilder.getBorderColor() != null) {
-                style.setBottomBorderColor(this.excelBuilder.getBorderColor().getIndex());
-                style.setTopBorderColor(this.excelBuilder.getBorderColor().getIndex());
-                style.setLeftBorderColor(this.excelBuilder.getBorderColor().getIndex());
-                style.setRightBorderColor(this.excelBuilder.getBorderColor().getIndex());
-            }
-            style.setBorderBottom(BorderStyle.THIN);
-            style.setBorderLeft(BorderStyle.THIN);
-            style.setBorderRight(BorderStyle.THIN);
-            style.setBorderTop(BorderStyle.THIN);
-            cell.setCellStyle(style);
+            cell.setCellStyle(cellStyle);
         }
     }
 }

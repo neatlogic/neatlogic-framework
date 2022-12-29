@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+ * Copyright (c)  2022 TechSure Co.,Ltd.  All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -29,10 +29,25 @@ public class ExcelBuilder {
     private HSSFColor.HSSFColorPredefined borderColor;
     private Integer columnWidth;
     private List<SheetBuilder> sheetBuilderList = new ArrayList<>();
+    private CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
 
     public ExcelBuilder(Class<? extends Workbook> workbookClass) {
         this.workbookClass = workbookClass;
+        //初始化默认cellStyle
+        Workbook workbook = build();
+        CellStyle style = workbook.createCellStyle();
+        if (this.borderColor != null) {
+            style.setBottomBorderColor(borderColor.getIndex());
+            style.setTopBorderColor(borderColor.getIndex());
+            style.setLeftBorderColor(borderColor.getIndex());
+            style.setRightBorderColor(borderColor.getIndex());
+        }
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        cellStyle = style;
     }
 
     public ExcelBuilder withWorkbook(Workbook workbook) {
@@ -43,6 +58,7 @@ public class ExcelBuilder {
 
     public SheetBuilder addSheet(String sheetName) {
         SheetBuilder sheetBuilder = new SheetBuilder(sheetName);
+        sheetBuilder.withCellStyle(cellStyle);
         sheetBuilderList.add(sheetBuilder);
         return sheetBuilder;
     }
@@ -83,18 +99,7 @@ public class ExcelBuilder {
 
     private void makeupBody(Cell cell) {
         if (workbook != null) {
-            CellStyle style = workbook.createCellStyle();
-            if (this.borderColor != null) {
-                style.setBottomBorderColor(borderColor.getIndex());
-                style.setTopBorderColor(borderColor.getIndex());
-                style.setLeftBorderColor(borderColor.getIndex());
-                style.setRightBorderColor(borderColor.getIndex());
-            }
-            style.setBorderBottom(BorderStyle.THIN);
-            style.setBorderLeft(BorderStyle.THIN);
-            style.setBorderRight(BorderStyle.THIN);
-            style.setBorderTop(BorderStyle.THIN);
-            cell.setCellStyle(style);
+            cell.setCellStyle(cellStyle);
         }
     }
 

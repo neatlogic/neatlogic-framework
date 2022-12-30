@@ -17,7 +17,7 @@ public abstract class AuditCleanerBase implements IAuditCleaner {
     @Resource
     private AuditConfigMapper auditConfigMapper;
 
-    public final void clean() {
+    public final void clean() throws Exception {
         AuditConfigVo auditConfigVo = auditConfigMapper.getAuditConfigByName(this.getName());
         if (auditConfigVo != null && MapUtils.isNotEmpty(auditConfigVo.getConfig())) {
             int timeRange = auditConfigVo.getConfig().getIntValue("timeRange");
@@ -46,5 +46,5 @@ public abstract class AuditCleanerBase implements IAuditCleaner {
         }
     }
 
-    protected abstract void myClean(int dayBefore);
+    protected abstract void myClean(int dayBefore) throws Exception;
 }

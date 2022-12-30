@@ -8,5 +8,5 @@ package codedriver.framework.auditconfig.core;
 public interface IAuditCleaner {
     String getName();
 
-    void clean();
+    void clean() throws Exception;
 }

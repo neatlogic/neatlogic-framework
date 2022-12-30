@@ -6,10 +6,12 @@
 package codedriver.framework.dto.condition;
 
 import codedriver.framework.asynchronization.threadlocal.ConditionParamContext;
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.constvalue.Expression;
 import codedriver.framework.common.constvalue.GroupSearch;
 import codedriver.framework.condition.core.ConditionHandlerFactory;
 import codedriver.framework.condition.core.IConditionHandler;
+import codedriver.framework.restful.annotation.EntityField;
 import codedriver.framework.util.ConditionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -31,6 +33,13 @@ public class ConditionVo implements Serializable{
 	private Integer isShowConditionValue;
 	private Object valueList;
 	private Boolean result;
+	@EntityField(name = "条件名", type = ApiParamType.STRING)
+	private String label;
+	@EntityField(name = "条件表达式列表", type = ApiParamType.JSONARRAY)
+	private List<Expression> expressionList;
+	@EntityField(name = "条件值名", type = ApiParamType.STRING)
+	private Object text;
+
 
 	public ConditionVo() {
 		super();
@@ -176,4 +185,27 @@ public class ConditionVo implements Serializable{
 		return result;
 	}
 
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public List<Expression> getExpressionList() {
+		return expressionList;
+	}
+
+	public void setExpressionList(List<Expression> expressionList) {
+		this.expressionList = expressionList;
+	}
+
+	public Object getText() {
+		return text;
+	}
+
+	public void setText(Object text) {
+		this.text = text;
+	}
 }

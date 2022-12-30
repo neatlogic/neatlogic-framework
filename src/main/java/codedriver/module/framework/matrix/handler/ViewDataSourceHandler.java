@@ -39,10 +39,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -162,13 +159,13 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int currentPage = 1;
                 dataVo.setPageSize(1000);
                 Integer pageCount = dataVo.getPageCount();
-                List<Map<String, Object>> dataList;
+                List<Map<String, String>> dataList;
                 while (currentPage <= pageCount) {
                     dataVo.setCurrentPage(currentPage);
                     dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
                     if (!dataList.isEmpty()) {
                         StringBuilder content = new StringBuilder();
-                        for (Map<String, Object> map : dataList) {
+                        for (Map<String, String> map : dataList) {
                             for (String head : headList) {
                                 Object value = map.get(head);
                                 content.append(value != null ? value.toString().replaceAll("\n", "").replaceAll(",", "，") : StringUtils.EMPTY).append(",");
@@ -220,7 +217,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 int rowNum = matrixViewDataMapper.getDynamicTableDataCount(dataVo);
                 dataVo.setRowNum(rowNum);
             }
-            List<Map<String, Object>> dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
+            List<Map<String, String>> dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
             List<Map<String, JSONObject>> tbodyList = matrixTableDataValueHandle(dataList);
             JSONArray theadList = getTheadList(attributeVoList);
             return TableResultUtil.getResult(theadList, tbodyList, dataVo);
@@ -237,7 +234,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         JSONArray attributeList = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
         if (CollectionUtils.isNotEmpty(attributeList)) {
-            List<Map<String, Object>> dataMapList = null;
+            List<Map<String, String>> dataMapList = null;
             JSONArray defaultValue = dataVo.getDefaultValue();
             if (CollectionUtils.isNotEmpty(defaultValue)) {
                 dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
@@ -302,7 +299,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                             sourceColumnList.add(matrixColumnVo);
                         }
                         dataVo.setSourceColumnList(sourceColumnList);
-                        List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                        List<Map<String, String>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
                         resultList.addAll(matrixTableDataValueHandle(dataMapList));
                     }
                 }
@@ -332,13 +329,13 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
                     return resultList;
                 }
-                List<Map<String, Object>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
+                List<Map<String, String>> dataMapList = matrixViewDataMapper.getDynamicTableDataForSelect(dataVo);
                 if (CollectionUtils.isEmpty(dataMapList)) {
                     return resultList;
                 }
-                List<Map<String, Object>> distinctDataMapList = new ArrayList<>();
-                List<Map<String, Object>> distinctList = new ArrayList<>(100);
-                for (Map<String, Object> dataMap : dataMapList) {
+                List<Map<String, String>> distinctDataMapList = new ArrayList<>();
+                List<Map<String, String>> distinctList = new ArrayList<>(100);
+                for (Map<String, String> dataMap : dataMapList) {
                     if(distinctList.contains(dataMap)){
                         continue;
                     }
@@ -354,6 +351,73 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         return resultList;
     }
 
+    @Override
+    protected List<Map<String, JSONObject>> mySearchTableDataNew(MatrixDataVo dataVo) {
+        List<Map<String, JSONObject>> resultList = new ArrayList<>();
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
+        if (matrixViewVo == null) {
+            throw new MatrixViewNotFoundException(dataVo.getUuid());
+        }
+        JSONArray attributeArray = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
+        if (CollectionUtils.isEmpty(attributeArray)) {
+            return resultList;
+        }
+        List<MatrixAttributeVo> attributeList = attributeArray.toJavaList(MatrixAttributeVo.class);
+
+        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        List<Map<String, String>> dataMapList = new ArrayList<>();
+        JSONArray defaultValue = dataVo.getDefaultValue();
+        if (CollectionUtils.isNotEmpty(defaultValue)) {
+            dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
+        } else if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
+                List<MatrixFilterVo> filterList = new ArrayList<>();
+                MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
+                filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
+                filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
+                dataVo.setFilterList(filterList);
+                List<Map<String, String>> list = matrixViewDataMapper.getDynamicTableDataList(dataVo);
+                if (CollectionUtils.isNotEmpty(list)) {
+                    dataMapList.addAll(list);
+                }
+            }
+        } else {
+            String keyword = dataVo.getKeyword();
+            String keywordColumn = dataVo.getKeywordColumn();
+            if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
+                MatrixAttributeVo matrixAttribute = matrixAttributeMap.get(keywordColumn);
+                if (matrixAttribute == null) {
+                    throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
+                }
+                List<MatrixFilterVo> filterList = new ArrayList<>();
+                filterList.add(new MatrixFilterVo(keywordColumn, Expression.LIKE.getExpression(), Arrays.asList(keyword)));
+                dataVo.setFilterList(filterList);
+            }
+            //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
+            int rowNum = matrixViewDataMapper.getDynamicTableDataListCount(dataVo);
+            if (rowNum == 0) {
+                return resultList;
+            }
+            dataVo.setRowNum(rowNum);
+            if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
+                return resultList;
+            }
+            dataMapList = matrixViewDataMapper.getDynamicTableDataList(dataVo);
+        }
+        if (CollectionUtils.isEmpty(dataMapList)) {
+            return resultList;
+        }
+        List<Map<String, String>> distinctList = new ArrayList<>();
+        for (Map<String, String> dataMap : dataMapList) {
+            if(distinctList.contains(dataMap)){
+                continue;
+            }
+            distinctList.add(dataMap);
+        }
+        resultList = matrixTableDataValueHandle(distinctList);
+        return resultList;
+    }
     @Override
     protected JSONObject mySaveTableRowData(String matrixUuid, JSONObject rowData) {
         return null;
@@ -417,18 +481,18 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         return matrixAttributeList;
     }
 
-    public List<Map<String, JSONObject>> matrixTableDataValueHandle(List<Map<String, Object>> valueList) {
+    public List<Map<String, JSONObject>> matrixTableDataValueHandle(List<Map<String, String>> valueList) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(valueList)) {
             //对valueList去重
-            List<Map<String, Object>> distinctList = new ArrayList<>();
-            for (Map<String, Object> valueMap : valueList) {
+            List<Map<String, String>> distinctList = new ArrayList<>();
+            for (Map<String, String> valueMap : valueList) {
                 if(distinctList.contains(valueMap)){
                     continue;
                 }
                 distinctList.add(valueMap);
                 Map<String, JSONObject> resultMap = new HashMap<>();
-                for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
                     JSONObject resultObj = new JSONObject();
                     resultObj.put("type", MatrixAttributeType.INPUT.getValue());
                     resultObj.put("value", entry.getValue());

@@ -441,6 +441,93 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
+    protected List<Map<String, JSONObject>> mySearchTableDataNew(MatrixDataVo dataVo) {
+        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
+        if (externalVo == null) {
+            throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
+        }
+        IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(externalVo.getIntegrationUuid());
+        IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
+        if (handler == null) {
+            throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
+        }
+        JSONArray tbodyArray = new JSONArray();
+        List<Map<String, JSONObject>> resultList = new ArrayList<>();
+        List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
+        if (CollectionUtils.isEmpty(matrixAttributeList)) {
+            return resultList;
+        }
+        JSONObject paramObj = integrationVo.getParamObj();
+
+        JSONArray defaultValue = dataVo.getDefaultValue();
+        if (CollectionUtils.isNotEmpty(defaultValue)) {
+            paramObj.put("defaultValue", defaultValue);
+            IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+            if (StringUtils.isNotBlank(resultVo.getError())) {
+                logger.error(resultVo.getError());
+                throw new MatrixExternalAccessException();
+            }
+            handler.validate(resultVo);
+            JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+            Integer rowNum = transformedResult.getInteger("rowNum");
+            dataVo.setRowNum(rowNum);
+            tbodyArray = transformedResult.getJSONArray("tbodyList");
+        } else if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
+                List<MatrixFilterVo> filterList = new ArrayList<>();
+                MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
+                filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
+                if (!Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
+                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
+                }
+//                dataVo.setFilterList(filterList);
+                paramObj.put("filterList", filterList);
+                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+                if (StringUtils.isNotBlank(resultVo.getError())) {
+                    logger.error(resultVo.getError());
+                    throw new MatrixExternalAccessException();
+                }
+                handler.validate(resultVo);
+                JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+                tbodyArray.addAll(transformedResult.getJSONArray("tbodyList"));
+            }
+        } else {
+            List<MatrixFilterVo> filterList = dataVo.getFilterList();
+            String keywordColumn = dataVo.getKeywordColumn();
+            if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
+//                paramObj.put("keyword", dataVo.getKeyword());
+                filterList.add(new MatrixFilterVo(keywordColumn, Expression.LIKE.getExpression(), Arrays.asList(dataVo.getKeyword())));
+            }
+            //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
+            paramObj.put("currentPage", dataVo.getCurrentPage());
+            paramObj.put("pageSize", dataVo.getPageSize());
+            paramObj.put("filterList", filterList);
+            IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
+            if (StringUtils.isNotBlank(resultVo.getError())) {
+                logger.error(resultVo.getError());
+                throw new MatrixExternalAccessException();
+            }
+            handler.validate(resultVo);
+            JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
+            Integer rowNum = transformedResult.getInteger("rowNum");
+            dataVo.setRowNum(rowNum);
+            tbodyArray = transformedResult.getJSONArray("tbodyList");
+        }
+        if (CollectionUtils.isEmpty(tbodyArray)) {
+            return resultList;
+        }
+        JSONArray distinctList = new JSONArray();
+        for (Object dataMap : tbodyArray) {
+            if(distinctList.contains(dataMap)){
+                continue;
+            }
+            distinctList.add(dataMap);
+        }
+        return getExternalDataTbodyList(matrixAttributeList, distinctList, dataVo.getColumnList());
+    }
+
+    @Override
     protected JSONObject mySaveTableRowData(String matrixUuid, JSONObject rowData) {
         return null;
     }

@@ -97,10 +97,14 @@ public class DependencyInfoVo {
     }
 
     public String getUrl() {
-        if (url == null && StringUtils.isNotBlank(urlFormat) && MapUtils.isNotEmpty(config)) {
-            try {
-                url = FreemarkerUtil.transform(config, urlFormat);
-            } catch (FreemarkerTransformException e) {
+        if (url == null && StringUtils.isNotBlank(urlFormat)) {
+            if (MapUtils.isNotEmpty(config)) {
+                try {
+                    url = FreemarkerUtil.transform(config, urlFormat);
+                } catch (FreemarkerTransformException e) {
+                    url = urlFormat;
+                }
+            } else {
                 url = urlFormat;
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2022 TechSure Co.,Ltd.  All Rights Reserved.
+ * Copyright(c) 2023 TechSure Co., Ltd. All Rights Reserved.
  * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
  */
 
@@ -28,9 +28,10 @@ public class ExcelBuilder {
     private HSSFColor.HSSFColorPredefined headFontColor;
     private HSSFColor.HSSFColorPredefined borderColor;
     private Integer columnWidth;
-    private List<SheetBuilder> sheetBuilderList = new ArrayList<>();
-    private CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
+    private final List<SheetBuilder> sheetBuilderList = new ArrayList<>();
+    private final CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
+    private String filePath;
 
     public ExcelBuilder(Class<? extends Workbook> workbookClass) {
         this.workbookClass = workbookClass;
@@ -55,6 +56,10 @@ public class ExcelBuilder {
         return this;
     }
 
+    public List<SheetBuilder> getSheetBuilderList() {
+        return sheetBuilderList;
+    }
+
 
     public SheetBuilder addSheet(String sheetName) {
         SheetBuilder sheetBuilder = new SheetBuilder(sheetName);
@@ -73,6 +78,11 @@ public class ExcelBuilder {
      */
     public ExcelBuilder withColumnWidth(Integer columnWidth) {
         this.columnWidth = columnWidth;
+        return this;
+    }
+
+    public ExcelBuilder withFilePath(String filePath) {
+        this.filePath = filePath;
         return this;
     }
 
@@ -129,6 +139,10 @@ public class ExcelBuilder {
             style.setBorderTop(BorderStyle.THIN);
             cell.setCellStyle(style);
         }
+    }
+
+    public String getFilePath() {
+        return this.filePath;
     }
 
     public Workbook build() {

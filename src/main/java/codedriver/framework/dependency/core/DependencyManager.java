@@ -212,7 +212,7 @@ public class DependencyManager {
                     for (Map<Object, Integer> map : handler.getBatchDependencyCount(fromList)) {
                         Object caller = map.get("caller");
                         Integer callerCount = Integer.parseInt(String.valueOf(map.get("callerCount")));
-                        if (Objects.isNull(returnMap.get(caller))) {
+                        if ((returnMap.get(caller) == null)) {
                             returnMap.put(caller, callerCount);
                         } else {
                             returnMap.put(caller, returnMap.get(caller) + callerCount);

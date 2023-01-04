@@ -43,11 +43,6 @@ public class AuthActionChecker {
         for (Class<? extends AuthBase> action : actionClass) {
             actionList.add(action.getSimpleName());
         }
-        //维护模式下且是维护用户 || ,指定权限不需要鉴权
-        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList) ) {
-            return true;
-        }
-
         if (userContext != null) {
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
@@ -61,16 +56,7 @@ public class AuthActionChecker {
         }
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
-        //无需鉴权注解 || 维护模式下，维护用户，指定权限不需要鉴权
-        if (Config.ENABLE_SUPERADMIN() && userContext.getUserUuid().equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
-            return true;
-        }
-
         if (userContext != null) {
-            if (SystemUser.SYSTEM.getUserUuid().equals(userContext.getUserUuid())) {
-                //系统用户不需要鉴权
-                return true;
-            }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
             return false;
@@ -102,7 +88,21 @@ public class AuthActionChecker {
      * @return 是否有权限 有：true 否：false
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
-        if(RequestContext.get() == null || !RequestContext.get().getIsExemptLicense()) {
+        //维护模式下且是维护用户 || ,指定权限无需鉴权
+        if (Config.ENABLE_SUPERADMIN() && userUuid.equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+            return true;
+        }
+        //系统用户无需鉴权
+        if (SystemUser.SYSTEM.getUserUuid().equals(userUuid)) {
+            return true;
+        }
+        //超级管理员无需鉴权
+        if (UserContext.get() != null && UserContext.get().getIsSuperAdmin()) {
+            return true;
+        }
+
+        //豁免license认证则无需判断license是否还有该权限
+        if (RequestContext.get() == null || !RequestContext.get().getIsExemptLicense()) {
             //先判断租户license 是否有该auth
             LicenseVo licenseVo = TenantContext.get().getLicenseVo();
             if (licenseVo == null) {

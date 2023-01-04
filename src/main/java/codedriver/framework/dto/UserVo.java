@@ -115,6 +115,10 @@ public class UserVo extends BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private Boolean isAutoGenerateId = true;
 
+    @EntityField(name = "是否超级管理员", type = ApiParamType.BOOLEAN)
+    @JSONField(serialize = false)
+    private Boolean isSuperAdmin;
+
     public UserVo() {
 
     }
@@ -555,5 +559,13 @@ public class UserVo extends BasePageVo implements Serializable {
 
     public void setTeamRoleList(List<RoleVo> teamRoleList) {
         this.teamRoleList = teamRoleList;
+    }
+
+    public Boolean getIsSuperAdmin() {
+        return this.isSuperAdmin;
+    }
+
+    public void setIsSuperAdmin(Boolean isSuperAdmin) {
+        this.isSuperAdmin = isSuperAdmin;
     }
 }

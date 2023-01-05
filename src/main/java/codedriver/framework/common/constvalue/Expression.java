@@ -23,7 +23,7 @@ public enum Expression implements IEnum {
     LESSTHAN("less-than", "早于", " %s < %s ", " %s.%s < '%s' ", 1),
     ISNULL("is-null", "为空", " %s = '' ", " %s.%s is null ", 0),
     MATCH("match", "包含(分词)", " %s match '%s'", " %s.%s match ( %s ) against (' %s ' IN BOOLEAN MODE) ", 0),
-    ISNOTNULL("is-not-null", "不为空", " not %s = '' ", " %s is not null ", 0);
+    ISNOTNULL("is-not-null", "不为空", " not %s = '' ", " %s.%s is not null ", 0);
     private final String expression;
     private final String expressionName;
     private final String expressionEs;

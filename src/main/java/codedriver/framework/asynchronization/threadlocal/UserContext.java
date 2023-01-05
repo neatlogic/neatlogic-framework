@@ -38,7 +38,7 @@ public class UserContext implements Serializable {
     private List<String> roleUuidList = new ArrayList<>();
     private AuthenticationInfoVo authenticationInfoVo;
     //是否超级管理员
-    private boolean isSuperAdmin = false;
+    private Boolean isSuperAdmin = false;
 
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
@@ -243,11 +243,13 @@ public class UserContext implements Serializable {
         return authUuidList;
     }
 
-    public boolean getIsSuperAdmin() {
+    public Boolean getIsSuperAdmin() {
         return isSuperAdmin;
     }
 
-    public void setIsSuperAdmin(boolean isSuperAdmin) {
-        this.isSuperAdmin = isSuperAdmin;
+    public void setIsSuperAdmin(Boolean isSuperAdmin) {
+        if(isSuperAdmin != null) {
+            this.isSuperAdmin = isSuperAdmin;
+        }
     }
 }

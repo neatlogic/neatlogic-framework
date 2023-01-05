@@ -217,5 +217,11 @@
         FROM `tenant_modulegroup`
         WHERE `tenant_id` = #{value}
     </delete>
+
+    <delete id="deleteTenantModuleByTenantId" parameterType="java.lang.Long">
+        DELETE
+        FROM `tenant_module`
+        WHERE `tenant_id` = #{value}
+    </delete>
 </mapper>
 

@@ -33,6 +33,8 @@ public class ExcelBuilder {
 
     private String filePath;
 
+    private String name;
+
     public ExcelBuilder(Class<? extends Workbook> workbookClass) {
         this.workbookClass = workbookClass;
         //初始化默认cellStyle
@@ -83,6 +85,11 @@ public class ExcelBuilder {
 
     public ExcelBuilder withFilePath(String filePath) {
         this.filePath = filePath;
+        return this;
+    }
+
+    public ExcelBuilder withName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -143,6 +150,10 @@ public class ExcelBuilder {
 
     public String getFilePath() {
         return this.filePath;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public Workbook build() {

@@ -48,4 +48,6 @@ public interface TenantMapper {
     int checkTenantUuidIsExists(TenantVo tenantVo);
 
     int deleteTenantModuleGroupByTenantId(Long tenantId);
+
+    void deleteTenantModuleByTenantId(Long id);
 }

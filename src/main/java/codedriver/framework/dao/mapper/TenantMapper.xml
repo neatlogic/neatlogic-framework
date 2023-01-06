@@ -119,6 +119,11 @@
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
         WHERE t.`is_active` = 1
     </select>
+    <select id="getTenantAuditMaxGroupIdByTenantId" resultType="java.lang.Long">
+        select max(group_id)
+        from tenant_audit
+        where tenant_id = #{value}
+    </select>
 
     <insert id="insertTenant" parameterType="codedriver.framework.dto.TenantVo">
         INSERT INTO `tenant` (`id`,

@@ -41,6 +41,8 @@ public class TenantVo extends BasePageVo {
 	private String status;
 	@EntityField(name = "license", type = ApiParamType.JSONOBJECT)
 	private LicenseVo license;
+	@EntityField(name = "超级管理员", type = ApiParamType.JSONARRAY)
+	private List<String> superAdminList;
 
 	public TenantVo() {
 		this.setPageSize(20);
@@ -131,5 +133,13 @@ public class TenantVo extends BasePageVo {
 
 	public void setLicense(LicenseVo license) {
 		this.license = license;
+	}
+
+	public List<String> getSuperAdminList() {
+		return superAdminList;
+	}
+
+	public void setSuperAdminList(List<String> superAdminList) {
+		this.superAdminList = superAdminList;
 	}
 }

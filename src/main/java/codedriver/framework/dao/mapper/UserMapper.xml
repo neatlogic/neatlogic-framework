@@ -45,14 +45,14 @@
             useCache="true">
         SELECT a.`id`,
                a.`uuid`,
-               a.`user_id`   as userId,
-               a.`user_name` as userName,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
                a.`email`,
                a.`phone`,
                a.`pinyin`,
-               a.`is_active` as isActive,
-               a.`user_info` as userInfo,
-               a.`vip_level` as vipLevel,
+               a.`is_active`      as isActive,
+               a.`user_info`      as userInfo,
+               a.`vip_level`      as vipLevel,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
         WHERE a.`uuid` = #{value}
@@ -78,13 +78,13 @@
             useCache="true">
         SELECT a.`id`,
                a.`uuid`,
-               a.`user_id`   as userId,
-               a.`user_name` as userName,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
                a.`email`,
                a.`phone`,
                a.`pinyin`,
-               a.`is_active` as isActive,
-               a.`user_info` as userInfo,
+               a.`is_active`      as isActive,
+               a.`user_info`      as userInfo,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
         WHERE a.`user_id` = #{value}
@@ -117,22 +117,22 @@
     <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
         SELECT a.`id`,
                a.`uuid`,
-               a.`user_id`   AS userId,
-               a.`user_name` AS userName,
+               a.`user_id`          AS userId,
+               a.`user_name`        AS userName,
                a.`email`,
                a.`phone`,
                e.`password`,
                a.`pinyin`,
-               a.`is_active` AS isActive,
-               a.`user_info` AS userInfo,
-               a.`vip_level` AS vipLevel,
-               b.`role_uuid` AS roleUuid,
-               r.`name`      AS roleName,
+               a.`is_active`        AS isActive,
+               a.`user_info`        AS userInfo,
+               a.`vip_level`        AS vipLevel,
+               b.`role_uuid`        AS roleUuid,
+               r.`name`             AS roleName,
                r.`description`,
-               c.`team_uuid` AS teamUuid,
-               d.`name`      AS teamName,
+               c.`team_uuid`        AS teamUuid,
+               d.`name`             AS teamName,
                d.`upward_name_path` AS upwardNamePath,
-               d.`is_super_admin` as isSuperAdmin
+               a.`is_super_admin`   as isSuperAdmin
         FROM `user` a
                  LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
                  LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
@@ -548,14 +548,14 @@
             useCache="false">
         SELECT a.`id`,
                a.`uuid`,
-               a.`user_id`   AS userId,
-               a.`user_name` AS userName,
+               a.`user_id`        AS userId,
+               a.`user_name`      AS userName,
                a.`email`,
                a.`phone`,
                a.`pinyin`,
-               a.`user_info` as `userInfo`,
-               a.`is_active` AS isActive,
-               b.`role_uuid` AS roleUuid,
+               a.`user_info`      as `userInfo`,
+               a.`is_active`      AS isActive,
+               b.`role_uuid`      AS roleUuid,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
                  LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
@@ -567,15 +567,15 @@
             useCache="false">
         SELECT a.`id`,
                a.`uuid`,
-               a.`user_id`   AS userId,
-               a.`user_name` AS userName,
+               a.`user_id`      AS userId,
+               a.`user_name`    AS userName,
                a.`email`,
                a.`phone`,
                a.`pinyin`,
-               a.`user_info` as `userInfo`,
+               a.`user_info`    as `userInfo`,
                c.`password`,
-               a.`is_active` AS isActive,
-               b.`role_uuid` AS roleUuid,
+               a.`is_active`    AS isActive,
+               b.`role_uuid`    AS roleUuid,
                a.is_super_admin as isSuperAdmin
         FROM `user` a
                  LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
@@ -1048,18 +1048,18 @@
 
     <select id="getActiveUserListExcludeRoleInfoByUserUuidList" parameterType="java.util.List" resultMap="userInfoMap">
         SELECT a.`id`,
-               a.`uuid`,
-               a.`user_id`   AS userId,
-               a.`user_name` AS userName,
-               a.`email`,
-               a.`phone`,
-               a.`pinyin`,
-               a.`is_active` AS isActive,
-               a.`user_info` AS userInfo,
-               a.`vip_level` AS vipLevel,
-               c.`uuid`      AS teamUuid,
-               c.`name`      AS teamName,
-               c.`upward_name_path` AS upwardNamePath
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        a.`pinyin`,
+        a.`is_active` AS isActive,
+        a.`user_info` AS userInfo,
+        a.`vip_level` AS vipLevel,
+        c.`uuid` AS teamUuid,
+        c.`name` AS teamName,
+        c.`upward_name_path` AS upwardNamePath
         FROM `user` a
         LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
         LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
@@ -1071,18 +1071,26 @@
     </select>
 
     <select id="getUserTeamCountByUserUuid" resultType="java.lang.Integer">
-        SELECT count(1) FROM `user_team` WHERE `user_uuid` = #{value}
+        SELECT count(1)
+        FROM `user_team`
+        WHERE `user_uuid` = #{value}
     </select>
 
-    <select id="getActiveUserEmailListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+    <select id="getActiveUserEmailListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
         SELECT `email` FROM `user` WHERE `is_active` = 1 AND `uuid` IN
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
 
-    <select id="getActiveUserEmailListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
-        SELECT a.`email` FROM `user` a JOIN `user_team` b ON a.`uuid` = b.`user_uuid` WHERE a.`is_active` = 1 AND b.`team_uuid` = #{value}
+    <select id="getActiveUserEmailListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT a.`email`
+        FROM `user` a
+                 JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        WHERE a.`is_active` = 1
+          AND b.`team_uuid` = #{value}
     </select>
 
     <select id="getUserIdByUserIdList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
@@ -1090,6 +1098,21 @@
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+    <select id="getSuperAdminList" resultType="codedriver.framework.dto.UserVo">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        AS userId,
+               a.`user_name`      AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      AS isActive,
+               a.`user_info`      AS userInfo,
+               a.`vip_level`      AS vipLevel,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        where is_super_admin = 1
     </select>
 
     <insert id="insertUserAuth" parameterType="codedriver.framework.dto.UserAuthVo">
@@ -1146,7 +1169,6 @@
         INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
         VALUES (#{userUuid}, #{roleUuid})
     </insert>
-
 
 
     <insert id="insertUserProfile" parameterType="codedriver.framework.dto.UserProfileVo">
@@ -1341,6 +1363,16 @@
         update `user`
         set `token` = #{token}
         where uuid = #{uuid}
+    </update>
+    <update id="updateSuperAdminByUuidList">
+        update user set is_super_admin = 1 where uuid
+        in
+        <foreach collection="list" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+    </update>
+    <update id="updateDelSuperAdmin">
+        update user set is_super_admin = 0
     </update>
 </mapper>
 

@@ -27,6 +27,8 @@ public interface TenantMapper {
 
     List<TenantVo> getAllActiveTenant();
 
+    Long getTenantAuditMaxGroupIdByTenantId(Long tenantId);
+
     int insertTenant(TenantVo tenantVo);
 
     int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup);
@@ -50,4 +52,5 @@ public interface TenantMapper {
     int deleteTenantModuleGroupByTenantId(Long tenantId);
 
     void deleteTenantModuleByTenantId(Long id);
+
 }

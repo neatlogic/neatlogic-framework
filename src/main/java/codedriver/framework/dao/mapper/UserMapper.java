@@ -152,6 +152,8 @@ public interface UserMapper {
      */
     List<UserVo> getActiveUserListExcludeRoleInfoByUserUuidList(List<String> uuidList);
 
+    List<UserVo> getSuperAdminList();
+
     int getUserTeamCountByUserUuid(String userUuid);
 
     List<String> getActiveUserEmailListByUserUuidList(List<String> userUuidList);
@@ -219,5 +221,9 @@ public interface UserMapper {
     List<String> searchUserUuIdByUser(UserVo vo);
 
     void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
+
+    void updateSuperAdminByUuidList(List<String> userUuIdList);
+
+    void updateDelSuperAdmin();
 
 }

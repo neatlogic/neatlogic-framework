@@ -41,6 +41,8 @@ public interface TenantMapper {
 
     int updateTenant(TenantVo tenantVo);
 
+    int updateTenantIsActive(TenantVo tenantVo);
+
     int updateTenantAudit(TenantAuditVo tenantAuditVo);
 
     int updateTenantStatus(TenantVo tenantVo);

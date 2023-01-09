@@ -113,16 +113,16 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         if (CollectionUtils.isEmpty(toUserSet)) {
             throw new NotifyNoReceiverException();
         }
-        List<String> toEmailList = new ArrayList<>();
+        Set<String> toEmailSet = new HashSet<>();
         for (UserVo user : toUserSet) {
             if (StringUtils.isNotBlank(user.getEmail())) {
-                toEmailList.add(user.getEmail());
+                toEmailSet.add(user.getEmail());
             }
         }
-        if (CollectionUtils.isEmpty(toEmailList)) {
+        if (CollectionUtils.isEmpty(toEmailSet)) {
             throw new NotifyNoReceiverException();
         }
-        notifyVo.setActualRecipientList(toEmailList);
+        notifyVo.setActualRecipientList(new ArrayList<>(toEmailSet));
         if (StringUtils.isNotBlank(notifyVo.getFromUser())) {
             UserVo userVo = userMapper.getUserBaseInfoByUuid(notifyVo.getFromUser());
             if (userVo != null && StringUtils.isNotBlank(userVo.getEmail())) {
@@ -148,7 +148,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         }
 
         /* 设置收件人 */
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", toEmailList), false));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", toEmailSet), false));
         /* 设置邮件标题 */
         msg.setSubject(clearStringHTML(notifyVo.getTitle()));
         msg.setSentDate(new Date());

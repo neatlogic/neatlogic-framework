@@ -37,6 +37,8 @@ public class UserContext implements Serializable {
     private String token;
     private List<String> roleUuidList = new ArrayList<>();
     private AuthenticationInfoVo authenticationInfoVo;
+    //是否超级管理员
+    private Boolean isSuperAdmin = false;
 
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
@@ -51,6 +53,7 @@ public class UserContext implements Serializable {
             // context.setResponse(_userContext.getResponse());
             context.setRoleUuidList(_userContext.getRoleUuidList());
             context.setAuthenticationInfoVo(_userContext.getAuthenticationInfoVo());
+            context.setIsSuperAdmin(_userContext.getIsSuperAdmin());
         }
         instance.set(context);
         return context;
@@ -76,23 +79,6 @@ public class UserContext implements Serializable {
         return context;
     }
 
-    public static UserContext init(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        UserContext context = new UserContext();
-        context.setUserId(userVo.getUserId());
-        context.setUserUuid(userVo.getUuid());
-        context.setUserName(userVo.getUserName());
-        context.setTenant(userVo.getTenant());
-        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
-        context.setRequest(request);
-        context.setResponse(response);
-        context.setTimezone(timezone);
-        for (String roleUuid : userVo.getRoleUuidList()) {
-            context.addRole(roleUuid);
-        }
-        instance.set(context);
-        return context;
-    }
-
     public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         UserContext context = new UserContext();
         context.setUserId(userVo.getUserId());
@@ -100,6 +86,7 @@ public class UserContext implements Serializable {
         context.setUserName(userVo.getUserName());
         context.setTenant(userVo.getTenant());
         context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
+        context.setIsSuperAdmin(userVo.getIsSuperAdmin());
         context.setRequest(request);
         context.setResponse(response);
         context.setTimezone(timezone);
@@ -111,35 +98,16 @@ public class UserContext implements Serializable {
         return context;
     }
 
-    public static UserContext init(UserVo userVo, String timezone) {
-        UserContext context = new UserContext();
-        context.setUserId(userVo.getUserId());
-        context.setUserUuid(userVo.getUuid());
-        context.setUserName(userVo.getUserName());
-        context.setTenant(userVo.getTenant());
-        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
-        context.setTimezone(timezone);
-        for (String roleUuid : userVo.getRoleUuidList()) {
-            context.addRole(roleUuid);
-        }
-        instance.set(context);
-        return context;
+    public static UserContext init(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+        return init(userVo, null, timezone, request, response);
     }
 
     public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
-        UserContext context = new UserContext();
-        context.setUserId(userVo.getUserId());
-        context.setUserUuid(userVo.getUuid());
-        context.setUserName(userVo.getUserName());
-        context.setTenant(userVo.getTenant());
-        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
-        context.setTimezone(timezone);
-        context.setAuthenticationInfoVo(authenticationInfoVo);
-        for (String roleUuid : userVo.getRoleUuidList()) {
-            context.addRole(roleUuid);
-        }
-        instance.set(context);
-        return context;
+        return init(userVo, authenticationInfoVo, timezone, null, null);
+    }
+
+    public static UserContext init(UserVo userVo, String timezone) {
+        return init(userVo, null, timezone, null, null);
     }
 
     public void addRole(String role) {
@@ -275,4 +243,13 @@ public class UserContext implements Serializable {
         return authUuidList;
     }
 
+    public Boolean getIsSuperAdmin() {
+        return isSuperAdmin;
+    }
+
+    public void setIsSuperAdmin(Boolean isSuperAdmin) {
+        if(isSuperAdmin != null) {
+            this.isSuperAdmin = isSuperAdmin;
+        }
+    }
 }

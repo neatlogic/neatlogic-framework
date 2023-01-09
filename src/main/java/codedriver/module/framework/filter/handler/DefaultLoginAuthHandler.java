@@ -98,6 +98,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             userVo.setUuid(jwtBodyObj.getString("useruuid"));
                             userVo.setUserId(jwtBodyObj.getString("userid"));
                             userVo.setUserName(jwtBodyObj.getString("username"));
+                            userVo.setIsSuperAdmin(jwtBodyObj.getBoolean("isSuperAdmin"));
                             if(jwtBodyObj.getJSONArray("rolelist") != null) {
                                 userVo.setRoleUuidList(JSONArray.parseArray(jwtBodyObj.getJSONArray("rolelist").toJSONString(),String.class));
                             }

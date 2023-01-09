@@ -94,6 +94,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         jwtBodyObj.put("userid", checkUserVo.getUserId());
         jwtBodyObj.put("username", checkUserVo.getUserName());
         jwtBodyObj.put("tenant", checkUserVo.getTenant());
+        jwtBodyObj.put("isSuperAdmin", checkUserVo.getIsSuperAdmin());
         if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
             jwtBodyObj.put("rolelist", checkUserVo.getRoleUuidList());
         }

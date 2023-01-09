@@ -201,6 +201,14 @@
         WHERE `id` = #{id}
     </update>
 
+    <update id="updateTenantIsActive" parameterType="codedriver.framework.dto.TenantVo">
+        UPDATE
+            `tenant`
+        SET
+            `is_active`   = #{isActive}
+        WHERE `id` = #{id}
+    </update>
+
     <update id="updateTenantStatus" parameterType="codedriver.framework.dto.TenantVo">
         UPDATE
             `tenant`

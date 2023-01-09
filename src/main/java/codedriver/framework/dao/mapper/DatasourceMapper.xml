@@ -57,6 +57,8 @@
                 #{driver},
                 #{host},
                 #{port})
+        ON DUPLICATE KEY
+            UPDATE `password` = #{passwordCipher}
     </insert>
 
     <insert id="createDatasource" parameterType="codedriver.framework.dto.DatasourceVo">

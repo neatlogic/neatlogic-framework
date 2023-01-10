@@ -930,6 +930,7 @@ CREATE TABLE `user`
     `vip_level` tinyint                                                       NULL DEFAULT 0 COMMENT 'VIP等级(0,1,2,3,4,5)',
     `is_delete` tinyint(1)                                                    NULL DEFAULT 0 COMMENT '是否已删除',
     `token`     varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NULL DEFAULT NULL COMMENT '随机生成的令牌，用于hmac认证方式签名',
+    `is_super_admin` tinyint(1) DEFAULT NULL COMMENT '是否超级管理员',
     PRIMARY KEY (`uuid`) USING BTREE,
     UNIQUE INDEX `user_id_idx` (`user_id`) USING BTREE,
     INDEX `id` (`id`) USING BTREE,

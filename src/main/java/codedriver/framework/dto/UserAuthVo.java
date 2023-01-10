@@ -24,19 +24,26 @@ public class UserAuthVo extends BasePageVo implements Serializable {
     @EntityField(name = "权限名", type = ApiParamType.STRING)
     private String authName;
 
-    
+
     public UserAuthVo() {
-		
-	}
-    
+
+    }
+
     public UserAuthVo(String _userUuid) {
-		this.userUuid = _userUuid;
-   	}
-    
-    public UserAuthVo(String _userUuid,String _auth) {
-		this.userUuid = _userUuid;
-		this.auth = _auth;
-   	}
+        this.userUuid = _userUuid;
+    }
+
+    public UserAuthVo(String _userUuid, String _auth) {
+        this.userUuid = _userUuid;
+        this.auth = _auth;
+    }
+
+    public UserAuthVo(String _userUuid, AuthBase authInstance) {
+        this.userUuid = _userUuid;
+        this.auth = authInstance.getAuthName();
+        this.authGroup = authInstance.getAuthGroup();
+        this.authName = authInstance.getAuthDisplayName();
+    }
 
     public UserAuthVo(AuthBase authInstance) {
         this.userUuid = UserContext.get().getUserUuid();
@@ -69,14 +76,14 @@ public class UserAuthVo extends BasePageVo implements Serializable {
         this.authGroup = authGroup;
     }
 
-	public String getAuthName() {
-		if(StringUtils.isNotBlank(auth)) {
-			AuthBase authVo =  AuthFactory.getAuthInstance(auth);
-			if(authVo != null) {
-				return authVo.getAuthDisplayName();
-			}
-		}
-		return authName;
-	}
+    public String getAuthName() {
+        if (StringUtils.isNotBlank(auth)) {
+            AuthBase authVo = AuthFactory.getAuthInstance(auth);
+            if (authVo != null) {
+                return authVo.getAuthDisplayName();
+            }
+        }
+        return authName;
+    }
 
 }

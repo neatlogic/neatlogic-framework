@@ -36,11 +36,12 @@ public class DatasourceVo {
             Random rand = new Random();
             StringBuilder password = new StringBuilder();
             String[] chars = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
-
-            for (int i = 0; i < 6; i++) {
+            String[] specialChars = new String[]{"#",".","@","$"};
+            for (int i = 0; i < 10; i++) {
                 int randNumber = rand.nextInt(chars.length);
                 password.append(chars[randNumber]);
             }
+            password.append(specialChars[rand.nextInt(specialChars.length)]);
             this.passwordPlain = password.toString();
         }
     }

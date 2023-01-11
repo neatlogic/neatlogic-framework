@@ -5,7 +5,9 @@
 
 package codedriver.framework.dto.condition;
 
+import codedriver.framework.common.constvalue.ApiParamType;
 import codedriver.framework.common.dto.BaseEditorVo;
+import codedriver.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -29,6 +31,9 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
     @JSONField(serialize = false)
     private Map<String, ConditionGroupVo> conditionGroupMap;
     protected List<ConditionGroupRelVo> conditionGroupRelList = new ArrayList<>();
+
+    @EntityField(name = "搜索模式：value|text，默认搜索value", type = ApiParamType.STRING)
+    private String searchMode;
 
 
     public ConditionConfigVo() {
@@ -153,7 +158,7 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
                     //append condition
                     String handler = conditionVo.getName();
                     //如果是form
-                    buildMyConditionWhereSql(sqlSb, handler, conditionVoList, i);
+                    buildMyConditionWhereSql(sqlSb, handler, conditionVoList, i,conditionConfigVo.getSearchMode());
                     fromConditionUuid = toConditionUuid;
                 }
                 sqlSb.append(" ) ");
@@ -167,7 +172,26 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
         }
     }
 
-    public void buildMyConditionWhereSql(StringBuilder sqlSb, String handler, List<ConditionVo> conditionVoList, int conditionIndex) {
+    /**
+     *
+     * @param sqlSb sql stringBuilder
+     * @param handler 条件处理器
+     * @param conditionVoList 所有条件
+     * @param conditionIndex 当前条件下标
+     * @param searchMode 搜索模式：value|text，默认搜索value
+     */
+    public void buildMyConditionWhereSql(StringBuilder sqlSb, String handler, List<ConditionVo> conditionVoList, int conditionIndex, String searchMode) {
 
+    }
+
+    public String getSearchMode() {
+        if(StringUtils.isBlank(searchMode)){
+            searchMode = "value";
+        }
+        return searchMode;
+    }
+
+    public void setSearchMode(String searchMode) {
+        this.searchMode = searchMode;
     }
 }

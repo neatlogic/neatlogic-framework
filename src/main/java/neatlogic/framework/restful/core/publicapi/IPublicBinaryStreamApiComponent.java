@@ -1,0 +1,25 @@
+/*
+ * Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+ * 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+ */
+
+package neatlogic.framework.restful.core.publicapi;
+
+import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @Author
+ * @Time Aug 26,2020
+ * @Description: 外部接口
+ */
+public interface IPublicBinaryStreamApiComponent extends IBinaryStreamApiComponent {
+    /**
+     * 接口唯一标识，也是访问URI
+     *
+     * @return token
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    String getToken();
+}

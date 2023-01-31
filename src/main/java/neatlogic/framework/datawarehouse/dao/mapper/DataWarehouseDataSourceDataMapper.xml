@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataMapper">
+    <select id="getDataSourceDataCount" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="int">
+        select count(1)
+        from ${tableName}
+    </select>
+
+    <sql id="searchDataSourceDataCondition">
+        <where>
+            true
+            <choose>
+                <when test="isExpired == 0">
+                    and (expire_time is null or expire_time &gt;= now())
+                </when>
+                <when test="isExpired == 1">
+                    and expire_time &lt;= now()
+                </when>
+            </choose>
+            <if test="conditionList != null and conditionList.size() > 0">
+                <foreach collection="conditionList" item="item">
+                    <if test="item.sqlConditionExpression != null and item.sqlConditionExpression != ''">
+                        and ${item.sqlConditionExpression}
+                    </if>
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchDataSourceData" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="java.util.HashMap">
+        select
+        <foreach collection="fieldList" item="item">
+            `${item.id}` as `field_${item.id}`,
+        </foreach>
+        id,
+        insert_time as insertTime,
+        expire_time as expireTime
+        from ${tableName}
+        <include refid="searchDataSourceDataCondition"></include>
+        <if test="sortList != null and sortList.size() > 0">
+            order by
+            <foreach collection="sortList" item="sort" separator=",">
+                `field_${sort.fieldId}` ${sort.type}
+            </foreach>
+        </if>
+        <choose>
+            <when test="limit > 0">
+                limit #{limit}
+            </when>
+            <otherwise>
+                limit #{startNum},#{pageSize}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchDataSourceDataCount" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="int">
+        select
+        count(1)
+        from ${tableName}
+        <include refid="searchDataSourceDataCondition"></include>
+    </select>
+
+    <select id="getAggregateFieldValue" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo"
+            resultType="java.util.HashMap">
+        select 1
+        <foreach collection="fieldList" item="item">
+            <if test="item.aggregate != null and item.aggregate != ''">
+                ,`${item.id}` as `field_${item.id}`
+            </if>
+        </foreach>
+        from ${tableName} where
+        true
+        <foreach collection="fieldList" item="item">
+            <if test="item.isKey==1">
+                and `${item.id}_hash` = #{item.value,typeHandler=Md5Handler}
+            </if>
+        </foreach>
+        limit 1
+    </select>
+
+    <insert id="insertDataSourceData" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo">
+        insert into ${tableName}
+        (
+        <foreach collection="fieldList" item="item">
+            `${item.id}`,
+            `${item.id}_hash`,
+        </foreach>
+        id, insert_time<if test="expireMinute != null and expireMinute > 0">, expire_time</if>)
+        values
+        (
+        <foreach collection="fieldList" item="item">
+            #{item.value},
+            #{item.value,typeHandler=Md5Handler},
+        </foreach>
+        #{id},now(3)
+        <if test="expireMinute != null and expireMinute > 0">, DATE_ADD(now(),INTERVAL #{expireMinute} minute)</if>
+        ) ON DUPLICATE KEY
+        UPDATE
+        <foreach collection="fieldList" item="item">
+            `${item.id}` = #{item.value},
+            `${item.id}_hash` = #{item.value,typeHandler=Md5Handler},
+        </foreach>
+        insert_time = now(3)
+        <choose>
+            <when test="expireMinute != null and expireMinute > 0">, expire_time = DATE_ADD(now(),INTERVAL
+                #{expireMinute} minute)
+            </when>
+            <otherwise>,expire_time = null</otherwise>
+        </choose>
+    </insert>
+
+    <delete id="truncateTable" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceVo">
+        truncate table ${tableName}
+    </delete>
+
+    <delete id="clearExpiredData" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceDataVo">
+        delete
+        from ${tableName}
+        where expire_time is not null
+          and expire_time &lt; now()
+    </delete>
+</mapper>

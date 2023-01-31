@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.message.dao.mapper.MessageMapper">
+
+    <select id="getMessageSubscribeListByUserUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.message.dto.MessageHandlerVo">
+        SELECT `handler`,
+               `is_active` AS isActive,
+               `pop_up`    AS popUp,
+               `fcd`
+        FROM `message_subscribe`
+        WHERE `user_uuid` = #{value}
+    </select>
+
+    <select id="getMessageSubscribeByUserUuidAndHandler" parameterType="neatlogic.framework.message.dto.MessageHandlerVo"
+            resultType="neatlogic.framework.message.dto.MessageHandlerVo">
+        SELECT `user_uuid` as userUuid,
+               `handler`,
+               `is_active` as isActive,
+               `pop_up` AS popUp,
+               `fcd`
+        FROM `message_subscribe`
+        WHERE `user_uuid` = #{userUuid}
+          AND `handler` = #{handler}
+    </select>
+
+    <select id="getMessageCount" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `message_user`
+        WHERE `user_uuid` = #{userUuid}
+        AND `is_read` = 0
+        <if test="minMessageId != null">
+            AND `message_id` &gt; #{minMessageId}
+        </if>
+        <if test="maxMessageId != null">
+            AND `message_id` &lt; #{maxMessageId}
+        </if>
+    </select>
+
+    <select id="getMessageList" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="neatlogic.framework.message.dto.MessageVo">
+        SELECT
+        b.`id`,
+        b.`title`,
+        b.`content`,
+        b.`fcd`,
+        b.`handler`,
+        b.`trigger`,
+        a.`is_show` as isShow
+        FROM `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        WHERE a.`user_uuid` = #{userUuid}
+        AND a.`is_read` = 0
+        <if test="minMessageId != null">
+            AND `message_id` &gt; #{minMessageId}
+        </if>
+        <if test="maxMessageId != null">
+            AND `message_id` &lt; #{maxMessageId}
+        </if>
+        ORDER BY a.`message_id` DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getMessageHistoryCount" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM `message` a
+        JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
+        WHERE a.`insert_time` &gt;= #{startTime} and a.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND a.`title` like concat('%', #{keyword}, '%')
+        </if>
+        <if test="notifyPolicyHandler != null and notifyPolicyHandler != ''">
+            AND a.`notify_policy_handler` = #{notifyPolicyHandler}
+        </if>
+        <if test="triggerList != null and triggerList.size() > 0">
+            AND a.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
+            </foreach>
+        </if>
+        <if test="isRead != null">
+            AND b.`is_read` = #{isRead}
+        </if>
+    </select>
+
+    <select id="getMessageHistoryList" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="neatlogic.framework.message.dto.MessageVo">
+        SELECT
+        a.`id`,
+        a.`title`,
+        a.`content`,
+        a.`fcd`,
+        a.`handler`,
+        a.`trigger`,
+        b.`is_read` AS isRead
+        FROM `message` a
+        JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid}
+        WHERE a.`insert_time` &gt;= #{startTime} AND a.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND a.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="notifyPolicyHandler != null and notifyPolicyHandler != ''">
+            AND a.`notify_policy_handler` = #{notifyPolicyHandler}
+        </if>
+        <if test="triggerList != null and triggerList.size()">
+            AND a.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
+            </foreach>
+        </if>
+        ORDER BY a.`id` DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <sql id="getMessagePullSql">
+        <if test="handlerList != null and handlerList.size() > 0">
+            JOIN `message` b ON b.`id` = a.`message_id`
+        </if>
+        WHERE a.`message_id` &gt; #{messageId}
+        <if test="handlerList != null and handlerList.size() > 0">
+            AND b.`handler` IN
+            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+                #{handler}
+            </foreach>
+        </if>
+        AND (
+            (a.`type` = 'user' AND a.`uuid` = #{userUuid})
+            <if test="teamUuidList != null and teamUuidList.size() > 0">
+                OR (a.`type` = 'team' AND a.`uuid` IN
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+                )
+            </if>
+            <if test="roleUuidList != null and roleUuidList.size() > 0">
+                OR (a.`type` = 'role' AND a.`uuid` IN
+                <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                    #{roleUuid}
+                </foreach>
+                )
+            </if>
+        )
+    </sql>
+
+    <select id="getMessagePullCount" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="int">
+        SELECT
+        COUNT(DISTINCT a.`message_id`)
+        FROM `message_recipient` a
+        <include refid="getMessagePullSql"/>
+    </select>
+
+    <select id="getMessagePullList" parameterType="neatlogic.framework.message.dto.MessageSearchVo"
+            resultType="java.lang.Long">
+        SELECT
+        DISTINCT a.`message_id`
+        FROM `message_recipient` a
+        <include refid="getMessagePullSql"/>
+        ORDER BY a.`message_id`
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getMessageUserMaxMessageIdByUserUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+            MAX(`message_id`)
+        FROM `message_user`
+        WHERE `user_uuid` = #{value}
+    </select>
+
+    <select id="getMessageInsertTimeById" parameterType="java.lang.Long" resultType="java.util.Date">
+        SELECT `insert_time` FROM `message` WHERE `id` = #{value}
+    </select>
+
+    <select id="getMessageMaxIdByLessThanInsertTime" parameterType="java.util.Date" resultType="java.lang.Long">
+        SELECT MAX(`id`) FROM `message` WHERE `insert_time` &lt; #{value}
+    </select>
+
+    <select id="getMessageUnsubscribedUserUuidListByHandlerAndUserUuidList" resultType="java.lang.String">
+        SELECT
+               `user_uuid`
+        FROM `message_subscribe`
+        WHERE `is_active` = 0
+          AND `handler` = #{handler}
+          AND `user_uuid` IN
+        <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+            #{userUuid}
+        </foreach>
+    </select>
+
+    <select id="getTriggerMessageCountListGroupByTriggerAndIsRead" parameterType="neatlogic.framework.message.dto.MessageSearchVo" resultType="neatlogic.framework.message.dto.TriggerMessageCountVo">
+        SELECT
+               b.`notify_policy_handler` as notifyPolicyHandler,
+               b.`trigger`,
+               a.`is_read` AS isRead,
+               COUNT(1) AS count
+        FROM `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        WHERE a.`user_uuid` = #{userUuid}
+        AND b.`insert_time` &gt;= #{startTime} AND b.`insert_time` &lt;= #{endTime}
+        <if test="keyword != null and keyword != ''">
+            AND b.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        GROUP BY b.`notify_policy_handler`,b.`trigger`, a.`is_read`
+    </select>
+
+    <select id="getMessageShortShowPopUpCountByUserUuidAndHandlerList" parameterType="neatlogic.framework.message.dto.MessageSearchVo" resultType="int">
+        SELECT COUNT(1) FROM (
+            SELECT a.`id` FROM `message` a
+            JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid} AND b.`is_read` = 0 AND b.`is_show` != 2 AND (b.`expired_time` IS NULL OR b.`expired_time` &gt; NOW(3))
+            WHERE a.`handler` IN
+            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+                #{handler}
+            </foreach>
+            LIMIT 100
+        ) c
+    </select>
+    <select id="getMessageLongShowPopUpCountByUserUuidAndHandlerList" parameterType="neatlogic.framework.message.dto.MessageSearchVo" resultType="int">
+        SELECT COUNT(1) FROM (
+            SELECT a.`id` FROM `message` a
+            JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid} AND b.`is_read` = 0 AND b.`is_show` != 2
+            WHERE a.`handler` IN
+            <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+                #{handler}
+            </foreach>
+            LIMIT 100
+        ) c
+    </select>
+    <select id="getMessageUnreadCountByUserUuid" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1) FROM (
+            SELECT `message_id` FROM `message_user`
+            WHERE `user_uuid` = #{userUuid} AND `is_read` = 0
+            LIMIT 100
+        ) c
+    </select>
+
+    <select id="getLastPopUpMessage" parameterType="neatlogic.framework.message.dto.MessageSearchVo" resultType="neatlogic.framework.message.dto.MessageVo">
+        SELECT
+            a.`id`,
+            a.`title`,
+            a.`content`,
+            a.`fcd`,
+            a.`handler`,
+            a.`trigger`
+        FROM `message` a
+        JOIN `message_user` b ON b.`message_id` = a.`id` AND b.`user_uuid` = #{userUuid} AND b.`is_read` = 0 AND b.`is_show` != 2 AND (b.`expired_time` IS NULL OR b.`expired_time` &gt; NOW(3))
+        WHERE a.`handler` IN
+        <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+            #{handler}
+        </foreach>
+        ORDER BY a.`id` DESC
+        LIMIT 1
+    </select>
+
+    <select id="getMessageByIdAndUserUuid" parameterType="neatlogic.framework.message.dto.MessageSearchVo" resultType="neatlogic.framework.message.dto.MessageVo">
+        SELECT
+            b.`id`,
+            b.`title`,
+            b.`content`,
+            b.`fcd`,
+            b.`handler`,
+            b.`trigger`
+        FROM `message_user` a
+        JOIN `message` b ON a.`message_id` = b.`id`
+        WHERE a.`user_uuid` = #{userUuid} AND a.`message_id` = #{messageId}
+    </select>
+
+    <insert id="insertMessage" parameterType="neatlogic.framework.message.dto.MessageVo">
+        INSERT INTO `message` (
+        `id`,
+        `title`,
+        `content`,
+        `handler`,
+        `fcd`,
+        `trigger`,
+        `notify_policy_handler`,
+        `insert_time`
+        )
+        VALUES
+        <foreach collection="list" item="messageVo" separator=",">
+            (
+            #{messageVo.id},
+            #{messageVo.title},
+            #{messageVo.content},
+            #{messageVo.handler},
+            #{messageVo.fcd},
+            #{messageVo.trigger},
+            #{messageVo.notifyPolicyHandler},
+            NOW(3)
+            )
+        </foreach>
+
+    </insert>
+
+    <insert id="insertMessageRecipient" parameterType="neatlogic.framework.message.dto.MessageRecipientVo">
+        INSERT INTO `message_recipient` (`message_id`, `type`, `uuid`)
+        VALUES
+        <foreach collection="list" item="messageRecipientVo" separator=",">
+            (#{messageRecipientVo.messageId}, #{messageRecipientVo.type}, #{messageRecipientVo.uuid})
+        </foreach>
+    </insert>
+
+    <insert id="insertMessageUser" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        INSERT IGNORE INTO `message_user` (
+        `message_id`,
+        `user_uuid`
+        )
+        VALUES
+        <foreach collection="list" item="messageUserVo" separator=",">
+            (
+            #{messageUserVo.messageId},
+            #{messageUserVo.userUuid}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertMessageSubscribe" parameterType="neatlogic.framework.message.dto.MessageHandlerVo">
+        INSERT INTO `message_subscribe` (`user_uuid`,
+                                      `handler`,
+                                      `is_active`,
+                                      `pop_up`,
+                                      `fcd`)
+        VALUES (#{userUuid},
+                #{handler},
+                #{isActive},
+                #{popUp},
+                NOW(3))
+    </insert>
+
+    <update id="updateMessageUserIsReadByUserUuidAndMessageId" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
+        SET `is_read` = 1,
+            `is_show` = 2,
+            `expired_time` = NULL
+        WHERE `user_uuid` = #{userUuid}
+        AND `message_id` = #{messageId}
+    </update>
+
+    <update id="updateMessageUserIsReadByUserUuidAndMessageIdList" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
+        SET `is_read` = 1,
+        `is_show` = 2,
+        `expired_time` = NULL
+        WHERE `user_uuid` = #{userUuid}
+        AND `message_id` IN
+        <foreach collection="messageIdList" item="messageId" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </update>
+
+    <update id="updateMessageUserIsReadByUserUuidAndMessageIdRange" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
+        SET `is_read` = 1,
+        `is_show` = 2,
+        `expired_time` = NULL
+        WHERE `user_uuid` = #{userUuid}
+          <if test="minMessageId != null">
+            AND `message_id` &gt; #{minMessageId}
+          </if>
+        <if test="maxMessageId != null">
+            AND `message_id` &lt;= #{maxMessageId}
+        </if>
+    </update>
+
+    <update id="updateMessageUserIsReadByUserUuidAndKeywordAndTriggerList" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        set
+        a.`is_read` = 1,
+        a.`is_show` = 2,
+        a.`expired_time` = NULL
+        WHERE b.`insert_time` &gt;= #{startTime}
+        AND b.`insert_time` &lt;= #{endTime}
+        AND a.`user_uuid` = #{userUuid}
+        and a.`is_read` = 0
+        <if test="keyword != null and keyword != ''">
+            AND b.`title` LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="notifyPolicyHandler != null and notifyPolicyHandler != ''">
+            AND b.`notify_policy_handler` = #{notifyPolicyHandler}
+        </if>
+        <if test="triggerList != null and triggerList.size()">
+            AND b.`trigger` in
+            <foreach collection="triggerList" item="trigger" open="(" separator="," close=")">
+                #{trigger}
+            </foreach>
+        </if>
+    </update>
+
+    <update id="updateMessageUserIsReadByUserUuid" parameterType="java.lang.String">
+        UPDATE `message_user`
+        SET `is_read` = 1,
+            `is_show` = 2,
+            `expired_time` = NULL
+        WHERE `user_uuid` = #{value}
+    </update>
+
+    <update id="updateMessageSubscribePopUp" parameterType="neatlogic.framework.message.dto.MessageHandlerVo">
+        UPDATE `message_subscribe`
+        SET `pop_up` = #{popUp}
+        WHERE `user_uuid` = #{userUuid}
+          AND `handler` = #{handler}
+    </update>
+
+    <update id="updateMessageSubscribeActive" parameterType="neatlogic.framework.message.dto.MessageHandlerVo">
+        UPDATE `message_subscribe`
+        SET `is_active` = !`is_active`,
+            `fcd` = NOW(3)
+        WHERE `user_uuid` = #{userUuid}
+          AND `handler` = #{handler}
+    </update>
+
+    <update id="updateMessageUserExpiredIsShow1To2AndExpiredTimeIsNullByUserUuid" parameterType="java.lang.String">
+        UPDATE `message_user`
+        SET
+            `is_show` = 2,
+            `expired_time` = NULL
+        WHERE`user_uuid` = #{value}
+          AND  `is_show` = 1
+          AND `expired_time` &lt;= NOW(3)
+    </update>
+
+    <update id="updateMessageUserIsShowAndExpiredTimeByUserUuidAndHandlerList" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user` a
+        JOIN `message` b ON b.`id` = a.`message_id`
+        SET
+        <if test="expiredTime != null">
+            a.`expired_time` = #{expiredTime},
+        </if>
+            a.`is_show` = #{isShow}
+        WHERE a.`user_uuid` = #{userUuid}
+        AND a.`is_show` = 0
+        AND a.`is_read` = 0
+        AND b.`handler` IN
+        <foreach collection="handlerList" item="handler" open="(" separator="," close=")">
+            #{handler}
+        </foreach>
+    </update>
+
+    <update id="updateMessageUserIsShow1To2AndIsRead0To1ByUserUuidAndMessageId" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        UPDATE `message_user`
+        SET
+        `is_read` = 1,
+        `is_show` = 2,
+        `expired_time` = NULL
+        WHERE `user_uuid` = #{userUuid}
+        <if test="messageId != null">
+            AND `message_id` = #{messageId}
+        </if>
+        <if test="maxMessageId != null">
+            AND `message_id` &lt;= #{maxMessageId}
+            AND `is_show` = 1
+        </if>
+    </update>
+
+    <delete id="deleteMessageUser" parameterType="neatlogic.framework.message.dto.MessageSearchVo">
+        DELETE FROM `message_user`
+        WHERE `user_uuid` = #{userUuid}
+          AND `message_id` = #{messageId}
+    </delete>
+
+    <delete id="deleteMessageRecipientByLessThanOrEqualMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_recipient` WHERE `message_id` &lt;= #{value}
+    </delete>
+
+    <delete id="deleteMessageUserByLessThanOrEqualMessageId" parameterType="java.lang.Long">
+        DELETE FROM `message_user` WHERE `message_id` &lt;= #{value}
+    </delete>
+
+    <delete id="deleteMessageByLessThanOrEqualId" parameterType="java.lang.Long">
+        DELETE FROM `message` WHERE `id` &lt;= #{value}
+    </delete>
+</mapper>

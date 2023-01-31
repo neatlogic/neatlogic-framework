@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.form.dao.mapper.FormMapper">
+    <select id="checkFormCustomItemNameIsExists" parameterType="neatlogic.framework.form.dto.FormCustomItemVo"
+            resultType="int">
+        SELECT count(1)
+        FROM form_customitem
+        WHERE name = #{name}
+          AND id != #{id}
+    </select>
+
+    <select id="searchFormCustomItem" parameterType="neatlogic.framework.form.dto.FormCustomItemVo"
+            resultType="neatlogic.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+        name,
+        label,
+        is_active AS isActive,
+        icon,
+        config AS configStr
+        FROM form_customitem
+        <include refid="searchFormCustomItemCondition"/>
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchFormCustomItemCount" parameterType="neatlogic.framework.form.dto.FormCustomItemVo"
+            resultType="int">
+        SELECT
+        count(1)
+        FROM form_customitem
+        <include refid="searchFormCustomItemCondition"/>
+    </select>
+
+    <sql id="searchFormCustomItemCondition">
+        <where>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE concat('%',#{keyword},'%') OR label LIKE concat('%',#{keyword},'%'))
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFormCustomItemByName" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+               name,
+               label,
+               icon,
+               is_active              AS isActive,
+               config                 AS configStr,
+               config_template_config AS configTemplateConfig,
+               config_template        AS configTemplate,
+               view_template          AS viewTemplate,
+               view_template_config   AS viewTemplateConfig
+        FROM form_customitem
+        WHERE name = #{value}
+    </select>
+
+    <select id="getFormCustomItemById" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.form.dto.FormCustomItemVo">
+        SELECT id,
+               name,
+               label,
+               icon,
+               is_active              AS isActive,
+               config                 AS configStr,
+               config_template_config AS configTemplateConfig,
+               config_template        AS configTemplate,
+               view_template          AS viewTemplate,
+               view_template_config   AS viewTemplateConfig
+        FROM form_customitem
+        WHERE id = #{value}
+    </select>
+
+    <select id="getActionFormVersionByFormUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfig,
+               b.`name`        AS formName
+        FROM `form_version` a
+                 JOIN `form` b
+                      ON a.`form_uuid` = b.`uuid`
+        WHERE a.`form_uuid` = #{value}
+          AND a.`is_active` = 1
+    </select>
+
+    <select id="searchFormList" parameterType="neatlogic.framework.form.dto.FormVo"
+            resultType="neatlogic.framework.form.dto.FormVo">
+        SELECT
+        f.`uuid`,
+        f.`name`,
+        f.`is_active` AS isActive,
+        fv.`version` AS currentVersion,
+        fv.`uuid` AS currentVersionUuid,
+        fv.`fcu`,
+        fv.`fcd`,
+        fv.`lcu`,
+        fv.`lcd`
+        FROM `form` f
+        JOIN `form_version` fv ON fv.`form_uuid`=f.`uuid` AND fv.`is_active` = 1
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
+        ORDER BY f.`fcd` DESC
+        <if test="needPage">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getFormListByUuidList" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVo">
+        SELECT
+        `uuid`,
+        `name`,
+        `is_active` AS isActive
+        FROM `form`
+        WHERE `uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+        ORDER BY `fcd` DESC
+    </select>
+
+    <select id="searchFormListForSelect" parameterType="neatlogic.framework.form.dto.FormVo"
+            resultType="neatlogic.framework.common.dto.ValueTextVo">
+        SELECT
+        f.`uuid` as `value`,
+        f.`name` as `text`
+        FROM `form` f
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
+        ORDER BY f.`fcd` DESC
+        <if test="needPage">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="searchFormCount" parameterType="neatlogic.framework.form.dto.FormVo" resultType="int">
+        SELECT
+        COUNT(f.`uuid`)
+        FROM
+        `form` f
+        JOIN `form_version` fv ON fv.`form_uuid`=f.`uuid` AND fv.`is_active` = 1
+        <where>
+            <if test="isActive != null">
+                AND f.`is_active` = #{isActive}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND f.`name` LIKE CONCAT('%', #{keyword},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getMaxVersionByFormUuid" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT max(version)
+        FROM `form_version`
+        WHERE form_uuid = #{value} FOR
+        UPDATE
+    </select>
+
+    <select id="getFormVersionByUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT `uuid`,
+               `version`,
+               `is_active`   AS isActive,
+               `form_uuid`   AS formUuid,
+               `form_config` AS formConfig,
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
+        FROM `form_version`
+        WHERE `uuid` = #{value}
+    </select>
+
+    <select id="getFormByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.form.dto.FormVo">
+        SELECT `uuid`,
+               `name`,
+               `is_active` AS isActive
+        FROM `form`
+        WHERE `uuid` = #{value}
+    </select>
+
+    <select id="getFormVersionByFormUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT `uuid`,
+               `version`,
+               `is_active`   AS isActive,
+               `form_uuid`   AS formUuid,
+               `form_config` AS formConfig,
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
+        FROM `form_version`
+        WHERE form_uuid = #{value}
+        ORDER BY `version`
+    </select>
+
+    <select id="getFormVersionSimpleByFormUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT `uuid`,
+               `version`,
+               `is_active` AS isActive,
+               `fcu`,
+               `fcd`,
+               `lcu`,
+               `lcd`
+        FROM `form_version`
+        WHERE form_uuid = #{value}
+        ORDER BY `version`
+    </select>
+
+    <select id="checkFormIsExists" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(`uuid`)
+        FROM `form`
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <select id="checkFormNameIsRepeat" parameterType="neatlogic.framework.form.dto.FormVo" resultType="int">
+        SELECT COUNT(`uuid`)
+        FROM `form`
+        WHERE `name` = #{name}
+          and `uuid` != #{uuid}
+    </select>
+
+    <select id="checkFormVersionIsExists" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(`uuid`)
+        FROM `form_version`
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <select id="getFormAttributeList" parameterType="neatlogic.framework.form.dto.FormAttributeVo"
+            resultType="neatlogic.framework.form.dto.FormAttributeVo">
+        SELECT
+        a.`form_uuid` AS formUuid,
+        a.`formversion_uuid` as formversionUuid,
+        a.`uuid`,
+        a.`label`,
+        a.`type`,
+        a.`handler`,
+        a.`config`,
+        a.`data`
+        FROM `form_attribute` a
+        JOIN `form_version` b ON b.`uuid`=a.`formversion_uuid` AND b.`is_active` = 1
+        WHERE a.`form_uuid` = #{formUuid}
+        <if test="formVersionUuid != null">
+            AND a.`formversion_uuid` = #{formVersionUuid}
+        </if>
+    </select>
+
+    <select id="getFormAttributeListByFormUuidList" parameterType="java.util.List"
+            resultType="neatlogic.framework.form.dto.FormAttributeVo">
+        SELECT
+        b.`form_uuid` AS formUuid,
+        b.`formversion_uuid` AS formversionUuid,
+        b.`uuid`,
+        b.`label`,
+        b.`type`,
+        b.`handler`,
+        b.`config`,
+        b.`data`
+        FROM `form_version` a
+        JOIN `form_attribute` b ON b.`form_uuid` = a.`form_uuid` AND a.`uuid` = b.`formversion_uuid`
+        WHERE a.`is_active` = 1
+        AND a.`form_uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getFormAttributeMatrixByMatrixUuid" resultType="neatlogic.framework.form.dto.FormAttributeMatrixVo">
+        select a.`matrix_uuid`          AS matrixUuid,
+               a.`form_version_uuid`    AS formVersionUuid,
+               a.`form_attribute_label` AS formAttributeLabel,
+               a.`form_attribute_uuid`  AS formAttributeUuid,
+               b.`version`,
+               c.`uuid`                 AS formUuid,
+               c.`name`                 AS formName
+        FROM `form_attribute_matrix` a
+                 JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
+                 JOIN form c ON c.`uuid` = b.`form_uuid`
+        WHERE a.`matrix_uuid` = #{matrixUuid}
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getFormVersionListByFormConfigLikeKeyword" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfig,
+               a.`fcd`,
+               a.`fcu`,
+               a.`lcd`,
+               a.`lcu`
+        FROM `form_version` a
+        WHERE a.`form_config` LIKE CONCAT('%', #{value}, '%')
+        ORDER BY a.`form_uuid`
+    </select>
+
+    <select id="getFormVersionList" resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfig,
+               a.`fcd`,
+               a.`fcu`,
+               a.`lcd`,
+               a.`lcu`
+        FROM `form_version` a
+        ORDER BY a.`form_uuid`
+    </select>
+
+    <update id="updateFormVersion" parameterType="neatlogic.framework.form.dto.FormVersionVo">
+        UPDATE
+        `form_version`
+        SET
+        <if test="isActive != null">
+            `is_active` = #{isActive},
+        </if>
+        <if test="formConfig != null and formConfig != ''">
+            `form_config` = #{formConfig},
+        </if>
+        `lcd` = NOW(3),
+        `lcu` = #{lcu}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateFormVersionConfigByUuid" parameterType="neatlogic.framework.form.dto.FormVersionVo">
+        UPDATE `form_version`
+        SET `form_config` = #{formConfig}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="resetFormVersionIsActiveByFormUuid" parameterType="java.lang.String">
+        UPDATE `form_version`
+        SET `is_active` = 0
+        WHERE `form_uuid` = #{value}
+    </update>
+
+    <update id="updateForm" parameterType="neatlogic.framework.form.dto.FormVo">
+        UPDATE `form` SET
+        <if test="isActive != null">
+            `is_active` = #{isActive},
+        </if>
+        <if test="name != null and name != ''">
+            `name`=#{name},
+        </if>
+        `uuid` = #{uuid}
+        WHERE `uuid` = #{uuid};
+    </update>
+
+    <update id="updateFormCustomItem" parameterType="neatlogic.framework.form.dto.FormCustomItemVo">
+        UPDATE form_customitem
+        SET name                   = #{name},
+            label                  = #{label},
+            icon=#{icon},
+            is_active              =#{isActive},
+            config                 = #{configStr},
+            config_template_config = #{configTemplateConfig},
+            config_template        = #{configTemplate},
+            view_template          = #{viewTemplate},
+            view_template_config   = #{viewTemplateConfig}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertFormCustomItem" parameterType="neatlogic.framework.form.dto.FormCustomItemVo">
+        INSERT INTO form_customitem (id,
+                                     name,
+                                     label,
+                                     icon,
+                                     is_active,
+                                     config,
+                                     config_template_config,
+                                     config_template,
+                                     view_template,
+                                     view_template_config)
+        VALUES (#{id},
+                #{name},
+                #{label},
+                #{icon},
+                #{isActive},
+                #{configStr},
+                #{configTemplateConfig},
+                #{configTemplate},
+                #{viewTemplate},
+                #{viewTemplateConfig})
+    </insert>
+
+    <insert id="insertForm" parameterType="neatlogic.framework.form.dto.FormVo">
+        INSERT INTO `form` (`uuid`,
+                            `name`,
+                            `is_active`,
+                            `fcd`)
+        VALUES (#{uuid},
+                #{name},
+                #{isActive},
+                now(3))
+    </insert>
+
+    <insert id="insertFormVersion" parameterType="neatlogic.framework.form.dto.FormVersionVo">
+        INSERT INTO `form_version` (`uuid`,
+                                    `version`,
+                                    `is_active`,
+                                    `form_uuid`,
+                                    `form_config`,
+                                    `fcd`,
+                                    `fcu`,
+                                    `lcd`,
+                                    `lcu`)
+        VALUES (#{uuid},
+                #{version},
+                #{isActive},
+                #{formUuid},
+                #{formConfig},
+                NOW(3),
+                #{fcu},
+                NOW(3),
+                #{fcu})
+    </insert>
+
+    <insert id="insertFormAttribute" parameterType="neatlogic.framework.form.dto.FormAttributeVo">
+        INSERT INTO `form_attribute` (`form_uuid`,
+                                      `formversion_uuid`,
+                                      `uuid`,
+                                      `label`,
+                                      `type`,
+                                      `handler`,
+                                      `config`,
+                                      `data`)
+        VALUES (#{formUuid},
+                #{formVersionUuid},
+                #{uuid},
+                #{label},
+                #{type},
+                #{handler},
+                #{config},
+                #{data})
+    </insert>
+
+    <insert id="insertFormAttributeMatrix" parameterType="neatlogic.framework.form.dto.FormAttributeMatrixVo">
+        INSERT IGNORE INTO `form_attribute_matrix` (`form_version_uuid`,
+                                                    `matrix_uuid`,
+                                                    `form_attribute_uuid`,
+                                                    `form_attribute_label`)
+        VALUES (#{formVersionUuid},
+                #{matrixUuid},
+                #{formAttributeUuid},
+                #{formAttributeLabel})
+    </insert>
+
+    <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `form_attribute`
+        WHERE `form_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteFormByUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `form`
+        WHERE `uuid` = #{uuid}
+    </delete>
+
+    <delete id="deleteFormVersionByFormUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `form_version`
+        WHERE `form_uuid` = #{formUuid}
+    </delete>
+
+    <delete id="deleteFormVersionByUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `form_version`
+        WHERE `uuid` = #{uuid}
+    </delete>
+
+    <delete id="deleteFormAttributeMatrixByFormVersionUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `form_attribute_matrix`
+        WHERE `form_version_uuid` = #{formVersionUuid}
+    </delete>
+
+    <delete id="deleteFormCustomItem" parameterType="java.lang.Long">
+        DELETE
+        FROM `form_customitem`
+        WHERE id = #{value}
+    </delete>
+</mapper>

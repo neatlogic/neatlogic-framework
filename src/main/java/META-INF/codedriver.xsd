@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://codedriver.techsure.com/schema/codedriver" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" targetNamespace="http://codedriver.techsure.com/schema/codedriver" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xsd:schema xmlns="http://neatlogic.techsure.com/schema/neatlogic" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans" targetNamespace="http://neatlogic.techsure.com/schema/neatlogic" elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 

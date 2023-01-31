@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (c)  2022 TechSure Co.,Ltd.  All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.globallock.dao.mapper.GlobalLockMapper">
+    <select id="getGlobalLockByUuidForUpdate" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`       as isLock,
+               `description`,
+               `fcd`
+        FROM `global_lock`
+        WHERE `uuid` = #{value} FOR
+        UPDATE
+    </select>
+
+    <select id="getGlobalLockById" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`       as isLock,
+               `description`,
+               `fcd`
+        FROM `global_lock`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getNextGlobalLockByUuid" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+               `uuid`,
+               `key`,
+               `handler`,
+               `handler_param` as handlerParamStr,
+               `is_lock`       as isLock,
+               `description`,
+               `fcd`
+        FROM `global_lock`
+        WHERE `uuid` = #{value}
+          and `is_lock` = 0
+        order by `id` asc
+        limit 1
+    </select>
+    <select id="searchLock" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+        `uuid`,
+        `key`,
+        `handler`,
+        `handler_param` as handlerParamStr,
+        `is_lock` as isLock,
+        `description`,
+        `fcd`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+            <if test="uuidList != null and uuidList.size() >0">
+                and `uuid` in
+                <foreach collection="uuidList" item="uuid" close=")" open="(" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
+        </where>
+        order by is_lock desc,`fcd` desc
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+
+    </select>
+
+    <select id="getLockListByKeyListAndHandler" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        SELECT `id`,
+        `uuid`,
+        `key`,
+        `handler`,
+        `handler_param` as handlerParamStr,
+        `is_lock` as isLock,
+        `description`,
+        `fcd`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            and
+            <foreach collection="keyList" item="key" separator="or" open="(" close=")">
+                `key` like CONCAT('%',#{key}, '%')
+            </foreach>
+        </where>
+    </select>
+    <select id="getLockCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+            <if test="uuidList != null and uuidList.size() >0">
+                and `uuid` in
+                <foreach collection="uuidList" item="uuid" close=")" open="(" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getGlobalLockUuidByKey" resultType="java.lang.String">
+        SELECT
+        `uuid`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            <if test="keyword !=null and keyword != ''">
+                and `key` like CONCAT('%',#{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateToLockById">
+        UPDATE `global_lock`
+        set `is_lock` = 1
+        where `id` = #{value}
+    </update>
+
+    <insert id="insertLock" parameterType="neatlogic.framework.dto.globallock.GlobalLockVo">
+        INSERT INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
+        VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{isLock}, #{description}, now())
+    </insert>
+
+    <delete id="deleteLock" parameterType="java.lang.Long">
+        DELETE
+        FROM `global_lock`
+        WHERE `id` = #{value}
+    </delete>
+
+</mapper>
+

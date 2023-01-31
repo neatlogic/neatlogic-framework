@@ -22,14 +22,14 @@
     <!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
     <!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
     <!-- 本地配置加载器,nacos不可用时加载配置数据 -->
-    <bean class="codedriver.framework.common.config.LocalConfig"></bean>
+    <bean class="neatlogic.framework.common.config.LocalConfig"></bean>
     <nacos:annotation-driven></nacos:annotation-driven>
     <!--指定nacos配置地址 -->
     <nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
     <!--指定dataId,group-id, 不自动刷新 -->
-    <nacos:property-source data-id="config" group-id="codedriver.framework" auto-refreshed="false"/>
+    <nacos:property-source data-id="config" group-id="neatlogic.framework" auto-refreshed="false"/>
 
-    <bean id="dataSourceMaster" class="codedriver.framework.store.mysql.CodeDriverBasicDataSource">
+    <bean id="dataSourceMaster" class="neatlogic.framework.store.mysql.CodeDriverBasicDataSource">
         <property name="driverClassName">
             <value>${db.driverClassName}</value>
         </property>
@@ -43,15 +43,15 @@
     </bean>
 
     <!-- 配置需要在rootComponent前加载 -->
-    <context:component-scan base-package="codedriver" use-default-filters="false">
-        <context:include-filter type="annotation" expression="codedriver.framework.common.RootConfiguration"/>
+    <context:component-scan base-package="neatlogic" use-default-filters="false">
+        <context:include-filter type="annotation" expression="neatlogic.framework.common.RootConfiguration"/>
     </context:component-scan>
 
-    <context:component-scan base-package="codedriver" use-default-filters="false">
-        <context:include-filter type="annotation" expression="codedriver.framework.common.RootComponent"/>
+    <context:component-scan base-package="neatlogic" use-default-filters="false">
+        <context:include-filter type="annotation" expression="neatlogic.framework.common.RootComponent"/>
     </context:component-scan>
 
-    <bean id="dataSource" class="codedriver.framework.store.mysql.CodeDriverRoutingDataSource">
+    <bean id="dataSource" class="neatlogic.framework.store.mysql.CodeDriverRoutingDataSource">
         <property name="targetDataSources">
             <map key-type="java.lang.String">
                 <entry key="master" value-ref="dataSourceMaster"/>
@@ -85,27 +85,27 @@
 
     <!-- scan for mappers and let them be autowired -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="codedriver.framework.**.mapper"/>
+        <property name="basePackage" value="neatlogic.framework.**.mapper"/>
     </bean>
     <!-- 创建SqlSessionFactory，同时指定数据源 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="configLocation" value="classpath:codedriver/framework/dao/config/mybatis-config.xml"/>
+        <property name="configLocation" value="classpath:neatlogic/framework/dao/config/mybatis-config.xml"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations">
             <list>
-                <value>classpath*:codedriver/framework/**/mapper/*.xml</value>
+                <value>classpath*:neatlogic/framework/**/mapper/*.xml</value>
             </list>
         </property>
     </bean>
 
     <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
 
-    <context:component-scan base-package="codedriver.framework"/>
+    <context:component-scan base-package="neatlogic.framework"/>
 
-    <bean id="JsonWebTokenValidFilter" class="codedriver.framework.filter.JsonWebTokenValidFilter"></bean>
+    <bean id="JsonWebTokenValidFilter" class="neatlogic.framework.filter.JsonWebTokenValidFilter"></bean>
 
     <!--mongoDb-->
-    <bean id="mongoDbFactory" class="codedriver.framework.store.mongodb.CodedriverMongoDbFactory">
+    <bean id="mongoDbFactory" class="neatlogic.framework.store.mongodb.CodedriverMongoDbFactory">
         <constructor-arg name="connectionString" value="${mongo.url}"/>
     </bean>
 

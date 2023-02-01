@@ -44,11 +44,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext context) throws ServletException {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         String moduleId = null;
-        System.out.println("   _  __             __    __                _              ____     ___ \n" +
-                "  / |/ / ___  ___ _ / /_  / /  ___   ___ _  (_) ____       |_  /    / _ \\\n" +
-                " /    / / -_)/ _ `// __/ / /__/ _ \\ / _ `/ / / / __/      _/_ <  _ / // /\n" +
-                "/_/|_/  \\__/ \\_,_/ \\__/ /____/\\___/ \\_, / /_/  \\__/      /____/ (_)\\___/ \n" +
-                "                                   /___/                                 \n" +
+        System.out.println("    _   __              __   __                  _          _____    ____ \n" +
+                "   / | / /___   ____ _ / /_ / /   ____   ____ _ (_)_____   |__  /   / __ \\\n" +
+                "  /  |/ // _ \\ / __ `// __// /   / __ \\ / __ `// // ___/    /_ <   / / / /\n" +
+                " / /|  //  __// /_/ // /_ / /___/ /_/ // /_/ // // /__    ___/ /_ / /_/ / \n" +
+                "/_/ |_/ \\___/ \\__,_/ \\__//_____/\\____/ \\__, //_/ \\___/   /____/(_)\\____/  \n" +
+                "                                      /____/                             \n" +
                 "===============================================================================================");
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");

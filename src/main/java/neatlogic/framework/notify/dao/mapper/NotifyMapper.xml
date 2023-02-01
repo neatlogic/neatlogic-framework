@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.notify.dao.mapper.NotifyMapper">
+	
+	<select id="getNotifyPolicyById" parameterType="java.lang.Long" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `id` = #{value}
+	FOR UPDATE
+	</select>
+
+	<select id="getNotifyPolicyByName" parameterType="java.lang.String" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+	SELECT
+	`id`,
+	`name`,
+	`handler`,
+	`config`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `name` = #{value}
+	Limit 1
+	</select>
+
+	<select id="getNotifyPolicyListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+	SELECT
+	`id`,
+	`name`,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `id` IN
+	<foreach collection="list" item="id" open="(" separator="," close=")">
+		#{id}
+	</foreach>
+	</select>
+
+	<select id="checkNotifyPolicyNameIsRepeat" parameterType="neatlogic.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT COUNT(1) FROM `notify_policy` WHERE `name` = #{name} AND `handler` = #{handler} AND `id` != #{id}
+	</select>
+
+	<select id="getNotifyPolicyList" parameterType="neatlogic.framework.notify.dto.NotifyPolicyVo" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+	SELECT 
+	`id`,
+	`name`,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	<!--(SELECT `user_name` FROM `user` WHERE `uuid` = `fcu`) AS fcuName,-->
+	`lcd`,
+	`lcu`,
+	<!--(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName,-->
+	IFNULL(lcd, fcd) AS actionTime
+	FROM `notify_policy`
+	WHERE `handler` = #{handler}
+	<if test="keyword != null and keyword != ''">
+		 AND `name` LIKE concat('%',#{keyword},'%') 
+	</if>
+	ORDER BY actionTime DESC
+	<if test="needPage">
+	limit #{startNum}, #{pageSize}
+	</if>
+	</select>
+
+	<select id="getNotifyPolicyListForSelect" parameterType="neatlogic.framework.notify.dto.NotifyPolicyVo" resultType="neatlogic.framework.common.dto.ValueTextVo">
+		SELECT
+		`id` as `value`,
+		`name` as `text`
+		FROM `notify_policy`
+		WHERE `handler` = #{handler}
+		<if test="keyword != null and keyword != ''">
+			AND `name` LIKE concat('%',#{keyword},'%')
+		</if>
+		<if test="needPage">
+			limit #{startNum}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="getNotifyPolicyCount" parameterType="neatlogic.framework.notify.dto.NotifyPolicyVo" resultType="int">
+	SELECT 
+	COUNT(`id`)
+	FROM `notify_policy`
+	WHERE `handler` = #{handler}
+	<if test="keyword != null and keyword != ''">
+		AND `name` LIKE concat('%',#{keyword},'%') 
+	</if>
+	</select>
+
+	<select id="checkNotifyPolicyIsExists" parameterType="java.lang.Long" resultType="int">
+	SELECT COUNT(`id`) FROM `notify_policy` WHERE `id` = #{id}
+	</select>
+
+	<select id="getNotifyPolicyByHandlerLimitOne" parameterType="java.lang.String" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+		SELECT
+			`id`,
+			`name`,
+			`handler`,
+			`config`,
+			`fcd`,
+			`fcu`,
+			`lcd`,
+			`lcu`
+		FROM `notify_policy`
+		WHERE `handler` = #{value} limit 1
+	</select>
+
+	<insert id="insertNotifyPolicy">
+	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
+	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))
+	</insert>
+
+	<update id="updateNotifyPolicyById">
+	UPDATE `notify_policy` SET
+	`name` = #{name},
+	`config` = #{configStr},
+	`lcu` = #{lcu},
+	`lcd` = NOW(3)
+	WHERE `id` = #{id}
+	</update>
+
+	<delete id="deleteNotifyPolicyById">
+	DELETE FROM `notify_policy` WHERE id = #{id}
+	</delete>
+
+</mapper>

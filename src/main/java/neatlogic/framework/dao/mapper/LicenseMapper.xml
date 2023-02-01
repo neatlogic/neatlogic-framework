@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.LicenseMapper">
+    <select id="getTenantLicenseByTenantUuid" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT tl.license
+        FROM `tenant_license` tl
+                 JOIN `tenant` t
+                      ON tl.`tenant_id` = t.`id`
+        WHERE t.`uuid` = #{tenantUuid}
+    </select>
+    <select id="getTenantLicenseByTenantUuidList" resultType="neatlogic.framework.dto.license.LicenseVo">
+        SELECT tl.license licenseStr,t.uuid as tenant
+        FROM `tenant_license` tl
+        JOIN `tenant` t
+        ON tl.`tenant_id` = t.`id`
+        WHERE t.`uuid` in
+        <foreach collection="list" item="tenantUuid" separator="," open="(" close=")">
+            #{tenantUuid}
+        </foreach>
+    </select>
+
+    <update id="insertLicenseByTenantUuid">
+        insert into `tenant_license` (`tenant_id`, `tenant_uuid`, `license`)
+        values (#{tenantId}, #{tenantUuid}, #{licenseStr})
+        ON DUPLiCATE KEY
+        UPDATE `license` = #{licenseStr};
+    </update>
+</mapper>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!-- 这个name和updateCheck 都按这样配置最好，不然启动时会在前台报错403，IOException -->
+<ehcache name="ehcache" updateCheck="false" maxBytesLocalHeap="500M">
+    <!-- 缓存位置 java.io.tmpdir:Java临时目录 -->
+    <diskStore path="java.io.tmpdir/ehcache"/>
+
+    <!-- 默认缓存 -->
+    <!--启用了复制模式，要注意使用了缓存的对象是否有transient字段，否则可能会因为数据不全导致功能异常-->
+    <defaultCache eternal="false" overflowToDisk="false" timeToIdleSeconds="30"
+                  timeToLiveSeconds="30" diskPersistent="false" copyOnRead="true"
+                  copyOnWrite="true" maxEntriesLocalDisk="10000"
+                  diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+    </defaultCache>
+</ehcache>

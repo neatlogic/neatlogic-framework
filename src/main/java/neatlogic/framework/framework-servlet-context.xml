@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="false" xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:neatlogic="http://neatlogic.com/schema/neatlogic"
+	   xsi:schemaLocation="http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://neatlogic.com/schema/neatlogic
+		http://neatlogic.com/schema/neatlogic.xsd">
+
+	<neatlogic:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99"
+					   groupDescription="挖掘更多强大的配置功能"/>
+
+	<context:component-scan base-package="neatlogic.module.framework"/>
+
+	<!-- enable autowire -->
+	<context:annotation-config/>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<!-- <aop:config proxy-target-class="true" /> -->
+	<!-- 启动expost-proxy,expose proxy在threadlocal -->
+	<aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
+
+	<mvc:annotation-driven/>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="neatlogic.module.framework.dao.mapper"/>
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:neatlogic/framework/dao/config/mybatis-config.xml"/>
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations">
+			<list>
+				<value>
+					classpath:neatlogic/module/framework/dao/mapper/**/*.xml
+				</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 启动Api方法拦截器 -->
+	<!-- <bean id="AuthApiInterceptor" class="neatlogic.framework.auth.core.AuthInterceptor"/> <aop:config proxy-target-class="true"> <aop:pointcut id="apiAction" expression="execution(* neatlogic.**.myDoService(..))"/> <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/> </aop:config> -->
+</beans>

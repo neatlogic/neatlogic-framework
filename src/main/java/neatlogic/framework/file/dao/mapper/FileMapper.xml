@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2022 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.file.dao.mapper.FileMapper">
+    <sql id="searchFileCondition">
+        <where>
+            <if test="uploadTimeRange != null and uploadTimeRange.size() == 2">
+                and (
+                upload_time &gt;= FROM_UNIXTIME(#{uploadTimeRange[0]})
+                and
+                upload_time &lt;= FROM_UNIXTIME(#{uploadTimeRange[1]})
+                )
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and name like concat('%',#{keyword}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchFileCount" parameterType="neatlogic.framework.file.dto.FileVo" resultType="int">
+        SELECT count(1)
+        FROM file
+        <include refid="searchFileCondition"></include>
+    </select>
+
+    <select id="searchFile" parameterType="neatlogic.framework.file.dto.FileVo"
+            resultType="neatlogic.framework.file.dto.FileVo">
+        SELECT id,
+        NAME,
+        size,
+        user_uuid as userUuid,
+        upload_time AS uploadTime,
+        type,
+        content_type AS contentType,
+        path
+        FROM file
+        <include refid="searchFileCondition"></include>
+        <choose>
+            <when test="sortList!=null and sortList.size() > 0">
+                order by
+                <foreach collection="sortList" item="sort" separator=",">
+                    ${sort.key} ${sort.type}
+                </foreach>
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getFileByNameAndUniqueKey" resultType="neatlogic.framework.file.dto.FileVo">
+        SELECT `id`,
+               `name`,
+               `size`,
+               `user_uuid`                                     AS userUuid,
+               DATE_FORMAT(`upload_time`, '%Y-%m-%d %H:%i:%s') AS uploadTime,
+               `type`,
+               content_type                                    AS contentType,
+               `path`
+        FROM `file`
+        WHERE `name` = #{name}
+        AND `unique_key`
+        <choose>
+            <when test="uniqueKey != null">
+                #{uniqueKey}
+            </when>
+            <otherwise>
+                is null
+            </otherwise>
+        </choose>
+        LIMIT 1
+    </select>
+
+    <select id="getFileById" parameterType="java.lang.Long" resultType="neatlogic.framework.file.dto.FileVo">
+        SELECT `id`,
+               `name`,
+               `size`,
+               `user_uuid`                                     AS userUuid,
+               DATE_FORMAT(`upload_time`, '%Y-%m-%d %H:%i:%s') AS uploadTime,
+               `type`,
+               content_type                                    AS contentType,
+               `path`
+        FROM `file`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getFileTypeConfigByType" parameterType="java.lang.String"
+            resultType="neatlogic.framework.file.dto.FileTypeVo">
+        SELECT `name`,
+               `config`
+        FROM `filetype_config`
+        WHERE name = #{value}
+    </select>
+
+    <select id="getFileListByIdList" parameterType="java.util.List" resultType="neatlogic.framework.file.dto.FileVo">
+        SELECT
+        `id`,
+        `name`,
+        `size`,
+        `user_uuid` AS userUuid,
+        DATE_FORMAT( `upload_time`, '%Y-%m-%d %H:%i:%s' ) AS uploadTime,
+        `type`,
+        content_type AS contentType,
+        `path`
+        FROM `file`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <resultMap id="fileVoMap" type="neatlogic.framework.file.dto.FileVo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="size" property="size"/>
+        <result column="uploadTime" property="uploadTime"/>
+        <result column="contentType" property="contentType"/>
+        <result column="path" property="path"/>
+        <association property="fcuVo" javaType="neatlogic.framework.dto.UserVo">
+            <result property="uuid" column="userUuid"/>
+            <result property="userName" column="userName"/>
+        </association>
+    </resultMap>
+
+    <select id="getFileDetailListByIdList" parameterType="java.util.List" resultMap="fileVoMap">
+        SELECT
+        a.`id`,
+        a.`name`,
+        a.`size`,
+        a.`user_uuid` AS userUuid,
+        a.`upload_time` AS uploadTime,
+        a.`type`,
+        a.`content_type` AS contentType,
+        a.`path`,
+        b.`user_name` AS userName
+        FROM `file` a
+        LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
+        WHERE a.`id` IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="updateFile" parameterType="neatlogic.framework.file.dto.FileVo">
+        UPDATE `file`
+        SET `name`         = #{name},
+            `size`         = #{size},
+            `user_uuid`    = #{userUuid},
+            `upload_time`  = NOW(3),
+            `type`         = #{type},
+            `content_type` = #{contentType},
+            `path`= #{path}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertFile" parameterType="neatlogic.framework.file.dto.FileVo">
+        INSERT INTO `file` (`id`,
+                            `name`,
+                            `size`,
+                            `user_uuid`,
+                            `upload_time`,
+                            `type`,
+                            `content_type`,
+                            `path`,
+                            `unique_key`)
+        VALUES (#{id},
+                #{name},
+                #{size},
+                #{userUuid},
+                NOW(3),
+                #{type},
+                #{contentType},
+                #{path},
+                #{uniqueKey})
+    </insert>
+
+    <delete id="deleteFile" parameterType="java.lang.Long">
+        DELETE
+        FROM `file`
+        WHERE `id` = #{fileId}
+    </delete>
+</mapper>
+

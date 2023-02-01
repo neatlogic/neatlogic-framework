@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexMapper">
+
+    <select id="getFullTextIndexCountByType"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo" resultType="int">
+        select count(1)
+        from fulltextindex_target_${moduleId}
+        where target_type = #{type}
+    </select>
+
+    <resultMap id="fullTextIndexMap" type="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexVo">
+        <id column="target_id" property="targetId"/>
+        <id column="target_field" property="targetField"/>
+        <collection property="wordOffsetVoList"
+                    ofType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordOffsetVo">
+            <result column="word" property="word"/>
+            <result column="start" property="start"/>
+            <result column="end" property="end"/>
+        </collection>
+    </resultMap>
+
+    <select id="getFullTextIndexListByKeywordListAndTargetList" resultMap="fullTextIndexMap">
+        SELECT `target_id`,`target_field`,`word`,`start`,`end` FROM `fulltextindex_field_${moduleId}` ftf
+        LEFT JOIN `fulltextindex_offset_${moduleId}` fto ON ftf.id = fto.`field_id`
+        LEFT JOIN `fulltextindex_word` ftw ON ftw.`id` = ftf.`word_id`
+        WHERE
+        target_id IN
+        <foreach collection="targetIdList" item="targetId" open="("
+                 separator="," close=")">#{targetId}
+        </foreach>
+        AND
+        word IN
+        <foreach collection="keywordList" item="k" open="("
+                 separator="," close=")">#{k}
+        </foreach>
+        ORDER BY ftf.`counter` DESC
+    </select>
+
+    <select id="getContentByTargetId"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexContentVo">
+        SELECT target_id AS targetId, target_field AS targetField, content
+        FROM `fulltextindex_content_${moduleId}`
+        WHERE target_id = #{targetId}
+    </select>
+
+    <select id="getContentByTargetIdList"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexContentVo">
+        SELECT target_id AS targetId, target_field AS targetField, content
+        FROM `fulltextindex_content_${moduleId}`
+        WHERE target_id in
+        <foreach collection="targetIdList" item="k" open="("
+                 separator="," close=")">#{k}
+        </foreach>
+    </select>
+
+    <update id="updateTargetError"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTargetVo">
+        UPDATE `fulltextindex_target_${moduleId}`
+        set error = #{error,typeHandler=CompressHandler}
+        where target_id = #{targetId}
+    </update>
+
+    <insert id="replaceIntoField">
+        REPLACE INTO `fulltextindex_field_${moduleId}` (`id`,
+                                                       `word_id`,
+                                                       `target_field`,
+                                                       `target_id`,
+                                                       `counter`)
+        VALUES (#{fieldVo.id},
+                #{fieldVo.wordId},
+                #{fieldVo.targetField},
+                #{fieldVo.targetId},
+                #{fieldVo.counter})
+    </insert>
+
+    <insert id="insertFieldOffset">
+        INSERT IGNORE INTO `fulltextindex_offset_${moduleId}` (`field_id`, `start`, `end`)
+        VALUES (#{offsetVo.fieldId}, #{offsetVo.start}, #{offsetVo.end})
+    </insert>
+
+    <insert id="insertTarget"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTargetVo">
+        INSERT IGNORE INTO `fulltextindex_target_${moduleId}` (`target_id`, `target_type`, `hit_count`, `click_count`, `error`)
+        values (#{targetId}, #{targetType}, #{hitCount}, #{clickCount}, #{error,typeHandler=CompressHandler})
+    </insert>
+
+    <insert id="insertContent">
+        INSERT INTO `fulltextindex_content_${moduleId}` (`target_id`,
+                                                         `target_field`,
+                                                         `content`)
+        VALUES (#{contentVo.targetId},
+                #{contentVo.targetField},
+                #{contentVo.content,typeHandler=CompressHandler})
+        ON DUPLICATE KEY UPDATE `content` = #{contentVo.content,typeHandler=CompressHandler}
+    </insert>
+
+    <delete id="deleteFullTextIndexByType"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
+        DELETE a,b,c,d
+        FROM fulltextindex_target_${moduleId} a
+                 LEFT JOIN fulltextindex_field_${moduleId} b ON a.target_id = b.target_id
+                 LEFT JOIN fulltextindex_offset_${moduleId} c ON b.`id` = c.field_id
+                 LEFT JOIN fulltextindex_content_${moduleId} d ON a.target_id = d.target_id
+        WHERE a.`target_type` = #{type}
+    </delete>
+
+    <delete id="deleteFullTextIndexByTargetIdAndType">
+        DELETE a,b,c,d
+        FROM fulltextindex_target_${moduleId} a
+                 LEFT JOIN fulltextindex_field_${moduleId} b ON a.target_id = b.target_id
+                 LEFT JOIN fulltextindex_offset_${moduleId} c ON b.`id` = c.field_id
+                 LEFT JOIN fulltextindex_content_${moduleId} d ON a.target_id = d.target_id
+        WHERE a.`target_id` = #{fullTextIndexVo.targetId}
+          and a.`target_type` = #{fullTextIndexVo.targetType}
+    </delete>
+
+</mapper>
+

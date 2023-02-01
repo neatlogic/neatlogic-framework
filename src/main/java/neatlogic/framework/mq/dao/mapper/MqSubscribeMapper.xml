@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright(c) 2021 TechSure Co., Ltd. All Rights Reserved.
+  ~ 本内容仅限于深圳市赞悦科技有限公司内部传阅，禁止外泄以及用于其他的商业项目。
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.mq.dao.mapper.MqSubscribeMapper">
+
+    <select id="checkSubscribeNameIsExists" parameterType="neatlogic.framework.mq.dto.SubscribeVo" resultType="int">
+        SELECT count(1)
+        FROM mq_subscribe
+        WHERE name = #{name}
+          AND id != #{id}
+    </select>
+
+    <sql id="searchSubscribeCondition">
+        <where>
+            <if test="className != null and className != ''">
+                AND class_name = #{className}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchSubscribeCount" parameterType="neatlogic.framework.mq.dto.SubscribeVo" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM mq_subscribe
+        <include refid="searchSubscribeCondition"></include>
+    </select>
+
+    <select id="searchSubscribe" parameterType="neatlogic.framework.mq.dto.SubscribeVo"
+            resultType="neatlogic.framework.mq.dto.SubscribeVo">
+        SELECT
+        id,
+        name,
+        class_name AS className,
+        topic_name AS topicName,
+        is_durable AS isDurable,
+        description,
+        is_active AS isActive,
+        error,
+        config AS configStr,
+        server_id AS serverId
+        FROM mq_subscribe
+        <include refid="searchSubscribeCondition"></include>
+    </select>
+
+    <select id="getSubscribeByName" parameterType="java.lang.String"
+            resultType="neatlogic.framework.mq.dto.SubscribeVo">
+        SELECT id,
+               name,
+               class_name AS className,
+               topic_name AS topicName,
+               is_durable AS isDurable,
+               description,
+               is_active  AS isActive,
+               error,
+               config     AS configStr,
+               server_id  AS serverId
+        FROM mq_subscribe
+        WHERE name = #{value}
+    </select>
+
+    <select id="getSubscribeById" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.mq.dto.SubscribeVo">
+        SELECT id,
+               name,
+               class_name AS className,
+               topic_name AS topicName,
+               is_durable AS isDurable,
+               description,
+               is_active  AS isActive,
+               error,
+               config     AS configStr,
+               server_id  AS serverId
+        FROM mq_subscribe
+        WHERE id = #{value}
+    </select>
+
+    <insert id="insertSubscribe" parameterType="neatlogic.framework.mq.dto.SubscribeVo">
+        INSERT INTO mq_subscribe
+        (id,
+         name,
+         class_name,
+         topic_name,
+         is_durable,
+         description,
+         is_active,
+         error,
+         config,
+         server_id)
+        VALUES (#{id},
+                #{name},
+                #{className},
+                #{topicName},
+                #{isDurable},
+                #{description},
+                #{isActive},
+                #{error},
+                #{configStr},
+                #{serverId})
+    </insert>
+
+    <update id="updateSubscribe" parameterType="neatlogic.framework.mq.dto.SubscribeVo">
+        UPDATE mq_subscribe
+        SET class_name  = #{className},
+            is_durable  = #{isDurable},
+            description = #{description},
+            is_active   = #{isActive},
+            error       = #{error},
+            config      = #{configStr},
+            server_id   = #{serverId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateSubscribeServerId" parameterType="neatlogic.framework.mq.dto.SubscribeVo">
+        UPDATE mq_subscribe
+        SET server_id = #{serverId}
+        WHERE name = #{name}
+    </update>
+
+    <update id="updateSubscribeError" parameterType="neatlogic.framework.mq.dto.SubscribeVo">
+        UPDATE mq_subscribe
+        SET error = #{error}
+        WHERE name = #{name}
+    </update>
+
+    <delete id="deleteSubscribeById" parameterType="java.lang.Long">
+        DELETE
+        FROM mq_subscribe
+        WHERE id = #{value}
+    </delete>
+</mapper>
+

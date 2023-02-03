@@ -50,7 +50,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 " / /|  //  __// /_/ // /_ / /___/ /_/ // /_/ // // /__    ___/ /_ / /_/ / \n" +
                 "/_/ |_/ \\___/ \\__,_/ \\__//_____/\\____/ \\__, //_/ \\___/   /____/(_)\\____/  \n" +
                 "                                      /____/                             \n" +
-                "===============================================================================================");
+                "===========================================================================");
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
             for (Resource resource : resources) {

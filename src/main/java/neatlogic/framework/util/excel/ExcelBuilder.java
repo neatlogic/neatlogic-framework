@@ -23,9 +23,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExcelBuilder {
     private final Class<? extends Workbook> workbookClass;
@@ -40,6 +38,8 @@ public class ExcelBuilder {
     private HSSFColor.HSSFColorPredefined borderColor;
     private Integer columnWidth;
     private final List<SheetBuilder> sheetBuilderList = new ArrayList<>();
+
+    private final Map<String, SheetBuilder> sheetBuilderMap = new HashMap<>();
     private final CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
     private String filePath;
@@ -73,15 +73,42 @@ public class ExcelBuilder {
         return sheetBuilderList;
     }
 
+    public SheetBuilder getSheetBuilderById(String sheetId) {
+        if (CollectionUtils.isNotEmpty(sheetBuilderList)) {
+            Optional<SheetBuilder> op = sheetBuilderList.stream().filter(d -> d.getId().equals(sheetId)).findFirst();
+            if (op.isPresent()) {
+                return op.get();
+            }
+        }
+        return null;
+    }
 
-    public SheetBuilder addSheet(String sheetName) {
-        SheetBuilder sheetBuilder = new SheetBuilder(sheetName);
+    public SheetBuilder getSheetBuilderByName(String sheetName) {
+        if (CollectionUtils.isNotEmpty(sheetBuilderList)) {
+            Optional<SheetBuilder> op = sheetBuilderList.stream().filter(d -> d.getId().equals(sheetName)).findFirst();
+            if (op.isPresent()) {
+                return op.get();
+            }
+        }
+        return null;
+    }
+
+
+    public SheetBuilder addSheet(String sheetId, String sheetName) {
+        SheetBuilder sheetBuilder = new SheetBuilder(sheetId, sheetName);
         sheetBuilder.withCellStyle(cellStyle);
         sheetBuilderList.add(sheetBuilder);
         return sheetBuilder;
     }
 
     public SheetBuilder addSheet(SheetBuilder sheetBuilder) {
+        sheetBuilderList.add(sheetBuilder);
+        return sheetBuilder;
+    }
+
+    public SheetBuilder addSheet(String sheetName) {
+        SheetBuilder sheetBuilder = new SheetBuilder(sheetName, sheetName);
+        sheetBuilder.withCellStyle(cellStyle);
         sheetBuilderList.add(sheetBuilder);
         return sheetBuilder;
     }

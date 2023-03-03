@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<beans default-lazy-init="false" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:nacos="http://nacos.io/schema/nacos"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://nacos.io/schema/nacos
+		http://nacos.io/schema/nacos.xsd
+        http://www.springframework.org/schema/data/mongo
+        https://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+    <!-- <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" /> <property name="ignoreResourceNotFound" value="true" /> <property name="locations"> <list> <value>classpath:config.properties</value> </list> </property> </bean> -->
+    <!-- <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"> <property name="location"> <value>classpath:config.properties</value> </property> </bean> -->
+    <!-- 本地配置加载器,nacos不可用时加载配置数据 -->
+    <bean class="neatlogic.framework.common.config.LocalConfig"></bean>
+    <nacos:annotation-driven></nacos:annotation-driven>
+    <!--指定nacos配置地址 -->
+    <nacos:global-properties server-addr="${nacos.home}" namespace="${nacos.namespace}"/>
+    <!--指定dataId,group-id, 不自动刷新 -->
+    <nacos:property-source data-id="config" group-id="neatlogic.framework" auto-refreshed="false"/>
+
+    <bean id="dataSourceMaster" class="neatlogic.framework.store.mysql.NeatLogicBasicDataSource">
+        <property name="driverClassName">
+            <value>${db.driverClassName}</value>
+        </property>
+        <property name="jdbcUrl" value="${db.url}"/>
+        <property name="username">
+            <value>${db.username}</value>
+        </property>
+        <property name="password">
+            <value>${db.password}</value>
+        </property>
+    </bean>
+
+    <!-- 配置需要在rootComponent前加载 -->
+    <context:component-scan base-package="neatlogic" use-default-filters="false">
+        <context:include-filter type="annotation" expression="neatlogic.framework.common.RootConfiguration"/>
+    </context:component-scan>
+
+    <context:component-scan base-package="neatlogic" use-default-filters="false">
+        <context:include-filter type="annotation" expression="neatlogic.framework.common.RootComponent"/>
+    </context:component-scan>
+
+    <bean id="dataSource" class="neatlogic.framework.store.mysql.NeatLogicRoutingDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="master" value-ref="dataSourceMaster"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="dataSourceMaster"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>classpath:i18n/messages</value>
+                <value>classpath:i18n/ValidationMessages</value>
+            </list>
+        </property>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="cacheSeconds" value="60"/>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="-1"></property>
+        <property name="maxInMemorySize" value="40960"></property>
+    </bean>
+
+
+    <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
+
+    <!-- scan for mappers and let them be autowired -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="neatlogic.framework.**.mapper"/>
+    </bean>
+    <!-- 创建SqlSessionFactory，同时指定数据源 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:neatlogic/framework/dao/config/mybatis-config.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:neatlogic/framework/**/mapper/*.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
+
+    <context:component-scan base-package="neatlogic.framework"/>
+
+    <bean id="JsonWebTokenValidFilter" class="neatlogic.framework.filter.JsonWebTokenValidFilter"></bean>
+
+    <!--mongoDb-->
+    <bean id="mongoDbFactory" class="neatlogic.framework.store.mongodb.NeatLogicMongoDbFactory">
+        <constructor-arg name="connectionString" value="${mongo.url}"/>
+    </bean>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+
+    <!--ActiveMQ Artemis-->
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
+        <property name="brokerURL">
+            <value>${jms.url}</value>
+        </property>
+    </bean>
+
+    <bean id="myCachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+        <property name="sessionCacheSize" value="5"/>
+        <property name="reconnectOnException" value="true"/>
+    </bean>
+
+    <bean id="topicSendJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="myCachedConnectionFactory"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="deliveryPersistent" value="true"/>
+        <!-- 发送模式 DeliveryMode.NON_PERSISTENT=1:非持久 ; DeliveryMode.PERSISTENT=2:持久 -->
+        <property name="deliveryMode" value="2"/>
+        <property name="explicitQosEnabled" value="true"/>
+        <!--过期时间1天 -->
+        <property name="timeToLive" value="86400000"/>
+    </bean>
+
+
+    <!-- <hdp:configuration id="hadoopConfiguration">
+        fs.defaultFS=${hadoop.url}
+    </hdp:configuration>
+    <hdp:file-system id="fileSystem" configuration-ref="hadoopConfiguration" user="root"></hdp:file-system> -->
+</beans>

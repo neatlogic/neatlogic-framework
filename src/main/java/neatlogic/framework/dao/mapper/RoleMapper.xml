@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.RoleMapper">
+    <cache-ref namespace="neatlogic.framework.dao.mapper.UserMapper"/>
+    <select id="getRoleUuidListByAuth" resultType="java.lang.String" useCache="true">
+        SELECT
+        `role_uuid`
+        FROM
+        `role_authority`
+        WHERE auth IN
+        <foreach collection="authList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="checkRoleIsExists" parameterType="java.lang.String" resultType="int" useCache="false">
+        SELECT COUNT(`uuid`)
+        FROM `role`
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <resultMap id="roleMap" type="neatlogic.framework.dto.RoleVo">
+        <id column="uuid" property="uuid"/>
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <select id="searchRole" parameterType="neatlogic.framework.dto.RoleVo" resultMap="roleMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`description`
+        FROM `role` a
+        LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
+       <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
+            </if>
+            <if test="authGroup != null and authGroup != ''">
+                AND c.`auth_group` = #{authGroup}
+            </if>
+            <if test="auth != null and auth != ''">
+                AND c.`auth` = #{auth}
+            </if>
+           <if test="roleUuidList != null and roleUuidList.size()>0">
+               and uuid in
+               <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                   #{roleUuid}
+               </foreach>
+           </if>
+       </where>
+        GROUP BY a.`uuid`
+        ORDER BY a.`id` DESC
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="searchRoleForSelect" parameterType="neatlogic.framework.dto.RoleVo"
+            resultType="neatlogic.framework.common.dto.ValueTextVo" useCache="false">
+        SELECT
+        CONCAT("role#",a.`uuid`) AS `value`,
+        a.`name` as `text`
+        FROM `role` a
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            AND (a.`name` LIKE CONCAT('%',#{keyword}, '%') OR a.`description` LIKE CONCAT('%',#{keyword}, '%'))
+        </if>
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="searchRoleAuthByRoleUuid" parameterType="String" resultType="neatlogic.framework.dto.RoleAuthVo"
+            useCache="false">
+        SELECT `role_uuid`  as `roleUuid`,
+               `auth_group` as `authGroup`,
+               `auth`
+        FROM `role_authority`
+        WHERE `role_uuid` = #{roleUuid}
+    </select>
+
+    <select id="searchRoleCount" parameterType="neatlogic.framework.dto.RoleVo" resultType="int" useCache="false">
+        SELECT
+        COUNT(DISTINCT (a.`uuid`))
+        FROM `role` a
+        LEFT JOIN `role_authority` b ON a.`uuid` = b.`role_uuid`
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="authGroup != null and authGroup != ''">
+            AND b.`auth_group` = #{authGroup}
+        </if>
+        <if test="auth != null and auth != ''">
+            AND b.`auth` = #{auth}
+        </if>
+    </select>
+
+    <select id="searchRoleUserCountByRoleUuid" parameterType="java.lang.String" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `user_role`
+        WHERE `role_uuid` = #{value}
+    </select>
+
+    <select id="getRoleByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="true">
+        SELECT `id`,
+               `uuid`,
+               `name`,
+               `description`
+        FROM `role`
+        WHERE `uuid` = #{value}
+    </select>
+
+    <select id="getRoleSimpleInfoByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="true">
+        SELECT `id`,
+               `uuid`,
+               `name`
+        FROM `role`
+        WHERE `uuid` = #{value}
+    </select>
+
+    <select id="getRoleByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `description`
+        FROM `role`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getRoleCountByAuth" resultType="neatlogic.framework.dto.AuthVo" useCache="false">
+        SELECT `auth`                        as `name`,
+               COUNT(DISTINCT (`role_uuid`)) as `roleCount`
+        FROM `role_authority`
+        GROUP BY `auth`, `auth_group`
+    </select>
+
+    <select id="getRoleUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
+        select `uuid`
+        from `role`
+        where `name` = #{value}
+    </select>
+
+    <select id="getRoleUuidAndNameMapList" resultType="neatlogic.framework.common.dto.ValueTextVo">
+        SELECT
+        CONCAT('role#', `uuid`) as `value`,
+        `name` as `text`
+        FROM `role`
+        WHERE `name` in
+        <foreach collection="list" item="text" separator="," open="(" close=")">
+            #{text}
+        </foreach>
+    </select>
+
+    <select id="getRoleListByAuthName" parameterType="java.lang.String" resultMap="roleMap" useCache="false">
+        select a.`uuid`,
+               a.`name`,
+               a.`description`
+        from `role` a
+                 join `role_authority` b
+                      on a.`uuid` = b.`role_uuid`
+        where b.`auth` = #{value}
+        ORDER BY b.`id`
+    </select>
+
+    <select id="getRoleUuidListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String">
+        select
+        distinct `role_uuid`
+        from
+        `user_role`
+        where `user_uuid` in
+        <foreach collection="list" item="userUuid" separator="," open="(" close=")">
+            #{userUuid}
+        </foreach>
+    </select>
+
+    <select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
+        select `role_uuid`
+        from `user_role`
+        where `user_uuid` = #{value}
+    </select>
+
+    <select id="getRoleTeamListByRoleUuid" resultType="neatlogic.framework.dto.RoleTeamVo">
+        SELECT
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
+        FROM `team_role`
+        WHERE `role_uuid` = #{value}
+    </select>
+
+    <select id="getRoleTeamListByRoleUuidAndTeamUuidList" resultType="neatlogic.framework.dto.RoleTeamVo">
+        SELECT
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
+        FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+        AND `team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+    </select>
+
+    <select id="getRoleTeamListByRoleUuidList" resultType="neatlogic.framework.dto.RoleTeamVo" useCache="false">
+        SELECT
+        `team_uuid` AS teamUuid,
+        `checked_children` AS checkedChildren
+        FROM `team_role`
+        WHERE `role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
+    </select>
+
+    <select id="getRoleUserListByRoleUuidList" resultType="neatlogic.framework.dto.RoleUserVo" useCache="false">
+        SELECT
+        `user_uuid` AS userUuid
+        FROM `user_role`
+        WHERE `role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
+    </select>
+
+    <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
+        SELECT `role_uuid` FROM `team_role` WHERE `team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+        <if test="checkedChildren != null">
+            AND `checked_children` = #{checkedChildren}
+        </if>
+    </select>
+
+    <resultMap id="roleTeamMap" type="neatlogic.framework.dto.RoleVo">
+        <id property="uuid" column="roleUuid"/>
+        <result property="name" column="roleName"/>
+        <collection property="teamList" ofType="neatlogic.framework.dto.TeamVo">
+            <id property="uuid" column="parentTeamUuid"/>
+            <result property="name" column="parentTeamName"/>
+            <result property="childrenTeamUuid" column="childrenTeamUuid"/>
+            <result property="childrenTeamName" column="childrenTeamName"/>
+        </collection>
+    </resultMap>
+
+    <select id="getRoleListByTeamUuidList" resultMap="roleTeamMap">
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
+               tr.role_uuid as roleUuid,
+               r.`name`     as roleName
+        FROM team t
+                 JOIN team_role tr ON tr.team_uuid = t.uuid
+                 LEFT JOIN role r ON r.uuid = tr.role_uuid
+        WHERE t.uuid IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </select>
+
+    <select id="getParentTeamRoleListWithCheckedChildrenByTeam" resultMap="roleTeamMap"
+            parameterType="neatlogic.framework.dto.TeamVo">
+        SELECT t.uuid       as parentTeamUuid,
+               t.`name`     as parentTeamName,
+               tr.role_uuid as roleUuid,
+               r.`name`     as roleName,
+               #{uuid}      as childrenTeamUuid,
+               #{name}      as childrenTeamName
+        FROM team t
+                 JOIN team_role tr ON tr.team_uuid = t.uuid and tr.checked_children = 1
+                 LEFT JOIN role r ON r.uuid = tr.role_uuid
+        WHERE t.`lft` &lt; #{lft}
+          and t.`rht` > #{rht}
+    </select>
+
+    <select id="getTeamCountListByRoleUuidList" resultType="neatlogic.framework.dto.RoleVo">
+        select a.role_uuid as uuid,
+        count(DISTINCT (a.`team_uuid`)) as `teamCount`
+        from team_role a
+        where a.role_uuid in
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+             #{roleUuid}
+        </foreach>
+        GROUP BY a.role_uuid
+    </select>
+
+    <select id="getUserCountListByRoleUuidList" resultType="neatlogic.framework.dto.RoleVo">
+        select a.role_uuid as uuid,
+        count(DISTINCT (a.`user_uuid`)) as `userCount`
+        from user_role a
+        where a.role_uuid in
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
+        GROUP BY a.role_uuid
+    </select>
+
+    <select id="getRoleUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String">
+        SELECT
+        DISTINCT
+        `uuid`
+        FROM `role`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">
+        INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
+        VALUES (#{id}, #{uuid}, #{name}, #{description})
+    </insert>
+
+    <insert id="replaceRoleUser" parameterType="neatlogic.framework.dto.RoleUserVo">
+        REPLACE INTO `user_role` (`user_uuid`, `role_uuid`)
+        VALUES (#{userUuid}, #{roleUuid})
+    </insert>
+
+    <insert id="insertRoleTeam" parameterType="neatlogic.framework.dto.RoleTeamVo">
+        INSERT IGNORE INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`)
+        VALUES (#{teamUuid}, #{roleUuid}, #{checkedChildren})
+    </insert>
+
+    <insert id="insertRoleTeamList" parameterType="java.util.List">
+        INSERT INTO `team_role` (`team_uuid`, `role_uuid`, `checked_children`) VALUES
+        <foreach collection="list" item="roleTeam" separator=",">
+            (#{roleTeam.teamUuid}, #{roleTeam.roleUuid}, #{roleTeam.checkedChildren})
+        </foreach>
+    </insert>
+
+    <insert id="insertRoleAuth" parameterType="neatlogic.framework.dto.RoleAuthVo">
+        INSERT INTO `role_authority` (`role_uuid`,
+                                      `auth_group`,
+                                      `auth`)
+        VALUES (#{roleUuid},
+                #{authGroup},
+                #{auth})
+    </insert>
+
+    <update id="updateRole" parameterType="neatlogic.framework.dto.RoleVo">
+        UPDATE `role`
+        SET `name`        = #{name},
+            `description` = #{description}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateTeamRole" parameterType="neatlogic.framework.dto.RoleTeamVo">
+        UPDATE `team_role`
+        set `checked_children` = #{checkedChildren}
+        WHERE `role_uuid` = #{roleUuid}
+          AND `team_uuid` = #{teamUuid}
+    </update>
+
+    <delete id="deleteRoleByUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `role`
+        WHERE `uuid` = #{value}
+    </delete>
+
+    <delete id="deleteRoleAuthByRoleUuid" parameterType="string">
+        DELETE
+        FROM `role_authority`
+        WHERE `role_uuid` = #{roleUuid}
+    </delete>
+
+    <delete id="deleteRoleAuth" parameterType="neatlogic.framework.dto.RoleAuthVo">
+        DELETE
+        FROM `role_authority`
+        <where>
+            <if test="roleUuid != null and roleUuid != ''">
+                AND `role_uuid` = #{roleUuid}
+            </if>
+            <if test="auth != null and auth != ''">
+                AND `auth` = #{auth}
+            </if>
+        </where>
+
+    </delete>
+
+    <delete id="deleteMenuRoleByRoleUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `menu_role`
+        WHERE `role_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteTeamRoleByRoleUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `team_role`
+        WHERE `role_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteRoleAuthByAuth" parameterType="string">
+        DELETE
+        FROM `role_authority`
+        WHERE `auth` = #{auth}
+    </delete>
+
+    <delete id="deleteRoleUser" parameterType="neatlogic.framework.dto.RoleUserVo">
+        DELETE FROM `user_role`
+        WHERE `role_uuid` = #{roleUuid}
+        <if test="userUuid != null and userUuid != ''">
+            AND `user_uuid` = #{userUuid}
+        </if>
+    </delete>
+
+    <delete id="deleteTeamRoleByRoleUuidAndTeamUuidList">
+        DELETE FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+        AND `team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTeamRole" parameterType="neatlogic.framework.dto.RoleTeamVo">
+        DELETE
+        FROM `team_role`
+        WHERE `role_uuid` = #{roleUuid}
+          AND `team_uuid` = #{teamUuid}
+    </delete>
+</mapper>

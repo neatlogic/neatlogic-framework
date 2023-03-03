@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.SchemaMapper">
+    <select id="testCiViewSql" parameterType="java.lang.String" resultType="java.util.Map">
+        ${value}
+    </select>
+
+    <!--<select id="checkTableHasData" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1)
+        FROM ${value}
+        LIMIT 1
+    </select>-->
+
+    <!--<select id="checkTableIsExists" resultType="int">
+        select count(1)
+        from information_schema.tables a
+        where a.TABLE_SCHEMA = #{schemaName}
+          and a.TABLE_NAME = #{tableName}
+    </select>-->
+
+    <select id="checkSchemaIsExists" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(1)
+        FROM information_schema.`SCHEMATA`
+        WHERE schema_name = #{value}
+    </select>
+
+    <select id="checkTableOrViewIsExists" resultType="java.lang.String">
+        SELECT `table_type` FROM `information_schema`.`tables`
+        WHERE `table_schema` = #{tableSchema}
+          AND `table_name` = #{tableName}
+    </select>
+
+    <select id="getTableOrViewAllColumnNameList" resultType="java.lang.String">
+        SELECT `column_name` FROM `information_schema`.`COLUMNS`
+        WHERE `table_schema` = #{tableSchema}
+          AND `table_name` = #{tableName}
+    </select>
+
+    <!--<insert id="insertAttrToCiTable">
+        ALTER TABLE ${tableName}
+            ADD COLUMN `${attrVo.id}`      TEXT     NULL COMMENT '${attrVo.label}',
+            ADD COLUMN `${attrVo.id}_hash` CHAR(32) NULL COMMENT '${attrVo.label}值散列码',
+            ADD KEY `index_${attrVo.id}_hash` (`${attrVo.id}_hash`);
+    </insert>-->
+
+    <!--<insert id="insertCiTable">
+        CREATE TABLE IF NOT EXISTS ${tableName}
+        (
+            `cientity_id` bigint(20) NOT NULL COMMENT '配置项id',
+            PRIMARY KEY (`cientity_id`)
+            ) ENGINE = INNODB
+            DEFAULT CHARSET = utf8mb4
+    </insert>-->
+
+    <insert id="insertView" parameterType="java.lang.String">
+        ${value}
+    </insert>
+
+
+    <!--<delete id="deleteAttrFromCiTable">
+        ALTER TABLE ${tableName}
+            DROP
+                COLUMN `${attrVo.id}_hash`,
+            DROP
+                COLUMN `${attrVo.id}`
+    </delete>-->
+
+    <delete id="deleteTable" parameterType="java.lang.String">
+        DROP TABLE IF EXISTS ${value}
+    </delete>
+
+    <delete id="deleteView" parameterType="java.lang.String">
+        DROP VIEW IF EXISTS ${value}
+    </delete>
+
+
+</mapper>

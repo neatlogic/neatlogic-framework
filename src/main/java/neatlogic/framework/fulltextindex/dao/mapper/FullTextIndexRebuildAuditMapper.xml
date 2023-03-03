@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper">
+    <select id="searchFullTextIndexRebuildAudit"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
+        select type, status, start_time as startTime, end_time as endTime, editor, server_id as serverId
+        from fulltextindex_rebuild_audit
+        <where>
+            <if test="typeList != null and typeList.size() > 0">
+                and type in
+                <foreach collection="typeList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="resetFullTextIndexRebuildAuditStatus">
+        update fulltextindex_rebuild_audit
+        set status = 'done'
+        where status = 'doing'
+    </update>
+
+    <update id="updateFullTextIndexRebuildAuditStatus"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
+        update fulltextindex_rebuild_audit
+        set status = #{status},
+        error = #{error,typeHandler=CompressHandler}
+        <if test="status == 'done'">
+            ,end_time = now(3)
+        </if>
+        where type = #{type}
+    </update>
+
+    <insert id="insertFullTextIndexRebuildAudit"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
+        insert into fulltextindex_rebuild_audit (type, status, start_time, editor, server_id)
+        values (#{type}, #{status}, now(3), #{editor}, #{serverId})
+        ON DUPLICATE KEY UPDATE `start_time` = now(3),
+                                `status`     = #{status},
+                                `end_time`   = null,
+                                `server_id`  = #{serverId},
+                                `editor`     = #{editor},
+                                `error`      = null
+    </insert>
+</mapper>
+

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="neatlogic.framework.lrcode.dao.mapper.TreeMapper">
+
+    <select id="checkLeftRightCodeIsWrong" resultType="java.lang.Object">
+        SELECT a.`${idKey}`
+        FROM `${tableName}` a
+        WHERE a.`lft` IS NULL
+           OR a.`rht` IS NULL
+           OR a.`lft` &lt; 2
+           OR a.`rht` &lt; 3
+           OR (a.`rht` - a.`lft` - 1) !=
+              (SELECT COUNT(1) * 2 FROM `${tableName}` b WHERE b.`lft` &gt; a.`lft` AND b.`rht` &lt; a.`rht`)
+        LIMIT 1
+    </select>
+
+    <!--    <select id="checkLeftRightCodeIsNull" resultType="java.lang.Object">-->
+    <!--        SELECT `${idKey}` FROM `${tableName}`-->
+    <!--        WHERE (`lft` IS NULL OR `rht` IS NULL)-->
+    <!--        <if test="idValue != null">-->
+    <!--            AND `${idKey}` != #{idValue}-->
+    <!--        </if>-->
+    <!--        limit 1-->
+    <!--    </select>-->
+    <!--    <select id="checkLftLt2OrRhtLt3IsExists" resultType="java.lang.Object">-->
+    <!--        SELECT `${idKey}` FROM `${tableName}`  WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1-->
+    <!--    </select>-->
+    <!--    <select id="checkChildLftLeParentLftOrChildRhtGeParentRhtIsExists" resultType="java.lang.Object">-->
+    <!--        SELECT parent.`${idKey}` FROM `${tableName}` parent-->
+    <!--        JOIN `${tableName}` child ON child.`${parentIdKey}`=parent.`${idKey}` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`)-->
+    <!--        limit 1-->
+    <!--    </select>-->
+    <!--    <select id="checkLeafNodeLeftRightCodeAreNotContinuous" resultType="java.lang.Object">-->
+    <!--        SELECT parent.`${idKey}` FROM `${tableName}` parent-->
+    <!--        LEFT JOIN `${tableName}` child ON child.`${parentIdKey}` = parent.`${idKey}`-->
+    <!--        WHERE child.`${idKey}` IS NULL-->
+    <!--        AND parent.`rht` - parent.`lft` != 1-->
+    <!--        limit 1-->
+    <!--    </select>-->
+
+    <select id="getTreeNodeListByParentId" resultType="neatlogic.framework.lrcode.dto.TreeNodeVo">
+        SELECT
+        a.`${idKey}` AS idValue,
+        a.`${parentIdKey}` AS parentIdValue,
+        a.`lft`,
+        a.`rht`,
+        (SELECT COUNT(1) FROM `${tableName}` b WHERE b.`${parentIdKey}` = a.`${idKey}`) AS childrenCount
+        FROM `${tableName}` a
+        WHERE
+        <choose>
+            <when test="parentIdValue == null">
+                a.`${parentIdKey}` = '0' OR a.`${parentIdKey}` is null
+            </when>
+            <otherwise>a.`${parentIdKey}` = #{parentIdValue}</otherwise>
+        </choose>
+        ORDER BY a.`lft`
+    </select>
+
+    <update id="updateTreeNodeLeftRightCodeById">
+        UPDATE `${tableName}`
+        SET `lft` = #{lft},
+            `rht` = #{rht}
+        WHERE `${idKey}` = #{idValue}
+    </update>
+
+    <select id="getTreeNodeById" resultType="neatlogic.framework.lrcode.dto.TreeNodeVo">
+        SELECT `${idKey}`       AS idValue,
+               `${parentIdKey}` AS parentIdValue,
+               `lft`,
+               `rht`
+        FROM `${tableName}`
+        where `${idKey}` = #{idValue}
+    </select>
+
+    <select id="getRootRht" parameterType="java.lang.String" resultType="int">
+        select IFNULL(MAX(`rht`), 1) + 1
+        from `${tableName}`
+    </select>
+
+    <update id="batchUpdateTreeNodeLeftCode">
+        UPDATE `${tableName}`
+        set `lft` = `lft` + #{step}
+        WHERE `lft` &gt;= #{minCode}
+    </update>
+
+    <update id="batchUpdateTreeNodeRightCode">
+        UPDATE `${tableName}`
+        set `rht` = `rht` + #{step}
+        WHERE `rht` &gt;= #{minCode}
+    </update>
+
+    <update id="batchUpdateTreeNodeLeftRightCodeByLeftRightCode">
+        UPDATE `${tableName}`
+        SET `lft` = `lft` + #{step},
+            `rht` = `rht` + #{step}
+        WHERE `lft` &gt;= #{lft}
+          AND `rht` &lt;= #{rht}
+    </update>
+
+    <select id="checkTreeNodeIsExistsByLeftRightCode" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `${tableName}`
+        WHERE `${idKey}` = #{idValue}
+          AND `lft` &gt; #{lft}
+          AND `rht` &lt; #{rht}
+    </select>
+
+    <update id="updateTreeNodeParentIdById" parameterType="neatlogic.framework.lrcode.dto.TreeNodeVo">
+        UPDATE `${tableName}`
+        SET `${parentIdKey}` = #{parentIdValue}
+        WHERE `${idKey}` = #{idValue}
+    </update>
+
+    <update id="batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode">
+        UPDATE `${tableName}`
+        SET `lft` = NULL,
+            `rht` = NULL
+        WHERE `lft` &gt;= #{lft}
+          AND `rht` &lt;= #{rht}
+    </update>
+</mapper>

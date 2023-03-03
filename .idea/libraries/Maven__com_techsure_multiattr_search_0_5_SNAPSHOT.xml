@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.techsure:multiattr-search:0.5-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/techsure/multiattr-search/0.5-SNAPSHOT/multiattr-search-0.5-20201023.074319-13.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/techsure/multiattr-search/0.5-SNAPSHOT/multiattr-search-0.5-20201023.074319-13-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/techsure/multiattr-search/0.5-SNAPSHOT/multiattr-search-0.5-20201023.074319-13-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

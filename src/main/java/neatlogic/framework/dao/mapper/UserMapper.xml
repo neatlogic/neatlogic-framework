@@ -1,0 +1,1389 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.UserMapper">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="100"/>
+
+
+    <select id="getUserTokenByUserId" parameterType="java.lang.String" resultType="java.lang.String">
+        select token
+        from `user`
+        where user_id = #{value}
+    </select>
+
+
+    <select id="checkUserAuthorityIsExists" resultType="int" useCache="true">
+        SELECT COUNT(1) FROM (
+        SELECT
+        1
+        FROM
+        `user_authority`
+        WHERE user_uuid = #{userUuid} AND auth IN
+        <foreach collection="authList" item="item" open="(" separator="," close=")">#{item}</foreach>
+        LIMIT 1
+        ) auth
+    </select>
+
+    <select id="checkUserIsInTeam" resultType="int" useCache="false">
+        SELECT count(1)
+        FROM `user_team`
+        WHERE `user_uuid` = #{userUuid}
+          AND `team_uuid` = #{teamUuid}
+    </select>
+
+    <select id="checkUserIsExists" parameterType="java.lang.String" resultType="int" useCache="false">
+        SELECT COUNT(`uuid`)
+        FROM `user`
+        WHERE `uuid` = #{value}
+    </select>
+
+    <select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="true">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      as isActive,
+               a.`user_info`      as userInfo,
+               a.`vip_level`      as vipLevel,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserBaseInfoByUuidWithoutCache" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.UserVo" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   as userId,
+               a.`user_name` as userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` as isActive,
+               a.`user_info` as userInfo,
+               a.`vip_level` as vipLevel
+        FROM `user` a
+        WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserByUserId" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="true">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      as isActive,
+               a.`user_info`      as userInfo,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        WHERE a.`user_id` = #{value}
+    </select>
+
+    <resultMap id="userInfoMap" type="neatlogic.framework.dto.UserVo">
+        <id property="uuid" column="uuid"/>
+        <result property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="userName" column="userName"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="pinyin" column="pinyin"/>
+        <result property="isActive" column="isActive"/>
+        <result property="userInfo" column="userInfo"/>
+        <result property="vipLevel" column="vipLevel"/>
+        <result property="isSuperAdmin" column="isSuperAdmin"/>
+        <collection property="roleList" ofType="neatlogic.framework.dto.RoleVo">
+            <id property="uuid" column="roleUuid"/>
+            <result property="name" column="roleName"/>
+            <result property="description" column="description"/>
+        </collection>
+        <collection property="teamList" ofType="neatlogic.framework.dto.TeamVo">
+            <id property="uuid" column="teamUuid"/>
+            <result property="name" column="teamName"/>
+            <result property="upwardNamePath" column="upwardNamePath"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`          AS userId,
+               a.`user_name`        AS userName,
+               a.`email`,
+               a.`phone`,
+               e.`password`,
+               a.`pinyin`,
+               a.`is_active`        AS isActive,
+               a.`user_info`        AS userInfo,
+               a.`vip_level`        AS vipLevel,
+               b.`role_uuid`        AS roleUuid,
+               r.`name`             AS roleName,
+               r.`description`,
+               c.`team_uuid`        AS teamUuid,
+               d.`name`             AS teamName,
+               d.`upward_name_path` AS upwardNamePath,
+               a.`is_super_admin`   as isSuperAdmin
+        FROM `user` a
+                 LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+                 LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
+                 LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+                 LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
+                 LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
+        WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserByMail" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_name` AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` AS isActive,
+               a.`vip_level` AS vipLevel
+        FROM `user` a
+        WHERE a.`email` like CONCAT(#{value}, '%')
+          and a.`is_active` = 1
+    </select>
+
+    <select id="getUserSimpleInfoByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="true">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_info` AS userInfo,
+               a.`vip_level` AS vipLevel,
+               a.`user_name` AS userName
+        FROM `user` a
+        WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserVip" resultType="neatlogic.framework.dto.UserVo">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   AS userId,
+               a.`user_name` AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` AS isActive,
+               a.`user_info` AS userInfo,
+               a.`vip_level` AS vipLevel
+        FROM `user` a
+        WHERE a.`vip_level` != 0
+    </select>
+
+    <select id="searchUser" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+        SELECT
+        k.`id`,
+        k.`uuid`,
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        k.`user_info` as `userInfo`,
+        k.`vip_level` as `vipLevel`,
+        h.`role_uuid` as `roleUuid`,
+        r.`name` as `roleName`,
+        r.`description`,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
+        FROM (
+        SELECT
+        a.`uuid`
+        FROM
+        `user` a
+        <where>
+            <if test="keyword !=null and keyword != ''">
+                AND
+                (
+                a.user_id LIKE CONCAT(#{keyword}, '%')
+                OR a.user_name LIKE CONCAT(#{keyword}, '%')
+                OR a.email LIKE CONCAT(#{keyword}, '%')
+                )
+            </if>
+            <if test="vipLevel != null">
+                and a.`vip_level` = #{vipLevel}
+            </if>
+            <if test="isActive != null">
+                AND a.`is_active` = #{isActive}
+            </if>
+            <if test="isDelete != null">
+                AND a.`is_delete` = #{isDelete}
+            </if>
+            <if test="teamUuid != null and teamUuid != ''">
+                AND EXISTS (select 1 from `user_team` where `user_uuid` = a.`uuid` and `team_uuid` = #{teamUuid})
+            </if>
+            <if test="authGroup != null and authGroup != ''">
+                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth_group` = #{authGroup})
+            </if>
+            <if test="auth != null and auth != ''">
+                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth` = #{auth})
+                or
+                EXISTS (
+                select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` =
+                `user_role`.`role_uuid`
+                where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
+                )
+            </if>
+            <if test="roleUuid != null and roleUuid != ''">
+                AND EXISTS (select 1 from `user_role` where `user_uuid` = a.`uuid` and `role_uuid` = #{roleUuid})
+            </if>
+            <if test="rangeList != null and rangeList.size()>0">
+                and (
+                <if test="userUuidList != null and userUuidList.size()>0">
+                    a.uuid in
+                    <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                        #{userUuid}
+                    </foreach>
+                </if>
+                <if test="teamUuidList != null and teamUuidList.size()>0">
+                    <if test="userUuidList != null and userUuidList.size()>0">
+                        or
+                    </if>
+                    EXISTS (
+                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                    where `user_team`.`user_uuid` = a.`uuid`
+                    and `team`.`uuid` in
+                    <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                    )
+                </if>
+                <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
+                    <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
+                        or
+                    </if>
+                    EXISTS (
+                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                    where `user_team`.`user_uuid` = a.`uuid`
+                    and
+                    <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
+                        `team`.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                    </foreach>
+                    )
+                </if>
+                )
+            </if>
+        </where>
+        <if test="keyword !=null and keyword != ''">
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
+        </if>
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+        ) g
+        JOIN `user` k ON g.`uuid` = k.`uuid`
+        LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+        LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        ORDER BY
+        <if test="keyword !=null and keyword != ''">
+            length(k.`user_id`) asc, length(k.`user_name`) asc,
+        </if>
+        k.`id` DESC
+    </select>
+
+    <select id="searchUserForSelect" parameterType="neatlogic.framework.dto.UserVo"
+            resultType="neatlogic.framework.dto.UserVo" useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_id` AS userId,
+        `user_name` AS userName,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active` AS isActive,
+        `user_info` AS userInfo,
+        `vip_level` AS vipLevel
+        FROM `user`
+        where `is_active` = 1
+        <if test="keyword !=null and keyword != ''">
+            AND (`user_id` LIKE CONCAT(#{keyword}, '%')
+            OR `user_name` LIKE CONCAT(#{keyword}, '%'))
+            ORDER BY
+            (
+            CASE
+            WHEN `user_id` = #{keyword} OR `user_name` = #{keyword} THEN 1
+            WHEN `user_id` LIKE CONCAT(#{keyword},'%') OR `user_name` LIKE CONCAT(#{keyword},'%') THEN 2
+            ELSE 4
+            END
+            )
+        </if>
+        <if test="needPage">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="searchUserByAuth" resultType="neatlogic.framework.dto.UserVo" parameterType="string" useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   as `userId`,
+               a.`user_name` as `userName`,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active` as `isActive`,
+               a.`user_info` as `userInfo`,
+               a.`vip_level` as `vipLevel`
+        FROM `user` a
+                 LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`auth` = #{auth}
+        ORDER BY b.`id`
+    </select>
+
+    <select id="searchUserAuthByUserUuid" parameterType="String" resultType="neatlogic.framework.dto.UserAuthVo"
+            useCache="false">
+        SELECT `user_uuid`  as `userUid`,
+               `auth_group` as `authGroup`,
+               `auth`
+        FROM `user_authority`
+        WHERE `user_uuid` = #{userUuid}
+    </select>
+
+    <select id="searchUserAllAuthByUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo"
+            resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
+        SELECT
+        ra.`auth_group` AS authGroup,
+        ra.`auth`
+        FROM `user_role` ur
+        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
+        WHERE ur.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND ra.`auth` = #{auth}
+        </if>
+        UNION
+        SELECT
+        `auth_group` AS authGroup,
+        `auth`
+        FROM `user_authority`
+        WHERE `user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
+        UNION
+        SELECT
+        c.`auth_group` AS authGroup,
+        c.`auth`
+        FROM `user_team` a
+        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
+        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
+        WHERE a.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
+    </select>
+
+    <select id="searchUserAllAuthByUserAuthCache" parameterType="neatlogic.framework.dto.UserAuthVo"
+            resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
+        SELECT
+        ra.`auth_group` AS authGroup,
+        ra.`auth`
+        FROM `user_role` ur
+        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
+        WHERE ur.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND ra.`auth` = #{auth}
+        </if>
+        UNION
+        SELECT
+        `auth_group` AS authGroup,
+        `auth`
+        FROM `user_authority`
+        WHERE `user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
+        UNION
+        SELECT
+        c.`auth_group` AS authGroup,
+        c.`auth`
+        FROM `user_team` a
+        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
+        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
+        WHERE a.`user_uuid` = #{userUuid}
+        <if test="auth != null and auth != ''">
+            AND `auth` = #{auth}
+        </if>
+    </select>
+
+    <select id="searchUserRoleAuthByUserUuid" parameterType="String" resultType="neatlogic.framework.dto.RoleAuthVo"
+            useCache="false">
+        SELECT a.`role_uuid`  as `roleUuid`,
+               a.`auth_group` as `authGroup`,
+               a.`auth`
+        FROM `role_authority` a
+                 LEFT JOIN `user_role` b ON a.`role_uuid` = b.`role_uuid`
+        WHERE b.`user_uuid` = #{userUuid}
+    </select>
+
+    <select id="searchUserCount" parameterType="neatlogic.framework.dto.UserVo" resultType="int" useCache="false">
+        SELECT
+        <if test="(teamUuid != null and teamUuid != '') or (authGroup != null and authGroup != '') or (auth != null and auth != '') or (roleUuid != null and roleUuid != '')">
+            count(DISTINCT (a.`uuid`))
+        </if>
+        <if test="(teamUuid == null or teamUuid == '') and (authGroup == null or authGroup == '') and (auth == null or auth == '') and (roleUuid == null or roleUuid == '')">
+            count(a.`uuid`)
+        </if>
+        FROM `user` a
+        <if test="teamUuid != null and teamUuid != ''">
+            LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        </if>
+
+        <if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
+            LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
+        </if>
+
+        <if test="roleUuid != null and roleUuid != ''">
+            LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
+        </if>
+        <where>
+            <if test="keyword !=null and keyword != ''">
+                (a.`user_id` LIKE CONCAT(#{keyword}, '%')
+                OR a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+            </if>
+
+            <if test="vipLevel != null">
+                and a.`vip_level` = #{vipLevel}
+            </if>
+
+            <if test="isActive != null">
+                AND a.`is_active` = #{isActive}
+            </if>
+
+            <if test="isDelete != null">
+                AND a.`is_delete` = #{isDelete}
+            </if>
+
+            <if test="teamUuid != null and teamUuid != ''">
+                AND b.`team_uuid` = #{teamUuid}
+            </if>
+
+            <if test="authGroup != null and authGroup != ''">
+                AND c.`auth_group` = #{authGroup}
+            </if>
+
+            <if test="auth != null and auth != ''">
+                AND c.`auth` = #{auth}
+            </if>
+
+            <if test="roleUuid != null and roleUuid != ''">
+                AND d.`role_uuid` = #{roleUuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">
+        SELECT `id`
+        FROM `user_password`
+        WHERE `user_uuid` = #{userUuid}
+        ORDER BY id DESC
+        LIMIT 2
+    </select>
+
+    <select id="getActiveUserByTeamId" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`   as `userId`,
+               a.`user_name` as `userName`,
+               a.`email`,
+               a.`phone`,
+               d.`password`,
+               a.`is_active` as `isActive`
+        FROM `user` a
+                 JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+                 JOIN `team` c ON b.`team_uuid` = c.`uuid` AND c.`uuid` = #{teamUuid}
+                 JOIN `user_password` d ON a.`uuid` = d.`user_uuid` AND d.`is_active` = 1
+        WHERE a.`is_active` = 1
+    </select>
+
+    <select id="getActiveUserByRoleUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT u.`id`,
+               u.`uuid`,
+               u.`user_id`   AS userId,
+               u.`user_name` AS userName,
+               u.`email`,
+               u.`phone`,
+               u.`is_active` AS isActive
+        FROM `user` u
+                 JOIN user_role ur ON ur.`user_uuid` = u.`uuid` AND ur.`role_uuid` = #{roleUuid}
+        WHERE u.`is_active` = 1
+    </select>
+
+    <resultMap id="userRoleMap" type="neatlogic.framework.dto.UserVo">
+        <id property="uuid" column="uuid"/>
+        <result property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="userName" column="userName"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="pinyin" column="pinyin"/>
+        <result property="password" column="password"/>
+        <result property="isActive" column="isActive"/>
+        <result property="userInfo" column="userInfo"/>
+        <result property="vipLevel" column="vipLevel"/>
+        <result property="isSuperAdmin" column="isSuperAdmin"/>
+        <collection property="roleUuidList" ofType="java.lang.String">
+            <result column="roleUuid"/>
+        </collection>
+    </resultMap>
+
+    <select id="getActiveUserByUserId" parameterType="neatlogic.framework.dto.UserVo" resultMap="userRoleMap"
+            useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        AS userId,
+               a.`user_name`      AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`user_info`      as `userInfo`,
+               a.`is_active`      AS isActive,
+               b.`role_uuid`      AS roleUuid,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+                 LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
+        WHERE a.user_id = #{userId}
+          AND a.`is_active` = 1
+    </select>
+
+    <select id="getUserByUserIdAndPassword" parameterType="neatlogic.framework.dto.UserVo" resultMap="userRoleMap"
+            useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`      AS userId,
+               a.`user_name`    AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`user_info`    as `userInfo`,
+               c.`password`,
+               a.`is_active`    AS isActive,
+               b.`role_uuid`    AS roleUuid,
+               a.is_super_admin as isSuperAdmin
+        FROM `user` a
+                 LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
+                 JOIN `user_password` c ON a.`uuid` = c.`user_uuid` AND c.`is_active` = 1
+        WHERE a.user_id = #{userId}
+          AND c.password = #{password}
+          AND a.`is_active` = 1
+    </select>
+
+    <select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_id` AS userId,
+        `user_name` AS userName,
+        `email`,
+        `phone`,
+        `is_active` AS isActive,
+        `user_info` AS userInfo,
+        `vip_level` AS vipLevel
+        FROM `user`
+        Where `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY `id` DESC
+    </select>
+
+    <select id="getUserCountByAuth" resultType="neatlogic.framework.dto.AuthVo" useCache="false">
+        SELECT a.`auth`                        as `name`,
+               COUNT(DISTINCT (a.`user_uuid`)) as `userCount`
+        FROM `user_authority` a
+                 LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
+        GROUP BY a.`auth`
+    </select>
+
+    <select id="getUserProfileByUserUuidAndModuleId" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.UserProfileVo" useCache="false">
+        SELECT
+        `user_uuid` as userUuid,
+        `module_id` as moduleId,
+        `config`
+        FROM `user_profile`
+        where `user_uuid` = #{userUuid}
+        <if test="moduleId !=null and moduleId !=''">
+            and `module_id` = #{moduleId}
+        </if>
+    </select>
+
+    <select id="getUserUuidListByTeamUuidList" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
+        SELECT
+        distinct a.`user_uuid`
+        FROM user_team a
+        JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+        WHERE a.`team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+    </select>
+
+    <select id="getUserUuidListByTeamUuidListLimitTwo" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
+        SELECT
+        distinct a.`user_uuid`
+        FROM user_team a
+        JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+        WHERE a.`team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+        LIMIT 2
+    </select>
+
+    <resultMap id="userTeamMap" type="neatlogic.framework.dto.UserVo">
+        <id property="uuid" column="uuid"/>
+        <collection property="teamUuidList" ofType="java.lang.String">
+            <result column="teamUuid"/>
+        </collection>
+        <collection property="roleUuidList" ofType="java.lang.String">
+            <result column="roleUuid"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserTeamRoleListByTeamUuidList" parameterType="java.util.List" resultMap="userTeamMap"
+            useCache="false">
+        SELECT
+        DISTINCT
+        a.`uuid` as uuid,c.`team_uuid` as teamUuid,d.`role_uuid` as roleUuid
+        FROM
+        `user` a
+        JOIN `user_team` b
+        ON a.`uuid` = b.`user_uuid` AND a.`is_active` = 1
+        LEFT JOIN `user_team` c ON a.uuid = c.`user_uuid`
+        LEFT JOIN `user_role` d ON a.uuid = d.`user_uuid`
+        WHERE b.`team_uuid` IN
+        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+    </select>
+
+    <select id="getUserUuidListByRoleUuidList" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
+        SELECT
+        a.`user_uuid`
+        FROM user_role a
+        JOIN `user` b ON b.`uuid`=a.`user_uuid` AND b.`is_active`=1
+        WHERE a.`role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" close=")" separator=",">
+            #{roleUuid}
+        </foreach>
+    </select>
+
+    <select id="getUserUuidListByUserName" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="true">
+        SELECT `uuid`
+        FROM `user`
+        WHERE `user_name` = #{value}
+    </select>
+
+    <select id="getUserListByUserUuidList" resultMap="userInfoMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        e.`password`,
+        a.`pinyin`,
+        a.`is_active` AS isActive,
+        b.`role_uuid` AS roleUuid,
+        r.`name` AS roleName,
+        r.`description`,
+        c.`team_uuid` AS teamUuid,
+        d.`name` AS teamName
+        FROM `user` a
+        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+        LEFT JOIN `user_team`c ON a.`uuid` = c.`user_uuid`
+        LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+        LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
+        LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
+        WHERE a.`uuid` IN
+        <foreach collection="list" item="userUuid" open="(" close=")" separator=",">
+            #{userUuid}
+        </foreach>
+        <if test="isActive != null">
+            and a.`is_active` = #{isActive}
+        </if>
+    </select>
+
+    <select id="getUserUuidListByUuidListAndIsActive" resultType="java.lang.String" useCache="false">
+        SELECT
+        DISTINCT `uuid`
+        FROM `user`
+        WHERE `uuid` IN
+        <foreach collection="list" item="userUuid" open="(" close=")" separator=",">
+            #{userUuid}
+        </foreach>
+        <if test="isActive != null">
+            and `is_active` = #{isActive}
+        </if>
+    </select>
+
+    <select id="getUserDataByUserUuidAndType" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.UserDataVo" useCache="false">
+        SELECT `user_uuid` as userUuid,
+               `data`      as data,
+               `type`      as type
+        FROM `user_data`
+        where `user_uuid` = #{userUuid}
+          and `type` = #{type}
+    </select>
+
+    <!--<select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="true">
+        SELECT `role_uuid`
+        FROM `user_role`
+        WHERE `user_uuid` = #{value}
+    </select>-->
+
+    <!--<select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT `team_uuid`
+        FROM `user_team`
+        WHERE `user_uuid` = #{value}
+    </select>-->
+
+    <select id="getUserByUserIdList" resultType="neatlogic.framework.dto.UserVo">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_name` as `userName`,
+        `user_id` as `userId`
+        FROM `user`
+        WHERE
+        `is_active` = 1
+        and
+        `user_id` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getUserListByTeamUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT a.`team_uuid` AS teamUuid,
+               a.`user_uuid` AS uuid,
+               a.`title`,
+               b.`user_id`   AS userId,
+               b.`user_name` AS userName,
+               b.`user_info` AS userInfo,
+               b.`vip_level` AS vipLevel,
+               b.`pinyin`    AS pinyin
+        FROM `user_team` a
+                 JOIN `user` b ON b.`uuid` = a.`user_uuid`
+        WHERE a.`team_uuid` = #{value}
+        ORDER BY a.`id`
+    </select>
+
+    <!--<select id="checkUserExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+        select count(a.`user_uuid`)
+        from (SELECT `user_uuid` FROM `user_agent` WHERE `user_uuid` = #{value} limit 1) a
+    </select>-->
+
+    <!--<select id="checkAgentExistsInUserAgent" parameterType="java.lang.String" resultType="int" useCache="false">
+        select count(a.`user_uuid`)
+        from (SELECT `user_uuid` FROM `user_agent` WHERE `agent_uuid` = #{value} limit 1) a
+    </select>-->
+
+    <!--<select id="checkExistsAgentLoop" parameterType="java.lang.String" resultType="int" useCache="false">
+        select count(a.`user_uuid`)
+        from (SELECT `user_uuid`
+              FROM `user_agent`
+              WHERE `user_uuid` = #{agentUuid}
+                and `agent_uuid` = #{userUuid}
+              limit 1) a
+    </select>-->
+
+    <!--<select id="getUserAgent" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+        select b.`id`,
+               b.`uuid`,
+               b.`user_id`   as `userId`,
+               b.`user_name` as `userName`,
+               b.`email`,
+               b.`phone`,
+               b.`pinyin`,
+               b.`is_active` as `isActive`,
+               b.`user_info` as `userInfo`,
+               b.`vip_level` as `vipLevel`,
+               d.`uuid`      as `roleUuid`,
+               d.`name`      as `roleName`,
+               f.`uuid`      as `teamUuid`,
+               f.`name`      as `teamName`
+        from `user_agent` a
+                 left join `user` b on a.`agent_uuid` = b.`uuid`
+                 left join `user_role` c on b.`uuid` = c.`user_uuid`
+                 left join `role` d on c.`role_uuid` = d.`uuid`
+                 left join `user_team` e on e.`user_uuid` = b.`uuid`
+                 left join `team` f on f.`uuid` = e.`team_uuid`
+        where a.`user_uuid` = #{value}
+    </select>-->
+
+    <!--<select id="getUserUuidByAgentUuidAndFunc" resultType="java.lang.String" useCache="false">
+        SELECT `user_uuid`
+        FROM `user_agent`
+        WHERE `agent_uuid` = #{agentUuid}
+          AND `func` = #{func}
+    </select>-->
+
+    <select id="getUserUuidListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT `user_uuid`
+        FROM `user_team`
+        WHERE `team_uuid` = #{value}
+    </select>
+
+    <select id="getUserUuidListByRoleUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT `user_uuid`
+        FROM `user_role`
+        WHERE `role_uuid` = #{value}
+    </select>
+
+    <select id="checkUserIdIsIsRepeat" parameterType="neatlogic.framework.dto.UserVo" resultType="int">
+        SELECT COUNT(`user_id`)
+        FROM `user`
+        WHERE `user_id` = #{userId}
+          AND `uuid` != #{uuid}
+    </select>
+
+    <select id="getUserListByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_id` AS userId,
+        `user_name` AS userName,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active` AS isActive,
+        `user_info` AS userInfo,
+        `vip_level` AS vipLevel
+        FROM `user`
+        WHERE `is_active` = 1
+        AND `uuid` IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getUserListByRoleUuid" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap"
+            useCache="false">
+        SELECT k.`id`,
+        k.`uuid`,
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        k.`user_info` as `userInfo`,
+        k.`vip_level` as `vipLevel`,
+        h.`role_uuid` as `roleUuid`,
+        r.`name` as `roleName`,
+        r.`description`,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
+        FROM (
+        SELECT DISTINCT (a.`uuid`) AS `uuid`,
+        b.`id`
+        FROM `user` a
+        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`role_uuid` = #{roleUuid}
+        <if test="keyword != null and keyword != ''">
+            and (a.`user_id` LIKE CONCAT('%', #{keyword}, '%')
+            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+        ) g
+        JOIN `user` k ON g.`uuid` = k.`uuid`
+        LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
+        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
+        LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        order by g.`id`
+    </select>
+
+    <select id="getUserTitleLockByName" resultType="neatlogic.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `name` = #{value} for
+        update
+    </select>
+
+    <select id="getUserTitleByName" resultType="neatlogic.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `name` = #{value}
+    </select>
+    <select id="getUserTitleListLockByTitleNameList" resultType="neatlogic.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `name` in
+        <foreach collection="titleNameList" item="titleName" open="(" close=")" separator=",">
+            #{titleName}
+        </foreach>
+        for update
+    </select>
+    <select id="searchUserTitleCount" resultType="java.lang.Integer">
+        select count(id) from `user_title`
+        <if test="keyword != null and keyword != ''">
+            where `name` LIKE CONCAT(#{keyword}, '%')
+        </if>
+    </select>
+    <select id="searchUserTitle" resultType="neatlogic.framework.dto.UserTitleVo">
+        select `id`,`name` from `user_title`
+        <if test="keyword != null and keyword != ''">
+            where `name` LIKE CONCAT(#{keyword}, '%')
+        </if>
+        ORDER BY LENGTH(`name`) ASC
+        <if test="needPage == true">
+            limit #{startNum},#{pageSize}
+        </if>
+    </select>
+    <select id="getUserTitleById" resultType="neatlogic.framework.dto.UserTitleVo">
+        select `id`, `name`
+        from `user_title`
+        where `id` = #{value}
+    </select>
+    <select id="getUserTitleListByUserUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.UserTitleVo">
+        select a.`id`,
+               a.`name`
+        from `user_title` a
+                 join `team_user_title` b
+                      on a.`id` = b.`title_id`
+        where b.`user_uuid` = #{value}
+    </select>
+    <select id="checkUserInRangeList" resultType="java.lang.String">
+        SELECT
+        distinct(a.uuid)
+        FROM
+        `user` a
+        LEFT JOIN user_team c ON a.uuid = c.user_uuid
+        LEFT JOIN team d ON c.team_uuid = d.uuid
+        <where>
+            a.`is_active` = #{user.isActive}
+            AND a.`is_delete` = #{user.isDelete}
+            AND a.uuid in
+            <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                #{userUuid}
+            </foreach>
+            <if test="user.rangeList != null and user.rangeList.size()>0">
+                and (
+                <if test="user.userUuidList != null and user.userUuidList.size()>0">
+                    a.uuid in
+                    <foreach collection="user.userUuidList" item="userUuid" open="(" separator="," close=")">
+                        #{userUuid}
+                    </foreach>
+                </if>
+                <if test="user.teamUuidList != null and user.teamUuidList.size()>0">
+                    <if test="user.userUuidList != null and user.userUuidList.size()>0">
+                        or
+                    </if>
+                    d.uuid in
+                    <foreach collection="user.teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                </if>
+                <if test="user.parentTeamUuidList != null and user.parentTeamUuidList.size()>0">
+                    <if test="user.userUuidList != null and user.userUuidList.size()>0 or user.teamUuidList != null and user.teamUuidList.size()>0">
+                        or
+                    </if>
+                    <foreach collection="user.parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or "
+                             close=")">
+                        d.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                    </foreach>
+                </if>
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="searchUserCountByAuth" resultType="int" parameterType="neatlogic.framework.dto.UserVo">
+        SELECT
+        COUNT(distinct a.`uuid`)
+        FROM `user` a
+        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`auth` = #{auth}
+        <if test="keyword != null and keyword != ''">
+            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
+            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="searchUserUuIdByUser" resultType="string" parameterType="neatlogic.framework.dto.UserVo">
+        SELECT distinct a.`uuid`
+        FROM `user` a
+        LEFT JOIN `user_authority` b ON a.`uuid` = b.`user_uuid`
+        WHERE b.`auth` = #{auth}
+        <if test="keyword != null and keyword != ''">
+            and( a.`user_id` LIKE CONCAT(#{keyword}, '%')
+            or a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getActiveUserListExcludeRoleInfoByUserUuidList" parameterType="java.util.List" resultMap="userInfoMap">
+        SELECT a.`id`,
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        a.`pinyin`,
+        a.`is_active` AS isActive,
+        a.`user_info` AS userInfo,
+        a.`vip_level` AS vipLevel,
+        c.`uuid` AS teamUuid,
+        c.`name` AS teamName,
+        c.`upward_name_path` AS upwardNamePath
+        FROM `user` a
+        LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        LEFT JOIN `team` c ON b.`team_uuid` = c.`uuid`
+        WHERE a.`is_active` = 1
+        AND a.`uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getUserTeamCountByUserUuid" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `user_team`
+        WHERE `user_uuid` = #{value}
+    </select>
+
+    <select id="getActiveUserEmailListByUserUuidList" parameterType="java.util.List" resultType="java.lang.String"
+            useCache="false">
+        SELECT `email` FROM `user` WHERE `is_active` = 1 AND `uuid` IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getActiveUserEmailListByTeamUuid" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
+        SELECT a.`email`
+        FROM `user` a
+                 JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        WHERE a.`is_active` = 1
+          AND b.`team_uuid` = #{value}
+    </select>
+
+    <select id="getUserIdByUserIdList" parameterType="java.util.List" resultType="java.lang.String" useCache="false">
+        select `user_id` from `user` where `user_id` in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getSuperAdminList" resultType="neatlogic.framework.dto.UserVo">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        AS userId,
+               a.`user_name`      AS userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      AS isActive,
+               a.`user_info`      AS userInfo,
+               a.`vip_level`      AS vipLevel,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        where is_super_admin = 1
+    </select>
+
+    <insert id="insertUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo">
+        REPLACE INTO `user_authority`(`user_uuid`,
+                                      `auth_group`,
+                                      `auth`)
+        VALUES (#{userUuid},
+                #{authGroup},
+                #{auth})
+    </insert>
+
+    <insert id="insertUser" parameterType="neatlogic.framework.dto.UserVo">
+        INSERT INTO `user` (`id`,
+                            `uuid`,
+                            `user_id`,
+                            `user_name`,
+                            `email`,
+                            `phone`,
+                            `pinyin`,
+                            `is_active`,
+                            `user_info`,
+                            `vip_level`)
+        VALUES (#{id},
+                #{uuid},
+                #{userId},
+                #{userName},
+                #{email},
+                #{phone},
+                #{pinyin},
+                #{isActive},
+                #{userInfo},
+                #{vipLevel})
+    </insert>
+
+    <insert id="insertUserPassword" parameterType="neatlogic.framework.dto.UserVo">
+        INSERT INTO `user_password` (`user_uuid`,
+                                     `user_id`,
+                                     `password`,
+                                     `create_time`,
+                                     `is_active`)
+        VALUES (#{uuid},
+                #{userId},
+                #{password},
+                NOW(3),
+                1)
+    </insert>
+
+    <insert id="insertUserTeam">
+        INSERT INTO `user_team` (`team_uuid`, `user_uuid`)
+        VALUES (#{teamUuid}, #{userUuid})
+    </insert>
+
+    <insert id="insertUserRole">
+        INSERT INTO `user_role` (`user_uuid`, `role_uuid`)
+        VALUES (#{userUuid}, #{roleUuid})
+    </insert>
+
+
+    <insert id="insertUserProfile" parameterType="neatlogic.framework.dto.UserProfileVo">
+        INSERT INTO `user_profile` (`user_uuid`, `module_id`, `config`)
+        VALUES (#{userUuid}, #{moduleId}, #{config})
+    </insert>
+
+    <insert id="insertUserData" parameterType="neatlogic.framework.dto.UserDataVo">
+        INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
+        VALUES (#{userUuid}, #{data}, #{type})
+    </insert>
+
+    <!--<insert id="insertUserAgent" parameterType="neatlogic.framework.dto.UserAgentVo">
+        INSERT INTO `user_agent` (`user_uuid`, `agent_uuid`, `func`)
+        VALUES (#{userUuid}, #{agentUuid}, #{func})
+    </insert>-->
+    <insert id="insertUserTitle">
+        INSERT INTO `user_title` (`id`, `name`)
+        VALUES (#{id}, #{name});
+    </insert>
+
+    <insert id="batchInsertUser" parameterType="java.util.List">
+        insert into `user` (
+        `id`,
+        `uuid`,
+        `user_id`,
+        `user_name`,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active`,
+        `user_info`
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.uuid},
+            #{item.userId},
+            #{item.userName},
+            #{item.email},
+            #{item.phone},
+            #{item.pinyin},
+            #{item.isActive},
+            #{item.userInfo}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertUserTeam" parameterType="java.util.List">
+        INSERT INTO `user_team` (
+        `team_uuid`,
+        `user_uuid`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.teamUuid},
+            #{item.userUuid}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertUserRole" parameterType="java.util.List">
+        INSERT ignore INTO `user_role` (
+        `user_uuid`, `role_uuid`
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userUuid}, #{item.roleUuid})
+        </foreach>
+    </insert>
+
+    <update id="updateUser" parameterType="neatlogic.framework.dto.UserVo">
+        UPDATE `user`
+        SET
+        `user_id` = #{userId},
+        `user_name` = #{userName},
+        `email` = #{email},
+        `phone` = #{phone},
+        <if test="isActive != null">
+            `is_active` = #{isActive},
+        </if>
+        <if test="userInfo != null and userInfo != ''">
+            `user_info` = #{userInfo},
+        </if>
+        <if test="vipLevel != null">
+            `vip_level` = #{vipLevel},
+        </if>
+        `pinyin` = #{pinyin}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateUserPasswordActive" parameterType="java.lang.String">
+        UPDATE
+            `user_password`
+        SET `is_active` = 0
+        WHERE `user_uuid` = #{userUuid}
+    </update>
+
+    <update id="updateUserActive" parameterType="neatlogic.framework.dto.UserVo">
+        UPDATE `user`
+        SET `is_active` = #{isActive}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">
+        UPDATE `user_profile`
+        set `config` = #{config}
+        where `user_uuid` = #{userUuid}
+        <if test="moduleId !=null and moduleId !=''">
+            and `module_id` = #{moduleId}
+        </if>
+    </update>
+
+    <update id="updateUserData" parameterType="neatlogic.framework.dto.UserDataVo">
+        UPDATE `user_data`
+        SET `data` = #{data}
+        WHERE `user_uuid` = #{userUuid}
+          and `type` = #{type}
+    </update>
+
+    <update id="updateUserInfo" parameterType="neatlogic.framework.dto.UserVo">
+        UPDATE `user`
+        SET `user_info` = #{userInfo}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateUserTeamByUserUuid" parameterType="neatlogic.framework.dto.TeamUserVo">
+        UPDATE `user_team`
+        SET `team_uuid` = #{teamUuid}
+        WHERE `user_uuid` = #{userUuid}
+    </update>
+
+    <delete id="deleteUserPasswordByLimit">
+        DELETE FROM `user_password`
+        WHERE `user_uuid` = #{userUuid}
+        AND `id` NOT IN
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteUserByUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user`
+        WHERE `uuid` = #{value}
+    </delete>
+
+    <delete id="deleteUserRoleByUserUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user_role`
+        where `user_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteUserTeamByUserUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user_team`
+        WHERE `user_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteUserProfileByUserUuidAndModuleId" parameterType="string">
+        DELETE FROM `user_profile`
+        where `user_uuid` = #{userUuid}
+        <if test="moduleId !=null and moduleId !=''">
+            and `module_id` = #{moduleId}
+        </if>
+    </delete>
+
+    <delete id="deleteUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo">
+        DELETE FROM `user_authority`
+        <where>
+            <if test="auth != null and auth != ''">
+                AND `auth` = #{auth}
+            </if>
+            <if test="userUuid != null and userUuid != ''">
+                AND `user_uuid` = #{userUuid}
+            </if>
+        </where>
+    </delete>
+
+    <!-- <delete id="deleteUserAgent" parameterType="java.lang.String">
+         DELETE
+         FROM `user_agent`
+         WHERE `user_uuid` = #{value}
+     </delete>-->
+    <delete id="deleteUserTitleByName">
+        DELETE
+        FROM `user_title`
+        WHERE `name` = #{value};
+    </delete>
+
+    <update id="updateUserTokenByUuid">
+        update `user`
+        set `token` = #{token}
+        where uuid = #{uuid}
+    </update>
+    <update id="updateSuperAdminByUuidList">
+        update user set is_super_admin = 1 where uuid
+        in
+        <foreach collection="list" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
+    </update>
+    <update id="updateDelSuperAdmin">
+        update user set is_super_admin = 0
+    </update>
+</mapper>
+

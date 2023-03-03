@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceAuditMapper">
+    <sql id="searchReportDataSourceAuditCondition">
+        <where>
+            <if test="dataSourceId != null">
+                datasource_id = #{dataSourceId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchReportDataSourceAudit"
+            parameterType="neatlogic.framework.datawarehouse.dto.DataSourceAuditVo"
+            resultType="neatlogic.framework.datawarehouse.dto.DataSourceAuditVo">
+        SELECT id,
+        datasource_id AS dataSourceId,
+        start_time AS startTime,
+        end_time AS endTime,
+        data_count AS dataCount,
+        error
+        FROM datawarehouse_datasource_audit
+        <include refid="searchReportDataSourceAuditCondition"></include>
+        order by id desc
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="searchReportDataSourceAuditCount"
+            parameterType="neatlogic.framework.datawarehouse.dto.DataSourceAuditVo"
+            resultType="int">
+        SELECT count(1)
+        FROM datawarehouse_datasource_audit
+        <include refid="searchReportDataSourceAuditCondition"></include>
+    </select>
+
+    <insert id="insertReportDataSourceAudit"
+            parameterType="neatlogic.framework.datawarehouse.dto.DataSourceAuditVo">
+        insert into datawarehouse_datasource_audit
+            (id, datasource_id, start_time)
+        values (#{id}, #{dataSourceId}, now(3))
+    </insert>
+
+    <update id="updateReportDataSourceAudit"
+            parameterType="neatlogic.framework.datawarehouse.dto.DataSourceAuditVo">
+        update datawarehouse_datasource_audit
+        set end_time   = now(3),
+            data_count = #{dataCount},
+            error= #{error,typeHandler=CompressHandler}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteReportDataSourceAuditByDatasourceId" parameterType="java.lang.Long">
+        delete
+        from datawarehouse_datasource_audit
+        where datasource_id = #{value}
+    </delete>
+
+    <delete id="deleteAuditByDayBefore" parameterType="int">
+        delete
+        from datawarehouse_datasource_audit
+        where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
+</mapper>

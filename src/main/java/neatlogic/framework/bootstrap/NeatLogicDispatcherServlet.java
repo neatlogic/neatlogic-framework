@@ -37,7 +37,8 @@ public class NeatLogicDispatcherServlet extends DispatcherServlet {
     public void init(ServletConfig config) throws ServletException {
         try {
             super.init(config);
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            logger.error(t.getMessage(), t);
             //如果模块加载异常则删除模块信息
             ModuleUtil.removeModule(moduleVo);
         } finally {

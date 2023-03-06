@@ -23,7 +23,14 @@ neatlogic-xxx-base中的包路径从neatlogic.framework.xxx开始，这里的类
 
 ## 多租户
 
-neatlogic采用中间件共享，数据库独占的多租户模式。\
+neatlogic采用中间件共享，数据库独占的多租户模式。
+
+## 处理流程
+
+neatlogic采用前后端分离架构，后端服务全部以restful接口形式暴露出去供前端调用。入口类是ApiDispatcher，支持三种数据格式，分别是json，json流和文件。不同的数据格式需要继承不同的基础类。\
+<img src="https://github.com/neatlogic/.github/blob/main/images/api.png?raw=true" width="800px">
+为了提高复用性和方便管理，neatlogic的每一个接口都是一个独立的bean，接口类可根据实际需要继承ApiComponentBase、JsonStreamApiComponentBase、BinaryStreamApiComponentBase三个基础类。\
+在每个接口类中可以通过注解定义接口的访问权限、操作类型（审计用）、入参、出参、说明、数据范例等信息，可以根据这些配置一键导出所有接口文档。
 
 ### 核心类
 

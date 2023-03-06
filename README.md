@@ -20,22 +20,27 @@ neatlogic-xxx-base中的包路径从neatlogic.framework.xxx开始，这里的类
 这个规则是由root-content.xml和xxx-servlet-context.xml共同决定的。
 
 ## 多租户
+
 neatlogic采用中间件共享，数据库独占的多租户模式。
 
+### 核心类
+
+- NeatLogicRoutingDataSource：通过threadlocal中的租户信息分发真正的datasource。
+- NeatLogicBasicDataSource：继承HikariDataSource，系统真正使用的datasource，可以在返回connection之前做一些前置操作，例如更改session配置。
+
 ## 处理流程
+
 neatlogic采用前后端分离架构，后端服务全部以restful接口形式暴露出去供前端调用。入口类是ApiDispatcher，支持三种数据格式，分别是json，json流和文件。不同的数据格式需要继承不同的基础类。\
 <img src="https://github.com/neatlogic/.github/blob/main/images/api.png?raw=true" width="800px">
 为了提高复用性和方便管理，neatlogic的每一个接口都是一个独立的bean，接口类可根据实际需要继承ApiComponentBase、JsonStreamApiComponentBase、BinaryStreamApiComponentBase三个基础类。\
 在每个接口类中可以通过注解定义接口的访问权限、操作类型（审计用）、入参、出参、说明、数据范例等信息，可以根据这些配置一键导出所有接口文档。
 
-### 核心类
-- NeatLogicRoutingDataSource：通过threadlocal中的租户信息分发真正的datasource。
-- NeatLogicBasicDataSource：继承HikariDataSource，系统真正使用的datasource，可以在返回connection之前做一些前置操作，例如更改session配置。
-
 ## 多活机制
+
 neatlogic的部署方式是多活架构，自带简易的心跳机制让每个服务实例之间能彼此了解存活情况，从而完成某些特殊的漂移工作，例如让定时作业服务自动漂移。
 
 ### 心跳机制
+
 - 每个服务实例都有一个唯一服务实例id，需要在config文件中配置schedule.server.id变量。\
 - 考虑企业内部可能有防火墙，心跳状态利用数据库进行传递，服务实例之间不会互发心跳。
 - 通过心跳计数器来判断服务实例存活状态。

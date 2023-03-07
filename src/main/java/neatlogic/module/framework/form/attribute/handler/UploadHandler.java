@@ -137,7 +137,15 @@ public class UploadHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return getMyDetailedData(attributeDataVo, configObj);
+        JSONObject dataObj = getMyDetailedData(attributeDataVo, configObj);
+        if (MapUtils.isNotEmpty(dataObj)) {
+            JSONArray textList = dataObj.getJSONArray("text");
+            if (CollectionUtils.isNotEmpty(textList)) {
+                List<String> nameList= textList.toJavaList(String.class);
+                return String.join("、", nameList);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -155,36 +163,111 @@ public class UploadHandler extends FormHandlerBase {
 
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formupload",
-//	"label": "附件上传_1",
-//	"type": "form",
-//	"uuid": "090ae87ae1c24950b1ea039d45ab0a85",
-//	"config": {
-//		"isRequired": false,
-//		"defaultValueList": [],
-//		"isTemplate": false,
-//		"ruleList": [],
-//		"width": "100%",
-//		"uploadType": "one",
-//		"validList": [],
-//		"quoteUuid": "",
-//		"defaultValueType": "self",
-//		"placeholder": "选择上传的附件",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"value": null
-//	}
-//}
-//保存数据
-//[{"name":"asd.jpg","id":623050252673024}]
-//返回数据结构
-//{
-//    "value": [{"name":"asd.jpg","id":623050252673024}],
-//    "text": ["asd.jpg"]
-//}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formupload",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "display": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-upload",
+        "hasValue": true,
+        "label": "附件上传_14",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "disableDefaultValue": true,
+            "isMask": false,
+            "isTemplate": false,
+            "width": "100%",
+            "uploadType": "one",
+            "description": "",
+            "isHide": false
+        },
+        "uuid": "0946a88ec8e045379ac4bf99d986ae97"
+    }
+     */
+    /*
+    保存数据结构
+    [
+        {
+            "uid": 1678174427861,
+            "size": 1396,
+            "showProgress": false,
+            "response": {
+                "Status": "OK",
+                "Return": {
+                    "ext": "jpg",
+                    "startPage": 1,
+                    "type": "itsm",
+                    "uploadTime": 1678174428000,
+                    "url": "api/binary/file/download?id=841934622228480",
+                    "actionType": "创建",
+                    "path": "file:C:\\ZzNonSystem\\DevInstall\\CodedriverDevelop\\neatlogic\\develop\\itsm\\2023\\03\\07\\841934622228480",
+                    "size": 1396,
+                    "sizeText": "1.36KB",
+                    "typeText": "IT服务附件",
+                    "name": "abc (4) (2).jpg",
+                    "userUuid": "fccf704231734072a1bf80d90b2d1de2",
+                    "fcu": "fccf704231734072a1bf80d90b2d1de2",
+                    "id": 841934622228480,
+                    "contentType": "image/jpeg",
+                    "lcu": "fccf704231734072a1bf80d90b2d1de2"
+                },
+                "TimeCost": 39
+            },
+            "percentage": 100,
+            "name": "abc (4) (2).jpg",
+            "id": 841934622228480,
+            "status": "finished"
+        }
+    ]
+     */
+    /*
+    返回数据结构
+    {
+        "value": [
+            {
+                "uid": 1678174427861,
+                "size": 1396,
+                "showProgress": false,
+                "response": {
+                    "Status": "OK",
+                    "Return": {
+                        "ext": "jpg",
+                        "startPage": 1,
+                        "type": "itsm",
+                        "uploadTime": 1678174428000,
+                        "url": "api/binary/file/download?id=841934622228480",
+                        "actionType": "创建",
+                        "path": "file:C:\\ZzNonSystem\\DevInstall\\CodedriverDevelop\\neatlogic\\develop\\itsm\\2023\\03\\07\\841934622228480",
+                        "size": 1396,
+                        "sizeText": "1.36KB",
+                        "typeText": "IT服务附件",
+                        "name": "abc (4) (2).jpg",
+                        "userUuid": "fccf704231734072a1bf80d90b2d1de2",
+                        "fcu": "fccf704231734072a1bf80d90b2d1de2",
+                        "id": 841934622228480,
+                        "contentType": "image/jpeg",
+                        "lcu": "fccf704231734072a1bf80d90b2d1de2"
+                    },
+                    "TimeCost": 39
+                },
+                "percentage": 100,
+                "name": "abc (4) (2).jpg",
+                "id": 841934622228480,
+                "status": "finished"
+            }
+        ],
+        "text": [
+            "abc (4) (2).jpg"
+        ]
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

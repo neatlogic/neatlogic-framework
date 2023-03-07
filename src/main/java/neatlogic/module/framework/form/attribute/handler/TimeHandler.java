@@ -133,40 +133,54 @@ public class TimeHandler extends FormHandlerBase {
         return true;
     }
 
-    //表单组件配置信息
-    //{
-//	"handler": "formtime",
-//	"label": "时间_5",
-//	"type": "form",
-//	"uuid": "3dd979696e83434daf2ec730fc023fa8",
-//	"config": {
-//		"isRequired": false,
-//		"validType": [],
-//		"defaultValueList": "05:05:05",
-//		"ruleList": [],
-//		"width": "100%",
-//		"validValueList": [],
-//		"showType": "HH:mm:ss",
-//		"validList": [],
-//		"quoteUuid": "",
-//		"defaultValueType": "self",
-//		"placeholder": "请选择时间",
-//		"authorityConfig": [
-//			"common#alluser"
-//		]
-//	}
-//}
-    //保存数据结构
-//    "05:05:05"
-    //返回数据结构
-//{
-//	"format": "HH:mm:ss",
-//	"value": "05:05:05"
-//}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formtime",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formtime",
+        "hasValue": true,
+        "label": "时间_5",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "isMask": false,
+            "isReadOnly": false,
+            "width": "100%",
+            "format": "HH:mm:ss",
+            "description": "",
+            "validValueList": [],
+            "placeholder": "请选择时间",
+            "isDisabled": false,
+            "isHide": false
+        },
+        "uuid": "65a008fda8804977a0037ceca868f9d4"
+    }
+     */
+    /*
+    保存数据结构
+    "05:05:05"
+     */
+    /*
+    返回数据结构
+    {
+        "format": "HH:mm:ss",
+        "value": "05:05:05"
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();
-        resultObj.put("format", configObj.getString("showType"));
+        resultObj.put("format", configObj.getString("format"));
         resultObj.put("value", attributeDataVo.getDataObj());
         return resultObj;
     }

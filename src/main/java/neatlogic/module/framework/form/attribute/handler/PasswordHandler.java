@@ -24,6 +24,7 @@ import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -53,7 +54,14 @@ public class PasswordHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getDataObj();
+        Object dataObj = attributeDataVo.getDataObj();
+        if (dataObj != null) {
+            String data = (String) dataObj;
+            if (StringUtils.isNotBlank(data)) {
+                return StringUtils.repeat("*", data.length());
+            }
+        }
+        return dataObj;
     }
 
     @Override
@@ -81,37 +89,50 @@ public class PasswordHandler extends FormHandlerBase {
         return true;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "forminput",
-//	"label": "文本框_1",
-//	"type": "form",
-//	"uuid": "f3d875032f0649f7aca5af75d6c37e10",
-//	"config": {
-//		"isRequired": false,
-//		"defaultValueList": "文本a",
-//		"ruleList": [],
-//		"validList": [],
-//		"textType": "none",
-//		"quoteUuid": "",
-//		"inputMaxlength": 50,
-//		"minNumber": "",
-//		"maxNumber": "",
-//		"decimalNumber": "",
-//		"width": "100%",
-//		"defaultValueType": "self",
-//		"placeholder": "请输入",
-//		"authorityConfig": [
-//			"common#alluser"
-//		]
-//	}
-//}
-    //保存数据结构
-//    "文本a"
-    //返回数据结构
-//{
-//	"value": "文本a"
-//}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formpassword",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "disable": {},
+            "display": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-option-horizontal",
+        "hasValue": true,
+        "label": "密码_4",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "isMask": false,
+            "width": "100%",
+            "description": "",
+            "isHide": false
+        },
+        "uuid": "4c0f58dc583c4fb0a3e5ff3e10b75797",
+        "switchHandler": [
+            "formtext",
+            "formtextarea",
+            "formckeditor",
+            "formnumber",
+            "formpassword"
+        ]
+    }
+     */
+    /*
+    保存数据结构
+    "12345"
+     */
+    /*
+    返回数据结构
+    {
+        "value": "12345"
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

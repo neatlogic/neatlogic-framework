@@ -41,7 +41,7 @@ neatlogic的部署方式是多活架构，自带简易的心跳机制让每个�
 
 ### 心跳机制
 
-- 每个服务实例都有一个唯一服务实例id，需要在config文件中配置schedule.server.id变量。\
+- 每个服务实例都有一个唯一服务实例id，需要在config文件中配置schedule.server.id变量。
 - 考虑企业内部可能有防火墙，心跳状态利用数据库进行传递，服务实例之间不会互发心跳。
 - 通过心跳计数器来判断服务实例存活状态。
 
@@ -69,7 +69,7 @@ CachedThreadPool.execute(new NeatLogicThread() {
 });
 ```
 
-CachedThreadPool是框架中的线程池，可以直接使用，**不要自己创建线程池**。\
+CachedThreadPool是框架中的线程池，可以直接使用，**不要自己创建线程池**。
 **考虑到CachedThreadPool会被多处引用和避免不同租户之间有明显的资源竞争关系，
 CachedThreadPool是个无限线程池，使用前一定要注意控制线程数量和考虑每个线程作业的执行时间，不能引起系统OOM。**
 
@@ -89,7 +89,8 @@ SchedulerManager启动时会加载所有租户的定时作业并运行。配合H
 - 外部作业：由用户在作业管理中配置发起，支持多个作业实例，需要实现IPublicJob接口。
 
 ## 全文检索
-由于不想单独维护一套ES环境，并且没有找到理想方案解决ES数据和DB数据联动问题，因此neatlogic的全文检索会把分词结果存放在数据库里，通过SQL查询实现全文检索功能。\
+
+由于不想单独维护一套ES环境，并且没有找到理想方案解决ES数据和DB数据联动问题，因此neatlogic的全文检索会把分词结果存放在数据库里，通过SQL查询实现全文检索功能。
 
 系统会自动根据FullTextIndexInitializer中定义的document种类自动创建相关数据表。只需要实现FullTextIndexHandlerBase中的相关方法，系统会把索引数据自动写入对应的数据表，查询时也不需要关注数据表具体的名称，只需要写前缀，系统会通过FulltextIndexInterceptor在SQL执行前替换成正确的数据表来执行。
 

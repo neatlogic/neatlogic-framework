@@ -25,7 +25,6 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.worktime.dao.mapper.WorktimeMapper;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;

@@ -23,11 +23,8 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class PasswordHandler extends FormHandlerBase {

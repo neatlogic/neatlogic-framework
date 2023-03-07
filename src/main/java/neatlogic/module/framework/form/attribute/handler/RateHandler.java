@@ -23,10 +23,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class RateHandler extends FormHandlerBase {
@@ -58,9 +55,6 @@ public class RateHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-//        if (CollectionUtils.isNotEmpty(values)) {
-//            return values.get(0);
-//        }
         return text;
     }
 

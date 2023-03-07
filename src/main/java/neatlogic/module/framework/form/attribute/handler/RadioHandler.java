@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class RadioHandler extends FormHandlerBase {

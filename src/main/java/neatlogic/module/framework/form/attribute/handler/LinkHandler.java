@@ -27,8 +27,6 @@ import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 
-import java.util.List;
-
 @Component
 public class LinkHandler extends FormHandlerBase {
 

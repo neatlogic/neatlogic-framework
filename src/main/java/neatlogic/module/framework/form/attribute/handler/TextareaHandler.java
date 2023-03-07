@@ -23,10 +23,7 @@ import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class TextareaHandler extends FormHandlerBase {

@@ -18,7 +18,6 @@ package neatlogic.module.framework.form.attribute.handler;
 
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
@@ -27,8 +26,6 @@ import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
-
-import java.util.List;
 
 @Component
 public class TextHandler extends FormHandlerBase {

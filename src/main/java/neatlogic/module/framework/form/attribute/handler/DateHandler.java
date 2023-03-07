@@ -64,14 +64,14 @@ public class DateHandler extends FormHandlerBase {
     }
 
     @Override
-    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject jsonObj) throws AttributeValidException {
+    public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
         JSONObject resultObj = new JSONObject();
         resultObj.put("result", true);
-        JSONObject configObj = jsonObj.getJSONObject("attributeConfig");
-        List<String> validTypeList = JSON.parseArray(configObj.getString("validType"), String.class);
-        if (CollectionUtils.isNotEmpty(validTypeList)) {
+        JSONArray validTypeArray = configObj.getJSONArray("validType");
+        if (CollectionUtils.isNotEmpty(validTypeArray)) {
+            List<String> validTypeList = validTypeArray.toJavaList(String.class);
             if (validTypeList.contains("workdate")) {
-                String worktimeUuid = jsonObj.getString("worktimeUuid");
+                String worktimeUuid = configObj.getString("worktimeUuid");
                 String data = attributeDataVo.getData();
                 JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
                 String format = detailedData.getString("format");
@@ -223,40 +223,6 @@ public class DateHandler extends FormHandlerBase {
         return false;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formdate",
-//	"label": "日期_4",
-//	"type": "form",
-//	"uuid": "a261982383e64f5ca45437cc025a1b72",
-//	"config": {
-//		"isRequired": false,
-//		"validType": [],
-//		"defaultValueList": "2022-02-21 00:00",
-//		"ruleList": [],
-//		"validValueList": [],
-//		"validList": [],
-//		"quoteUuid": "",
-//		"styleType": "-",
-//		"nowValue": "",
-//		"nowUnit": "",
-//		"width": "100%",
-//		"showType": "yyyy-MM-dd HH:mm",
-//		"defaultValueType": "self",
-//		"placeholder": "请选择日期",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"nowExpression": "others"
-//	}
-//}
-    //保存数据结构
-//    "2022-02-21 00:00"
-    //返回数据结构
-//{
-//	"format": "yyyy-MM-dd HH:mm",
-//	"value": "2022-02-21 00:00"
-//}
     /*
     表单组件配置信息
     {

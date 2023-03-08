@@ -52,7 +52,7 @@ public class PasswordHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getDataObj();
+        return "已更新";
     }
 
     @Override

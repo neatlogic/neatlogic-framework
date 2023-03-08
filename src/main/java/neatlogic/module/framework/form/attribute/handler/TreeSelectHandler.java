@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
@@ -119,23 +120,36 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        String data = (String) attributeDataVo.getDataObj();
-        if (StringUtils.isNotBlank(data)) {
-            String dataSource = configObj.getString("dataSource");
-            if (StringUtils.isNotBlank(dataSource)) {
-                ITreeSelectDataSourceHandler handler = TreeSelectDataSourceFactory.getHandler(dataSource);
-                if (handler != null) {
-                    List<String> pathList = handler.valueConversionTextPathList(data);
-                    return String.join("/", pathList);
-                }
-            }
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
         }
-        return data;
+        return resultObj.get("value");
+//        String data = (String) attributeDataVo.getDataObj();
+//        if (StringUtils.isNotBlank(data)) {
+//            String dataSource = configObj.getString("dataSource");
+//            if (StringUtils.isNotBlank(dataSource)) {
+//                ITreeSelectDataSourceHandler handler = TreeSelectDataSourceFactory.getHandler(dataSource);
+//                if (handler != null) {
+//                    List<String> pathList = handler.valueConversionTextPathList(data);
+//                    return String.join("/", pathList);
+//                }
+//            }
+//        }
+//        return data;
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
+        }
+        return null;
     }
 
     @Override
@@ -216,6 +230,12 @@ public class TreeSelectHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
+        }
+        return resultObj.get("value");
     }
 }

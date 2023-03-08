@@ -31,7 +31,6 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -72,33 +71,45 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-            if (isMultiple) {
-                List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
-                if (CollectionUtils.isNotEmpty(valueList)) {
-                    List<String> textList = new ArrayList<>();
-                    for (String key : valueList) {
-                        textList.add(parse(key));
-                    }
-                    return textList;
-                }
-                return valueList;
-            } else {
-                String value = (String) dataObj;
-                if (StringUtils.isNotBlank(value)) {
-                    return parse(value);
-                }
-            }
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            return textArray;
         }
-        return dataObj;
+        return resultObj.getJSONArray("valueList");
+//        Object dataObj = attributeDataVo.getDataObj();
+//        if (dataObj != null) {
+//            boolean isMultiple = configObj.getBooleanValue("isMultiple");
+//            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+//            if (isMultiple) {
+//                List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
+//                if (CollectionUtils.isNotEmpty(valueList)) {
+//                    List<String> textList = new ArrayList<>();
+//                    for (String key : valueList) {
+//                        textList.add(parse(key));
+//                    }
+//                    return textList;
+//                }
+//                return valueList;
+//            } else {
+//                String value = (String) dataObj;
+//                if (StringUtils.isNotBlank(value)) {
+//                    return parse(value);
+//                }
+//            }
+//        }
+//        return dataObj;
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("、", textList);
+        }
+        return null;
     }
 
     @Override
@@ -369,45 +380,46 @@ public class UserSelectHandler extends FormHandlerBase {
 //}
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
         Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            JSONObject resultObj = new JSONObject();
-            List<String> valueList = new ArrayList<>();
-            List<String> textList = new ArrayList<>();
-            List<ValueTextVo> valueTextList = new ArrayList<>();
-            boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-            if (isMultiple) {
-                valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
-                if (CollectionUtils.isNotEmpty(valueList)) {
-                    for (String value : valueList) {
-                        String text = parse(value);
-                        textList.add(text);
-                        valueTextList.add(new ValueTextVo(value, text));
-                    }
-                }
-            } else {
-                String value = (String) dataObj;
-                if (StringUtils.isNotBlank(value)) {
+        if (dataObj == null) {
+            return resultObj;
+        }
+        List<String> valueList = new ArrayList<>();
+        List<String> textList = new ArrayList<>();
+        List<ValueTextVo> valueTextList = new ArrayList<>();
+        boolean isMultiple = configObj.getBooleanValue("isMultiple");
+        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+        if (isMultiple) {
+            JSONArray valueArray = (JSONArray) dataObj;
+            if (CollectionUtils.isNotEmpty(valueArray)) {
+                valueList = valueArray.toJavaList(String.class);
+                for (String value : valueList) {
                     String text = parse(value);
                     textList.add(text);
-                    valueList.add(value);
                     valueTextList.add(new ValueTextVo(value, text));
                 }
             }
-            resultObj.put("text", textList);
-            resultObj.put("value", valueList);
-            resultObj.put("valueTextList", valueTextList);
-            return resultObj;
+        } else {
+            String value = (String) dataObj;
+            if (StringUtils.isNotBlank(value)) {
+                String text = parse(value);
+                textList.add(text);
+                valueList.add(value);
+                valueTextList.add(new ValueTextVo(value, text));
+            }
         }
-        return null;
+        resultObj.put("textList", textList);
+        resultObj.put("valueList", valueList);
+        resultObj.put("valueTextList", valueTextList);
+        return resultObj;
     }
 
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
         if (detailedData != null) {
-            JSONArray text = detailedData.getJSONArray("text");
+            JSONArray text = detailedData.getJSONArray("textList");
             if (CollectionUtils.isNotEmpty(text)) {
                 return String.join(",", text.toJavaList(String.class));
             }

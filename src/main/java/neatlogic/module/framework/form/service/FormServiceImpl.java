@@ -18,12 +18,17 @@ package neatlogic.module.framework.form.service;
 
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
+import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
+import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeMatrixVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
+import neatlogic.framework.form.dto.FormVersionVo;
+import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.exception.FormAttributeHandlerNotFoundException;
 import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
@@ -292,6 +297,36 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             }
         }
         return null;
+    }
+
+    @Override
+    public void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException {
+        if (formVersionVo == null) {
+            return;
+        }
+        List<FormAttributeVo> formAttributeList = formVersionVo.getFormAttributeList();
+        if (CollectionUtils.isEmpty(formAttributeList)) {
+            return;
+        }
+        Map<String, FormAttributeVo> formAttributeMap = formAttributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        for (int i = 0; i < formAttributeDataList.size(); i++) {
+            JSONObject formAttributeDataObj = formAttributeDataList.getJSONObject(i);
+            String attributeUuid = formAttributeDataObj.getString("attributeUuid");
+            FormAttributeVo formAttributeVo = formAttributeMap.get(attributeUuid);
+            if (formAttributeVo == null) {
+                continue;
+            }
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
+            if (formAttributeHandler == null) {
+                continue;
+            }
+            AttributeDataVo attributeDataVo = new AttributeDataVo();
+            attributeDataVo.setAttributeUuid(formAttributeVo.getUuid());
+            attributeDataVo.setAttributeLabel(formAttributeVo.getLabel());
+            attributeDataVo.setDataObj(formAttributeDataObj.get("dataList"));
+            formAttributeHandler.valid(attributeDataVo, formAttributeVo.getConfigObj());
+            formAttributeDataObj.put("dataList", attributeDataVo.getDataObj());
+        }
     }
 
     private String getValue(String matrixUuid, ValueTextVo mapping, String text) {

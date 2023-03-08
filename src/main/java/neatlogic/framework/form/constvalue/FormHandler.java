@@ -18,7 +18,7 @@ package neatlogic.framework.form.constvalue;
 
 public enum FormHandler implements IFormHandler {
     FORMLABEL("formlabel", "标签"),
-    FORMCASCADELIST("formcascadelist", "级联下拉"),
+    FORMCASCADER("formcascader", "级联下拉框"),
     FORMCHECKBOX("formcheckbox", "复选框"),
     FORMDATE("formdate", "日期"),
     FORMDIVIDER("formdivider", "分割线"),

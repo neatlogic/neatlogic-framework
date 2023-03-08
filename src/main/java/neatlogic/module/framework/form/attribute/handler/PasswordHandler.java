@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.form.attribute.handler;
 
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -41,12 +42,17 @@ public class PasswordHandler extends FormHandlerBase {
 
     @Override
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
+        String dataObj = (String) attributeDataVo.getDataObj();
+        if (StringUtils.isNotBlank(dataObj)) {
+            // 加密
+            attributeDataVo.setDataObj(RC4Util.encrypt(dataObj));
+        }
         return null;
     }
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getDataObj();
+        return "已更新";
     }
 
     @Override

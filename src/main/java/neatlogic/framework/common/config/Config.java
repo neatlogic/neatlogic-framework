@@ -462,7 +462,7 @@ public class Config {
                 value = value.trim();
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+           // logger.error(e.getMessage(), e);
         }
         if (value == null && isRequired) {
             throw new RuntimeException();

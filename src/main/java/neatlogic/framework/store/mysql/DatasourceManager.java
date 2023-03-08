@@ -93,7 +93,7 @@ public class DatasourceManager {
                 tenantDatasource.addDataSourceProperty("cacheServerConfiguration", true);
                 tenantDatasource.addDataSourceProperty("elideSetAutoCommits", true);
                 tenantDatasource.addDataSourceProperty("maintainTimeStats", false);
-
+                tenantDatasource.setConnectionTimeout(5000);
                 datasourceMap.put(datasourceVo.getTenantUuid(), tenantDatasource);
 
 
@@ -140,14 +140,12 @@ public class DatasourceManager {
     }
 
     public static void addDynamicDataSource(String tenantUuid, NeatLogicBasicDataSource neatlogicBasicDataSource) {
-        if (!datasourceMap.containsKey(tenantUuid)) {
-            datasourceMap.put(tenantUuid, neatlogicBasicDataSource);
-            datasource.setTargetDataSources(datasourceMap);
-            if (datasourceMap.containsKey("master")) {
-                datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
-            }
-            datasource.afterPropertiesSet();
+        datasourceMap.put(tenantUuid, neatlogicBasicDataSource);
+        datasource.setTargetDataSources(datasourceMap);
+        if (datasourceMap.containsKey("master")) {
+            datasource.setDefaultTargetDataSource(datasourceMap.get("master"));
         }
+        datasource.afterPropertiesSet();
     }
 
 }

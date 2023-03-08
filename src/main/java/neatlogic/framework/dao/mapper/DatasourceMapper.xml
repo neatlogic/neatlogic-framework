@@ -44,6 +44,18 @@ limitations under the License.
                `port`
         FROM `datasource`
     </select>
+    <select id="getDatasourceByTenantUuid" resultType="neatlogic.framework.dto.DatasourceVo">
+        SELECT tenant_id     as tenantId,
+               `tenant_uuid` AS `tenantUuid`,
+               `url`,
+               `username`,
+               `password`    AS passwordCipher,
+               `driver`,
+               `host`,
+               `port`
+        FROM `datasource`
+        where `tenant_uuid` = #{value}
+    </select>
 
     <update id="updateDatasourcePasswordByTenantId">
         update `datasource`
@@ -69,7 +81,9 @@ limitations under the License.
                 #{host},
                 #{port})
         ON DUPLICATE KEY
-            UPDATE `password` = #{passwordCipher}
+            UPDATE `password` = #{passwordCipher},
+                   `host`     = #{host},
+                   `port`     = #{port}
     </insert>
 
     <insert id="createDatasource" parameterType="neatlogic.framework.dto.DatasourceVo">

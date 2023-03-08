@@ -10,9 +10,12 @@ public interface DatasourceMapper {
 
 	List<DatasourceVo> getAllTenantDatasource();
 
+	DatasourceVo getDatasourceByTenantUuid(String tenantUuid);
+
 	int updateDatasourcePasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
 
 	int insertDatasource(DatasourceVo datasourceVo);
 
 	int createDatasource(DatasourceVo datasourceVo);
+
 }

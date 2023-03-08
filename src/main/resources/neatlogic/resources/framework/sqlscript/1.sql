@@ -1,7 +1,7 @@
 -- ----------------------------
 -- Table structure for api
 -- ----------------------------
-CREATE TABLE `api` (
+CREATE TABLE IF NOT EXISTS `api` (
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'token',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `module_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '模块id',
@@ -24,7 +24,7 @@ CREATE TABLE `api` (
 -- ----------------------------
 -- Table structure for api_access_count
 -- ----------------------------
-CREATE TABLE `api_access_count` (
+CREATE TABLE IF NOT EXISTS `api_access_count` (
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'token',
   `count` int DEFAULT NULL COMMENT '访问次数',
   PRIMARY KEY (`token`) USING BTREE
@@ -33,7 +33,7 @@ CREATE TABLE `api_access_count` (
 -- ----------------------------
 -- Table structure for api_audit
 -- ----------------------------
-CREATE TABLE `api_audit` (
+CREATE TABLE IF NOT EXISTS `api_audit` (
   `id` bigint NOT NULL COMMENT '记录id',
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口token',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '访问用户uuid',
@@ -55,7 +55,7 @@ CREATE TABLE `api_audit` (
 -- ----------------------------
 -- Table structure for audit_config
 -- ----------------------------
-CREATE TABLE `audit_config` (
+CREATE TABLE IF NOT EXISTS `audit_config` (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '审计类型',
   `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '审计配置',
   PRIMARY KEY (`name`) USING BTREE
@@ -64,7 +64,7 @@ CREATE TABLE `audit_config` (
 -- ----------------------------
 -- Table structure for audit_file
 -- ----------------------------
-CREATE TABLE `audit_file` (
+CREATE TABLE IF NOT EXISTS `audit_file` (
   `hash` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件hash',
   `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '日志文件路径',
   PRIMARY KEY (`hash`) USING BTREE
@@ -73,7 +73,7 @@ CREATE TABLE `audit_file` (
 -- ----------------------------
 -- Table structure for config
 -- ----------------------------
-CREATE TABLE `config` (
+CREATE TABLE IF NOT EXISTS `config` (
   `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置名',
   `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '配置值',
   `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '配置描述',
@@ -83,7 +83,7 @@ CREATE TABLE `config` (
 -- ----------------------------
 -- Table structure for datawarehouse_datasource
 -- ----------------------------
-CREATE TABLE `datawarehouse_datasource` (
+CREATE TABLE IF NOT EXISTS `datawarehouse_datasource` (
   `id` bigint NOT NULL COMMENT 'id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '唯一标识',
   `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '中文名称',
@@ -105,7 +105,7 @@ CREATE TABLE `datawarehouse_datasource` (
 -- ----------------------------
 -- Table structure for datawarehouse_datasource_audit
 -- ----------------------------
-CREATE TABLE `datawarehouse_datasource_audit` (
+CREATE TABLE IF NOT EXISTS `datawarehouse_datasource_audit` (
   `id` bigint NOT NULL COMMENT '自增id',
   `datasource_id` bigint DEFAULT NULL COMMENT '数据源id',
   `start_time` datetime(3) DEFAULT NULL COMMENT '开始时间',
@@ -120,7 +120,7 @@ CREATE TABLE `datawarehouse_datasource_audit` (
 -- ----------------------------
 -- Table structure for datawarehouse_datasource_condition
 -- ----------------------------
-CREATE TABLE `datawarehouse_datasource_condition` (
+CREATE TABLE IF NOT EXISTS `datawarehouse_datasource_condition` (
   `id` bigint NOT NULL COMMENT '主键',
   `datasource_id` bigint DEFAULT NULL COMMENT '数据源Id',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '唯一标识',
@@ -135,7 +135,7 @@ CREATE TABLE `datawarehouse_datasource_condition` (
 -- ----------------------------
 -- Table structure for datawarehouse_datasource_field
 -- ----------------------------
-CREATE TABLE `datawarehouse_datasource_field` (
+CREATE TABLE IF NOT EXISTS `datawarehouse_datasource_field` (
   `id` bigint NOT NULL COMMENT '主键',
   `datasource_id` bigint DEFAULT NULL COMMENT '数据源id',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '唯一标识',
@@ -152,7 +152,7 @@ CREATE TABLE `datawarehouse_datasource_field` (
 -- ----------------------------
 -- Table structure for datawarehouse_datasource_param
 -- ----------------------------
-CREATE TABLE `datawarehouse_datasource_param` (
+CREATE TABLE IF NOT EXISTS `datawarehouse_datasource_param` (
   `id` bigint NOT NULL COMMENT '自增id',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '标签',
@@ -166,7 +166,7 @@ CREATE TABLE `datawarehouse_datasource_param` (
 -- ----------------------------
 -- Table structure for dependency
 -- ----------------------------
-CREATE TABLE `dependency` (
+CREATE TABLE IF NOT EXISTS `dependency` (
   `from` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '被引用方(上游)标识',
   `type` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
   `to` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '下游标识',
@@ -178,7 +178,7 @@ CREATE TABLE `dependency` (
 -- ----------------------------
 -- Table structure for discovery_conf_combop
 -- ----------------------------
-CREATE TABLE `discovery_conf_combop` (
+CREATE TABLE IF NOT EXISTS `discovery_conf_combop` (
   `conf_id` bigint NOT NULL COMMENT '自动发现id',
   `combop_id` bigint NOT NULL COMMENT '组合工具id',
   PRIMARY KEY (`conf_id`,`combop_id`) USING BTREE
@@ -187,7 +187,7 @@ CREATE TABLE `discovery_conf_combop` (
 -- ----------------------------
 -- Table structure for file
 -- ----------------------------
-CREATE TABLE `file` (
+CREATE TABLE IF NOT EXISTS `file` (
   `id` bigint NOT NULL COMMENT 'id',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件名称',
   `size` bigint NOT NULL COMMENT '文件大小',
@@ -206,7 +206,7 @@ CREATE TABLE `file` (
 -- ----------------------------
 -- Table structure for filetype_config
 -- ----------------------------
-CREATE TABLE `filetype_config` (
+CREATE TABLE IF NOT EXISTS `filetype_config` (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `config` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT 'jsong格式，进行允许扩展名等设置',
   PRIMARY KEY (`name`) USING BTREE
@@ -215,7 +215,7 @@ CREATE TABLE `filetype_config` (
 -- ----------------------------
 -- Table structure for form
 -- ----------------------------
-CREATE TABLE `form` (
+CREATE TABLE IF NOT EXISTS `form` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单名字',
   `is_active` tinyint(1) NOT NULL COMMENT '表单是否启用，1：启用，0：禁用',
@@ -226,7 +226,7 @@ CREATE TABLE `form` (
 -- ----------------------------
 -- Table structure for form_attribute
 -- ----------------------------
-CREATE TABLE `form_attribute` (
+CREATE TABLE IF NOT EXISTS `form_attribute` (
   `form_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
   `formversion_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性uuid',
@@ -241,7 +241,7 @@ CREATE TABLE `form_attribute` (
 -- ----------------------------
 -- Table structure for form_attribute_matrix
 -- ----------------------------
-CREATE TABLE `form_attribute_matrix` (
+CREATE TABLE IF NOT EXISTS `form_attribute_matrix` (
   `form_version_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
   `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
   `form_attribute_label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '表单组件名称',
@@ -252,7 +252,7 @@ CREATE TABLE `form_attribute_matrix` (
 -- ----------------------------
 -- Table structure for form_customitem
 -- ----------------------------
-CREATE TABLE `form_customitem` (
+CREATE TABLE IF NOT EXISTS `form_customitem` (
   `id` bigint NOT NULL COMMENT 'id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '唯一标识',
   `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '显示名',
@@ -270,7 +270,7 @@ CREATE TABLE `form_customitem` (
 -- ----------------------------
 -- Table structure for form_version
 -- ----------------------------
-CREATE TABLE `form_version` (
+CREATE TABLE IF NOT EXISTS `form_version` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
   `version` int DEFAULT NULL COMMENT '表单版本',
   `is_active` tinyint(1) DEFAULT NULL COMMENT '表单版本是否启用，1：启用；2：禁用',
@@ -287,7 +287,7 @@ CREATE TABLE `form_version` (
 -- ----------------------------
 -- Table structure for fulltextindex_content_autoexec
 -- ----------------------------
-CREATE TABLE `fulltextindex_content_autoexec` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_content_autoexec` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
@@ -297,7 +297,7 @@ CREATE TABLE `fulltextindex_content_autoexec` (
 -- ----------------------------
 -- Table structure for fulltextindex_content_cmdb
 -- ----------------------------
-CREATE TABLE `fulltextindex_content_cmdb` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_content_cmdb` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
@@ -307,7 +307,7 @@ CREATE TABLE `fulltextindex_content_cmdb` (
 -- ----------------------------
 -- Table structure for fulltextindex_content_knowledge
 -- ----------------------------
-CREATE TABLE `fulltextindex_content_knowledge` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_content_knowledge` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
@@ -317,7 +317,7 @@ CREATE TABLE `fulltextindex_content_knowledge` (
 -- ----------------------------
 -- Table structure for fulltextindex_content_process
 -- ----------------------------
-CREATE TABLE `fulltextindex_content_process` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_content_process` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '字段',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
@@ -327,7 +327,7 @@ CREATE TABLE `fulltextindex_content_process` (
 -- ----------------------------
 -- Table structure for fulltextindex_field_autoexec
 -- ----------------------------
-CREATE TABLE `fulltextindex_field_autoexec` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_field_autoexec` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word_id` bigint NOT NULL COMMENT '词id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '字段',
@@ -341,7 +341,7 @@ CREATE TABLE `fulltextindex_field_autoexec` (
 -- ----------------------------
 -- Table structure for fulltextindex_field_cmdb
 -- ----------------------------
-CREATE TABLE `fulltextindex_field_cmdb` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_field_cmdb` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word_id` bigint NOT NULL COMMENT '词id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '字段',
@@ -355,7 +355,7 @@ CREATE TABLE `fulltextindex_field_cmdb` (
 -- ----------------------------
 -- Table structure for fulltextindex_field_knowledge
 -- ----------------------------
-CREATE TABLE `fulltextindex_field_knowledge` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_field_knowledge` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word_id` bigint NOT NULL COMMENT '词id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '字段',
@@ -369,7 +369,7 @@ CREATE TABLE `fulltextindex_field_knowledge` (
 -- ----------------------------
 -- Table structure for fulltextindex_field_process
 -- ----------------------------
-CREATE TABLE `fulltextindex_field_process` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_field_process` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word_id` bigint NOT NULL COMMENT '词id',
   `target_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '字段',
@@ -383,7 +383,7 @@ CREATE TABLE `fulltextindex_field_process` (
 -- ----------------------------
 -- Table structure for fulltextindex_offset_autoexec
 -- ----------------------------
-CREATE TABLE `fulltextindex_offset_autoexec` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_offset_autoexec` (
   `field_id` bigint NOT NULL COMMENT '词id',
   `start` int NOT NULL COMMENT 'start',
   `end` int NOT NULL COMMENT 'end',
@@ -393,7 +393,7 @@ CREATE TABLE `fulltextindex_offset_autoexec` (
 -- ----------------------------
 -- Table structure for fulltextindex_offset_cmdb
 -- ----------------------------
-CREATE TABLE `fulltextindex_offset_cmdb` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_offset_cmdb` (
   `field_id` bigint NOT NULL COMMENT '词id',
   `start` int NOT NULL COMMENT 'start',
   `end` int NOT NULL COMMENT 'end',
@@ -403,7 +403,7 @@ CREATE TABLE `fulltextindex_offset_cmdb` (
 -- ----------------------------
 -- Table structure for fulltextindex_offset_knowledge
 -- ----------------------------
-CREATE TABLE `fulltextindex_offset_knowledge` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_offset_knowledge` (
   `field_id` bigint NOT NULL COMMENT '词id',
   `start` int NOT NULL COMMENT 'start',
   `end` int NOT NULL COMMENT 'end',
@@ -413,7 +413,7 @@ CREATE TABLE `fulltextindex_offset_knowledge` (
 -- ----------------------------
 -- Table structure for fulltextindex_offset_process
 -- ----------------------------
-CREATE TABLE `fulltextindex_offset_process` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_offset_process` (
   `field_id` bigint NOT NULL COMMENT '词id',
   `start` int NOT NULL COMMENT 'start',
   `end` int NOT NULL COMMENT 'end',
@@ -423,7 +423,7 @@ CREATE TABLE `fulltextindex_offset_process` (
 -- ----------------------------
 -- Table structure for fulltextindex_rebuild_audit
 -- ----------------------------
-CREATE TABLE `fulltextindex_rebuild_audit` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_rebuild_audit` (
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
   `status` enum('doing','done') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '状态',
   `start_time` timestamp(3) NULL DEFAULT NULL COMMENT '开始时间',
@@ -437,7 +437,7 @@ CREATE TABLE `fulltextindex_rebuild_audit` (
 -- ----------------------------
 -- Table structure for fulltextindex_target_autoexec
 -- ----------------------------
-CREATE TABLE `fulltextindex_target_autoexec` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_target_autoexec` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '目标类型',
   `hit_count` int DEFAULT NULL COMMENT '命中次数',
@@ -450,7 +450,7 @@ CREATE TABLE `fulltextindex_target_autoexec` (
 -- ----------------------------
 -- Table structure for fulltextindex_target_cmdb
 -- ----------------------------
-CREATE TABLE `fulltextindex_target_cmdb` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_target_cmdb` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '目标类型',
   `hit_count` int DEFAULT NULL COMMENT '命中次数',
@@ -463,7 +463,7 @@ CREATE TABLE `fulltextindex_target_cmdb` (
 -- ----------------------------
 -- Table structure for fulltextindex_target_knowledge
 -- ----------------------------
-CREATE TABLE `fulltextindex_target_knowledge` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_target_knowledge` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '目标类型',
   `hit_count` int DEFAULT NULL COMMENT '命中次数',
@@ -476,7 +476,7 @@ CREATE TABLE `fulltextindex_target_knowledge` (
 -- ----------------------------
 -- Table structure for fulltextindex_target_process
 -- ----------------------------
-CREATE TABLE `fulltextindex_target_process` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_target_process` (
   `target_id` bigint NOT NULL COMMENT '目标id',
   `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '目标类型',
   `hit_count` int DEFAULT NULL COMMENT '命中次数',
@@ -489,7 +489,7 @@ CREATE TABLE `fulltextindex_target_process` (
 -- ----------------------------
 -- Table structure for fulltextindex_word
 -- ----------------------------
-CREATE TABLE `fulltextindex_word` (
+CREATE TABLE IF NOT EXISTS `fulltextindex_word` (
   `id` bigint unsigned NOT NULL COMMENT 'id',
   `word` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'word',
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'type',
@@ -500,7 +500,7 @@ CREATE TABLE `fulltextindex_word` (
 -- ----------------------------
 -- Table structure for global_lock
 -- ----------------------------
-CREATE TABLE `global_lock` (
+CREATE TABLE IF NOT EXISTS `global_lock` (
   `id` bigint NOT NULL COMMENT '主键id',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'key 散列的唯一标识',
   `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'key ',
@@ -517,7 +517,7 @@ CREATE TABLE `global_lock` (
 -- ----------------------------
 -- Table structure for globalsearch_document
 -- ----------------------------
-CREATE TABLE `globalsearch_document` (
+CREATE TABLE IF NOT EXISTS `globalsearch_document` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `target_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'target_id',
   `type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
@@ -532,7 +532,7 @@ CREATE TABLE `globalsearch_document` (
 -- ----------------------------
 -- Table structure for globalsearch_document_field
 -- ----------------------------
-CREATE TABLE `globalsearch_document_field` (
+CREATE TABLE IF NOT EXISTS `globalsearch_document_field` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word_id` bigint NOT NULL COMMENT '词id',
   `field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '字段',
@@ -547,7 +547,7 @@ CREATE TABLE `globalsearch_document_field` (
 -- ----------------------------
 -- Table structure for globalsearch_document_offset
 -- ----------------------------
-CREATE TABLE `globalsearch_document_offset` (
+CREATE TABLE IF NOT EXISTS `globalsearch_document_offset` (
   `field_id` bigint NOT NULL COMMENT 'field_id',
   `type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
   `start` int NOT NULL COMMENT 'start',
@@ -559,7 +559,7 @@ CREATE TABLE `globalsearch_document_offset` (
 -- ----------------------------
 -- Table structure for globalsearch_rebuild_audit
 -- ----------------------------
-CREATE TABLE `globalsearch_rebuild_audit` (
+CREATE TABLE IF NOT EXISTS `globalsearch_rebuild_audit` (
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'type',
   `status` enum('doing','done') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'status',
   `start_time` timestamp(3) NULL DEFAULT NULL COMMENT 'start_time',
@@ -572,7 +572,7 @@ CREATE TABLE `globalsearch_rebuild_audit` (
 -- ----------------------------
 -- Table structure for globalsearch_wordbook
 -- ----------------------------
-CREATE TABLE `globalsearch_wordbook` (
+CREATE TABLE IF NOT EXISTS `globalsearch_wordbook` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
   `word` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'word',
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'type',
@@ -583,7 +583,7 @@ CREATE TABLE `globalsearch_wordbook` (
 -- ----------------------------
 -- Table structure for integration
 -- ----------------------------
-CREATE TABLE `integration` (
+CREATE TABLE IF NOT EXISTS `integration` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'url',
@@ -604,7 +604,7 @@ CREATE TABLE `integration` (
 -- ----------------------------
 -- Table structure for integration_audit
 -- ----------------------------
-CREATE TABLE `integration_audit` (
+CREATE TABLE IF NOT EXISTS `integration_audit` (
   `id` bigint NOT NULL COMMENT '记录id',
   `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口token',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '访问用户uuid',
@@ -627,7 +627,7 @@ CREATE TABLE `integration_audit` (
 -- ----------------------------
 -- Table structure for integration_invoke
 -- ----------------------------
-CREATE TABLE `integration_invoke` (
+CREATE TABLE IF NOT EXISTS `integration_invoke` (
   `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '集成配置uuid',
   `invoke_config` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT 'config',
   `invoke_hash` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'hash',
@@ -638,7 +638,7 @@ CREATE TABLE `integration_invoke` (
 -- ----------------------------
 -- Table structure for lock
 -- ----------------------------
-CREATE TABLE `lock` (
+CREATE TABLE IF NOT EXISTS `lock` (
   `id` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'id',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='专门用来放锁的表';
@@ -646,7 +646,7 @@ CREATE TABLE `lock` (
 -- ----------------------------
 -- Table structure for login_captcha
 -- ----------------------------
-CREATE TABLE `login_captcha` (
+CREATE TABLE IF NOT EXISTS `login_captcha` (
   `session_id` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '登录session_id',
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '验证码',
   `expired_time` timestamp NULL DEFAULT NULL COMMENT '超时时间点',
@@ -657,7 +657,7 @@ CREATE TABLE `login_captcha` (
 -- ----------------------------
 -- Table structure for login_failed_count
 -- ----------------------------
-CREATE TABLE `login_failed_count` (
+CREATE TABLE IF NOT EXISTS `login_failed_count` (
   `user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `failed_count` int DEFAULT NULL COMMENT '错误次数',
   PRIMARY KEY (`user_id`) USING BTREE
@@ -666,7 +666,7 @@ CREATE TABLE `login_failed_count` (
 -- ----------------------------
 -- Table structure for mail_server
 -- ----------------------------
-CREATE TABLE `mail_server` (
+CREATE TABLE IF NOT EXISTS `mail_server` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `host` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'host',
@@ -681,7 +681,7 @@ CREATE TABLE `mail_server` (
 -- ----------------------------
 -- Table structure for matrix
 -- ----------------------------
-CREATE TABLE `matrix` (
+CREATE TABLE IF NOT EXISTS `matrix` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '唯一表示id',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '矩阵名称',
@@ -699,7 +699,7 @@ CREATE TABLE `matrix` (
 -- ----------------------------
 -- Table structure for matrix_attribute
 -- ----------------------------
-CREATE TABLE `matrix_attribute` (
+CREATE TABLE IF NOT EXISTS `matrix_attribute` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '属性uuid',
   `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '矩阵uuid',
@@ -715,7 +715,7 @@ CREATE TABLE `matrix_attribute` (
 -- ----------------------------
 -- Table structure for matrix_ci
 -- ----------------------------
-CREATE TABLE `matrix_ci` (
+CREATE TABLE IF NOT EXISTS `matrix_ci` (
   `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
   `ci_id` bigint NOT NULL COMMENT 'ci模型id',
   `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置信息',
@@ -725,7 +725,7 @@ CREATE TABLE `matrix_ci` (
 -- ----------------------------
 -- Table structure for matrix_external
 -- ----------------------------
-CREATE TABLE `matrix_external` (
+CREATE TABLE IF NOT EXISTS `matrix_external` (
   `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
   `integration_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '插件类型',
   PRIMARY KEY (`matrix_uuid`) USING BTREE
@@ -734,7 +734,7 @@ CREATE TABLE `matrix_external` (
 -- ----------------------------
 -- Table structure for matrix_view
 -- ----------------------------
-CREATE TABLE `matrix_view` (
+CREATE TABLE IF NOT EXISTS `matrix_view` (
   `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
   `file_id` bigint DEFAULT NULL COMMENT '配置文件',
   `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'config',
@@ -746,7 +746,7 @@ CREATE TABLE `matrix_view` (
 -- ----------------------------
 -- Table structure for menu
 -- ----------------------------
-CREATE TABLE `menu` (
+CREATE TABLE IF NOT EXISTS `menu` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单名称',
   `parent_id` bigint NOT NULL DEFAULT '0' COMMENT '父节点id',
@@ -764,7 +764,7 @@ CREATE TABLE `menu` (
 -- ----------------------------
 -- Table structure for menu_mobile
 -- ----------------------------
-CREATE TABLE `menu_mobile` (
+CREATE TABLE IF NOT EXISTS `menu_mobile` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单标识',
   `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '菜单名',
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '图标',
@@ -776,7 +776,7 @@ CREATE TABLE `menu_mobile` (
 -- ----------------------------
 -- Table structure for menu_role
 -- ----------------------------
-CREATE TABLE `menu_role` (
+CREATE TABLE IF NOT EXISTS `menu_role` (
   `menu_id` bigint NOT NULL COMMENT '菜单Id',
   `role_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色uuid(引用role的uuid)',
   PRIMARY KEY (`menu_id`,`role_uuid`) USING BTREE
@@ -785,7 +785,7 @@ CREATE TABLE `menu_role` (
 -- ----------------------------
 -- Table structure for message
 -- ----------------------------
-CREATE TABLE `message` (
+CREATE TABLE IF NOT EXISTS `message` (
   `id` bigint NOT NULL COMMENT '主键id',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '标题',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
@@ -801,7 +801,7 @@ CREATE TABLE `message` (
 -- ----------------------------
 -- Table structure for message_recipient
 -- ----------------------------
-CREATE TABLE `message_recipient` (
+CREATE TABLE IF NOT EXISTS `message_recipient` (
   `message_id` bigint NOT NULL COMMENT '消息id',
   `type` enum('user','team','role') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接收者类型，用户、组、角色',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接收者标识',
@@ -811,7 +811,7 @@ CREATE TABLE `message_recipient` (
 -- ----------------------------
 -- Table structure for message_subscribe
 -- ----------------------------
-CREATE TABLE `message_subscribe` (
+CREATE TABLE IF NOT EXISTS `message_subscribe` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '订阅用户uuid',
   `handler` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '消息类型处理器全类名',
   `is_active` tinyint(1) DEFAULT NULL COMMENT '是否订阅',
@@ -823,7 +823,7 @@ CREATE TABLE `message_subscribe` (
 -- ----------------------------
 -- Table structure for message_user
 -- ----------------------------
-CREATE TABLE `message_user` (
+CREATE TABLE IF NOT EXISTS `message_user` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `message_id` bigint NOT NULL COMMENT '消息id',
   `is_read` tinyint(1) DEFAULT '0' COMMENT '1：已读，0：未读',
@@ -837,7 +837,7 @@ CREATE TABLE `message_user` (
 -- ----------------------------
 -- Table structure for mq_subscribe
 -- ----------------------------
-CREATE TABLE `mq_subscribe` (
+CREATE TABLE IF NOT EXISTS `mq_subscribe` (
   `id` bigint NOT NULL COMMENT 'id',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '唯一标识',
   `topic_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '主题唯一标识',
@@ -857,7 +857,7 @@ CREATE TABLE `mq_subscribe` (
 -- ----------------------------
 -- Table structure for mq_topic
 -- ----------------------------
-CREATE TABLE `mq_topic` (
+CREATE TABLE IF NOT EXISTS `mq_topic` (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `is_active` tinyint(1) DEFAULT NULL COMMENT '是否激活',
   PRIMARY KEY (`name`) USING BTREE
@@ -866,7 +866,7 @@ CREATE TABLE `mq_topic` (
 -- ----------------------------
 -- Table structure for notify_job
 -- ----------------------------
-CREATE TABLE `notify_job` (
+CREATE TABLE IF NOT EXISTS `notify_job` (
   `id` bigint NOT NULL COMMENT 'id',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '任务名称',
   `cron` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'cron',
@@ -884,7 +884,7 @@ CREATE TABLE `notify_job` (
 -- ----------------------------
 -- Table structure for notify_job_receiver
 -- ----------------------------
-CREATE TABLE `notify_job_receiver` (
+CREATE TABLE IF NOT EXISTS `notify_job_receiver` (
   `notify_job_id` bigint NOT NULL COMMENT '通知定时任务ID',
   `receiver` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接收者、组、角色uuid或者邮箱',
   `type` enum('common','user','team','role','processUserType','email') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'receiver类型，区分是用户、组、角色的uuid还是邮箱',
@@ -895,7 +895,7 @@ CREATE TABLE `notify_job_receiver` (
 -- ----------------------------
 -- Table structure for notify_policy
 -- ----------------------------
-CREATE TABLE `notify_policy` (
+CREATE TABLE IF NOT EXISTS `notify_policy` (
   `id` bigint NOT NULL COMMENT '主键',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `handler` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '不同类型策略处理器',
@@ -910,7 +910,7 @@ CREATE TABLE `notify_policy` (
 -- ----------------------------
 -- Table structure for role
 -- ----------------------------
-CREATE TABLE `role` (
+CREATE TABLE IF NOT EXISTS `role` (
   `id` bigint NOT NULL COMMENT '自增ID',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'uuid',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
@@ -922,7 +922,7 @@ CREATE TABLE `role` (
 -- ----------------------------
 -- Table structure for role_authority
 -- ----------------------------
-CREATE TABLE `role_authority` (
+CREATE TABLE IF NOT EXISTS `role_authority` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `role_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
   `auth_group` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '权限组',
@@ -936,7 +936,7 @@ CREATE TABLE `role_authority` (
 -- ----------------------------
 -- Table structure for runner
 -- ----------------------------
-CREATE TABLE `runner` (
+CREATE TABLE IF NOT EXISTS `runner` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `host` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'ip',
@@ -961,7 +961,7 @@ CREATE TABLE `runner` (
 -- ----------------------------
 -- Table structure for runner_map
 -- ----------------------------
-CREATE TABLE `runner_map` (
+CREATE TABLE IF NOT EXISTS `runner_map` (
   `id` bigint NOT NULL COMMENT '抽象id',
   `runner_id` bigint NOT NULL COMMENT 'runnerId',
   PRIMARY KEY (`id`,`runner_id`) USING BTREE,
@@ -971,7 +971,7 @@ CREATE TABLE `runner_map` (
 -- ----------------------------
 -- Table structure for runnergroup
 -- ----------------------------
-CREATE TABLE `runnergroup` (
+CREATE TABLE IF NOT EXISTS `runnergroup` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组名称',
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '描述',
@@ -981,7 +981,7 @@ CREATE TABLE `runnergroup` (
 -- ----------------------------
 -- Table structure for runnergroup_network
 -- ----------------------------
-CREATE TABLE `runnergroup_network` (
+CREATE TABLE IF NOT EXISTS `runnergroup_network` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `group_id` bigint DEFAULT NULL COMMENT '组id',
   `network_ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'ip',
@@ -992,7 +992,7 @@ CREATE TABLE `runnergroup_network` (
 -- ----------------------------
 -- Table structure for runnergroup_runner
 -- ----------------------------
-CREATE TABLE `runnergroup_runner` (
+CREATE TABLE IF NOT EXISTS `runnergroup_runner` (
   `runnergroup_id` bigint DEFAULT NULL COMMENT 'runner组id',
   `runner_id` bigint DEFAULT NULL COMMENT 'runnerId'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='runner组和runner关系表';
@@ -1000,7 +1000,7 @@ CREATE TABLE `runnergroup_runner` (
 -- ----------------------------
 -- Table structure for schedule_job
 -- ----------------------------
-CREATE TABLE `schedule_job` (
+CREATE TABLE IF NOT EXISTS `schedule_job` (
   `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '全局唯一id，跨环境导入用',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
   `handler` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器',
@@ -1016,7 +1016,7 @@ CREATE TABLE `schedule_job` (
 -- ----------------------------
 -- Table structure for schedule_job_audit
 -- ----------------------------
-CREATE TABLE `schedule_job_audit` (
+CREATE TABLE IF NOT EXISTS `schedule_job_audit` (
   `id` bigint NOT NULL COMMENT 'id',
   `job_uuid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '引用schedule_job的uuid',
   `start_time` timestamp(3) NULL DEFAULT NULL COMMENT '开始时间',
@@ -1034,7 +1034,7 @@ CREATE TABLE `schedule_job_audit` (
 -- ----------------------------
 -- Table structure for schedule_job_audit_detail
 -- ----------------------------
-CREATE TABLE `schedule_job_audit_detail` (
+CREATE TABLE IF NOT EXISTS `schedule_job_audit_detail` (
   `hash` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'hash',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '内容',
   PRIMARY KEY (`hash`) USING BTREE
@@ -1043,7 +1043,7 @@ CREATE TABLE `schedule_job_audit_detail` (
 -- ----------------------------
 -- Table structure for schedule_job_load_time
 -- ----------------------------
-CREATE TABLE `schedule_job_load_time` (
+CREATE TABLE IF NOT EXISTS `schedule_job_load_time` (
   `job_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'schedule_job表的uuid',
   `job_group` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job组',
   `cron` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'cron表达式',
@@ -1054,7 +1054,7 @@ CREATE TABLE `schedule_job_load_time` (
 -- ----------------------------
 -- Table structure for schedule_job_lock
 -- ----------------------------
-CREATE TABLE `schedule_job_lock` (
+CREATE TABLE IF NOT EXISTS `schedule_job_lock` (
   `job_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'schedule_job表的uuid',
   `job_group` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job组',
   `job_handler` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器',
@@ -1067,7 +1067,7 @@ CREATE TABLE `schedule_job_lock` (
 -- ----------------------------
 -- Table structure for schedule_job_prop
 -- ----------------------------
-CREATE TABLE `schedule_job_prop` (
+CREATE TABLE IF NOT EXISTS `schedule_job_prop` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
   `job_uuid` char(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用schedule_job的uuid',
   `prop_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '属性名称',
@@ -1079,7 +1079,7 @@ CREATE TABLE `schedule_job_prop` (
 -- ----------------------------
 -- Table structure for schedule_job_status
 -- ----------------------------
-CREATE TABLE `schedule_job_status` (
+CREATE TABLE IF NOT EXISTS `schedule_job_status` (
   `job_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job uuid',
   `job_group` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'job组',
   `handler` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '处理器',
@@ -1095,7 +1095,7 @@ CREATE TABLE `schedule_job_status` (
 -- ----------------------------
 -- Table structure for score_template
 -- ----------------------------
-CREATE TABLE `score_template` (
+CREATE TABLE IF NOT EXISTS `score_template` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '评分模版名称',
   `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '评分模版说明',
@@ -1110,7 +1110,7 @@ CREATE TABLE `score_template` (
 -- ----------------------------
 -- Table structure for score_template_dimension
 -- ----------------------------
-CREATE TABLE `score_template_dimension` (
+CREATE TABLE IF NOT EXISTS `score_template_dimension` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `score_template_id` bigint NOT NULL COMMENT '评分模版ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '评分维度名称',
@@ -1121,7 +1121,7 @@ CREATE TABLE `score_template_dimension` (
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------
-CREATE TABLE `system_notice` (
+CREATE TABLE IF NOT EXISTS `system_notice` (
   `id` bigint NOT NULL COMMENT 'id',
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '标题',
   `content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
@@ -1142,7 +1142,7 @@ CREATE TABLE `system_notice` (
 -- ----------------------------
 -- Table structure for system_notice_recipient
 -- ----------------------------
-CREATE TABLE `system_notice_recipient` (
+CREATE TABLE IF NOT EXISTS `system_notice_recipient` (
   `system_notice_id` bigint NOT NULL COMMENT '系统公告ID',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '通知对象uuid',
   `type` enum('common','user','team','role') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型(common,user,team,role)',
@@ -1152,7 +1152,7 @@ CREATE TABLE `system_notice_recipient` (
 -- ----------------------------
 -- Table structure for system_notice_user
 -- ----------------------------
-CREATE TABLE `system_notice_user` (
+CREATE TABLE IF NOT EXISTS `system_notice_user` (
   `system_notice_id` bigint NOT NULL COMMENT '系统公告ID',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `is_read` tinyint(1) NOT NULL COMMENT '1:已读；0:未读',
@@ -1165,7 +1165,7 @@ CREATE TABLE `system_notice_user` (
 -- ----------------------------
 -- Table structure for tag
 -- ----------------------------
-CREATE TABLE `tag` (
+CREATE TABLE IF NOT EXISTS `tag` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '标签名',
   PRIMARY KEY (`id`) USING BTREE
@@ -1174,7 +1174,7 @@ CREATE TABLE `tag` (
 -- ----------------------------
 -- Table structure for team
 -- ----------------------------
-CREATE TABLE `team` (
+CREATE TABLE IF NOT EXISTS `team` (
   `id` bigint NOT NULL COMMENT 'id',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '全局唯一id，跨环境导入用',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
@@ -1196,7 +1196,7 @@ CREATE TABLE `team` (
 -- ----------------------------
 -- Table structure for team_role
 -- ----------------------------
-CREATE TABLE `team_role` (
+CREATE TABLE IF NOT EXISTS `team_role` (
   `team_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用team的uuid',
   `role_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用role的uuid',
   `checked_children` tinyint NOT NULL COMMENT '是否穿透选择子节点',
@@ -1206,7 +1206,7 @@ CREATE TABLE `team_role` (
 -- ----------------------------
 -- Table structure for team_user_title
 -- ----------------------------
-CREATE TABLE `team_user_title` (
+CREATE TABLE IF NOT EXISTS `team_user_title` (
   `team_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '组uuid',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `title_id` bigint NOT NULL COMMENT '头衔id',
@@ -1217,7 +1217,7 @@ CREATE TABLE `team_user_title` (
 -- ----------------------------
 -- Table structure for test
 -- ----------------------------
-CREATE TABLE `test` (
+CREATE TABLE IF NOT EXISTS `test` (
   `A` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `B` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `C` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -1228,7 +1228,7 @@ CREATE TABLE `test` (
 -- ----------------------------
 -- Table structure for theme
 -- ----------------------------
-CREATE TABLE `theme` (
+CREATE TABLE IF NOT EXISTS `theme` (
   `id` bigint NOT NULL COMMENT '主键 id',
   `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '主题配置',
   `fcu` varbinary(32) DEFAULT NULL COMMENT '创建人',
@@ -1239,7 +1239,7 @@ CREATE TABLE `theme` (
 -- ----------------------------
 -- Table structure for user
 -- ----------------------------
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `id` bigint NOT NULL COMMENT 'ID',
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '全局唯一id，跨环境导入用',
   `user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户Id',
@@ -1262,7 +1262,7 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Table structure for user_agent
 -- ----------------------------
-CREATE TABLE `user_agent` (
+CREATE TABLE IF NOT EXISTS `user_agent` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `agent_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '代理人uuid',
   `func` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能',
@@ -1274,7 +1274,7 @@ CREATE TABLE `user_agent` (
 -- ----------------------------
 -- Table structure for user_authority
 -- ----------------------------
-CREATE TABLE `user_authority` (
+CREATE TABLE IF NOT EXISTS `user_authority` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户ID',
   `auth_group` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '权限组',
@@ -1288,7 +1288,7 @@ CREATE TABLE `user_authority` (
 -- ----------------------------
 -- Table structure for user_data
 -- ----------------------------
-CREATE TABLE `user_data` (
+CREATE TABLE IF NOT EXISTS `user_data` (
   `user_uuid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '数据',
   `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能类型',
@@ -1298,7 +1298,7 @@ CREATE TABLE `user_data` (
 -- ----------------------------
 -- Table structure for user_password
 -- ----------------------------
-CREATE TABLE `user_password` (
+CREATE TABLE IF NOT EXISTS `user_password` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `user_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户ID',
@@ -1311,7 +1311,7 @@ CREATE TABLE `user_password` (
 -- ----------------------------
 -- Table structure for user_profile
 -- ----------------------------
-CREATE TABLE `user_profile` (
+CREATE TABLE IF NOT EXISTS `user_profile` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `module_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块id',
   `config` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '个性化 json',
@@ -1321,7 +1321,7 @@ CREATE TABLE `user_profile` (
 -- ----------------------------
 -- Table structure for user_role
 -- ----------------------------
-CREATE TABLE `user_role` (
+CREATE TABLE IF NOT EXISTS `user_role` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `role_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用role的uuid',
@@ -1333,7 +1333,7 @@ CREATE TABLE `user_role` (
 -- ----------------------------
 -- Table structure for user_session
 -- ----------------------------
-CREATE TABLE `user_session` (
+CREATE TABLE IF NOT EXISTS `user_session` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `visit_time` timestamp(3) NULL DEFAULT NULL COMMENT '访问时间',
   PRIMARY KEY (`user_uuid`) USING HASH
@@ -1342,7 +1342,7 @@ CREATE TABLE `user_session` (
 -- ----------------------------
 -- Table structure for user_team
 -- ----------------------------
-CREATE TABLE `user_team` (
+CREATE TABLE IF NOT EXISTS `user_team` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `team_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用flow_team的uuid',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '引用flow_user的uuid',
@@ -1355,7 +1355,7 @@ CREATE TABLE `user_team` (
 -- ----------------------------
 -- Table structure for user_title
 -- ----------------------------
-CREATE TABLE `user_title` (
+CREATE TABLE IF NOT EXISTS `user_title` (
   `id` bigint NOT NULL COMMENT '唯一id',
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '头衔名，如果不被引用则自动删除',
   PRIMARY KEY (`id`) USING BTREE,
@@ -1365,7 +1365,7 @@ CREATE TABLE `user_title` (
 -- ----------------------------
 -- Table structure for worktime
 -- ----------------------------
-CREATE TABLE `worktime` (
+CREATE TABLE IF NOT EXISTS `worktime` (
   `uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'id',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `is_active` int NOT NULL DEFAULT '1' COMMENT '是否激活，1：激活，0：禁用',
@@ -1379,7 +1379,7 @@ CREATE TABLE `worktime` (
 -- ----------------------------
 -- Table structure for worktime_range
 -- ----------------------------
-CREATE TABLE `worktime_range` (
+CREATE TABLE IF NOT EXISTS `worktime_range` (
   `worktime_uuid` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'worktime表的uuid',
   `year` int NOT NULL COMMENT '年份',
   `date` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '日期',

@@ -42,17 +42,25 @@ public class DatasourceVo {
         this.tenantId = _tenantId;
         this.tenantUuid = _tenantUuid;
         // 生成随机密码
+        /*There are three levels of password validation policy enforced when Validate Password plugin is enabled:
+            LOW    Length >= 8 characters.
+            MEDIUM Length >= 8, numeric, mixed case, and special characters.
+            STRONG Length >= 8, numeric, mixed case, special characters and dictionary file.
+            default is MEDIUM
+        */
         if (generatePwd) {
             // this.passwordPlain = "123456";
             Random rand = new Random();
             StringBuilder password = new StringBuilder();
             String[] chars = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
             String[] specialChars = new String[]{"#",".","@","$"};
+            String[] nums = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
             for (int i = 0; i < 10; i++) {
                 int randNumber = rand.nextInt(chars.length);
                 password.append(chars[randNumber]);
             }
             password.append(specialChars[rand.nextInt(specialChars.length)]);
+            password.append(nums[rand.nextInt(nums.length)]);
             this.passwordPlain = password.toString();
         }
     }

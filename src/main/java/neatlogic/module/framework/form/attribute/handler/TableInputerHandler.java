@@ -1097,6 +1097,321 @@ public class TableInputerHandler extends FormHandlerBase {
 //		}
 //	]
 //}
+        /*
+    {
+        "handler": "formtableinputer",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "disable": {},
+            "display": {},
+            "emit": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formstaticlist",
+        "hasValue": true,
+        "label": "表格输入_2",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "disableDefaultValue": true,
+            "isMask": false,
+            "isCanDrag": true,
+            "width": "100%",
+            "description": "",
+            "dataConfig": [
+                {
+                    "handler": "formtext",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "文本框_1",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "cad032ca2175424eb815586694a8f17d",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "文本1"
+                    }
+                },
+                {
+                    "handler": "formtextarea",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "文本域_2",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "bbc47193be544403a79f31e5529a93f4",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "文本域1"
+                    }
+                },
+                {
+                    "handler": "formselect",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "下拉框_3",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "266abb12741f49218c6d6a6d1e89e131",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "1",
+                        "dataList": [
+                            {
+                                "text": "a1",
+                                "value": "1"
+                            },
+                            {
+                                "text": "a2",
+                                "value": "2"
+                            }
+                        ],
+                        "dataSource": "static"
+                    }
+                },
+                {
+                    "handler": "formradio",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "单选框_4",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "3805bbf114414604b6a514c6287b51f0",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "3",
+                        "dataList": [
+                            {
+                                "text": "a3",
+                                "value": "3"
+                            },
+                            {
+                                "text": "a4",
+                                "value": "4"
+                            }
+                        ],
+                        "dataSource": "static"
+                    }
+                },
+                {
+                    "handler": "formcheckbox",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "复选框_5",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "694181007eaa43079f0dba131593fe8a",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": [
+                            "5",
+                            "6"
+                        ],
+                        "dataList": [
+                            {
+                                "text": "a5",
+                                "value": "5"
+                            },
+                            {
+                                "text": "a6",
+                                "value": "6"
+                            }
+                        ],
+                        "isMultiple": true,
+                        "dataSource": "static"
+                    }
+                },
+                {
+                    "handler": "formdate",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "日期_6",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "3c33ca77c2f148f4af50bf7f98715a38",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "2023-03-02",
+                        "format": "yyyy-MM-dd"
+                    }
+                },
+                {
+                    "handler": "formtime",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "时间_7",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "b9e04282e1f84b828d9ae745f58471fd",
+                    "config": {
+                        "isRequired": true,
+                        "defaultValue": "00:00:00",
+                        "format": "HH:mm:ss"
+                    }
+                },
+                {
+                    "handler": "formtable",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "表格_8",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "d2e965358f264cee926fe00b5caec36c",
+                    "config": {
+                        "isRequired": true,
+                        "dataConfig": [
+                            {
+                                "handler": "formtext",
+                                "reaction": {
+                                    "hide": {},
+                                    "readonly": {},
+                                    "disable": {},
+                                    "display": {},
+                                    "mask": {}
+                                },
+                                "isSearch": false,
+                                "isExtra": true,
+                                "hasValue": true,
+                                "label": "文本框_2",
+                                "isSearchable": 0,
+                                "uuid": "6e4161058e3043b38c334d36cb2cc1d4",
+                                "config": {
+                                    "isRequired": true,
+                                    "defaultValue": "文本2"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "isShowNumber": true,
+            "lineNumber": 1,
+            "isHide": false
+        },
+        "uuid": "476924a9d8ec4f06be393337f993a1cb"
+    }
+     */
+    /*
+    [
+        {
+            "bbc47193be544403a79f31e5529a93f4": "文本域1",
+            "_selected": false,
+            "266abb12741f49218c6d6a6d1e89e131": "1",
+            "3805bbf114414604b6a514c6287b51f0": "3",
+            "3c33ca77c2f148f4af50bf7f98715a38": "2023-03-02",
+            "cad032ca2175424eb815586694a8f17d": "文本1",
+            "d2e965358f264cee926fe00b5caec36c": [
+                {
+                    "_selected": false,
+                    "6e4161058e3043b38c334d36cb2cc1d4": "文本2",
+                    "uuid": "1a0339b98a104cae8240e50e51074508"
+                }
+            ],
+            "b9e04282e1f84b828d9ae745f58471fd": "00:00:00",
+            "694181007eaa43079f0dba131593fe8a": [
+                "5",
+                "6"
+            ],
+            "uuid": "d53aec8bea0943dcb721c70e0f1946f8"
+        },
+        {
+            "bbc47193be544403a79f31e5529a93f4": "文本域1",
+            "_selected": false,
+            "266abb12741f49218c6d6a6d1e89e131": "1",
+            "3805bbf114414604b6a514c6287b51f0": "3",
+            "3c33ca77c2f148f4af50bf7f98715a38": "2023-03-02",
+            "cad032ca2175424eb815586694a8f17d": "文本1",
+            "d2e965358f264cee926fe00b5caec36c": [
+                {
+                    "_selected": false,
+                    "6e4161058e3043b38c334d36cb2cc1d4": "文本2",
+                    "uuid": "88225d931e564327bc9e472d953e7eb0"
+                }
+            ],
+            "b9e04282e1f84b828d9ae745f58471fd": "00:00:00",
+            "694181007eaa43079f0dba131593fe8a": [
+                "5",
+                "6"
+            ],
+            "uuid": "cef4da6d65e8476db2c64f1d5544557e"
+        }
+    ]
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

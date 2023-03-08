@@ -148,41 +148,51 @@ public class TreeSelectHandler extends FormHandlerBase {
         return 13;
     }
 
-//表单组件配置信息
-//    {
-//        "handler": "formtreeselect",
-//        "label": "下拉树组件_1",
-//        "type": "form",
-//        "uuid": "2fd292d9e99940c5add33543a48dd045",
-//        "config": {
-//            "isRequired": false,
-//                    "ruleList": [],
-//            "width": "100%",
-//                    "validList": [],
-//            "quoteUuid": "",
-//                    "defaultValueType": "self",
-//                    "placeholder": "请选择下拉树",
-//                    "value": "",
-//                    "authorityConfig": [
-//            "common#alluser"
-//                    ],
-//            "config": {
-//                "textName": "name",
-//                        "valueName": "uuid",
-//                        "url": "/api/rest/knowledge/document/type/tree/forselect"
-//            },
-//            "dataSource": "knowledgeType",
-//                    "url": "/api/rest/knowledge/document/type/tree/forselect"
-//        }
-//    }
-//保存数据
-//7174540d09f043948fb4e168045a4094
-//返回数据结构
-//{
-//    "value": "7174540d09f043948fb4e168045a4094",
-//    "text": "发布文档",
-//    "textList": ["测试", "发布文档"]
-//}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formtreeselect",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "disable": {},
+            "display": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-topo",
+        "hasValue": true,
+        "label": "树型下拉框_16",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "isMask": false,
+            "width": "100%",
+            "description": "",
+            "dataSource": "knowledgeType",
+            "config": {
+                "textName": "name",
+                "valueName": "uuid",
+                "url": "/api/rest/knowledge/document/type/tree/forselect"
+            },
+            "url": "/api/rest/knowledge/document/type/tree/forselect",
+            "isHide": false
+        },
+        "uuid": "289d1989bc5e42cba23499272ac4a531"
+    }
+     */
+    /*
+    保存数据结构
+    7174540d09f043948fb4e168045a4094
+     */
+    /*
+    返回数据结构
+    {
+        "value": "7174540d09f043948fb4e168045a4094",
+        "text": "发布文档",
+        "textList": ["测试", "发布文档"]
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

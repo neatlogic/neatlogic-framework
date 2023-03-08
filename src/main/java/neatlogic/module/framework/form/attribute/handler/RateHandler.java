@@ -23,10 +23,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class RateHandler extends FormHandlerBase {
@@ -58,9 +55,6 @@ public class RateHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-//        if (CollectionUtils.isNotEmpty(values)) {
-//            return values.get(0);
-//        }
         return text;
     }
 
@@ -86,6 +80,48 @@ public class RateHandler extends FormHandlerBase {
         return true;
     }
 
+    /*
+    表单组件配置信息
+    {
+        "handler": "formrate",
+        "reaction": {
+            "hide": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "emit": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-star",
+        "hasValue": true,
+        "label": "评分_13",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "isMask": false,
+            "showText": false,
+            "width": "100%",
+            "count": 5,
+            "description": "",
+            "isDisabled": false,
+            "allowHalf": false,
+            "isHide": false
+        },
+        "uuid": "a8fb26d3b69b461a8c992b6a8ec831fa"
+    }
+     */
+    /*
+    保存数据结构
+    5
+     */
+    /*
+    返回数据结构
+    {
+        "value": 5
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

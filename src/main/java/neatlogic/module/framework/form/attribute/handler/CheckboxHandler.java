@@ -69,17 +69,29 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        List<String> valueList = JSON.parseArray(JSON.toJSONString(attributeDataVo.getDataObj()), String.class);
-        if (CollectionUtils.isNotEmpty(valueList)) {
-            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
-        } else {
-            return valueList;
+//        List<String> valueList = JSON.parseArray(JSON.toJSONString(attributeDataVo.getDataObj()), String.class);
+//        if (CollectionUtils.isNotEmpty(valueList)) {
+//            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
+//        } else {
+//            return valueList;
+//        }
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            return textArray;
         }
+        return resultObj.getJSONArray("valueList");
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("、", textList);
+        }
+        return null;
     }
 
     @Override
@@ -278,6 +290,65 @@ public class CheckboxHandler extends FormHandlerBase {
 //		"1"
 //	]
 //}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formcheckbox",
+        "reaction": {
+            "filter": {},
+            "hide": {},
+            "readonly": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-check-square",
+        "hasValue": true,
+        "label": "复选框_3",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "mapping": {
+                "text": "",
+                "value": ""
+            },
+            "description": "",
+            "isMultiple": true,
+            "matrixUuid": "",
+            "isHide": false,
+            "isMask": false,
+            "isReadOnly": false,
+            "dataList": [
+                {
+                    "text": "a4",
+                    "value": "4"
+                },
+                {
+                    "text": "a5",
+                    "value": "5"
+                },
+                {
+                    "text": "a6",
+                    "value": "6"
+                }
+            ],
+            "width": "100%",
+            "isDisabled": false,
+            "defaultValueType": "self",
+            "dataSource": "static",
+            "direction": "vertical"
+        },
+        "uuid": "06632514996e42848261fcb53a7869e9",
+        "switchHandler": [
+            "formselect",
+            "formradio",
+            "formcheckbox"
+        ]
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();

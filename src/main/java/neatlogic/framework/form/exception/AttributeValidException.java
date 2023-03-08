@@ -16,7 +16,9 @@ limitations under the License.
 
 package neatlogic.framework.form.exception;
 
-public class AttributeValidException extends Exception {
+import neatlogic.framework.exception.core.ApiRuntimeException;
+
+public class AttributeValidException extends ApiRuntimeException {
     /**
      * @Fields serialVersionUID : TODO
      */

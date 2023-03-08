@@ -77,7 +77,13 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("、", textList);
+        }
+        return null;
     }
 
     @Override
@@ -238,10 +244,58 @@ public class RadioHandler extends FormHandlerBase {
 //		"1"
 //	]
 //}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formradio",
+        "reaction": {
+            "filter": {},
+            "hide": {},
+            "readonly": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-circle-o",
+        "hasValue": true,
+        "label": "单选框_2",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "mapping": {
+                "text": "14a67eabc2584d4da19c561c26ed0f3a",
+                "value": "e00fc42fca5d4f5e831d296ed68b3ff1"
+            },
+            "defaultValue": "",
+            "description": "",
+            "isMultiple": false,
+            "matrixUuid": "e54221ef3b814eebbf57df252426923c",
+            "isHide": false,
+            "isMask": false,
+            "isReadOnly": false,
+            "sourceColumnList": [],
+            "dataList": [],
+            "width": "100%",
+            "isDisabled": false,
+            "defaultValueType": "self",
+            "dataSource": "matrix",
+            "direction": "vertical"
+        },
+        "uuid": "17acdaf2693441d4aa0414645db0cd64",
+        "switchHandler": [
+            "formselect",
+            "formradio",
+            "formcheckbox"
+        ]
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();
-        String value = (String) attributeDataVo.getDataObj();
+        String value = attributeDataVo.getDataObj().toString();
         if (StringUtils.isNotBlank(value)) {
             List<String> valueList = new ArrayList<>();
             valueList.add(value);

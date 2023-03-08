@@ -66,34 +66,36 @@ public class DateHandler extends FormHandlerBase {
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
         JSONObject resultObj = new JSONObject();
         resultObj.put("result", true);
-        JSONArray validTypeArray = configObj.getJSONArray("validType");
-        if (CollectionUtils.isNotEmpty(validTypeArray)) {
-            List<String> validTypeList = validTypeArray.toJavaList(String.class);
-            if (validTypeList.contains("workdate")) {
-                String worktimeUuid = configObj.getString("worktimeUuid");
-                String data = attributeDataVo.getData();
-                JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
-                String format = detailedData.getString("format");
-                if (DATE_FORMAT.equals(format)) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat(format);
-                        Date date = sdf.parse(data);
-                        String dateStr = dateFormatter.format((date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
-                        boolean result = worktimeMapper.checkIsWithinWorktime(worktimeUuid, dateStr) > 0;
-                        resultObj.put("result", result);
-                        return resultObj;
-                    } catch (ParseException ex) {
-                        throw new ParamIrregularException("data", format);
-                    }
-                } else if (DATETIME_FORMAT.equals(format)) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat(format);
-                        Date date = sdf.parse(data);
-                        boolean result = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, date.getTime()) > 0;
-                        resultObj.put("result", result);
-                        return resultObj;
-                    } catch (ParseException ex) {
-                        throw new ParamIrregularException("data", format);
+        String worktimeUuid = configObj.getString("worktimeUuid");
+        if (StringUtils.isNotBlank(worktimeUuid)) {
+            JSONArray validTypeArray = configObj.getJSONArray("validType");
+            if (CollectionUtils.isNotEmpty(validTypeArray)) {
+                List<String> validTypeList = validTypeArray.toJavaList(String.class);
+                if (validTypeList.contains("workdate")) {
+                    String data = attributeDataVo.getData();
+                    JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
+                    String format = detailedData.getString("format");
+                    if (DATE_FORMAT.equals(format)) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat(format);
+                            Date date = sdf.parse(data);
+                            String dateStr = dateFormatter.format((date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+                            boolean result = worktimeMapper.checkIsWithinWorktime(worktimeUuid, dateStr) > 0;
+                            resultObj.put("result", result);
+                            return resultObj;
+                        } catch (ParseException ex) {
+                            throw new ParamIrregularException("data", format);
+                        }
+                    } else if (DATETIME_FORMAT.equals(format)) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat(format);
+                            Date date = sdf.parse(data);
+                            boolean result = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, date.getTime()) > 0;
+                            resultObj.put("result", result);
+                            return resultObj;
+                        } catch (ParseException ex) {
+                            throw new ParamIrregularException("data", format);
+                        }
                     }
                 }
             }

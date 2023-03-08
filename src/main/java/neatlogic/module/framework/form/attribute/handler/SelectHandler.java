@@ -108,7 +108,7 @@ public class SelectHandler extends FormHandlerBase {
                         if (dataObj instanceof JSONArray) {
                             return ((JSONArray) dataObj).getString(0);
                         } else {
-                            String text = valueTextMap.get((String) dataObj);
+                            String text = valueTextMap.get(dataObj);
                             if (text != null) {
                                 return text;
                             } else {
@@ -159,7 +159,13 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("、", textList);
+        }
+        return null;
     }
 
     @Override
@@ -346,72 +352,119 @@ public class SelectHandler extends FormHandlerBase {
 //		"1"
 //	]
 //}
+    /*
+    {
+        "handler": "formselect",
+        "reaction": {
+            "filter": {},
+            "hide": {},
+            "readonly": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "emit": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formselect",
+        "hasValue": true,
+        "label": "下拉框_7",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "mapping": {
+                "text": "579c9de2986d48738cc0ecafab2f43d3",
+                "value": "a22002af151b4da589bc390f3ad164f5"
+            },
+            "defaultValue": "",
+            "description": "",
+            "isMultiple": true,
+            "matrixUuid": "e54221ef3b814eebbf57df252426923c",
+            "isHide": false,
+            "isMask": false,
+            "isReadOnly": false,
+            "sourceColumnList": [],
+            "dataList": [],
+            "width": "100%",
+            "isDisabled": false,
+            "defaultValueType": "self",
+            "dataSource": "matrix"
+        },
+        "uuid": "8fb965f2523d4989b875993f502a5581",
+        "switchHandler": [
+            "formselect",
+            "formradio",
+            "formcheckbox"
+        ]
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();
         Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            List<String> valueList = new ArrayList<>();
-            List<String> textList = new ArrayList<>();
-            boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-            String dataSource = configObj.getString("dataSource");
-            if ("static".equals(dataSource)) {
-                JSONArray dataArray = configObj.getJSONArray("dataList");
-                if (CollectionUtils.isNotEmpty(dataArray)) {
-                    Map<Object, String> valueTextMap = new HashMap<>();
-                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-                    for (ValueTextVo data : dataList) {
-                        valueTextMap.put(data.getValue(), data.getText());
-                    }
-                    if (isMultiple) {
-                        JSONArray valueArray = (JSONArray) dataObj;
-                        if (CollectionUtils.isNotEmpty(valueArray)) {
-                            valueList = valueArray.toJavaList(String.class);
-                            for (String key : valueList) {
-                                String text = valueTextMap.get(key);
-                                if (text != null) {
-                                    textList.add(text);
-                                } else {
-                                    textList.add(key);
-                                }
-                            }
-                        }
-                    } else {
-                        valueList.add((String) dataObj);
-                        String text = valueTextMap.get(dataObj);
+        if (dataObj == null) {
+            return resultObj;
+        }
+        List<String> valueList = new ArrayList<>();
+        List<String> textList = new ArrayList<>();
+        boolean isMultiple = configObj.getBooleanValue("isMultiple");
+        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+        String dataSource = configObj.getString("dataSource");
+        if ("static".equals(dataSource)) {
+            JSONArray dataArray = configObj.getJSONArray("dataList");
+            if (CollectionUtils.isEmpty(dataArray)) {
+                return resultObj;
+            }
+            List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+            Map<Object, String> valueTextMap = dataList.stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getText()));
+            if (isMultiple) {
+                JSONArray valueArray = (JSONArray) dataObj;
+                if (CollectionUtils.isNotEmpty(valueArray)) {
+                    valueList = valueArray.toJavaList(String.class);
+                    for (String key : valueList) {
+                        String text = valueTextMap.get(key);
                         if (text != null) {
                             textList.add(text);
                         } else {
-                            textList.add((String) dataObj);
+                            textList.add(key);
                         }
                     }
                 }
-            } else {// 其他，如动态数据源
-                if (isMultiple) {
-                    JSONArray valueArray = (JSONArray) dataObj;
-                    if (CollectionUtils.isNotEmpty(valueArray)) {
-                        valueList = valueArray.toJavaList(String.class);
-                        for (String key : valueList) {
-                            if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                                textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                            } else {
-                                textList.add(key);
-                            }
-                        }
-                    }
+            } else {
+                String dataObjStr = dataObj.toString();
+                valueList.add(dataObjStr);
+                String text = valueTextMap.get(dataObjStr);
+                if (text != null) {
+                    textList.add(text);
                 } else {
-                    String value = (String) dataObj;
-                    if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                        textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                    } else {
-                        textList.add((String) dataObj);
-                    }
+                    textList.add(dataObjStr);
                 }
             }
-            resultObj.put("valueList", valueList);
-            resultObj.put("textList", textList);
+        } else {// 其他，如动态数据源
+            if (isMultiple) {
+                JSONArray valueArray = (JSONArray) dataObj;
+                if (CollectionUtils.isNotEmpty(valueArray)) {
+                    valueList = valueArray.toJavaList(String.class);
+                    for (String key : valueList) {
+                        if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                            textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                        } else {
+                            textList.add(key);
+                        }
+                    }
+                }
+            } else {
+                String value = (String) dataObj;
+                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                } else {
+                    textList.add((String) dataObj);
+                }
+            }
         }
+        resultObj.put("valueList", valueList);
+        resultObj.put("textList", textList);
         return resultObj;
     }
 

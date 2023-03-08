@@ -4,7 +4,7 @@ neatlogic-framework是整个项目的底层框架，所有模块均需要引用n
 ## 模块化
 neatlogic基于Spring MVC，版本5.x。通过动态加载Servlet，利用SpringContext分层特性实现模块化管理。\
 如下图所示，子模块之间的bean互不影响，不能相互织入，公共模块的bean可以织入子模块的bean中。\
-<img src="https://github.com/neatlogic/.github/blob/main/images/framework.png?raw=true" width="500px">
+![img.png](README_IMAGES/img.png)
 
 * root context通过ContextLoaderListener加载，管理公共的bean。
 * module context通过DispatcherServlet加载，管理模块内部的bean。

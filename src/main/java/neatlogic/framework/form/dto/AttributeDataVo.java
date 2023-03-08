@@ -68,6 +68,18 @@ public class AttributeDataVo {
         } else if (data.startsWith("{") && data.endsWith("}")) {
             return JSON.parseObject(data);
         } else {
+            try {
+                return Integer.valueOf(data);
+            } catch (NumberFormatException e) {
+            }
+            try {
+                return Long.valueOf(data);
+            } catch (NumberFormatException e) {
+            }
+            try {
+                return Double.valueOf(data);
+            } catch (NumberFormatException e) {
+            }
             return data;
         }
     }

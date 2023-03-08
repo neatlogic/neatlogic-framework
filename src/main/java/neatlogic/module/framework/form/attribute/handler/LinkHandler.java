@@ -27,8 +27,6 @@ import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 
-import java.util.List;
-
 @Component
 public class LinkHandler extends FormHandlerBase {
 
@@ -49,7 +47,7 @@ public class LinkHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return attributeDataVo.getData();
+        return null;
     }
 
     @Override
@@ -135,35 +133,45 @@ public class LinkHandler extends FormHandlerBase {
         return null;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formlink",
-//	"label": "链接_11",
-//	"type": "form",
-//	"uuid": "cf9557ac6bac404a8e20355df23f2e11",
-//	"config": {
-//		"isRequired": false,
-//		"ruleList": [],
-//		"width": "100%",
-//		"validList": [],
-//		"quoteUuid": "",
-//		"defaultValueType": "self",
-//		"text": "百度",
-//		"value": "https://www.baidu.com/",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"target": "_blank"
-//	}
-//}
-    //保存数据结构
-//    "https://www.baidu.com/"
-    //返回数据结构
-//{
-//	"text": "百度",
-//	"label": "<a href='https://www.baidu.com/' target='_blank'>百度</a>",
-//	"value": "https://www.baidu.com/"
-//}
+    /*
+    表单组件配置信息
+    {
+        "handler": "formlink",
+        "reaction": {
+            "hide": {},
+            "readonly": {},
+            "display": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formlink",
+        "hasValue": false,
+        "label": "超链接_7",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isMask": false,
+            "width": "100%",
+            "description": "",
+            "text": "百度",
+            "value": "https://www.baidu.com/",
+            "isHide": false,
+            "target": "_blank"
+        },
+        "uuid": "d4fc474411bd448f8ea5ce384032efe4"
+    }
+     */
+    /*
+    保存数据结构
+    无
+     */
+    /*
+    返回数据结构
+    {
+        "text": "百度",
+        "label": "<a href='https://www.baidu.com/' target='_blank'>百度</a>",
+        "value": "https://www.baidu.com/"
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         String value = configObj.getString("value");

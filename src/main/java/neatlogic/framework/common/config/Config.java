@@ -453,20 +453,21 @@ public class Config {
     }
 
     private static String getProperty(String configFile, String keyName, String defaultValue, boolean isRequired) {
+        String value = null;
         Properties pro = new Properties();
         try (InputStream is = Config.class.getClassLoader().getResourceAsStream(configFile)) {
             pro.load(is);
-            String value = pro.getProperty(keyName, defaultValue);
+            value = pro.getProperty(keyName, defaultValue);
             if (value != null) {
                 value = value.trim();
             }
-            return value;
         } catch (Exception e) {
-            if (isRequired) {
-                logger.error(e.getMessage(), e);
-            }
+           // logger.error(e.getMessage(), e);
         }
-        return "";
+        if (value == null && isRequired) {
+            throw new RuntimeException();
+        }
+        return value;
     }
 
     public static String getProperty(String configFile, String keyName) {
@@ -474,7 +475,7 @@ public class Config {
     }
 
     public static String getProperty(String configFile, String keyName, boolean isRequired) {
-        return getProperty(configFile, keyName, "", isRequired);
+        return getProperty(configFile, keyName, null, isRequired);
     }
 
 }

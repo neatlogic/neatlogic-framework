@@ -29,7 +29,7 @@ import neatlogic.framework.form.attribute.core.FormHandlerBase;
 
 import java.util.List;
 
-@Component
+//@Component
 public class DivideHandler extends FormHandlerBase {
 
     @Override

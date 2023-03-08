@@ -72,12 +72,19 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
-            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
         }
-        return dataObj;
+        JSONArray valueArray = resultObj.getJSONArray("valueList");
+        if (CollectionUtils.isNotEmpty(valueArray)) {
+            List<String> valueList = valueArray.toJavaList(String.class);
+            return String.join("/", valueList);
+        }
+
+        return null;
     }
 
     @Override
@@ -86,7 +93,7 @@ public class CascadeHandler extends FormHandlerBase {
         JSONArray textArray = resultObj.getJSONArray("textList");
         if (CollectionUtils.isNotEmpty(textArray)) {
             List<String> textList = textArray.toJavaList(String.class);
-            return String.join(" / ", textList);
+            return String.join("/", textList);
         }
         return null;
     }

@@ -68,11 +68,17 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        String value = (String) attributeDataVo.getDataObj();
-        if (StringUtils.isNotBlank(value)) {
-            return getTextOrValue(value, configObj, ConversionType.TOTEXT.getValue());
+//        String value = (String) attributeDataVo.getDataObj();
+//        if (StringUtils.isNotBlank(value)) {
+//            return getTextOrValue(value, configObj, ConversionType.TOTEXT.getValue());
+//        }
+//        return value;
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            return textArray;
         }
-        return value;
+        return resultObj.getJSONArray("valueList");
     }
 
     @Override

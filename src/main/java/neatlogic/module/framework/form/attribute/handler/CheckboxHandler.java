@@ -69,12 +69,18 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        List<String> valueList = JSON.parseArray(JSON.toJSONString(attributeDataVo.getDataObj()), String.class);
-        if (CollectionUtils.isNotEmpty(valueList)) {
-            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
-        } else {
-            return valueList;
+//        List<String> valueList = JSON.parseArray(JSON.toJSONString(attributeDataVo.getDataObj()), String.class);
+//        if (CollectionUtils.isNotEmpty(valueList)) {
+//            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
+//        } else {
+//            return valueList;
+//        }
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            return textArray;
         }
+        return resultObj.getJSONArray("valueList");
     }
 
     @Override

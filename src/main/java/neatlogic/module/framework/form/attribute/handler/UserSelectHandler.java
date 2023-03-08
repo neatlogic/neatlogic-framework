@@ -31,7 +31,6 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -72,28 +71,34 @@ public class UserSelectHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            boolean isMultiple = configObj.getBooleanValue("isMultiple");
-            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-            if (isMultiple) {
-                List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
-                if (CollectionUtils.isNotEmpty(valueList)) {
-                    List<String> textList = new ArrayList<>();
-                    for (String key : valueList) {
-                        textList.add(parse(key));
-                    }
-                    return textList;
-                }
-                return valueList;
-            } else {
-                String value = (String) dataObj;
-                if (StringUtils.isNotBlank(value)) {
-                    return parse(value);
-                }
-            }
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            return textArray;
         }
-        return dataObj;
+        return resultObj.getJSONArray("valueList");
+//        Object dataObj = attributeDataVo.getDataObj();
+//        if (dataObj != null) {
+//            boolean isMultiple = configObj.getBooleanValue("isMultiple");
+//            attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+//            if (isMultiple) {
+//                List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
+//                if (CollectionUtils.isNotEmpty(valueList)) {
+//                    List<String> textList = new ArrayList<>();
+//                    for (String key : valueList) {
+//                        textList.add(parse(key));
+//                    }
+//                    return textList;
+//                }
+//                return valueList;
+//            } else {
+//                String value = (String) dataObj;
+//                if (StringUtils.isNotBlank(value)) {
+//                    return parse(value);
+//                }
+//            }
+//        }
+//        return dataObj;
     }
 
     @Override
@@ -414,7 +419,7 @@ public class UserSelectHandler extends FormHandlerBase {
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
         if (detailedData != null) {
-            JSONArray text = detailedData.getJSONArray("text");
+            JSONArray text = detailedData.getJSONArray("textList");
             if (CollectionUtils.isNotEmpty(text)) {
                 return String.join(",", text.toJavaList(String.class));
             }

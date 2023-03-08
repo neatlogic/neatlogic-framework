@@ -55,7 +55,30 @@ public class CubeHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return "已更新";
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = new ArrayList<>();
+            for (int i = 0; i < textArray.size(); i++) {
+                JSONObject textObj = textArray.getJSONObject(i);
+                String type = textObj.getString("type");
+                String option = textObj.getString("option");
+                textList.add(type + "-" + option);
+            }
+            return textList;
+        }
+        JSONArray valueArray = resultObj.getJSONArray("valueList");
+        if (CollectionUtils.isNotEmpty(valueArray)) {
+            List<String> valueList = new ArrayList<>();
+            for (int i = 0; i < valueArray.size(); i++) {
+                JSONObject valueObj = valueArray.getJSONObject(i);
+                String type = valueObj.getString("type");
+                String option = valueObj.getString("option");
+                valueList.add(type + "-" + option);
+            }
+            return valueList;
+        }
+        return null;
     }
 
     @Override
@@ -220,6 +243,29 @@ public class CubeHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = new ArrayList<>();
+            for (int i = 0; i < textArray.size(); i++) {
+                JSONObject textObj = textArray.getJSONObject(i);
+                String type = textObj.getString("type");
+                String option = textObj.getString("option");
+                textList.add(type + "-" + option);
+            }
+            return String.join(",", textList);
+        }
+        JSONArray valueArray = resultObj.getJSONArray("valueList");
+        if (CollectionUtils.isNotEmpty(valueArray)) {
+            List<String> valueList = new ArrayList<>();
+            for (int i = 0; i < valueArray.size(); i++) {
+                JSONObject valueObj = valueArray.getJSONObject(i);
+                String type = valueObj.getString("type");
+                String option = valueObj.getString("option");
+                valueList.add(type + "-" + option);
+            }
+            return String.join(",", valueList);
+        }
         return null;
     }
 }

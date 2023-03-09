@@ -47,12 +47,12 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public String getHandler() {
-        return FormHandler.FORMCASCADELIST.getHandler();
+        return FormHandler.FORMCASCADER.getHandler();
     }
 
     @Override
     public String getHandlerName() {
-        return FormHandler.FORMCASCADELIST.getHandlerName();
+        return FormHandler.FORMCASCADER.getHandlerName();
     }
 
     @Override
@@ -72,17 +72,30 @@ public class CascadeHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj != null) {
-            List<String> valueList = JSON.parseArray(JSON.toJSONString(dataObj), String.class);
-            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
         }
-        return dataObj;
+        JSONArray valueArray = resultObj.getJSONArray("valueList");
+        if (CollectionUtils.isNotEmpty(valueArray)) {
+            List<String> valueList = valueArray.toJavaList(String.class);
+            return String.join("/", valueList);
+        }
+
+        return null;
     }
 
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return valueConversionText(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        JSONArray textArray = resultObj.getJSONArray("textList");
+        if (CollectionUtils.isNotEmpty(textArray)) {
+            List<String> textList = textArray.toJavaList(String.class);
+            return String.join("/", textList);
+        }
+        return null;
     }
 
     @Override
@@ -363,6 +376,101 @@ public class CascadeHandler extends FormHandlerBase {
 //		"3"
 //	]
 //}
+    /*
+    {
+        "handler": "formcascader",
+        "reaction": {
+            "filter": {},
+            "hide": {},
+            "readonly": {},
+            "setvalue": {},
+            "disable": {},
+            "display": {},
+            "emit": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formcascadelist",
+        "hasValue": true,
+        "label": "级联下拉框_4",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "mapping": {
+                "text": "",
+                "value": ""
+            },
+            "description": "",
+            "matrixUuid": "",
+            "isHide": false,
+            "isMask": false,
+            "isReadOnly": false,
+            "levelType": 2,
+            "dataList": [
+                {
+                    "children": [
+                        {
+                            "text": "b71",
+                            "value": "71"
+                        },
+                        {
+                            "text": "b72",
+                            "value": "72"
+                        },
+                        {
+                            "text": "b73",
+                            "value": "73"
+                        }
+                    ],
+                    "text": "a7",
+                    "value": "7"
+                },
+                {
+                    "children": [
+                        {
+                            "text": "b81",
+                            "value": "81"
+                        },
+                        {
+                            "text": "b82",
+                            "value": "82"
+                        },
+                        {
+                            "text": "b83",
+                            "value": "83"
+                        }
+                    ],
+                    "text": "a8",
+                    "value": "8"
+                },
+                {
+                    "children": [
+                        {
+                            "text": "a91",
+                            "value": "91"
+                        },
+                        {
+                            "text": "a92",
+                            "value": "92"
+                        },
+                        {
+                            "text": "a93",
+                            "value": "93"
+                        }
+                    ],
+                    "text": "a9",
+                    "value": "9"
+                }
+            ],
+            "width": "100%",
+            "isDisabled": false,
+            "defaultValueType": "self",
+            "dataSource": "static"
+        },
+        "uuid": "998c8ff9d83b48ee8c56a83de562cb23"
+    }
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = new JSONObject();
@@ -390,15 +498,16 @@ public class CascadeHandler extends FormHandlerBase {
                     }
                 }
             }
-        } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-            for (String value : valueList) {
-                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                } else {
-                    textList.add(value);
-                }
-            }
         }
+//        else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
+//            for (String value : valueList) {
+//                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+//                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+//                } else {
+//                    textList.add(value);
+//                }
+//            }
+//        }
         resultObj.put("textList", textList);
         return resultObj;
     }

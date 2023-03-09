@@ -68,6 +68,8 @@
         `name`,
         `is_active` AS isActive,
         `expire_date` AS expireDate,
+        `status`,
+        `error_msg` as errorMsg,
         `description`
         FROM
         `tenant`
@@ -107,6 +109,8 @@
                `name`,
                `is_active`   AS isActive,
                `expire_date` AS expireDate,
+               `status`,
+               `error_msg`   as errorMsg,
                `description`
         FROM `tenant`
         WHERE `id` = #{value}
@@ -197,15 +201,16 @@
         SET `name`        = #{name},
             `is_active`   = #{isActive},
             `expire_date` = #{expireDate},
-            `description` = #{description}
+            `description` = #{description},
+            `status`      = #{status},
+            `error_msg`   = #{errorMsg}
         WHERE `id` = #{id}
     </update>
 
     <update id="updateTenantIsActive" parameterType="neatlogic.framework.dto.TenantVo">
         UPDATE
             `tenant`
-        SET
-            `is_active`   = #{isActive}
+        SET `is_active` = #{isActive}
         WHERE `id` = #{id}
     </update>
 

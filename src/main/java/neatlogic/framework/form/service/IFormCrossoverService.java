@@ -20,6 +20,8 @@ import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.crossover.ICrossoverService;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.form.dto.FormVersionVo;
+import neatlogic.framework.form.exception.AttributeValidException;
 
 public interface IFormCrossoverService extends ICrossoverService {
 
@@ -34,4 +36,12 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @param data
      */
     JSONArray staticListPasswordEncrypt(JSONArray data, JSONObject config);
+
+    /**
+     * 校验表单数据有效性，并针对特殊组件数据进行相应处理，如密码类型组件对数据进行加密处理
+     * @param formVersionVo
+     * @param formAttributeDataList
+     * @throws AttributeValidException
+     */
+    void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException;
 }

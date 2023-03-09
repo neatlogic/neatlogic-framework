@@ -27,119 +27,151 @@ import java.util.Date;
 import java.util.List;
 
 public class TenantVo extends BasePageVo {
-	public enum Status {
-		BUILDING, BUILDED;
-	}
+    private static final long serialVersionUID = 5037087043421533431L;
 
-	@EntityField(name = "id", type = ApiParamType.LONG)
-	private Long id;
-	@EntityField(name = "uuid", type = ApiParamType.STRING)
-	private String uuid;
-	@EntityField(name = "名称", type = ApiParamType.STRING)
-	private String name;
-	@EntityField(name = "是否激活", type = ApiParamType.INTEGER)
-	private Integer isActive;
-	@EntityField(name = "描述", type = ApiParamType.STRING)
-	private String description;
-	@EntityField(name = "有效期限", type = ApiParamType.LONG)
-	private Date expireDate;
-	@EntityField(name = "激活模块", type = ApiParamType.JSONARRAY)
-	private List<ModuleVo> moduleList;
-	@EntityField(name = "激活模块分组", type = ApiParamType.JSONARRAY)
-	private List<ModuleGroupVo> moduleGroupList;
-	@EntityField(name = "状态", type = ApiParamType.STRING)
-	private String status;
-	@EntityField(name = "超级管理员", type = ApiParamType.JSONARRAY)
-	private List<String> superAdminList;
+    public enum Status {
+        BUILDING, BUILT, ERROR;
+    }
 
-	public TenantVo() {
-		this.setPageSize(20);
-	}
+    @EntityField(name = "id", type = ApiParamType.LONG)
+    private Long id;
+    @EntityField(name = "uuid", type = ApiParamType.STRING)
+    private String uuid;
+    @EntityField(name = "名称", type = ApiParamType.STRING)
+    private String name;
+    @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
+    private Integer isActive;
+    @EntityField(name = "描述", type = ApiParamType.STRING)
+    private String description;
+    @EntityField(name = "有效期限", type = ApiParamType.LONG)
+    private Date expireDate;
+    @EntityField(name = "激活模块", type = ApiParamType.JSONARRAY)
+    private List<ModuleVo> moduleList;
+    @EntityField(name = "激活模块分组", type = ApiParamType.JSONARRAY)
+    private List<ModuleGroupVo> moduleGroupList;
+    @EntityField(name = "状态", type = ApiParamType.STRING)
+    private String status;
+    @EntityField(name = "超级管理员", type = ApiParamType.JSONARRAY)
+    private List<String> superAdminList;
+    @EntityField(name = "数据库IP", type = ApiParamType.STRING)
+    private String dbHost;
+    @EntityField(name = "数据库Port", type = ApiParamType.INTEGER)
+    private Integer dbPort;
+    @EntityField(name = "异常信息", type = ApiParamType.STRING)
+    private String errorMsg;
 
-	public TenantVo(String uuid) {
-		this.uuid = uuid;
-	}
+    public TenantVo() {
+        this.setPageSize(20);
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public TenantVo(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Integer getIsActive() {
-		return isActive;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setIsActive(Integer isActive) {
-		this.isActive = isActive;
-	}
+    public Integer getIsActive() {
+        return isActive;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setIsActive(Integer isActive) {
+        this.isActive = isActive;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Date getExpireDate() {
-		return expireDate;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setExpireDate(Date expireDate) {
-		this.expireDate = expireDate;
-	}
+    public Date getExpireDate() {
+        return expireDate;
+    }
 
-	public List<ModuleVo> getModuleList() {
-		return moduleList;
-	}
+    public void setExpireDate(Date expireDate) {
+        this.expireDate = expireDate;
+    }
 
-	public void setModuleList(List<ModuleVo> moduleList) {
-		this.moduleList = moduleList;
-	}
+    public List<ModuleVo> getModuleList() {
+        return moduleList;
+    }
 
-	public Long getId() {
-		if (id == null) {
-			id = SnowflakeUtil.uniqueLong();
-		}
-		return id;
-	}
+    public void setModuleList(List<ModuleVo> moduleList) {
+        this.moduleList = moduleList;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
+        return id;
+    }
 
-	public List<ModuleGroupVo> getModuleGroupList() {
-		return moduleGroupList;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setModuleGroupList(List<ModuleGroupVo> moduleGroupList) {
-		this.moduleGroupList = moduleGroupList;
-	}
+    public List<ModuleGroupVo> getModuleGroupList() {
+        return moduleGroupList;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public void setModuleGroupList(List<ModuleGroupVo> moduleGroupList) {
+        this.moduleGroupList = moduleGroupList;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public List<String> getSuperAdminList() {
-		return superAdminList;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public void setSuperAdminList(List<String> superAdminList) {
-		this.superAdminList = superAdminList;
-	}
+    public List<String> getSuperAdminList() {
+        return superAdminList;
+    }
+
+    public void setSuperAdminList(List<String> superAdminList) {
+        this.superAdminList = superAdminList;
+    }
+
+    public String getDbHost() {
+        return dbHost;
+    }
+
+    public void setDbHost(String dbHost) {
+        this.dbHost = dbHost;
+    }
+
+    public Integer getDbPort() {
+        return dbPort;
+    }
+
+    public void setDbPort(Integer dbPort) {
+        this.dbPort = dbPort;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
 }

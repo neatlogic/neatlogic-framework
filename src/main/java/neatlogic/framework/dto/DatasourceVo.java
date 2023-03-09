@@ -38,9 +38,11 @@ public class DatasourceVo {
 
     }
 
-    public DatasourceVo(Long _tenantId, String _tenantUuid, boolean generatePwd) {
-        this.tenantId = _tenantId;
-        this.tenantUuid = _tenantUuid;
+    public DatasourceVo(TenantVo tenantVo,boolean generatePwd) {
+        this.tenantId = tenantVo.getId();
+        this.tenantUuid = tenantVo.getUuid();
+        this.host = tenantVo.getDbHost();
+        this.port = tenantVo.getDbPort();
         // 生成随机密码
         /*There are three levels of password validation policy enforced when Validate Password plugin is enabled:
             LOW    Length >= 8 characters.

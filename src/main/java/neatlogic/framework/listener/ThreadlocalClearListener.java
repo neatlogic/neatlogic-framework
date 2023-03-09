@@ -39,4 +39,9 @@ public class ThreadlocalClearListener implements ServletRequestListener {
         }
         CacheContext.release();
     }
+
+    @Override
+    public void requestInitialized(ServletRequestEvent event) {
+        //必须实现方法 否则遇到低版本的javaee-api 会报错
+    }
 }

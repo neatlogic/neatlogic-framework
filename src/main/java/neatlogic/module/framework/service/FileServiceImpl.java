@@ -25,6 +25,7 @@ import neatlogic.framework.exception.file.FileAccessDeniedException;
 import neatlogic.framework.exception.file.FileNotFoundException;
 import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
 import neatlogic.framework.exception.user.NoTenantException;
+import neatlogic.framework.file.core.FileOperationType;
 import neatlogic.framework.file.core.FileTypeHandlerFactory;
 import neatlogic.framework.file.core.IFileTypeHandler;
 import neatlogic.framework.file.dao.mapper.FileMapper;
@@ -110,7 +111,7 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
                         }
                     }
                 } else {
-                    throw new FileAccessDeniedException(fileVo.getName(), "下载");
+                    throw new FileAccessDeniedException(fileVo.getName(), FileOperationType.DOWNLOAD.getText());
                 }
             } else {
                 throw new FileTypeHandlerNotFoundException(fileVo.getType());

@@ -860,11 +860,17 @@ public class TimeUtil {
 
     /**
      * 将指定毫秒数格式化，unitCount和minTimeUnit之间满足其中任何一个条件即可返回数据，
-     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator=" "，
-     * 返回值为3天 2小时 4分钟 6秒
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天 2小时 4分钟 6秒
+     * 例如入参milliseconds = 266646000，unitCount=3，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天 2小时 4分钟
+     * 例如入参milliseconds = 266646000，unitCount=2，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天 2小时
+     * 例如入参milliseconds = 266646000，unitCount=1，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.DAYS，separator=" "， 返回值为3天
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.HOURS，separator=" "， 返回值为3天 2小时
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.MINUTES，separator=" "， 返回值为3天 2小时 4分钟
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天 2小时 4分钟 6秒
      * @param milliseconds 毫秒数
-     * @param unitCount 单位个数，如unitCount=2时，3天 2小时，2小时 4分钟， 4分钟 6秒
-     * @param minTimeUnit 最小单位，如minTimeUnit=TimeUnit.HOURS时，最小精确显示到小时，3天 2小时，2小时
+     * @param unitCount 结果显示最多单位个数
+     * @param minTimeUnit 结果显示最小单位
      * @param separator 两个单位之间的连接符
      * @return
      */

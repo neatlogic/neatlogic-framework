@@ -1,7 +1,11 @@
+中文 / [English](README.en.md)
+
 ## 关于
+
 neatlogic-framework是整个项目的底层框架，所有模块均需要引用neatlogic-framework。
 
 ## 模块化
+
 neatlogic基于Spring MVC，版本5.x。通过动态加载Servlet，利用SpringContext分层特性实现模块化管理。\
 如下图所示，子模块之间的bean互不影响，不能相互织入，公共模块的bean可以织入子模块的bean中。\
 ![img.png](README_IMAGES/img.png)
@@ -31,7 +35,7 @@ neatlogic采用中间件共享，数据库独占的多租户模式。
 ## 处理流程
 
 neatlogic采用前后端分离架构，后端服务全部以restful接口形式暴露出去供前端调用。入口类是ApiDispatcher，支持三种数据格式，分别是json，json流和文件。不同的数据格式需要继承不同的基础类。\
-<img src="https://github.com/neatlogic/.github/blob/main/images/api.png?raw=true" width="800px">
+![api](README_IMAGES/api.png)
 为了提高复用性和方便管理，neatlogic的每一个接口都是一个独立的bean，接口类可根据实际需要继承ApiComponentBase、JsonStreamApiComponentBase、BinaryStreamApiComponentBase三个基础类。\
 在每个接口类中可以通过注解定义接口的访问权限、操作类型（审计用）、入参、出参、说明、数据范例等信息，可以根据这些配置一键导出所有接口文档。
 
@@ -94,4 +98,4 @@ SchedulerManager启动时会加载所有租户的定时作业并运行。配合H
 
 系统会自动根据FullTextIndexInitializer中定义的document种类自动创建相关数据表。只需要实现FullTextIndexHandlerBase中的相关方法，系统会把索引数据自动写入对应的数据表，查询时也不需要关注数据表具体的名称，只需要写前缀，系统会通过FulltextIndexInterceptor在SQL执行前替换成正确的数据表来执行。
 
-![fullindex tables](https://github.com/neatlogic/.github/blob/main/images/fullindextables.png?raw=true)
+![fullindex](README_IMAGES/fullindextables.png)

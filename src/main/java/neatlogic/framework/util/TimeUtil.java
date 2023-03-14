@@ -859,7 +859,7 @@ public class TimeUtil {
     }
 
     /**
-     * 将指定毫秒数格式化，unitCount和minTimeUnit之间满足任何一个条件即可返回数据，例如 3天 2小时 4分钟 6秒
+     * 将指定毫秒数格式化，unitCount和minTimeUnit之间满足其中任何一个条件即可返回数据，例如 3天 2小时 4分钟 6秒
      * @param milliseconds 毫秒数
      * @param unitCount 单位个数，如unitCount=2时，3天 2小时，4小时 50分钟， 4分钟 20秒
      * @param minTimeUnit 最小单位，如minTimeUnit=TimeUnit.HOURS时，最小精确显示到小时，3天 2小时，4小时

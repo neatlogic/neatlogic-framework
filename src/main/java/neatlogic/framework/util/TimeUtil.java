@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.time.DateUtils.isSameDay;
 import static org.apache.commons.lang3.time.DateUtils.toCalendar;
@@ -855,5 +856,51 @@ public class TimeUtil {
             timeRangeList.add(endTime);
         }
         return timeRangeList;
+    }
+
+    /**
+     * 将指定毫秒数格式化
+     * @param milliseconds 毫秒数
+     * @param unitCount 单位个数
+     * @param minTimeUnit 最小单位
+     * @param separator 两个单位之间的连接符
+     * @return
+     */
+    public static String millisecondsFormat(Long milliseconds, int unitCount, TimeUnit minTimeUnit, String separator) {
+        List<String> list = new ArrayList<>(unitCount);
+        if (milliseconds >= TimeUnit.DAYS.toMillis(1)) {
+            list.add((milliseconds / TimeUnit.DAYS.toMillis(1)) + I18nUtils.getMessage("const.days"));
+            if (list.size() >= unitCount) {
+                return String.join(separator, list);
+            }
+            if (TimeUnit.DAYS == minTimeUnit) {
+                return String.join(separator, list);
+            }
+            milliseconds = milliseconds % TimeUnit.DAYS.toMillis(1);
+        }
+        if (milliseconds >= TimeUnit.HOURS.toMillis(1)) {
+            list.add((milliseconds / TimeUnit.HOURS.toMillis(1)) + I18nUtils.getMessage("const.hours"));
+            if (list.size() >= unitCount) {
+                return String.join(separator, list);
+            }
+            if (TimeUnit.HOURS == minTimeUnit) {
+                return String.join(separator, list);
+            }
+            milliseconds = milliseconds % TimeUnit.HOURS.toMillis(1);
+        }
+        if (milliseconds >= TimeUnit.MINUTES.toMillis(1)) {
+            list.add((milliseconds / TimeUnit.MINUTES.toMillis(1)) + I18nUtils.getMessage("const.minutes"));
+            if (list.size() >= unitCount) {
+                return String.join(separator, list);
+            }
+            if (TimeUnit.MINUTES == minTimeUnit) {
+                return String.join(separator, list);
+            }
+            milliseconds = milliseconds % TimeUnit.MINUTES.toMillis(1);
+        }
+        if (milliseconds >= TimeUnit.SECONDS.toMillis(1)) {
+            list.add((milliseconds / TimeUnit.SECONDS.toMillis(1)) + I18nUtils.getMessage("const.seconds"));
+        }
+        return String.join(separator, list);
     }
 }

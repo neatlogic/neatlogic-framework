@@ -24,40 +24,28 @@ import java.util.List;
 
 public class TableResultUtil {
     public static JSONObject getResult(List resultList, BasePageVo vo) {
-        JSONObject returnObj = new JSONObject();
-        returnObj.put("pageSize", vo.getPageSize());
-        returnObj.put("pageCount", vo.getPageCount());
-        returnObj.put("rowNum", vo.getRowNum());
-        returnObj.put("currentPage", vo.getCurrentPage());
-        returnObj.put("tbodyList", resultList);
-        return returnObj;
+        return getResult(null, resultList, vo);
+    }
+
+    public static JSONObject getResult(List theadList, List tbodyList) {
+        return getResult(theadList, tbodyList, null);
     }
 
     public static JSONObject getResult(List theadList, List tbodyList, BasePageVo vo) {
         JSONObject returnObj = new JSONObject();
-        returnObj.put("pageSize", vo.getPageSize());
-        returnObj.put("pageCount", vo.getPageCount());
-        returnObj.put("rowNum", vo.getRowNum());
-        returnObj.put("currentPage", vo.getCurrentPage());
+        if (vo != null) {
+            returnObj.put("pageSize", vo.getPageSize());
+            returnObj.put("pageCount", vo.getPageCount());
+            returnObj.put("rowNum", vo.getRowNum());
+            returnObj.put("currentPage", vo.getCurrentPage());
+        }
         returnObj.put("theadList", theadList);
         returnObj.put("tbodyList", tbodyList);
         return returnObj;
     }
 
-    public static JSONObject getResult(JSONArray resultList, BasePageVo vo) {
-        JSONObject returnObj = new JSONObject();
-        returnObj.put("pageSize", vo.getPageSize());
-        returnObj.put("pageCount", vo.getPageCount());
-        returnObj.put("rowNum", vo.getRowNum());
-        returnObj.put("currentPage", vo.getCurrentPage());
-        returnObj.put("tbodyList", resultList);
-        return returnObj;
-    }
-
     public static JSONObject getResult(List resultList) {
-        JSONObject returnObj = new JSONObject();
-        returnObj.put("tbodyList", resultList);
-        return returnObj;
+        return getResult(null, resultList, null);
     }
 
     public static JSONObject getOffsetResult(List theadList, List tbodyList, BasePageVo vo) {

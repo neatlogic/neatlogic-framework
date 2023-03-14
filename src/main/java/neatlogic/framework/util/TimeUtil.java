@@ -867,7 +867,7 @@ public class TimeUtil {
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.DAYS，separator=" "， 返回值为3天
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.HOURS，separator=" "， 返回值为3天 2小时
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.MINUTES，separator=" "， 返回值为3天 2小时 4分钟
-     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator=" "， 返回值为3天 2小时 4分钟 6秒
+     * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator="-"， 返回值为3天-2小时-4分钟-6秒
      * @param milliseconds 毫秒数
      * @param unitCount 结果显示最多单位个数
      * @param minTimeUnit 结果显示最小单位

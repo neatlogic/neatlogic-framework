@@ -17,7 +17,9 @@ limitations under the License.
 package neatlogic.module.framework.form.attribute.handler;
 
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.form.attribute.core.FormAttributeDataConversionHandlerFactory;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
+import neatlogic.framework.form.attribute.core.IFormAttributeDataConversionHandler;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -30,6 +32,7 @@ import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
+import neatlogic.framework.util.TableResultUtil;
 import neatlogic.module.framework.integration.service.IntegrationService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -37,6 +40,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -1351,8 +1355,19 @@ public class TableSelectorHandler extends FormHandlerBase {
      */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject tableObj = new JSONObject();
-        return tableObj;
+        JSONObject resultObj = new JSONObject();
+        JSONArray dataArray = (JSONArray) attributeDataVo.getDataObj();
+        resultObj.put("value", dataArray);
+        if (CollectionUtils.isEmpty(dataArray)) {
+            return resultObj;
+        }
+        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isEmpty(dataConfig)) {
+            return resultObj;
+        }
+        JSONObject tableObj = convertTableData(dataArray, dataConfig);
+        resultObj.putAll(tableObj);
+        return resultObj;
 //        JSONObject tableObj = new JSONObject();
 //        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
 //        tableObj.put("value", dataObj);
@@ -1372,6 +1387,79 @@ public class TableSelectorHandler extends FormHandlerBase {
 //            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
 //        }
 //        return tableObj;
+    }
+
+    /**
+     * 将原始数据转换成表格数据（包含theadList、tbodyList）
+     * @param dataArray 原始数据
+     * @param dataConfig 配置信息
+     * @return
+     */
+    private JSONObject convertTableData(JSONArray dataArray, JSONArray dataConfig) {
+        JSONArray theadList = new JSONArray();
+        Map<String, String> extraAttributeHandlerMap = new HashMap<>();
+        Map<String, JSONObject> extraAttributeConfigMap = new HashMap<>();
+        for (int i = 0; i < dataConfig.size(); i++) {
+            JSONObject attributeObj = dataConfig.getJSONObject(i);
+            String uuid = attributeObj.getString("uuid");
+            String label = attributeObj.getString("label");
+            String handler = attributeObj.getString("handler");
+            Boolean isExtra = attributeObj.getBoolean("isExtra");
+            if (Objects.equals(isExtra, true)) {
+                JSONObject config = attributeObj.getJSONObject("config");
+                extraAttributeConfigMap.put(uuid, config);
+                extraAttributeHandlerMap.put(uuid, handler);
+            }
+            JSONObject theadObj = new JSONObject();
+            theadObj.put("title", label);
+            theadObj.put("handler", handler);
+            theadObj.put("key", uuid);
+            theadList.add(theadObj);
+        }
+        // 不需要解析的属性类型，有文本框、文本域、时间、日期
+        List<String> noNeedParseHandlerList = new ArrayList<>();
+        noNeedParseHandlerList.add(FormHandler.FORMTEXT.getHandler());
+        noNeedParseHandlerList.add(FormHandler.FORMTEXTAREA.getHandler());
+        noNeedParseHandlerList.add(FormHandler.FORMTIME.getHandler());
+        noNeedParseHandlerList.add(FormHandler.FORMDATE.getHandler());
+
+        // 需要解析的属性类型，有下拉框、单选框、复选框
+        List<String> needParseHandlerList = new ArrayList<>();
+        needParseHandlerList.add(FormHandler.FORMSELECT.getHandler());
+        needParseHandlerList.add(FormHandler.FORMRADIO.getHandler());
+        needParseHandlerList.add(FormHandler.FORMCHECKBOX.getHandler());
+
+        JSONArray tbodyList = new JSONArray();
+        for (int i = 0; i < dataArray.size(); i++) {
+            JSONObject newRowDataObj = new JSONObject();
+            JSONObject rowDataObj = dataArray.getJSONObject(i);
+            for (Map.Entry<String, Object> cellDataObj : rowDataObj.entrySet()) {
+                String key = cellDataObj.getKey();
+                String handler = extraAttributeHandlerMap.get(key);
+                if (StringUtils.isBlank(handler)) {
+                    // 非扩展属性
+                    newRowDataObj.put(key, cellDataObj.getValue());
+                } else if (noNeedParseHandlerList.contains(handler)) {
+                    newRowDataObj.put(key, cellDataObj.getValue());
+                } else if (needParseHandlerList.contains(handler)) {
+                    IFormAttributeDataConversionHandler formAttributeDataConversionHandler = FormAttributeDataConversionHandlerFactory.getHandler(handler);
+                    if (formAttributeDataConversionHandler != null) {
+                        JSONObject config = extraAttributeConfigMap.get(key);
+                        AttributeDataVo attributeDataVo = new AttributeDataVo();
+                        attributeDataVo.setDataObj(cellDataObj.getValue());
+                        Object result = formAttributeDataConversionHandler.dataTransformationForEmail(attributeDataVo, config);
+                        newRowDataObj.put(key, result);
+                    } else {
+                        newRowDataObj.put(key, "");
+                    }
+                } else {
+                    // 未来增加属性类型，不做解析
+                    newRowDataObj.put(key, cellDataObj.getValue());
+                }
+            }
+            tbodyList.add(newRowDataObj);
+        }
+        return TableResultUtil.getResult(theadList, tbodyList);
     }
 
     /**

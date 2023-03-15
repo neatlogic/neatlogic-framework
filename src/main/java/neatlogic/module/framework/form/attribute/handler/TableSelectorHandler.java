@@ -1115,27 +1115,263 @@ public class TableSelectorHandler extends FormHandlerBase {
 //		}
 //	]
 //}
+    /*
+    {
+        "handler": "formtableselector",
+        "reaction": {
+            "filter": {},
+            "hide": {},
+            "readonly": {},
+            "disable": {},
+            "display": {},
+            "emit": {},
+            "mask": {}
+        },
+        "override_config": {},
+        "icon": "tsfont-formdynamiclist",
+        "hasValue": true,
+        "label": "表格选择_3",
+        "type": "form",
+        "category": "basic",
+        "config": {
+            "isRequired": false,
+            "disableDefaultValue": true,
+            "mapping": {},
+            "description": "",
+            "pageSize": 10,
+            "matrixType": "custom",
+            "dataConfig": [
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "文本框1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "a22002af151b4da589bc390f3ad164f5"
+                },
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "下拉框1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "579c9de2986d48738cc0ecafab2f43d3"
+                },
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "日期1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "b67e647f6fd049e59cc903fb678c7291"
+                },
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "用户1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "e00fc42fca5d4f5e831d296ed68b3ff1"
+                },
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "分组1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "14a67eabc2584d4da19c561c26ed0f3a"
+                },
+                {
+                    "handler": "formtext",
+                    "isSearch": false,
+                    "hasValue": true,
+                    "label": "角色1",
+                    "isMobile": false,
+                    "isSearchable": 1,
+                    "isPC": true,
+                    "uuid": "93303dc9e96348e68ae5009702958606"
+                },
+                {
+                    "handler": "formtext",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "扩展属性_1",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "147321ac250d48ed9cff09516f47bd8f",
+                    "config": {
+                        "isRequired": false,
+                        "isMask": false,
+                        "isHide": false
+                    }
+                },
+                {
+                    "handler": "formselect",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "扩展属性_2",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "688dfb6ec05147098cf8e34a1141ad58",
+                    "config": {
+                        "mapping": {
+                            "text": "e00fc42fca5d4f5e831d296ed68b3ff1",
+                            "value": "a22002af151b4da589bc390f3ad164f5"
+                        },
+                        "isMultiple": true,
+                        "dataSource": "matrix",
+                        "matrixUuid": "e54221ef3b814eebbf57df252426923c"
+                    }
+                },
+                {
+                    "handler": "formradio",
+                    "reaction": {
+                        "hide": {},
+                        "readonly": {},
+                        "disable": {},
+                        "display": {},
+                        "mask": {}
+                    },
+                    "isSearch": false,
+                    "isExtra": true,
+                    "hasValue": true,
+                    "label": "扩展属性_3",
+                    "isMobile": false,
+                    "isSearchable": 0,
+                    "isPC": true,
+                    "uuid": "42dd19dc6a234275bd8d2585d4c2a751",
+                    "config": {
+                        "dataList": [
+                            {
+                                "text": "radio1",
+                                "value": "1"
+                            },
+                            {
+                                "text": "radio2",
+                                "value": "2"
+                            }
+                        ],
+                        "isMultiple": false,
+                        "dataSource": "static"
+                    }
+                }
+            ],
+            "matrixUuid": "e54221ef3b814eebbf57df252426923c",
+            "isHide": false,
+            "mode": "dialog",
+            "needPage": true,
+            "isMask": false,
+            "sourceColumnList": [],
+            "width": "100%",
+            "dataSource": "matrix"
+        },
+        "uuid": "db70eeb48a144616ab038180e32eea5b"
+    }
+     */
+    /*
+    [
+        {
+            "93303dc9e96348e68ae5009702958606": "R_职位_科技运营中心经理",
+            "_selected": false,
+            "e00fc42fca5d4f5e831d296ed68b3ff1": "0093a20ff182675fee7b6f821b874488",
+            "14a67eabc2584d4da19c561c26ed0f3a": "金融市场总部",
+            "a22002af151b4da589bc390f3ad164f5": "2",
+            "579c9de2986d48738cc0ecafab2f43d3": "a2",
+            "42dd19dc6a234275bd8d2585d4c2a751": "1",
+            "b67e647f6fd049e59cc903fb678c7291": "2022-09-24 00:00:00",
+            "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_3",
+            "688dfb6ec05147098cf8e34a1141ad58": [
+                "6&=&许*航"
+            ],
+            "uuid": "1b0661a40da3478c9be344c99db2ffb0"
+        },
+        {
+            "93303dc9e96348e68ae5009702958606": "测试用户功能",
+            "_selected": false,
+            "e00fc42fca5d4f5e831d296ed68b3ff1": "薛*源",
+            "14a67eabc2584d4da19c561c26ed0f3a": "纪律监督室",
+            "a22002af151b4da589bc390f3ad164f5": "3333",
+            "579c9de2986d48738cc0ecafab2f43d3": "a2",
+            "42dd19dc6a234275bd8d2585d4c2a751": "2",
+            "b67e647f6fd049e59cc903fb678c7291": "2022-12-13 00:00:00",
+            "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_2",
+            "688dfb6ec05147098cf8e34a1141ad58": [
+                "3333&=&薛*源"
+            ],
+            "uuid": "8eed18cdbcb34691b379d1b5fc1e3b0f"
+        },
+        {
+            "93303dc9e96348e68ae5009702958606": "测试用户功能",
+            "_selected": false,
+            "e00fc42fca5d4f5e831d296ed68b3ff1": "冉ss",
+            "14a67eabc2584d4da19c561c26ed0f3a": "基金公司（筹建）",
+            "a22002af151b4da589bc390f3ad164f5": "1",
+            "579c9de2986d48738cc0ecafab2f43d3": "a1",
+            "42dd19dc6a234275bd8d2585d4c2a751": "1",
+            "b67e647f6fd049e59cc903fb678c7291": "2023-02-10 00:00:00",
+            "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_1",
+            "688dfb6ec05147098cf8e34a1141ad58": [
+                "3&=&冉ss",
+                "6&=&许*航"
+            ],
+            "uuid": "c8bc60ca9ec740d7a8808753ab504bab"
+        }
+    ]
+     */
+    /*
+
+     */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject tableObj = new JSONObject();
-        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
-        tableObj.put("value", dataObj);
-        if (MapUtils.isEmpty(dataObj)) {
-            return tableObj;
-        }
-        JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
-        if (CollectionUtils.isEmpty(selectUuidList)) {
-            return tableObj;
-        }
-        tableObj.put("selectUuidList", selectUuidList);
-        String mode = configObj.getString("mode");
-        Boolean needPage = configObj.getBoolean("needPage");
-        if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
-            tableObj.putAll(noNeedPage(dataObj, true));
-        } else {//分页
-            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
-        }
         return tableObj;
+//        JSONObject tableObj = new JSONObject();
+//        JSONObject dataObj = (JSONObject) attributeDataVo.getDataObj();
+//        tableObj.put("value", dataObj);
+//        if (MapUtils.isEmpty(dataObj)) {
+//            return tableObj;
+//        }
+//        JSONArray selectUuidList = dataObj.getJSONArray("selectUuidList");
+//        if (CollectionUtils.isEmpty(selectUuidList)) {
+//            return tableObj;
+//        }
+//        tableObj.put("selectUuidList", selectUuidList);
+//        String mode = configObj.getString("mode");
+//        Boolean needPage = configObj.getBoolean("needPage");
+//        if ("normal".equals(mode) && Objects.equals(needPage, false)) {//不分页
+//            tableObj.putAll(noNeedPage(dataObj, true));
+//        } else {//分页
+//            tableObj.putAll(needPage(dataObj, selectUuidList, configObj));
+//        }
+//        return tableObj;
     }
 
     /**

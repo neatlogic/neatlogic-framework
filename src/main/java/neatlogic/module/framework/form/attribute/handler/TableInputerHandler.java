@@ -58,7 +58,6 @@ public class TableInputerHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
-        System.out.println(resultObj);
         resultObj.remove("value");
         return resultObj;
     }
@@ -732,26 +731,40 @@ public class TableInputerHandler extends FormHandlerBase {
 
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        return getMyDetailedData(attributeDataVo, configObj);
+        JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
+        resultObj.remove("value");
+        return resultObj;
     }
 
     @Override
     public int getExcelHeadLength(JSONObject configObj) {
-        JSONArray attributeList = configObj.getJSONArray("dataConfig");
-        if (CollectionUtils.isNotEmpty(attributeList)) {
-            return attributeList.size();
+        int count = 0;
+        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isNotEmpty(dataConfig)) {
+            for (int i = 0; i < dataConfig.size(); i++) {
+                JSONObject columnHeadObj = dataConfig.getJSONObject(i);
+                Boolean isPC = columnHeadObj.getBoolean("isPC");
+                if (!Objects.equals(isPC, true)) {
+                    continue;
+                }
+                String uuid = columnHeadObj.getString("uuid");
+                if (StringUtils.isBlank(uuid)) {
+                    continue;
+                }
+                count++;
+            }
         }
-        return 1;
+        if (count == 0) {
+            count++;
+        }
+        return count;
     }
 
     @Override
     public int getExcelRowCount(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject detailedData = getMyDetailedData(attributeDataVo, configObj);
-        if (MapUtils.isNotEmpty(detailedData)) {
-            JSONArray tbodyList = detailedData.getJSONArray("tbodyList");
-            if (CollectionUtils.isNotEmpty(tbodyList)) {
-                return tbodyList.size() + 1;
-            }
+        JSONArray dataArray = (JSONArray) attributeDataVo.getDataObj();
+        if (CollectionUtils.isNotEmpty(dataArray)) {
+            return dataArray.size() + 1;
         }
         return 1;
     }

@@ -31,7 +31,7 @@
         `tenant_id` as tenantId,
         `module_id` as moduleId,
         `module_group` as moduleGroup,
-        `version`,
+        `sql_type` as sqlType,
         `start_time` as startTime,
         `end_time` as endTime,
         (UNIX_TIMESTAMP(IFNULL(end_time, NOW(3)))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost,
@@ -107,10 +107,11 @@
         SELECT `id`,
                `uuid`,
                `name`,
-               `is_active`   AS isActive,
-               `expire_date` AS expireDate,
+               `is_active`    AS isActive,
+               `is_need_demo` AS isNeedDemo,
+               `expire_date`  AS expireDate,
                `status`,
-               `error_msg`   as errorMsg,
+               `error_msg`    as errorMsg,
                `description`
         FROM `tenant`
         WHERE `id` = #{value}
@@ -134,6 +135,7 @@
                               `uuid`,
                               `name`,
                               `is_active`,
+                              `is_need_demo`,
                               `expire_date`,
                               `status`,
                               `description`)
@@ -141,6 +143,7 @@
                 #{uuid},
                 #{name},
                 #{isActive},
+                #{isNeedDemo},
                 #{expireDate},
                 #{status},
                 #{description})
@@ -158,7 +161,7 @@
                                     `start_time`,
                                     `module_id`,
                                     `module_group`,
-                                    `version`,
+                                    `sql_type`,
                                     `status`)
         VALUES (#{id},
                 #{tenantId},
@@ -166,7 +169,7 @@
                 NOW(3),
                 #{moduleId},
                 #{moduleGroup},
-                #{version},
+                #{sqlType},
                 #{status})
     </insert>
 
@@ -189,7 +192,7 @@
             `tenant_audit`
         SET `result_hash` = #{resultHash},
             `error_hash`  = #{errorHash},
-            `version`     = #{version},
+            `sql_type`    = #{sqlType},
             `end_time`    = NOW(3),
             `status`      = #{status}
         WHERE `id` = #{id}
@@ -224,8 +227,7 @@
     <update id="updateTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
         UPDATE
             `tenant_module`
-        SET `version` = #{version},
-            `lcd`     = NOW(3)
+        SET `lcd` = NOW(3)
         WHERE `tenant_id` = #{tenantId}
           AND `module_id` = #{moduleId}
     </update>

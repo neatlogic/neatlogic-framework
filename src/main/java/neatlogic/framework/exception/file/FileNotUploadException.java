@@ -7,7 +7,7 @@ public class FileNotUploadException extends ApiRuntimeException {
 	private static final long serialVersionUID = 2146739388736169580L;
 
 	public FileNotUploadException() {
-		super("没有上传文件");
+		super("exception.framework.filenotuploadexception");
 	}
 
 }

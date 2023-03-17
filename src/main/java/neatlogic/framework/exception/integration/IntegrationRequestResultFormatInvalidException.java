@@ -27,6 +27,6 @@ public class IntegrationRequestResultFormatInvalidException extends ApiRuntimeEx
     private static final long serialVersionUID = 1161601312349475176L;
 
     public IntegrationRequestResultFormatInvalidException() {
-        super("集成请求结果不符合JSON格式");
+        super("exception.framework.integrationrequestresultformatinvalidexception");
     }
 }

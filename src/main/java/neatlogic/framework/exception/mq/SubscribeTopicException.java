@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiException;
 
 public class SubscribeTopicException extends ApiException {
     public SubscribeTopicException(String topicName, String clientName, String error) {
-        super(clientName + "订阅主题：" + topicName + "失败，异常：" + error);
+        super("exception.framework.subscribetopicexception" + clientName, topicName, error);
     }
 }

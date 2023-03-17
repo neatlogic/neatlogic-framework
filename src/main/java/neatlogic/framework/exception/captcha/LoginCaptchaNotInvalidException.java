@@ -23,7 +23,7 @@ public class LoginCaptchaNotInvalidException extends ApiRuntimeException {
     private static final long serialVersionUID = 4874681430601702912L;
 
     public LoginCaptchaNotInvalidException() {
-        super("验证码不正确，请重新输入");
+        super("exception.framework.logincaptchanotinvalidexception");
     }
 
 }

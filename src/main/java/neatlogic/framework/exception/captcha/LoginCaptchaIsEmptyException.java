@@ -23,7 +23,7 @@ public class LoginCaptchaIsEmptyException extends ApiRuntimeException {
     private static final long serialVersionUID = -6675900866180763840L;
 
     public LoginCaptchaIsEmptyException(int times) {
-        super("登录错误次数超过"+times+"次，请输入验证码后重试");
+        super("exception.framework.logincaptchaisemptyexception", times);
     }
 
 }

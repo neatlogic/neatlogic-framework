@@ -4,9 +4,9 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class NoAuthGroupException extends ApiRuntimeException {
 
-	private static final long serialVersionUID = -804858290704711315L;
+    private static final long serialVersionUID = -804858290704711315L;
 
-	public NoAuthGroupException(String authGroup) {
-		super("不存在'"+authGroup+"'模块组");
-	}
+    public NoAuthGroupException(String authGroup) {
+        super("exception.framework.noauthgroupexception", authGroup);
+    }
 }

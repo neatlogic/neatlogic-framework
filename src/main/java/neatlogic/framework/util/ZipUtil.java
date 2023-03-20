@@ -17,7 +17,6 @@ package neatlogic.framework.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -34,7 +33,6 @@ public class ZipUtil {
      * @param zipOutputStream   zip的输出流
      * @param inputFile      需要压缩的文件
      * @param fileName          文件名
-     * @throws IOException
      */
     public static void zip(ZipOutputStream zipOutputStream, File inputFile, String fileName) throws Exception {
         if (inputFile.isDirectory()) {

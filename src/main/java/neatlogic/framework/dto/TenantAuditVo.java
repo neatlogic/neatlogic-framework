@@ -16,18 +16,17 @@
 
 package neatlogic.framework.dto;
 
-import java.util.Date;
-
-import neatlogic.framework.dto.module.ModuleGroupVo;
-import neatlogic.framework.dto.module.ModuleVo;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.DigestUtils;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.DigestUtils;
+
+import java.util.Date;
 
 public class TenantAuditVo extends BasePageVo {
 	public enum Status {
@@ -49,7 +48,7 @@ public class TenantAuditVo extends BasePageVo {
 	@EntityField(name = "模块分组名称", type = ApiParamType.STRING)
 	private String moduleGroupName;
 	@EntityField(name = "版本序号", type = ApiParamType.STRING)
-	private String version;
+	private String sqlType;
 	@EntityField(name = "开始时间", type = ApiParamType.LONG)
 	private Date startTime;
 	@EntityField(name = "结束时间", type = ApiParamType.LONG)
@@ -108,14 +107,6 @@ public class TenantAuditVo extends BasePageVo {
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	public String getResult() {
@@ -216,4 +207,11 @@ public class TenantAuditVo extends BasePageVo {
 		this.moduleGroupName = moduleGroupName;
 	}
 
+	public String getSqlType() {
+		return sqlType;
+	}
+
+	public void setSqlType(String sqlType) {
+		this.sqlType = sqlType;
+	}
 }

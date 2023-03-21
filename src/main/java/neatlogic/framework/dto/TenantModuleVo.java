@@ -11,8 +11,6 @@ public class TenantModuleVo {
 	private Long tenantId;
 	@EntityField(name = "模块id", type = ApiParamType.STRING)
 	private String moduleId;
-	@EntityField(name = "版本", type = ApiParamType.STRING)
-	private String version;
 	@EntityField(name = "添加日期", type = ApiParamType.LONG)
 	private Date fcd;
 	@EntityField(name = "更新日期", type = ApiParamType.LONG)
@@ -32,14 +30,6 @@ public class TenantModuleVo {
 
 	public void setModuleId(String moduleId) {
 		this.moduleId = moduleId;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	public Date getFcd() {

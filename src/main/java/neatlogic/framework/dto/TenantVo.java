@@ -21,16 +21,55 @@ import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.SnowflakeUtil;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class TenantVo extends BasePageVo {
     private static final long serialVersionUID = 5037087043421533431L;
 
     public enum Status {
-        BUILDING, BUILT, ERROR;
+        BUILDING("building", "enum.master.tenantvo.status.building"),
+        BUILT("built", "enum.master.tenantvo.status.built"),
+        DDL("ddl", "enum.master.tenantvo.status.ddl"),
+        DML("dml", "enum.master.tenantvo.status.dml"),
+        ERROR("error", "enum.master.tenantvo.status.error");
+
+        private String value;
+        private String text;
+
+        Status(String value, String text) {
+            this.value = value;
+            this.text = text;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public static String getText(String value){
+            for (Status status : Status.values()){
+                if(Objects.equals(status.getValue(),value)){
+                    return status.getText();
+                }
+            }
+            return null;
+        }
+
+        public String getText() {
+            return I18nUtils.getMessage(text);
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
     }
 
     @EntityField(name = "id", type = ApiParamType.LONG)
@@ -41,6 +80,8 @@ public class TenantVo extends BasePageVo {
     private String name;
     @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
     private Integer isActive;
+    @EntityField(name = "是否初始化样本数据", type = ApiParamType.INTEGER)
+    private Integer isNeedDemo;
     @EntityField(name = "描述", type = ApiParamType.STRING)
     private String description;
     @EntityField(name = "有效期限", type = ApiParamType.LONG)
@@ -139,6 +180,10 @@ public class TenantVo extends BasePageVo {
         return status;
     }
 
+    public String getStatusText() {
+        return Status.getText(status);
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }
@@ -173,5 +218,13 @@ public class TenantVo extends BasePageVo {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public Integer getIsNeedDemo() {
+        return isNeedDemo;
+    }
+
+    public void setIsNeedDemo(Integer isNeedDemo) {
+        this.isNeedDemo = isNeedDemo;
     }
 }

@@ -22,7 +22,7 @@ public class ParamInvalidException extends ApiRuntimeException {
     private static final long serialVersionUID = 5268968033542583582L;
 
     public ParamInvalidException(String paramName, String paramValue) {
-        super("参数'" + paramName + "' ，参数值'" + paramValue + "'不合法");
+        super("exception.framework.paraminvalidexception", paramName, paramValue);
     }
 
 }

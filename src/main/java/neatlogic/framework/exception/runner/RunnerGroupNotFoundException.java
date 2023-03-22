@@ -23,6 +23,6 @@ public class RunnerGroupNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -2208449808982631219L;
 
     public RunnerGroupNotFoundException(String name) {
-        super("runnerGroup: " + name + " 不存在");
+        super("exception.framework.runnergroupnotfoundexception", name);
     }
 }

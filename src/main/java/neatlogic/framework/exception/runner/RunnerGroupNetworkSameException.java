@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerGroupNetworkSameException extends ApiRuntimeException {
     public RunnerGroupNetworkSameException() {
-        super("含有相同网段,请检查");
+        super("exception.framework.runnergroupnetworksameexception");
     }
 }

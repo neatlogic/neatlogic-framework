@@ -22,6 +22,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class RunnerGroupRunnerListEmptyException extends ApiRuntimeException {
 
     public RunnerGroupRunnerListEmptyException(RunnerGroupVo groupVo) {
-        super("runner group: "+groupVo.getName()+"("+groupVo.getId()+") 不存在runner，请检查runner管理");
+        super("exception.framework.runnergrouprunnerlistemptyexception", groupVo.getName(), groupVo.getId());
     }
 }

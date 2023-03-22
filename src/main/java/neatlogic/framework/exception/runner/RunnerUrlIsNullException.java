@@ -16,8 +16,10 @@ limitations under the License.
 
 package neatlogic.framework.exception.runner;
 
-public class RunnerUrlIsNullException extends RuntimeException {
+import neatlogic.framework.exception.core.ApiRuntimeException;
+
+public class RunnerUrlIsNullException extends ApiRuntimeException {
     public RunnerUrlIsNullException(Long runnerId) {
-        super("runner id 为：“" + runnerId + "”的url 为空");
+        super("exception.framework.runnerurlisnullexception", runnerId);
     }
 }

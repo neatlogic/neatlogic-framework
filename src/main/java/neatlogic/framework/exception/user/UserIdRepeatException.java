@@ -22,6 +22,6 @@ public class UserIdRepeatException extends ApiRuntimeException {
 
 
     public UserIdRepeatException(String userId) {
-        super("用户ID“" + userId + "”已存在");
+        super("exception.framework.useridrepeatexception", userId);
     }
 }

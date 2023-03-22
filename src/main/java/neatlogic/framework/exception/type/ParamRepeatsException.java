@@ -23,7 +23,7 @@ public class ParamRepeatsException extends ApiRuntimeException {
     private static final long serialVersionUID = -7420026194484040260L;
 
     public ParamRepeatsException(String param) {
-        super("参数“" + param + "”重复");
+        super("exception.framework.paramrepeatsexception", param);
     }
 
 }

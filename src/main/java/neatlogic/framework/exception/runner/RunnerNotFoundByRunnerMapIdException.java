@@ -16,10 +16,12 @@ limitations under the License.
 
 package neatlogic.framework.exception.runner;
 
-public class RunnerNotFoundByRunnerMapIdException extends RuntimeException {
+import neatlogic.framework.exception.core.ApiRuntimeException;
+
+public class RunnerNotFoundByRunnerMapIdException extends ApiRuntimeException {
     private static final long serialVersionUID = -3849705005655724969L;
 
     public RunnerNotFoundByRunnerMapIdException(Long runnerMapId) {
-        super("未找到" + runnerMapId + "对应的runner");
+        super("exception.framework.runnernotfoundbyrunnermapIdexception", runnerMapId);
     }
 }

@@ -390,7 +390,7 @@ public class UserSelectHandler extends FormHandlerBase {
         List<ValueTextVo> valueTextList = new ArrayList<>();
         boolean isMultiple = configObj.getBooleanValue("isMultiple");
         attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-        if (isMultiple) {
+        if (dataObj instanceof JSONArray) {
             JSONArray valueArray = (JSONArray) dataObj;
             if (CollectionUtils.isNotEmpty(valueArray)) {
                 valueList = valueArray.toJavaList(String.class);
@@ -400,7 +400,7 @@ public class UserSelectHandler extends FormHandlerBase {
                     valueTextList.add(new ValueTextVo(value, text));
                 }
             }
-        } else {
+        } else if (dataObj instanceof String) {
             String value = (String) dataObj;
             if (StringUtils.isNotBlank(value)) {
                 String text = parse(value);

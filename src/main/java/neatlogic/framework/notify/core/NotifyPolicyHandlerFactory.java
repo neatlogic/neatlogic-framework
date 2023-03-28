@@ -59,7 +59,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {
         if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
-            moduleTreeVoList.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+            List<NotifyTreeVo> moduleTreeListTmp = new ArrayList<>(moduleTreeVoList);
+            moduleTreeListTmp.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+            return moduleTreeListTmp;
         }
         return moduleTreeVoList;
     }

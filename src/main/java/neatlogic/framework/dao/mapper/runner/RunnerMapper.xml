@@ -136,7 +136,7 @@ limitations under the License.
                rgr.`runnergroup_id`                    AS groupId,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
-                 JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+                 LEFT JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
                  LEFT JOIN `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
         where ar.is_delete = 0;
     </select>

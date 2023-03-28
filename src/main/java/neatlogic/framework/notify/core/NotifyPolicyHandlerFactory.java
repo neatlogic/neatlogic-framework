@@ -25,6 +25,7 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.notify.dto.NotifyPolicyHandlerVo;
 import neatlogic.framework.notify.dto.NotifyTreeVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
     }
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {
+        if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
+            moduleTreeVoList.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+        }
         return moduleTreeVoList;
     }
 
@@ -65,7 +69,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         return getTriggerList(targetNode);
     }
 
-    public static List<String> getAllActiveTriggerList(){
+    public static List<String> getAllActiveTriggerList() {
         List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
         List<String> triggerList = new ArrayList<>();
         for (ModuleVo moduleVo : activeModuleList) {

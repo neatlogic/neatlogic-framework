@@ -121,15 +121,19 @@ public class PublicApiDispatcher {
 
         //自定义接口 访问人初始化
         String user = request.getHeader("User");
-        UserVo userVo = new UserVo(SystemUser.SYSTEM.getUserUuid());
+        UserVo userVo = null;
         if (StringUtils.isNotBlank(user)) {
             UserVo userTmpVo = userMapper.getUserByUuid(user);
             if (userTmpVo != null) {
                 userVo = userTmpVo;
                 userVo.setAuthorization(authorization);
+                UserContext.init(userVo, timezone, request, response);
             }
         }
-        UserContext.init(userVo, timezone, request, response);
+        if(userVo == null){
+            UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
+        }
+
         UserContext.get().setRequest(request);
 
         ApiVo interfaceVo = apiMapper.getApiByToken(token);

@@ -20,6 +20,7 @@ import neatlogic.framework.dependency.dao.mapper.DependencyMapper;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.dependency.dto.DependencyVo;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18nUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
 
     @Override
     public String getGroupName() {
-        return groupName;
+        return I18nUtils.getMessage(groupName);
     }
 
     @Override

@@ -329,6 +329,75 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         }
     }
 
+    @Override
+    public JSONObject getMyDetailedDataForSelectHandler(AttributeDataVo attributeDataVo, JSONObject configObj) {
+        JSONObject resultObj = new JSONObject();
+        Object dataObj = attributeDataVo.getDataObj();
+        if (dataObj == null) {
+            return resultObj;
+        }
+        List<String> valueList = new ArrayList<>();
+        List<String> textList = new ArrayList<>();
+        boolean isMultiple = configObj.getBooleanValue("isMultiple");
+        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+        String dataSource = configObj.getString("dataSource");
+        if ("static".equals(dataSource)) {
+            JSONArray dataArray = configObj.getJSONArray("dataList");
+            if (CollectionUtils.isEmpty(dataArray)) {
+                return resultObj;
+            }
+            List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
+            Map<Object, String> valueTextMap = dataList.stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getText()));
+            if (dataObj instanceof JSONArray) {
+                JSONArray valueArray = (JSONArray) dataObj;
+                if (CollectionUtils.isNotEmpty(valueArray)) {
+                    valueList = valueArray.toJavaList(String.class);
+                    for (String value : valueList) {
+                        String text = valueTextMap.get(value);
+                        if (text != null) {
+                            textList.add(text);
+                        } else {
+                            textList.add(value);
+                        }
+                    }
+                }
+            } else if (dataObj instanceof String) {
+                String value = (String) dataObj;
+                valueList.add(value);
+                String text = valueTextMap.get(value);
+                if (text != null) {
+                    textList.add(text);
+                } else {
+                    textList.add(value);
+                }
+            }
+        } else {// 其他，如动态数据源
+            if (dataObj instanceof JSONArray) {
+                JSONArray valueArray = (JSONArray) dataObj;
+                if (CollectionUtils.isNotEmpty(valueArray)) {
+                    valueList = valueArray.toJavaList(String.class);
+                    for (String key : valueList) {
+                        if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                            textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                        } else {
+                            textList.add(key);
+                        }
+                    }
+                }
+            } else if (dataObj instanceof String) {
+                String value = (String) dataObj;
+                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
+                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                } else {
+                    textList.add(value);
+                }
+            }
+        }
+        resultObj.put("valueList", valueList);
+        resultObj.put("textList", textList);
+        return resultObj;
+    }
+
     private String getValue(String matrixUuid, ValueTextVo mapping, String text) {
         if (StringUtils.isBlank(text)) {
             return text;

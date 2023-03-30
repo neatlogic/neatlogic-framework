@@ -91,7 +91,7 @@ public class CheckboxHandler extends FormHandlerBase {
             List<String> textList = textArray.toJavaList(String.class);
             return String.join("、", textList);
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     @Override
@@ -241,55 +241,6 @@ public class CheckboxHandler extends FormHandlerBase {
         return false;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formcheckbox",
-//	"label": "复选框_7",
-//	"type": "form",
-//	"uuid": "4120a16ca0dc4b90a794eea80d3b61d3",
-//	"config": {
-//		"isRequired": false,
-//		"mapping": {
-//			"text": "",
-//			"value": ""
-//		},
-//		"defaultValueList": [
-//			"1"
-//		],
-//		"ruleList": [],
-//		"validList": [],
-//		"isMultiple": true,
-//		"quoteUuid": "",
-//		"dataList": [
-//			{
-//				"text": "复选1",
-//				"value": "1"
-//			},
-//			{
-//				"text": "复选2",
-//				"value": "2"
-//			}
-//		],
-//		"width": "100%",
-//		"defaultValueType": "self",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"dataSource": "static",
-//		"direction": "transverse"
-//	}
-//}
-    //保存数据结构
-//    ["1"]
-    //返回数据结构
-//{
-//	"textList": [
-//		"复选1"
-//	],
-//	"valueList": [
-//		"1"
-//	]
-//}
     /*
     表单组件配置信息
     {
@@ -351,45 +302,7 @@ public class CheckboxHandler extends FormHandlerBase {
      */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject resultObj = new JSONObject();
-        JSONArray valueArray = (JSONArray) attributeDataVo.getDataObj();
-        if (CollectionUtils.isNotEmpty(valueArray)) {
-            List<String> textList = new ArrayList<>();
-            List<String> valueList = valueArray.toJavaList(String.class);
-            String dataSource = configObj.getString("dataSource");
-            if ("static".equals(dataSource)) {
-                Map<Object, String> valueTextMap = new HashMap<>();
-                JSONArray dataArray = configObj.getJSONArray("dataList");
-                if (CollectionUtils.isNotEmpty(dataArray)) {
-                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-                    if (CollectionUtils.isNotEmpty(dataList)) {
-                        for (ValueTextVo data : dataList) {
-                            valueTextMap.put(data.getValue(), data.getText());
-                        }
-                    }
-                }
-
-                for (String value : valueList) {
-                    String text = valueTextMap.get(value);
-                    if (text != null) {
-                        textList.add(text);
-                    } else {
-                        textList.add(value);
-                    }
-                }
-            } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-                for (String value : valueList) {
-                    if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                        textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                    } else {
-                        textList.add(value);
-                    }
-                }
-            }
-            resultObj.put("textList", textList);
-        }
-        resultObj.put("valueList", valueArray);
-        return resultObj;
+        return formService.getMyDetailedDataForSelectHandler(attributeDataVo, configObj);
     }
 
     @Override

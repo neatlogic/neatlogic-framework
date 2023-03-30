@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.form.service;
 
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.FormVersionVo;
@@ -44,4 +45,6 @@ public interface FormService {
      * @throws AttributeValidException
      */
     void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException;
+
+    JSONObject getMyDetailedDataForSelectHandler(AttributeDataVo attributeDataVo, JSONObject configObj);
 }

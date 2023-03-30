@@ -69,7 +69,7 @@ public class HttpRequestUtil {
     //默认boundary
     private static final String FORM_DATA_BOUNDARY = "----MyFormBoundarySMFEtUYQG6r5B920";
     //连接地址
-    private final String url;
+    private String url;
     private String method;
     private ContentType contentType = ContentType.CONTENT_TYPE_APPLICATION_JSON;
     private Charset charset = StandardCharsets.UTF_8;
@@ -127,6 +127,60 @@ public class HttpRequestUtil {
             System.out.println("verify " + hostname);
             return true;
         }
+    }
+
+    /**
+     * 拼接url queryString
+     *
+     * @param params url 入参
+     */
+    private void setUrlWithQueryString(JSONObject params) {
+        StringBuilder builder = new StringBuilder(this.url);
+        if (this.url.contains("?")) {
+            builder.append("&");
+        } else {
+            builder.append("?");
+        }
+
+        int i = 0;
+        for (String key : params.keySet()) {
+            String value = params.getString(key);
+            if (value == null) { // 过滤空的key
+                continue;
+            }
+
+            if (i != 0) {
+                builder.append('&');
+            }
+
+            builder.append(key);
+            builder.append('=');
+            builder.append(encode(value));
+
+            i++;
+        }
+
+        this.url = builder.toString();
+    }
+
+    /**
+     * 对输入的字符串进行URL编码, 即转换为%20这种形式
+     *
+     * @param input 原文
+     * @return URL编码. 如果编码失败, 则返回原文
+     */
+    public static String encode(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        try {
+            return URLEncoder.encode(input, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return input;
     }
 
     static {
@@ -324,6 +378,13 @@ public class HttpRequestUtil {
      */
     public HttpRequestUtil setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    public HttpRequestUtil setQueryString(JSONObject queryString) {
+        if (MapUtils.isNotEmpty(queryString)) {
+            setUrlWithQueryString(queryString);
+        }
         return this;
     }
 

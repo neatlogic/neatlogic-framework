@@ -109,6 +109,7 @@ limitations under the License.
     <insert id="insertDependency" parameterType="neatlogic.framework.dependency.dto.DependencyVo">
         INSERT INTO `dependency` (`from`, `type`, `to`, `config`)
         VALUES (#{from}, #{type}, #{to}, #{configStr})
+        ON DUPLICATE KEY UPDATE `config` = #{configStr}
     </insert>
 
     <delete id="deleteDependency" parameterType="neatlogic.framework.dependency.dto.DependencyVo">

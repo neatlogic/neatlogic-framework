@@ -91,7 +91,7 @@ public class CheckboxHandler extends FormHandlerBase {
             List<String> textList = textArray.toJavaList(String.class);
             return String.join("、", textList);
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     @Override

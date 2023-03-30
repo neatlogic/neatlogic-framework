@@ -203,53 +203,6 @@ public class RadioHandler extends FormHandlerBase {
         return false;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formradio",
-//	"label": "单选框_6",
-//	"type": "form",
-//	"uuid": "749af88f046d4478a2a3c31f4dd4ec3a",
-//	"config": {
-//		"isRequired": false,
-//		"mapping": {
-//			"text": "",
-//			"value": ""
-//		},
-//		"defaultValueList": "1",
-//		"ruleList": [],
-//		"validList": [],
-//		"isMultiple": false,
-//		"quoteUuid": "",
-//		"dataList": [
-//			{
-//				"text": "单选1",
-//				"value": "1"
-//			},
-//			{
-//				"text": "单选2",
-//				"value": "2"
-//			}
-//		],
-//		"width": "100%",
-//		"defaultValueType": "self",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"dataSource": "static",
-//		"direction": "transverse"
-//	}
-//}
-    //保存数据结构
-//    1
-    //返回数据结构
-//{
-//	"textList": [
-//		"单选1"
-//	],
-//	"valueList": [
-//		"1"
-//	]
-//}
     /*
     表单组件配置信息
     {
@@ -300,33 +253,7 @@ public class RadioHandler extends FormHandlerBase {
      */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject resultObj = new JSONObject();
-        String value = attributeDataVo.getDataObj().toString();
-        if (StringUtils.isNotBlank(value)) {
-            List<String> valueList = new ArrayList<>();
-            valueList.add(value);
-            List<String> textList = new ArrayList<>();
-            String dataSource = configObj.getString("dataSource");
-            if ("static".equals(dataSource)) {
-                JSONArray dataArray = configObj.getJSONArray("dataList");
-                if (CollectionUtils.isNotEmpty(dataArray)) {
-                    List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-                    for (ValueTextVo data : dataList) {
-                        if (value.equals(data.getValue())) {
-                            textList.add(data.getText());
-                            break;
-                        }
-                    }
-                }
-            } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                }
-            }
-            resultObj.put("valueList", valueList);
-            resultObj.put("textList", textList);
-        }
-        return resultObj;
+        return formService.getMyDetailedDataForSelectHandler(attributeDataVo, configObj);
     }
 
     @Override

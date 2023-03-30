@@ -16,6 +16,8 @@
 
 package neatlogic.framework.notify.core;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
@@ -59,7 +61,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {
         if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
-            moduleTreeVoList.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+            List<NotifyTreeVo> moduleTreeListTmp = JSONArray.parseArray(JSON.toJSONString(moduleTreeVoList), NotifyTreeVo.class);
+            moduleTreeListTmp.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+            return moduleTreeListTmp;
         }
         return moduleTreeVoList;
     }

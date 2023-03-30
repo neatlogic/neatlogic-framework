@@ -171,7 +171,7 @@ public class SelectHandler extends FormHandlerBase {
             List<String> textList = textArray.toJavaList(String.class);
             return String.join("、", textList);
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     @Override
@@ -310,54 +310,6 @@ public class SelectHandler extends FormHandlerBase {
         return false;
     }
 
-    //表单组件配置信息
-//{
-//	"handler": "formselect",
-//	"label": "下拉框_8",
-//	"type": "form",
-//	"uuid": "4425ae2a7fd3402ebc828233a79d5c62",
-//	"config": {
-//		"isRequired": false,
-//		"mapping": {
-//			"text": "",
-//			"value": ""
-//		},
-//		"defaultValueList": "1",
-//		"ruleList": [],
-//		"validList": [],
-//		"isMultiple": false,
-//		"quoteUuid": "",
-//		"dataList": [
-//			{
-//				"text": "下拉1",
-//				"value": "1"
-//			},
-//			{
-//				"text": "下拉2",
-//				"value": "2"
-//			}
-//		],
-//		"width": "100%",
-//		"defaultValueType": "self",
-//		"placeholder": "请输入",
-//		"authorityConfig": [
-//			"common#alluser"
-//		],
-//		"dataSource": "static",
-//		"direction": "transverse"
-//	}
-//}
-    //保存数据结构
-//    1
-    //返回数据结构
-//{
-//	"textList": [
-//		"下拉1"
-//	],
-//	"valueList": [
-//		"1"
-//	]
-//}
     /*
     {
         "handler": "formselect",
@@ -407,71 +359,7 @@ public class SelectHandler extends FormHandlerBase {
      */
     @Override
     protected JSONObject getMyDetailedData(AttributeDataVo attributeDataVo, JSONObject configObj) {
-        JSONObject resultObj = new JSONObject();
-        Object dataObj = attributeDataVo.getDataObj();
-        if (dataObj == null) {
-            return resultObj;
-        }
-        List<String> valueList = new ArrayList<>();
-        List<String> textList = new ArrayList<>();
-        boolean isMultiple = configObj.getBooleanValue("isMultiple");
-        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
-        String dataSource = configObj.getString("dataSource");
-        if ("static".equals(dataSource)) {
-            JSONArray dataArray = configObj.getJSONArray("dataList");
-            if (CollectionUtils.isEmpty(dataArray)) {
-                return resultObj;
-            }
-            List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-            Map<Object, String> valueTextMap = dataList.stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getText()));
-            if (isMultiple) {
-                JSONArray valueArray = (JSONArray) dataObj;
-                if (CollectionUtils.isNotEmpty(valueArray)) {
-                    valueList = valueArray.toJavaList(String.class);
-                    for (String key : valueList) {
-                        String text = valueTextMap.get(key);
-                        if (text != null) {
-                            textList.add(text);
-                        } else {
-                            textList.add(key);
-                        }
-                    }
-                }
-            } else {
-                String dataObjStr = dataObj.toString();
-                valueList.add(dataObjStr);
-                String text = valueTextMap.get(dataObjStr);
-                if (text != null) {
-                    textList.add(text);
-                } else {
-                    textList.add(dataObjStr);
-                }
-            }
-        } else {// 其他，如动态数据源
-            if (isMultiple) {
-                JSONArray valueArray = (JSONArray) dataObj;
-                if (CollectionUtils.isNotEmpty(valueArray)) {
-                    valueList = valueArray.toJavaList(String.class);
-                    for (String key : valueList) {
-                        if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                            textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                        } else {
-                            textList.add(key);
-                        }
-                    }
-                }
-            } else {
-                String value = (String) dataObj;
-                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                } else {
-                    textList.add((String) dataObj);
-                }
-            }
-        }
-        resultObj.put("valueList", valueList);
-        resultObj.put("textList", textList);
-        return resultObj;
+        return formService.getMyDetailedDataForSelectHandler(attributeDataVo, configObj);
     }
 
     @Override

@@ -23,6 +23,6 @@ public class WorktimeNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 63938639408504619L;
 
     public WorktimeNotFoundException(String msg) {
-        super("服务窗口:'" + msg + "'不存在");
+        super("exception.framework.worktimenotfoundexception", msg);
     }
 }

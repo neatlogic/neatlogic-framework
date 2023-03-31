@@ -27,6 +27,6 @@ public class LineHandlerNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1669102356313895841L;
 
     public LineHandlerNotFoundException(String handler) {
-        super("知识插件：'" + handler + "'不存在");
+        super("exception.framework.linehandlernotfoundexception" + handler);
     }
 }

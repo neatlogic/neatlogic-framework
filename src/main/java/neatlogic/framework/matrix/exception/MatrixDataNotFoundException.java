@@ -11,6 +11,6 @@ public class MatrixDataNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508274752209783532L;
 
     public MatrixDataNotFoundException(String matrixName) {
-        super("矩阵" + matrixName + "数据不存在");
+        super("exception.framework.matrixdatanotfoundexception", matrixName);
     }
 }

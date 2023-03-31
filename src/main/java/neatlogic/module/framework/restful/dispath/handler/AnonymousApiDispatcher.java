@@ -16,6 +16,9 @@
 
 package neatlogic.module.framework.restful.dispath.handler;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -27,10 +30,7 @@ import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
-import neatlogic.framework.exception.type.AnonymousExceptionMessage;
-import neatlogic.framework.exception.type.ApiNotFoundException;
-import neatlogic.framework.exception.type.ComponentNotFoundException;
-import neatlogic.framework.exception.type.PermissionDeniedException;
+import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
@@ -41,9 +41,6 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONReader;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -92,7 +89,7 @@ public class AnonymousApiDispatcher {
                 throw new PermissionDeniedException();
             }
         } else {
-            throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+            throw new ComponentNotFoundException(interfaceVo.getHandler());
         }
         Double qps = interfaceVo.getQps();
         ApiVo apiVo = apiMapper.getApiByToken(token);
@@ -147,7 +144,7 @@ public class AnonymousApiDispatcher {
                         returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                    throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
@@ -173,7 +170,7 @@ public class AnonymousApiDispatcher {
                         returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                    throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
@@ -199,7 +196,7 @@ public class AnonymousApiDispatcher {
                         returnObj.putAll(restComponent.help());
                     }
                 } else {
-                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                    throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             }
         }
@@ -303,7 +300,7 @@ public class AnonymousApiDispatcher {
                 try {
                     paramObj = JSONObject.parseObject(jsonStr);
                 } catch (Exception e) {
-                    throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                    throw new ParamJSONIrregularException();
                 }
             } else {
                 paramObj = new JSONObject();

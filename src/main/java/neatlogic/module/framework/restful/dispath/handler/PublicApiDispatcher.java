@@ -16,6 +16,8 @@
 
 package neatlogic.module.framework.restful.dispath.handler;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
 import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -31,6 +33,7 @@ import neatlogic.framework.exception.integration.AuthenticateException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
+import neatlogic.framework.exception.type.ParamJSONIrregularException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.restful.auth.core.ApiAuthFactory;
 import neatlogic.framework.restful.auth.core.IApiAuth;
@@ -44,8 +47,6 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -298,7 +299,7 @@ public class PublicApiDispatcher {
                 try {
                     paramObj = JSONObject.parseObject(jsonStr);
                 } catch (Exception e) {
-                    throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                    throw new ParamJSONIrregularException();
                 }
             } else {
                 paramObj = new JSONObject();
@@ -430,7 +431,7 @@ public class PublicApiDispatcher {
             try {
                 paramObj = JSONObject.parseObject(jsonStr);
             } catch (Exception e) {
-                throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                throw new ParamJSONIrregularException();
             }
         } else {
             paramObj = new JSONObject();

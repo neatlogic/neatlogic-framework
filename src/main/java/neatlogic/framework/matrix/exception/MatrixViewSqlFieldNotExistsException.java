@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class MatrixViewSqlFieldNotExistsException extends ApiRuntimeException {
     public MatrixViewSqlFieldNotExistsException(String field) {
-        super("矩阵视图SQL语句缺少字段：" + field);
+        super("exception.framework.matrixviewsqlfieldnotexistsexception", field);
     }
 }

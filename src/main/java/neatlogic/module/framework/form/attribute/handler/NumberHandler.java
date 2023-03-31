@@ -16,15 +16,13 @@ limitations under the License.
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
-import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +42,11 @@ public class NumberHandler extends FormHandlerBase {
     public JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException {
         Object dataObj = attributeDataVo.getDataObj();
         if (!(dataObj instanceof Number)) {
-            throw new AttributeValidException("格式不对");
+            if (attributeDataVo.getAttributeLabel() != null) {
+                throw new AttributeValidException(attributeDataVo.getAttributeLabel());
+            } else {
+                throw new AttributeValidException(attributeDataVo.getAttributeUuid());
+            }
         }
         return null;
     }

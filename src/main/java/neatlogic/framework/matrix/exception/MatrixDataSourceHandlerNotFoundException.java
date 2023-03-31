@@ -27,6 +27,6 @@ public class MatrixDataSourceHandlerNotFoundException extends ApiRuntimeExceptio
     private static final long serialVersionUID = -4508275752609703532L;
 
     public MatrixDataSourceHandlerNotFoundException(String name) {
-        super("矩阵数据源处理器：'" + name + "'不存在");
+        super("exception.framework.matrixdatasourcehandlernotfoundexception", name);
     }
 }

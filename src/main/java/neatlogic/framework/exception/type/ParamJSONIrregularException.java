@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package neatlogic.framework.matrix.exception;
+package neatlogic.framework.exception.type;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class MatrixViewNameEmptyException extends ApiRuntimeException {
-    public MatrixViewNameEmptyException() {
-        super("exception.framework.matrixviewnameemptyexception");
+/**
+ * @author longrf
+ * @date 2023/3/31 18:22
+ */
+
+public class ParamJSONIrregularException extends ApiRuntimeException {
+    public ParamJSONIrregularException() {
+        super("exception.framework.paramjsonirregularexception");
     }
 }

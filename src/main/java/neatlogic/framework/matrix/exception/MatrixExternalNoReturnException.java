@@ -23,6 +23,6 @@ public class MatrixExternalNoReturnException extends ApiRuntimeException {
     private static final long serialVersionUID = 8558168883177657125L;
 
     public MatrixExternalNoReturnException() {
-        super("集成配置接口无返回结果");
+        super("exception.framework.matrixexternalnoreturnexception");
     }
 }

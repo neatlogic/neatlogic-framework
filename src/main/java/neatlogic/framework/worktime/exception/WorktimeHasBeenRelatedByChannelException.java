@@ -23,6 +23,6 @@ public class WorktimeHasBeenRelatedByChannelException extends ApiRuntimeExceptio
     private static final long serialVersionUID = -3889598914385553027L;
 
     public WorktimeHasBeenRelatedByChannelException(String name) {
-        super("服务窗口:'" + name + "'已被服务引用");
+        super("exception.framework.worktimehasbeenrelatedbychannelexception", name);
     }
 }

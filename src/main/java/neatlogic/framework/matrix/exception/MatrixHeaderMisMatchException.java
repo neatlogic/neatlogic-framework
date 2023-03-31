@@ -11,6 +11,6 @@ public class MatrixHeaderMisMatchException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508274752209783532L;
 
     public MatrixHeaderMisMatchException(String matrixName) {
-        super("矩阵" + matrixName + "头信息不匹配");
+        super("exception.framework.matrixheadermismatchexception", matrixName);
     }
 }

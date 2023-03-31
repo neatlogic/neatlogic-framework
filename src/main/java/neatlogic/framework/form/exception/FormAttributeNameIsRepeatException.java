@@ -8,6 +8,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
  */
 public class FormAttributeNameIsRepeatException extends ApiRuntimeException {
     public FormAttributeNameIsRepeatException(String name) {
-        super("表单组件名称“" + name + "”重复");
+        super("exception.framework.formattributenameisrepeatexception", name);
     }
 }

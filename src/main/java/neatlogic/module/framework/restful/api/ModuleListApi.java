@@ -16,18 +16,18 @@
 
 package neatlogic.module.framework.restful.api;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentBase;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.collections4.CollectionUtils;
+import neatlogic.framework.util.I18nUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,7 @@ public class ModuleListApi extends PrivateApiComponentBase {
 		return null;
 	}
 
-	@Input({@Param( name = "includeList", type = ApiParamType.JSONARRAY, desc = "白名单")})
+	@Input({})
 	@Output({
 		@Param( name = "value", type = ApiParamType.STRING, desc = "模块"),
 		@Param( name = "text", type = ApiParamType.STRING, desc = "模块名") 
@@ -78,19 +78,10 @@ public class ModuleListApi extends PrivateApiComponentBase {
 				checkSet.add(moduleVo.getGroup());
 				JSONObject returnObj = new JSONObject();
 				returnObj.put("value", moduleVo.getGroup());
-				returnObj.put("text", moduleVo.getGroupName());
+				returnObj.put("text", I18nUtils.getMessage(moduleVo.getGroupName()));
 				returnObj.put("sort", moduleVo.getGroupSort());
 				resultArray.add(returnObj);
 			}
-		}
-		JSONArray includeList = jsonObj.getJSONArray("includeList");
-		if(CollectionUtils.isNotEmpty(includeList)&&includeList.contains("dashboard")) {
-			//添加仪表板 TODO 等前端完成迁移，则删除此逻辑
-			JSONObject returnObj = new JSONObject();
-			returnObj.put("value", "dashboard");
-			returnObj.put("text", "仪表板");
-			returnObj.put("sort", 0);
-			resultArray.add(returnObj);
 		}
 		resultArray.sort(Comparator.comparing(obj-> ((JSONObject) obj).getInteger("sort")));
 		

@@ -33,7 +33,6 @@ public class MessageHandlerVo implements Cloneable {
     private Date fcd;
     @JSONField(serialize = false)
     private String userUuid;
-    @JSONField(serialize = false)
     private boolean isPublic;
     public String getModuleId() {
         return moduleId;

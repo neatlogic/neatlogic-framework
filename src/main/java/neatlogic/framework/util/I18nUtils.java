@@ -24,7 +24,7 @@ import java.util.Locale;
 
 public class I18nUtils {
 
-    public static String getMessage(String key, Object[] args) {
+    public static String getMessage(String key, Object ... args) {
         MessageSourceAccessor messageSource = SpringContextUtil.getBean(MessageSourceAccessor.class);
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;

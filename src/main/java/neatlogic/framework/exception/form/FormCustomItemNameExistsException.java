@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class FormCustomItemNameExistsException extends ApiRuntimeException {
     public FormCustomItemNameExistsException(String name) {
-        super("表单自定义组件“" + name + "”已存在");
+        super("exception.framework.formcustomitemnameexistsexception", name);
     }
 }

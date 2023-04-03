@@ -6,6 +6,6 @@ public class UserAuthFailedException extends ApiRuntimeException {
 	private static final long serialVersionUID = -1541151756865093959L;
 
 	public UserAuthFailedException() {
-		super("用户验证失败");
+		super("exception.framework.userauthfailedexception");
 	}
 }

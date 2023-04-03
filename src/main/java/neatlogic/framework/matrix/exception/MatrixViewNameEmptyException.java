@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class MatrixViewNameEmptyException extends ApiRuntimeException {
     public MatrixViewNameEmptyException() {
-        super("矩阵视图名称不能为空");
+        super("exception.framework.matrixviewnameemptyexception");
     }
 }

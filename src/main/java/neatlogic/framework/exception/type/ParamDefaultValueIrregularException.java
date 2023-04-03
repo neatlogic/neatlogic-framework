@@ -23,6 +23,6 @@ public class ParamDefaultValueIrregularException extends ApiRuntimeException {
     private static final long serialVersionUID = -7810805356261538579L;
 
     public ParamDefaultValueIrregularException(String paramName, String defaultValue, ApiParamType paramType) {
-        super("",paramName,  defaultValue,  paramType.getText());
+        super("exception.framework.paramdefaultvalueirregularexception",paramName,  defaultValue,  paramType.getText());
     }
 }

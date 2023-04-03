@@ -30,6 +30,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
+import neatlogic.framework.exception.type.ParamJSONIrregularException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
@@ -115,7 +116,7 @@ public class ApiDispatcher {
                 throw new PermissionDeniedException();
             }
         } else {
-            throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+            throw new ComponentNotFoundException(interfaceVo.getHandler());
         }
         Double qps = interfaceVo.getQps();
         ApiVo apiVo = apiMapper.getApiByToken(token);
@@ -297,7 +298,7 @@ public class ApiDispatcher {
                 try {
                     paramObj = JSONObject.parseObject(jsonStr);
                 } catch (Exception e) {
-                    throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                    throw new ParamJSONIrregularException();
                 }
             } else {
                 paramObj = new JSONObject();
@@ -492,7 +493,7 @@ public class ApiDispatcher {
             try {
                 paramObj = JSONObject.parseObject(jsonStr);
             } catch (Exception e) {
-                throw new ApiRuntimeException("请求参数需要符合JSON格式");
+                throw new ParamJSONIrregularException();
             }
         } else {
             paramObj = new JSONObject();

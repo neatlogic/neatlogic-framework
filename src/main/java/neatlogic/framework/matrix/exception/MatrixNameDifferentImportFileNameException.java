@@ -12,6 +12,6 @@ public class MatrixNameDifferentImportFileNameException extends ApiRuntimeExcept
     private static final long serialVersionUID = -4508274752209783532L;
 
     public MatrixNameDifferentImportFileNameException() {
-        super("矩阵名称与导入文件名不同，不能导入");
+        super("exception.framework.matrixnamedifferentimportfilenameexception");
     }
 }

@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package neatlogic.framework.exception.type;
 
-package neatlogic.framework.exception.mq;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import neatlogic.framework.exception.core.ApiException;
+/**
+ * @author longrf
+ * @date 2023/3/31 18:22
+ */
 
-public class SubscribeTopicException extends ApiException {
-    public SubscribeTopicException(String topicName, String clientName, String error) {
-        super("exception.framework.subscribetopicexception" + clientName, topicName, error);
+public class ParamJSONIrregularException extends ApiRuntimeException {
+    public ParamJSONIrregularException() {
+        super("exception.framework.paramjsonirregularexception");
     }
 }

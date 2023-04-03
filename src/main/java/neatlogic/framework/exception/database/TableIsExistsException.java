@@ -6,6 +6,6 @@ public class TableIsExistsException extends ApiRuntimeException {
 
 
     public TableIsExistsException(String tableName) {
-        super("表：" + tableName + "已存在");
+        super("exception.framework.tableisexistsexception", tableName);
     }
 }

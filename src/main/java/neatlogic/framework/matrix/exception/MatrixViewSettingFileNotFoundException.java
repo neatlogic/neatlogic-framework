@@ -27,6 +27,6 @@ public class MatrixViewSettingFileNotFoundException extends ApiRuntimeException 
     private static final long serialVersionUID = -6114648438319986274L;
 
     public MatrixViewSettingFileNotFoundException() {
-        super("矩阵视图配置文件不能为空");
+        super("exception.framework.matrixviewsettingfilenotfoundexception");
     }
 }

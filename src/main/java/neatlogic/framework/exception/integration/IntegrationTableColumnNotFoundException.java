@@ -17,16 +17,13 @@ limitations under the License.
 package neatlogic.framework.exception.integration;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 public class IntegrationTableColumnNotFoundException extends ApiRuntimeException {
 
     private static final long serialVersionUID = 1061691151919475176L;
 
     public IntegrationTableColumnNotFoundException(String integration, String columnUuid) {
-        super("在" + integration + "集成配置输出转换theadList列表中找不到：'" + columnUuid + "'列信息");
+        super("exception.framework.integrationtablecolumnnotfoundexception", integration, columnUuid);
     }
 
 }

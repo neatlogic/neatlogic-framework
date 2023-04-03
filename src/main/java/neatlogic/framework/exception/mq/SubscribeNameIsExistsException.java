@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class SubscribeNameIsExistsException extends ApiRuntimeException {
     public SubscribeNameIsExistsException(String name) {
-        super("订阅：" + name + "已存在，请使用新的唯一标识");
+        super("exception.framework.subscribenameisexistsexception", name);
     }
 }

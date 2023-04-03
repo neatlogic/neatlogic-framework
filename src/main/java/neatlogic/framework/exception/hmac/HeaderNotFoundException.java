@@ -22,6 +22,6 @@ public class HeaderNotFoundException extends ApiRuntimeException {
 
 
     public HeaderNotFoundException(String header) {
-        super("缺少头部“" + header + "”");
+        super("exception.framework.headernotfoundexception", header);
     }
 }

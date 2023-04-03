@@ -22,6 +22,6 @@ public class HttpMethodIrregularException extends ApiRuntimeException {
 
 
     public HttpMethodIrregularException() {
-        super("只支持GET和POST两种请求方法");
+        super("exception.framework.httpmethodirregularexception");
     }
 }

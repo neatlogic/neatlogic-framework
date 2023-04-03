@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerNameRepeatsException extends ApiRuntimeException {
     public RunnerNameRepeatsException(String name) {
-        super("已存在名称为：" + name + "的runner");
+        super("exception.framework.runnernamerepeatsexception", name);
     }
 }

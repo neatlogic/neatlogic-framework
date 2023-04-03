@@ -4,9 +4,9 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class IntegrationSendRequestException extends ApiRuntimeException {
 
-	private static final long serialVersionUID = 2626448627649753817L;
+    private static final long serialVersionUID = 2626448627649753817L;
 
-	public IntegrationSendRequestException(String uuid) {
-		super("集成配置：'" + uuid + "'发送请求异常");
-	}
+    public IntegrationSendRequestException(String uuid) {
+        super("exception.framework.integrationsendrequestexception", uuid);
+    }
 }

@@ -16,10 +16,12 @@ limitations under the License.
 
 package neatlogic.framework.exception.runner;
 
-public class RunnerNotFoundInGroupException extends RuntimeException {
+import neatlogic.framework.exception.core.ApiRuntimeException;
+
+public class RunnerNotFoundInGroupException extends ApiRuntimeException {
     private static final long serialVersionUID = 4760150017764148841L;
 
     public RunnerNotFoundInGroupException(Long runnerGroupId) {
-        super("在id为：" + runnerGroupId + "的runner组里找不到runner");
+        super("exception.framework.runnernotfoundingroupexception", runnerGroupId);
     }
 }

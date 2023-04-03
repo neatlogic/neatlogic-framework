@@ -32,6 +32,6 @@ public class WorktimeConfigIllegalException extends ApiRuntimeException {
             "}";
 
     public WorktimeConfigIllegalException(String msg) {
-        super("config参数中\"" + msg + "\"不合法,正确的config参数格式是" + configTemplate);
+        super("exception.framework.worktimeconfigillegalexception", msg, configTemplate);
     }
 }

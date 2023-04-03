@@ -11,6 +11,6 @@ public class MatrixViewExportTemplateException extends ApiRuntimeException {
     private static final long serialVersionUID = -4507385752209782623L;
 
     public MatrixViewExportTemplateException() {
-        super("外部数据源矩阵不能导出模板");
+        super("exception.framework.matrixviewexporttemplateexception");
     }
 }

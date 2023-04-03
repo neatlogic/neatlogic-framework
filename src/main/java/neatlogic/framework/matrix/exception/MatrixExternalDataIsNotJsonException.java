@@ -23,6 +23,6 @@ public class MatrixExternalDataIsNotJsonException extends ApiRuntimeException {
     private static final long serialVersionUID = 7391664365834538416L;
 
     public MatrixExternalDataIsNotJsonException() {
-        super("集成配置接口返回结果不是JSON格式");
+        super("exception.framework.matrixexternaldataisnotjsonexception");
     }
 }

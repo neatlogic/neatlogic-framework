@@ -21,7 +21,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class FullTextIndexHandlerNotFoundException extends ApiRuntimeException {
 
     public FullTextIndexHandlerNotFoundException(String type) {
-        super("索引类型处理器“" + type + "”不存在");
+        super("exception.framework.fulltextindexhandlernotfoundexception", type);
     }
 
 }

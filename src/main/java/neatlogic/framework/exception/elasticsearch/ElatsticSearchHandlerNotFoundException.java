@@ -1,10 +1,12 @@
 package neatlogic.framework.exception.elasticsearch;
 
-public class ElatsticSearchHandlerNotFoundException extends RuntimeException {
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-	private static final long serialVersionUID = 8358695524151979636L;
+public class ElatsticSearchHandlerNotFoundException extends ApiRuntimeException {
 
-	public ElatsticSearchHandlerNotFoundException(String handler) {
-		super("找不到类型为：" + handler + "的工单中心处理器");
-	}
+    private static final long serialVersionUID = 8358695524151979636L;
+
+    public ElatsticSearchHandlerNotFoundException(String handler) {
+        super("exception.framework.elatsticsearchhandlernotfoundexception", handler);
+    }
 }

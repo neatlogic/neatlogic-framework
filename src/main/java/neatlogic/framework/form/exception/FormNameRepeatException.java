@@ -23,6 +23,6 @@ public class FormNameRepeatException extends ApiRuntimeException {
     private static final long serialVersionUID = 1901910086387644808L;
 
     public FormNameRepeatException(String name) {
-        super("表单：'" + name + "'已存在");
+        super("exception.framework.formnamerepeatexception" + name);
     }
 }

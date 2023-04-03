@@ -25,4 +25,8 @@ public class FormAttributeNotFoundException extends ApiRuntimeException {
     public FormAttributeNotFoundException(String attributeUuid) {
         super("exception.framework.formattributenotfoundexception", attributeUuid);
     }
+
+    public FormAttributeNotFoundException(String formName, String attributeUuid) {
+        super("exception.framework.formattributenotfoundexception.1", formName, attributeUuid);
+    }
 }

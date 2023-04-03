@@ -16,10 +16,13 @@
 
 package neatlogic.framework.message.core;
 
+import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.message.dto.MessageHandlerVo;
+import neatlogic.framework.util.I18nUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +45,15 @@ public class MessageHandlerFactory extends ModuleInitializedListenerBase {
     }
 
     public static List<MessageHandlerVo> getMessageHandlerVoList() {
+        if(CollectionUtils.isNotEmpty(messageHandlerVoList)){
+            List<MessageHandlerVo> messageHandlerVos = JSONArray.parseArray(JSONArray.toJSONString(messageHandlerVoList),MessageHandlerVo.class);
+            messageHandlerVos.forEach(o-> {
+                o.setModuleName(I18nUtils.getMessage(o.getModuleName()));
+                o.setName(I18nUtils.getMessage(o.getName()));
+                o.setDescription(I18nUtils.getMessage(o.getDescription()));
+            });
+            return messageHandlerVos;
+        }
         return messageHandlerVoList;
     }
 

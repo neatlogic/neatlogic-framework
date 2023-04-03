@@ -19,7 +19,6 @@ package neatlogic.framework.dto.module;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.initialdata.core.InitialDataManager;
 import neatlogic.framework.restful.annotation.EntityField;
-import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class ModuleVo {
@@ -96,7 +95,7 @@ public class ModuleVo {
     }
 
     public String getGroupName() {
-        return I18nUtils.getMessage(groupName);
+        return groupName;
     }
 
     public void setGroupName(String groupName) {

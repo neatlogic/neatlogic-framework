@@ -200,26 +200,24 @@ public class LRCodeManager {
         treeMapper.batchUpdateTreeNodeRightCode(tableName, treeNodeVo.getLft(), -step);
     }
 
-    /**
-     * @Description: 重建左右编码
-     * @Author: linbq
-     * @Date: 2021/3/17 17:42
-     * @Params: [tableName, idKey, parentIdKey]
-     * @Returns:void
-     **/
     public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
-        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1);
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, null);
     }
 
-    private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft) {
-        List<TreeNodeVo> catalogList = treeMapper.getTreeNodeListByParentId(tableName, idKey, parentIdKey, parentIdValue);
+    public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, String condition) {
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, condition);
+    }
+
+
+    private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft, String condition) {
+        List<TreeNodeVo> catalogList = treeMapper.getTreeNodeListByParentId(tableName, idKey, parentIdKey, parentIdValue, condition);
         for (TreeNodeVo catalog : catalogList) {
             if (catalog.getChildrenCount() == 0) {
                 treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, catalog.getIdValue(), parentLft + 1, parentLft + 2);
                 parentLft += 2;
             } else {
                 int lft = parentLft + 1;
-                parentLft = rebuildLeftRightCode(tableName, idKey, parentIdKey, catalog.getIdValue(), lft);
+                parentLft = rebuildLeftRightCode(tableName, idKey, parentIdKey, catalog.getIdValue(), lft, condition);
                 treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, catalog.getIdValue(), lft, parentLft + 1);
                 parentLft += 1;
             }

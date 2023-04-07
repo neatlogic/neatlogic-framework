@@ -16,11 +16,12 @@
 
 package neatlogic.framework.common.config;
 
-import neatlogic.framework.common.RootConfiguration;
 import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import neatlogic.framework.common.RootConfiguration;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class Config {
     @NacosInjected
     private ConfigService configService;
     private static final String CONFIG_FILE = "config.properties";
+    private static final String SERVER_ID_FILE = "serverid.conf";
 
     public static final int SCHEDULE_SERVER_ID;
     public static final String SERVER_HOST;
@@ -147,14 +149,24 @@ public class Config {
         }
 
         try {
-            String sid = getProperty(CONFIG_FILE, "schedule.server.id", "1", true);
-            if (StringUtils.isBlank(sid)) {
-                sid = "1";
+            StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
+            BufferedReader br;
+            try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
+                assert is != null;
+                try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
+                    br = new BufferedReader(in);
+                    String inLine = "";
+                    while ((inLine = br.readLine()) != null) {
+                        sid.append(inLine);
+                    }
+                }
+            } catch (Exception e) {
+                // logger.error(e.getMessage(), e);
             }
-            SCHEDULE_SERVER_ID = Integer.parseInt(sid);
+            SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
         } catch (Exception ex) {
-            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
-            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置schedule.server.id变量");
+            logger.error(I18nUtils.getStaticMessage("config.serverid.notfound", SERVER_ID_FILE));
+            System.out.println(I18nUtils.getStaticMessage("config.serverid.notfound", SERVER_ID_FILE));
             throw ex;
         }
 
@@ -462,7 +474,7 @@ public class Config {
                 value = value.trim();
             }
         } catch (Exception e) {
-           // logger.error(e.getMessage(), e);
+            // logger.error(e.getMessage(), e);
         }
         if (value == null && isRequired) {
             throw new RuntimeException();

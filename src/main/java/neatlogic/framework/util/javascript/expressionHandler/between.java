@@ -16,8 +16,8 @@
 
 package neatlogic.framework.util.javascript.expressionHandler;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.util.javascript.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -49,10 +49,10 @@ public class between {
                     }
                 }
             } else {
-                throw new ApiRuntimeException(prefix + "值个数和条件值个数不一致");
+                throw new ValueNumberIsNotEqualException(prefix);
             }
         }
-        throw new ApiRuntimeException(prefix + "值为空");
+        throw new ValueIsNullException(prefix);
     }
 
     private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label) {
@@ -76,7 +76,7 @@ public class between {
                 }
             }
             if (!(transferValue >= transferValueBefore && transferValue <= transferValueAfter)) {
-                throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 和 " + valueAfter + " 范围内");
+                throw new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
             }
             return true;
         } else if (isDate(dataValue) || isDateTime(dataValue) || isTime(dataValue)) {
@@ -106,24 +106,24 @@ public class between {
                 }
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 和 " + valueAfter + " 范围内");
+                        throw new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
                     }
                     return true;
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
-                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueBefore + " 之后");
+                        throw new ValueNotAfterException(prefix, dataValue, valueBefore);
                     }
                     return true;
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
-                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不在 " + valueAfter + " 之前");
+                        throw new ValueNotBeforeException(prefix, dataValue, valueAfter);
                     }
                     return true;
                 }
             } catch (ParseException ignored) {
             }
         }
-        throw new ApiRuntimeException(prefix + "值不符合格式要求");
+        throw new ValueIsIrregularException(prefix);
     }
 
     private final static Set<Character> numberCharSet = new HashSet<>();

@@ -16,8 +16,9 @@
 
 package neatlogic.framework.util.javascript.expressionHandler;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.util.javascript.ValueIsNotContainException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,13 +35,13 @@ public class like {
                     if (dataValue.contains(conditionValue)) {
                         return true;
                     } else {
-                        throw new ApiRuntimeException(prefix + "值 " + dataValue + " 不包含 " + conditionValue + "");
+                        throw new ValueIsNotContainException(prefix, dataValue, conditionValue);
                     }
                 } else {
                     for (int i = 0; i < conditionValueList.size(); i++) {
                         String cValue = conditionValueList.getString(i);
                         if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                            throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + " 不包含 " + getValue(conditionValueList));
+                            throw new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                         }
                     }
                     return true;
@@ -49,16 +50,16 @@ public class like {
                 for (int i = 0; i < conditionValueList.size(); i++) {
                     String cValue = conditionValueList.getString(i);
                     if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                        throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + " 不包含 " + getValue(conditionValueList));
+                        throw new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     }
                 }
                 return true;
             } else {
-                throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + " 不包含 " + getValue(conditionValueList));
+                throw new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                throw new ApiRuntimeException(prefix + "值为空");
+                throw new ApiRuntimeException(prefix);
             } else {
                 return true;
             }

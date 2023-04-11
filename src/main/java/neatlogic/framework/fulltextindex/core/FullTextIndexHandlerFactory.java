@@ -21,6 +21,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.exception.fulltextindex.FullTextIndexComponentOfTypeNotFoundException;
 import neatlogic.framework.exception.fulltextindex.FullTextIndexTypeNotFoundException;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo;
 
@@ -35,7 +36,7 @@ public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
 
     public static IFullTextIndexHandler getHandler(String type) {
         if (!componentMap.containsKey(type) || componentMap.get(type) == null) {
-            throw new RuntimeException("找不到类型为：" + type + "的全文索引组件");
+            throw new FullTextIndexComponentOfTypeNotFoundException(type);
         }
         return componentMap.get(type);
     }
@@ -89,7 +90,7 @@ public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
 
     public static IFullTextIndexHandler getHandler(IFullTextIndexType type) {
         if (!componentMap.containsKey(type.getType()) || componentMap.get(type.getType()) == null) {
-            throw new RuntimeException("找不到类型为：" + type.getTypeName() + "的全文索引组件");
+            throw new FullTextIndexComponentOfTypeNotFoundException(type.getTypeName());
         }
         return componentMap.get(type.getType());
     }

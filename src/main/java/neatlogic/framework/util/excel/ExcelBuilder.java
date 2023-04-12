@@ -16,6 +16,8 @@
 
 package neatlogic.framework.util.excel;
 
+import neatlogic.framework.exception.excel.UnableToCreateWorkbookException;
+import neatlogic.framework.exception.excel.WorkbookTypeIsIncorrectException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -199,11 +201,11 @@ public class ExcelBuilder {
             try {
                 this.workbook = (Workbook) (Class.forName(workbookClass.getName()).newInstance());
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                throw new RuntimeException("无法使用" + workbookClass.getSimpleName() + "创建工作簿：" + e.getMessage(), e);
+                throw new UnableToCreateWorkbookException(workbookClass.getSimpleName(), e.getMessage());
             }
         }
         if (!this.workbook.getClass().getSimpleName().equals(workbookClass.getSimpleName())) {
-            throw new RuntimeException("工作簿类型不正确，定义是:" + workbookClass.getSimpleName() + "，实际是：" + workbook.getClass().getSimpleName());
+            throw new WorkbookTypeIsIncorrectException(workbookClass.getSimpleName(), workbook.getClass().getSimpleName());
         }
 
 

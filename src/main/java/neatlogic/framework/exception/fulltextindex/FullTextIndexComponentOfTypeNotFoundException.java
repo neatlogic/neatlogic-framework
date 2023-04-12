@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.util.javascript.expressionHandler;
+package neatlogic.framework.exception.fulltextindex;
 
-import com.alibaba.fastjson.JSONArray;
-import neatlogic.framework.exception.util.javascript.ValueConNotNullException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class isnotnull {
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
-        String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        if (CollectionUtils.isEmpty(dataValueList)) {
-            throw new ValueConNotNullException(prefix);
-        }
-        return true;
+public class FullTextIndexComponentOfTypeNotFoundException extends ApiRuntimeException {
+
+    public FullTextIndexComponentOfTypeNotFoundException(String type) {
+        super("exception.framework.fulltextindexcomponentoftypenotfoundexception", type);
     }
+
 }

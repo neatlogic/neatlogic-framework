@@ -16,8 +16,9 @@
 
 package neatlogic.framework.util.javascript.expressionHandler;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.util.javascript.ValueIsEqualException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,7 +34,7 @@ public class notequal {
                 if (!dataValueList.toString().equals(conditionValueList.toString())) {
                     return true;
                 } else {
-                    throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + " 等于 " + getValue(conditionValueList));
+                    throw new ValueIsEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 }
             } else {
                 return true;
@@ -43,7 +44,7 @@ public class notequal {
         } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
             return true;
         } else {
-            throw new ApiRuntimeException(prefix + "值都为空");
+            throw new ApiRuntimeException(prefix);
         }
     }
 

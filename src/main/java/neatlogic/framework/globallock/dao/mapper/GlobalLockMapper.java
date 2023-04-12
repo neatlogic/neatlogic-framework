@@ -21,6 +21,8 @@ public interface GlobalLockMapper {
 
     void deleteLock(Long id);
 
+    void deleteLockByUuidList(@Param("uuidList") List<String> uuidList);
+
     List<GlobalLockVo> searchLock(GlobalLockVo globalLockVo);
 
     List<GlobalLockVo> getLockListByKeyListAndHandler(@Param("keyList") List<String> keyList, @Param("handler") String handler);

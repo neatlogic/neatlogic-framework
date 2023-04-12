@@ -152,5 +152,14 @@ limitations under the License.
         WHERE `id` = #{value}
     </delete>
 
+    <delete id="deleteLockByUuidList" parameterType="java.lang.Long">
+        DELETE
+        FROM `global_lock`
+        WHERE `uuid` in
+        <foreach collection="uuidList" item="uuid" open="(" close=")" separator=",">
+            #{uuid}
+        </foreach>
+    </delete>
+
 </mapper>
 

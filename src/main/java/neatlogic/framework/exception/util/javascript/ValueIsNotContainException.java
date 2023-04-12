@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package neatlogic.framework.exception.util.javascript;
 
-package neatlogic.framework.util.javascript.expressionHandler;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import com.alibaba.fastjson.JSONArray;
-import neatlogic.framework.exception.util.javascript.ValueConNotNullException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+/**
+ * @author longrf
+ * @date 2023/4/11 15:36
+ */
 
-public class isnotnull {
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
-        String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        if (CollectionUtils.isEmpty(dataValueList)) {
-            throw new ValueConNotNullException(prefix);
-        }
-        return true;
+public class ValueIsNotContainException extends ApiRuntimeException {
+    public ValueIsNotContainException(String prefix, String value, String otherValue) {
+        super("exception.framework.valueisnotcontainexception", prefix, value, otherValue);
     }
 }

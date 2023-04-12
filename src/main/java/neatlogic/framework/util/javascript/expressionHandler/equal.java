@@ -16,8 +16,10 @@
 
 package neatlogic.framework.util.javascript.expressionHandler;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.util.javascript.ValueConNotNullException;
+import neatlogic.framework.exception.util.javascript.ValueIsNotEqualException;
+import neatlogic.framework.exception.util.javascript.ValueNeedNullException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,17 +33,17 @@ public class equal {
                 dataValueList.sort(Comparator.comparing(Object::toString));
                 conditionValueList.sort(Comparator.comparing(Object::toString));
                 if (!dataValueList.toString().equals(conditionValueList.toString())) {
-                    throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + " 不等于 " + getValue(conditionValueList));
+                    throw new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 }
                 return true;
             } else {
-                throw new ApiRuntimeException(prefix + "值 " + getValue(dataValueList) + "不等于 " + getValue(conditionValueList));
+                throw new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                throw new ApiRuntimeException(prefix + "值要求是 " + getValue(conditionValueList) + "，不能是空值");
+                throw new ValueConNotNullException(prefix, getValue(conditionValueList));
             } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
-                throw new ApiRuntimeException(prefix + "值要求是空值");
+                throw new ValueNeedNullException(prefix);
             }
             return true;
         }

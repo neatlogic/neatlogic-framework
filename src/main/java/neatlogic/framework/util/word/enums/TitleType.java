@@ -66,7 +66,6 @@ public enum TitleType {
 
     public String getFontFamily() {
         return I18nUtils.getMessage(fontFamily.toString());
-
     }
 
     public Integer getFontSize() {

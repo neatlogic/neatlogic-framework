@@ -1,4 +1,8 @@
 package neatlogic.framework.common.constvalue;
+
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * @Description: Cache-control头类型
  * no-store          没有缓存         缓存中不得存储任何关于客户端请求和服务端响应的内容。每次由客户端发起的请求都会下载完整的响应内容。
@@ -13,27 +17,31 @@ package neatlogic.framework.common.constvalue;
  * @Returns: * @return: null
  **/
 public enum CacheControlType {
-    NOSTORE("no-store", "没有缓存"),
-    NOCACHE("no-cache", "缓存但重新验证"),
-    PRIVATE("private", "私有缓存"),
-    PUBLIC("public", "公共缓存"),
-    MAXAGE("max-age", "过期"),
-    MUSTREVALIDATE("must-revalidate", "验证方式");
+    NOSTORE("no-store", new I18n("enum.framework.cachecontroltype.nostore")),
+    NOCACHE("no-cache", new I18n("enum.framework.cachecontroltype.nocache")),
+    PRIVATE("private", new I18n("enum.framework.cachecontroltype.private")),
+    PUBLIC("public", new I18n("enum.framework.cachecontroltype.public")),
+    MAXAGE("max-age", new I18n("enum.framework.cachecontroltype.maxage")),
+    MUSTREVALIDATE("must-revalidate", new I18n("enum.framework.cachecontroltype.mustrevalidate"));
     private final String value;
-    private final String text;
-    private CacheControlType(String value, String text) {
+    private final I18n text;
+
+    private CacheControlType(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
+
     public String getValue() {
         return value;
     }
+
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
+
     public static String getText(String value) {
-        for(CacheControlType type : values()) {
-            if(type.getValue().equals(value)) {
+        for (CacheControlType type : values()) {
+            if (type.getValue().equals(value)) {
                 return type.getText();
             }
         }

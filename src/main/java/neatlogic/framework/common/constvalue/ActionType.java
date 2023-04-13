@@ -1,17 +1,21 @@
 package neatlogic.framework.common.constvalue;
+
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
- * 
+ *
 * @Author:linbq
 * @Time:2020年8月18日
-* @ClassName: ActionType 
+* @ClassName: ActionType
 * @Description: 操作类型枚举类
  */
 public enum ActionType {
-    CREATE("create", "创建"),
-    UPDATE("update", "修改");
-    private String value;
-    private String text;
-    private ActionType(String value, String text) {
+    CREATE("create", new I18n("enum.framework.actiontype.create")),
+    UPDATE("update", new I18n("enum.framework.actiontype.update"));
+    private final String value;
+    private final I18n text;
+    private ActionType(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -19,7 +23,7 @@ public enum ActionType {
         return value;
     }
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
     public static String getText(String value) {
         for(ActionType type : values()) {

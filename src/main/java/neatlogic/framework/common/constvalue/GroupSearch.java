@@ -18,20 +18,22 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 
 public enum GroupSearch implements IEnum {
-    USER("user", "用户类型"),
-    TEAM("team", "组类型"),
-    ROLE("role", "角色类型"),
-    COMMON("common", "公共类型");
+    USER("user", new I18n("enum.framework.groupsearch.user")),
+    TEAM("team", new I18n("enum.framework.groupsearch.team")),
+    ROLE("role", new I18n("enum.framework.groupsearch.role")),
+    COMMON("common", new I18n("enum.framework.groupsearch.common"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    private GroupSearch(String value, String text) {
+    private GroupSearch(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -45,7 +47,7 @@ public enum GroupSearch implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getValue(String _value) {

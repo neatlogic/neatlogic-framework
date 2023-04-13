@@ -16,35 +16,38 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum FormHandler implements IFormHandler {
-    FORMLABEL("formlabel", "标签"),
-    FORMCASCADER("formcascader", "级联下拉框"),
-    FORMCHECKBOX("formcheckbox", "复选框"),
-    FORMDATE("formdate", "日期"),
-    FORMDIVIDER("formdivider", "分割线"),
-    FORMTABLESELECTOR("formtableselector", "表格选择组件"),
-    FORMCKEDITOR("formckeditor", "富文本框"),
-    FORMLINK("formlink", "链接"),
-    FORMPRIORITY("formpriority", "修改优先级"),
-    FORMRADIO("formradio", "单选框"),
-    FORMSELECT("formselect", "下拉框"),
-    FORMTABLEINPUTER("formtableinputer", "表格输入组件"),
-    FORMTEXTAREA("formtextarea", "文本域"),
-    FORMTEXT("formtext", "文本框"),
-    FORMNUMBER("formnumber", "数字"),
-    FORMPASSWORD("formpassword", "密码"),
-    FORMTIME("formtime", "时间"),
-    FORMTREESELECT("formtreeselect", "下拉树组件"),
-    FORMUPLOAD("formupload", "附件上传"),
-    FORMUSERSELECT("formuserselect", "用户选择器"),
-    FORMCUBE("formcube", "矩阵选择"),
-    FORMRATE("formrate", "评分"),
+    FORMLABEL("formlabel", new I18n("enum.framework.formhandler.formlabel")),
+    FORMCASCADER("formcascader", new I18n("enum.framework.formhandler.formcascader")),
+    FORMCHECKBOX("formcheckbox", new I18n("enum.framework.formhandler.formcheckbox")),
+    FORMDATE("formdate", new I18n("enum.framework.formhandler.formdate")),
+    FORMDIVIDER("formdivider", new I18n("enum.framework.formhandler.formdivider")),
+    FORMTABLESELECTOR("formtableselector", new I18n("enum.framework.formhandler.formtableselector")),
+    FORMCKEDITOR("formckeditor", new I18n("enum.framework.formhandler.formckeditor")),
+    FORMLINK("formlink", new I18n("enum.framework.formhandler.formlink")),
+    FORMPRIORITY("formpriority", new I18n("enum.framework.formhandler.formpriority")),
+    FORMRADIO("formradio", new I18n("enum.framework.formhandler.formradio")),
+    FORMSELECT("formselect", new I18n("enum.framework.formhandler.formselect")),
+    FORMTABLEINPUTER("formtableinputer", new I18n("enum.framework.formhandler.formtableinputer")),
+    FORMTEXTAREA("formtextarea", new I18n("enum.framework.formhandler.formtextarea")),
+    FORMTEXT("formtext", new I18n("enum.framework.formhandler.formtext")),
+    FORMNUMBER("formnumber", new I18n("enum.framework.formhandler.formnumber")),
+    FORMPASSWORD("formpassword", new I18n("enum.framework.formhandler.formpassword")),
+    FORMTIME("formtime", new I18n("enum.framework.formhandler.formtime")),
+    FORMTREESELECT("formtreeselect", new I18n("enum.framework.formhandler.formtreeselect")),
+    FORMUPLOAD("formupload", new I18n("enum.framework.formhandler.formupload")),
+    FORMUSERSELECT("formuserselect", new I18n("enum.framework.formhandler.formuserselect")),
+    FORMCUBE("formcube", new I18n("enum.framework.formhandler.formcube")),
+    FORMRATE("formrate", new I18n("enum.framework.formhandler.formrate")),
     ;
 
     private final String handler;
-    private final String handlerName;
+    private final I18n handlerName;
 
-    FormHandler(String handler, String handlerName) {
+    FormHandler(String handler, I18n handlerName) {
         this.handler = handler;
         this.handlerName = handlerName;
     }
@@ -56,6 +59,6 @@ public enum FormHandler implements IFormHandler {
 
     @Override
     public String getHandlerName() {
-        return handlerName;
+        return I18nUtils.getMessage(handlerName.toString());
     }
 }

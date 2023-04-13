@@ -16,12 +16,15 @@ limitations under the License.
 
 package neatlogic.framework.lcs.constvalue;
 
-public enum LineHandler {
-    TEXT("text", "纯文本");
-    String value;
-    String text;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
-    LineHandler(String value, String text) {
+public enum LineHandler {
+    TEXT("text", new I18n("enum.framework.linehandler.text"));
+    String value;
+    I18n text;
+
+    LineHandler(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -31,6 +34,6 @@ public enum LineHandler {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 }

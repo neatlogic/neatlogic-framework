@@ -15,22 +15,25 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * @author longrf
  * @date 2022/9/26 17:47
  */
 
 public enum FontColor {
-    BLACK("000000", "黑色"),
-    WHITE("ffffff", "白色"),
-    RED("FF0000", "红色"),
-    BLUE("0000FF", "蓝色"),
+    BLACK("000000", new I18n("enum.framework.fontcolor.black")),
+    WHITE("ffffff", new I18n("enum.framework.fontcolor.white")),
+    RED("FF0000", new I18n("enum.framework.fontcolor.red")),
+    BLUE("0000FF", new I18n("enum.framework.fontcolor.blue")),
     ;
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    private FontColor(String value, String text) {
+    private FontColor(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -40,6 +43,6 @@ public enum FontColor {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 }

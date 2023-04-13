@@ -20,34 +20,39 @@ import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.matrix.core.IMatrixType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum MatrixType implements IMatrixType, IEnum {
-    CUSTOM("custom", "自定义数据源", "custom", 1),
-    EXTERNAL("external", "外部数据源", "integrationUuid", 2),
-    PRIVATE("private", "私有数据源", "private", 5),
-    VIEW("view", "数据库视图", "fileId", 3);
+    CUSTOM("custom", new I18n("enum.framework.matrixtype.custom"), "custom", 1),
+    EXTERNAL("external", new I18n("enum.framework.matrixtype.external"), "integrationUuid", 2),
+    PRIVATE("private", new I18n("enum.framework.matrixtype.private"), "private", 5),
+    VIEW("view", new I18n("enum.framework.matrixtype.view"), "fileId", 3);
 
     private String value;
-    private String name;
+    private I18n name;
     private String key;
     private int sort;
 
-    MatrixType(String _value, String _name, String _key, int _sort) {
+    MatrixType(String _value, I18n _name, String _key, int _sort) {
         this.value = _value;
         this.name = _name;
         this.key = _key;
         this.sort = _sort;
     }
+
     @Override
     public String getValue() {
         return value;
     }
+
     @Override
     public String getName() {
-        return name;
+        return I18nUtils.getMessage(name.toString());
     }
+
     @Override
     public String getKey() {
         return key;
@@ -71,12 +76,12 @@ public enum MatrixType implements IMatrixType, IEnum {
     @Override
     public List getValueTextList() {
         JSONArray array = new JSONArray();
-        for(MatrixType type : MatrixType.values()){
-            array.add(new JSONObject(){
+        for (MatrixType type : MatrixType.values()) {
+            array.add(new JSONObject() {
                 {
-                    this.put("value",type.getValue());
-                    this.put("text",type.getName());
-                    this.put("key",type.getKey());
+                    this.put("value", type.getValue());
+                    this.put("text", type.getName());
+                    this.put("key", type.getKey());
                 }
             });
         }

@@ -16,13 +16,18 @@
 
 package neatlogic.framework.restful.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum TreeMenuType {
-    SYSTEM("system", "系统接口目录"), CUSTOM("custom", "自定义接口目录"), AUDIT("audit", "操作审计目录");
+    SYSTEM("system", new I18n("enum.framework.treemenutype.system")),
+    CUSTOM("custom", new I18n("enum.framework.treemenutype.custom")),
+    AUDIT("audit", new I18n("enum.framework.treemenutype.audit"));
 
     private final String name;
-    private final String text;
+    private final I18n text;
 
-    TreeMenuType(String _name, String _text) {
+    TreeMenuType(String _name, I18n _text) {
         this.name = _name;
         this.text = _text;
     }
@@ -32,7 +37,8 @@ public enum TreeMenuType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
+
     }
 
     public static String getText(String name) {

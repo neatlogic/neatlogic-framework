@@ -16,13 +16,17 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum Mode {
-    APPEND("append", "追加"), REPLACE("replace", "替换");
+    APPEND("append", new I18n("enum.framework.mode.append")),
+    REPLACE("replace", new I18n("enum.framework.mode.replace"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    Mode(String _value, String _text) {
+    Mode(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -32,7 +36,7 @@ public enum Mode {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
 

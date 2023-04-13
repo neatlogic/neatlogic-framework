@@ -16,13 +16,16 @@
 
 package neatlogic.framework.restful.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum ApiKind {
-    SYSTEM("system", "内部接口"), CUSTOM("custom", "外部接口");
+    SYSTEM("system", new I18n("enum.framework.apikind.system")), CUSTOM("custom", new I18n("enum.framework.apikind.custom"));
 
     private final String name;
-    private final String text;
+    private final I18n text;
 
-    ApiKind(String _name, String _text) {
+    ApiKind(String _name, I18n _text) {
         this.name = _name;
         this.text = _text;
     }
@@ -32,7 +35,7 @@ public enum ApiKind {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String name) {

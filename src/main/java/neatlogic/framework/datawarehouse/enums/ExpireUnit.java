@@ -16,14 +16,18 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum ExpireUnit {
-    MINUTE("minute", "分钟"), HOUR("hour", "小时"),
-    DAY("day", "天");
+    MINUTE("minute", new I18n("enum.framework.expireunit.minute")),
+    HOUR("hour", new I18n("enum.framework.expireunit.hour")),
+    DAY("day", new I18n("enum.framework.expireunit.day"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    ExpireUnit(String _value, String _text) {
+    ExpireUnit(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -33,7 +37,7 @@ public enum ExpireUnit {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
 

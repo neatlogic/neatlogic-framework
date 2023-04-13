@@ -1,32 +1,33 @@
 package neatlogic.framework.common.constvalue.dashboard;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 public enum ChartType {
-	BARCHART("barchart","柱状图",Chart.BARCHART,false),
-	STACKBARCHART("stackbarchart","堆叠柱状图",Chart.BARCHART,false),
-	COLUMNCHART("columnchart","条形图",Chart.BARCHART,true),
-	STACKCOLUMNCHART("stackcolumnchart","堆叠条形图",Chart.BARCHART,false),
-	PIECHART("piechart","饼图",Chart.PIECHART,true),
-	DONUTCHART("donutchart","环形图",Chart.PIECHART,true),
-	AREACHART("areachart","面积图",Chart.AREACHART,true),
-	LINECHART("linechart","曲线图",Chart.LINECHART,true),
-	TABLECHART("tablechart","表格",Chart.TABLECHART,true),
-	NUMBERCHART("numberchart","值图",Chart.NUMBERCHART,true)
+	BARCHART("barchart",new I18n("enum.framework.charttype.barchart"),Chart.BARCHART,false),
+	STACKBARCHART("stackbarchart",new I18n("enum.framework.charttype.stackbarchart"),Chart.BARCHART,false),
+	COLUMNCHART("columnchart",new I18n("enum.framework.charttype.columnchart"),Chart.BARCHART,true),
+	STACKCOLUMNCHART("stackcolumnchart",new I18n("enum.framework.charttype.stackcolumnchart"),Chart.BARCHART,false),
+	PIECHART("piechart",new I18n("enum.framework.chart.piechart"),Chart.PIECHART,true),
+	DONUTCHART("donutchart",new I18n("enum.framework.charttype.donutchart"),Chart.PIECHART,true),
+	AREACHART("areachart",new I18n("enum.framework.chart.areachart"),Chart.AREACHART,true),
+	LINECHART("linechart",new I18n("enum.framework.chart.linechart"),Chart.LINECHART,true),
+	TABLECHART("tablechart",new I18n("enum.framework.chart.tablechart"),Chart.TABLECHART,true),
+	NUMBERCHART("numberchart",new I18n("enum.framework.charttype.numberchart"),Chart.NUMBERCHART,true)
 	;
 
 	private String value;
-	private String text;
+	private I18n text;
 	private Chart chart;
 	private Boolean isDefault;
 
-	private ChartType(String _value, String _text,Chart _chart,Boolean _isDefault) {
+	private ChartType(String _value, I18n _text,Chart _chart,Boolean _isDefault) {
 		this.value = _value;
 		this.text = _text;
 		this.chart = _chart;
@@ -38,7 +39,7 @@ public enum ChartType {
 	}
 
 	public String getText() {
-		return text;
+		return I18nUtils.getMessage(text.toString());
 	}
 
 	public Chart getChart() {

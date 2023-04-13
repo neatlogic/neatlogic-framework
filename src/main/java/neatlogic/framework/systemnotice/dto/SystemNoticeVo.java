@@ -4,6 +4,8 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -22,12 +24,12 @@ import java.util.List;
  **/
 public class SystemNoticeVo extends BaseEditorVo {
 
-    public enum Status{
-        NOTISSUED("not_issued","未下发",""),
-        ISSUED("issued","已下发","#15bf81"),
-        STOPPED("stopped","已停用","#ff8484");
+    public enum Status {
+        NOTISSUED("not_issued", new I18n("enum.framework.status.notissued"), ""),
+        ISSUED("issued", new I18n("enum.framework.status.issued"), "#15bf81"),
+        STOPPED("stopped", new I18n("enum.framework.status.stopped"), "#ff8484");
         private String value;
-        private String text;
+        private I18n text;
         private String color;
 
         public String getValue() {
@@ -35,26 +37,26 @@ public class SystemNoticeVo extends BaseEditorVo {
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text.toString());
         }
 
         public String getColor() {
             return color;
         }
 
-        private Status(String value, String text, String color) {
+        private Status(String value, I18n text, String color) {
             this.value = value;
             this.text = text;
             this.color = color;
         }
 
-        public static JSONObject getStatus(String value){
-            for(Status status : Status.values()){
-                if(status.getValue().equals(value)){
+        public static JSONObject getStatus(String value) {
+            for (Status status : Status.values()) {
+                if (status.getValue().equals(value)) {
                     JSONObject obj = new JSONObject();
-                    obj.put("value",value);
-                    obj.put("text",status.getText());
-                    obj.put("color",status.getColor());
+                    obj.put("value", value);
+                    obj.put("text", status.getText());
+                    obj.put("color", status.getColor());
                     return obj;
                 }
             }
@@ -83,10 +85,10 @@ public class SystemNoticeVo extends BaseEditorVo {
     @JSONField(serialize = false)
     private List<SystemNoticeRecipientVo> recipientVoList;
 
-    @EntityField(name = "通知对象uuid列表",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "通知对象uuid列表", type = ApiParamType.JSONARRAY)
     private List<String> recipientList;
 
-    @EntityField(name = "通知对象列表，供前端组件使用",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "通知对象列表，供前端组件使用", type = ApiParamType.JSONARRAY)
     private List<Object> recipientObjList;
 
     @EntityField(name = "状态(包含中文名与颜色值)", type = ApiParamType.JSONOBJECT)
@@ -95,13 +97,13 @@ public class SystemNoticeVo extends BaseEditorVo {
     @EntityField(name = "下发时间", type = ApiParamType.LONG)
     private Date issueTime;
 
-    @EntityField(name = "公告内容中包含的所有图片，供前端展示使用",type = ApiParamType.JSONARRAY)
+    @EntityField(name = "公告内容中包含的所有图片，供前端展示使用", type = ApiParamType.JSONARRAY)
     private List<String> imgList;
 
-    @EntityField(name = "是否已读(1:已读;0:未读)",type = ApiParamType.INTEGER)
+    @EntityField(name = "是否已读(1:已读;0:未读)", type = ApiParamType.INTEGER)
     private Integer isRead;
 
-    @EntityField(name = "供前端查询使用(before:找issueTime之前的公告;after:找issueTime之后的公告)",type = ApiParamType.STRING)
+    @EntityField(name = "供前端查询使用(before:找issueTime之前的公告;after:找issueTime之后的公告)", type = ApiParamType.STRING)
     @JSONField(serialize = false)
     private String direction;
 
@@ -185,11 +187,11 @@ public class SystemNoticeVo extends BaseEditorVo {
     }
 
     public List<String> getRecipientList() {
-        if(CollectionUtils.isEmpty(recipientList) && CollectionUtils.isNotEmpty(recipientVoList)){
+        if (CollectionUtils.isEmpty(recipientList) && CollectionUtils.isNotEmpty(recipientVoList)) {
             recipientList = new ArrayList<>();
-            for(SystemNoticeRecipientVo vo : recipientVoList){
+            for (SystemNoticeRecipientVo vo : recipientVoList) {
                 GroupSearch groupSearch = GroupSearch.getGroupSearch(vo.getType());
-                if(groupSearch != null) {
+                if (groupSearch != null) {
                     recipientList.add(groupSearch.getValuePlugin() + vo.getUuid());
                 }
             }

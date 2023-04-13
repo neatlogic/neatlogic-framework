@@ -17,6 +17,8 @@ limitations under the License.
 package neatlogic.framework.dependency.constvalue;
 
 import neatlogic.framework.dependency.core.IFromType;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 /**
  * 被引用者（上游）类型
@@ -25,21 +27,21 @@ import neatlogic.framework.dependency.core.IFromType;
  * @since: 2021/4/2 10:30
  **/
 public enum FrameworkFromType implements IFromType {
-    MATRIX("matrix", "矩阵"),
-    MATRIXATTR("matrixattr", "矩阵属性"),
-    FORM("form", "表单"),
-    FORMSCENE("formscene", "表单场景"),
-    FORMATTR("formattr", "表单属性"),
-    INTEGRATION("integration", "集成"),
-    CMDBCI("cmdbci", "cmdb模型"),
-    CMDBCIATTR("cmdbciattr", "cmdb模型属性"),
-    WORKTIME("worktime", "服务窗口"),
-    NOTIFY_POLICY("notifypolicy", "通知策略");
+    MATRIX("matrix", new I18n("enum.framework.frameworkfromtype.matrix")),
+    MATRIXATTR("matrixattr", new I18n("enum.framework.frameworkfromtype.matrixattr")),
+    FORM("form", new I18n("enum.framework.frameworkfromtype.form")),
+    FORMSCENE("formscene", new I18n("enum.framework.frameworkfromtype.formscene")),
+    FORMATTR("formattr", new I18n("enum.framework.frameworkfromtype.formattr")),
+    INTEGRATION("integration", new I18n("enum.framework.frameworkfromtype.integration")),
+    CMDBCI("cmdbci", new I18n("enum.framework.frameworkfromtype.cmdbci")),
+    CMDBCIATTR("cmdbciattr", new I18n("enum.framework.frameworkfromtype.cmdbciattr")),
+    WORKTIME("worktime", new I18n("enum.framework.frameworkfromtype.worktime")),
+    NOTIFY_POLICY("notifypolicy", new I18n("enum.framework.frameworkfromtype.notify_policy"));
 
     private String value;
-    private String text;
+    private I18n text;
 
-    FrameworkFromType(String value, String text) {
+    FrameworkFromType(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -51,6 +53,6 @@ public enum FrameworkFromType implements IFromType {
 
     @Override
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 }

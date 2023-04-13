@@ -15,25 +15,28 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * @author longrf
  * @date 2022/9/26 17:56
  */
 
 public enum FontFamily {
-    SONG("宋体"),
-    BLACK("黑体"),
-    FANG_SONG("仿宋"),
-    REGULAR_SCRIPT("楷体"),
+    SONG(new I18n("enum.framework.fontfamily.song")),
+    BLACK(new I18n("enum.framework.fontfamily.black")),
+    FANG_SONG(new I18n("enum.framework.fontfamily.fang_song")),
+    REGULAR_SCRIPT(new I18n("enum.framework.fontfamily.regular_script")),
     ;
 
-    private final String value;
+    private final I18n value;
 
-    private FontFamily(String value) {
+    private FontFamily(I18n value) {
         this.value = value;
     }
 
     public String getValue() {
-        return value;
+        return I18nUtils.getMessage(value.toString());
     }
 }

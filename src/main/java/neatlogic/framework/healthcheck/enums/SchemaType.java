@@ -19,15 +19,17 @@ package neatlogic.framework.healthcheck.enums;
 import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum SchemaType implements IEnum {
-    MAIN("main", "核心库"), DATA("data", "数据库");
+    MAIN("main", new I18n("enum.framework.schematype.main")), DATA("data", new I18n("enum.framework.schematype.data"));
     private final String type;
-    private final String text;
+    private final I18n text;
 
-    SchemaType(String _type, String _text) {
+    SchemaType(String _type, I18n _text) {
         this.type = _type;
         this.text = _text;
     }
@@ -37,7 +39,7 @@ public enum SchemaType implements IEnum {
     }
 
     public String getText() {
-        return this.text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String value) {

@@ -18,6 +18,8 @@ package neatlogic.module.framework.notify.exception;
 
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.notify.core.INotifyParam;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author laiwt
@@ -25,13 +27,13 @@ import neatlogic.framework.notify.core.INotifyParam;
  **/
 public enum ExceptionNotifyParam implements INotifyParam {
 
-    EXCEPTIONSTACK("exceptionstack", "异常信息", ParamType.STRING);
+    EXCEPTIONSTACK("exceptionstack", new I18n("enum.framework.exceptionnotifyparam.exceptionstack"), ParamType.STRING);
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final ParamType paramType;
 
-    ExceptionNotifyParam(String value, String text, ParamType paramType) {
+    ExceptionNotifyParam(String value, I18n text, ParamType paramType) {
         this.value = value;
         this.text = text;
         this.paramType = paramType;
@@ -44,7 +46,7 @@ public enum ExceptionNotifyParam implements INotifyParam {
 
     @Override
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     @Override

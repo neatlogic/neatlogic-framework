@@ -18,31 +18,34 @@ package neatlogic.framework.notify.constvalue;
 
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.notify.core.INotifyParam;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author linbq
  * @since 2021/10/18 11:57
  **/
 public enum CommonNotifyParam implements INotifyParam {
-    OPERATOR("operator", "操作人", ParamType.STRING),
-    HOMEURL("homeUrl", "域名", ParamType.STRING, "<a href=\"${homeUrl}\" target=\"_blank\"></a>"),
+    OPERATOR("operator", new I18n("enum.framework.commonnotifyparam.operator"), ParamType.STRING),
+    HOMEURL("homeUrl", new I18n("enum.framework.commonnotifyparam.homeurl"), ParamType.STRING, "<a href=\"${homeUrl}\" target=\"_blank\"></a>"),
     ;
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final ParamType paramType;
     private String freemarkerTemplate;
 
-    CommonNotifyParam(String value, String text, ParamType paramType) {
+    CommonNotifyParam(String value, I18n text, ParamType paramType) {
         this(value, text, paramType, null);
     }
 
-    CommonNotifyParam(String value, String text, ParamType paramType, String freemarkerTemplate) {
+    CommonNotifyParam(String value, I18n text, ParamType paramType, String freemarkerTemplate) {
         this.value = value;
         this.text = text;
         this.paramType = paramType;
         this.freemarkerTemplate = freemarkerTemplate;
     }
+
     @Override
     public String getValue() {
         return value;
@@ -50,7 +53,7 @@ public enum CommonNotifyParam implements INotifyParam {
 
     @Override
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     @Override

@@ -16,20 +16,23 @@
 
 package neatlogic.framework.matrix.constvalue;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum SearchExpression {
-    EQ("eq", "equal", "等于"),
-    BT("bt", "between", "在此区间"),
-    NE("ne", "notequal", "不等于"),
-    NL("nl", "notlike", "不包含"),
-    LI("li", "like", "包含"),
-    NULL("null", "is-null", "为空"),
-    NOTNULL("notnull", "is-not-null", "不为空");
+    EQ("eq", "equal", new I18n("enum.framework.searchexpression.eq")),
+    BT("bt", "between", new I18n("enum.framework.searchexpression.bt")),
+    NE("ne", "notequal", new I18n("enum.framework.searchexpression.ne")),
+    NL("nl", "notlike", new I18n("enum.framework.searchexpression.nl")),
+    LI("li", "like", new I18n("enum.framework.searchexpression.li")),
+    NULL("null", "is-null", new I18n("enum.framework.searchexpression.null")),
+    NOTNULL("notnull", "is-not-null", new I18n("enum.framework.searchexpression.notnull"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final String expression;
 
-    SearchExpression(String value, String expression, String text) {
+    SearchExpression(String value, String expression, I18n text) {
         this.value = value;
         this.text = text;
         this.expression = expression;
@@ -40,7 +43,7 @@ public enum SearchExpression {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public String getExpression() {

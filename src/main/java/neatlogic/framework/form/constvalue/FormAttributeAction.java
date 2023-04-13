@@ -16,22 +16,25 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum FormAttributeAction {
-    HIDE("hide", "隐藏"),
-    READ("read", "只读"),
-    EDIT("edit", "编辑");
+    HIDE("hide", new I18n("enum.framework.formattributeaction.hide")),
+    READ("read", new I18n("enum.framework.formattributeaction.read")),
+    EDIT("edit", new I18n("enum.framework.formattributeaction.edit"));
     private String value;
-    private String text;
+    private I18n text;
 
     public String getValue() {
         return value;
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
-    private FormAttributeAction(String value, String text) {
+    private FormAttributeAction(String value, I18n text) {
         this.value = value;
         this.text = text;
     }

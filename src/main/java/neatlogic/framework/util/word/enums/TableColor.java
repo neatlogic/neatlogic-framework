@@ -15,23 +15,26 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * @author longrf
  * @date 2022/9/26 17:47
  */
 
 public enum TableColor {
-    BLACK("000000", "黑色"),
-    WHITE("ffffff", "白色"),
-    RED("FF0000", "红色"),
-    BLUE("0000FF", "蓝色"),
-    GREY("808080", "灰色"),
+    BLACK("000000", new I18n("enum.framework.tablecolor.black")),
+    WHITE("ffffff", new I18n("enum.framework.tablecolor.white")),
+    RED("FF0000", new I18n("enum.framework.tablecolor.red")),
+    BLUE("0000FF", new I18n("enum.framework.tablecolor.blue")),
+    GREY("808080", new I18n("enum.framework.tablecolor.grey")),
     ;
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    private TableColor(String value, String text) {
+    private TableColor(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -41,6 +44,6 @@ public enum TableColor {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 }

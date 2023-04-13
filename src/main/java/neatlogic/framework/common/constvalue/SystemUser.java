@@ -20,6 +20,8 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +30,17 @@ import org.slf4j.LoggerFactory;
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser {
-    SYSTEM("system", "system", "系统"),
-    ANONYMOUS("anonymous", "anonymous", "匿名用户");
+    SYSTEM("system", "system", new I18n("enum.framework.systemuser.system")),
+    ANONYMOUS("anonymous", "anonymous", new I18n("enum.framework.systemuser.anonymous"));
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 
     private final String userId;
     private final String userUuid;
-    private final String userName;
+    private final I18n userName;
     private final String timezone = "+8:00";
 
-    SystemUser(String userId, String userUuid, String userName) {
+    SystemUser(String userId, String userUuid, I18n userName) {
         this.userId = userId;
         this.userUuid = userUuid;
         this.userName = userName;
@@ -53,7 +55,7 @@ public enum SystemUser {
     }
 
     public String getUserName() {
-        return userName;
+        return I18nUtils.getMessage(userName.toString());
     }
 
     public String getTimezone() {
@@ -64,7 +66,7 @@ public enum SystemUser {
         UserVo userVo = new UserVo();
         userVo.setUuid(userUuid);
         userVo.setUserId(userId);
-        userVo.setUserName(userName);
+        userVo.setUserName(getUserName());
         userVo.setTenant(TenantContext.get().getTenantUuid());
         try {
             JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(userVo);

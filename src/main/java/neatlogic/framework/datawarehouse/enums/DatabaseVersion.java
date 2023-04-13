@@ -16,13 +16,16 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum DatabaseVersion {
-    MYSQL8("MySql8.x", "文本框");
+    MYSQL8("MySql8.x", new I18n("enum.framework.databaseversion.mysql8"));
 
     private final String name;
-    private final String driver;
+    private final I18n driver;
 
-    DatabaseVersion(String _name, String _driver) {
+    DatabaseVersion(String _name, I18n _driver) {
         this.name = _name;
         this.driver = _driver;
     }
@@ -32,7 +35,7 @@ public enum DatabaseVersion {
     }
 
     public String getDriver() {
-        return driver;
+        return I18nUtils.getMessage(driver.toString());
     }
 
 

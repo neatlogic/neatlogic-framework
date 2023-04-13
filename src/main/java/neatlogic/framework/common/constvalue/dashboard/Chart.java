@@ -2,22 +2,24 @@ package neatlogic.framework.common.constvalue.dashboard;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 public enum Chart {
 
-	BARCHART("barchart","柱状图","tsfont-chart-bar"),
-	PIECHART("piechart","饼图","tsfont-chart-pie"),
-	LINECHART("linechart","曲线图","tsfont-chart-line"),
-	TABLECHART("tablechart","表格","tsfont-chart-table"),
-	NUMBERCHART("numberchart","值图","tsfont-chart-number"),
-	AREACHART("areachart","面积图","tsfont-chart-area"),
+	BARCHART("barchart",new I18n("enum.framework.chart.barchart"),"tsfont-chart-bar"),
+	PIECHART("piechart",new I18n("enum.framework.chart.piechart"),"tsfont-chart-pie"),
+	LINECHART("linechart",new I18n("enum.framework.chart.linechart"),"tsfont-chart-line"),
+	TABLECHART("tablechart",new I18n("enum.framework.chart.tablechart"),"tsfont-chart-table"),
+	NUMBERCHART("numberchart",new I18n("enum.framework.chart.numberchart"),"tsfont-chart-number"),
+	AREACHART("areachart",new I18n("enum.framework.chart.areachart"),"tsfont-chart-area"),
 	;
 
-	private String value;
-	private String text;
-	private String icon;
+	private final String value;
+	private final I18n text;
+	private final String icon;
 
-	private Chart(String _value, String _text,String _icon) {
+	private Chart(String _value, I18n _text,String _icon) {
 		this.value = _value;
 		this.text = _text;
 		this.icon = _icon;
@@ -28,7 +30,7 @@ public enum Chart {
 	}
 
 	public String getText() {
-		return text;
+		return I18nUtils.getMessage(text.toString());
 	}
 
 	public String getIcon() {

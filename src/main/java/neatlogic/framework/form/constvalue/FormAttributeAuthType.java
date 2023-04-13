@@ -16,21 +16,24 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum FormAttributeAuthType {
-    COMPONENT("component", "组件"),
-    ROW("row", "行");
+    COMPONENT("component", new I18n("enum.framework.formattributeauthtype.component")),
+    ROW("row", new I18n("enum.framework.formattributeauthtype.row"));
     private String value;
-    private String text;
+    private I18n text;
 
     public String getValue() {
         return value;
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
-    private FormAttributeAuthType(String value, String text) {
+    private FormAttributeAuthType(String value, I18n text) {
         this.value = value;
         this.text = text;
     }

@@ -16,15 +16,18 @@
 
 package neatlogic.framework.notify.core;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum NotifyHandlerType {
 
-    EMAIL("email", "邮件通知"),
-    MESSAGE("message", "消息通知");
+    EMAIL("email", new I18n("enum.framework.notifyhandlertype.email")),
+    MESSAGE("message", new I18n("enum.framework.notifyhandlertype.message"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    NotifyHandlerType(String value, String text) {
+    NotifyHandlerType(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -34,7 +37,7 @@ public enum NotifyHandlerType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String _value) {

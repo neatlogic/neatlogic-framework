@@ -18,20 +18,26 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 public enum InputFrom implements IEnum {
-    PAGE("page", "页面操作"),
-    IMPORT("import", "excel导入"),
-    RESTFUL("restful", "接口调用"),
-    ITSM("itsm", "流程修改"), UNKNOWN("unknown", "未知"), CRON("cron", "定时任务"), AUTOEXEC("autoexec", "自动采集"), RELATIVE("relative", "级联更新");
+    PAGE("page", new I18n("enum.framework.inputfrom.page")),
+    IMPORT("import", new I18n("enum.framework.inputfrom.import")),
+    RESTFUL("restful", new I18n("enum.framework.inputfrom.restful")),
+    ITSM("itsm", new I18n("enum.framework.inputfrom.itsm")),
+    UNKNOWN("unknown", new I18n("enum.framework.inputfrom.unknown")),
+    CRON("cron", new I18n("enum.framework.inputfrom.cron")),
+    AUTOEXEC("autoexec", new I18n("enum.framework.inputfrom.autoexec")),
+    RELATIVE("relative", new I18n("enum.framework.inputfrom.relative"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    InputFrom(String _value, String _text) {
+    InputFrom(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -41,7 +47,7 @@ public enum InputFrom implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static InputFrom get(String value) {

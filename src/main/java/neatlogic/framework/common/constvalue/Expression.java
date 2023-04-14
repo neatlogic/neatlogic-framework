@@ -17,31 +17,33 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.dto.ExpressionVo;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum Expression implements IEnum {
-    LIKE("like", "包含", " %s contains %s ", " %s.%s like '%s%%' ", 1),
-    NOTLIKE("notlike", "不包含", " not %s contains %s ", " %s.%s not like '%s%%' ", 1),
-    EQUAL("equal", "等于", " %s = %s ", " %s.%s = '%s' ", 1),
-    UNEQUAL("unequal", "不等于", " not %s = %s ", " %s.%s != '%s' ", 1),
-    INCLUDE("include", "包括", " %s contains any ( %s ) ", " %s.%s in ( '%s' ) ", 1),
-    EXCLUDE("exclude", "不包括", " not %s contains any ( %s ) ", " %s.%s not in ( '%s' ) ", 1),
-    BETWEEN("between", "属于", " %s between '%s' and '%s' ", " %s.%s between '%s' and '%s' ", 1),
-    GREATERTHAN("greater-than", "晚于", " %s > %s ", " %s.%s > '%s' ", 1),
-    LESSTHAN("less-than", "早于", " %s < %s ", " %s.%s < '%s' ", 1),
-    ISNULL("is-null", "为空", " %s = '' ", " %s.%s is null ", 0),
-    MATCH("match", "包含(分词)", " %s match '%s'", " %s.%s match ( %s ) against (' %s ' IN BOOLEAN MODE) ", 0),
-    ISNOTNULL("is-not-null", "不为空", " not %s = '' ", " %s.%s is not null ", 0);
+    LIKE("like", new I18n("enum.framework.expression.like"), " %s contains %s ", " %s.%s like '%s%%' ", 1),
+    NOTLIKE("notlike", new I18n("enum.framework.expression.notlike"), " not %s contains %s ", " %s.%s not like '%s%%' ", 1),
+    EQUAL("equal", new I18n("enum.framework.expression.equal"), " %s = %s ", " %s.%s = '%s' ", 1),
+    UNEQUAL("unequal", new I18n("enum.framework.expression.unequal"), " not %s = %s ", " %s.%s != '%s' ", 1),
+    INCLUDE("include", new I18n("enum.framework.expression.include"), " %s contains any ( %s ) ", " %s.%s in ( '%s' ) ", 1),
+    EXCLUDE("exclude", new I18n("enum.framework.expression.exclude"), " not %s contains any ( %s ) ", " %s.%s not in ( '%s' ) ", 1),
+    BETWEEN("between", new I18n("enum.framework.expression.between"), " %s between '%s' and '%s' ", " %s.%s between '%s' and '%s' ", 1),
+    GREATERTHAN("greater-than", new I18n("enum.framework.expression.greaterthan"), " %s > %s ", " %s.%s > '%s' ", 1),
+    LESSTHAN("less-than", new I18n("enum.framework.expression.lessthan"), " %s < %s ", " %s.%s < '%s' ", 1),
+    ISNULL("is-null", new I18n("enum.framework.expression.isnull"), " %s = '' ", " %s.%s is null ", 0),
+    MATCH("match", new I18n("enum.framework.expression.match"), " %s match '%s'", " %s.%s match ( %s ) against (' %s ' IN BOOLEAN MODE) ", 0),
+    ISNOTNULL("is-not-null", new I18n("enum.framework.expression.isnotnull"), " not %s = '' ", " %s.%s is not null ", 0);
     private final String expression;
-    private final String expressionName;
+    private final I18n expressionName;
     private final String expressionEs;
     private final String expressionSql;
     private final Integer isShowConditionValue;
 
-    Expression(String _expression, String _expressionName, String _expressionEs, String _expressionSql, Integer _isShowConditionValue) {
+    Expression(String _expression, I18n _expressionName, String _expressionEs, String _expressionSql, Integer _isShowConditionValue) {
         this.expression = _expression;
         this.expressionName = _expressionName;
         this.expressionEs = _expressionEs;
@@ -54,7 +56,7 @@ public enum Expression implements IEnum {
     }
 
     public String getExpressionName() {
-        return expressionName;
+        return I18nUtils.getMessage(expressionName.toString());
     }
 
     public String getExpressionEs() {

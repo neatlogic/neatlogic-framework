@@ -16,13 +16,17 @@
 
 package neatlogic.framework.fulltextindex.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum Status {
-    DOING("doing", "重建中"), DONE("done", "重建完毕");
+    DOING("doing", new I18n("enum.framework.fulltextindex.status.doing")),
+    DONE("done", new I18n("enum.framework.fulltextindex.status.done"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    Status(String _value, String _text) {
+    Status(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -32,7 +36,7 @@ public enum Status {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getValue(String _status) {

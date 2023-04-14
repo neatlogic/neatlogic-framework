@@ -16,8 +16,7 @@ limitations under the License.
 
 package neatlogic.framework.form.attribute.core;
 
-import neatlogic.framework.common.constvalue.FormHandlerType;
-import neatlogic.framework.common.constvalue.GroupSearch;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
@@ -27,7 +26,8 @@ import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
-import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,21 +38,21 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
 
     public enum ConversionType {
 
-        TOVALUE("toValue", "text转换成value"),
-        TOTEXT("toText", "value转换成text");
+        TOVALUE("toValue", new I18n("enum.framework.conversiontype.tovalue")),
+        TOTEXT("toText", new I18n("enum.framework.conversiontype.totext"));
 
         private String value;
-        private String text;
+        private I18n text;
 
         public String getValue() {
             return value;
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text.toString());
         }
 
-        private ConversionType(String _value, String _text) {
+        private ConversionType(String _value, I18n _text) {
             value = _value;
             text = _text;
         }

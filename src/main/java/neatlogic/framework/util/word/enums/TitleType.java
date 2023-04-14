@@ -15,27 +15,30 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * @author longrf
  * @date 2022/9/26 14:23
  */
 
 public enum TitleType {
-    H1("h1", "标题 1", true, "000000", "楷体", 18, 1),
-    H2("h2", "标题 2", true, "000000", "楷体", 15, 2),
-    H3("h3", "标题 3", true, "000000", "楷体", 14, 3),
-    TILE("centered_tile", "居中标题", true, "000000", "楷体", 15, 0),
+    H1("h1", new I18n("enum.framework.titletype.h1"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 18, 1),
+    H2("h2", new I18n("enum.framework.titletype.h2"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 15, 2),
+    H3("h3", new I18n("enum.framework.titletype.h3"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 14, 3),
+    TILE("centered_tile", new I18n("enum.framework.titletype.tile"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 15, 0),
     ;
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final Boolean bold;
     private final String color;
-    private final String fontFamily;
+    private final I18n fontFamily;
     private final Integer fontSize;
     private final Integer headingLevel;
 
-    TitleType(String value, String text, Boolean bold, String color, String fontFamily, Integer fontSize, Integer headingLevel) {
+    TitleType(String value, I18n text, Boolean bold, String color, I18n fontFamily, Integer fontSize, Integer headingLevel) {
         this.value = value;
         this.text = text;
         this.bold = bold;
@@ -50,7 +53,7 @@ public enum TitleType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public Boolean getBold() {
@@ -62,7 +65,7 @@ public enum TitleType {
     }
 
     public String getFontFamily() {
-        return fontFamily;
+        return I18nUtils.getMessage(fontFamily.toString());
     }
 
     public Integer getFontSize() {

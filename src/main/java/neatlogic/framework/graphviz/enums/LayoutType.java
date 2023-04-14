@@ -19,25 +19,27 @@ package neatlogic.framework.graphviz.enums;
 import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum LayoutType implements IEnum {
-    DOT("dot", "分层布局", true),
-    CIRCO("circo", "环形布局", false),
-    NEATO("neato", "张力布局", false),
-    OSAGE("osage", "阵列布局", false),
-    TWOPI("twopi", "星形布局", false),
-    FDP("fdp", "无向布局", false),
-    SFDP("sfdp", "无向布局2", false),
-    PATCHWORK("patchwork", "无向布局2", false);
+    DOT("dot", new I18n("enum.framework.layouttype.dot"), true),
+    CIRCO("circo", new I18n("enum.framework.layouttype.circo"), false),
+    NEATO("neato", new I18n("enum.framework.layouttype.neato"), false),
+    OSAGE("osage", new I18n("enum.framework.layouttype.osage"), false),
+    TWOPI("twopi", new I18n("enum.framework.layouttype.twopi"), false),
+    FDP("fdp", new I18n("enum.framework.layouttype.fdp"), false),
+    SFDP("sfdp", new I18n("enum.framework.layouttype.sfdp"), false),
+    PATCHWORK("patchwork", new I18n("enum.framework.layouttype.patchwork"), false);
 
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final Boolean supportLayer;
 
-    LayoutType(String _value, String _text, boolean _supportLayer) {
+    LayoutType(String _value, I18n _text, boolean _supportLayer) {
         this.value = _value;
         this.text = _text;
         this.supportLayer = _supportLayer;
@@ -71,7 +73,7 @@ public enum LayoutType implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public boolean getSupportLayer() {

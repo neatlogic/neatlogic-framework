@@ -1,21 +1,24 @@
 package neatlogic.framework.notify.constvalue;
 
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 /**
  * 通知接收者类型
  */
 public enum NotifyRecipientType {
-	USER("user", "用户"),
-	TEAM("team", "组"),
-	ROLE("role", "角色"),
-	EMAIL("email", "邮箱"),
-	PROCESSUSERTYPE("processUserType", "工单干系人"),
-	CUSTOM("custom", "组件自定义的对象")
+	USER("user", new I18n("enum.framework.notifyrecipienttype.user")),
+	TEAM("team", new I18n("enum.framework.notifyrecipienttype.team")),
+	ROLE("role", new I18n("enum.framework.notifyrecipienttype.role")),
+	EMAIL("email", new I18n("enum.framework.notifyrecipienttype.email")),
+	PROCESSUSERTYPE("processUserType", new I18n("enum.framework.notifyrecipienttype.processusertype")),
+	CUSTOM("custom", new I18n("enum.framework.notifyrecipienttype.custom"))
 	;
 
 	private String value;
-	private String text;
-	private NotifyRecipientType(String value, String text) {
+	private I18n text;
+	private NotifyRecipientType(String value, I18n text) {
 		this.value = value;
 		this.text = text;
 	}
@@ -28,7 +31,7 @@ public enum NotifyRecipientType {
 	}
 
 	public String getText() {
-		return text;
+		return I18nUtils.getMessage(text.toString());
 	}
 	
 	public static String getValue(String _value) {

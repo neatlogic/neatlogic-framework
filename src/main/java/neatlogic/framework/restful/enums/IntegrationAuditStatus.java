@@ -3,6 +3,8 @@ package neatlogic.framework.restful.enums;
 import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
@@ -11,11 +13,12 @@ import java.util.List;
  * @date 2022/3/31 5:12 下午
  */
 public enum IntegrationAuditStatus implements IEnum {
-    SUCCEED("succeed", "成功"), FAILED("failed", "失败");
+    SUCCEED("succeed", new I18n("enum.framework.integrationauditstatus.succeed")),
+    FAILED("failed", new I18n("enum.framework.integrationauditstatus.failed"));
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    IntegrationAuditStatus(String value, String text) {
+    IntegrationAuditStatus(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -25,7 +28,7 @@ public enum IntegrationAuditStatus implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     @Override

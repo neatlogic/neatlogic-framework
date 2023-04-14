@@ -16,13 +16,17 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum AggregateType {
-    COUNT("count", "计数"), SUM("sum", "求和");
+    COUNT("count", new I18n("enum.framework.aggregatetype.count")),
+    SUM("sum", new I18n("enum.framework.aggregatetype.sum"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    AggregateType(String _value, String _text) {
+    AggregateType(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -32,7 +36,7 @@ public enum AggregateType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
 

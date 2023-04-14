@@ -19,6 +19,8 @@ package neatlogic.framework.scheduler.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -38,13 +40,15 @@ public class JobAuditVo extends BasePageVo {
 //	public final static String FAILED = "failed";
 
     public enum Status {
-        SUCCEED("succeed", "成功", "#25b865"), RUNNING("running", "进行中", "#2d84fb"), FAILED("failed", "失败", "#f71010");
+        SUCCEED("succeed", new I18n("enum.framework.jobauditvo.status.succeed"), "#25b865"),
+        RUNNING("running", new I18n("enum.framework.jobauditvo.status.running"), "#2d84fb"),
+        FAILED("failed", new I18n("enum.framework.jobauditvo.status.failed"), "#f71010");
 
         private final String value;
-        private final String text;
+        private final I18n text;
         private final String color;
 
-        Status(String _value, String _text, String _color) {
+        Status(String _value, I18n _text, String _color) {
             value = _value;
             text = _text;
             color = _color;
@@ -55,7 +59,7 @@ public class JobAuditVo extends BasePageVo {
         }
 
         public String getText() {
-            return text;
+            return I18nUtils.getMessage(text.toString());
         }
 
         public String getColor() {

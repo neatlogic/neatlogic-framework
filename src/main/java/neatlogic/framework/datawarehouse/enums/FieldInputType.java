@@ -16,15 +16,20 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum FieldInputType {
-    TEXT("text", "文本框"), DATETIME("datetime", "日期时间"),
-    SELECT("select", "下拉框"), RADIO("radio", "单选框"),
-    CHECKBOX("checkbox", "复选框");
+    TEXT("text", new I18n("enum.framework.fieldinputtype.text")),
+    DATETIME("datetime", new I18n("enum.framework.fieldinputtype.datetime")),
+    SELECT("select", new I18n("enum.framework.fieldinputtype.select")),
+    RADIO("radio", new I18n("enum.framework.fieldinputtype.radio")),
+    CHECKBOX("checkbox", new I18n("enum.framework.fieldinputtype.checkbox"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    FieldInputType(String _value, String _text) {
+    FieldInputType(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -34,7 +39,7 @@ public enum FieldInputType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getValue(String _status) {

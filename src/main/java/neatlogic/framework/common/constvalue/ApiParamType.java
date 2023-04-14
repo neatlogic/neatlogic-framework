@@ -16,25 +16,28 @@
 
 package neatlogic.framework.common.constvalue;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum ApiParamType {
-    INTEGER("int", "整型"),
-    ENUM("enum", "枚举型"),
-    BOOLEAN("boolean", "布尔型"),
-    STRING("string", "字符型"),
-    LONG("long", "长整型"),
-    JSONOBJECT("jsonObject", "json对象"),
-    JSONARRAY("jsonArray", "json数组"),
-    IP("ip", "ip"),
-    EMAIL("email", "邮箱"),
-    REGEX("regex", "正则表达式"),
-    DOUBLE("double", "双精度浮点数"),
-    NOAUTH("noAuth", "任意对象，无需校验"),
-    FILE("file", "附件");
+    INTEGER("int", new I18n("enum.framework.apiparamtype.integer")),
+    ENUM("enum", new I18n("enum.framework.apiparamtype.enum")),
+    BOOLEAN("boolean", new I18n("enum.framework.apiparamtype.boolean")),
+    STRING("string", new I18n("enum.framework.apiparamtype.string")),
+    LONG("long", new I18n("enum.framework.apiparamtype.long")),
+    JSONOBJECT("jsonObject", new I18n("enum.framework.apiparamtype.jsonobject")),
+    JSONARRAY("jsonArray", new I18n("enum.framework.apiparamtype.jsonarray")),
+    IP("ip", new I18n("enum.framework.apiparamtype.ip")),
+    EMAIL("email", new I18n("enum.framework.apiparamtype.email")),
+    REGEX("regex", new I18n("enum.framework.apiparamtype.regex")),
+    DOUBLE("double", new I18n("enum.framework.apiparamtype.double")),
+    NOAUTH("noAuth", new I18n("enum.framework.apiparamtype.noauth")),
+    FILE("file", new I18n("enum.framework.apiparamtype.file"));
 
     private String name;
-    private String text;
+    private I18n text;
 
-    private ApiParamType(String _name, String _text) {
+    private ApiParamType(String _name, I18n _text) {
         this.name = _name;
         this.text = _text;
     }
@@ -44,7 +47,7 @@ public enum ApiParamType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String name) {

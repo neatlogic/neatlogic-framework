@@ -19,16 +19,21 @@ package neatlogic.framework.integration.authentication.enums;
 import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum AuthenticateType implements IEnum {
-    NOAUTH("noauth", "无需认证"), BUILDIN("buildin", "内部验证"), BASIC("basicauth", "Basic认证"), BEARER("bearertoken", "Bearer Token");
+    NOAUTH("noauth", new I18n("enum.framework.authenticatetype.noauth")),
+    BUILDIN("buildin", new I18n("enum.framework.authenticatetype.buildin")),
+    BASIC("basicauth", new I18n("enum.framework.authenticatetype.basic")),
+    BEARER("bearertoken", new I18n("enum.framework.authenticatetype.bearer"));
 
     private String type;
-    private String text;
+    private I18n text;
 
-    AuthenticateType(String _type, String _text) {
+    AuthenticateType(String _type, I18n _text) {
         this.type = _type;
         this.text = _text;
     }
@@ -38,7 +43,7 @@ public enum AuthenticateType implements IEnum {
     }
 
     public String getText() {
-        return this.text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String value) {

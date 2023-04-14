@@ -2,24 +2,26 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 public enum ParamType implements IEnum{
-	STRING("string","字符串",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
-	NUMBER("number","数字",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
-	ENUM("enum","枚举",Arrays.asList(Expression.EQUAL,Expression.UNEQUAL),Expression.EQUAL),
-	ARRAY("array","数组",Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
-	DATE("date","日期",Arrays.asList(Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.BETWEEN)
+	STRING("string",new I18n("enum.framework.paramtype.string"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
+	NUMBER("number",new I18n("enum.framework.paramtype.number"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
+	ENUM("enum",new I18n("enum.framework.paramtype.enum"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL),Expression.EQUAL),
+	ARRAY("array",new I18n("enum.framework.paramtype.array"),Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
+	DATE("date",new I18n("enum.framework.paramtype.date"),Arrays.asList(Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.BETWEEN)
 	;
 	private String name;
-	private String text;
+	private I18n text;
 	private List<Expression> expressionList;
 	private Expression defaultExpression;
 
-	private ParamType(String _name,String _text,List<Expression> _expressionList,Expression _defaultExpression) {
+	private ParamType(String _name,I18n _text,List<Expression> _expressionList,Expression _defaultExpression) {
 		this.name = _name;
 		this.text = _text;
 		this.expressionList = _expressionList;
@@ -31,7 +33,7 @@ public enum ParamType implements IEnum{
 	}
 
 	public String getText() {
-		return text;
+		return I18nUtils.getMessage(text.toString());
 	}
 
 	public List<Expression> getExpressionList() {

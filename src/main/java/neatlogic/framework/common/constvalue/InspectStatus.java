@@ -18,22 +18,24 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public enum InspectStatus implements IEnum {
-    NORMAL("normal", "正常", "text-success"),
-    WARN("warn", "告警", "text-warning"),
-    CRITICAL("critical", "严重", "text-error"),
-    FATAL("fatal", "致命", "text-error");
+    NORMAL("normal", new I18n("enum.framework.inspectstatus.normal"), "text-success"),
+    WARN("warn", new I18n("enum.framework.inspectstatus.warn"), "text-warning"),
+    CRITICAL("critical", new I18n("enum.framework.inspectstatus.critical"), "text-error"),
+    FATAL("fatal", new I18n("enum.framework.inspectstatus.fatal"), "text-error");
 
     private final String value;
-    private final String text;
+    private final I18n text;
     private final String cssClass;
 
-    InspectStatus(String value, String text, String cssClass) {
+    InspectStatus(String value, I18n text, String cssClass) {
         this.value = value;
         this.text = text;
         this.cssClass = cssClass;
@@ -44,7 +46,7 @@ public enum InspectStatus implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public String getCssClass() {
@@ -90,10 +92,10 @@ public enum InspectStatus implements IEnum {
         return null;
     }
 
-    public static Map<String,JSONObject> getAllInspectStatusMap() {
-        Map<String,JSONObject> map = new HashMap<>();
+    public static Map<String, JSONObject> getAllInspectStatusMap() {
+        Map<String, JSONObject> map = new HashMap<>();
         for (InspectStatus action : values()) {
-            map.put(action.getValue(),new JSONObject() {
+            map.put(action.getValue(), new JSONObject() {
                 {
                     this.put("value", action.getValue());
                     this.put("text", action.getText());

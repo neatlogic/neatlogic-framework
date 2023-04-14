@@ -1,28 +1,31 @@
 package neatlogic.framework.common.constvalue;
 
-public enum UserProfileOperate{
-	KEEP_ON_CREATE("keeponcreate","继续创建"),
-	EDIT_USER("edituser","编辑用户"),
-	BACK_USER_LIST("backuserlist","返回用户列表"),
-	EDIT_ROLE("editrole","编辑角色"),
-	BACK_ROLE_LIST("backrolelist","返回角色列表"),
-	EDIT_TEAM("editteam","编辑用户组"),
-	BACK_TEAM_LIST("backteamlist","返回用户组列表");
-	
-	private String value;
-	private String text;
-	
-	private UserProfileOperate(String _value,String _text){
-		this.value = _value;
-		this.text = _text;
-	}
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
-	public String getValue() {
-		return value;
-	}
+public enum UserProfileOperate {
+    KEEP_ON_CREATE("keeponcreate", new I18n("enum.framework.userprofileoperate.keep_on_create")),
+    EDIT_USER("edituser", new I18n("enum.framework.userprofileoperate.edit_user")),
+    BACK_USER_LIST("backuserlist", new I18n("enum.framework.userprofileoperate.back_user_list")),
+    EDIT_ROLE("editrole", new I18n("enum.framework.userprofileoperate.edit_role")),
+    BACK_ROLE_LIST("backrolelist", new I18n("enum.framework.userprofileoperate.back_role_list")),
+    EDIT_TEAM("editteam", new I18n("enum.framework.userprofileoperate.edit_user")),
+    BACK_TEAM_LIST("backteamlist", new I18n("enum.framework.userprofileoperate.back_team_list"));
 
-	public String getText() {
-		return text;
-	}
+    private String value;
+    private I18n text;
+
+    private UserProfileOperate(String _value, I18n _text) {
+        this.value = _value;
+        this.text = _text;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getText() {
+        return I18nUtils.getMessage(text.toString());
+    }
 
 }

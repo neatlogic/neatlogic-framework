@@ -19,15 +19,18 @@ package neatlogic.framework.restful.enums;
 import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum ApiInvokedStatus implements IEnum {
-    SUCCEED("succeed", "成功"), FAILED("failed", "失败");
+    SUCCEED("succeed", new I18n("enum.framework.apiinvokedstatus.succeed")),
+    FAILED("failed", new I18n("enum.framework.apiinvokedstatus.failed"));
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    ApiInvokedStatus(String value, String text) {
+    ApiInvokedStatus(String value, I18n text) {
         this.value = value;
         this.text = text;
     }
@@ -37,7 +40,7 @@ public enum ApiInvokedStatus implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     @Override

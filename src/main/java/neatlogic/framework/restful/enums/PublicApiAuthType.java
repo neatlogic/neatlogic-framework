@@ -19,16 +19,18 @@ import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.restful.auth.core.ApiAuthFactory;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum PublicApiAuthType implements IEnum {
-    BASIC("basic", "Basic认证");
+    BASIC("basic", new I18n("enum.framework.publicapiauthtype.basic"));
 
     private final String type;
-    private final String text;
+    private final I18n text;
 
-    PublicApiAuthType(String _type, String _text) {
+    PublicApiAuthType(String _type, I18n _text) {
         this.type = _type;
         this.text = _text;
     }
@@ -38,7 +40,7 @@ public enum PublicApiAuthType implements IEnum {
     }
 
     public String getText() {
-        return this.text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getText(String value) {

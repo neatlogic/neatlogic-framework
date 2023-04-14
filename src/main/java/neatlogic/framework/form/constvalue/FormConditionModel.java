@@ -16,12 +16,16 @@
 
 package neatlogic.framework.form.constvalue;
 
-public enum FormConditionModel {
-    SIMPLE("simple", "简单模式"), CUSTOM("custom", "自定义模式");
-    private final String value;
-    private final String name;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
-    FormConditionModel(String _value, String _name) {
+public enum FormConditionModel {
+    SIMPLE("simple", new I18n("enum.framework.formconditionmodel.simple")),
+    CUSTOM("custom", new I18n("enum.framework.formconditionmodel.custom"));
+    private final String value;
+    private final I18n name;
+
+    FormConditionModel(String _value, I18n _name) {
         this.value = _value;
         this.name = _name;
     }
@@ -31,7 +35,7 @@ public enum FormConditionModel {
     }
 
     public String getName() {
-        return name;
+        return I18nUtils.getMessage(name.toString());
     }
 
     public static FormConditionModel getFormConditionModel(String _value) {

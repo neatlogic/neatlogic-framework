@@ -16,15 +16,20 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum FieldType {
-    TEXT("text", "文本"), DATETIME("datetime", "日期时间"),
-    DATE("date", "日期"), TIME("time", "时间"),
-    NUMBER("number", "数字");
+    TEXT("text", new I18n("enum.framework.fieldtype.text")),
+    DATETIME("datetime", new I18n("enum.framework.fieldtype.datetime")),
+    DATE("date", new I18n("enum.framework.fieldtype.date")),
+    TIME("time", new I18n("enum.framework.fieldtype.time")),
+    NUMBER("number", new I18n("enum.framework.fieldtype.number"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    FieldType(String _value, String _text) {
+    FieldType(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -34,7 +39,7 @@ public enum FieldType {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
 

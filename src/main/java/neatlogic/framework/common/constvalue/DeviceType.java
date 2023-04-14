@@ -19,17 +19,21 @@ package neatlogic.framework.common.constvalue;
 import neatlogic.framework.common.config.Config;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 import java.util.Objects;
 
 public enum DeviceType implements IEnum {
-    ALL("all", "所有"), MOBILE("mobile", "手机端"), PC("pc", "电脑端");
+    ALL("all", new I18n("enum.framework.devicetype.all")),
+    MOBILE("mobile", new I18n("enum.framework.devicetype.mobile")),
+    PC("pc", new I18n("enum.framework.devicetype.pc"));
 
     private final String status;
-    private final String text;
+    private final I18n text;
 
-    DeviceType(String _status, String _text) {
+    DeviceType(String _status, I18n _text) {
         this.status = _status;
         this.text = _text;
     }
@@ -39,7 +43,7 @@ public enum DeviceType implements IEnum {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
     public static String getValue(String _status) {

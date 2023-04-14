@@ -16,13 +16,18 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.I18nUtils;
+
 public enum Status {
-    DOING("doing", "同步数据中"), DONE("done", "同步完成"), FAILED("failed", "同步失败");
+    DOING("doing", new I18n("enum.framework.status.doing")),
+    DONE("done", new I18n("enum.framework.status.done")),
+    FAILED("failed", new I18n("enum.framework.status.failed"));
 
     private final String value;
-    private final String text;
+    private final I18n text;
 
-    Status(String _value, String _text) {
+    Status(String _value, I18n _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -32,7 +37,7 @@ public enum Status {
     }
 
     public String getText() {
-        return text;
+        return I18nUtils.getMessage(text.toString());
     }
 
 

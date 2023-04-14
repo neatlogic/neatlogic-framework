@@ -396,9 +396,11 @@ public class Config {
             Properties prop = new Properties();
             if (StringUtils.isNotBlank(configInfo)) {
                 prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                System.out.println("load config from nacos!!!");
             } else {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                System.out.println("load config from config.properties!!!");
             }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));

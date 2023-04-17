@@ -72,7 +72,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 groupDescription = neatlogicE.attributeValue("groupDescription");
 
                 if (StringUtils.isNotBlank(moduleId)) {
-                    System.out.println("start to initialize module " + moduleId + "...");
+                    System.out.println("Start to initialize module " + moduleId + "...");
                     version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
                     NeatLogicWebApplicationContext appContext = new NeatLogicWebApplicationContext();
                     appContext.setConfigLocation("classpath*:" + path);

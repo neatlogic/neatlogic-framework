@@ -875,81 +875,33 @@ public class TimeUtil {
      * @return
      */
     public static String millisecondsFormat(Long milliseconds, int unitCount, TimeUnit minTimeUnit, String separator) {
-        boolean flag = false;
         List<String> list = new ArrayList<>(unitCount);
-        if (milliseconds >= TimeUnit.DAYS.toMillis(1)) {
-            long value = milliseconds / TimeUnit.DAYS.toMillis(1);
+        if (milliseconds >= TimeUnit.DAYS.toMillis(1) || TimeUnit.DAYS == minTimeUnit) {
+            double value = milliseconds.doubleValue() / TimeUnit.DAYS.toMillis(1);
+            list.add(Math.round(value) + new I18n("const.days").toString());
+            if (list.size() >= unitCount || TimeUnit.DAYS == minTimeUnit) {
+                return String.join(separator, list);
+            }
             milliseconds = milliseconds % TimeUnit.DAYS.toMillis(1);
-            if (list.size() + 1 >= unitCount || TimeUnit.DAYS == minTimeUnit) {
-                flag = true;
-                if (milliseconds * 2 >= TimeUnit.DAYS.toMillis(1)) {
-                    value++;
-                }
-            }
-            list.add(value + new I18n("const.days").toString());
-        } else if (TimeUnit.DAYS == minTimeUnit) {
-            flag = true;
-            int value = 0;
-            if (milliseconds * 2 >= TimeUnit.DAYS.toMillis(1)) {
-                value++;
-            }
-            list.add(value + new I18n("const.days").toString());
         }
-        if (flag) {
-            return String.join(separator, list);
-        }
-        if (milliseconds >= TimeUnit.HOURS.toMillis(1)) {
-            long value = milliseconds / TimeUnit.HOURS.toMillis(1);
+        if (milliseconds >= TimeUnit.HOURS.toMillis(1) || TimeUnit.HOURS == minTimeUnit) {
+            double value = milliseconds.doubleValue() / TimeUnit.HOURS.toMillis(1);
+            list.add(Math.round(value) + new I18n("const.hours").toString());
+            if (list.size() >= unitCount || TimeUnit.HOURS == minTimeUnit) {
+                return String.join(separator, list);
+            }
             milliseconds = milliseconds % TimeUnit.HOURS.toMillis(1);
-            if (list.size() + 1 >= unitCount || TimeUnit.HOURS == minTimeUnit) {
-                flag = true;
-                if (milliseconds * 2 >= TimeUnit.HOURS.toMillis(1)) {
-                    value++;
-                }
-            }
-            list.add(value + new I18n("const.hours").toString());
-        } else if (TimeUnit.HOURS == minTimeUnit) {
-            flag = true;
-            int value = 0;
-            if (milliseconds * 2 >= TimeUnit.HOURS.toMillis(1)) {
-                value++;
-            }
-            list.add(value + new I18n("const.hours").toString());
         }
-        if (flag) {
-            return String.join(separator, list);
-        }
-        if (milliseconds >= TimeUnit.MINUTES.toMillis(1)) {
-            long value = milliseconds / TimeUnit.MINUTES.toMillis(1);
+        if (milliseconds >= TimeUnit.MINUTES.toMillis(1) || TimeUnit.MINUTES == minTimeUnit) {
+            double value = milliseconds.doubleValue() / TimeUnit.MINUTES.toMillis(1);
+            list.add(Math.round(value) + new I18n("const.minutes").toString());
+            if (list.size() >= unitCount || TimeUnit.MINUTES == minTimeUnit) {
+                return String.join(separator, list);
+            }
             milliseconds = milliseconds % TimeUnit.MINUTES.toMillis(1);
-            if (list.size() + 1 >= unitCount || TimeUnit.MINUTES == minTimeUnit) {
-                flag = true;
-                if (milliseconds * 2 >= TimeUnit.MINUTES.toMillis(1)) {
-                    value++;
-                }
-            }
-            list.add(value + new I18n("const.minutes").toString());
-        } else if (TimeUnit.MINUTES == minTimeUnit) {
-            flag = true;
-            int value = 0;
-            if (milliseconds * 2 >= TimeUnit.MINUTES.toMillis(1)) {
-                value++;
-            }
-            list.add(value + new I18n("const.minutes").toString());
         }
-        if (flag) {
-            return String.join(separator, list);
-        }
-        if (milliseconds >= TimeUnit.SECONDS.toMillis(1)) {
-            long value = milliseconds / TimeUnit.SECONDS.toMillis(1);
-            list.add(value + new I18n("const.seconds").toString());
-        } else if (TimeUnit.SECONDS == minTimeUnit) {
-            int value = 0;
-            if (milliseconds * 2 >= TimeUnit.SECONDS.toMillis(1)) {
-                value++;
-            }
-            list.add(value + new I18n("const.seconds").toString());
-        }
+        double value = milliseconds.doubleValue() / TimeUnit.SECONDS.toMillis(1);
+        list.add(Math.round(value) + new I18n("const.seconds").toString());
         return String.join(separator, list);
     }
 }

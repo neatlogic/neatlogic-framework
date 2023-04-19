@@ -56,7 +56,17 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
     }
 
     public static List<NotifyPolicyHandlerVo> getNotifyPolicyHandlerList() {
-        return notifyPolicyHandlerList;
+        List<NotifyPolicyHandlerVo> notifyPolicyHandlerVoList = new ArrayList<>();
+        notifyPolicyHandlerList.forEach(o -> {
+            try {
+                NotifyPolicyHandlerVo handlerVo = o.clone();
+                handlerVo.setName(I18nUtils.getMessage(handlerVo.getName()));
+                notifyPolicyHandlerVoList.add(handlerVo);
+            } catch (CloneNotSupportedException e) {
+                notifyPolicyHandlerVoList.add(o);
+            }
+        });
+        return notifyPolicyHandlerVoList;
     }
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {

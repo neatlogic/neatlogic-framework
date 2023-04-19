@@ -20,7 +20,7 @@ package neatlogic.framework.notify.dto;
  * @author linbq
  * @since 2021/7/23 15:30
  **/
-public class NotifyPolicyHandlerVo {
+public class NotifyPolicyHandlerVo implements Cloneable{
     private String handler;
     private String name;
     private String moduleGroup;
@@ -73,5 +73,11 @@ public class NotifyPolicyHandlerVo {
 
     public void setIsAllowMultiPolicy(Integer isAllowMultiPolicy) {
         this.isAllowMultiPolicy = isAllowMultiPolicy;
+    }
+
+    @Override
+
+    public NotifyPolicyHandlerVo clone() throws CloneNotSupportedException {
+        return (NotifyPolicyHandlerVo) super.clone();
     }
 }

@@ -37,7 +37,7 @@ import java.util.List;
 public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
     @Override
     public String getName() {
-        return "通知异常";
+        return "handler.notify.exception";
     }
 
     /**

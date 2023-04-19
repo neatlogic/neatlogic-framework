@@ -885,6 +885,8 @@ public class TimeUtil {
                 return String.join(separator, list);
             }
             milliseconds = milliseconds % TimeUnit.DAYS.toMillis(1);
+        } else if (TimeUnit.DAYS == minTimeUnit) {
+            return 0 + I18nUtils.getMessage("const.days");
         }
         if (milliseconds >= TimeUnit.HOURS.toMillis(1)) {
             list.add((milliseconds / TimeUnit.HOURS.toMillis(1)) + I18nUtils.getMessage("const.hours"));
@@ -895,6 +897,8 @@ public class TimeUtil {
                 return String.join(separator, list);
             }
             milliseconds = milliseconds % TimeUnit.HOURS.toMillis(1);
+        } else if (TimeUnit.HOURS == minTimeUnit) {
+            return 0 + I18nUtils.getMessage("const.hours");
         }
         if (milliseconds >= TimeUnit.MINUTES.toMillis(1)) {
             list.add((milliseconds / TimeUnit.MINUTES.toMillis(1)) + I18nUtils.getMessage("const.minutes"));
@@ -905,9 +909,13 @@ public class TimeUtil {
                 return String.join(separator, list);
             }
             milliseconds = milliseconds % TimeUnit.MINUTES.toMillis(1);
+        } else if (TimeUnit.MINUTES == minTimeUnit) {
+            return 0 + I18nUtils.getMessage("const.minutes");
         }
         if (milliseconds >= TimeUnit.SECONDS.toMillis(1)) {
             list.add((milliseconds / TimeUnit.SECONDS.toMillis(1)) + I18nUtils.getMessage("const.seconds"));
+        } else if (TimeUnit.SECONDS == minTimeUnit) {
+            return 0 + I18nUtils.getMessage("const.seconds");
         }
         return String.join(separator, list);
     }

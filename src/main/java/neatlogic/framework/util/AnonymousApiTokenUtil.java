@@ -29,7 +29,6 @@ public class AnonymousApiTokenUtil {
             return source;
         }
         //source = api/binary/image/download?id=314907690737664
-        System.out.println("source=" + source);
         String[] split = source.split("\\?");
         String path = split[0];
         String queryString = split[1];

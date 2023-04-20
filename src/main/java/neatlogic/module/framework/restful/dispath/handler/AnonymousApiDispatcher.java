@@ -41,6 +41,7 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
+import neatlogic.framework.util.AnonymousApiTokenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -210,19 +211,23 @@ public class AnonymousApiDispatcher {
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
-            String decryptData = RC4Util.decrypt(token);
-            String[] split = decryptData.split("\\?", 2);
-            token = split[0].substring(0, split[0].lastIndexOf("/"));
-            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-            if (split.length == 2) {
-                String[] params = split[1].split("&");
-                for (String param : params) {
-                    String[] array = param.split("=", 2);
-                    if (array.length == 2) {
-                        paramObj.put(array[0], array[1]);
-                    }
-                }
-            }
+            JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
+            token = resultObj.getString("token");
+            tenant = resultObj.getString("tenant");
+            paramObj.putAll(resultObj.getJSONObject("paramObj"));
+//            String decryptData = RC4Util.decrypt(token);
+//            String[] split = decryptData.split("\\?", 2);
+//            token = split[0].substring(0, split[0].lastIndexOf("/"));
+//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+//            if (split.length == 2) {
+//                String[] params = split[1].split("&");
+//                for (String param : params) {
+//                    String[] array = param.split("=", 2);
+//                    if (array.length == 2) {
+//                        paramObj.put(array[0], array[1]);
+//                    }
+//                }
+//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;
@@ -369,19 +374,23 @@ public class AnonymousApiDispatcher {
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
-            String decryptData = RC4Util.decrypt(token);
-            String[] split = decryptData.split("\\?", 2);
-            token = split[0].substring(0, split[0].lastIndexOf("/"));
-            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-            if (split.length == 2) {
-                String[] params = split[1].split("&");
-                for (String param : params) {
-                    String[] array = param.split("=", 2);
-                    if (array.length == 2) {
-                        paramObj.put(array[0], array[1]);
-                    }
-                }
-            }
+            JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
+            token = resultObj.getString("token");
+            tenant = resultObj.getString("tenant");
+            paramObj.putAll(resultObj.getJSONObject("paramObj"));
+//            String decryptData = RC4Util.decrypt(token);
+//            String[] split = decryptData.split("\\?", 2);
+//            token = split[0].substring(0, split[0].lastIndexOf("/"));
+//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+//            if (split.length == 2) {
+//                String[] params = split[1].split("&");
+//                for (String param : params) {
+//                    String[] array = param.split("=", 2);
+//                    if (array.length == 2) {
+//                        paramObj.put(array[0], array[1]);
+//                    }
+//                }
+//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;

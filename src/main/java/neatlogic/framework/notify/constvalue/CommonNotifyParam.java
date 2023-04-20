@@ -27,7 +27,8 @@ import neatlogic.framework.util.I18nUtils;
  **/
 public enum CommonNotifyParam implements INotifyParam {
     OPERATOR("operator", new I18n("enum.framework.commonnotifyparam.operator"), ParamType.STRING),
-    HOMEURL("homeUrl", new I18n("enum.framework.commonnotifyparam.homeurl"), ParamType.STRING, "<a href=\"${homeUrl}\" target=\"_blank\"></a>"),
+//    HOMEURL("homeUrl", new I18n("enum.framework.commonnotifyparam.homeurl"), ParamType.STRING, "<a href=\"${DATA.homeUrl}\" target=\"_blank\"></a>"),
+    FRONT_END_URL("frontEndUrl", new I18n("enum.framework.commonnotifyparam.frontendurl"), ParamType.STRING, "<a href=\"${DATA.frontEndUrl}\" target=\"_blank\"></a>"),
     ;
 
     private final String value;
@@ -53,7 +54,7 @@ public enum CommonNotifyParam implements INotifyParam {
 
     @Override
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return text.toString();
     }
 
     @Override

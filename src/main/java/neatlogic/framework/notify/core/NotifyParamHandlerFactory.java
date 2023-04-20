@@ -47,7 +47,9 @@ public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
         for (String param : paramList) {
             INotifyParamHandler handler = map.get(param);
             if (handler != null) {
-                resultObj.put(param, handler.getText(object));
+                Object text = handler.getText(object);
+//                System.out.println(param + "-->" + JSONObject.toJSONString(text));
+                resultObj.put(param, text);
             }
         }
         return resultObj;

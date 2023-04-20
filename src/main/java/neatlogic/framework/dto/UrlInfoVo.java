@@ -1,11 +1,5 @@
 package neatlogic.framework.dto;
 
-import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.util.RC4Util;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-
 /**
  * @Title: UrlInfoVo
  * @Package neatlogic.framework.dto
@@ -63,26 +57,29 @@ public class UrlInfoVo {
     }
 
     public String getTarget() {
-        if(StringUtils.isBlank(target) && StringUtils.isNotBlank(source)){
-            //source = /test/api/binary/image/download?id=314907690737664
-            String[] split = source.split("\\?");
-            String path = split[0];
-            String queryString = split[1];
-            String tenant = path.substring(0, path.indexOf("/", 1));
-            int fromIndex = path.indexOf("/api/");
-            int beginIndex = fromIndex;
-            fromIndex += 5;
-            int endIndex = path.indexOf("/", fromIndex) + 1;
-            String token = path.substring(endIndex);
-            String encryptedData = RC4Util.encrypt(token + tenant + "?" + queryString);
-            String homeUrl = Config.HOME_URL();
-            if(StringUtils.isNotBlank(homeUrl)) {
-                if (!homeUrl.endsWith(File.separator)) {
-                    homeUrl += File.separator;
-                }
-            }
-            target = homeUrl + "anonymous" + path.substring(beginIndex, endIndex) + encryptedData;
-        }
+//        if(StringUtils.isBlank(target) && StringUtils.isNotBlank(source)){
+//            //source = /test/api/binary/image/download?id=314907690737664
+//            //source = api/binary/image/download?id=314907690737664
+//            System.out.println("source=" + source);
+//            String[] split = source.split("\\?");
+//            String path = split[0];
+//            String queryString = split[1];
+////            String tenant = path.substring(0, path.indexOf("/", 1));
+//            String tenant = TenantContext.get().getTenantUuid();
+//            int fromIndex = path.indexOf("api/");
+//            int beginIndex = fromIndex;
+//            fromIndex += 4;
+//            int endIndex = path.indexOf("/", fromIndex) + 1;
+//            String token = path.substring(endIndex);
+//            String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
+//            String homeUrl = Config.HOME_URL();
+//            if(StringUtils.isNotBlank(homeUrl)) {
+//                if (!homeUrl.endsWith("/")) {
+//                    homeUrl += "/";
+//                }
+//            }
+//            target = homeUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
+//        }
         return target;
     }
 

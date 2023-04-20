@@ -117,13 +117,16 @@ public class HtmlUtil {
 
     public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList) {
         if (CollectionUtils.isEmpty(urlInfoVoList)) {
-            return null;
+            return content;
         }
         int sourceTotalLength = 0;
         int targetTotalLength = 0;
         for (UrlInfoVo urlInfo : urlInfoVoList) {
-            sourceTotalLength += urlInfo.getSource().length();
-            targetTotalLength += urlInfo.getTarget().length();
+            String source = urlInfo.getSource();
+            String target = AnonymousApiTokenUtil.encrypt(source);
+            urlInfo.setTarget(target);
+            sourceTotalLength += source.length();
+            targetTotalLength += target.length();
         }
         StringBuilder stringBuilder = new StringBuilder(content.length() + targetTotalLength - sourceTotalLength);
         int fromIndex = 0;

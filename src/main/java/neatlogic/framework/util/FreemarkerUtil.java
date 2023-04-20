@@ -26,13 +26,13 @@ public class FreemarkerUtil {
 		String resultStr = "";
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
-//		String homeUrl = Config.HOME_URL();
-//		if(StringUtils.isNotBlank(homeUrl)) {
-//		    if(!homeUrl.endsWith(File.separator)) {
-//	            homeUrl += File.separator;
-//	        }
-//	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
-//		}
+		String homeUrl = Config.HOME_URL();
+		if(StringUtils.isNotBlank(homeUrl)) {
+		    if(!homeUrl.endsWith("/")) {
+	            homeUrl += "/";
+	        }
+	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + "/");
+		}
         
 		try {
 			if (content != null) {
@@ -62,13 +62,13 @@ public class FreemarkerUtil {
 		// String resultStr = "";
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
-//		String homeUrl = Config.HOME_URL();
-//		if(StringUtils.isNotBlank(homeUrl)) {
-//	        if(!homeUrl.endsWith(File.separator)) {
-//	            homeUrl += File.separator;
-//	        }
-//	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + File.separator);
-//		}
+		String homeUrl = Config.HOME_URL();
+		if(StringUtils.isNotBlank(homeUrl)) {
+	        if(!homeUrl.endsWith("/")) {
+	            homeUrl += "/";
+	        }
+	        dataObj.put("homeUrl", homeUrl + TenantContext.get().getTenantUuid() + "/");
+		}
 		try {
 			if (content != null && !content.equals("")) {
 				Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);

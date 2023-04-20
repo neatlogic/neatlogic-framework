@@ -29,23 +29,22 @@ import java.io.File;
  * @author linbq
  * @since 2021/10/16 15:52
  **/
-//@Component
+@Component
 public class homeUrlParamHandler implements INotifyParamHandler {
 
     @Override
     public String getValue() {
-        return null;
-//        return CommonNotifyParam.HOMEURL.getValue();
+        return CommonNotifyParam.HOMEURL.getValue();
     }
 
     @Override
     public Object getText(Object object) {
         String homeUrl = Config.HOME_URL();
         if(StringUtils.isNotBlank(homeUrl)) {
-            if(!homeUrl.endsWith(File.separator)) {
-                homeUrl += File.separator;
+            if(!homeUrl.endsWith("/")) {
+                homeUrl += "/";
             }
-            return homeUrl + TenantContext.get().getTenantUuid() + File.separator;
+            return homeUrl + TenantContext.get().getTenantUuid() + "/";
         }
         return null;
     }

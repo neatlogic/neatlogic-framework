@@ -28,13 +28,11 @@ public class AnonymousApiTokenUtil {
         if (StringUtils.isBlank(source)) {
             return source;
         }
-        //source = /test/api/binary/image/download?id=314907690737664
         //source = api/binary/image/download?id=314907690737664
         System.out.println("source=" + source);
         String[] split = source.split("\\?");
         String path = split[0];
         String queryString = split[1];
-//            String tenant = path.substring(0, path.indexOf("/", 1));
         String tenant = TenantContext.get().getTenantUuid();
         int fromIndex = path.indexOf("api/");
         int beginIndex = fromIndex;
@@ -42,13 +40,15 @@ public class AnonymousApiTokenUtil {
         int endIndex = path.indexOf("/", fromIndex) + 1;
         String token = path.substring(endIndex);
         String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
-        String homeUrl = Config.HOME_URL();
-        if(StringUtils.isNotBlank(homeUrl)) {
-            if (!homeUrl.endsWith("/")) {
-                homeUrl += "/";
+        String backEndUrl = Config.BACK_END_URL();
+        if(StringUtils.isNotBlank(backEndUrl)) {
+            if (!backEndUrl.endsWith("/")) {
+                backEndUrl += "/";
             }
+        } else {
+            backEndUrl = "";
         }
-        String target = homeUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
+        String target = backEndUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
         return target;
     }
 

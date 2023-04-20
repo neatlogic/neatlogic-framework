@@ -29,12 +29,13 @@ import java.io.File;
  * @author linbq
  * @since 2021/10/16 15:52
  **/
-@Component
+//@Component
 public class homeUrlParamHandler implements INotifyParamHandler {
 
     @Override
     public String getValue() {
-        return CommonNotifyParam.HOMEURL.getValue();
+        return null;
+//        return CommonNotifyParam.HOMEURL.getValue();
     }
 
     @Override

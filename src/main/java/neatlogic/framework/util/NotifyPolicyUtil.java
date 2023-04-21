@@ -1,5 +1,6 @@
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.ConditionParamContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.GroupSearch;
@@ -10,9 +11,7 @@ import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.message.core.IMessageHandler;
 import neatlogic.framework.notify.core.*;
 import neatlogic.framework.notify.dto.*;
-import neatlogic.framework.notify.exception.NotifyHandlerNotFoundException;
 import neatlogic.framework.notify.exception.NotifyPolicyNotFoundException;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -196,11 +195,14 @@ public class NotifyPolicyUtil {
                 }
                 notifyBuilder.addFileList(fileList);
                 NotifyVo notifyVo = notifyBuilder.build();
-                /** 通知出现异常时，防止循环调用本方法 */
+                /* 通知出现异常时，防止循环调用本方法 */
                 if (callerData instanceof NotifyVo) {
                     notifyVo.setIsSendExceptionNotify(((NotifyVo) callerData).getIsSendExceptionNotify());
                 }
-                /** 发送通知 **/
+                /* 发送通知 */
+                notifyVo.setCallerData(callerData);
+                notifyVo.setCallerMessageHandlerClass(newsHandlerClass);
+                notifyVo.setCallerNotifyPolicyVo(notifyPolicyVo);
                 boolean isSentSuccessfully = handler.execute(notifyVo);
                 audit(policyHandler.getName(), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
             }

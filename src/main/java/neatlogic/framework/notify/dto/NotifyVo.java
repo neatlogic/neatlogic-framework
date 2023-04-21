@@ -1,19 +1,17 @@
 package neatlogic.framework.notify.dto;
 
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.file.dto.FileVo;
+import neatlogic.framework.message.core.IMessageHandler;
+import neatlogic.framework.notify.core.INotifyTriggerType;
+import neatlogic.framework.util.FreemarkerUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import neatlogic.framework.file.dto.FileVo;
-import neatlogic.framework.message.core.IMessageHandler;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
-import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.util.FreemarkerUtil;
 
 public class NotifyVo {
     /**
@@ -68,6 +66,21 @@ public class NotifyVo {
      * 实际接收对象列表
      */
     private List<String> actualRecipientList;
+
+    /**
+     * 发起对象，用于异常通知
+     */
+    private Object callerData;
+
+    /**
+     * 发起对象通知策略类型，用于异常通知
+     */
+    private Class<? extends IMessageHandler> callerMessageHandlerClass;
+
+    /**
+     * 发起对象通知策略，用于异常通知
+     */
+    private NotifyPolicyVo callerNotifyPolicyVo;
 
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
@@ -186,6 +199,30 @@ public class NotifyVo {
 
     public void setActualRecipientList(List<String> actualRecipientList) {
         this.actualRecipientList = actualRecipientList;
+    }
+
+    public Object getCallerData() {
+        return callerData;
+    }
+
+    public void setCallerData(Object callerData) {
+        this.callerData = callerData;
+    }
+
+    public Class<? extends IMessageHandler> getCallerMessageHandlerClass() {
+        return callerMessageHandlerClass;
+    }
+
+    public void setCallerMessageHandlerClass(Class<? extends IMessageHandler> callerMessageHandlerClass) {
+        this.callerMessageHandlerClass = callerMessageHandlerClass;
+    }
+
+    public NotifyPolicyVo getCallerNotifyPolicyVo() {
+        return callerNotifyPolicyVo;
+    }
+
+    public void setCallerNotifyPolicyVo(NotifyPolicyVo callerNotifyPolicyVo) {
+        this.callerNotifyPolicyVo = callerNotifyPolicyVo;
     }
 
     public static class Builder {
@@ -312,6 +349,8 @@ public class NotifyVo {
         public List<String> getToRoleUuidList() {
             return toRoleUuidList;
         }
+
+
 
         @Override
         public boolean equals(Object o) {

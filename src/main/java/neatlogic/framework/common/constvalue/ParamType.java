@@ -73,7 +73,7 @@ public enum ParamType implements IEnum{
 			case NUMBER : 
 				return "${DATA." + name + "}";
 			case ARRAY : 
-				return "<#if DATA." + name + "?? && (DATA." + name + "?size > 0)><#list DATA." + name + " as item>${item_index}-${item}<#if item_has_next>,</#if></#list></#if>";
+				return "<#if DATA." + name + "?? && (DATA." + name + "?size > 0)><#list DATA." + name + " as item>${item}<#if item_has_next><br></#if></#list></#if>";
 			case DATE : 
 				return "${DATA." + name + "}";
 			default : break;

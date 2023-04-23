@@ -78,8 +78,8 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                     for (NotifyTreeVo childNotifyTreeVo : notifyTreeVo.getChildren()) {
                         childNotifyTreeVo.setName(I18nUtils.getMessage(childNotifyTreeVo.getName()));
                         if (CollectionUtils.isNotEmpty(childNotifyTreeVo.getChildren())) {
-                            for (NotifyTreeVo childNotifyTreeVo1 : childNotifyTreeVo.getChildren()) {
-                                childNotifyTreeVo1.setName(I18nUtils.getMessage(childNotifyTreeVo1.getName()));
+                            for (NotifyTreeVo secondChildNotifyTreeVo : childNotifyTreeVo.getChildren()) {
+                                secondChildNotifyTreeVo.setName(I18nUtils.getMessage(secondChildNotifyTreeVo.getName()));
                             }
                         }
                     }

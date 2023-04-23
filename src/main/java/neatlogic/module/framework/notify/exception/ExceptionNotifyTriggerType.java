@@ -17,18 +17,17 @@
 package neatlogic.module.framework.notify.exception;
 
 import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ExceptionNotifyTriggerType implements INotifyTriggerType {
 
-    EMAILNOTIFYEXCEPTION("emailnotifyexception", new I18n("enum.framework.exceptionnotifytriggertype.emailnotifyexception"), new I18n("enum.framework.exceptionnotifytriggertype.emailnotifyexception.1"));
+    EMAILNOTIFYEXCEPTION("emailnotifyexception", "enum.framework.exceptionnotifytriggertype.emailnotifyexception", "enum.framework.exceptionnotifytriggertype.emailnotifyexception.1");
 
     private final String trigger;
-    private final I18n text;
-    private final I18n description;
+    private final String text;
+    private final String description;
 
-    ExceptionNotifyTriggerType(String _trigger, I18n _text, I18n _description) {
+    ExceptionNotifyTriggerType(String _trigger, String _text, String _description) {
         this.trigger = _trigger;
         this.text = _text;
         this.description = _description;
@@ -41,7 +40,7 @@ public enum ExceptionNotifyTriggerType implements INotifyTriggerType {
 
     @Override
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return text;
     }
 
     @Override

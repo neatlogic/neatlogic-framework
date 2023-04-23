@@ -16,6 +16,8 @@
 
 package neatlogic.framework.notify.core;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.notify.dto.NotifyVo;
 import neatlogic.module.framework.notify.exception.ExceptionNotifyThread;
@@ -34,6 +36,13 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
             logger.error(notifyVo.getError());
             if (notifyVo.getIsSendExceptionNotify() == 1) {
                 notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
+                notifyVo.appendError("<br>Data：<xmp>");
+                notifyVo.appendError(JSONObject.toJSONString(notifyVo.getData(), SerializerFeature.PrettyFormat));
+                notifyVo.appendError("</xmp><br>TitleTemplate：<xmp>");
+                notifyVo.appendError(notifyVo.getTemplateTitle());
+                notifyVo.appendError("</xmp><br>contentTemplate：<xmp>");
+                notifyVo.appendError(notifyVo.getTemplateContent());
+                notifyVo.appendError("</xmp><br>");
                 CachedThreadPool.execute(new ExceptionNotifyThread(notifyVo, ExceptionNotifyTriggerType.EMAILNOTIFYEXCEPTION));
             }
             return false;

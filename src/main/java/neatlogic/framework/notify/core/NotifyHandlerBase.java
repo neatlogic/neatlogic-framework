@@ -36,9 +36,9 @@ public abstract class NotifyHandlerBase implements INotifyHandler {
             logger.error(notifyVo.getError());
             if (notifyVo.getIsSendExceptionNotify() == 1) {
                 notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
-                notifyVo.appendError("<br>Data：<xmp>");
+                notifyVo.appendError("<br>data：<xmp>");
                 notifyVo.appendError(JSONObject.toJSONString(notifyVo.getData(), SerializerFeature.PrettyFormat));
-                notifyVo.appendError("</xmp><br>TitleTemplate：<xmp>");
+                notifyVo.appendError("</xmp><br>titleTemplate：<xmp>");
                 notifyVo.appendError(notifyVo.getTemplateTitle());
                 notifyVo.appendError("</xmp><br>contentTemplate：<xmp>");
                 notifyVo.appendError(notifyVo.getTemplateContent());

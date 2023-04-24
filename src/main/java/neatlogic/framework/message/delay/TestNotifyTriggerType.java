@@ -1,7 +1,6 @@
 package neatlogic.framework.message.delay;
 
 import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.util.I18n;
 
 /**
  * @Title: TestNotifyTriggerType
@@ -25,13 +24,13 @@ import neatlogic.framework.util.I18n;
  **/
 public enum TestNotifyTriggerType implements INotifyTriggerType {
 
-    TEST("test", new I18n("enum.framework.testnotifytriggertype.test"), new I18n("enum.framework.testnotifytriggertype.test.1"));
+    TEST("test", "enum.framework.testnotifytriggertype.test", "enum.framework.testnotifytriggertype.test.1");
 
     private String trigger;
-    private I18n text;
-    private I18n description;
+    private String text;
+    private String description;
 
-    private TestNotifyTriggerType(String _trigger, I18n _text, I18n _description) {
+    private TestNotifyTriggerType(String _trigger, String _text, String _description) {
         this.trigger = _trigger;
         this.text = _text;
         this.description = _description;

@@ -22,7 +22,8 @@ import neatlogic.framework.util.I18nUtils;
 public enum NotifyHandlerType {
 
     EMAIL("email", new I18n("enum.framework.notifyhandlertype.email")),
-    MESSAGE("message", new I18n("enum.framework.notifyhandlertype.message"));
+    MESSAGE("message", new I18n("enum.framework.notifyhandlertype.message")),
+    WECHAT("wechat", new I18n("enum.framework.notifyhandlertype.wechat"));
 
     private final String value;
     private final I18n text;

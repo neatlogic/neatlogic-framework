@@ -102,6 +102,8 @@ public class Config {
     private static String WECHAT_ACCESS_TOKEN_URL;//获取企业微信token链接
     private static String WECHAT_USERINFO_URL;//获取企业微信user链接
 
+    private static String WECHAT_SEND_MESSAGE_URL; //推送企业微信通知链接
+
     private static String LICENSE_PK; //license公钥
 
     private static String LICENSE; //license
@@ -347,6 +349,10 @@ public class Config {
         return WECHAT_APP_AGENT_ID;
     }
 
+    public static String WECHAT_SEND_MESSAGE_URL() {
+        return WECHAT_SEND_MESSAGE_URL;
+    }
+
     public static String LICENSE_PK() {
         return LICENSE_PK;
     }
@@ -442,6 +448,7 @@ public class Config {
 
             WECHAT_ACCESS_TOKEN_URL = prop.getProperty("wechat.access.token.url", "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=CorpID&corpsecret=SECRET");
             WECHAT_USERINFO_URL = prop.getProperty("wechat.userinfo.url", "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=ACCESS_TOKEN&code=CODE&agentid=AGENTID");
+            WECHAT_SEND_MESSAGE_URL = prop.getProperty("wechat.send.message.url", "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN");
             WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
             WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
             WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");

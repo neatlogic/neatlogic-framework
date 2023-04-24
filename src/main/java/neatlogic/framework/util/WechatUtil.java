@@ -16,13 +16,20 @@ limitations under the License.
 
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.wechat.WechatGetUserIdFailedException;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class WechatUtil {
     private static final Logger logger = LoggerFactory.getLogger(WechatUtil.class);
@@ -65,6 +72,12 @@ public class WechatUtil {
         return accessToken;
     }
 
+    public static AccessToken getAccessToken() {
+        String corpID = Config.WECHAT_CORP_ID();
+        String appSecret = Config.WECHAT_APP_SECRET();
+        return getAccessToken(corpID , appSecret);
+    }
+
     /**
      * 根据code获取成员信息
      *
@@ -93,6 +106,110 @@ public class WechatUtil {
             throw new WechatGetUserIdFailedException("wechat getUserId api return empty!");
         }
         return UserId;
+    }
+
+    public static JSONObject httpRequest(String request, String RequestMethod, String output) {
+        JSONObject jsonObject = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            URL url = new URL(request);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setRequestMethod(RequestMethod);
+            if (output != null) {
+                OutputStream out = connection.getOutputStream();
+                out.write(output.getBytes("UTF-8"));
+                out.close();
+            }
+            InputStream input = connection.getInputStream();
+            InputStreamReader inputReader = new InputStreamReader(input, "UTF-8");
+            BufferedReader reader = new BufferedReader(inputReader);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+            reader.close();
+            inputReader.close();
+            input.close();
+            input = null;
+            connection.disconnect();
+            jsonObject = JSONObject.parseObject(buffer.toString());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return jsonObject;
+    }
+
+    /***
+     * textcard 卡片消息格式 详细参数可参数：https://developer.work.weixin.qq.com/document/path/90250
+     * @param toUser 发送用户
+     * @param title  卡片标题
+     * @param content 卡片内容
+     * @return
+     */
+    public static JSONObject getTextCardMsg(String toUser , String title , String content ){
+        String forwardURL = "";
+        content = content.trim();
+        //插件个性化跳转url，存放模板内插件内部处理
+        if(content.indexOf("@link:") > -1 ){
+            forwardURL = content.substring(content.lastIndexOf("@link:")+6 , content.length());
+            String corpID = Config.WECHAT_CORP_ID();
+            forwardURL = forwardURL.replace("CorpID", corpID);
+            content = content.substring(0 ,content.lastIndexOf("@link:")-1);
+        }
+        JSONObject data = new JSONObject();
+        data.put("touser",toUser);//消息接收者，多个接收者用‘|’分隔
+        data.put("msgtype","textcard"); //卡片消息类型，此时固定为：textcard
+        JSONObject textCard= new JSONObject();
+        textCard.put("title",title);
+        textCard.put("description",content);
+        textCard.put("url", forwardURL); //必须存在
+        data.put("textcard" , textCard);
+        data.put("safe","0"); //是否是保密消息，0表示否，1表示是，默认0
+        return data;
+    }
+
+    /***
+     * text文本消息格式 详细参数可参数：https://developer.work.weixin.qq.com/document/path/90250
+     * @param toUser 发送用户
+     * @param title  卡片标题
+     * @param content 卡片内容
+     * @return
+     */
+    public static JSONObject getTextMsg(String toUser , String title , String content ){
+        JSONObject data = new JSONObject();
+        data.put("touser",toUser);//消息接收者，多个接收者用‘|’分隔
+        data.put("msgtype","text"); //消息类型，此时固定为：text
+        JSONObject textObj= new JSONObject();
+        textObj.put("content",content);
+        data.put("text" , textObj);
+        data.put("safe","0"); //是否是保密消息，0表示否，1表示是，默认0
+        return data;
+    }
+
+    /***
+     * 发送消息
+     * @param access_token
+     * @param data
+     * @return
+     */
+    public static int sendMessage(String access_token, JSONObject data) {
+        int result = 0;
+        String messageUrl = Config.WECHAT_SEND_MESSAGE_URL();
+        data.put("agentid",  Config.WECHAT_APP_AGENT_ID());
+        messageUrl = messageUrl.replace("ACCESS_TOKEN", access_token);
+
+        JSONObject jsonobject = httpRequest(messageUrl, "POST", data.toString());
+        if (null != jsonobject) {
+            result = jsonobject.getIntValue("errcode");
+            if (0 != result) {
+                logger.error("wechat send message，errcode:{} errmsg:{}", result, jsonobject.getString("errmsg"));
+                throw new RuntimeException("wechat send message，errcode:{} errmsg:{}"+ result +",msg:"+jsonobject.getString("errmsg"));
+            }
+        }
+        return result;
     }
 
     public static class AccessToken {

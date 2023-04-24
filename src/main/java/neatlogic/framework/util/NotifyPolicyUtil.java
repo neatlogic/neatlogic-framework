@@ -80,7 +80,7 @@ public class NotifyPolicyUtil {
         List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
         List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
         /** 注入流程作业信息 不够将来再补充 **/
-        JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData);
+        JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
         /** 模板列表 **/
         List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
         Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));

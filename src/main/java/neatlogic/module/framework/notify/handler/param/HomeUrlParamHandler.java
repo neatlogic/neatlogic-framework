@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @since 2021/10/16 15:52
  **/
 @Component
-public class homeUrlParamHandler implements INotifyParamHandler {
+public class HomeUrlParamHandler implements INotifyParamHandler {
 
     @Override
     public String getValue() {

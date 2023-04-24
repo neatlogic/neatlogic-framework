@@ -72,7 +72,19 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
     public static List<NotifyTreeVo> getModuleTreeVoList() {
         if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
             List<NotifyTreeVo> moduleTreeListTmp = JSONArray.parseArray(JSON.toJSONString(moduleTreeVoList), NotifyTreeVo.class);
-            moduleTreeListTmp.forEach(o -> o.setName(I18nUtils.getMessage(o.getName())));
+            for (NotifyTreeVo notifyTreeVo : moduleTreeListTmp) {
+                notifyTreeVo.setName(I18nUtils.getMessage(notifyTreeVo.getName()));
+                if (CollectionUtils.isNotEmpty(notifyTreeVo.getChildren())) {
+                    for (NotifyTreeVo childNotifyTreeVo : notifyTreeVo.getChildren()) {
+                        childNotifyTreeVo.setName(I18nUtils.getMessage(childNotifyTreeVo.getName()));
+                        if (CollectionUtils.isNotEmpty(childNotifyTreeVo.getChildren())) {
+                            for (NotifyTreeVo secondChildNotifyTreeVo : childNotifyTreeVo.getChildren()) {
+                                secondChildNotifyTreeVo.setName(I18nUtils.getMessage(secondChildNotifyTreeVo.getName()));
+                            }
+                        }
+                    }
+                }
+            }
             return moduleTreeListTmp;
         }
         return moduleTreeVoList;

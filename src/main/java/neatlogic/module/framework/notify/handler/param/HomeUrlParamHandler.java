@@ -14,25 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package neatlogic.module.framework.notify.exception;
+package neatlogic.module.framework.notify.handler.param;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.notify.constvalue.CommonNotifyParam;
 import neatlogic.framework.notify.core.INotifyParamHandler;
 import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.notify.dto.NotifyVo;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
- * @author laiwt
- * @since 2021/10/28 16:55
+ * @author linbq
+ * @since 2021/10/16 15:52
  **/
-public abstract class ExceptionNotifyParamHandlerBase implements INotifyParamHandler {
+@Component
+public class HomeUrlParamHandler implements INotifyParamHandler {
+
+    @Override
+    public String getValue() {
+        return CommonNotifyParam.HOMEURL.getValue();
+    }
 
     @Override
     public Object getText(Object object, INotifyTriggerType notifyTriggerType) {
-        if (object instanceof NotifyVo) {
-            return getMyText((NotifyVo) object);
+        String homeUrl = Config.HOME_URL();
+        if(StringUtils.isNotBlank(homeUrl)) {
+            if(!homeUrl.endsWith("/")) {
+                homeUrl += "/";
+            }
+            return homeUrl + TenantContext.get().getTenantUuid() + "/";
         }
         return null;
     }
-
-    public abstract Object getMyText(NotifyVo notifyVo);
 }

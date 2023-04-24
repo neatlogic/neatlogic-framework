@@ -3,6 +3,7 @@ package neatlogic.framework.exception.type;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.exception.core.ApiException;
+import neatlogic.framework.util.I18n;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class PermissionDeniedException extends ApiException {
         super(key, values);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {
-        super("exception.framework.permissiondeniedexception.1", AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName());
+        super("exception.framework.permissiondeniedexception.1", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
     }
 
     public PermissionDeniedException(List<String> authNameList) {

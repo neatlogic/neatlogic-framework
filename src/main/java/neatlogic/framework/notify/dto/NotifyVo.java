@@ -27,9 +27,17 @@ public class NotifyVo {
      */
     private String title;
     /**
+     * 邮件标题模板
+     */
+    private String templateTitle;
+    /**
      * 邮件内容
      */
     private String content;
+    /**
+     * 邮件内容模板
+     */
+    private String templateContent;
     /**
      * 附件列表
      */
@@ -89,6 +97,8 @@ public class NotifyVo {
         this.messageHandlerAndRecipientVo = new MessageHandlerAndRecipientVo(builder);
         this.fcd = builder.fcd;
         this.fileList = builder.fileList;
+        this.templateTitle = builder.templateTitle;
+        this.templateContent = builder.templateContent;
         try {
             title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
         } catch (Exception e) {
@@ -107,6 +117,14 @@ public class NotifyVo {
 
     public String getContent() {
         return content;
+    }
+
+    public String getTemplateTitle() {
+        return templateTitle;
+    }
+
+    public String getTemplateContent() {
+        return templateContent;
     }
 
     public List<FileVo> getFileList() {

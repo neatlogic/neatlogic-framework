@@ -95,17 +95,20 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 hasTenant = true;
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
+                logger.warn("======= defaultLoginAuth: ");
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 userVo = defaultLoginAuth.auth(cachedRequest, response);
                 AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
                     authType = request.getHeader("AuthType");
+                    logger.warn("======= AuthType: " + authType);
                     logger.info("AuthType: " + authType);
                     if (StringUtils.isNotBlank(authType)) {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
                         if (loginAuth != null) {
                             userVo = loginAuth.auth(cachedRequest, response);
                             if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+                                logger.warn("======= userUuid: " + userVo.getUuid());
                                 authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                                 UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
@@ -119,6 +122,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     if (authenticationInfoVo == null) {
                         authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                         UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                        logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
                     }
                     isUnExpired = userExpirationValid();
                     isAuth = true;
@@ -132,25 +136,30 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     response.setStatus(521);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "租户 '" + tenant + "' 不存在或已被禁用");
+                    logger.warn("======= login error: 租户 '" + tenant + "' 不存在或已被禁用");
                 } else if (loginAuth == null) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
+                    logger.warn("======= login error: 找不到认证方式 '" + authType + "'");
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
                 } else if (userVo != null && StringUtils.isBlank(userVo.getAuthorization())) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "没有找到认证信息，请登录");
+                    logger.warn("======= login error: 没有找到认证信息，请登录");
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
                 } else if (isAuth) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
+                    logger.warn("======= login error: 会话已超时或已被终止，请重新登录");
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
                 } else {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "用户认证失败，请登录");
+                    logger.warn("======= login error: 用户认证失败，请登录");
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
                 }
                 response.setContentType(Config.RESPONSE_TYPE_JSON);

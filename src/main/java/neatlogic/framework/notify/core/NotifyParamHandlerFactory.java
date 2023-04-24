@@ -42,12 +42,12 @@ public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
         return map.get(handler);
     }
 
-    public static JSONObject getData(List<String> paramList, Object object) {
+    public static JSONObject getData(List<String> paramList, Object object, INotifyTriggerType notifyTriggerType) {
         JSONObject resultObj = new JSONObject();
         for (String param : paramList) {
             INotifyParamHandler handler = map.get(param);
             if (handler != null) {
-                Object text = handler.getText(object);
+                Object text = handler.getText(object, notifyTriggerType);
 //                System.out.println(param + "-->" + JSONObject.toJSONString(text));
                 resultObj.put(param, text);
             }

@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.notify.exception;
 
 import neatlogic.framework.notify.core.INotifyParamHandler;
+import neatlogic.framework.notify.core.INotifyTriggerType;
 import neatlogic.framework.notify.dto.NotifyVo;
 
 /**
@@ -26,7 +27,7 @@ import neatlogic.framework.notify.dto.NotifyVo;
 public abstract class ExceptionNotifyParamHandlerBase implements INotifyParamHandler {
 
     @Override
-    public Object getText(Object object) {
+    public Object getText(Object object, INotifyTriggerType notifyTriggerType) {
         if (object instanceof NotifyVo) {
             return getMyText((NotifyVo) object);
         }

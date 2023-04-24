@@ -20,10 +20,9 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.notify.constvalue.CommonNotifyParam;
 import neatlogic.framework.notify.core.INotifyParamHandler;
+import neatlogic.framework.notify.core.INotifyTriggerType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
 
 /**
  * @author linbq
@@ -38,7 +37,7 @@ public class homeUrlParamHandler implements INotifyParamHandler {
     }
 
     @Override
-    public Object getText(Object object) {
+    public Object getText(Object object, INotifyTriggerType notifyTriggerType) {
         String homeUrl = Config.HOME_URL();
         if(StringUtils.isNotBlank(homeUrl)) {
             if(!homeUrl.endsWith("/")) {

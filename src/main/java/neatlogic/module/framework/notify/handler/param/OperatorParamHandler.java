@@ -19,6 +19,7 @@ package neatlogic.module.framework.notify.handler.param;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.notify.constvalue.CommonNotifyParam;
 import neatlogic.framework.notify.core.INotifyParamHandler;
+import neatlogic.framework.notify.core.INotifyTriggerType;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +35,7 @@ public class OperatorParamHandler implements INotifyParamHandler {
     }
 
     @Override
-    public Object getText(Object object) {
+    public Object getText(Object object, INotifyTriggerType notifyTriggerType) {
         UserContext userContext = UserContext.get();
         if (userContext != null) {
             return userContext.getUserName();

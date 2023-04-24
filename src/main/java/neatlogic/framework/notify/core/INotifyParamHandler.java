@@ -23,5 +23,5 @@ package neatlogic.framework.notify.core;
 public interface INotifyParamHandler {
     String getValue();
 
-    Object getText(Object object);
+    Object getText(Object object, INotifyTriggerType notifyTriggerType);
 }

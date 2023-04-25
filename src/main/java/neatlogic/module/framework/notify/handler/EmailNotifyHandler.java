@@ -128,6 +128,8 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         for (UserVo user : toUserSet) {
             if (StringUtils.isNotBlank(user.getEmail())) {
                 toEmailSet.add(user.getEmail());
+            } else {
+                logger.error("接收对象用户：”" + user.getUserName() + "(" + user.getUserId() + ")”没有设置邮箱地址");
             }
         }
         if (CollectionUtils.isEmpty(toEmailSet)) {

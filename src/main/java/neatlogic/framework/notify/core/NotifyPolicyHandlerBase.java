@@ -102,6 +102,17 @@ public abstract class NotifyPolicyHandlerBase implements INotifyPolicyHandler{
 	
 	protected abstract List<ConditionParamVo> mySystemParamList();
 
+	protected ConditionParamVo createConditionParam(INotifyParam param) {
+		ConditionParamVo paramVo = new ConditionParamVo();
+		paramVo.setName(param.getValue());
+		paramVo.setLabel(param.getText());
+		paramVo.setParamType(param.getParamType().getName());
+		paramVo.setParamTypeName(param.getParamType().getText());
+		paramVo.setFreemarkerTemplate(param.getFreemarkerTemplate());
+		paramVo.setIsEditable(0);
+		return paramVo;
+	}
+
     @Override
     public List<ConditionParamVo> getSystemConditionOptionList() {
         return mySystemConditionOptionList();

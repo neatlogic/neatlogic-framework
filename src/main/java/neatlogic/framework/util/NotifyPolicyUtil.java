@@ -190,6 +190,8 @@ public class NotifyPolicyUtil {
                                     notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
                                 }
                             }
+                        } else {
+                            logger.error("触发点：”" + notifyTriggerType + "“的接收对象：“" + receiver + "”找不到对应的用户、组、角色等数据");
                         }
                     }
                 }

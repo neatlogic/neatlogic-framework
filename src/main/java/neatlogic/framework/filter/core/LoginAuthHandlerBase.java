@@ -79,6 +79,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         }
         //如果不存在 cookie authorization，则构建jwt,以便下次认证直接走 default 认证
         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid()) && StringUtils.isBlank(userVo.getCookieAuthorization())) {
+            logger.warn("======= myAuth: " + getType() + userVo.getUserId());
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
             userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));

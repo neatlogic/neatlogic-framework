@@ -23,6 +23,7 @@ import neatlogic.framework.notify.dto.NotifyPolicyConfigVo;
 import neatlogic.framework.notify.dto.NotifyPolicyVo;
 import neatlogic.framework.notify.dto.NotifyVo;
 import neatlogic.framework.util.NotifyPolicyUtil;
+import neatlogic.module.framework.message.handler.ExceptionMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class ExceptionNotifyThread extends NeatLogicThread {
                 NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
                 if (policyConfig != null) {
                     String notifyPolicyHandler = notifyPolicyVo.getHandler();
-                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, null, notifyPolicyVo, null, null, null, notifyVo, null, "");
+                    NotifyPolicyUtil.execute(notifyPolicyHandler, notifyTriggerType, ExceptionMessageHandler.class, notifyPolicyVo, null, null, null, notifyVo, null, "");
                 }
             }
 

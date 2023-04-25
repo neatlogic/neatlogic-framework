@@ -11,28 +11,30 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.
+limitations under the License. 
  */
 
-package neatlogic.module.framework.notify.exception;
+package neatlogic.module.framework.notify.handler.param;
 
+import neatlogic.framework.notify.constvalue.CommonNotifyParam;
 import neatlogic.framework.notify.core.INotifyParamHandler;
 import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.notify.dto.NotifyVo;
+import org.springframework.stereotype.Component;
 
-/**
- * @author laiwt
- * @since 2021/10/28 16:55
- **/
-public abstract class ExceptionNotifyParamHandlerBase implements INotifyParamHandler {
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Component
+public class CurrentTimeParamHandler implements INotifyParamHandler {
+
+    @Override
+    public String getValue() {
+        return CommonNotifyParam.CURRENT_TIME.getValue();
+    }
 
     @Override
     public Object getText(Object object, INotifyTriggerType notifyTriggerType) {
-        if (object instanceof NotifyVo) {
-            return getMyText((NotifyVo) object);
-        }
-        return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date());
     }
-
-    public abstract Object getMyText(NotifyVo notifyVo);
 }

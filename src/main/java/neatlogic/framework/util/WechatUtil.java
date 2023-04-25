@@ -17,8 +17,10 @@ limitations under the License.
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.wechat.WechatGetUserIdFailedException;
+import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -108,40 +110,6 @@ public class WechatUtil {
         return UserId;
     }
 
-    public static JSONObject httpRequest(String request, String RequestMethod, String output) {
-        JSONObject jsonObject = null;
-        StringBuffer buffer = new StringBuffer();
-        try {
-            URL url = new URL(request);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setUseCaches(false);
-            connection.setRequestMethod(RequestMethod);
-            if (output != null) {
-                OutputStream out = connection.getOutputStream();
-                out.write(output.getBytes("UTF-8"));
-                out.close();
-            }
-            InputStream input = connection.getInputStream();
-            InputStreamReader inputReader = new InputStreamReader(input, "UTF-8");
-            BufferedReader reader = new BufferedReader(inputReader);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            reader.close();
-            inputReader.close();
-            input.close();
-            input = null;
-            connection.disconnect();
-            jsonObject = JSONObject.parseObject(buffer.toString());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        return jsonObject;
-    }
-
     /***
      * textcard 卡片消息格式 详细参数可参数：https://developer.work.weixin.qq.com/document/path/90250
      * @param toUser 发送用户
@@ -174,11 +142,10 @@ public class WechatUtil {
     /***
      * text文本消息格式 详细参数可参数：https://developer.work.weixin.qq.com/document/path/90250
      * @param toUser 发送用户
-     * @param title  卡片标题
-     * @param content 卡片内容
+     * @param content 消息内容
      * @return
      */
-    public static JSONObject getTextMsg(String toUser , String title , String content ){
+    public static JSONObject getTextMsg(String toUser, String content ){
         JSONObject data = new JSONObject();
         data.put("touser",toUser);//消息接收者，多个接收者用‘|’分隔
         data.put("msgtype","text"); //消息类型，此时固定为：text
@@ -201,7 +168,11 @@ public class WechatUtil {
         data.put("agentid",  Config.WECHAT_APP_AGENT_ID());
         messageUrl = messageUrl.replace("ACCESS_TOKEN", access_token);
 
-        JSONObject jsonobject = httpRequest(messageUrl, "POST", data.toString());
+        HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(messageUrl).setPayload(data.toJSONString()).sendRequest();
+        if (StringUtils.isNotBlank(httpRequestUtil.getError())) {
+            throw new RuntimeException(httpRequestUtil.getError());
+        }
+        JSONObject jsonobject = httpRequestUtil.getResultJson();
         if (null != jsonobject) {
             result = jsonobject.getIntValue("errcode");
             if (0 != result) {

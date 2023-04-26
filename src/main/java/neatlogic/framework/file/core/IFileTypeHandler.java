@@ -32,6 +32,14 @@ public interface IFileTypeHandler {
     boolean valid(String userUuid, FileVo fileVo, JSONObject jsonObj) throws Exception;
 
     /**
+     * 校验附件是否允许删除
+     * @param fileVo 附件信息
+     * @return
+     */
+    default boolean validDeleteFile(FileVo fileVo) {
+        return false;
+    }
+    /**
      * 文件名是否唯一，如果返回true，相同名字的文件会被新文件覆盖
      *
      * @return 文件名是否唯一

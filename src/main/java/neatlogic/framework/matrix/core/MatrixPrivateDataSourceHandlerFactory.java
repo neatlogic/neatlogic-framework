@@ -35,7 +35,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
 
     private final static Logger logger = LoggerFactory.getLogger(MatrixPrivateDataSourceHandlerFactory.class);
     private final static Map<String, IMatrixPrivateDataSourceHandler> map = new HashMap<>();
-
+    private final static List<String> nameList = new ArrayList<>();
     private final static List<MatrixVo> list = new ArrayList<>();
 
     public static IMatrixPrivateDataSourceHandler getHandler(String uuid) {
@@ -129,14 +129,18 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
                 logger.error("私有类型矩阵：" + name + "（" + uuid + "）" + "已存在，请检查代码，不要重复");
                 System.exit(1);
             }
-            map.put(uuid, matrixPrivateDataSourceHandler);
-
+            if (nameList.contains(name)) {
+                logger.error("私有类型矩阵：" + name + "（" + uuid + "）" + "的名称已存在，请检查代码，不要重复");
+                System.exit(1);
+            }
             MatrixVo matrixVo = new MatrixVo();
             matrixVo.setUuid(uuid);
             matrixVo.setName(name);
             matrixVo.setLabel(matrixPrivateDataSourceHandler.getLabel());
             matrixVo.setType(MatrixType.PRIVATE.getValue());
             list.add(matrixVo);
+            nameList.add(name);
+            map.put(uuid, matrixPrivateDataSourceHandler);
         }
     }
 

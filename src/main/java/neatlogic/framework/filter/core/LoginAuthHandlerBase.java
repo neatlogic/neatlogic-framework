@@ -17,8 +17,10 @@
 package neatlogic.framework.filter.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
@@ -168,6 +170,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public void logout() {
+        UserSessionCache.removeItem(TenantContext.get().getTenantUuid(),UserContext.get().getUserUuid(true));
         userSessionMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
         myLogout();
     }

@@ -69,14 +69,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             throws IOException {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
-        boolean isAuth = false;
         boolean isUnExpired = false;
         boolean hasTenant = false;
         UserVo userVo = null;
         JSONObject redirectObj = new JSONObject();
-        ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth("default");
+        String authType = "default";
+        ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
         ILoginAuthHandler loginAuth = defaultLoginAuth;
-        String authType = null;
         //获取时区
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -99,7 +98,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 userVo = defaultLoginAuth.auth(cachedRequest, response);
                 AuthenticationInfoVo authenticationInfoVo = null;
-                if (userVo == null || StringUtils.isBlank(userVo.getUuid())) {
+                if (userVo == null) {
                     authType = request.getHeader("AuthType");
                     logger.warn("======= AuthType: " + authType);
                     logger.info("AuthType: " + authType);
@@ -118,18 +117,21 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         }
                     }
                 }
-                if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+                if (userVo != null) {
                     if (authenticationInfoVo == null) {
                         authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                         UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
                         logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
                     }
                     isUnExpired = userExpirationValid();
-                    isAuth = true;
+                    if (isUnExpired) {
+                        //只要获取到用户就刷新用户访问时间，防止使用中的用户登出
+                        userSessionMapper.updateUserSession(userVo.getUuid());
+                    }
                 }
             }
 
-            if (hasTenant && isAuth && isUnExpired) {
+            if (hasTenant && userVo != null && isUnExpired) {
                 filterChain.doFilter(cachedRequest, response);
             } else {
                 if (!hasTenant) {
@@ -137,31 +139,25 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "租户 '" + tenant + "' 不存在或已被禁用");
                     logger.warn("======= login error: 租户 '" + tenant + "' 不存在或已被禁用");
-                } else if (loginAuth == null) {
+                } else if (userVo == null) {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
-                    logger.warn("======= login error: 找不到认证方式 '" + authType + "'");
+                    if (loginAuth == null) {
+                        redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
+                        logger.warn("======= login error: 找不到认证方式 '" + authType + "'");
+                    } else {
+                        redirectObj.put("Message", "认证失败(" + loginAuth.getType() + ")，请重新登录");
+                        logger.warn("======= login error: 通过" + loginAuth.getType() + "认证失败，请重新登录");
+                    }
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
-                } else if (userVo != null && StringUtils.isBlank(userVo.getAuthorization())) {
-                    response.setStatus(522);
-                    redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "没有找到认证信息，请登录");
-                    logger.warn("======= login error: 没有找到认证信息，请登录");
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
-                } else if (isAuth) {
+                } else {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
                     logger.warn("======= login error: 会话已超时或已被终止，请重新登录");
                     redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
-                } else {
-                    response.setStatus(522);
-                    redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "用户认证失败，请登录");
-                    logger.warn("======= login error: 用户认证失败，请登录");
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
                 }
+                removeAuthCookie(response);
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
                 response.getWriter().print(redirectObj.toJSONString());
             }
@@ -171,12 +167,28 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             redirectObj.put("Status", "FAILED");
             redirectObj.put("Message", ex.getMessage());
             redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+            removeAuthCookie(response);
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());
         }
         //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ end");
     }
 
+    /**
+     * 登录异常后端清除neatlogic_authorization cookie，防止sso循环跳转
+     */
+    private void removeAuthCookie(HttpServletResponse response) {
+        if (TenantContext.get() != null) {
+            Cookie authCookie = new Cookie("neatlogic_authorization", null);
+            authCookie.setPath("/" + TenantContext.get().getTenantUuid());
+            authCookie.setMaxAge(0);//表示删除
+            response.addCookie(authCookie);
+        }
+    }
+
+    /**
+     * 校验用户登录超时
+     */
     private boolean userExpirationValid() {
         String userUuid = UserContext.get().getUserUuid();
         String tenant = TenantContext.get().getTenantUuid();

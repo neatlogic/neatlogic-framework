@@ -16,6 +16,7 @@
 
 package neatlogic.framework.filter.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.RoleMapper;
@@ -23,7 +24,6 @@ import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -69,20 +69,18 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String type = this.getType();
         String tenant = request.getHeader("tenant");
         UserVo userVo = myAuth(request);
-        //logger.info("loginAuth type: " + type);
-        if (userVo != null) {
-            //logger.info("get userUuId: " + userVo.getUuid());
-            //logger.info("get userId: " + userVo.getUserId());
+        //如果userVo没有uuid则这个user不合法，直接置null
+        if (userVo != null && StringUtils.isBlank(userVo.getUuid())) {
+            userVo = null;
         }
-        //如果不存在 cookie authorization，则构建jwt,以便下次认证直接走 default 认证
-        if (userVo != null && StringUtils.isNotBlank(userVo.getUuid()) && StringUtils.isBlank(userVo.getCookieAuthorization())) {
-            logger.warn("======= myAuth: " + getType() + userVo.getUserId());
+        //如果认证cookie为null 构建并设置response 认证 cookie
+        if (userVo != null && StringUtils.isBlank(userVo.getCookieAuthorization())) {
+            logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));
+            userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));//TODO 是否可以去掉，得排查后续用到的逻辑，换成使用authenticationInfoVo
             userSessionMapper.insertUserSession(userVo.getUuid());
         }
         return userVo;

@@ -124,10 +124,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
                     }
                     isUnExpired = userExpirationValid();
-                    if (isUnExpired) {
-                        //只要获取到用户就刷新用户访问时间，防止使用中的用户登出
-                        userSessionMapper.updateUserSession(userVo.getUuid());
-                    }
                 }
             }
 
@@ -207,6 +203,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 userSessionMapper.deleteUserSessionByUserUuid(userUuid);
             }
         } else {
+            //只要获取到用户就刷新用户访问时间，防止使用中的用户登出
+            userSessionMapper.updateUserSession(userUuid);
             return true;
         }
         return false;

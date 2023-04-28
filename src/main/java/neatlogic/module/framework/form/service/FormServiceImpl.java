@@ -361,8 +361,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                         }
                     }
                 }
-            } else if (dataObj instanceof String) {
-                String value = (String) dataObj;
+            } else {
+                String value = dataObj.toString();
                 valueList.add(value);
                 String text = valueTextMap.get(value);
                 if (text != null) {
@@ -384,8 +384,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                         }
                     }
                 }
-            } else if (dataObj instanceof String) {
-                String value = (String) dataObj;
+            } else {
+                String value = dataObj.toString();
                 if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
                     textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
                 } else {

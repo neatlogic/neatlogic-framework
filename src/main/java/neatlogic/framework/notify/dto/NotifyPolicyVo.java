@@ -23,6 +23,8 @@ public class NotifyPolicyVo extends BaseEditorVo {
     private NotifyPolicyConfigVo config;
     @EntityField(name = "通知策略处理器", type = ApiParamType.STRING)
     private String handler;
+    @EntityField(name = "是否是默认通知策略", type = ApiParamType.INTEGER)
+    private Integer isDefault;
 
     public NotifyPolicyVo() {
 
@@ -96,4 +98,11 @@ public class NotifyPolicyVo extends BaseEditorVo {
         this.handler = handler;
     }
 
+    public Integer getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(Integer isDefault) {
+        this.isDefault = isDefault;
+    }
 }

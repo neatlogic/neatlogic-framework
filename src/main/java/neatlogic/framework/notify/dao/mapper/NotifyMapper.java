@@ -17,9 +17,13 @@ import neatlogic.framework.notify.dto.NotifyPolicyVo;
 
 	 List<NotifyPolicyVo> getNotifyPolicyList(NotifyPolicyVo notifyPolicyVo);
 
+	 List<NotifyPolicyVo> getAllDefaultNotifyPolicyList();
+
 	 List<ValueTextVo> getNotifyPolicyListForSelect(NotifyPolicyVo notifyPolicyVo);
 
 	 NotifyPolicyVo getNotifyPolicyByHandlerLimitOne(String handler);
+
+	 NotifyPolicyVo getDefaultNotifyPolicyByHandler(String handler);
 
 	 int getNotifyPolicyCount(NotifyPolicyVo notifyPolicyVo);
 
@@ -29,6 +33,9 @@ import neatlogic.framework.notify.dto.NotifyPolicyVo;
 
 	 int updateNotifyPolicyById(NotifyPolicyVo notifyPolicyVo);
 
-	 int deleteNotifyPolicyById(Long id);
+	 int resetNotifyPolicyIsDefaultByHandler(String handler);
 
-}
+	 void updateNotifyPolicyIsDefaultById(Long id);
+
+	 int deleteNotifyPolicyById(Long id);
+ }

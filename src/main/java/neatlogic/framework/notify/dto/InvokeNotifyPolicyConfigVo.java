@@ -31,6 +31,9 @@ public class InvokeNotifyPolicyConfigVo {
     private String policyPath;
     private List<NotifyPolicyParamMappingVo> paramMappingList = new ArrayList<>();
     private String handler;
+    private int isCustom = 0;
+
+    private List<String> excludeTriggerList;
     public Long getPolicyId() {
         return policyId;
     }
@@ -69,5 +72,21 @@ public class InvokeNotifyPolicyConfigVo {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public int getIsCustom() {
+        return isCustom;
+    }
+
+    public void setIsCustom(int isCustom) {
+        this.isCustom = isCustom;
+    }
+
+    public List<String> getExcludeTriggerList() {
+        return excludeTriggerList;
+    }
+
+    public void setExcludeTriggerList(List<String> excludeTriggerList) {
+        this.excludeTriggerList = excludeTriggerList;
     }
 }

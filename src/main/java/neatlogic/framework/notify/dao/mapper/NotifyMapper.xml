@@ -6,6 +6,7 @@
 	SELECT 
 	`id`,
 	`name`,
+	`is_default` AS isDefault,
 	`handler`,
 	`config`,
 	`fcd`,
@@ -21,6 +22,7 @@
 	SELECT
 	`id`,
 	`name`,
+	`is_default` AS isDefault,
 	`handler`,
 	`config`,
 	`fcd`,
@@ -36,6 +38,7 @@
 	SELECT
 	`id`,
 	`name`,
+	`is_default` AS isDefault,
 	`handler`,
 	`fcd`,
 	`fcu`,
@@ -56,13 +59,12 @@
 	SELECT 
 	`id`,
 	`name`,
+	`is_default` AS isDefault,
 	`handler`,
 	`fcd`,
 	`fcu`,
-	<!--(SELECT `user_name` FROM `user` WHERE `uuid` = `fcu`) AS fcuName,-->
 	`lcd`,
 	`lcu`,
-	<!--(SELECT `user_name` FROM `user` WHERE `uuid` = `lcu`) AS lcuName,-->
 	IFNULL(lcd, fcd) AS actionTime
 	FROM `notify_policy`
 	WHERE `handler` = #{handler}
@@ -73,6 +75,20 @@
 	<if test="needPage">
 	limit #{startNum}, #{pageSize}
 	</if>
+	</select>
+
+	<select id="getAllDefaultNotifyPolicyList" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+	SELECT
+	`id`,
+	`name`,
+	`is_default` AS isDefault,
+	`handler`,
+	`fcd`,
+	`fcu`,
+	`lcd`,
+	`lcu`
+	FROM `notify_policy`
+	WHERE `is_default` = 1
 	</select>
 
 	<select id="getNotifyPolicyListForSelect" parameterType="neatlogic.framework.notify.dto.NotifyPolicyVo" resultType="neatlogic.framework.common.dto.ValueTextVo">
@@ -107,6 +123,7 @@
 		SELECT
 			`id`,
 			`name`,
+			`is_default` AS isDefault,
 			`handler`,
 			`config`,
 			`fcd`,
@@ -117,9 +134,26 @@
 		WHERE `handler` = #{value} limit 1
 	</select>
 
+	<select id="getDefaultNotifyPolicyByHandler" parameterType="java.lang.String" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+		SELECT
+			`id`,
+			`name`,
+			`handler`,
+			`is_default` AS isDefault,
+			`config`,
+			`fcd`,
+			`fcu`,
+			`lcd`,
+			`lcu`
+		FROM `notify_policy`
+		WHERE `handler` = #{value}
+		AND `is_default` = 1
+		limit 1
+	</select>
+
 	<insert id="insertNotifyPolicy">
-	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
-	VALUES (#{id}, #{name}, #{handler}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))
+	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `is_default`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
+	VALUES (#{id}, #{name}, #{handler}, #{isDefault}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))
 	</insert>
 
 	<update id="updateNotifyPolicyById">
@@ -129,6 +163,18 @@
 	`lcu` = #{lcu},
 	`lcd` = NOW(3)
 	WHERE `id` = #{id}
+	</update>
+
+	<update id="resetNotifyPolicyIsDefaultByHandler">
+	UPDATE `notify_policy` SET
+	`is_default` = 0
+	WHERE `handler` = #{value}
+	</update>
+
+	<update id="updateNotifyPolicyIsDefaultById">
+	UPDATE `notify_policy` SET
+	`is_default` = 1
+	WHERE `id` = #{value}
 	</update>
 
 	<delete id="deleteNotifyPolicyById">

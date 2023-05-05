@@ -899,6 +899,7 @@ CREATE TABLE IF NOT EXISTS `notify_policy` (
   `id` bigint NOT NULL COMMENT '主键',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `handler` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '不同类型策略处理器',
+  `is_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否是默认策略',
   `config` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT 'json格式配置信息',
   `fcd` timestamp(3) NULL DEFAULT NULL COMMENT '创建时间',
   `fcu` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '创建人',

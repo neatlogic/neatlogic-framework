@@ -29,7 +29,7 @@ public class InvokeNotifyPolicyConfigVo {
     private String policyName;
 
     private String policyPath;
-    private List<NotifyPolicyParamMappingVo> paramMappingList = new ArrayList<>();
+    private List<ParamMappingVo> paramMappingList = new ArrayList<>();
     private String handler;
     private int isCustom = 0;
 
@@ -58,11 +58,11 @@ public class InvokeNotifyPolicyConfigVo {
         this.policyPath = policyPath;
     }
 
-    public List<NotifyPolicyParamMappingVo> getParamMappingList() {
+    public List<ParamMappingVo> getParamMappingList() {
         return paramMappingList;
     }
 
-    public void setParamMappingList(List<NotifyPolicyParamMappingVo> paramMappingList) {
+    public void setParamMappingList(List<ParamMappingVo> paramMappingList) {
         this.paramMappingList = paramMappingList;
     }
 

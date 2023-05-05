@@ -46,6 +46,10 @@ public enum GroupSearch implements IEnum {
         return value + "#";
     }
 
+    public String addPrefix(String uuid) {
+        return getValuePlugin() + uuid;
+    }
+
     public String getText() {
         return I18nUtils.getMessage(text.toString());
     }

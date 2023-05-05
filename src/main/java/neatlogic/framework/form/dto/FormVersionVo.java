@@ -117,6 +117,10 @@ public class FormVersionVo extends BaseEditorVo {
                         if (MapUtils.isEmpty(componentObj)) {
                             continue;
                         }
+                        // 标签组件不能改变值，不放入组件列表里
+                        if (Objects.equals("formlabel", componentObj.getString("handler"))) {
+                            continue;
+                        }
                         FormAttributeVo formAttributeVo = createFormAttribute(componentObj);
                         if (formAttributeVo != null) {
                             defaultSceneFormAttributeList.add(formAttributeVo);

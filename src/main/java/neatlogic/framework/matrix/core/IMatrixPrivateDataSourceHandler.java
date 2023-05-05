@@ -51,8 +51,7 @@ public interface IMatrixPrivateDataSourceHandler {
     /**
      * 把私有矩阵插件定义的列转成属性对象
      * */
-    default void setAttribute(List<MatrixAttributeVo> matrixAttributeList , String attributeDefine){
-        JSONArray attributeArray = JSON.parseArray(attributeDefine);
+    default void setAttribute(List<MatrixAttributeVo> matrixAttributeList , JSONArray attributeArray){
         int index = 0 ;
         for (Object obj : attributeArray) {
             JSONObject jsonObj = (JSONObject) obj;

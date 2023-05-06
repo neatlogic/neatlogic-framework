@@ -1145,6 +1145,7 @@ limitations under the License.
                             `pinyin`,
                             `is_active`,
                             `user_info`,
+                            `is_super_admin`,
                             `vip_level`)
         VALUES (#{id},
                 #{uuid},
@@ -1155,6 +1156,7 @@ limitations under the License.
                 #{pinyin},
                 #{isActive},
                 #{userInfo},
+                #{isSuperAdmin},
                 #{vipLevel})
     </insert>
 

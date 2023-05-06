@@ -11,6 +11,10 @@ public class TenantModuleVo {
 	private Long tenantId;
 	@EntityField(name = "模块id", type = ApiParamType.STRING)
 	private String moduleId;
+	@EntityField(name = "ddl执行状态,1:成功 0:失败", type = ApiParamType.INTEGER)
+	private Integer ddlStatus;
+	@EntityField(name = "dml执行状态,1:成功 0:失败", type = ApiParamType.INTEGER)
+	private Integer dmlStatus;
 	@EntityField(name = "添加日期", type = ApiParamType.LONG)
 	private Date fcd;
 	@EntityField(name = "更新日期", type = ApiParamType.LONG)
@@ -48,4 +52,19 @@ public class TenantModuleVo {
 		this.lcd = lcd;
 	}
 
+	public Integer getDdlStatus() {
+		return ddlStatus;
+	}
+
+	public void setDdlStatus(Integer ddlStatus) {
+		this.ddlStatus = ddlStatus;
+	}
+
+	public Integer getDmlStatus() {
+		return dmlStatus;
+	}
+
+	public void setDmlStatus(Integer dmlStatus) {
+		this.dmlStatus = dmlStatus;
+	}
 }

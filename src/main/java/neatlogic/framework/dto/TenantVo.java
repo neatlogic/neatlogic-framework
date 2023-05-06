@@ -80,8 +80,6 @@ public class TenantVo extends BasePageVo {
     private String name;
     @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
     private Integer isActive;
-    @EntityField(name = "是否初始化样本数据", type = ApiParamType.INTEGER)
-    private Integer isNeedDemo;
     @EntityField(name = "描述", type = ApiParamType.STRING)
     private String description;
     @EntityField(name = "有效期限", type = ApiParamType.LONG)
@@ -220,11 +218,4 @@ public class TenantVo extends BasePageVo {
         this.errorMsg = errorMsg;
     }
 
-    public Integer getIsNeedDemo() {
-        return isNeedDemo;
-    }
-
-    public void setIsNeedDemo(Integer isNeedDemo) {
-        this.isNeedDemo = isNeedDemo;
-    }
 }

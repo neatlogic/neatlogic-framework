@@ -1,6 +1,7 @@
 package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.dto.TenantAuditVo;
+import neatlogic.framework.dto.TenantModuleGroupVo;
 import neatlogic.framework.dto.TenantModuleVo;
 import neatlogic.framework.dto.TenantVo;
 import org.apache.ibatis.annotations.Param;
@@ -19,7 +20,9 @@ public interface TenantMapper {
 
     List<TenantVo> searchTenant(TenantVo tenantVo);
 
-    List<String> getTenantModuleGroupByTenantId(Long tenantId);
+    List<TenantModuleGroupVo> getTenantModuleGroupByTenantId(Long tenantId);
+
+    List<TenantModuleVo> getTenantModuleByTenantId(Long tenantId);
 
     TenantVo getTenantByUuid(String tenantUuid);
 
@@ -31,11 +34,11 @@ public interface TenantMapper {
 
     int insertTenant(TenantVo tenantVo);
 
-    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup);
+    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup,@Param("isInitDml") Integer isInitDml);
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int insertTenantModule(TenantModuleVo tenantModuleVo);
+    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo,@Param("updateTag") Long updateTag);
 
     int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 

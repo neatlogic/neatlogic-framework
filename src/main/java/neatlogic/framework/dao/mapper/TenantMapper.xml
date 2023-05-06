@@ -8,9 +8,22 @@
         WHERE `hash` = #{value}
     </select>
 
-    <select id="getTenantModuleGroupByTenantId" parameterType="java.lang.Long" resultType="java.lang.String">
-        SELECT `module_group` AS moduleGroup
+    <select id="getTenantModuleGroupByTenantId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.dto.TenantModuleGroupVo">
+        SELECT `tenant_id`    as tenantId,
+               `tenant_uuid`  as tenantUuid,
+               `module_group` AS moduleGroup
         FROM `tenant_modulegroup`
+        WHERE tenant_id = #{value}
+    </select>
+
+    <select id="getTenantModuleByTenantId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.dto.TenantModuleVo">
+        SELECT `tenant_id`  AS tenantId,
+               `module_id`  as moduleId,
+               `ddl_status` as ddlStatus,
+               `dml_status` as dmlStatus
+        FROM `tenant_module`
         WHERE tenant_id = #{value}
     </select>
 
@@ -40,7 +53,7 @@
         `status`
         FROM
         `tenant_audit`
-        <include refid="searchTenantAuditCondition"></include>
+        <include refid="searchTenantAuditCondition"/>
         ORDER BY id DESC
     </select>
 
@@ -49,7 +62,7 @@
         COUNT(1)
         FROM
         `tenant_audit`
-        <include refid="searchTenantAuditCondition"></include>
+        <include refid="searchTenantAuditCondition"/>
     </select>
 
     <sql id="searchTenantCondition">
@@ -73,7 +86,7 @@
         `description`
         FROM
         `tenant`
-        <include refid="searchTenantCondition"></include>
+        <include refid="searchTenantCondition"/>
         ORDER BY id DESC
     </select>
 
@@ -82,7 +95,7 @@
         COUNT(1)
         FROM
         `tenant`
-        <include refid="searchTenantCondition"></include>
+        <include refid="searchTenantCondition"/>
     </select>
 
     <select id="checkTenantUuidIsExists" parameterType="neatlogic.framework.dto.TenantVo" resultType="int">
@@ -135,7 +148,6 @@
                               `uuid`,
                               `name`,
                               `is_active`,
-                              `is_need_demo`,
                               `expire_date`,
                               `status`,
                               `description`)
@@ -143,7 +155,6 @@
                 #{uuid},
                 #{name},
                 #{isActive},
-                #{isNeedDemo},
                 #{expireDate},
                 #{status},
                 #{description})
@@ -179,11 +190,11 @@
     </insert>
 
     <insert id="insertTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
-        INSERT INTO `tenant_module` (`tenant_id`,
-                                     `module_id`,
-                                     `fcd`)
-        VALUES (#{tenantId},
-                #{moduleId},
+        INSERT IGNORE INTO `tenant_module` (`tenant_id`,
+                                            `module_id`,
+                                            `fcd`)
+        VALUES (#{tenantModule.tenantId},
+                #{tenantModule.moduleId},
                 NOW(3))
     </insert>
 
@@ -226,10 +237,16 @@
 
     <update id="updateTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
         UPDATE
-            `tenant_module`
+        `tenant_module`
         SET `lcd` = NOW(3)
+        <if test="ddlStatus != null">
+            ,`ddl_status` = #{ddlStatus}
+        </if>
+        <if test="dmlStatus != null">
+            ,`dml_status` = #{dmlStatus}
+        </if>
         WHERE `tenant_id` = #{tenantId}
-          AND `module_id` = #{moduleId}
+        AND `module_id` = #{moduleId}
     </update>
 
     <delete id="deleteTenantModuleGroupByTenantId" parameterType="java.lang.Long">

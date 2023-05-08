@@ -26,5 +26,10 @@ public interface MongoDbMapper {
 
     List<MongoDbVo> getAllTenantMongoDb();
 
+    MongoDbVo getTenantMongoDbByTenantId(Long id);
+
     int updateTenantMongoDbPasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
+
+    int insertTenantMongodb(MongoDbVo mongoDbVo);
+
 }

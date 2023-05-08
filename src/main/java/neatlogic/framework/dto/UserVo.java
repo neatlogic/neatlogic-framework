@@ -127,7 +127,6 @@ public class UserVo extends BasePageVo implements Serializable {
     private Boolean isAutoGenerateId = true;
 
     @EntityField(name = "是否超级管理员", type = ApiParamType.BOOLEAN)
-    @JSONField(serialize = false)
     private Boolean isSuperAdmin;
 
     public UserVo() {

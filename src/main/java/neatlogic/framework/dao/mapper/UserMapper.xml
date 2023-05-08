@@ -206,6 +206,7 @@ limitations under the License.
         k.`is_active` as `isActive`,
         k.`user_info` as `userInfo`,
         k.`vip_level` as `vipLevel`,
+        k.`is_super_admin` as isSuperAdmin,
         h.`role_uuid` as `roleUuid`,
         r.`name` as `roleName`,
         r.`description`,
@@ -1378,14 +1379,15 @@ limitations under the License.
         where uuid = #{uuid}
     </update>
     <update id="updateSuperAdminByUuidList">
-        update user set is_super_admin = 1 where uuid
+        update user set is_super_admin = #{isSuperAdmin} where uuid
         in
-        <foreach collection="list" item="value" separator="," open="(" close=")">
+        <foreach collection="userUuidList" item="value" separator="," open="(" close=")">
             #{value}
         </foreach>
     </update>
     <update id="updateDelSuperAdmin">
-        update user set is_super_admin = 0
+        update user
+        set is_super_admin = 0
     </update>
 </mapper>
 

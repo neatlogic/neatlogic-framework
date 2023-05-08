@@ -1,5 +1,7 @@
 package neatlogic.framework.notify.dto;
 
+import neatlogic.framework.notify.core.INotifyTriggerType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,12 @@ public class NotifyTriggerVo {
         this.trigger = trigger;
         this.triggerName = triggerName;
         this.description = description;
+    }
+
+    public NotifyTriggerVo(INotifyTriggerType notifyTriggerType) {
+        this.trigger = notifyTriggerType.getTrigger();
+        this.triggerName = notifyTriggerType.getText();
+        this.description = notifyTriggerType.getDescription();
     }
 
     public String getTrigger() {

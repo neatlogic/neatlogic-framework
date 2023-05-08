@@ -58,7 +58,7 @@ public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
     protected List<NotifyTriggerVo> myNotifyTriggerList() {
         List<NotifyTriggerVo> returnList = new ArrayList<>();
         for (ExceptionNotifyTriggerType triggerType : ExceptionNotifyTriggerType.values()) {
-            returnList.add(new NotifyTriggerVo(triggerType.getTrigger(), I18nUtils.getMessage(triggerType.getText()), I18nUtils.getMessage(triggerType.getDescription())));
+            returnList.add(new NotifyTriggerVo(triggerType));
         }
         return returnList;
     }

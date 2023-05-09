@@ -111,20 +111,20 @@ public class ApiValidateAndHelpBase {
         }
     }
 
-	/*
-	private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
-	private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
-	private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOLL);
-	*/
+    /*
+    private static Pattern scriptPattern = Pattern.compile("<script(.*?)</script>", Pattern.CASE_INSENSITIVE);
+    private static Pattern javascriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
+    private static Pattern evalPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOLL);
+    */
 
     private static String escapeXss(String str) {
         if (StringUtils.isNotBlank(str)) {
-			/*
-			 处理js xss注入
-			 str = scriptPattern.matcher(str).replaceAll("");
-			 str = javascriptPattern.matcher(str).replaceAll("");
-			 str = evalPattern.matcher(str).replaceAll("");
-			*/
+            /*
+             处理js xss注入
+             str = scriptPattern.matcher(str).replaceAll("");
+             str = javascriptPattern.matcher(str).replaceAll("");
+             str = evalPattern.matcher(str).replaceAll("");
+            */
             str = str.replace("&", "&amp;");
             str = str.replace("<", "&lt;");
             str = str.replace(">", "&gt;");
@@ -477,11 +477,17 @@ public class ApiValidateAndHelpBase {
                             if (Objects.equals(p.type().getValue(), ApiParamType.REGEX.getValue())) {
                                 paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
                                 rule = p.rule();
-                                help = help + "，需满足正则表达式：" + RegexUtils.regexPatternMap.get(rule).toString();
+                                if (StringUtils.isNotBlank(help)) {
+                                    help += "，";
+                                }
+                                help = help + "需满足正则表达式：" + RegexUtils.regexPatternMap.get(rule).toString();
                             } else if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
                                 paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
                                 rule = getEnumMember(p);
-                                help = help + "，需满足枚举：" + rule;
+                                if (StringUtils.isNotBlank(help)) {
+                                    help += "，";
+                                }
+                                help = help + "需满足枚举：" + rule;
                             } else if (ApiParamType.NOAUTH.equals(p.type())) {
                                 paramObj.put("type", "object[任意对象]");
                             } else {

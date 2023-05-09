@@ -213,6 +213,8 @@ public interface UserMapper {
 
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
+    int deleteUserPasswordByUserUuid(String userUuid);
+
     int deleteUserByUuid(String uuid);
 
     int deleteUserRoleByUserUuid(String userUuid);

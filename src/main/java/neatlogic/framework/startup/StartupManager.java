@@ -56,7 +56,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
         Map<String, IStartup> myMap = context.getBeansOfType(IStartup.class);
         for (Map.Entry<String, IStartup> entry : myMap.entrySet()) {
             IStartup startup = entry.getValue();
-            startup.setGroupName(context.getGroupName());
+            startup.setGroup(context.getGroup());
             list.add(startup);
         }
         //模块全部加载完毕后再开始启动作业，依赖NeatLogicThread任务会等待全部模块加载完毕后再开始执行逻辑
@@ -70,10 +70,10 @@ public class StartupManager extends ModuleInitializedListenerBase {
                         for (TenantVo tenantVo : tenantList) {
                             TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
                             List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                            List<String> groupNameList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroupName).collect(Collectors.toList());
+                            List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
                             for (IStartup startup : list) {
                                 //只有拥有当前模块权限的的租户才会执行startup里的逻辑
-                                if (groupNameList.contains(startup.getGroupName())) {
+                                if (groupList.contains(startup.getGroup())) {
                                     try {
                                         startup.executeForCurrentTenant();
                                     } catch (Exception ex) {
@@ -95,27 +95,6 @@ public class StartupManager extends ModuleInitializedListenerBase {
             startupList.addAll(list);
         }
     }
-
-    /**
-     * 执行指定租户的所有启动作业，用在创建租户的场景
-     *
-     * @param tenantVo 租户信息
-     */
-    public static void executeStartup(TenantVo tenantVo) {
-        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-        List<String> groupNameList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroupName).collect(Collectors.toList());
-        for (IStartup startup : startupList) {
-            if (groupNameList.contains(startup.getGroupName())) {
-                try {
-                    startup.executeForCurrentTenant();
-                } catch (Exception ex) {
-                    logger.error("租户：" + tenantVo.getName() + "的启动作业：" + startup.getName() + "执行失败：" + ex.getMessage(), ex);
-                }
-            }
-        }
-    }
-
 
     @Override
     protected void myInit() {

@@ -6,7 +6,7 @@ package neatlogic.framework.dto;
  * @Description: Url信息类，保存url在content中的位置
  * @Author: linbq
  * @Date: 2021/3/15 12:04
-Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -21,13 +21,13 @@ package neatlogic.framework.startup;
  * @since 2022/2/9 18:44
  **/
 public abstract class StartupBase implements IStartup {
-    private String groupName;
+    private String group;
 
-    public String getGroupName() {
-        return groupName;
+    public String getGroup() {
+        return group;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

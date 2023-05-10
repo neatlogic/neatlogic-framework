@@ -28,7 +28,6 @@ public class DatasourceVo {
     private String host;
     private Integer port;
     private String url;
-    private String database;
     private String username;
     private String passwordPlain;
     private String passwordCipher;
@@ -65,14 +64,6 @@ public class DatasourceVo {
             password.append(nums[rand.nextInt(nums.length)]);
             this.passwordPlain = password.toString();
         }
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
     }
 
     public String getTenantUuid() {

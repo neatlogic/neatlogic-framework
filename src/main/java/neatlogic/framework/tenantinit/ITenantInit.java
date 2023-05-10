@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.startup;
+package neatlogic.framework.tenantinit;
 
-public interface IStartup {
+public interface ITenantInit {
+
     /**
      * 作业名称
      *
      * @return 字符串
      */
     String getName();
-
     /**
-     * 每个租户分别执行
+     * 初始化租户的时候会执行
      */
-    void executeForCurrentTenant();
-
-    /*
-    只执行一次，晚于executeForTenant执行
-     */
-    void executeForAllTenant();
-
+    void execute();
     /**
      * 排序
      *
@@ -42,14 +36,15 @@ public interface IStartup {
     int sort();
 
     /**
-     * 设置所在模块组名
+     * 设置所在模块组
      * @param group 模块组
      */
     void setGroup(String group);
 
     /**
      * 获取所在模块组
-     * @return  模块组
+     * @return 模块组
      */
     String getGroup();
+
 }

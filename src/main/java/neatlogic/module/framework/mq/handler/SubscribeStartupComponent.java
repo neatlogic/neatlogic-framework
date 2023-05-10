@@ -25,7 +25,6 @@ import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.core.SubscribeManager;
 import neatlogic.framework.mq.dao.mapper.MqSubscribeMapper;
 import neatlogic.framework.mq.dto.SubscribeVo;
-import neatlogic.framework.startup.IStartup;
 import neatlogic.framework.startup.StartupBase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -44,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SubscribeStartupComponent extends StartupBase {
     private final static Logger logger = LoggerFactory.getLogger(SubscribeStartupComponent.class);
-
     @Resource
     private MqSubscribeMapper mqSubscribeMapper;
 

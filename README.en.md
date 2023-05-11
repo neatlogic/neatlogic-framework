@@ -62,8 +62,8 @@ as allowing the scheduled job service to drift automatically.
 
 ### Heartbeat Mechanism
 
-- Each service instance has a unique service instance id, and the schedule.server.id variable needs to be configured in
-  the config file.
+- Each service instance has a unique service instance ID, which is automatically generated when the service is first
+  started, and saved in serverid.conf after generation, followed by a unique identifier for the current service.
 - Considering that there may be a firewall inside the enterprise, the heartbeat status is transmitted by the database,
   and the service instances will not send heartbeats to each other.
 - Use the heartbeat counter to judge the survival status of the service instance.

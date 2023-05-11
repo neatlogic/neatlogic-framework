@@ -213,6 +213,8 @@ public interface UserMapper {
 
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
+    int deleteUserPasswordByUserUuid(String userUuid);
+
     int deleteUserByUuid(String uuid);
 
     int deleteUserRoleByUserUuid(String userUuid);
@@ -233,7 +235,7 @@ public interface UserMapper {
 
     void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
 
-    void updateSuperAdminByUuidList(List<String> userUuIdList);
+    void updateSuperAdminByUuidList(@Param("userUuidList") List<String> userUuidList, @Param("isSuperAdmin") Integer isSuperAdmin);
 
     void updateDelSuperAdmin();
 

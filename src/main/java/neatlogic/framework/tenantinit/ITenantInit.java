@@ -14,22 +14,37 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.dao.mapper;
+package neatlogic.framework.tenantinit;
 
-import neatlogic.framework.dto.MongoDbVo;
-import org.apache.ibatis.annotations.Param;
+public interface ITenantInit {
 
-import java.util.List;
+    /**
+     * 作业名称
+     *
+     * @return 字符串
+     */
+    String getName();
+    /**
+     * 初始化租户的时候会执行
+     */
+    void execute();
+    /**
+     * 排序
+     *
+     * @return 顺序
+     */
+    int sort();
 
-public interface MongoDbMapper {
-    List<MongoDbVo> getAllActiveTenantMongoDb();
+    /**
+     * 设置所在模块组
+     * @param group 模块组
+     */
+    void setGroup(String group);
 
-    List<MongoDbVo> getAllTenantMongoDb();
-
-    MongoDbVo getTenantMongoDbByTenantId(Long id);
-
-    int updateTenantMongoDbPasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
-
-    int insertTenantMongodb(MongoDbVo mongoDbVo);
+    /**
+     * 获取所在模块组
+     * @return 模块组
+     */
+    String getGroup();
 
 }

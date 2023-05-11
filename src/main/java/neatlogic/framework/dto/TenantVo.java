@@ -98,6 +98,8 @@ public class TenantVo extends BasePageVo {
     private Integer dbPort;
     @EntityField(name = "异常信息", type = ApiParamType.STRING)
     private String errorMsg;
+    @EntityField(name = "租户mongodb", type = ApiParamType.JSONOBJECT)
+    private MongoDbVo mongodb;
 
     public TenantVo() {
         this.setPageSize(20);
@@ -218,4 +220,11 @@ public class TenantVo extends BasePageVo {
         this.errorMsg = errorMsg;
     }
 
+    public MongoDbVo getMongodb() {
+        return mongodb;
+    }
+
+    public void setMongodb(MongoDbVo mongodb) {
+        this.mongodb = mongodb;
+    }
 }

@@ -34,7 +34,7 @@ public interface TenantMapper {
 
     int insertTenant(TenantVo tenantVo);
 
-    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup,@Param("isInitDml") Integer isInitDml);
+    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup,@Param("isInitDml") Boolean isInitDml);
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 

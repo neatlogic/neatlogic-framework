@@ -17,14 +17,13 @@
 package neatlogic.module.framework.startup;
 
 import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper;
-import neatlogic.framework.startup.IStartup;
 import neatlogic.framework.startup.StartupBase;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 @Service
-public class ResetFullTextIndexRebuildAuditHandler  extends StartupBase {
+public class ResetFullTextIndexRebuildAuditHandler extends StartupBase {
     @Resource
     private FullTextIndexRebuildAuditMapper auditMapper;
 

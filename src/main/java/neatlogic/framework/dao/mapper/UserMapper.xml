@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -206,6 +206,7 @@ limitations under the License.
         k.`is_active` as `isActive`,
         k.`user_info` as `userInfo`,
         k.`vip_level` as `vipLevel`,
+        k.`is_super_admin` as isSuperAdmin,
         h.`role_uuid` as `roleUuid`,
         r.`name` as `roleName`,
         r.`description`,
@@ -1269,6 +1270,9 @@ limitations under the License.
         <if test="vipLevel != null">
             `vip_level` = #{vipLevel},
         </if>
+        <if test="isSuperAdmin != null">
+            `is_super_admin` = #{isSuperAdmin},
+        </if>
         `pinyin` = #{pinyin}
         WHERE `uuid` = #{uuid}
     </update>
@@ -1321,6 +1325,11 @@ limitations under the License.
         <foreach collection="idList" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </delete>
+
+    <delete id="deleteUserPasswordByUserUuid">
+        DELETE FROM `user_password`
+        WHERE `user_uuid` = #{value}
     </delete>
 
     <delete id="deleteUserByUuid" parameterType="java.lang.String">
@@ -1378,14 +1387,15 @@ limitations under the License.
         where uuid = #{uuid}
     </update>
     <update id="updateSuperAdminByUuidList">
-        update user set is_super_admin = 1 where uuid
+        update user set is_super_admin = #{isSuperAdmin} where uuid
         in
-        <foreach collection="list" item="value" separator="," open="(" close=")">
+        <foreach collection="userUuidList" item="value" separator="," open="(" close=")">
             #{value}
         </foreach>
     </update>
     <update id="updateDelSuperAdmin">
-        update user set is_super_admin = 0
+        update user
+        set is_super_admin = 0
     </update>
 </mapper>
 

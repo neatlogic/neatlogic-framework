@@ -40,10 +40,10 @@ public class ModuleGroupVo {
     @EntityField(name = "模块版本", type = ApiParamType.STRING)
     private String version;
 
-    @EntityField(name = "是否初始化默认数据", type = ApiParamType.STRING)
-    private Integer isInitDml = 0;
-    @EntityField(name = "是否存在初始化默认数据文件", type = ApiParamType.STRING)
-    private Integer isHasDml =0;
+    @EntityField(name = "是否初始化默认数据", type = ApiParamType.BOOLEAN)
+    private Boolean isInitDml = false;
+    @EntityField(name = "是否存在初始化默认数据文件", type = ApiParamType.BOOLEAN)
+    private Boolean isHasDml = false;
 
     public ModuleGroupVo() {
 
@@ -104,19 +104,19 @@ public class ModuleGroupVo {
     }
 
 
-    public Integer getIsInitDml() {
+    public Boolean getIsInitDml() {
         return isInitDml;
     }
 
-    public void setIsInitDml(Integer isInitDml) {
+    public void setIsInitDml(Boolean isInitDml) {
         this.isInitDml = isInitDml;
     }
 
-    public Integer getIsHasDml() {
+    public Boolean getIsHasDml() {
         return isHasDml;
     }
 
-    public void setIsHasDml(Integer isHasDml) {
+    public void setIsHasDml(Boolean isHasDml) {
         this.isHasDml = isHasDml;
     }
 }

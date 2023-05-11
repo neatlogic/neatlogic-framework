@@ -43,13 +43,13 @@ public interface IStartup {
 
     /**
      * 设置所在模块组名
-     * @param groupName
+     * @param group 模块组
      */
-    void setGroupName(String groupName);
+    void setGroup(String group);
 
     /**
-     * 获取所在模块组名
-     * @return
+     * 获取所在模块组
+     * @return  模块组
      */
-    String getGroupName();
+    String getGroup();
 }

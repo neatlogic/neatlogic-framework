@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+  Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ limitations under the License.
 <mapper namespace="neatlogic.framework.dao.mapper.DatasourceMapper">
 
     <select id="getAllActiveTenantDatasource" resultType="neatlogic.framework.dto.DatasourceVo">
-        SELECT b.`uuid`        AS tenantUuid,
-               a.`tenant_uuid` AS `database`,
+        SELECT
+               a.`tenant_uuid` AS `tenantUuid`,
                `url`,
                `username`,
                `password`      AS passwordCipher,

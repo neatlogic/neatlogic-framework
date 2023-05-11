@@ -8,7 +8,7 @@ import neatlogic.framework.notify.core.INotifyTriggerType;
  * @Description: 测试触发点，用于压测
  * @Author: linbq
  * @Date: 2021/1/12 7:49
- * Copyright(c) $today.year NeatLogic Co., Ltd. All Rights Reserved.
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

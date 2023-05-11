@@ -132,7 +132,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
         if (StringUtils.isNotBlank(resultVo.getError())) {
             logger.error(resultVo.getError());
-            throw new MatrixExternalAccessException();
+            throw new MatrixExternalAccessException(integrationVo.getName());
         } else if (StringUtils.isNotBlank(resultVo.getTransformedResult())) {
             JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
             if (MapUtils.isNotEmpty(transformedResult)) {
@@ -203,7 +203,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
         if (StringUtils.isNotBlank(resultVo.getError())) {
             logger.error(resultVo.getError());
-            throw new MatrixExternalAccessException();
+            throw new MatrixExternalAccessException(integrationVo.getName());
         }
         handler.validate(resultVo);
         JSONObject returnObj = new JSONObject();
@@ -296,7 +296,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
                     logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException();
+                    throw new MatrixExternalAccessException(integrationVo.getName());
                 }
                 handler.validate(resultVo);
                 JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
@@ -319,7 +319,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
                     logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException();
+                    throw new MatrixExternalAccessException(integrationVo.getName());
                 }
                 handler.validate(resultVo);
                 JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
@@ -394,7 +394,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                         if (StringUtils.isNotBlank(resultVo.getError())) {
                             logger.error(resultVo.getError());
-                            throw new MatrixExternalAccessException();
+                            throw new MatrixExternalAccessException(integrationVo.getName());
                         }
                         JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
                         if (MapUtils.isNotEmpty(transformedResult)) {
@@ -433,7 +433,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
                     logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException();
+                    throw new MatrixExternalAccessException(integrationVo.getName());
                 }
                 JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
                 if (MapUtils.isNotEmpty(transformedResult)) {
@@ -477,7 +477,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
             if (StringUtils.isNotBlank(resultVo.getError())) {
                 logger.error(resultVo.getError());
-                throw new MatrixExternalAccessException();
+                throw new MatrixExternalAccessException(integrationVo.getName());
             }
             handler.validate(resultVo);
             JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
@@ -498,7 +498,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
                 if (StringUtils.isNotBlank(resultVo.getError())) {
                     logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException();
+                    throw new MatrixExternalAccessException(integrationVo.getName());
                 }
                 handler.validate(resultVo);
                 JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
@@ -518,7 +518,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
             if (StringUtils.isNotBlank(resultVo.getError())) {
                 logger.error(resultVo.getError());
-                throw new MatrixExternalAccessException();
+                throw new MatrixExternalAccessException(integrationVo.getName());
             }
             handler.validate(resultVo);
             JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
@@ -700,7 +700,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         IntegrationResultVo resultVo = handler.sendRequest(integrationVo, FrameworkRequestFrom.TEST);
         if (StringUtils.isNotBlank(resultVo.getError())) {
-            throw new MatrixExternalAccessException();
+            throw new MatrixExternalAccessException(integrationVo.getName());
         }
         handler.validate(resultVo);
     }

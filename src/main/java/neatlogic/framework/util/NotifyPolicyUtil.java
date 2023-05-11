@@ -138,8 +138,8 @@ public class NotifyPolicyUtil {
                         notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
                     }
                 }
+                templateParamData.put("notifyTriggerType", notifyTriggerType.getText());
                 notifyBuilder.addAllData(templateParamData);
-                notifyBuilder.addData("notifyTriggerType", notifyTriggerType.getText());
                 /** 参数映射 **/
                 if (CollectionUtils.isNotEmpty(paramMappingList)) {
                     for (ParamMappingVo paramMappingVo : paramMappingList) {

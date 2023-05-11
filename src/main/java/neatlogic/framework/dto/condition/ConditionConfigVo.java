@@ -205,4 +205,58 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
     public void setSearchMode(String searchMode) {
         this.searchMode = searchMode;
     }
+
+    /**
+     * 将过滤器高级模式的结构转换自然语言表达式
+     * @return
+     */
+    public String getBuildNaturalLanguageExpressions() {
+        List<ConditionGroupVo> conditionGroupList = this.getConditionGroupList();
+        Map<String, ConditionGroupVo> conditionGroupMap = this.getConditionGroupMap();
+        List<ConditionGroupRelVo> conditionGroupRelList = this.getConditionGroupRelList();
+        if (CollectionUtils.isNotEmpty(conditionGroupRelList)) {
+            StringBuilder script = new StringBuilder();
+            script.append("(");
+            String toUuid = null;
+            for (ConditionGroupRelVo conditionGroupRelVo : conditionGroupRelList) {
+                script.append(getBuildNaturalLanguageExpressions(conditionGroupMap.get(conditionGroupRelVo.getFrom())));
+                script.append("and".equals(conditionGroupRelVo.getJoinType()) ? "并且" : " 或者 ");
+                toUuid = conditionGroupRelVo.getTo();
+            }
+            script.append(getBuildNaturalLanguageExpressions(conditionGroupMap.get(toUuid)));
+            script.append(")");
+            return script.toString();
+        } else if (CollectionUtils.isNotEmpty(conditionGroupList)) {
+            ConditionGroupVo conditionGroupVo = conditionGroupList.get(0);
+            return conditionGroupVo.buildScript();
+        }
+        return StringUtils.EMPTY;
+    }
+
+    private String getBuildNaturalLanguageExpressions(ConditionGroupVo conditionGroupVo) {
+        List<ConditionVo> conditionList = conditionGroupVo.getConditionList();
+        Map<String, ConditionVo> conditionMap = conditionGroupVo.getConditionMap();
+        List<ConditionRelVo> conditionRelList = conditionGroupVo.getConditionRelList();
+        if (CollectionUtils.isNotEmpty(conditionRelList)) {
+            StringBuilder script = new StringBuilder();
+            script.append("(");
+            String toUuid = null;
+            for (ConditionRelVo conditionRelVo : conditionRelList) {
+                script.append(getBuildNaturalLanguageExpressions(conditionMap.get(conditionRelVo.getFrom())));
+                script.append("and".equals(conditionRelVo.getJoinType()) ? " 并且 " : " 或者 ");
+                toUuid = conditionRelVo.getTo();
+            }
+            script.append(getBuildNaturalLanguageExpressions(conditionMap.get(toUuid)));
+            script.append(")");
+            return script.toString();
+        } else if (CollectionUtils.isNotEmpty(conditionList)) {
+            ConditionVo conditionVo = conditionList.get(0);
+            return getBuildNaturalLanguageExpressions(conditionVo);
+        }
+        return StringUtils.EMPTY;
+    }
+
+    protected String getBuildNaturalLanguageExpressions(ConditionVo conditionVo) {
+        return StringUtils.EMPTY;
+    }
 }

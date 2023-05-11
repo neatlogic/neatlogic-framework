@@ -1,5 +1,6 @@
 package neatlogic.framework.filter.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dto.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ public interface ILoginAuthHandler {
     String getType();
     
     /**
+     * 资源权限拦截
     * @Author 89770
     * @Time 2020年11月19日  
     * @Description: 认证逻辑
@@ -24,6 +26,15 @@ public interface ILoginAuthHandler {
     * @return
      */
     UserVo auth(HttpServletRequest request,HttpServletResponse response) throws Exception;
+
+
+    /**
+     * 登录认证
+     * @param userVo
+     * @param resultJson
+     * @return
+     */
+    UserVo login(UserVo userVo, JSONObject resultJson);
     
     /**
     * @Author 89770

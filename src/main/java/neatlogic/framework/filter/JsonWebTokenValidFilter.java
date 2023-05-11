@@ -17,6 +17,7 @@
 package neatlogic.framework.filter;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
@@ -73,9 +74,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         boolean hasTenant = false;
         UserVo userVo = null;
         JSONObject redirectObj = new JSONObject();
-        String authType = "default";
-        ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
-        ILoginAuthHandler loginAuth = defaultLoginAuth;
+        //认证插件名称
+        String authType = request.getHeader("AuthPlugin");
+        if(Strings.isNullOrEmpty(authType)){
+            //当插件定义参数值等同于插件名（慎用，为了兼容）
+            authType =  request.getHeader("AuthType");
+        }
+        //都找不到用默认
+        if(Strings.isNullOrEmpty(authType)){
+            authType =  "default";
+        }
+
+        ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
         //获取时区
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -94,35 +104,38 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 hasTenant = true;
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                logger.warn("======= defaultLoginAuth: ");
+                logger.warn("======= AuthType: " + authType);
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
-                userVo = defaultLoginAuth.auth(cachedRequest, response);
-                AuthenticationInfoVo authenticationInfoVo = null;
-                if (userVo == null) {
-                    authType = request.getHeader("AuthType");
-                    logger.warn("======= AuthType: " + authType);
-                    logger.info("AuthType: " + authType);
-                    if (StringUtils.isNotBlank(authType)) {
-                        loginAuth = LoginAuthFactory.getLoginAuth(authType);
-                        if (loginAuth != null) {
-                            userVo = loginAuth.auth(cachedRequest, response);
-                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                                logger.warn("======= userUuid: " + userVo.getUuid());
-                                authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
-                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                                    loginPostProcessor.loginAfterInitialization();
-                                }
-                            }
-                        }
-                    }
-                }
+                userVo = loginAuth.auth(cachedRequest, response);
+//                AuthenticationInfoVo authenticationInfoVo = null;
+//                if (userVo == null) {
+//                    authType = request.getHeader("AuthType");
+//                    logger.warn("======= AuthType: " + authType);
+//                    logger.info("AuthType: " + authType);
+//                    if (StringUtils.isNotBlank(authType)) {
+//                        loginAuth = LoginAuthFactory.getLoginAuth(authType);
+//                        if (loginAuth != null) {
+//                            userVo = loginAuth.auth(cachedRequest, response);
+//                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+//                                logger.warn("======= userUuid: " + userVo.getUuid());
+//                                authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+//                                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+//                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+//                                    loginPostProcessor.loginAfterInitialization();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 if (userVo != null) {
-                    if (authenticationInfoVo == null) {
-                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+//                    if (authenticationInfoVo == null) {
+                        AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                         UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                        for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                            loginPostProcessor.loginAfterInitialization();
+                        }
                         logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
-                    }
+//                    }
                     isUnExpired = userExpirationValid();
                 }
             }
@@ -145,13 +158,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         redirectObj.put("Message", "认证失败(" + loginAuth.getType() + ")，请重新登录");
                         logger.warn("======= login error: 通过" + loginAuth.getType() + "认证失败，请重新登录");
                     }
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+                    redirectObj.put("DirectUrl", loginAuth.directUrl());
                 } else {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
                     logger.warn("======= login error: 会话已超时或已被终止，请重新登录");
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+                    redirectObj.put("DirectUrl", loginAuth.directUrl());
                 }
                 removeAuthCookie(response);
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
@@ -162,7 +175,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setStatus(522);
             redirectObj.put("Status", "FAILED");
             redirectObj.put("Message", ex.getMessage());
-            redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+            redirectObj.put("DirectUrl", loginAuth.directUrl());
             removeAuthCookie(response);
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());

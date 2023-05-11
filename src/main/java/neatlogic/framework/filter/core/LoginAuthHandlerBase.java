@@ -21,11 +21,14 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.cache.UserSessionCache;
+import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.captcha.LoginFailedCountVo;
+import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,12 +36,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 
+import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.zip.GZIPOutputStream;
 
@@ -46,11 +51,16 @@ import java.util.zip.GZIPOutputStream;
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
 
+    @Resource
+    private LoginService loginService;
+
     public abstract String getType();
 
     protected static UserMapper userMapper;
 
     protected static RoleMapper roleMapper;
+
+    protected  static LoginMapper loginMapper;
 
     protected static UserSessionMapper userSessionMapper;
 
@@ -62,6 +72,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Autowired
     public void setRoleMapper(RoleMapper _roleMapper) {
         roleMapper = _roleMapper;
+    }
+
+    @Autowired
+    public void setLoginMapper(LoginMapper _loginMapper) {
+        loginMapper = _loginMapper;
     }
 
     @Autowired
@@ -172,10 +187,48 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     public void logout() {
         UserSessionCache.removeItem(TenantContext.get().getTenantUuid(),UserContext.get().getUserUuid(true));
         userSessionMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
-        myLogout();
+        try {
+            myLogout();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException();
+        }
     }
 
-    protected void myLogout() {
+    protected void myLogout() throws IOException {
     }
 
+    @Override
+    public String directUrl() {
+        String directUrl = myDirectUrl();
+        if(StringUtils.isBlank(directUrl)){
+            directUrl = Config.DIRECT_URL();
+        }
+        return directUrl;
+    }
+
+    protected String myDirectUrl() {
+        return null;
+    }
+
+    @Override
+    public UserVo login(UserVo userVo, JSONObject resultJson) {
+        UserVo checkUserVo = myLogin(userVo , resultJson);
+        LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
+        if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
+            int failedCount = 1;
+            loginFailedCountVo = loginMapper.getLoginFailedCountVoByUserId(userVo.getUserId());
+            if (loginFailedCountVo != null) {
+                failedCount = loginFailedCountVo.getFailedCount();
+            }
+            loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount);
+            loginMapper.updateLoginFailedCount(loginFailedCountVo);
+        } else {//如果正常用户登录成功，则清空该用户的失败次数
+            resultJson.remove("isNeedCaptcha");
+            loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
+        }
+        return checkUserVo;
+    }
+
+    public abstract UserVo myLogin(UserVo userVo, JSONObject resultJson);
 }

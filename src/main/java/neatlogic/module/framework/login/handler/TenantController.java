@@ -25,6 +25,7 @@ import neatlogic.framework.dao.mapper.ThemeMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.ThemeVo;
 import neatlogic.framework.service.TenantService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -68,7 +69,16 @@ public class TenantController {
                 themeConfig = theme.getConfig();
             }
             data.put("themeConfig", themeConfig);
-            data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
+
+            //登录插件
+            data.put("authType", Config.LOGIN_AUTH_HANDLER());
+            data.put("encrypt", Config.LOGIN_AUTH_PASSWORD_ENCRYPT());
+
+            //单点登录
+            if(StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {
+                data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
+                data.put("ssoAuthKey" , Config.SSO_AUTH_PLUGIN_KEY());
+            }
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

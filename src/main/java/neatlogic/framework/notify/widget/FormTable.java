@@ -232,7 +232,7 @@ public class FormTable implements TemplateMethodModelEx {
     }
 
     /**
-     * 生成表格，帐号，配置项修改，表格选择
+     * 生成表格，表单的帐号、配置项修改、表格选择等组件需要用到表格
      * @param tableObj
      * @return
      */

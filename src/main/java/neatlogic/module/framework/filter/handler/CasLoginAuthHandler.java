@@ -19,6 +19,7 @@ package neatlogic.module.framework.filter.handler;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.api.utils.StringUtils;
 import com.google.common.base.Strings;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
@@ -47,7 +48,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
     @Override
     public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException{
 
-        String ticket = request.getParameter("ticket");
+        String ticket = request.getHeader("AuthValue");
         String tenant = request.getHeader("Tenant");
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();
@@ -64,12 +65,16 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
             throw new ApiRuntimeException("exception.framework.login.auth.cas.no_config");
         }
 
+        if(casUrl.indexOf("http:") == -1 ){
+            casUrl = "http://" + casUrl;
+        }
+
         UserVo userVo  = null;
         boolean isFailed = true;
         try {
             String userId = "";
             TicketValidator validator = new Cas20ServiceTicketValidator(casUrl);
-            Assertion assertion = validator.validate(ticket, casUrl);
+            Assertion assertion = validator.validate(ticket, selfUrl);
             if (assertion != null && assertion.getPrincipal() != null) {
                 if(assertion.getPrincipal().getName().indexOf("@") > -1){
                     userId = assertion.getPrincipal().getName().substring(0, assertion.getPrincipal().getName().indexOf("@")).toUpperCase();
@@ -77,7 +82,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
                     userId = assertion.getPrincipal().getName().toUpperCase();
                 }
             }
-            isFailed = true ;
+            isFailed = false ;
             userVo =  new UserVo();
             userVo.setUserId(userId);
             TenantContext.init();
@@ -86,7 +91,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
             logger.info("[CAS认证成功] userId:" + userId);
         } catch (TicketValidationException e) {
             logger.error("[CAS认证失败]" + e.getMessage());
-            isFailed = false;
+            isFailed = true;
         }
 
         if(isFailed){
@@ -99,15 +104,15 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Override
     public String myDirectUrl() {
-        HttpServletRequest request=  UserContext.get().getRequest();
+        HttpServletRequest request=  RequestContext.get().getRequest();
         String tenant = request.getHeader("Tenant");
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();
         if(!selfUrl.endsWith("/")){
-            selfUrl = selfUrl + "/";
+            selfUrl = selfUrl + "/" ;
         }
         selfUrl = selfUrl + tenant;
-        String redirectTo = casUrl + "/login?service=" + Config.HOME_URL() +  selfUrl + "?AuthType=cas";
+        String redirectTo = casUrl + "/login?service=" +  selfUrl;
         return redirectTo;
     }
 
@@ -134,5 +139,28 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
         }
         String redirectTo = casUrl + "/logout?service=" + selfUrl + "&renew=true&other=form";
         response.sendRedirect(redirectTo);
+    }
+
+    public static void main(String[] args) {
+        String userId = "";
+        String  casUrl="http://cas.techsure.cn:9200/cas";
+        //String selfUrl="http://192.168.2.60:8090/demo";
+        String selfUrl="http://bsm.techsure.cn:8080/balantflow";
+        String ticket = "ST-20-pwR7iySe5dvc2LoLbke1-cas01.example.org";
+        TicketValidator validator = new Cas20ServiceTicketValidator(casUrl);
+        Assertion assertion = null;
+        try {
+            assertion = validator.validate(ticket, selfUrl);
+        } catch (TicketValidationException e) {
+            e.printStackTrace();
+        }
+        if (assertion != null && assertion.getPrincipal() != null) {
+            if(assertion.getPrincipal().getName().indexOf("@") > -1){
+                userId = assertion.getPrincipal().getName().substring(0, assertion.getPrincipal().getName().indexOf("@")).toUpperCase();
+            }else{
+                userId = assertion.getPrincipal().getName().toUpperCase();
+            }
+        }
+        System.out.println("userId:" + userId);
     }
 }

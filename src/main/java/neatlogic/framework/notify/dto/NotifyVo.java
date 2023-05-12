@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.message.core.IMessageHandler;
 import neatlogic.framework.notify.core.INotifyTriggerType;
-import neatlogic.framework.util.NotifyFreemarkerUtil;
+import neatlogic.framework.util.FreemarkerUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -100,12 +100,12 @@ public class NotifyVo {
         this.templateTitle = builder.templateTitle;
         this.templateContent = builder.templateContent;
         try {
-            title = NotifyFreemarkerUtil.transform(builder.data, builder.templateTitle);
+            title = FreemarkerUtil.transform(builder.data, builder.templateTitle);
         } catch (Exception e) {
             this.appendError(e.getMessage());
         }
         try {
-            content = NotifyFreemarkerUtil.transform(builder.data, builder.templateContent);
+            content = FreemarkerUtil.transform(builder.data, builder.templateContent);
         } catch (Exception e) {
             this.appendError(e.getMessage());
         }

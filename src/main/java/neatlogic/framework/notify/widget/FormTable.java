@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
+import neatlogic.framework.form.dto.AttributeDataVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -348,43 +349,27 @@ public class FormTable implements TemplateMethodModelEx {
         stringBuilder.append("</table>");
         return stringBuilder.toString();
     }
+    // 表单组件数据列表
+    private List<AttributeDataVo> attributeDataList;
 
-    // 通知模板中所有数据源
-    private JSONObject allData;
-
-    public FormTable(JSONObject allData) {
-        this.allData = allData;
+    public FormTable(List<AttributeDataVo> attributeDataList) {
+        this.attributeDataList = attributeDataList;
     }
 
     @Override
     public Object exec(List arguments) throws TemplateModelException {
-        String dataKey = "form";
-//        if (arguments.size() >= 1) {
-//            String config = arguments.get(0).toString();
-//            try {
-//                JSONObject configObj = JSONObject.parseObject(config);
-//                dataKey = configObj.getString("data");
-//            } catch (Exception ex) {
-//                // 非json格式
-//            }
-//        }
-        JSONArray formAttributeDataList = allData.getJSONArray(dataKey);
-        if (CollectionUtils.isEmpty(formAttributeDataList)) {
+        if (CollectionUtils.isEmpty(attributeDataList)) {
             return StringUtils.EMPTY;
         }
         StringBuilder stringBuilder = new StringBuilder("<table border=\"1\" width=\"100%\">");
-        for (int i = 0; i < formAttributeDataList.size(); i++) {
-            JSONObject formAttributeDataObj = formAttributeDataList.getJSONObject(i);
-            if (MapUtils.isEmpty(formAttributeDataObj)) {
+        for (AttributeDataVo attributeDataVo : attributeDataList) {
+            if (attributeDataVo == null) {
                 continue;
             }
-            String attributeLabel = formAttributeDataObj.getString("attributeLabel");
-            if (attributeLabel == null) {
-                attributeLabel = StringUtils.EMPTY;
-            }
+            String attributeLabel = attributeDataVo.getAttributeLabel();
+            String type = attributeDataVo.getType();
+            Object dataObj = attributeDataVo.getDataObj();
             String result = StringUtils.EMPTY;
-            String type = formAttributeDataObj.getString("type");
-            Object dataObj = formAttributeDataObj.get("dataObj");
             if (dataObj != null) {
                 Function<Object, String> function = map.get(type);
                 if (function != null) {

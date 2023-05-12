@@ -16,9 +16,8 @@
 
 package neatlogic.framework.util;
 
-import neatlogic.framework.common.dto.BasePageVo;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.dto.BasePageVo;
 
 import java.util.List;
 

@@ -442,7 +442,7 @@ public class Config {
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
-            PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic");
+            PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic1");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
             RUNNER_CONTEXT = prop.getProperty("runner.context", "/autoexecrunner");
 

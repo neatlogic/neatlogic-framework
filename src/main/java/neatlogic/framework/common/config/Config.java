@@ -47,7 +47,7 @@ public class Config {
     public static final String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
-    private static String JWT_SECRET = "techsure#neatlogic$secret";
+    private static String JWT_SECRET = "neatlogic#neatlogic$secret";
     private static String NEATLOGIC_HOME;
     //    private static Map<String, String> ES_CLUSTERS;
     private static boolean ES_ENABLE;
@@ -418,7 +418,7 @@ public class Config {
             MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "5"));
             HOME_URL = prop.getProperty("home.url");
             BACK_END_URL = prop.getProperty("back.end.url");
-            JWT_SECRET = prop.getProperty("jwt.secret", "techsure#neatlogic$secret");
+            JWT_SECRET = prop.getProperty("jwt.secret", "neatlogic#neatlogic$secret");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
@@ -442,7 +442,7 @@ public class Config {
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
-            PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "techsure");
+            PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
             RUNNER_CONTEXT = prop.getProperty("runner.context", "/autoexecrunner");
 

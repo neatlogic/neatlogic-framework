@@ -123,7 +123,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
     }
 
     @Override
-    protected void myLogout() throws IOException {
+    protected String myLogout() throws IOException {
         HttpServletRequest request=  UserContext.get().getRequest();
         HttpServletResponse response = UserContext.get().getResponse();
 
@@ -138,29 +138,6 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
             throw new ApiRuntimeException("exception.framework.login.auth.cas.no_config");
         }
         String redirectTo = casUrl + "/logout?service=" + selfUrl + "&renew=true&other=form";
-        response.sendRedirect(redirectTo);
-    }
-
-    public static void main(String[] args) {
-        String userId = "";
-        String  casUrl="http://cas.techsure.cn:9200/cas";
-        //String selfUrl="http://192.168.2.60:8090/demo";
-        String selfUrl="http://bsm.techsure.cn:8080/balantflow";
-        String ticket = "ST-20-pwR7iySe5dvc2LoLbke1-cas01.example.org";
-        TicketValidator validator = new Cas20ServiceTicketValidator(casUrl);
-        Assertion assertion = null;
-        try {
-            assertion = validator.validate(ticket, selfUrl);
-        } catch (TicketValidationException e) {
-            e.printStackTrace();
-        }
-        if (assertion != null && assertion.getPrincipal() != null) {
-            if(assertion.getPrincipal().getName().indexOf("@") > -1){
-                userId = assertion.getPrincipal().getName().substring(0, assertion.getPrincipal().getName().indexOf("@")).toUpperCase();
-            }else{
-                userId = assertion.getPrincipal().getName().toUpperCase();
-            }
-        }
-        System.out.println("userId:" + userId);
+        return redirectTo;
     }
 }

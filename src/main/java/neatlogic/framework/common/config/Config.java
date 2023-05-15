@@ -112,8 +112,6 @@ public class Config {
 
     private static String SSO_TICKET_KEY;//sso免登录，url中获取的ticket的参数名
 
-    private static String SSO_AUTH_TYPE_KEY;//sso免登录，url中获取认证插件的参数名
-
     private static String LOGIN_AUTH_HANDLER;//系统登录方式,默认是default，DB登录
     private static String LOGIN_AUTH_PASSWORD_ENCRYPT;//系统登录密码加密策略，默认是md5
 
@@ -400,10 +398,6 @@ public class Config {
         return LDAP_USER_DN;
     }
 
-    public static String SSO_AUTH_TYPE_KEY(){
-        return SSO_AUTH_TYPE_KEY;
-    }
-
     @PostConstruct
     public void init() {
         try {
@@ -486,7 +480,6 @@ public class Config {
 
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");
-            SSO_AUTH_TYPE_KEY = prop.getProperty("sso.auth.type.key");
 
             LOGIN_AUTH_HANDLER = prop.getProperty("login.auth.type" , "default");
             LOGIN_AUTH_PASSWORD_ENCRYPT =  prop.getProperty("login.auth.password.encrypt" , "md5");

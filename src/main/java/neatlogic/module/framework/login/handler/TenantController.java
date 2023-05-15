@@ -77,7 +77,6 @@ public class TenantController {
             //单点登录
             if(StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {
                 data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
-                data.put("ssoAuthKey" , Config.SSO_AUTH_TYPE_KEY());
             }
             ReturnJson.success(data, response);
         } catch (Exception e) {

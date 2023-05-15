@@ -104,8 +104,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null) {
                     //获取认证插件名
-                    authType = request.getHeader("AuthPlugin");
-                    logger.warn("======= AuthType: " + authType);
+                    authType = Config.LOGIN_AUTH_HANDLER();//request.getHeader("AuthPlugin");
                     logger.info("AuthType: " + authType);
                     if (StringUtils.isNotBlank(authType)) {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);

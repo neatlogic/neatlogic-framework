@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.restful.api;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.login.LoginAuthNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
@@ -55,15 +56,17 @@ public class LogoutApi extends PrivateApiComponentBase {
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
 		ILoginAuthHandler loginAuth;
-		if(StringUtils.isBlank(Config.SSO_TICKET_KEY())){
+		if(StringUtils.isBlank(Config.LOGIN_AUTH_HANDLER())){
 			loginAuth = LoginAuthFactory.getLoginAuth("default");
 		}else{
-			loginAuth = LoginAuthFactory.getLoginAuth(Config.SSO_TICKET_KEY());
+			loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_HANDLER());
 		}
 		if(loginAuth == null){
-			throw new LoginAuthNotFoundException(Config.SSO_TICKET_KEY());
+			throw new LoginAuthNotFoundException(Config.LOGIN_AUTH_HANDLER());
 		}
-		loginAuth.logout();
-		return null;
+		String url = loginAuth.logout();
+		JSONObject returnObj = new JSONObject();
+		returnObj.put("url", Strings.isNullOrEmpty(url) ? "" : url);
+		return returnObj;
 	}
 }

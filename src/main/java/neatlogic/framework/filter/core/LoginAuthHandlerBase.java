@@ -184,18 +184,21 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     @Override
-    public void logout() {
+    public String logout() {
         UserSessionCache.removeItem(TenantContext.get().getTenantUuid(),UserContext.get().getUserUuid(true));
         userSessionMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
+        String url = null ;
         try {
-            myLogout();
+            url = myLogout();
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new RuntimeException();
         }
+        return url;
     }
 
-    protected void myLogout() throws IOException {
+    protected String myLogout() throws IOException {
+        return null;
     }
 
     @Override

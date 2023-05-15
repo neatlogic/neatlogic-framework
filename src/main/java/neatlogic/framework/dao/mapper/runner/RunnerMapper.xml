@@ -20,11 +20,11 @@ limitations under the License.
     <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="100"/>
 
     <select id="getAllNetworkMask" resultType="neatlogic.framework.dto.runner.GroupNetworkVo" useCache="false">
-        SELECT `id`,
-               `group_id`   as groupId,
-               `network_ip` as networkIp,
-               `mask`
-        FROM `runnergroup_network`
+        SELECT rn.`id`,
+               rn.`group_id`   as groupId,
+               rn.`network_ip` as networkIp,
+               rn.`mask`
+        FROM `runnergroup_network` rn join runnergroup r on rn.group_id = r.id
     </select>
 
     <resultMap id="runnerGroupMap" type="neatlogic.framework.dto.runner.RunnerGroupVo">

@@ -233,5 +233,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return checkUserVo;
     }
 
-    public abstract UserVo myLogin(UserVo userVo, JSONObject resultJson);
+    public UserVo myLogin(UserVo userVo, JSONObject resultJson){
+        return null ;
+    };
 }

@@ -92,7 +92,7 @@ public class LoginController {
             String password = jsonObj.getString("password");
             String authType = jsonObj.getString("authType");
             if(Strings.isNullOrEmpty("authType")){
-                authType = Config.LOGIN_AUTH_HANDLER();
+                authType = Config.LOGIN_AUTH_TYPE();
             }
 
             if (StringUtils.isBlank(tenant)) {

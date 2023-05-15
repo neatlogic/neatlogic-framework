@@ -56,17 +56,17 @@ public class LogoutApi extends PrivateApiComponentBase {
 	@Override
 	public Object myDoService(JSONObject jsonObj) throws Exception {
 		ILoginAuthHandler loginAuth;
-		if(StringUtils.isBlank(Config.LOGIN_AUTH_HANDLER())){
+		if(StringUtils.isBlank(Config.LOGIN_AUTH_TYPE())){
 			loginAuth = LoginAuthFactory.getLoginAuth("default");
 		}else{
-			loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_HANDLER());
+			loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
 		}
 		if(loginAuth == null){
-			throw new LoginAuthNotFoundException(Config.LOGIN_AUTH_HANDLER());
+			throw new LoginAuthNotFoundException(Config.LOGIN_AUTH_TYPE());
 		}
 		String url = loginAuth.logout();
 		JSONObject returnObj = new JSONObject();
-		returnObj.put("url", Strings.isNullOrEmpty(url) ? "" : url);
+		returnObj.put("url", StringUtils.isBlank(url) ? StringUtils.EMPTY : url);
 		return returnObj;
 	}
 }

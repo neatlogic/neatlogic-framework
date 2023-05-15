@@ -17,9 +17,12 @@
 package neatlogic.module.framework.filter.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.nacos.api.utils.StringUtils;
 import com.google.common.base.Strings;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.login.LoginAuthConfigNoFoundException;
+import neatlogic.framework.exception.login.LoginAuthUserNotFoundException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import org.springframework.stereotype.Service;
@@ -66,8 +69,8 @@ public class LdapAuthHandler extends LoginAuthHandlerBase {
         String ldapUrl = Config.LDAP_SERVER_URL();
         String userDn = Config.LDAP_USER_DN().replace("{0}", userId);
 
-        if(Strings.isNullOrEmpty(ldapUrl) || Strings.isNullOrEmpty(userDn)){
-            throw new RuntimeException("exception.framework.login.auth.ldap.no_config");
+        if(StringUtils.isBlank(userDn)){
+            throw new LoginAuthConfigNoFoundException("ldap");
         }
 
         DirContext dirCtx = null;
@@ -101,7 +104,7 @@ public class LdapAuthHandler extends LoginAuthHandlerBase {
         if(isFailed){
             throw new UserAuthFailedException();
         }else if(checkUserVo == null){//认证通过，但数据库内没用户
-            throw new RuntimeException("exception.framework.login.auth.user_not_found");
+            throw new LoginAuthUserNotFoundException();
         }
         return checkUserVo;
     }

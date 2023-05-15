@@ -16,15 +16,15 @@ limitations under the License.
 
 package neatlogic.module.framework.filter.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.api.utils.StringUtils;
-import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserVo;
-import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.login.LoginAuthCasParamNoFoundException;
+import neatlogic.framework.exception.login.LoginAuthConfigNoFoundException;
+import neatlogic.framework.exception.login.LoginAuthUserNotFoundException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import org.jasig.cas.client.validation.Assertion;
@@ -58,11 +58,11 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
         selfUrl = selfUrl + tenant;
 
         if (StringUtils.isBlank(ticket)) {
-            throw new RuntimeException("exception.framework.login.cas.auth.no_ticket");
+            throw new LoginAuthCasParamNoFoundException();
         }
 
-        if (Strings.isNullOrEmpty(casUrl)) {
-            throw new ApiRuntimeException("exception.framework.login.auth.cas.no_config");
+        if (StringUtils.isBlank(casUrl)) {
+            throw new LoginAuthConfigNoFoundException("cas");
         }
 
         if(casUrl.indexOf("http:") == -1 ){
@@ -97,7 +97,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
         if(isFailed){
             throw new UserAuthFailedException();
         }else if(userVo == null){//认证通过，但数据库内没用户
-            throw new RuntimeException("exception.framework.login.auth.user_not_found");
+            throw new LoginAuthUserNotFoundException();
         }
         return userVo;
     }
@@ -116,12 +116,6 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
         return redirectTo;
     }
 
-
-    @Override
-    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return null;
-    }
-
     @Override
     protected String myLogout() throws IOException {
         HttpServletRequest request=  UserContext.get().getRequest();
@@ -134,8 +128,8 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
             selfUrl = selfUrl + "/";
         }
         selfUrl = selfUrl + tenant;
-        if (Strings.isNullOrEmpty(casUrl)) {
-            throw new ApiRuntimeException("exception.framework.login.auth.cas.no_config");
+        if (StringUtils.isBlank(casUrl)) {
+            throw new LoginAuthConfigNoFoundException("cas");
         }
         String redirectTo = casUrl + "/logout?service=" + selfUrl + "&renew=true&other=form";
         return redirectTo;

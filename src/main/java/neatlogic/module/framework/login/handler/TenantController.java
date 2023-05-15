@@ -71,7 +71,7 @@ public class TenantController {
             data.put("themeConfig", themeConfig);
 
             //登录插件
-            data.put("authType", Config.LOGIN_AUTH_HANDLER());
+            data.put("authType", Config.LOGIN_AUTH_TYPE());
             data.put("encrypt", Config.LOGIN_AUTH_PASSWORD_ENCRYPT());
 
             //单点登录

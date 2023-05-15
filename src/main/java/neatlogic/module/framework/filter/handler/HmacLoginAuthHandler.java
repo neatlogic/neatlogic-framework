@@ -111,9 +111,5 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         }
         return null;
     }
-    @Override
-    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return null;
-    }
 
 }

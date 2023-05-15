@@ -64,9 +64,4 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
         }
     }
 
-    @Override
-    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return null;
-    }
-
 }

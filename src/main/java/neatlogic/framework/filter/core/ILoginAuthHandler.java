@@ -48,6 +48,6 @@ public interface ILoginAuthHandler {
     /**
      * 登出
      */
-    void logout();
+    String logout();
 
 }

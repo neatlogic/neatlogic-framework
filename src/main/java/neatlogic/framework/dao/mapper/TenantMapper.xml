@@ -142,6 +142,12 @@
         from tenant_audit
         where tenant_id = #{value}
     </select>
+    <select id="getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId" resultType="java.lang.String">
+        select sql_uuid
+        from tenant_module_dmlsql
+        where tenant_uuid = #{tenantUuid}
+          and `module_id` = #{moduleId}
+    </select>
 
     <insert id="insertTenant" parameterType="neatlogic.framework.dto.TenantVo">
         INSERT INTO `tenant` (`id`,
@@ -196,6 +202,13 @@
         VALUES (#{tenantModule.tenantId},
                 #{tenantModule.moduleId},
                 NOW(3))
+    </insert>
+    <insert id="insertTenantModuleDmlSql">
+        insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`fcd`)
+        values
+        <foreach collection="currentRunSqlMd5List" item="sqlMd5" separator="),(" open="(" close=")">
+            #{tenantUuid},#{moduleId},#{sqlMd5},#{sqlStatus},now()
+        </foreach>
     </insert>
 
     <update id="updateTenantAudit" parameterType="neatlogic.framework.dto.TenantAuditVo">

@@ -22,16 +22,24 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dao.mapper.TenantMapper;
-import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.TenantVo;
+import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import javax.annotation.Resource;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +60,19 @@ public class StartupManager extends ModuleInitializedListenerBase {
     @Override
     public void onInitialized(NeatLogicWebApplicationContext context) {
         List<IStartup> list = new ArrayList<>();
+        //获取对应模块dml 数据初始化
+        org.springframework.core.io.Resource resource = null;
+        ModuleVo moduleVo = ModuleUtil.getModuleById(context.getModuleId());
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        org.springframework.core.io.Resource[] resources = null;
+        try {
+            resources = resolver.getResources("classpath*:neatlogic/resources/" + moduleVo.getId() + "/sqlscript/dml.sql");
+            if (resources.length == 1) {
+                resource = resources[0];
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
         //先收集所有启动作业
         Map<String, IStartup> myMap = context.getBeansOfType(IStartup.class);
         for (Map.Entry<String, IStartup> entry : myMap.entrySet()) {
@@ -59,29 +80,51 @@ public class StartupManager extends ModuleInitializedListenerBase {
             startup.setGroup(context.getGroup());
             list.add(startup);
         }
+        //如果没有要执行的dml 和 要初始化的startup
+        if(resource == null  && CollectionUtils.isEmpty(list)){
+            return;
+        }
         //模块全部加载完毕后再开始启动作业，依赖NeatLogicThread任务会等待全部模块加载完毕后再开始执行逻辑
-        if (CollectionUtils.isNotEmpty(list)) {
-            list.sort(Comparator.comparingInt(IStartup::sort));
-            List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
-            if (CollectionUtils.isNotEmpty(tenantList)) {
-                CachedThreadPool.execute(new NeatLogicThread("STARTUP-RUNNER") {
-                    @Override
-                    protected void execute() {
-                        for (TenantVo tenantVo : tenantList) {
-                            TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                            List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                            List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
+        List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
+        if (CollectionUtils.isNotEmpty(tenantList)) {
+            org.springframework.core.io.Resource finalResource = resource;
+            CachedThreadPool.execute(new NeatLogicThread("STARTUP-RUNNER") {
+                @Override
+                protected void execute() {
+                    for (TenantVo tenantVo : tenantList) {
+                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+                        List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
+                        //只有拥有当前模块权限的的租户才会执行startup 和 dml
+                        if (!groupList.contains(moduleVo.getGroup())) {
+                            continue;
+                        }
+                        //执行dml
+                        if (finalResource != null) {
+                            StringWriter logStrWriter = new StringWriter();
+                            PrintWriter logWriter = new PrintWriter(logStrWriter);
+                            StringWriter errStrWriter = new StringWriter();
+                            PrintWriter errWriter = new PrintWriter(errStrWriter);
+                            try {
+                                Reader scriptReader = new InputStreamReader(finalResource.getInputStream());
+                                ScriptRunnerManager.runScriptOnce(tenantVo, moduleVo.getId(), scriptReader, logWriter, errWriter);
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
+                                logger.error(errStrWriter.toString());
+                            }
+                        }
+                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                        if(CollectionUtils.isNotEmpty(list)) {
                             for (IStartup startup : list) {
-                                //只有拥有当前模块权限的的租户才会执行startup里的逻辑
-                                if (groupList.contains(startup.getGroup())) {
-                                    try {
-                                        startup.executeForCurrentTenant();
-                                    } catch (Exception ex) {
-                                        logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
-                                    }
+                                try {
+                                    startup.executeForCurrentTenant();
+                                } catch (Exception ex) {
+                                    logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
                                 }
                             }
                         }
+                    }
+                    if(CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             try {
                                 startup.executeForAllTenant();
@@ -90,11 +133,12 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                     }
-                });
-            }
-            startupList.addAll(list);
+                }
+            });
         }
+        startupList.addAll(list);
     }
+
 
     @Override
     protected void myInit() {

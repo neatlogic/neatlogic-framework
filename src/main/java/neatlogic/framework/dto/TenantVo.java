@@ -36,6 +36,7 @@ public class TenantVo extends BasePageVo {
         BUILT("built", "enum.master.tenantvo.status.built"),
         DDL("ddl", "enum.master.tenantvo.status.ddl"),
         DML("dml", "enum.master.tenantvo.status.dml"),
+        DML_DEMO("dmldemo", "enum.master.tenantvo.status.dmldemo"),
         ERROR("error", "enum.master.tenantvo.status.error");
 
         private String value;

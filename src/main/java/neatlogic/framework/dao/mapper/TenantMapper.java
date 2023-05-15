@@ -32,13 +32,17 @@ public interface TenantMapper {
 
     Long getTenantAuditMaxGroupIdByTenantId(Long tenantId);
 
+    List<String> getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId);
+
     int insertTenant(TenantVo tenantVo);
 
-    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup,@Param("isInitDml") Boolean isInitDml);
+    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo,@Param("updateTag") Long updateTag);
+    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo, @Param("updateTag") Long updateTag);
+
+    int insertTenantModuleDmlSql(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId, @Param("currentRunSqlMd5List") List<String> currentRunSqlMd5List,@Param("sqlStatus")int sqlStatus);
 
     int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 

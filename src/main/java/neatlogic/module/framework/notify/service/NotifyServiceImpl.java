@@ -34,6 +34,12 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
     @Resource
     private NotifyMapper notifyMapper;
 
+    /**
+     * 保存流程、查询流程信息时调用
+     * @param notifyPolicyConfig
+     * @param clazz
+     * @return
+     */
     @Override
     public InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(JSONObject notifyPolicyConfig, Class<? extends INotifyPolicyHandler> clazz) {
         InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo = JSONObject.toJavaObject(notifyPolicyConfig, InvokeNotifyPolicyConfigVo.class);
@@ -42,20 +48,20 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         }
         String handler = clazz.getName();
         invokeNotifyPolicyConfigVo.setHandler(handler);
-        if (invokeNotifyPolicyConfigVo.getIsCustom() == 1) {
-            return invokeNotifyPolicyConfigVo;
-        }
         NotifyPolicyVo notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(handler);
         if (notifyPolicyVo == null) {
-            invokeNotifyPolicyConfigVo.setPolicyId(null);
-            invokeNotifyPolicyConfigVo.setPolicyName(null);
+            invokeNotifyPolicyConfigVo.setDefaultPolicyId(null);
         } else {
-            invokeNotifyPolicyConfigVo.setPolicyId(notifyPolicyVo.getId());
-            invokeNotifyPolicyConfigVo.setPolicyName(notifyPolicyVo.getName());
+            invokeNotifyPolicyConfigVo.setDefaultPolicyId(notifyPolicyVo.getId());
         }
         return invokeNotifyPolicyConfigVo;
     }
 
+    /**
+     * 触发点发送通知时调用
+     * @param notifyPolicyConfig
+     * @return
+     */
     @Override
     public InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(JSONObject notifyPolicyConfig) {
         if (MapUtils.isEmpty(notifyPolicyConfig)) {
@@ -65,6 +71,11 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         return regulateNotifyPolicyConfig(invokeNotifyPolicyConfigVo);
     }
 
+    /**
+     * 组合工具发送通知时调用
+     * @param invokeNotifyPolicyConfigVo
+     * @return
+     */
     @Override
     public InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo) {
         if (invokeNotifyPolicyConfigVo == null) {
@@ -74,16 +85,11 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         if (StringUtils.isBlank(handler)) {
             return null;
         }
-        if (invokeNotifyPolicyConfigVo.getIsCustom() == 1) {
-            return invokeNotifyPolicyConfigVo;
-        }
         NotifyPolicyVo notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(handler);
         if (notifyPolicyVo == null) {
-            invokeNotifyPolicyConfigVo.setPolicyId(null);
-            invokeNotifyPolicyConfigVo.setPolicyName(null);
+            invokeNotifyPolicyConfigVo.setDefaultPolicyId(null);
         } else {
-            invokeNotifyPolicyConfigVo.setPolicyId(notifyPolicyVo.getId());
-            invokeNotifyPolicyConfigVo.setPolicyName(notifyPolicyVo.getName());
+            invokeNotifyPolicyConfigVo.setDefaultPolicyId(notifyPolicyVo.getId());
         }
         return invokeNotifyPolicyConfigVo;
     }

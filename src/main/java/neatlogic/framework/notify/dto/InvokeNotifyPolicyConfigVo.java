@@ -33,7 +33,8 @@ public class InvokeNotifyPolicyConfigVo {
     private String handler;
     private int isCustom = 0;
 
-    private List<String> excludeTriggerList;
+    private List<String> excludeTriggerList = new ArrayList<>();
+
     public Long getPolicyId() {
         return policyId;
     }

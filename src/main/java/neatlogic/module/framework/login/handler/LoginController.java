@@ -16,6 +16,8 @@ limitations under the License.
 
 package neatlogic.module.framework.login.handler;
 
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -32,9 +34,12 @@ import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.tenant.TenantUnActiveException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
+import neatlogic.framework.filter.core.ILoginAuthHandler;
+import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
@@ -42,7 +47,6 @@ import neatlogic.framework.service.TenantService;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +91,11 @@ public class LoginController {
         try {
             String userId = jsonObj.getString("userid");
             String password = jsonObj.getString("password");
+            String authType = jsonObj.getString("authType");
+            if(Strings.isNullOrEmpty("authType")){
+                authType = Config.LOGIN_AUTH_TYPE();
+            }
+
             if (StringUtils.isBlank(tenant)) {
                 tenant = request.getHeader("Tenant");
             }
@@ -126,7 +135,12 @@ public class LoginController {
                     if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
                         loginService.loginCaptchaValid(jsonObj, resultJson);
                     }
-                    checkUserVo = loginService.loginWithUserIdAndPassword(userVo, resultJson);
+                    //切换到具体的认证插件
+                    ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
+                    if(loginAuth == null ){//配置了插件，但不在已有的插件范围内
+                        throw  new LoginAuthPluginNoFoundException();
+                    }
+                    checkUserVo = loginAuth.login(userVo , returnObj);
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";

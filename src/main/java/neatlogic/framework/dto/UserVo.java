@@ -289,7 +289,7 @@ public class UserVo extends BasePageVo implements Serializable {
 
     public String getPassword() {
         if (StringUtils.isNotBlank(password)) {
-            if (!password.startsWith("{MD5}")) {
+            if (!password.startsWith("{MD5}") && !password.startsWith("{BS}")) {
                 password = DigestUtils.md5DigestAsHex(password.getBytes());
                 password = "{MD5}" + password;
             }

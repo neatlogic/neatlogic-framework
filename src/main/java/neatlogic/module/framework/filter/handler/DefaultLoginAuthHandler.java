@@ -127,8 +127,13 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
     }
 
     @Override
-    public String directUrl() {
+    public String myDirectUrl() {
         return Config.DIRECT_URL();
+    }
+
+    @Override
+    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
+        return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
 }

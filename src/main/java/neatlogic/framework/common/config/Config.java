@@ -110,7 +110,14 @@ public class Config {
 
     private static String DIRECT_URL;//登录失败默认跳转url
 
-    private static String SSO_TICKET_KEY;//sso免登录ticket key
+    private static String SSO_TICKET_KEY;//sso免登录，url中获取的ticket的参数名
+
+    private static String LOGIN_AUTH_TYPE;//系统登录方式,默认是default，DB登录
+    private static String LOGIN_AUTH_PASSWORD_ENCRYPT;//系统登录密码加密策略，默认是md5
+
+    private static String LDAP_SERVER_URL;//ldap服务url
+
+    private static String LDAP_USER_DN;//ldap userDn格式
 
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
@@ -316,7 +323,6 @@ public class Config {
         return PUBLIC_API_AUTH_PASSWORD;
     }
 
-
     public static String RUNNER_CONTEXT() {
         return RUNNER_CONTEXT;
     }
@@ -377,6 +383,20 @@ public class Config {
         return SSO_TICKET_KEY;
     }
 
+    public static String LOGIN_AUTH_TYPE(){
+        return LOGIN_AUTH_TYPE;
+    }
+
+    public static String LOGIN_AUTH_PASSWORD_ENCRYPT(){
+        return LOGIN_AUTH_PASSWORD_ENCRYPT;
+    }
+
+    public static String LDAP_SERVER_URL(){
+        return LDAP_SERVER_URL;
+    }
+    public static String LDAP_USER_DN(){
+        return LDAP_USER_DN;
+    }
 
     @PostConstruct
     public void init() {
@@ -460,6 +480,12 @@ public class Config {
 
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");
+
+            LOGIN_AUTH_TYPE = prop.getProperty("login.auth.type" , "default");
+            LOGIN_AUTH_PASSWORD_ENCRYPT =  prop.getProperty("login.auth.password.encrypt" , "md5");
+
+            LDAP_SERVER_URL = prop.getProperty("ldap.server.url","");
+            LDAP_USER_DN = prop.getProperty("ldap.user.dn","");
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

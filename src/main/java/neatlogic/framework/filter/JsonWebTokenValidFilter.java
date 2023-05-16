@@ -17,6 +17,7 @@
 package neatlogic.framework.filter;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
@@ -84,6 +85,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 }
             }
         }
+        //初始化request上下文
+        RequestContext.init(request,request.getRequestURI());
+
         //判断租户
         try {
             //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
@@ -99,8 +103,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 userVo = defaultLoginAuth.auth(cachedRequest, response);
                 AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null) {
-                    authType = request.getHeader("AuthType");
-                    logger.warn("======= AuthType: " + authType);
+                    //获取认证插件名
+                    authType = Config.LOGIN_AUTH_TYPE();//request.getHeader("AuthPlugin");
                     logger.info("AuthType: " + authType);
                     if (StringUtils.isNotBlank(authType)) {
                         loginAuth = LoginAuthFactory.getLoginAuth(authType);
@@ -145,13 +149,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         redirectObj.put("Message", "认证失败(" + loginAuth.getType() + ")，请重新登录");
                         logger.warn("======= login error: 通过" + loginAuth.getType() + "认证失败，请重新登录");
                     }
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+                    redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
                 } else {
                     response.setStatus(522);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
                     logger.warn("======= login error: 会话已超时或已被终止，请重新登录");
-                    redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+                    redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
                 }
                 removeAuthCookie(response);
                 response.setContentType(Config.RESPONSE_TYPE_JSON);
@@ -162,7 +166,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             response.setStatus(522);
             redirectObj.put("Status", "FAILED");
             redirectObj.put("Message", ex.getMessage());
-            redirectObj.put("DirectUrl", defaultLoginAuth.directUrl());
+            redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
             removeAuthCookie(response);
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(redirectObj.toJSONString());

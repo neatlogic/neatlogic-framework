@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.wechat.WechatGetAccessTokenFailedException;
@@ -61,12 +62,6 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
         } else {
             throw new WechatGetCodeFailedException(String.format("code could not be null!  please check source url : %s", request.getRequestURL()));
         }
-    }
-
-    @Override
-    public String directUrl() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

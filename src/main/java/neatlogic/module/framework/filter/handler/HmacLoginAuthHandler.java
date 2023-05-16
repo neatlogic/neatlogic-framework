@@ -16,6 +16,7 @@
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.hmac.HeaderIrregularException;
@@ -110,12 +111,5 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         }
         return null;
     }
-
-
-    @Override
-    public String directUrl() {
-        return null;
-    }
-
 
 }

@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.login.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -33,6 +34,7 @@ import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.tenant.TenantUnActiveException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
@@ -45,7 +47,6 @@ import neatlogic.framework.service.TenantService;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +138,7 @@ public class LoginController {
                     //切换到具体的认证插件
                     ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
                     if(loginAuth == null ){//配置了插件，但不在已有的插件范围内
-                        throw  new RuntimeException("exception.framework.login.auth.plugin_not_found");
+                        throw  new LoginAuthPluginNoFoundException();
                     }
                     checkUserVo = loginAuth.login(userVo , returnObj);
                 }

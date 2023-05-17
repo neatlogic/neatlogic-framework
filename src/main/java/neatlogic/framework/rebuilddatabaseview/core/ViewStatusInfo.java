@@ -22,7 +22,7 @@ public class ViewStatusInfo {
         SUCCESS, FAILURE;
     }
 
-    private String viewName;
+    private String name;
 
     private String label;
 
@@ -30,12 +30,12 @@ public class ViewStatusInfo {
 
     private String error;
 
-    public String getViewName() {
-        return viewName;
+    public String getName() {
+        return name;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLabel() {

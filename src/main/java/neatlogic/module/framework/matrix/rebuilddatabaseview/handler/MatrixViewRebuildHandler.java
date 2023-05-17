@@ -70,7 +70,7 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
                 String matrixUuid = matrixViewVo.getMatrixUuid();
                 String matrixName = uuidToNameMap.get(matrixUuid);
                 ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
-                viewStatusInfo.setViewName("matrix_" + matrixUuid);
+                viewStatusInfo.setName("matrix_" + matrixUuid);
                 viewStatusInfo.setLabel(matrixName);
                 try {
                     viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());

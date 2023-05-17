@@ -8,12 +8,10 @@ import neatlogic.framework.scheduler.dto.JobVo;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Service
 @DisallowConcurrentExecution
 public class TestPublicSchedule extends PublicJobBase {
     @Override

@@ -79,16 +79,19 @@ limitations under the License.
           AND `job_group` = #{jobGroup}
     </select>
 
-    <select id="getJobByHandler" parameterType="java.lang.String" resultType="neatlogic.framework.scheduler.dto.JobVo">
-        SELECT `uuid`,
-               `name`,
-               `handler`,
-               `begin_time` AS beginTime,
-               `end_time`   AS endTime,
-               `cron`,
-               `is_active`  AS isActive,
-               `need_audit` AS needAudit
-        FROM `schedule_job`
+    <select id="getJobByHandler" parameterType="java.lang.String" resultMap="jobMap">
+        SELECT a.`uuid`,
+               a.`name`,
+               a.`handler`,
+               a.`begin_time`,
+               a.`end_time`,
+               a.`cron`,
+               a.`is_active`,
+               a.`need_audit`,
+               d.prop_name,
+               d.prop_value,
+               d.id as prop_id
+        FROM `schedule_job` a LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
         WHERE `handler` = #{value}
     </select>
 

@@ -1,8 +1,11 @@
 package neatlogic.framework.scheduler.dto;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JobObject implements Serializable {
@@ -22,6 +25,8 @@ public class JobObject implements Serializable {
 //	private Date loadTime = new Date();
 
 	private Map<String, Object> dataMap;
+	//用于外部作业的入参
+	private Map<String, Object> propMap;
 
 	private JobObject(Builder builder) {
 		this.jobName = builder.jobId;
@@ -35,6 +40,8 @@ public class JobObject implements Serializable {
 		this.type = builder.type;
 		this.intervalInSeconds = builder.intervalInSeconds;
 		this.dataMap = builder.dataMap;
+		this.propMap = builder.propMap;
+
 		this.repeatCount = builder.repeatCount;
 	}
 
@@ -98,6 +105,7 @@ public class JobObject implements Serializable {
 		private Integer intervalInSeconds;
 		private Integer repeatCount;
 		private Map<String, Object> dataMap;
+		private Map<String, Object> propMap;
 
 		public Builder(String jobId, String jobGroup, String jobHandler, String tenantUuid) {
 			this.jobId = jobId;
@@ -118,6 +126,15 @@ public class JobObject implements Serializable {
 
 		public Builder withEndTime(Date _endTime) {
 			endTime = _endTime;
+			return this;
+		}
+
+		public Builder withPropList(List<JobPropVo> propList) {
+			if(CollectionUtils.isNotEmpty(propList)){
+				propList.forEach(p->{
+					addProp(p.getName(),p.getValue());
+				});
+			}
 			return this;
 		}
 
@@ -149,6 +166,14 @@ public class JobObject implements Serializable {
 			return this;
 		}
 
+		public Builder addProp(String key, Object data) {
+			if (propMap == null) {
+				propMap = new HashMap<>();
+			}
+			propMap.put(key, data);
+			return this;
+		}
+
 		public JobObject build() {
 			return new JobObject(this);
 		}
@@ -157,6 +182,13 @@ public class JobObject implements Serializable {
 	public Object getData(String key) {
 		if (dataMap != null) {
 			return dataMap.get(key);
+		}
+		return null;
+	}
+
+	public Object getProp(String key) {
+		if (propMap != null) {
+			return propMap.get(key);
 		}
 		return null;
 	}

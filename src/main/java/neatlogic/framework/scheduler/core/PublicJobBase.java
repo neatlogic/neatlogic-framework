@@ -47,10 +47,17 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 		String tenantUuid = jobObject.getTenantUuid();
 		// 切换租户库
 		TenantContext.get().switchTenant(tenantUuid);
-		JobVo jobVo = schedulerMapper.getJobBaseInfoByUuid(jobObject.getJobName());
+		JobVo jobVo = schedulerMapper.getJobByUuid(jobObject.getJobName());
 		if (jobVo != null && jobVo.getIsActive().equals(1)) {
 			JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobObject.getJobHandler());
-			JobObject newJobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), jobClassVo.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
+			JobObject newJobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), jobClassVo.getClassName(), tenantUuid)
+					.withCron(jobVo.getCron())
+					.withBeginTime(jobVo.getBeginTime())
+					.withEndTime(jobVo.getEndTime())
+					.needAudit(jobVo.getNeedAudit())
+					.withPropList(jobVo.getPropList())
+					.setType("public")
+					.build();
 			schedulerManager.loadJob(newJobObject);
 		} else {
 			schedulerManager.unloadJob(jobObject);
@@ -62,7 +69,14 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 		List<JobVo> jobVoList = schedulerMapper.getJobByHandler(this.getClassName());
 		for (JobVo jobVo : jobVoList) {
 			if (jobVo.getIsActive().equals(1)) {
-				JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), this.getClassName(), tenantUuid).withCron(jobVo.getCron()).withBeginTime(jobVo.getBeginTime()).withEndTime(jobVo.getEndTime()).needAudit(jobVo.getNeedAudit()).setType("public").build();
+				JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), this.getClassName(), tenantUuid)
+						.withCron(jobVo.getCron())
+						.withBeginTime(jobVo.getBeginTime())
+						.withEndTime(jobVo.getEndTime())
+						.needAudit(jobVo.getNeedAudit())
+						.setType("public")
+						.withPropList(jobVo.getPropList())
+						.build();
 				schedulerManager.loadJob(jobObject);
 			}
 		}

@@ -23,7 +23,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.scheduler.annotation.Input;
+import neatlogic.framework.scheduler.annotation.Prop;
 import neatlogic.framework.scheduler.annotation.Param;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.*;
@@ -348,12 +348,12 @@ public abstract class JobBase implements IJob {
         Map<String, Param> paramMap = new HashMap<>();
         try {
             Method method = this.getClass().getDeclaredMethod("executeInternal", JobExecutionContext.class, JobObject.class);
-            if (!method.isAnnotationPresent(Input.class)) {
+            if (!method.isAnnotationPresent(Prop.class)) {
                 return paramMap;
             }
             for (Annotation anno : method.getDeclaredAnnotations()) {
-                if (anno.annotationType().equals(Input.class)) {
-                    Input input = (Input) anno;
+                if (anno.annotationType().equals(Prop.class)) {
+                    Prop input = (Prop) anno;
                     Param[] params = input.value();
                     for (Param param : params) {
                         paramMap.put(param.name(), param);

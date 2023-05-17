@@ -207,7 +207,7 @@ public class CubeHandler extends FormHandlerBase {
                 continue;
             }
             String typeText = typeMap.get(type);
-            String optionText = optionMap.get(type);
+            String optionText = optionMap.get(option);
             JSONObject textObj = new JSONObject();
             textObj.put("type", typeText);
             textObj.put("option", optionText);

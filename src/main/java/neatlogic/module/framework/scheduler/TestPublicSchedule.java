@@ -4,14 +4,15 @@ import neatlogic.framework.scheduler.annotation.Input;
 import neatlogic.framework.scheduler.annotation.Param;
 import neatlogic.framework.scheduler.core.PublicJobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
-import neatlogic.framework.scheduler.dto.JobVo;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Service
 @DisallowConcurrentExecution
 public class TestPublicSchedule extends PublicJobBase {
     @Override
@@ -26,11 +27,7 @@ public class TestPublicSchedule extends PublicJobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
         JobDetail jobDetail = context.getJobDetail();
         String jobUuid = jobDetail.getKey().getName();
-        JobVo jobVo = schedulerMapper.getJobByUuid(jobUuid);
-        if (jobVo != null) {
-            //用户入参
-            jobVo.getPropList();
-        }
+        System.out.println(jobObject.getData("a"));
 //        String key = new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(jobObject.getLoadTime());
 //        System.out.println("测试：" + new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(new Date()) + ">>>>" + key);
         System.out.println("测试：" + new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(new Date()));

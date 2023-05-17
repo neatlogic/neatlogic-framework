@@ -1,18 +1,16 @@
 package neatlogic.module.framework.scheduler;
 
-import neatlogic.framework.scheduler.annotation.Prop;
 import neatlogic.framework.scheduler.annotation.Param;
+import neatlogic.framework.scheduler.annotation.Prop;
 import neatlogic.framework.scheduler.core.PublicJobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Service
 @DisallowConcurrentExecution
 public class TestPublicSchedule extends PublicJobBase {
     @Override

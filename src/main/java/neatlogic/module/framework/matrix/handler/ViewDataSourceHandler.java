@@ -444,7 +444,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     }
 
-    private List<MatrixAttributeVo> buildView(String matrixUuid, String matrixName, String xml) {
+    public List<MatrixAttributeVo> buildView(String matrixUuid, String matrixName, String xml) {
         List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();
         MatrixViewSqlBuilder viewBuilder = new MatrixViewSqlBuilder(xml);
 //        viewBuilder.setCiId(ciVo.getId());

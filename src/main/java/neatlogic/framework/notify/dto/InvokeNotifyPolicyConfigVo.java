@@ -24,8 +24,6 @@ import java.util.List;
  * @since 2021/5/20 18:08
  **/
 public class InvokeNotifyPolicyConfigVo {
-
-    private Long defaultPolicyId;
     private Long policyId;
     private String policyName;
     private String policyPath;
@@ -34,14 +32,6 @@ public class InvokeNotifyPolicyConfigVo {
     private int isCustom = 0;
 
     private List<String> excludeTriggerList = new ArrayList<>();
-
-    public Long getDefaultPolicyId() {
-        return defaultPolicyId;
-    }
-
-    public void setDefaultPolicyId(Long defaultPolicyId) {
-        this.defaultPolicyId = defaultPolicyId;
-    }
 
     public Long getPolicyId() {
         return policyId;

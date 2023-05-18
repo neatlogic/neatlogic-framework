@@ -39,6 +39,8 @@ public interface ApiMapper {
 
     int replaceApi(ApiVo apiVo);
 
+    int insertApi(ApiVo apiVo);
+
     int insertOrUpdateNeedAuditApi(ApiVo apiVo);
 
     int updatePasswordByToken(@Param("token")String token,@Param("password")String password);

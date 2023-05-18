@@ -174,4 +174,13 @@ public interface IMatrixDataSourceHandler {
      * @param uuidList
      */
     void deleteTableRowData(String matrixUuid, List<String> uuidList);
+
+    /**
+     * 移动行数据顺序
+     * @param matrixUuid 矩阵唯一标识
+     * @param uuid 被移动行数据唯一标识
+     * @param toUuid 移动后，被移动行占据的位置之前的行数据唯一标识
+     */
+    void moveTableRowDataSort(String matrixUuid, String uuid, String toUuid);
+
 }

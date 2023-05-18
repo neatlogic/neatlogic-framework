@@ -45,7 +45,9 @@
         <foreach collection="attributeList" item="attribute" separator="," index="index">
             `${attribute.uuid}` varchar(100) DEFAULT NULL
         </foreach>
-        ,PRIMARY KEY (`uuid`),
+        ,
+        `sort` int(11) NOT NULL,
+        PRIMARY KEY (`uuid`),
         KEY `id`(`id`)
         )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 
@@ -57,6 +59,10 @@
 
     <update id="addMatrixDynamicTableColumn">
         ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` VARCHAR (100)
+    </update>
+
+    <update id="addMatrixDynamicTableColumnSort">
+        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `sort` int (11)
     </update>
 
     <update id="dropMatrixDynamicTableColumn">

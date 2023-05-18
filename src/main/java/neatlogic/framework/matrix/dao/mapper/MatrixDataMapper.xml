@@ -12,6 +12,7 @@
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
+        `sort`,
         <foreach collection="columnList" separator="," item="column">
             `${column}`
         </foreach>
@@ -23,6 +24,7 @@
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
+        `sort`,
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
@@ -44,11 +46,12 @@
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
+        `sort`,
         <foreach collection="columnList" separator="," item="column">
             `${column}`
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
-        ORDER BY `id` DESC
+        ORDER BY `sort` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -101,6 +104,7 @@
             resultType="java.util.LinkedHashMap">
         SELECT
         `uuid`,
+        `sort`,
         <foreach collection="columnList" item="column" separator=",">
             `${column}`
         </foreach>
@@ -108,7 +112,7 @@
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
-        ORDER BY `id` DESC
+        ORDER BY `sort` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -298,7 +302,7 @@
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataForSelectSql"/>
-        ORDER BY a.`id` DESC
+        ORDER BY a.`sort` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -321,7 +325,7 @@
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
-        ORDER BY a.`id` DESC
+        ORDER BY a.`sort` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -333,6 +337,19 @@
             COUNT(`${attributeUuid}`) AS `${attributeUuid}`
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+    </select>
+
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        SELECT `sort`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        ORDER BY `sort` DESC
+        LIMIT 1
+    </select>
+
+    <select id="getSortByUuid" resultType="java.lang.Integer">
+        SELECT `sort`
+        FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        where `uuid` = #{uuid}
     </select>
 
     <insert id="insertDynamicTableData">
@@ -359,7 +376,7 @@
             `${sourceColumn}`
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${sourceMatrixUuid}`
-        ORDER BY `id`
+        ORDER BY `sort`
     </insert>
 
     <update id="updateDynamicTableDataByUuid">
@@ -369,6 +386,30 @@
             `${columnData.column}` = #{columnData.value}
         </foreach>
         WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateSortByUuid">
+        UPDATE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        SET `sort` = #{sort}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateSortIncrement">
+        UPDATE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        SET `sort` = `sort` + 1
+        WHERE `sort` &gt;= #{fromSort}
+          and `sort` &lt;= #{toSort}
+    </update>
+
+    <update id="updateSortDecrement">
+        UPDATE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
+        SET `sort` = `sort` - 1
+        WHERE `sort` &gt;= #{fromSort}
+          and `sort` &lt;= #{toSort}
+    </update>
+
+    <update id="batchUpdateSortequalsId">
+        UPDATE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` SET `sort` = `id`
     </update>
 
     <delete id="deleteDynamicTableDataByUuid">

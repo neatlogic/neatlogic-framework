@@ -33,6 +33,10 @@ public interface MatrixDataMapper {
 
     Map<String, Long> checkMatrixAttributeHasDataByAttributeUuidList(@Param("matrixUuid") String matrixUuid, @Param("attributeUuidList") List<String> attributeUuidList);
 
+    Integer getMaxSort(String matrixUuid);
+
+    Integer getSortByUuid(@Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid);
+
     int insertDynamicTableData(@Param("rowData") List<MatrixColumnVo> rowData, @Param("matrixUuid") String matrixUuid);
 
     int insertDynamicTableDataForCopy(
@@ -43,6 +47,18 @@ public interface MatrixDataMapper {
     );
 
     int updateDynamicTableDataByUuid(@Param("rowData") List<MatrixColumnVo> rowData, @Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid);
+
+    int updateSortByUuid(@Param("uuid") String uuid, @Param("matrixUuid") String matrixUuid, @Param("sort") Integer sort);
+
+    int updateSortIncrement(@Param("matrixUuid") String matrixUuid,
+                            @Param("fromSort") Integer fromSort,
+                            @Param("toSort") Integer toSort);
+
+    int updateSortDecrement(@Param("matrixUuid") String matrixUuid,
+                            @Param("fromSort") Integer fromSort,
+                            @Param("toSort") Integer toSort);
+
+    void batchUpdateSortequalsId(String matrixUuid);
 
     int deleteDynamicTableDataByUuid(MatrixDataVo dataVo);
 }

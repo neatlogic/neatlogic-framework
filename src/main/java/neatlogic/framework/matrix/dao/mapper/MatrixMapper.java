@@ -1,5 +1,6 @@
 package neatlogic.framework.matrix.dao.mapper;
 
+import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.matrix.dto.MatrixCiVo;
 import neatlogic.framework.matrix.dto.MatrixExternalVo;
 import neatlogic.framework.matrix.dto.MatrixViewVo;
@@ -32,6 +33,10 @@ public interface MatrixMapper {
     MatrixExternalVo getMatrixExternalByMatrixUuid(String matrixUuid);
 
     MatrixViewVo getMatrixViewByMatrixUuid(String matrixUuid);
+
+    int getMatrixViewCount();
+
+    List<MatrixViewVo> getMatrixViewList(BasePageVo searchVo);
 
     MatrixCiVo getMatrixCiByMatrixUuid(String matrixUuid);
 

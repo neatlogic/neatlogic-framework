@@ -115,6 +115,21 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 
+	<select id="getMatrixViewCount" resultType="int">
+		SELECT COUNT(1) FROM `matrix_view`
+	</select>
+
+	<select id="getMatrixViewList" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="neatlogic.framework.matrix.dto.MatrixViewVo">
+		SELECT
+			`matrix_uuid` AS matrixUuid,
+			`file_name` AS fileName,
+			`config`,
+		    `xml`
+		FROM `matrix_view`
+		ORDER BY `matrix_uuid`
+		LIMIT #{startNum}, #{pageSize}
+	</select>
+
 	<select id="getMatrixCiByMatrixUuid" parameterType="string" resultType="neatlogic.framework.matrix.dto.MatrixCiVo">
 		SELECT
 			`matrix_uuid` AS matrixUuid,

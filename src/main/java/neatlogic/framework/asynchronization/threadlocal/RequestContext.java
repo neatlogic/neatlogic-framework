@@ -20,6 +20,7 @@ import neatlogic.framework.restful.constvalue.RejectSource;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
@@ -31,16 +32,16 @@ import java.util.Optional;
  */
 public class RequestContext implements Serializable {
     private static final ThreadLocal<RequestContext> instance = new ThreadLocal<>();
+    private static final long serialVersionUID = -5420998728515359626L;
     private String url;
     private HttpServletRequest request;
+    private HttpServletResponse response;
     //接口访问拒绝来源，租户或接口
     private RejectSource rejectSource;
     //接口访问速率
     private Double apiRate;
     //租户接口访问总速率
     private Double tenantRate;
-    //接口是否豁免license
-    private Boolean isExemptLicense = false;
     //语言
     Locale locale;
 
@@ -58,6 +59,14 @@ public class RequestContext implements Serializable {
 
     public void setRequest(HttpServletRequest request) {
         this.request = request;
+    }
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(HttpServletResponse response) {
+        this.response = response;
     }
 
     public Double getApiRate() {
@@ -102,10 +111,11 @@ public class RequestContext implements Serializable {
         return context;
     }
 
-    public static RequestContext init(HttpServletRequest request, String url) {
+    public static RequestContext init(HttpServletRequest request, String url, HttpServletResponse response) {
         RequestContext context = new RequestContext(request, url);
+        context.setResponse(response);
         instance.set(context);
-        if(request.getCookies() != null && request.getCookies().length > 0) {
+        if (request.getCookies() != null && request.getCookies().length > 0) {
             Optional<Cookie> languageCookie = Arrays.stream(request.getCookies()).filter(o -> Objects.equals(o.getName(), "neatlogic_language")).findFirst();
             if (languageCookie.isPresent()) {
                 context.setLocale(new Locale(languageCookie.get().getValue()));

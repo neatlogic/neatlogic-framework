@@ -95,6 +95,7 @@ public class ApiDispatcher {
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         InputFromContext.init(InputFrom.PAGE);
+        RequestContext.init(request, token, response);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {
             paramObj = new JSONObject();
@@ -237,7 +238,6 @@ public class ApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -290,7 +290,6 @@ public class ApiDispatcher {
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         try {
             JSONObject paramObj;
@@ -363,7 +362,6 @@ public class ApiDispatcher {
     public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -423,7 +421,6 @@ public class ApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -487,7 +484,6 @@ public class ApiDispatcher {
     public void dispatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj;
         if (StringUtils.isNotBlank(jsonStr)) {
             try {
@@ -560,7 +556,6 @@ public class ApiDispatcher {
     public void dispatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -616,7 +611,6 @@ public class ApiDispatcher {
     public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
@@ -651,7 +645,6 @@ public class ApiDispatcher {
     public void streamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
@@ -686,7 +679,6 @@ public class ApiDispatcher {
     public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");

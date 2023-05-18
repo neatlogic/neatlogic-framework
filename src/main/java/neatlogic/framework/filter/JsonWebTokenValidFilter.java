@@ -86,7 +86,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
         }
         //初始化request上下文
-        RequestContext.init(request, request.getRequestURI());
+        RequestContext.init(request, request.getRequestURI(), response);
 
         //判断租户
         try {

@@ -72,7 +72,7 @@ public class AnonymousApiDispatcher {
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
-
+        RequestContext.init(request, token, response);
         if (interfaceVo == null) {
             interfaceVo = apiMapper.getApiByToken(token);
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
@@ -244,7 +244,6 @@ public class AnonymousApiDispatcher {
                 }
             }
         }
-        RequestContext.init(request, token);
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
@@ -290,7 +289,6 @@ public class AnonymousApiDispatcher {
             tenant = token.substring(token.lastIndexOf("/") + 1);
             token = token.substring(0, token.lastIndexOf("/"));
         }
-        RequestContext.init(request, token);
         JSONObject returnObj = new JSONObject();
         JSONObject paramObj;
         try {
@@ -407,7 +405,6 @@ public class AnonymousApiDispatcher {
                 }
             }
         }
-        RequestContext.init(request, token);
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);

@@ -48,15 +48,37 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         }
         String handler = clazz.getName();
         invokeNotifyPolicyConfigVo.setHandler(handler);
-        NotifyPolicyVo notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(handler);
-        if (notifyPolicyVo == null) {
-            invokeNotifyPolicyConfigVo.setDefaultPolicyId(null);
+        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
+    }
+
+    @Override
+    public InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo, Class<? extends INotifyPolicyHandler> clazz) {
+        if (invokeNotifyPolicyConfigVo == null) {
+            invokeNotifyPolicyConfigVo = new InvokeNotifyPolicyConfigVo();
+        }
+        String handler = clazz.getName();
+        invokeNotifyPolicyConfigVo.setHandler(handler);
+        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
+    }
+
+    private InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig2(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo) {
+        NotifyPolicyVo notifyPolicyVo = null;
+        if (invokeNotifyPolicyConfigVo.getIsCustom() == 1) {
+            if (invokeNotifyPolicyConfigVo.getPolicyId() != null) {
+                notifyPolicyVo = notifyMapper.getNotifyPolicyById(invokeNotifyPolicyConfigVo.getPolicyId());
+            }
         } else {
-            invokeNotifyPolicyConfigVo.setDefaultPolicyId(notifyPolicyVo.getId());
+            notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(invokeNotifyPolicyConfigVo.getHandler());
+        }
+        if (notifyPolicyVo == null) {
+            invokeNotifyPolicyConfigVo.setPolicyId(null);
+            invokeNotifyPolicyConfigVo.setPolicyName(null);
+        } else {
+            invokeNotifyPolicyConfigVo.setPolicyId(notifyPolicyVo.getId());
+            invokeNotifyPolicyConfigVo.setPolicyName(notifyPolicyVo.getName());
         }
         return invokeNotifyPolicyConfigVo;
     }
-
     /**
      * 触发点发送通知时调用
      * @param notifyPolicyConfig
@@ -85,12 +107,6 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         if (StringUtils.isBlank(handler)) {
             return null;
         }
-        NotifyPolicyVo notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(handler);
-        if (notifyPolicyVo == null) {
-            invokeNotifyPolicyConfigVo.setDefaultPolicyId(null);
-        } else {
-            invokeNotifyPolicyConfigVo.setDefaultPolicyId(notifyPolicyVo.getId());
-        }
-        return invokeNotifyPolicyConfigVo;
+        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
     }
 }

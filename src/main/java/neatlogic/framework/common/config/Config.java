@@ -481,7 +481,7 @@ public class Config {
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");
 
-            LOGIN_AUTH_TYPE = prop.getProperty("login.auth.type" , "default");
+            LOGIN_AUTH_TYPE = prop.getProperty("login.auth.type" );
             LOGIN_AUTH_PASSWORD_ENCRYPT =  prop.getProperty("login.auth.password.encrypt" , "md5");
 
             LDAP_SERVER_URL = prop.getProperty("ldap.server.url","");

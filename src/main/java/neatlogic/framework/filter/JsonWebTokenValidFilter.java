@@ -86,7 +86,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
         }
         //初始化request上下文
-        RequestContext.init(request,request.getRequestURI());
+        RequestContext.init(request, request.getRequestURI());
 
         //判断租户
         try {
@@ -104,8 +104,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null) {
                     //获取认证插件名,优先使用请求方指定的认证
-                    authType =  request.getHeader("AuthType");
-                    if(StringUtils.isBlank(authType)) {
+                    String authTypeHeader = request.getHeader("AuthType");
+                    if (StringUtils.isNotBlank(authTypeHeader)) {
+                        authType = authTypeHeader;
+                    } else if (StringUtils.isNotBlank(Config.LOGIN_AUTH_TYPE())) {
                         authType = Config.LOGIN_AUTH_TYPE();
                     }
                     logger.info("AuthType: " + authType);

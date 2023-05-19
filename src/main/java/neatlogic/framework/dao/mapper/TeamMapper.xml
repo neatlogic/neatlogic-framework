@@ -655,7 +655,8 @@ limitations under the License.
                             `level`,
                             `upward_uuid_path`,
                             `upward_name_path`,
-                            `is_delete`)
+                            `is_delete`,
+                            `lcd`)
         VALUES (#{id},
                 #{uuid},
                 #{name},
@@ -665,7 +666,8 @@ limitations under the License.
                 #{level},
                 #{upwardUuidPath},
                 #{upwardNamePath},
-                0)
+                0,
+                NOW())
     </insert>
 
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
@@ -688,7 +690,8 @@ limitations under the License.
         <if test="level != null and level != ''">
             `level` = #{level},
         </if>
-        `name` = #{name}
+        `name` = #{name},
+        `lcd` = NOW()
         WHERE `uuid` = #{uuid}
     </update>
 

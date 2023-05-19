@@ -19,5 +19,7 @@ public interface MatrixAttributeMapper {
 
     void addMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid);
 
+    void addMatrixDynamicTableColumnSort(String matrixUuid);
+
     void dropMatrixDynamicTableColumn(@Param("columnName") String columnName, @Param("matrixUuid") String matrixUuid);
 }

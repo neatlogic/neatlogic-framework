@@ -193,6 +193,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     }
                 }
                 if (isNew) {
+                    Integer maxSort = matrixDataMapper.getMaxSort(matrixUuid);
+                    maxSort = maxSort == null ? 1 : maxSort + 1;
+                    rowData.add(new MatrixColumnVo("sort", maxSort.toString()));
                     matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
                     insert++;
                     update++;
@@ -741,6 +744,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (uuidValue == null) {
             if (hasData) {
                 rowData.add(new MatrixColumnVo("uuid", UuidUtil.randomUuid()));
+                Integer maxSort = matrixDataMapper.getMaxSort(matrixUuid);
+                maxSort = maxSort == null ? 1 : maxSort + 1;
+                rowData.add(new MatrixColumnVo("sort", maxSort.toString()));
                 matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
             }
         } else {
@@ -787,6 +793,25 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             return rowData;
         }
         return null;
+    }
+
+    @Override
+    protected void myMoveTableRowDataSort(String matrixUuid, String uuid, String toUuid) {
+        Integer oldSort = matrixDataMapper.getSortByUuid(uuid, matrixUuid);
+        Integer newSort = matrixDataMapper.getSortByUuid(toUuid, matrixUuid);
+        if (oldSort == null) {
+            return;
+        }
+        if (Objects.equals(newSort, oldSort)) {
+            return;
+        }
+        matrixDataMapper.updateSortByUuid(uuid, matrixUuid, 0);
+        if (newSort > oldSort) {
+            matrixDataMapper.updateSortDecrement(matrixUuid, oldSort, newSort);
+        } else {
+            matrixDataMapper.updateSortIncrement(matrixUuid, newSort, oldSort);
+        }
+        matrixDataMapper.updateSortByUuid(uuid, matrixUuid, newSort);
     }
 
     @Override

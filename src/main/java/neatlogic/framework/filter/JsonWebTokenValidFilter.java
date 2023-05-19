@@ -107,7 +107,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     String authTypeHeader = request.getHeader("AuthType");
                     if (StringUtils.isNotBlank(authTypeHeader)) {
                         authType = authTypeHeader;
-                    } else if (StringUtils.isNotBlank(Config.LOGIN_AUTH_TYPE())) {
+                    } else {
                         authType = Config.LOGIN_AUTH_TYPE();
                     }
                     logger.info("AuthType: " + authType);

@@ -398,6 +398,35 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return resultObj;
     }
 
+    @Override
+    public boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
+                                      List<? extends AttributeDataVo> newFormAttributeDataList,
+                                      List<? extends AttributeDataVo> oldFormAttributeDataList) {
+        boolean isModified = false;
+        Map<String, ? extends AttributeDataVo> newFormAttributeDataMap = newFormAttributeDataList.stream().collect(Collectors.toMap(e -> e.getAttributeUuid(), e -> e));
+        Map<String, ? extends AttributeDataVo> oldFormAttributeDataMap = oldFormAttributeDataList.stream().collect(Collectors.toMap(e -> e.getAttributeUuid(), e -> e));
+        for (FormAttributeVo formAttributeVo : formAttributeList) {
+            String attributeUuid = formAttributeVo.getUuid();
+            AttributeDataVo newProcessTaskFormAttributeDataVo = newFormAttributeDataMap.get(attributeUuid);
+            AttributeDataVo oldProcessTaskFormAttributeDataVo = oldFormAttributeDataMap.get(attributeUuid);
+            if (oldProcessTaskFormAttributeDataVo == null && newProcessTaskFormAttributeDataVo == null) {
+                continue;
+            }
+            // 在此之前如果该属性的值，在数据库中没有对应的旧数据
+            if (oldProcessTaskFormAttributeDataVo == null) {
+                if (newProcessTaskFormAttributeDataVo.getDataObj() != null) {
+                    // 现在要保存该属性的值不为null，则将该属性值保存到数据库中，但标记为已修改
+                    isModified = true;
+                }
+            } else if (newProcessTaskFormAttributeDataVo == null) {
+                // 如果现在接口参数中没有该属性值，则表示不修改该属性值
+            } else if (!Objects.equals(oldProcessTaskFormAttributeDataVo.getDataObj(), newProcessTaskFormAttributeDataVo.getDataObj())) {
+                isModified = true;
+            }
+        }
+        return isModified;
+    }
+
     private String getValue(String matrixUuid, ValueTextVo mapping, String text) {
         if (StringUtils.isBlank(text)) {
             return text;

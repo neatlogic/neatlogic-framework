@@ -23,6 +23,8 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 
+import java.util.List;
+
 public interface FormService {
     /**
      * 保存表单属性与其他功能的引用关系
@@ -47,4 +49,15 @@ public interface FormService {
     void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException;
 
     JSONObject getMyDetailedDataForSelectHandler(AttributeDataVo attributeDataVo, JSONObject configObj);
+
+    /**
+     * 判断是否修改了表单数据
+     * @param formAttributeList 表单属性列表
+     * @param newFormAttributeDataList 新的表单属性数据列表
+     * @param oldFormAttributeDataList 旧的表单属性数据列表
+     * @return
+     */
+    boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
+                               List<? extends AttributeDataVo> newFormAttributeDataList,
+                               List<? extends AttributeDataVo> oldFormAttributeDataList);
 }

@@ -18,10 +18,13 @@ package neatlogic.framework.form.service;
 
 import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.crossover.ICrossoverService;
+import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+
+import java.util.List;
 
 public interface IFormCrossoverService extends ICrossoverService {
 
@@ -44,4 +47,15 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @throws AttributeValidException
      */
     void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException;
+
+    /**
+     * 判断是否修改了表单数据
+     * @param formAttributeList 表单属性列表
+     * @param newFormAttributeDataList 新的表单属性数据列表
+     * @param oldFormAttributeDataList 旧的表单属性数据列表
+     * @return
+     */
+    boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
+                               List<? extends AttributeDataVo> newFormAttributeDataList,
+                               List<? extends AttributeDataVo> oldFormAttributeDataList);
 }

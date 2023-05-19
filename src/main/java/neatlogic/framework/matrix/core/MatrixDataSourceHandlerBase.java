@@ -238,6 +238,14 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
 
     protected abstract void myDeleteTableRowData(String matrixUuid, List<String> uuidList);
 
+    @Override
+    public void moveTableRowDataSort(String matrixUuid, String uuid, String toUuid) {
+        myMoveTableRowDataSort(matrixUuid, uuid, toUuid);
+    }
+
+    protected void myMoveTableRowDataSort(String matrixUuid, String uuid, String toUuid) {
+
+    }
 
     protected JSONArray getTheadList(List<MatrixAttributeVo> attributeList) {
         JSONArray theadList = new JSONArray();

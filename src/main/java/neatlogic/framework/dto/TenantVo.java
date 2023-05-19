@@ -93,15 +93,14 @@ public class TenantVo extends BasePageVo {
     private String status;
     @EntityField(name = "超级管理员", type = ApiParamType.JSONARRAY)
     private List<String> superAdminList;
-    @EntityField(name = "数据库IP", type = ApiParamType.STRING)
-    private String dbHost;
-    @EntityField(name = "数据库Port", type = ApiParamType.INTEGER)
-    private Integer dbPort;
     @EntityField(name = "异常信息", type = ApiParamType.STRING)
     private String errorMsg;
     @EntityField(name = "租户mongodb", type = ApiParamType.JSONOBJECT)
     private MongoDbVo mongodb;
-
+    @EntityField(name = "数据库数据源", type = ApiParamType.JSONOBJECT)
+    private DatasourceVo datasource;
+    @EntityField(name = "数据库数据源", type = ApiParamType.JSONOBJECT)
+    private boolean isLocalDb = true;
     public TenantVo() {
         this.setPageSize(20);
     }
@@ -197,22 +196,6 @@ public class TenantVo extends BasePageVo {
         this.superAdminList = superAdminList;
     }
 
-    public String getDbHost() {
-        return dbHost;
-    }
-
-    public void setDbHost(String dbHost) {
-        this.dbHost = dbHost;
-    }
-
-    public Integer getDbPort() {
-        return dbPort;
-    }
-
-    public void setDbPort(Integer dbPort) {
-        this.dbPort = dbPort;
-    }
-
     public String getErrorMsg() {
         return errorMsg;
     }
@@ -227,5 +210,21 @@ public class TenantVo extends BasePageVo {
 
     public void setMongodb(MongoDbVo mongodb) {
         this.mongodb = mongodb;
+    }
+
+    public DatasourceVo getDatasource() {
+        return datasource;
+    }
+
+    public void setDatasource(DatasourceVo datasource) {
+        this.datasource = datasource;
+    }
+
+    public boolean getIsLocalDb() {
+        return isLocalDb;
+    }
+
+    public void setIsLocalDb(boolean localDb) {
+        isLocalDb = localDb;
     }
 }

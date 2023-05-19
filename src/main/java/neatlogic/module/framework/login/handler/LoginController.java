@@ -17,7 +17,6 @@ limitations under the License.
 package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -91,8 +90,10 @@ public class LoginController {
         try {
             String userId = jsonObj.getString("userid");
             String password = jsonObj.getString("password");
-            String authType = jsonObj.getString("authType");
-            if(Strings.isNullOrEmpty("authType")){
+            String authType = "default";
+            if (StringUtils.isNotBlank(jsonObj.getString("authType"))) {
+                authType = jsonObj.getString("authType");
+            } else if (StringUtils.isNotBlank(Config.LOGIN_AUTH_TYPE())) {
                 authType = Config.LOGIN_AUTH_TYPE();
             }
 
@@ -137,10 +138,10 @@ public class LoginController {
                     }
                     //切换到具体的认证插件
                     ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
-                    if(loginAuth == null ){//配置了插件，但不在已有的插件范围内
-                        throw  new LoginAuthPluginNoFoundException();
+                    if (loginAuth == null) {//配置了插件，但不在已有的插件范围内
+                        throw new LoginAuthPluginNoFoundException();
                     }
-                    checkUserVo = loginAuth.login(userVo , returnObj);
+                    checkUserVo = loginAuth.login(userVo, returnObj);
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";

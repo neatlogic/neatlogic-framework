@@ -204,6 +204,42 @@ limitations under the License.
                                 `need_audit`  = #{needAudit}
     </insert>
 
+    <insert id="insertApi" parameterType="neatlogic.framework.restful.dto.ApiVo">
+        INSERT IGNORE INTO `api`
+        (`name`,
+         `module_id`,
+         `is_active`,
+         `handler`,
+         `config`,
+         `token`,
+         `description`,
+         `expire`,
+         `username`,
+         `password`,
+         `authtype`,
+         `type`,
+         `qps`,
+         `timeout`,
+         `need_audit`,
+         `create_time`)
+        VALUES (#{name},
+                #{moduleId},
+                #{isActive},
+                #{handler},
+                #{config},
+                #{token},
+                #{description},
+                #{expire},
+                #{username},
+                #{passwordCipher},
+                #{authtype},
+                #{type},
+                #{qps},
+                #{timeout},
+                #{needAudit},
+                now(3))
+    </insert>
+
     <insert id="insertOrUpdateNeedAuditApi" parameterType="neatlogic.framework.restful.dto.ApiVo">
         INSERT INTO `api`
         (`name`,

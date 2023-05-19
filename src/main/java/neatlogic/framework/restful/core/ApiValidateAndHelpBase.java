@@ -358,6 +358,8 @@ public class ApiValidateAndHelpBase {
                             paramObj.put(p.name(), JSONArray.parse(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.JSONOBJECT)) {
                             paramObj.put(p.name(), JSONObject.parse(p.defaultValue()));
+                        } else if (p.type().equals(ApiParamType.ENUM)) {
+                            paramObj.put(p.name(), p.defaultValue());
                         }
                     } catch (Exception ex) {
                         throw new ParamDefaultValueIrregularException(p.name(), p.defaultValue(), p.type());

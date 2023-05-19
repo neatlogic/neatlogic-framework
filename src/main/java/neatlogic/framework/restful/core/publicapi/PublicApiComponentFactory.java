@@ -60,7 +60,6 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
     private static final List<ApiVo> apiList = new ArrayList<>();
     private static final List<ApiVo> apiTokenList = new ArrayList<>();
     private static final Map<String, ApiVo> apiMap = new HashMap<>();
-    private static final Map<String, ApiVo> apiTokenMap = new HashMap<>();
     // public static Map<String, RateLimiter> interfaceRateMap = new
     // ConcurrentHashMap<>();
     private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
@@ -148,10 +147,6 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static Map<String, ApiVo> getApiMap() {
         return apiMap;
-    }
-
-    public static Map<String, ApiVo> getApiTokenMap() {
-        return apiTokenMap;
     }
 
 
@@ -276,7 +271,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
             }
             if (!apiMap.containsKey(token)) {
                 apiTokenList.add(apiVo);
-                apiTokenMap.put(token, apiVo);
+                apiMap.put(token, apiVo);
             } else {
                 logger.error("接口：" + token + "已存在，请重新定义访问路径");
                 System.exit(1);
@@ -301,10 +296,10 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
             // 切换租户数据源
             TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
             for (ApiVo apiVo : apiTokenList) {
-                ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
+                //ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
                 //if (api == null) {
                 //即使接口存在也可能需要更新模块、类型、描述等信息
-                apiMapper.replaceApi(apiVo);
+                apiMapper.insertApi(apiVo);
                 // }
             }
         }

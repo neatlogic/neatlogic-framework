@@ -97,6 +97,7 @@ public class PublicApiDispatcher {
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         InputFromContext.init(InputFrom.RESTFUL);
+        RequestContext.init(request, token, response);
         //初始化时区
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
@@ -131,7 +132,7 @@ public class PublicApiDispatcher {
                 UserContext.init(userVo, timezone, request, response);
             }
         }
-        if(userVo == null){
+        if (userVo == null) {
             UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
         }
 
@@ -252,7 +253,6 @@ public class PublicApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -267,7 +267,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -291,7 +291,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject returnObj = new JSONObject();
         try {
             JSONObject paramObj;
@@ -317,7 +317,7 @@ public class PublicApiDispatcher {
             }
 
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -341,7 +341,6 @@ public class PublicApiDispatcher {
     public void dispatcherForPostStream(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
         JSONObject paramObj = new JSONObject();
         Enumeration<String> paraNames = request.getParameterNames();
         while (paraNames.hasMoreElements()) {
@@ -356,7 +355,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.STREAM, paramObj, returnObj, "doservice");
-        }catch (TenantNotFoundException ex) {
+        } catch (TenantNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             response.setStatus(521);
             returnObj.put("Status", "ERROR");
@@ -385,7 +384,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -401,7 +400,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -425,7 +424,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject paramObj;
         if (StringUtils.isNotBlank(jsonStr)) {
             try {
@@ -440,7 +439,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -464,7 +463,7 @@ public class PublicApiDispatcher {
     public void dispatcherForPostBinaryMultipart(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject paramObj = new JSONObject();
 
         Enumeration<String> paraNames = request.getParameterNames();
@@ -480,7 +479,7 @@ public class PublicApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
-        }catch (ApiRuntimeException ex) {
+        } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
@@ -504,7 +503,7 @@ public class PublicApiDispatcher {
     public void resthelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
@@ -530,7 +529,7 @@ public class PublicApiDispatcher {
     public void streamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
@@ -556,7 +555,7 @@ public class PublicApiDispatcher {
     public void binaryhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        RequestContext.init(request, token);
+        
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");

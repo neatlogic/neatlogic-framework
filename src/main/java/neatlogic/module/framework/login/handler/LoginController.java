@@ -17,7 +17,6 @@ limitations under the License.
 package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Strings;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -92,7 +91,7 @@ public class LoginController {
             String userId = jsonObj.getString("userid");
             String password = jsonObj.getString("password");
             String authType = jsonObj.getString("authType");
-            if(Strings.isNullOrEmpty("authType")){
+            if(StringUtils.isNotBlank(authType)){
                 authType = Config.LOGIN_AUTH_TYPE();
             }
 

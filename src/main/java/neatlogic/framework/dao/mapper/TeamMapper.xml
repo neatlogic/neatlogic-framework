@@ -821,7 +821,7 @@ limitations under the License.
             `team`
         SET
             `is_delete` = 1
-        WHERE `source` = #{source}  AND UNIX_TIMESTAMP(`lcd`) &lt; UNIX_TIMESTAMP(DATE_FORMAT(NOW(),'%Y-%m-%d'))
+        WHERE `source` = #{value}  AND UNIX_TIMESTAMP(`lcd`) &lt; UNIX_TIMESTAMP(DATE_FORMAT(NOW(),'%Y-%m-%d'))
     </update>
 
     <!--	<delete id="deleteTeamByLeftRightCode">-->

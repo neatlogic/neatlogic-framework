@@ -645,6 +645,10 @@ limitations under the License.
         WHERE `user_uuid` = #{value}
     </select>
 
+    <select id="getTeamUUIDbyNameAndUpwardNamePath" parameterType="neatlogic.framework.dto.TeamVo" resultType="java.lang.String">
+        SELECT  `uuid` FROM `team`  WHERE `name` = #{name} AND upward_name_path=#{upwardNamePath}
+    </select>
+
     <insert id="insertTeam" parameterType="neatlogic.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,
                             `uuid`,

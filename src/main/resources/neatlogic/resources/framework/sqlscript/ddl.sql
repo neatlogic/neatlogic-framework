@@ -1187,6 +1187,8 @@ CREATE TABLE IF NOT EXISTS `team` (
   `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已删除',
   `upward_uuid_path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '向上uuid路径',
   `upward_name_path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '向上名称路径',
+  `source` varchar(30) COLLATE utf8mb4_general_ci DEFAULT 'web' COMMENT '用户来源',
+  `lcd` timestamp(3) NULL DEFAULT NULL COMMENT '最后更新时间',
   PRIMARY KEY (`uuid`) USING BTREE,
   KEY `idx_lft_rht` (`lft`,`rht`) USING BTREE,
   KEY `idx_rht_lft` (`rht`,`lft`) USING BTREE,

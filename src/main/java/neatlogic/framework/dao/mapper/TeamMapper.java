@@ -133,6 +133,7 @@ public interface TeamMapper {
 
 //	 int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 
+    int updateTeamIsDeleteBySource(String source);
     int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
     int updateUpwardUuidPathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);

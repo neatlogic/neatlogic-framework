@@ -12,4 +12,5 @@ public @interface Param {
     String controlValue() default "";
     String description() default "";
     boolean required() default true;
+    int sort() default  0;
 }

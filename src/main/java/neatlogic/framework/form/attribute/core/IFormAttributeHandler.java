@@ -191,6 +191,15 @@ public interface IFormAttributeHandler {
     JSONObject valid(AttributeDataVo attributeDataVo, JSONObject configObj) throws AttributeValidException;
 
     /**
+     * 转换数据类型，传入的数据转换成当前组件对应的数据类型
+     * @param source
+     * @param attributeLabel
+     * @return
+     */
+    default Object conversionDataType(Object source, String attributeLabel) {
+        return source;
+    }
+    /**
      * @param @return
      * @return int
      * @Author: chenqiwei

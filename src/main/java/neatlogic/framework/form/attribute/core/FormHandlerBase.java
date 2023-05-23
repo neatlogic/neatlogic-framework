@@ -16,9 +16,11 @@ limitations under the License.
 
 package neatlogic.framework.form.attribute.core;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.dto.AttributeDataVo;
+import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
@@ -209,5 +211,31 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
     @Override
     public int getSort() {
         return 100;
+    }
+
+    protected String convertToString(Object source, String attributeLabel) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            return (String) source;
+        }
+        throw new AttributeValidException(attributeLabel);
+    }
+
+    protected JSONArray convertToJSONArray(Object source, String attributeLabel) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            try {
+                return JSONObject.parseArray((String) source);
+            } catch (Exception e) {
+                throw new AttributeValidException(attributeLabel);
+            }
+        } else if (source instanceof JSONArray) {
+            return (JSONArray) source;
+        }
+        throw new AttributeValidException(attributeLabel);
     }
 }

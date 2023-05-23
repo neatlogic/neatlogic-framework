@@ -117,6 +117,11 @@ public class UploadHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        return convertToJSONArray(source, attributeLabel);
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONArray dataArray = (JSONArray) attributeDataVo.getDataObj();
         if (CollectionUtils.isNotEmpty(dataArray)) {

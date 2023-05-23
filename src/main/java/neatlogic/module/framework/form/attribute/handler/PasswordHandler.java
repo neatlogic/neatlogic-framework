@@ -51,6 +51,17 @@ public class PasswordHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            return RC4Util.encrypt((String) source);
+        }
+        throw new AttributeValidException(attributeLabel);
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return "已更新";
     }

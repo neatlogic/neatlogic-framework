@@ -55,6 +55,11 @@ public class CheckboxHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        return convertToJSONArray(source, attributeLabel);
+    }
+
+    @Override
     public int getSort() {
         return 6;
     }

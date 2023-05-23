@@ -70,6 +70,28 @@ public class SelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            String sourceStr = (String) source;
+            if (sourceStr.startsWith("[") && sourceStr.endsWith("]")) {
+                try {
+                    return JSONObject.parseArray((String) source);
+                } catch (Exception e) {
+                    throw new AttributeValidException(attributeLabel);
+                }
+            } else {
+                return source;
+            }
+        } else if (source instanceof JSONArray) {
+            return source;
+        }
+        throw new AttributeValidException(attributeLabel);
+    }
+
+    @Override
     public int getSort() {
         return 3;
     }

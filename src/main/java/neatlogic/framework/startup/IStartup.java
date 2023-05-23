@@ -27,12 +27,18 @@ public interface IStartup {
     /**
      * 每个租户分别执行
      */
-    void executeForCurrentTenant();
+    default int executeForCurrentTenant() {
+        //返回-999代表没有任何执行逻辑
+        return -999;
+    }
 
     /*
     只执行一次，晚于executeForTenant执行
      */
-    void executeForAllTenant();
+    default int executeForAllTenant() {
+        //返回-999代表没有任何执行逻辑
+        return -999;
+    }
 
     /**
      * 排序
@@ -43,13 +49,15 @@ public interface IStartup {
 
     /**
      * 设置所在模块组名
+     *
      * @param group 模块组
      */
     void setGroup(String group);
 
     /**
      * 获取所在模块组
-     * @return  模块组
+     *
+     * @return 模块组
      */
     String getGroup();
 }

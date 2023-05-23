@@ -52,7 +52,7 @@ public class SubscribeStartupComponent extends StartupBase {
     }
 
     @Override
-    public void executeForCurrentTenant() {
+    public int executeForCurrentTenant() {
         SubscribeVo subscribeVo = new SubscribeVo();
         subscribeVo.setIsActive(1);
         List<SubscribeVo> subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
@@ -74,10 +74,11 @@ public class SubscribeStartupComponent extends StartupBase {
                 }
             }
         }
+        return 0;
     }
 
     @Override
-    public void executeForAllTenant() {
+    public int executeForAllTenant() {
         ScheduledExecutorService mqRestartService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
@@ -108,6 +109,7 @@ public class SubscribeStartupComponent extends StartupBase {
             }
         };
         mqRestartService.scheduleAtFixedRate(runnable, Config.MQ_SUBSCRIBE_RECONNECT_PERIOD(), Config.MQ_SUBSCRIBE_RECONNECT_PERIOD(), TimeUnit.MINUTES);
+        return 0;
     }
 
     @Override

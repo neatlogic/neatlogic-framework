@@ -81,7 +81,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
             list.add(startup);
         }
         //如果没有要执行的dml 和 要初始化的startup
-        if(resource == null  && CollectionUtils.isEmpty(list)){
+        if (resource == null && CollectionUtils.isEmpty(list)) {
             return;
         }
         //模块全部加载完毕后再开始启动作业，依赖NeatLogicThread任务会等待全部模块加载完毕后再开始执行逻辑
@@ -114,22 +114,31 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                         TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                        if(CollectionUtils.isNotEmpty(list)) {
+                        if (CollectionUtils.isNotEmpty(list)) {
                             for (IStartup startup : list) {
                                 try {
-                                    startup.executeForCurrentTenant();
+
+                                    int i = startup.executeForCurrentTenant();
+                                    if (i != -999) {
+                                        System.out.println("[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is completed.");
+                                    }
                                 } catch (Exception ex) {
-                                    logger.error("租户“" + tenantVo.getName() + "”的启动作业“" + startup.getName() + "”执行失败：" + ex.getMessage(), ex);
+                                    System.out.println("[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is failed.");
+                                    logger.error(ex.getMessage(), ex);
                                 }
                             }
                         }
                     }
-                    if(CollectionUtils.isNotEmpty(list)) {
+                    if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             try {
-                                startup.executeForAllTenant();
+                                int i = startup.executeForAllTenant();
+                                if (i != -999) {
+                                    System.out.println("[All Tenant]Startup Job:" + startup.getName() + " is completed.");
+                                }
                             } catch (Exception ex) {
-                                logger.error("启动作业“" + startup.getName() + "“执行失败：" + ex.getMessage(), ex);
+                                System.out.println("[All Tenant]Startup Job:" + startup.getName() + " is failed.");
+                                logger.error(ex.getMessage(), ex);
                             }
                         }
                     }

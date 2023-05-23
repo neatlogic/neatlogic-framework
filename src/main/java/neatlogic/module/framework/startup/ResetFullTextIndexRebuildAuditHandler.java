@@ -38,12 +38,9 @@ public class ResetFullTextIndexRebuildAuditHandler extends StartupBase {
     }
 
     @Override
-    public void executeForCurrentTenant() {
+    public int executeForCurrentTenant() {
         auditMapper.resetFullTextIndexRebuildAuditStatus();
+        return 0;
     }
 
-    @Override
-    public void executeForAllTenant() {
-
-    }
 }

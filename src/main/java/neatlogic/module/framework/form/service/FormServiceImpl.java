@@ -320,12 +320,14 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (formAttributeHandler == null) {
                 continue;
             }
-            AttributeDataVo attributeDataVo = new AttributeDataVo();
-            attributeDataVo.setAttributeUuid(formAttributeVo.getUuid());
-            attributeDataVo.setAttributeLabel(formAttributeVo.getLabel());
-            attributeDataVo.setDataObj(formAttributeDataObj.get("dataList"));
-            formAttributeHandler.valid(attributeDataVo, formAttributeVo.getConfigObj());
-            formAttributeDataObj.put("dataList", attributeDataVo.getDataObj());
+            Object dataList = formAttributeHandler.conversionDataType(formAttributeDataObj.get("dataList"), formAttributeVo.getLabel());
+            formAttributeDataObj.put("dataList", dataList);
+//            AttributeDataVo attributeDataVo = new AttributeDataVo();
+//            attributeDataVo.setAttributeUuid(formAttributeVo.getUuid());
+//            attributeDataVo.setAttributeLabel(formAttributeVo.getLabel());
+//            attributeDataVo.setDataObj(formAttributeDataObj.get("dataList"));
+//            formAttributeHandler.valid(attributeDataVo, formAttributeVo.getConfigObj());
+//            formAttributeDataObj.put("dataList", attributeDataVo.getDataObj());
         }
     }
 

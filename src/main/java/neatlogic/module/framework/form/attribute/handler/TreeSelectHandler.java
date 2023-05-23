@@ -119,6 +119,11 @@ public class TreeSelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        return convertToString(source, attributeLabel);
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");

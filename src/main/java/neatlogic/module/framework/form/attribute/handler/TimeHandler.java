@@ -46,6 +46,11 @@ public class TimeHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        return convertToString(source, attributeLabel);
+    }
+
+    @Override
     public int getSort() {
         return 7;
     }

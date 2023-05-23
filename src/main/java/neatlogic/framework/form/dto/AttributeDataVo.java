@@ -17,11 +17,12 @@ limitations under the License.
 package neatlogic.framework.form.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
+import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -72,28 +73,43 @@ public class AttributeDataVo {
         if (data == null) {
             return null;
         }
-        if (data.startsWith("[") && data.endsWith("]")) {
-            return JSON.parseArray(data);
-        } else if (data.startsWith("{") && data.endsWith("}")) {
-            return JSON.parseObject(data);
-        } else {
-            try {
-                return Integer.valueOf(data);
-            } catch (NumberFormatException e) {
-            }
-            try {
-                return Long.valueOf(data);
-            } catch (NumberFormatException e) {
-            }
-            try {
-                return Double.valueOf(data);
-            } catch (NumberFormatException e) {
-            }
+        if (StringUtils.isBlank(type)) {
             return data;
         }
+        IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+        if (handler == null) {
+            return data;
+        }
+        return handler.conversionDataType(data, attributeLabel);
+//        if (data.startsWith("[") && data.endsWith("]")) {
+//            return JSONObject.parseArray(data);
+//        } else if (data.startsWith("{") && data.endsWith("}")) {
+//            return JSONObject.parseObject(data);
+//        } else {
+//            try {
+//                return Integer.valueOf(data);
+//            } catch (NumberFormatException e) {
+//            }
+//            try {
+//                return Long.valueOf(data);
+//            } catch (NumberFormatException e) {
+//            }
+//            try {
+//                return Double.valueOf(data);
+//            } catch (NumberFormatException e) {
+//            }
+//            return data;
+//        }
     }
 
     public void setDataObj(Object dataObj) {
+        if (StringUtils.isNotBlank(type)) {
+            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+            if (handler != null) {
+                this.dataObj = handler.conversionDataType(data, attributeLabel);
+                return;
+            }
+        }
         this.dataObj = dataObj;
     }
 

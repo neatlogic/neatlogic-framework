@@ -47,6 +47,11 @@ public class CkEditorHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object conversionDataType(Object source, String attributeLabel) {
+        return convertToString(source, attributeLabel);
+    }
+
+    @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
     }

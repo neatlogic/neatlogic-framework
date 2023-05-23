@@ -75,7 +75,7 @@ public class AttributeDataVo {
             if (handler == null) {
                 return dataObj;
             }
-            return handler.conversionDataType(data, attributeLabel);
+            return handler.conversionDataType(dataObj, attributeLabel);
         } else {
             if (data == null) {
                 return null;

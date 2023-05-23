@@ -1229,6 +1229,12 @@ limitations under the License.
             #{item.userInfo}
             )
         </foreach>
+        on DUPLICATE KEY UPDATE
+        user_id=values(user_id),
+        user_name=values(user_name),
+        email=values(email),
+        phone=values(phone),
+        pinyin=values(pinyin)
     </insert>
 
     <insert id="batchInsertUserTeam" parameterType="java.util.List">
@@ -1243,6 +1249,9 @@ limitations under the License.
             #{item.userUuid}
             )
         </foreach>
+        on DUPLICATE KEY UPDATE
+        team_uuid=values(team_uuid),
+        user_uuid=values(user_uuid)
     </insert>
 
     <insert id="batchInsertUserRole" parameterType="java.util.List">
@@ -1252,6 +1261,9 @@ limitations under the License.
         <foreach collection="list" item="item" separator=",">
             (#{item.userUuid}, #{item.roleUuid})
         </foreach>
+        on DUPLICATE KEY UPDATE
+        role_uuid=values(role_uuid),
+        user_uuid=values(user_uuid)
     </insert>
 
     <update id="updateUser" parameterType="neatlogic.framework.dto.UserVo">
@@ -1379,6 +1391,15 @@ limitations under the License.
         DELETE
         FROM `user_title`
         WHERE `name` = #{value};
+    </delete>
+
+    <delete id="bacthDeleteUserTeam" parameterType="java.util.List">
+        DELETE a.* FROM `user_team`  a JOIN `team` b ON a.team_uuid = b.uuid
+        WHERE b.source = #{source}
+        AND `user_uuid` IN
+        <foreach collection="userUuidlist" item="value" separator="," open="(" close=")">
+            #{value}
+        </foreach>
     </delete>
 
     <update id="updateUserTokenByUuid">

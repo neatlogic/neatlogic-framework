@@ -229,6 +229,8 @@ public interface UserMapper {
 
     int deleteUserTitleByName(String name);
 
+    int bacthDeleteUserTeam(@Param("userUuidlist")List<String> userUuidlist,@Param("source")String source);
+
     int searchUserCountByAuth(UserVo vo);
 
     List<String> searchUserUuIdByUser(UserVo vo);

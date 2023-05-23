@@ -7,6 +7,7 @@ import neatlogic.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TeamMapper {
     TeamVo getTeam(TeamVo teamVo);
@@ -107,7 +108,7 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByUserUuid(String userUuid);
 
-    List<String> getTeamUUIDbyNameAndUpwardNamePath(TeamVo teamVo);
+    List<TeamVo> getTeamUuidbyUpwardNamePath(@Param("list") List<String> list);
 
     int checkTitleIsReferenceByTitleId(Long id);
 

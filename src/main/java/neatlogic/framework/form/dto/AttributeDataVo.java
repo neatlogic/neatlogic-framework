@@ -68,48 +68,30 @@ public class AttributeDataVo {
 
     public Object getDataObj() {
         if (dataObj != null) {
-            return dataObj;
+            if (StringUtils.isBlank(type)) {
+                return dataObj;
+            }
+            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+            if (handler == null) {
+                return dataObj;
+            }
+            return handler.conversionDataType(data, attributeLabel);
+        } else {
+            if (data == null) {
+                return null;
+            }
+            if (StringUtils.isBlank(type)) {
+                return data;
+            }
+            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+            if (handler == null) {
+                return data;
+            }
+            return handler.conversionDataType(data, attributeLabel);
         }
-        if (data == null) {
-            return null;
-        }
-        if (StringUtils.isBlank(type)) {
-            return data;
-        }
-        IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
-        if (handler == null) {
-            return data;
-        }
-        return handler.conversionDataType(data, attributeLabel);
-//        if (data.startsWith("[") && data.endsWith("]")) {
-//            return JSONObject.parseArray(data);
-//        } else if (data.startsWith("{") && data.endsWith("}")) {
-//            return JSONObject.parseObject(data);
-//        } else {
-//            try {
-//                return Integer.valueOf(data);
-//            } catch (NumberFormatException e) {
-//            }
-//            try {
-//                return Long.valueOf(data);
-//            } catch (NumberFormatException e) {
-//            }
-//            try {
-//                return Double.valueOf(data);
-//            } catch (NumberFormatException e) {
-//            }
-//            return data;
-//        }
     }
 
     public void setDataObj(Object dataObj) {
-        if (StringUtils.isNotBlank(type)) {
-            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
-            if (handler != null) {
-                this.dataObj = handler.conversionDataType(data, attributeLabel);
-                return;
-            }
-        }
         this.dataObj = dataObj;
     }
 

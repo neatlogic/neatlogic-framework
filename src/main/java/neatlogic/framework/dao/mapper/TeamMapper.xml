@@ -680,6 +680,50 @@ limitations under the License.
                 NOW())
     </insert>
 
+    <insert id="batchSaveTeam" parameterType="java.util.List">
+        INSERT INTO `team` (`id`,
+                            `uuid`,
+                            `name`,
+                            `parent_uuid`,
+                            `lft`,
+                            `rht`,
+                            `level`,
+                            `upward_uuid_path`,
+                            `upward_name_path`,
+                            `is_delete`,
+                            `source`,
+                            `lcd`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.uuid},
+            #{item.name},
+            #{item.parentUuid},
+            #{item.lft},
+            #{item.rht},
+            #{item.level},
+            #{item.upwardUuidPath},
+            #{item.upwardNamePath},
+            0,
+            #{item.source},
+            NOW()
+            )
+        </foreach>
+        on DUPLICATE KEY UPDATE
+        uuid=values(uuid),
+        `name`=values(name),
+        parent_uuid=values(parent_uuid),
+        lft=values(lft),
+        rht=values(rht),
+        `level`=values(`level`),
+        upward_uuid_path=values(upward_uuid_path),
+        upward_name_path=values(upward_name_path),
+        is_delete=values(is_delete),
+        `source`=values(source),
+        lcd=values(lcd)
+    </insert>
+
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
         INSERT INTO `user_team` (`team_uuid`,
                                  `user_uuid`)

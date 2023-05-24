@@ -59,6 +59,8 @@ public interface RoleMapper {
 
     List<String> getRoleUuidByName(String name);
 
+    List<String> getRoleUuidByNameList(@Param("nameList") List nameList);
+
     List<ValueTextVo> getRoleUuidAndNameMapList(List<String> list);
 
     List<RoleTeamVo> getRoleTeamListByRoleUuid(String roleUuid);

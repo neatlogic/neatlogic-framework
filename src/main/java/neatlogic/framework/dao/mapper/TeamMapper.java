@@ -116,6 +116,8 @@ public interface TeamMapper {
 
     int insertTeam(TeamVo teamVo);
 
+    int batchSaveTeam(@Param("list")List teamList);
+
     int insertTeamUser(TeamUserVo teamUserVo);
 
     int insertTeamUserTitle(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid, @Param("titleId") Long titleId);

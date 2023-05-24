@@ -66,9 +66,6 @@ public class BaseEditorVo extends BasePageVo {
 
 
     public final String getFcu() {
-        if (StringUtils.isBlank(fcu)) {
-            fcu = UserContext.get().getUserUuid();
-        }
         return fcu;
     }
 
@@ -93,9 +90,6 @@ public class BaseEditorVo extends BasePageVo {
     }
 
     public final String getLcu() {
-        if (StringUtils.isBlank(lcu)) {
-            lcu = UserContext.get().getUserUuid();
-        }
         return lcu;
     }
 

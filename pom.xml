@@ -36,7 +36,7 @@ limitations under the License.
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>**</include>
+                    <include>**</include> 
                 </includes>
             </resource>
         </resources>

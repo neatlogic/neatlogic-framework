@@ -18,6 +18,9 @@ package neatlogic.framework.sla.core;
 
 import org.springframework.util.ClassUtils;
 
+/**
+ * SLA重算接口，当服务窗口排班更新时，调用该接口的实现类进行相关SLA耗时重算
+ */
 public interface ISlaRecalculateHandler {
 
     default String getHandler() {

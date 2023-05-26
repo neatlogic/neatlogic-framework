@@ -26,7 +26,7 @@ import java.util.List;
 public class InvokeNotifyPolicyConfigVo {
     private Long policyId;
     private String policyName;
-    private String policyPath;
+    private String policyPath = "";
     private List<ParamMappingVo> paramMappingList = new ArrayList<>();
     private String handler;
     private int isCustom = 0;

@@ -1,17 +1,17 @@
 /*
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package neatlogic.framework.auth.init;
@@ -34,8 +34,7 @@ import java.util.Set;
 /**
  * @Title: MaintenanceMode
  * @Package neatlogic.framework.auth.init
- * @Description:
- * 维护模式下（config文件 is.maintenance.mode = true）
+ * @Description: 维护模式下-DenableNoSecret=true
  * administrator 厂商维护用户可拥有 用户、角色、组织架构、权限的维护权限。上生产后请关闭维护模式 即设置为false
  * @Author: 89770
  * @Date: 2021/1/5 14:50
@@ -57,7 +56,7 @@ public class MaintenanceMode {
      * @Params: []
      * @Returns: neatlogic.framework.dto.UserVo
      **/
-    public static UserVo getMaintenanceUser(){
+    public static UserVo getMaintenanceUser() {
         UserVo userVo = new UserVo();
         userVo.setUuid(Config.SUPERADMIN());
         userVo.setUserId(Config.SUPERADMIN());
@@ -65,7 +64,7 @@ public class MaintenanceMode {
         userVo.setIsActive(1);
         userVo.setVipLevel(0);
         List<UserAuthVo> authList = new ArrayList<>();
-        for (String auth :maintenanceAuthSet){
+        for (String auth : maintenanceAuthSet) {
             AuthBase authVo = AuthFactory.getAuthInstance(auth);
             UserAuthVo userAuthVo = new UserAuthVo();
             userAuthVo.setAuth(auth);

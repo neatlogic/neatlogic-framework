@@ -10,7 +10,7 @@ public class IntegrationNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1061691150909475176L;
 
     public IntegrationNotFoundException(String uuid) {
-        super("exception.framework.integrationnotfoundexception" + uuid);
+        super("exception.framework.integrationnotfoundexception", uuid);
     }
 
     public IntegrationNotFoundException(List<String> uuidList) {

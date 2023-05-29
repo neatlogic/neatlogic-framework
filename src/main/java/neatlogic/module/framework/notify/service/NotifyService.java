@@ -29,4 +29,13 @@ public interface NotifyService {
     InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(JSONObject notifyPolicyConfig);
 
     InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo);
+
+    /**
+     * 检查通知策略是否存在
+     * 1.如果是采用默认模式，不用检查通知策略是否存在，直接返回false
+     * 2.如果是采用自定义模式，需要检查通知策略是否存在，存在返回true，不存在则抛异常
+     * @param invokeNotifyPolicyConfigVo 引用通知策略配置信息
+     * @return 如果返回true，调用方可能需要执行依赖引用关系保存逻辑
+     */
+    boolean checkNotifyPolicyIsExists(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo);
 }

@@ -23,6 +23,6 @@ public class FormAttributeRequiredException extends ApiRuntimeException {
     private static final long serialVersionUID = -2778517020610259453L;
 
     public FormAttributeRequiredException(String label) {
-        super("exception.framework.formattributerequiredexception" + label);
+        super("exception.framework.formattributerequiredexception", label);
     }
 }

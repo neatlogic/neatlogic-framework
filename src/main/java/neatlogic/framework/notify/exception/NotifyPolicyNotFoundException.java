@@ -11,6 +11,6 @@ public class NotifyPolicyNotFoundException extends ApiRuntimeException {
     }
 
     public NotifyPolicyNotFoundException(Long id) {
-        super("exception.framework.notifypolicynotfoundexception" + id);
+        super("exception.framework.notifypolicynotfoundexception", id);
     }
 }

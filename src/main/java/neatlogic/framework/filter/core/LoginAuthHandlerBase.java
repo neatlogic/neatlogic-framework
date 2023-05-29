@@ -28,7 +28,6 @@ import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
-import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 
-import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
@@ -50,9 +48,6 @@ import java.util.zip.GZIPOutputStream;
 @DependsOn("loginService")
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
-
-    @Resource
-    private LoginService loginService;
 
     public abstract String getType();
 

@@ -1,4 +1,12 @@
 中文 / [English](README.en.md)
+<p align="left">
+    <a href="https://opensource.org/licenses/Apache-2.0" alt="License">
+        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" /></a>
+<a target="_blank" href="https://join.slack.com/t/neatlogichome/shared_invite/zt-1w037axf8-r_i2y4pPQ1Z8FxOkAbb64w">
+<img src="https://img.shields.io/badge/Slack-Neatlogic-orange" /></a>
+</p>
+
+---
 
 ## 关于
 
@@ -50,6 +58,7 @@ neatlogic的部署方式是多活架构，自带简易的心跳机制让每个�
 - 通过心跳计数器来判断服务实例存活状态。
 
 ### 心跳算法
+
 1. 服务实例启动时把状态写入状态表（neatlogic库server_status表），将自身状态设为startup。并且启动一个心跳线程定时执行心跳检测。
 2. 每次心跳唤醒时，先清空自身计数器，并且给自己的关注服务实例计数器+1，如果关注服务实例的计数器已经大于某个阈值，则将它的状态设为shutdown。
 3. 调用漂移接口下所有实现类，完成漂移动作。所有需要在服务实例死亡时需要处理的逻辑，都需要实现IHeartbreakHandler接口。
@@ -58,12 +67,14 @@ neatlogic的部署方式是多活架构，自带简易的心跳机制让每个�
 心跳频率通过设置heartbeat.rate参数控制，单位是分钟，失败阈值通过heartbeat.threshold控制。
 
 ### 多线程
+
 由于neatlogic通过threadlocal中的租户信息切换数据源，所以不能直接定义thread来实现异步作业，所有线程都需要继承NeatLogicThread来创建。
 
 NeatLogicThread会在实例化阶段自动获取当前线程的threadlocal信息，保证异步线程和线程能使用同一个数据源进行工作。
 NeatLogicThead也会等待所有模块全部加载完毕才会开始执行，避免启动过程中抢先执行导致异常。
 
 使用范例：
+
 ``` java
 CachedThreadPool.execute(new NeatLogicThread() {
     @Override
@@ -78,9 +89,11 @@ CachedThreadPool是框架中的线程池，可以直接使用，**不要自己�
 CachedThreadPool是个无限线程池，使用前一定要注意控制线程数量和考虑每个线程作业的执行时间，不能引起系统OOM。**
 
 ## 定时调度
+
 统一使用SchedulerManager进行定时调度管理，包括内部作业和外部作业。
 
 使用范例：
+
 ``` java
 JobObject.Builder newJobObjectBuilder = new JobObject.Builder(changeId.toString(), this.getGroupName(), this.getClassName(), TenantContext.get().getTenantUuid()).withBeginTime(changeAutoStartVo.getTargetTime()).withIntervalInSeconds(60 * 60).withRepeatCount(0).addData("changeId", changeId);
 JobObject newJobObject = newJobObjectBuilder.build();

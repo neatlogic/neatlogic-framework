@@ -20,7 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
-import neatlogic.framework.form.dto.AttributeDataVo;
+import neatlogic.framework.form.dto.AttributeExtendedDataVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -350,25 +350,25 @@ public class FormTable implements TemplateMethodModelEx {
         return stringBuilder.toString();
     }
     // 表单组件数据列表
-    private List<AttributeDataVo> attributeDataList;
+    private List<AttributeExtendedDataVo> attributeExtendedDataList;
 
-    public FormTable(List<AttributeDataVo> attributeDataList) {
-        this.attributeDataList = attributeDataList;
+    public FormTable(List<AttributeExtendedDataVo> attributeDataList) {
+        this.attributeExtendedDataList = attributeDataList;
     }
 
     @Override
     public Object exec(List arguments) throws TemplateModelException {
-        if (CollectionUtils.isEmpty(attributeDataList)) {
+        if (CollectionUtils.isEmpty(attributeExtendedDataList)) {
             return StringUtils.EMPTY;
         }
         StringBuilder stringBuilder = new StringBuilder("<table border=\"1\" width=\"100%\">");
-        for (AttributeDataVo attributeDataVo : attributeDataList) {
+        for (AttributeExtendedDataVo attributeDataVo : attributeExtendedDataList) {
             if (attributeDataVo == null) {
                 continue;
             }
             String attributeLabel = attributeDataVo.getAttributeLabel();
             String type = attributeDataVo.getType();
-            Object dataObj = attributeDataVo.getDataObj();
+            Object dataObj = attributeDataVo.getExtendedData();
             String result = StringUtils.EMPTY;
             if (dataObj != null) {
                 Function<Object, String> function = map.get(type);

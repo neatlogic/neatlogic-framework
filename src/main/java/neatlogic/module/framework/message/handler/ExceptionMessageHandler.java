@@ -28,7 +28,7 @@ public class ExceptionMessageHandler extends MessageHandlerBase {
 
     @Override
     public String getName() {
-        return "handler.message.exception";
+        return "handler.message.exception.a";
     }
 
     @Override

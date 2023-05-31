@@ -22,7 +22,7 @@ import neatlogic.framework.util.I18nUtils;
 public enum FieldType {
     TEXT("text", new I18n("enum.framework.fieldtype.text")),
     DATETIME("datetime", new I18n("enum.framework.fieldtype.datetime")),
-    DATE("date", new I18n("enum.framework.fieldtype.date")),
+    DATE("date", new I18n("enum.framework.fieldtype.date.a")),
     TIME("time", new I18n("enum.framework.fieldtype.time")),
     NUMBER("number", new I18n("enum.framework.fieldtype.number"));
 

@@ -33,7 +33,7 @@ public enum FormHandler implements IFormHandler {
     FORMSELECT("formselect", new I18n("enum.framework.formhandler.formselect")),
     FORMTABLEINPUTER("formtableinputer", new I18n("enum.framework.formhandler.formtableinputer")),
     FORMTEXTAREA("formtextarea", new I18n("enum.framework.formhandler.formtextarea")),
-    FORMTEXT("formtext", new I18n("enum.framework.formhandler.formtext")),
+    FORMTEXT("formtext", new I18n("enum.framework.formhandler.formtext.a")),
     FORMNUMBER("formnumber", new I18n("enum.framework.formhandler.formnumber")),
     FORMPASSWORD("formpassword", new I18n("enum.framework.formhandler.formpassword")),
     FORMTIME("formtime", new I18n("enum.framework.formhandler.formtime")),

@@ -15,7 +15,7 @@ public class PermissionDeniedException extends ApiException {
     private static final long serialVersionUID = 6148939003449322484L;
 
     public PermissionDeniedException() {
-        super("exception.framework.permissiondeniedexception");
+        super("exception.framework.permissiondeniedexception.a");
     }
     public PermissionDeniedException(String message) {
         super(message);
@@ -24,11 +24,11 @@ public class PermissionDeniedException extends ApiException {
         super(key, values);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {
-        super("exception.framework.permissiondeniedexception.1", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
+        super("exception.framework.permissiondeniedexception.b", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
     }
 
     public PermissionDeniedException(List<String> authNameList) {
-        super("exception.framework.permissiondeniedexception.2", String.join("、", authNameList));
+        super("exception.framework.permissiondeniedexception.c", String.join("、", authNameList));
     }
 
 }

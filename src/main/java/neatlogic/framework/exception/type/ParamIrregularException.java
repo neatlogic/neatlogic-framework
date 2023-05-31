@@ -22,11 +22,11 @@ public class ParamIrregularException extends ApiRuntimeException {
     private static final long serialVersionUID = 6665736901978853670L;
 
     public ParamIrregularException(String paramName) {
-        super("exception.framework.paramirregularexception", paramName);
+        super("exception.framework.paramirregularexception.a", paramName);
     }
 
     public ParamIrregularException(String paramName, String rule) {
-        super("exception.framework.paramirregularexception.1", paramName, rule);
+        super("exception.framework.paramirregularexception.b", paramName, rule);
     }
 
 }

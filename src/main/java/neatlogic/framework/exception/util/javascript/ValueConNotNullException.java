@@ -24,11 +24,11 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueConNotNullException extends ApiRuntimeException {
     public ValueConNotNullException(String prefix) {
-        super("exception.framework.valueconnotnullexception", prefix);
+        super("exception.framework.valueconnotnullexception.a", prefix);
     }
 
     public ValueConNotNullException(String prefix, String value) {
-        super("exception.framework.valueconnotnullexception.1", prefix, value);
+        super("exception.framework.valueconnotnullexception.b", prefix, value);
 
     }
 }

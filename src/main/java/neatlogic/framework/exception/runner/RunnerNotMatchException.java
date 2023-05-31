@@ -23,11 +23,11 @@ public class RunnerNotMatchException extends ApiRuntimeException {
     private static final long serialVersionUID = 3593220313941443951L;
 
     public RunnerNotMatchException(String ip) {
-        super("exception.framework.runnernotmatchexception.1", ip);
+        super("exception.framework.runnernotmatchexception.b", ip);
     }
 
     public RunnerNotMatchException() {
-        super("exception.framework.runnernotmatchexception.2");
+        super("exception.framework.runnernotmatchexception.c");
     }
 
 

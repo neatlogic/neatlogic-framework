@@ -27,7 +27,7 @@ public enum TitleType {
     H1("h1", new I18n("enum.framework.titletype.h1"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 18, 1),
     H2("h2", new I18n("enum.framework.titletype.h2"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 15, 2),
     H3("h3", new I18n("enum.framework.titletype.h3"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 14, 3),
-    TILE("centered_tile", new I18n("enum.framework.titletype.tile"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 15, 0),
+    TILE("centered_tile", new I18n("enum.framework.titletype.tile.a"), true, "000000", new I18n("enum.framework.titletype.tilefont"), 15, 0),
     ;
 
     private final String value;

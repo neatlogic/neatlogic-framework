@@ -23,11 +23,11 @@ public class ExcelFormatIllegalException extends ApiRuntimeException {
     private static final long serialVersionUID = -5415989970048167194L;
 
     public ExcelFormatIllegalException() {
-        super("exception.framework.excelformatillegalexception.1");
+        super("exception.framework.excelformatillegalexception.b");
     }
 
     public ExcelFormatIllegalException(String format) {
-        super("exception.framework.excelformatillegalexception.2", format);
+        super("exception.framework.excelformatillegalexception.c", format);
     }
 
 }

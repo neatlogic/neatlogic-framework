@@ -22,10 +22,10 @@ public class RunnerGroupIdNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -7392923556010588732L;
 
     public RunnerGroupIdNotFoundException(Long id) {
-        super("exception.framework.runnergroupidnotfoundexception.1", id);
+        super("exception.framework.runnergroupidnotfoundexception.b", id);
     }
 
     public RunnerGroupIdNotFoundException(String agentIp) {
-        super("exception.framework.runnergroupidnotfoundexception.2", agentIp);
+        super("exception.framework.runnergroupidnotfoundexception.c", agentIp);
     }
 }

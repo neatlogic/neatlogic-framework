@@ -23,10 +23,10 @@ public class FormAttributeNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -2778517020600259453L;
 
     public FormAttributeNotFoundException(String attributeUuid) {
-        super("exception.framework.formattributenotfoundexception", attributeUuid);
+        super("exception.framework.formattributenotfoundexception.a", attributeUuid);
     }
 
     public FormAttributeNotFoundException(String formName, String attributeUuid) {
-        super("exception.framework.formattributenotfoundexception.1", formName, attributeUuid);
+        super("exception.framework.formattributenotfoundexception.b", formName, attributeUuid);
     }
 }

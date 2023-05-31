@@ -25,15 +25,15 @@ public class ParamNotExistsException extends ApiRuntimeException {
     private static final long serialVersionUID = -2608671566655133328L;
 
     public ParamNotExistsException(String paramNames) {
-        super("exception.framework.paramnotexistsexception.1",paramNames);
+        super("exception.framework.paramnotexistsexception.b",paramNames);
     }
 
     public ParamNotExistsException(int index, String keyName) {
-        super("exception.framework.paramnotexistsexception.2", index, keyName);
+        super("exception.framework.paramnotexistsexception.c", index, keyName);
     }
 
     public ParamNotExistsException(int index, String paramName, String keyName) {
-        super("exception.framework.paramnotexistsexception.3", index, paramName, keyName);
+        super("exception.framework.paramnotexistsexception.d", index, paramName, keyName);
     }
 
     public ParamNotExistsException(String... paramNames) {
@@ -41,6 +41,6 @@ public class ParamNotExistsException extends ApiRuntimeException {
     }
 
     public ParamNotExistsException(List<String> eitherParamList, List<String> orParamList) {
-        super("exception.framework.paramnotexistsexception.5", String.join("、", eitherParamList), String.join("、", orParamList));
+        super("exception.framework.paramnotexistsexception.f", String.join("、", eitherParamList), String.join("、", orParamList));
     }
 }

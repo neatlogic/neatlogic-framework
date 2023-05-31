@@ -29,10 +29,10 @@ public class IntegrationRequestResultFieldNotExistsException extends ApiRuntimeE
     private static final long serialVersionUID = 1161502312345475176L;
 
     public IntegrationRequestResultFieldNotExistsException(String field) {
-        super("exception.framework.integrationrequestresultfieldnotexistsexception.1", field);
+        super("exception.framework.integrationrequestresultfieldnotexistsexception.b", field);
     }
 
     public IntegrationRequestResultFieldNotExistsException(List<String> fieldList) {
-        super("exception.framework.integrationrequestresultfieldnotexistsexception.2", String.join("、", fieldList));
+        super("exception.framework.integrationrequestresultfieldnotexistsexception.c", String.join("、", fieldList));
     }
 }

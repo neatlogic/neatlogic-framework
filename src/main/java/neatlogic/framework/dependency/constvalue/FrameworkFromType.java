@@ -27,13 +27,13 @@ import neatlogic.framework.util.I18nUtils;
  * @since: 2021/4/2 10:30
  **/
 public enum FrameworkFromType implements IFromType {
-    MATRIX("matrix", new I18n("enum.framework.frameworkfromtype.matrix")),
+    MATRIX("matrix", new I18n("enum.framework.frameworkfromtype.matrix.a")),
     MATRIXATTR("matrixattr", new I18n("enum.framework.frameworkfromtype.matrixattr")),
-    FORM("form", new I18n("enum.framework.frameworkfromtype.form")),
+    FORM("form", new I18n("enum.framework.frameworkfromtype.form.a")),
     FORMSCENE("formscene", new I18n("enum.framework.frameworkfromtype.formscene")),
     FORMATTR("formattr", new I18n("enum.framework.frameworkfromtype.formattr")),
     INTEGRATION("integration", new I18n("enum.framework.frameworkfromtype.integration")),
-    CMDBCI("cmdbci", new I18n("enum.framework.frameworkfromtype.cmdbci")),
+    CMDBCI("cmdbci", new I18n("enum.framework.frameworkfromtype.cmdbci.a")),
     CMDBCIATTR("cmdbciattr", new I18n("enum.framework.frameworkfromtype.cmdbciattr")),
     WORKTIME("worktime", new I18n("enum.framework.frameworkfromtype.worktime")),
     NOTIFY_POLICY("notifypolicy", new I18n("enum.framework.frameworkfromtype.notify_policy"));

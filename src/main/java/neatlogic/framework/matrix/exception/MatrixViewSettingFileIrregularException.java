@@ -22,14 +22,14 @@ public class MatrixViewSettingFileIrregularException extends ApiRuntimeException
     private static final long serialVersionUID = 5166847622344597434L;
 
     public MatrixViewSettingFileIrregularException(Exception ex) {
-        super("exception.framework.matrixviewsettingfileirregularexception.1", ex.getMessage());
+        super("exception.framework.matrixviewsettingfileirregularexception.b", ex.getMessage());
     }
 
     public MatrixViewSettingFileIrregularException(String nodeName) {
-        super("exception.framework.matrixviewsettingfileirregularexception.2", nodeName);
+        super("exception.framework.matrixviewsettingfileirregularexception.c", nodeName);
     }
 
     public MatrixViewSettingFileIrregularException(String nodeName, String attrName) {
-        super("exception.framework.matrixviewsettingfileirregularexception.3", nodeName, attrName);
+        super("exception.framework.matrixviewsettingfileirregularexception.d", nodeName, attrName);
     }
 }

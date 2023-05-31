@@ -109,7 +109,7 @@ public class I18nUtils {
             locale = Locale.CHINESE;
         }
         // 获得资源文件
-        ResourceBundle rb = ResourceBundle.getBundle("i18n/message", locale);
+        ResourceBundle rb = ResourceBundle.getBundle("i18n/language", locale);
         // 获得相应的key值
         String value = key;
         try {

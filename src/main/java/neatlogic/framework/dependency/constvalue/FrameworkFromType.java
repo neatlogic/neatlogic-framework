@@ -29,9 +29,9 @@ import neatlogic.framework.util.I18nUtils;
 public enum FrameworkFromType implements IFromType {
     MATRIX("matrix", new I18n("enum.framework.frameworkfromtype.matrix.a")),
     MATRIXATTR("matrixattr", new I18n("enum.framework.frameworkfromtype.matrixattr")),
-    FORM("form", new I18n("enum.framework.frameworkfromtype.form.a")),
+    FORM("form", new I18n("common.form")),
     FORMSCENE("formscene", new I18n("enum.framework.frameworkfromtype.formscene")),
-    FORMATTR("formattr", new I18n("enum.framework.frameworkfromtype.formattr")),
+    FORMATTR("formattr", new I18n("common.formproperty")),
     INTEGRATION("integration", new I18n("enum.framework.frameworkfromtype.integration")),
     CMDBCI("cmdbci", new I18n("enum.framework.frameworkfromtype.cmdbci.a")),
     CMDBCIATTR("cmdbciattr", new I18n("enum.framework.frameworkfromtype.cmdbciattr")),

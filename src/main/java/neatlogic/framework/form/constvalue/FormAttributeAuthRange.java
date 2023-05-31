@@ -20,7 +20,7 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FormAttributeAuthRange {
-    ALL("all", new I18n("enum.framework.formattributeauthrange.all"));
+    ALL("all", new I18n("common.all"));
     private String value;
     private I18n text;
 

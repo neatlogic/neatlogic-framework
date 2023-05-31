@@ -33,11 +33,11 @@ public class TenantVo extends BasePageVo {
 
     public enum Status {
         BUILDING("building", "enum.master.tenantvo.status.building"),
-        BUILT("built", "enum.master.tenantvo.status.built"),
+        BUILT("built", "common.completed"),
         DDL("ddl", "enum.master.tenantvo.status.ddl"),
         DML("dml", "enum.master.tenantvo.status.dml"),
         DML_DEMO("dmldemo", "enum.master.tenantvo.status.dmldemo"),
-        ERROR("error", "enum.master.tenantvo.status.error");
+        ERROR("error", "common.exception");
 
         private String value;
         private String text;

@@ -22,12 +22,12 @@ public class API_AUDIT_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.apiauditview.name";
+		return "common.apiauditviewauth";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.apiauditview.introduction";
+		return "common.apiauditviewauth";
 	}
 
 	@Override

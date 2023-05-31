@@ -7,10 +7,10 @@ public class NotifyPolicyNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 4427302613682187323L;
 
     public NotifyPolicyNotFoundException(String path) {
-        super("exception.framework.notifypolicynotfoundexception", path);
+        super("common.notificati", path);
     }
 
     public NotifyPolicyNotFoundException(Long id) {
-        super("exception.framework.notifypolicynotfoundexception", id);
+        super("common.notificati", id);
     }
 }

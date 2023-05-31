@@ -20,11 +20,11 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FieldType {
-    TEXT("text", new I18n("enum.framework.fieldtype.text")),
-    DATETIME("datetime", new I18n("enum.framework.fieldtype.datetime")),
-    DATE("date", new I18n("enum.framework.fieldtype.date.a")),
-    TIME("time", new I18n("enum.framework.fieldtype.time")),
-    NUMBER("number", new I18n("enum.framework.fieldtype.number"));
+    TEXT("text", new I18n("common.text")),
+    DATETIME("datetime", new I18n("common.datatime")),
+    DATE("date", new I18n("common.date")),
+    TIME("time", new I18n("common.time")),
+    NUMBER("number", new I18n("common.number"));
 
     private final String value;
     private final I18n text;

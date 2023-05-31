@@ -20,7 +20,7 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum DatabaseVersion {
-    MYSQL8("MySql8.x", new I18n("enum.framework.databaseversion.mysql8"));
+    MYSQL8("MySql8.x", new I18n("common.textbox"));
 
     private final String name;
     private final I18n driver;

@@ -25,7 +25,7 @@ import java.util.List;
 
 
 public enum GroupSearch implements IEnum {
-    USER("user", new I18n("enum.framework.groupsearch.user")),
+    USER("user", new I18n("common.usertype")),
     TEAM("team", new I18n("enum.framework.groupsearch.team")),
     ROLE("role", new I18n("enum.framework.groupsearch.role")),
     COMMON("common", new I18n("enum.framework.groupsearch.common"));

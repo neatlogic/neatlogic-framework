@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ChartType {
-	BARCHART("barchart",new I18n("enum.framework.charttype.barchart"),Chart.BARCHART,false),
+	BARCHART("barchart",new I18n("common.barchart"),Chart.BARCHART,false),
 	STACKBARCHART("stackbarchart",new I18n("enum.framework.charttype.stackbarchart"),Chart.BARCHART,false),
 	COLUMNCHART("columnchart",new I18n("enum.framework.charttype.columnchart"),Chart.BARCHART,true),
 	STACKCOLUMNCHART("stackcolumnchart",new I18n("enum.framework.charttype.stackcolumnchart"),Chart.BARCHART,false),
-	PIECHART("piechart",new I18n("enum.framework.chart.piechart"),Chart.PIECHART,true),
+	PIECHART("piechart",new I18n("common.piechart"),Chart.PIECHART,true),
 	DONUTCHART("donutchart",new I18n("enum.framework.charttype.donutchart"),Chart.PIECHART,true),
-	AREACHART("areachart",new I18n("enum.framework.chart.areachart"),Chart.AREACHART,true),
-	LINECHART("linechart",new I18n("enum.framework.chart.linechart"),Chart.LINECHART,true),
-	TABLECHART("tablechart",new I18n("enum.framework.chart.tablechart"),Chart.TABLECHART,true),
-	NUMBERCHART("numberchart",new I18n("enum.framework.charttype.numberchart"),Chart.NUMBERCHART,true)
+	AREACHART("areachart",new I18n("common.areachart"),Chart.AREACHART,true),
+	LINECHART("linechart",new I18n("common.curvechart"),Chart.LINECHART,true),
+	TABLECHART("tablechart",new I18n("common.table"),Chart.TABLECHART,true),
+	NUMBERCHART("numberchart",new I18n("common.valuemap"),Chart.NUMBERCHART,true)
 	;
 
 	private String value;

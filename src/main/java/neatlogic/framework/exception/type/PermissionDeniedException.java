@@ -24,11 +24,11 @@ public class PermissionDeniedException extends ApiException {
         super(key, values);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {
-        super("exception.framework.permissiondeniedexception.b", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
+        super("exception.lackauth", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
     }
 
     public PermissionDeniedException(List<String> authNameList) {
-        super("exception.framework.permissiondeniedexception.c", String.join("、", authNameList));
+        super("exception.lackauth", String.join("、", authNameList));
     }
 
 }

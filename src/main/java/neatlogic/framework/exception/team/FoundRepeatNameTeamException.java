@@ -7,6 +7,6 @@ public class FoundRepeatNameTeamException extends ApiRuntimeException {
     private static final long serialVersionUID = -7791153993204463500L;
 
     public FoundRepeatNameTeamException(String name) {
-        super("exception.framework.foundrepeatnameteamexception", name);
+        super("common.there", name);
     }
 }

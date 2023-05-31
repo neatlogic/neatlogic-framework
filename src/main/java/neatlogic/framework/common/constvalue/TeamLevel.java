@@ -13,7 +13,7 @@ public enum TeamLevel implements IEnum {
     COMPANY("company", new I18n("enum.framework.teamlevel.company"), 2),
     CENTER("center", new I18n("enum.framework.teamlevel.center"), 3),
     DEPARTMENT("department", new I18n("enum.framework.teamlevel.department"), 4),
-    TEAM("team", new I18n("enum.framework.teamlevel.team"), 5);
+    TEAM("team", new I18n("common.group"), 5);
     private String value;
     private I18n text;
     private int level;

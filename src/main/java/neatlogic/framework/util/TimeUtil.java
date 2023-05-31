@@ -878,7 +878,7 @@ public class TimeUtil {
         List<String> list = new ArrayList<>(unitCount);
         if (milliseconds >= TimeUnit.DAYS.toMillis(1) || TimeUnit.DAYS == minTimeUnit) {
             double value = milliseconds.doubleValue() / TimeUnit.DAYS.toMillis(1);
-            list.add(Math.round(value) + new I18n("const.days").toString());
+            list.add(Math.round(value) + new I18n("common.day").toString());
             if (list.size() >= unitCount || TimeUnit.DAYS == minTimeUnit) {
                 return String.join(separator, list);
             }
@@ -886,7 +886,7 @@ public class TimeUtil {
         }
         if (milliseconds >= TimeUnit.HOURS.toMillis(1) || TimeUnit.HOURS == minTimeUnit) {
             double value = milliseconds.doubleValue() / TimeUnit.HOURS.toMillis(1);
-            list.add(Math.round(value) + new I18n("const.hours").toString());
+            list.add(Math.round(value) + new I18n("common.hour").toString());
             if (list.size() >= unitCount || TimeUnit.HOURS == minTimeUnit) {
                 return String.join(separator, list);
             }
@@ -894,7 +894,7 @@ public class TimeUtil {
         }
         if (milliseconds >= TimeUnit.MINUTES.toMillis(1) || TimeUnit.MINUTES == minTimeUnit) {
             double value = milliseconds.doubleValue() / TimeUnit.MINUTES.toMillis(1);
-            list.add(Math.round(value) + new I18n("const.minutes").toString());
+            list.add(Math.round(value) + new I18n("common.minute").toString());
             if (list.size() >= unitCount || TimeUnit.MINUTES == minTimeUnit) {
                 return String.join(separator, list);
             }

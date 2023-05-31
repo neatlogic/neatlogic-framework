@@ -25,7 +25,7 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum PublicApiAuthType implements IEnum {
-    BASIC("basic", new I18n("enum.framework.publicapiauthtype.basic"));
+    BASIC("basic", new I18n("common.basicauth"));
 
     private final String type;
     private final I18n text;

@@ -11,6 +11,6 @@ public class MatrixExternalExportTemplateException extends ApiRuntimeException {
     private static final long serialVersionUID = -4507385752209783532L;
 
     public MatrixExternalExportTemplateException() {
-        super("exception.framework.matrixexternalexporttemplateexception");
+        super("exeception.matrixviewexportexception");
     }
 }

@@ -26,7 +26,7 @@ public class ParamIrregularException extends ApiRuntimeException {
     }
 
     public ParamIrregularException(String paramName, String rule) {
-        super("exception.framework.paramirregularexception.b", paramName, rule);
+        super("exception.paraminvalid", paramName, rule);
     }
 
 }

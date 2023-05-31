@@ -7,6 +7,6 @@ public class ElatsticSearchHandlerNotFoundException extends ApiRuntimeException 
     private static final long serialVersionUID = 8358695524151979636L;
 
     public ElatsticSearchHandlerNotFoundException(String handler) {
-        super("exception.framework.elatsticsearchhandlernotfoundexception", handler);
+        super("exception.workcenterhandlernotfound", handler);
     }
 }

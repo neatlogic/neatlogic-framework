@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 public enum DeviceType implements IEnum {
-    ALL("all", new I18n("enum.framework.devicetype.all")),
+    ALL("all", new I18n("common.all")),
     MOBILE("mobile", new I18n("enum.framework.devicetype.mobile")),
     PC("pc", new I18n("enum.framework.devicetype.pc"));
 

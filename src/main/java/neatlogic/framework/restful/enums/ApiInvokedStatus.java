@@ -25,8 +25,8 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum ApiInvokedStatus implements IEnum {
-    SUCCEED("succeed", new I18n("enum.framework.apiinvokedstatus.succeed")),
-    FAILED("failed", new I18n("enum.framework.apiinvokedstatus.failed"));
+    SUCCEED("succeed", new I18n("common.success")),
+    FAILED("failed", new I18n("common.fail"));
     private final String value;
     private final I18n text;
 

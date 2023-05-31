@@ -12,7 +12,7 @@ import neatlogic.framework.util.I18nUtils;
  */
 public enum ActionType {
     CREATE("create", new I18n("enum.framework.actiontype.create")),
-    UPDATE("update", new I18n("enum.framework.actiontype.update"));
+    UPDATE("update", new I18n("common.modify"));
     private final String value;
     private final I18n text;
     private ActionType(String value, I18n text) {

@@ -20,9 +20,9 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FormAttributeAction {
-    HIDE("hide", new I18n("enum.framework.formattributeaction.hide")),
-    READ("read", new I18n("enum.framework.formattributeaction.read")),
-    EDIT("edit", new I18n("enum.framework.formattributeaction.edit"));
+    HIDE("hide", new I18n("common.hidden")),
+    READ("read", new I18n("common.read-only")),
+    EDIT("edit", new I18n("common.edit"));
     private String value;
     private I18n text;
 

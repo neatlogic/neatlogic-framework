@@ -29,7 +29,7 @@ import java.util.List;
  */
 
 public enum FileOperationType implements IEnum {
-    DELETE("delete", new I18n("enum.framework.fileoperationtype.delete")),
+    DELETE("delete", new I18n("common.delete")),
     DOWNLOAD("download", new I18n("enum.framework.fileoperationtype.download"));
     private final String value;
     private final I18n text;

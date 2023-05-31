@@ -10,10 +10,10 @@ import java.util.List;
 
 public enum OperationTypeEnum implements IEnum {
     CREATE("create", new I18n("enum.framework.operationtypeenum.create")),
-    DELETE("delete", new I18n("enum.framework.operationtypeenum.delete")),
-    UPDATE("update", new I18n("enum.framework.operationtypeenum.update")),
+    DELETE("delete", new I18n("common.delete")),
+    UPDATE("update", new I18n("common.update")),
     SEARCH("search", new I18n("enum.framework.operationtypeenum.search")),
-    OPERATE("operate", new I18n("enum.framework.operationtypeenum.operate"));
+    OPERATE("operate", new I18n("common.operation"));
     private String name;
     private I18n text;
 

@@ -25,9 +25,9 @@ import java.util.List;
 
 
 public enum AuthType implements IEnum {
-    USER("user", new I18n("enum.framework.authtype.user")),
-    TEAM("team", new I18n("enum.framework.authtype.team")),
-    ROLE("role", new I18n("enum.framework.authtype.role")),
+    USER("user", new I18n("common.user")),
+    TEAM("team", new I18n("common.group")),
+    ROLE("role", new I18n("common.role")),
     COMMON("common", new I18n("enum.framework.authtype.common"));
 
     private final String value;

@@ -27,7 +27,7 @@ public enum FontFamily {
     SONG(new I18n("enum.framework.fontfamily.song")),
     BLACK(new I18n("enum.framework.fontfamily.black")),
     FANG_SONG(new I18n("enum.framework.fontfamily.fang_song")),
-    REGULAR_SCRIPT(new I18n("enum.framework.fontfamily.regular_script")),
+    REGULAR_SCRIPT(new I18n("common.regularscript")),
     ;
 
     private final I18n value;

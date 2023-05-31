@@ -31,8 +31,8 @@ public enum LayoutType implements IEnum {
     OSAGE("osage", new I18n("enum.framework.layouttype.osage"), false),
     TWOPI("twopi", new I18n("enum.framework.layouttype.twopi"), false),
     FDP("fdp", new I18n("enum.framework.layouttype.fdp"), false),
-    SFDP("sfdp", new I18n("enum.framework.layouttype.sfdp"), false),
-    PATCHWORK("patchwork", new I18n("enum.framework.layouttype.patchwork"), false);
+    SFDP("sfdp", new I18n("common.undirectedlayout2"), false),
+    PATCHWORK("patchwork", new I18n("common.undirectedlayout2"), false);
 
 
     private final String value;

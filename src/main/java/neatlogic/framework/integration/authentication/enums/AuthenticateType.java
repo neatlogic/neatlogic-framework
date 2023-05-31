@@ -27,7 +27,7 @@ import java.util.List;
 public enum AuthenticateType implements IEnum {
     NOAUTH("noauth", new I18n("enum.framework.authenticatetype.noauth")),
     BUILDIN("buildin", new I18n("enum.framework.authenticatetype.buildin")),
-    BASIC("basicauth", new I18n("enum.framework.authenticatetype.basic")),
+    BASIC("basicauth", new I18n("common.basicauth")),
     BEARER("bearertoken", new I18n("enum.framework.authenticatetype.bearer"));
 
     private String type;

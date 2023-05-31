@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public enum InspectStatus implements IEnum {
-    NORMAL("normal", new I18n("enum.framework.inspectstatus.normal"), "text-success"),
+    NORMAL("normal", new I18n("common.normal"), "text-success"),
     WARN("warn", new I18n("enum.framework.inspectstatus.warn"), "text-warning"),
     CRITICAL("critical", new I18n("enum.framework.inspectstatus.critical"), "text-error"),
     FATAL("fatal", new I18n("enum.framework.inspectstatus.fatal"), "text-error");

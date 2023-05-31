@@ -20,19 +20,19 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ApiParamType {
-    INTEGER("int", new I18n("enum.framework.apiparamtype.integer")),
+    INTEGER("int", new I18n("common.int")),
     ENUM("enum", new I18n("enum.framework.apiparamtype.enum")),
     BOOLEAN("boolean", new I18n("enum.framework.apiparamtype.boolean")),
-    STRING("string", new I18n("enum.framework.apiparamtype.string")),
+    STRING("string", new I18n("common.char")),
     LONG("long", new I18n("enum.framework.apiparamtype.long")),
-    JSONOBJECT("jsonObject", new I18n("enum.framework.apiparamtype.jsonobject")),
-    JSONARRAY("jsonArray", new I18n("enum.framework.apiparamtype.jsonarray")),
+    JSONOBJECT("jsonObject", new I18n("common.jsonobject")),
+    JSONARRAY("jsonArray", new I18n("common.jsonarray")),
     IP("ip", new I18n("enum.framework.apiparamtype.ip")),
-    EMAIL("email", new I18n("enum.framework.apiparamtype.email")),
+    EMAIL("email", new I18n("common.email")),
     REGEX("regex", new I18n("enum.framework.apiparamtype.regex")),
     DOUBLE("double", new I18n("enum.framework.apiparamtype.double")),
     NOAUTH("noAuth", new I18n("enum.framework.apiparamtype.noauth")),
-    FILE("file", new I18n("enum.framework.apiparamtype.file"));
+    FILE("file", new I18n("common.attachment"));
 
     private String name;
     private I18n text;

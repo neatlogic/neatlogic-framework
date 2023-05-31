@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class MatrixViewAttrIdMapEmptyException extends ApiRuntimeException {
     public MatrixViewAttrIdMapEmptyException() {
-        super("exception.framework.matrixviewattridmapemptyexception");
+        super("common.propnameandidcannotbenull");
     }
 }

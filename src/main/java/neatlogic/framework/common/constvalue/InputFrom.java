@@ -30,8 +30,8 @@ public enum InputFrom implements IEnum {
     RESTFUL("restful", new I18n("enum.framework.inputfrom.restful")),
     ITSM("itsm", new I18n("enum.framework.inputfrom.itsm")),
     UNKNOWN("unknown", new I18n("enum.framework.inputfrom.unknown")),
-    CRON("cron", new I18n("enum.framework.inputfrom.cron")),
-    AUTOEXEC("autoexec", new I18n("enum.framework.inputfrom.autoexec")),
+    CRON("cron", new I18n("common.scheduledtask")),
+    AUTOEXEC("autoexec", new I18n("common.automaticcollection")),
     RELATIVE("relative", new I18n("enum.framework.inputfrom.relative"));
 
     private final String value;

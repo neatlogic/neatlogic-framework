@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ParamJSONIrregularException extends ApiRuntimeException {
     public ParamJSONIrregularException() {
-        super("exception.framework.paramjsonirregularexception");
+        super("exception.paraminvalid");
     }
 }

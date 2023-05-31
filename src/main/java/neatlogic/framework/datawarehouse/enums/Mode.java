@@ -21,7 +21,7 @@ import neatlogic.framework.util.I18nUtils;
 
 public enum Mode {
     APPEND("append", new I18n("enum.framework.mode.append")),
-    REPLACE("replace", new I18n("enum.framework.mode.replace"));
+    REPLACE("replace", new I18n("common.replace"));
 
     private final String value;
     private final I18n text;

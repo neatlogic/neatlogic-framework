@@ -24,10 +24,10 @@ import neatlogic.framework.util.I18nUtils;
  */
 
 public enum TableColor {
-    BLACK("000000", new I18n("enum.framework.tablecolor.black")),
-    WHITE("ffffff", new I18n("enum.framework.tablecolor.white")),
-    RED("FF0000", new I18n("enum.framework.tablecolor.red")),
-    BLUE("0000FF", new I18n("enum.framework.tablecolor.blue")),
+    BLACK("000000", new I18n("common.black")),
+    WHITE("ffffff", new I18n("common.white")),
+    RED("FF0000", new I18n("common.red")),
+    BLUE("0000FF", new I18n("common.blue")),
     GREY("808080", new I18n("enum.framework.tablecolor.grey")),
     ;
 

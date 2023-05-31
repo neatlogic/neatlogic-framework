@@ -5,10 +5,10 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum IntegrationParamType {
-    NUMBER("number", new I18n("enum.framework.integrationparamtype.number")),
-    STRING("string", new I18n("enum.framework.integrationparamtype.string")),
-    JSONOBJECT("jsonObject", new I18n("enum.framework.integrationparamtype.jsonobject")),
-    JSONARRAY("jsonArray", new I18n("enum.framework.integrationparamtype.jsonarray"));
+    NUMBER("number", new I18n("common.number")),
+    STRING("string", new I18n("common.char")),
+    JSONOBJECT("jsonObject", new I18n("common.jsonobject")),
+    JSONARRAY("jsonArray", new I18n("common.jsonarray"));
 
     private String name;
     private I18n text;

@@ -7,6 +7,6 @@ public class GroupSearchHandlerNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 4778633677540696671L;
 
     public GroupSearchHandlerNotFoundException(String handler) {
-        super("exception.framework.groupsearchhandlernotfoundexception", handler);
+        super("exception.dashboardhandlernotfound", handler);
     }
 }

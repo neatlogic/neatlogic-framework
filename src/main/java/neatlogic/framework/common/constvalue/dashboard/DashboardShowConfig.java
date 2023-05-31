@@ -5,12 +5,12 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum DashboardShowConfig {
-	TYPE("type", new I18n("enum.framework.dashboardshowconfig.type"),FormHandlerType.RADIO.toString(),false),
+	TYPE("type", new I18n("common.type"),FormHandlerType.RADIO.toString(),false),
 	AGGREGATE("aggregate", new I18n("enum.framework.dashboardshowconfig.aggregate"),FormHandlerType.SELECT.toString(),false),
 	GROUPFIELD("groupfield", new I18n("enum.framework.dashboardshowconfig.groupfield"),FormHandlerType.SELECT.toString(),false),
 	SUBGROUPFIELD("subgroupfield", new I18n("enum.framework.dashboardshowconfig.subgroupfield"),FormHandlerType.SELECT.toString(),false),
 	MAXGROUP("maxgroup",new I18n("enum.framework.dashboardshowconfig.maxgroup"),FormHandlerType.SELECT.toString(),false),
-	COLOR("color",new I18n("enum.framework.dashboardshowconfig.color"),FormHandlerType.RADIO.toString(),false),
+	COLOR("color",new I18n("common.color"),FormHandlerType.RADIO.toString(),false),
 	REFRESHTIME("refreshtime",new I18n("enum.framework.dashboardshowconfig.refreshtime"),FormHandlerType.SELECT.toString(),false)
 	;
 	

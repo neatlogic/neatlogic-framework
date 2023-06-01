@@ -22,12 +22,12 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.Objects;
 
 public enum DateRange {
-    LAST_DAY(1, "day", new I18n("enum.framework.daterange.last_day")),
-    LAST_WEEK(1, "week", new I18n("enum.framework.daterange.last_week")),
-    LAST_HALF_MONTH(15, "day", new I18n("enum.framework.daterange.last_half_month")),
-    LAST_MONTH(1, "month", new I18n("enum.framework.daterange.last_month")),
-    LAST_HALF_YEAR(6, "month", new I18n("enum.framework.daterange.last_half_year")),
-    LAST_YEAR(1, "year", new I18n("enum.framework.daterange.last_year"));
+    LAST_DAY(1, "day", new I18n("最近一天")),
+    LAST_WEEK(1, "week", new I18n("最近一周")),
+    LAST_HALF_MONTH(15, "day", new I18n("最近半个月")),
+    LAST_MONTH(1, "month", new I18n("最近一个月")),
+    LAST_HALF_YEAR(6, "month", new I18n("最近半年")),
+    LAST_YEAR(1, "year", new I18n("最近一年"));
     Integer timeRange;
     String timeUnit;
     I18n text;

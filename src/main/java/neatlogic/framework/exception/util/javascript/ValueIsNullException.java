@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueIsNullException extends ApiRuntimeException {
     public ValueIsNullException(String prefix) {
-        super("exception.framework.valueisnullexception", prefix);
+        super("{0}值为空", prefix);
     }
 }

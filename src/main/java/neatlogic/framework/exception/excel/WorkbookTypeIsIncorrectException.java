@@ -25,6 +25,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class WorkbookTypeIsIncorrectException extends ApiRuntimeException {
 
     public WorkbookTypeIsIncorrectException(String simpleName, String truthSimpleName) {
-        super("exception.framework.workbooktypeisincorrectexception", simpleName, truthSimpleName);
+        super("工作簿类型不正确，定义是:{0}，实际是：{1}", simpleName, truthSimpleName);
     }
 }

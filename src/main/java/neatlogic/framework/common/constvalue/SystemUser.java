@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser {
-    SYSTEM("system", "system", new I18n("common.system")),
-    ANONYMOUS("anonymous", "anonymous", new I18n("enum.framework.systemuser.anonymous"));
+    SYSTEM("system", "system", new I18n("系统")),
+    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户"));
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 

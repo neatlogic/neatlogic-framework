@@ -20,9 +20,9 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ApiType {
-    OBJECT("object", new I18n("enum.framework.apitype.object"), "rest/"),
-    STREAM("stream", new I18n("enum.framework.apitype.stream"), "stream/"),
-    BINARY("binary", new I18n("enum.framework.apitype.binary"), "binary/");
+    OBJECT("object", new I18n("对象模式"), "rest/"),
+    STREAM("stream", new I18n("json流模式"), "stream/"),
+    BINARY("binary", new I18n("字节流模式"), "binary/");
 
     private final String name;
     private final I18n text;

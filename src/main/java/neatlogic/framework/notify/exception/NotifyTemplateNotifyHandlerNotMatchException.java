@@ -7,6 +7,6 @@ public class NotifyTemplateNotifyHandlerNotMatchException extends ApiRuntimeExce
     private static final long serialVersionUID = -4188466068213684051L;
 
     public NotifyTemplateNotifyHandlerNotMatchException(String templateId, String notifyHandlerName) {
-        super("exception.framework.notifytemplatenotifyhandlernotmatchexception", templateId, notifyHandlerName);
+        super("通知模板：“{0}”不是“{1}”类型", templateId, notifyHandlerName);
     }
 }

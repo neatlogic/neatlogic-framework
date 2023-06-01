@@ -22,12 +22,12 @@ public class SYSTEM_NOTICE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.systemnoticemodify.name";
+		return "系统公告管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.systemnoticemodify.introduction";
+		return "对系统公告进行添加、修改和删除";
 	}
 
 	@Override

@@ -26,12 +26,12 @@ public class FILE_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.filemodify.name";
+        return "附件管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.filemodify.introduction";
+        return "对所有附件进行管理";
     }
 
     @Override

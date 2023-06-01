@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueIsIrregularException extends ApiRuntimeException {
     public ValueIsIrregularException(String prefix) {
-        super("exception.framework.valueisirregularexception", prefix);
+        super("{0}值不符合格式要求", prefix);
     }
 }

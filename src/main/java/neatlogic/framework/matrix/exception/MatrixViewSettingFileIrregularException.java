@@ -22,14 +22,14 @@ public class MatrixViewSettingFileIrregularException extends ApiRuntimeException
     private static final long serialVersionUID = 5166847622344597434L;
 
     public MatrixViewSettingFileIrregularException(Exception ex) {
-        super("exception.framework.matrixviewsettingfileirregularexception.b", ex.getMessage());
+        super("矩阵视图配置文件内容不合法：{0}", ex.getMessage());
     }
 
     public MatrixViewSettingFileIrregularException(String nodeName) {
-        super("exception.framework.matrixviewsettingfileirregularexception.c", nodeName);
+        super("矩阵视图配置文件缺少节点：{0}", nodeName);
     }
 
     public MatrixViewSettingFileIrregularException(String nodeName, String attrName) {
-        super("exception.framework.matrixviewsettingfileirregularexception.d", nodeName, attrName);
+        super("矩阵视图配置文件{0}节点缺少属性{1}", nodeName, attrName);
     }
 }

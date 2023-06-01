@@ -22,6 +22,6 @@ public class LoginAuthNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 999623777857022003L;
 
     public LoginAuthNotFoundException(String authName) {
-        super("exception.framework.loginauthnotfoundexception", authName);
+        super("登录认证：“{0}”不存在", authName);
     }
 }

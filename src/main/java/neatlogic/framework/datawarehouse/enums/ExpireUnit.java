@@ -20,9 +20,9 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ExpireUnit {
-    MINUTE("minute", new I18n("common.minute")),
-    HOUR("hour", new I18n("common.hour")),
-    DAY("day", new I18n("common.day"));
+    MINUTE("minute", new I18n("分钟")),
+    HOUR("hour", new I18n("小时")),
+    DAY("day", new I18n("天"));
 
     private final String value;
     private final I18n text;

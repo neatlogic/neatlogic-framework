@@ -22,12 +22,12 @@ public class NOTIFY_POLICY_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.notifypolicymodify.name";
+		return "通知策略管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.notifypolicymodify.introduction";
+		return "对通知策略进行添加、修改和删除";
 	}
 
 	@Override

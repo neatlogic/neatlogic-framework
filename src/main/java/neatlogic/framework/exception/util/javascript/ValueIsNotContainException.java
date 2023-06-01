@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueIsNotContainException extends ApiRuntimeException {
     public ValueIsNotContainException(String prefix, String value, String otherValue) {
-        super("exception.framework.valueisnotcontainexception", prefix, value, otherValue);
+        super("{0}值{1}不包含{2}", prefix, value, otherValue);
     }
 }

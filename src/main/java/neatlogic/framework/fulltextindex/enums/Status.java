@@ -20,8 +20,8 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum Status {
-    DOING("doing", new I18n("common.rebuilding")),
-    DONE("done", new I18n("common.rebuildingcompleted"));
+    DOING("doing", new I18n("重建中")),
+    DONE("done", new I18n("重建完毕"));
 
     private final String value;
     private final I18n text;

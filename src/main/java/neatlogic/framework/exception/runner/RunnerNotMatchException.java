@@ -23,11 +23,11 @@ public class RunnerNotMatchException extends ApiRuntimeException {
     private static final long serialVersionUID = 3593220313941443951L;
 
     public RunnerNotMatchException(String ip) {
-        super("exception.framework.runnernotmatchexception.b", ip);
+        super("ip: {0}找不到匹配的runner，请核对runner组配置", ip);
     }
 
     public RunnerNotMatchException() {
-        super("exception.framework.runnernotmatchexception.c");
+        super("找不到匹配的runner，请核对runner组配置 或者 没有配置runner map");
     }
 
 

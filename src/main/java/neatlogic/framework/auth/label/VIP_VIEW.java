@@ -6,12 +6,12 @@ public class VIP_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.vipview.name";
+		return "VIP查看权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.vipview.introduction";
+		return "拥有此权限才能查看vip用户头像的VIP标识";
 	}
 
 	@Override

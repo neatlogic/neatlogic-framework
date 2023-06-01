@@ -22,12 +22,12 @@ public class INTEGRATION_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.integrationmodify.name";
+		return "集成管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.integrationmodify.introduction";
+		return "对集成进行添加、修改和删除";
 	}
 
 	@Override

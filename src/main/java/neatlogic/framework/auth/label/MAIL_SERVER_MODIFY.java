@@ -22,12 +22,12 @@ public class MAIL_SERVER_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.mailsevermodify.name";
+		return "邮件服务器管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.mailsevermodify.introduction";
+		return "对邮件服务器进行添加、修改和删除";
 	}
 
 	@Override

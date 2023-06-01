@@ -27,6 +27,6 @@ public class IntegrationReferencedCannotBeDeletedException extends ApiRuntimeExc
     private static final long serialVersionUID = 3459303360397256808L;
 
     public IntegrationReferencedCannotBeDeletedException(String uuid) {
-        super("exception.framework.integrationreferencedcannotbedeletedexception", uuid);
+        super("集成：“{0}”有被引用，不能删除", uuid);
     }
 }

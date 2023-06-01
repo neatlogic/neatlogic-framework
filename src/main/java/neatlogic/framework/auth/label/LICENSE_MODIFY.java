@@ -22,12 +22,12 @@ public class LICENSE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.licensemodify.name";
+		return "许可管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.licensemodify.introduction";
+		return "查看和更新许可";
 	}
 
 	@Override

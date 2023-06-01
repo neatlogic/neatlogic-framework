@@ -23,7 +23,7 @@ public class ParamTypeNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -7638721905310824679L;
 
     public ParamTypeNotFoundException(String type) {
-        super("exception.framework.paramtypenotfoundexception", type);
+        super("参数类型：“{0}”不存在", type);
     }
 
 }

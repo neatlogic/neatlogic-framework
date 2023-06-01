@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ParamJSONIrregularException extends ApiRuntimeException {
     public ParamJSONIrregularException() {
-        super("exception.paraminvalid");
+        super("参数“{0}”不符合格式要求，{1}");
     }
 }

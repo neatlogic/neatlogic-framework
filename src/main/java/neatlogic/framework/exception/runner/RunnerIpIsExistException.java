@@ -4,6 +4,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerIpIsExistException extends ApiRuntimeException {
     public RunnerIpIsExistException(String host) {
-        super("exception.framework.runneripisexistexception", host);
+        super("ip为：{0}的runner已存在", host);
     }
 }

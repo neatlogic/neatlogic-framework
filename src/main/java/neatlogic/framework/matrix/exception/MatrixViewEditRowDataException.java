@@ -11,6 +11,6 @@ public class MatrixViewEditRowDataException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508276752259783532L;
 
     public MatrixViewEditRowDataException() {
-        super("exception.framework.matrixvieweditrowdataexception");
+        super("视图矩阵不能编辑一行数据");
     }
 }

@@ -7,6 +7,6 @@ public class NotifyJobNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 8236167326955410191L;
 
     public NotifyJobNotFoundException(Long id) {
-        super("exception.framework.notifyjobnotfoundexception", id);
+        super("通知定时任务：“{0}”不存在", id);
     }
 }

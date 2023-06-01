@@ -7,6 +7,6 @@ public class TeamUserTitleNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -5856346069642288523L;
 
     public TeamUserTitleNotFoundException(String title) {
-        super("exception.framework.teamusertitlenotfoundexception", title);
+        super("组用户头衔：“{0}”不存在", title);
     }
 }

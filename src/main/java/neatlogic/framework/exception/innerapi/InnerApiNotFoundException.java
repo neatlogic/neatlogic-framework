@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InnerApiNotFoundException extends ApiRuntimeException {
     public InnerApiNotFoundException(String className) {
-        super("exception.framework.innerapinotfoundexception", className);
+        super("内部接口“{0}”不存在", className);
     }
 }

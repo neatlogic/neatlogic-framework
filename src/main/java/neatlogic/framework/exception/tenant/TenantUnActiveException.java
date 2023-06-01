@@ -10,6 +10,6 @@ public class TenantUnActiveException extends ApiRuntimeException {
     private static final long serialVersionUID = 1099170784444348169L;
 
     public TenantUnActiveException(String tenant) {
-        super("exception.framework.tenantunactiveexception", tenant);
+        super("租户：{0}已禁用", tenant);
     }
 }

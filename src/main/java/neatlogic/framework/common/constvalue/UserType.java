@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum UserType implements IUserType {
-    ALL("alluser", new I18n("enum.framework.usertype.all"), true),
-    LOGIN_USER("loginuser", new I18n("enum.framework.usertype.login_user"), false),
-    LOGIN_TEAM("loginteam", new I18n("enum.framework.usertype.login_team"), false),
-    LOGIN_DEPARTMENT("logindepartment", new I18n("enum.framework.usertype.login_department"), false),
-    LOGIN_CENTER("logincenter", new I18n("enum.framework.usertype.login_center"), false),
-    VIP_USER("vipuser", new I18n("enum.framework.usertype.vip_user"), false);
+    ALL("alluser", new I18n("所有人"), true),
+    LOGIN_USER("loginuser", new I18n("当前登录人"), false),
+    LOGIN_TEAM("loginteam", new I18n("当前登录人所在组"), false),
+    LOGIN_DEPARTMENT("logindepartment", new I18n("当前登录人所在部"), false),
+    LOGIN_CENTER("logincenter", new I18n("当前登录人所在中心"), false),
+    VIP_USER("vipuser", new I18n("vip用户"), false);
 
     private final String status;
     private final I18n text;

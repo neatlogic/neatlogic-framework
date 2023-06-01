@@ -20,8 +20,8 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum AggregateType {
-    COUNT("count", new I18n("common.count")),
-    SUM("sum", new I18n("enum.framework.aggregatetype.sum"));
+    COUNT("count", new I18n("计数")),
+    SUM("sum", new I18n("求和"));
 
     private final String value;
     private final I18n text;

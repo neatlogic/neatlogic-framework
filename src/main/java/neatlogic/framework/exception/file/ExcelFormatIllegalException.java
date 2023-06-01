@@ -23,11 +23,11 @@ public class ExcelFormatIllegalException extends ApiRuntimeException {
     private static final long serialVersionUID = -5415989970048167194L;
 
     public ExcelFormatIllegalException() {
-        super("exception.framework.excelformatillegalexception.b");
+        super("Excel文件格式错误，请上传xls或xlsx格式的Excel文件");
     }
 
     public ExcelFormatIllegalException(String format) {
-        super("exception.framework.excelformatillegalexception.c", format);
+        super("Excel文件格式错误，请上传{0}格式的Excel文件", format);
     }
 
 }

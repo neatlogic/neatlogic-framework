@@ -7,12 +7,12 @@ import neatlogic.framework.util.I18nUtils;
 
 public enum Chart {
 
-	BARCHART("barchart",new I18n("common.barchart"),"tsfont-chart-bar"),
-	PIECHART("piechart",new I18n("common.piechart"),"tsfont-chart-pie"),
-	LINECHART("linechart",new I18n("common.curvechart"),"tsfont-chart-line"),
-	TABLECHART("tablechart",new I18n("common.table"),"tsfont-chart-table"),
-	NUMBERCHART("numberchart",new I18n("common.valuemap"),"tsfont-chart-number"),
-	AREACHART("areachart",new I18n("common.areachart"),"tsfont-chart-area"),
+	BARCHART("barchart",new I18n("柱状图"),"tsfont-chart-bar"),
+	PIECHART("piechart",new I18n("饼图"),"tsfont-chart-pie"),
+	LINECHART("linechart",new I18n("曲线图"),"tsfont-chart-line"),
+	TABLECHART("tablechart",new I18n("表格"),"tsfont-chart-table"),
+	NUMBERCHART("numberchart",new I18n("值图"),"tsfont-chart-number"),
+	AREACHART("areachart",new I18n("面积图"),"tsfont-chart-area"),
 	;
 
 	private final String value;

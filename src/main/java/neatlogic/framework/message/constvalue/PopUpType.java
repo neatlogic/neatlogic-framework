@@ -11,9 +11,9 @@ import neatlogic.framework.util.I18nUtils;
  * @Date: 2020/12/31 10:51
  **/
 public enum PopUpType {
-    SHORTSHOW("shortshow", new I18n("enum.framework.popuptype.shortshow")),
-    LONGSHOW("longshow", new I18n("enum.framework.popuptype.longshow")),
-    CLOSE("close", new I18n("enum.framework.popuptype.close"));
+    SHORTSHOW("shortshow", new I18n("临时")),
+    LONGSHOW("longshow", new I18n("持续")),
+    CLOSE("close", new I18n("关闭"));
 
     private String value;
     private I18n text;

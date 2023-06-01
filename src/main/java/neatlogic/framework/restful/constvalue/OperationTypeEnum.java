@@ -9,11 +9,11 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum OperationTypeEnum implements IEnum {
-    CREATE("create", new I18n("enum.framework.operationtypeenum.create")),
-    DELETE("delete", new I18n("common.delete")),
-    UPDATE("update", new I18n("common.update")),
-    SEARCH("search", new I18n("enum.framework.operationtypeenum.search")),
-    OPERATE("operate", new I18n("common.operation"));
+    CREATE("create", new I18n("增加")),
+    DELETE("delete", new I18n("删除")),
+    UPDATE("update", new I18n("更新")),
+    SEARCH("search", new I18n("查询")),
+    OPERATE("operate", new I18n("操作"));
     private String name;
     private I18n text;
 

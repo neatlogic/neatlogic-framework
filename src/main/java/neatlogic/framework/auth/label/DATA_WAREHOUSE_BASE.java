@@ -22,12 +22,12 @@ public class DATA_WAREHOUSE_BASE extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.datawarehousebase.name";
+        return "数据仓库默认权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.datawarehousebase.introduction";
+        return "对数据仓库数据源进行访问";
     }
 
     @Override

@@ -20,7 +20,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class FileUniqueKeyEmptyException extends ApiRuntimeException {
     public FileUniqueKeyEmptyException() {
-        super("exception.framework.fileuniquekeyemptyexception");
+        super("附件唯一键不能为空");
     }
 
 }

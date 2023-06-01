@@ -23,6 +23,6 @@ public class FormActiveVersionNotFoundExcepiton extends ApiRuntimeException {
     private static final long serialVersionUID = 6933170692575758579L;
 
     public FormActiveVersionNotFoundExcepiton(String uuid) {
-        super("exception.framework.formactiveversionnotfoundexcepiton", uuid);
+        super("表单：“{0}”没有激活版本", uuid);
     }
 }

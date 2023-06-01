@@ -26,10 +26,10 @@ import neatlogic.framework.util.I18nUtils;
  * @since 2021/10/18 11:57
  **/
 public enum CommonNotifyParam implements INotifyParam {
-    OPERATOR("operator", new I18n("enum.framework.commonnotifyparam.operator"), ParamType.STRING),
-    CURRENT_TIME("currentTime", new I18n("enum.framework.commonnotifyparam.currenttime"), ParamType.STRING),
-    NOTIFYTRIGGERTYPE("notifyTriggerType", new I18n("enum.framework.commonnotifyparam.notifytriggertype"), ParamType.STRING),
-    HOMEURL("homeUrl", new I18n("enum.framework.commonnotifyparam.homeurl"), ParamType.STRING, "<a href=\"${DATA.homeUrl}\" target=\"_blank\"></a>"),
+    OPERATOR("operator", new I18n("操作人"), ParamType.STRING),
+    CURRENT_TIME("currentTime", new I18n("当前时间"), ParamType.STRING),
+    NOTIFYTRIGGERTYPE("notifyTriggerType", new I18n("通知触发点"), ParamType.STRING),
+    HOMEURL("homeUrl", new I18n("域名"), ParamType.STRING, "<a href=\"${DATA.homeUrl}\" target=\"_blank\"></a>"),
     ;
 
     private final String value;

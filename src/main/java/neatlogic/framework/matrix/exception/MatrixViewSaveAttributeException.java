@@ -11,6 +11,6 @@ public class MatrixViewSaveAttributeException extends ApiRuntimeException {
     private static final long serialVersionUID = -4598274152233703032L;
 
     public MatrixViewSaveAttributeException() {
-        super("exception.framework.matrixviewsaveattributeexception");
+        super("视图矩阵不能保存属性");
     }
 }

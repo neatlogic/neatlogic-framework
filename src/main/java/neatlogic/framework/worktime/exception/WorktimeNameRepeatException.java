@@ -23,6 +23,6 @@ public class WorktimeNameRepeatException extends ApiRuntimeException {
     private static final long serialVersionUID = -3658559078633543316L;
 
     public WorktimeNameRepeatException(String msg) {
-        super("exception.framework.worktimenamerepeatexception", msg);
+        super("服务窗口：“{0}”已存在", msg);
     }
 }

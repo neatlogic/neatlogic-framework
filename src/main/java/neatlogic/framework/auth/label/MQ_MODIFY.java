@@ -22,12 +22,12 @@ public class MQ_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.mqmodify.name";
+        return "消息队列管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.mqmodify.introduction";
+        return "对消息队列主题和订阅进行添加、修改和删除";
     }
 
     @Override

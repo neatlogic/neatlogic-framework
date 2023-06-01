@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerIdNotFoundException extends ApiRuntimeException {
     public RunnerIdNotFoundException(Long id) {
-        super("exception.framework.runneridnotfoundexception", id);
+        super("runner id：{0}不存在", id);
     }
 }

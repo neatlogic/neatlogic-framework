@@ -8,12 +8,12 @@ import neatlogic.framework.util.I18nUtils;
  * 通知接收者类型
  */
 public enum NotifyRecipientType {
-	USER("user", new I18n("common.user")),
-	TEAM("team", new I18n("common.group")),
-	ROLE("role", new I18n("common.role")),
-	EMAIL("email", new I18n("common.email")),
-	PROCESSUSERTYPE("processUserType", new I18n("enum.framework.notifyrecipienttype.processusertype")),
-	CUSTOM("custom", new I18n("enum.framework.notifyrecipienttype.custom"))
+	USER("user", new I18n("用户")),
+	TEAM("team", new I18n("组")),
+	ROLE("role", new I18n("角色")),
+	EMAIL("email", new I18n("邮箱")),
+	PROCESSUSERTYPE("processUserType", new I18n("工单干系人")),
+	CUSTOM("custom", new I18n("组件自定义的对象"))
 	;
 
 	private String value;

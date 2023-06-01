@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class ResubmitException extends ApiRuntimeException {
 
     public ResubmitException(String token) {
-        super("exception.framework.resubmitexception", token);
+        super("请勿重复提交到：{0}", token);
     }
 }

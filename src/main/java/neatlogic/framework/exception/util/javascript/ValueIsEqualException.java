@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueIsEqualException extends ApiRuntimeException {
     public ValueIsEqualException(String prefix, String value, String otherValue) {
-        super("exception.framework.valueisequalexception", prefix, value, otherValue);
+        super("{0}值{1}等于{2}", prefix, value, otherValue);
     }
 }

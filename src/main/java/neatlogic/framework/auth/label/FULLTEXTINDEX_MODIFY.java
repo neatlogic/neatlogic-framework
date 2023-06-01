@@ -22,12 +22,12 @@ public class FULLTEXTINDEX_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.fulltextindex.name";
+        return "重建搜索中心索引权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.fulltextindex.introduction";
+        return "对全局检索索引进行重建";
     }
 
     @Override

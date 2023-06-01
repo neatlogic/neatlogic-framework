@@ -7,6 +7,6 @@ public class DataBaseNotFoundException extends ApiRuntimeException {
 
 
     public DataBaseNotFoundException() {
-        super("exception.framework.databasenotfoundexception", TenantContext.get().getTenantUuid());
+        super("租户：{0}缺少DATA数据库，请补充创建。", TenantContext.get().getTenantUuid());
     }
 }

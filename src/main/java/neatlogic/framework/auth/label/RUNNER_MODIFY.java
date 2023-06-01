@@ -22,12 +22,12 @@ public class RUNNER_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.runnermodify.name";
+        return "自动化执行器管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.runnermodify.introduction";
+        return "对自动化执行器进行添加、修改和删除";
     }
 
     @Override

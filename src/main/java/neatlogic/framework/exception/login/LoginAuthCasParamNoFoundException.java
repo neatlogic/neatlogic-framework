@@ -22,6 +22,6 @@ public class LoginAuthCasParamNoFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 999623777857022003L;
 
     public LoginAuthCasParamNoFoundException() {
-        super("exception.framework.login.cas.auth.no_ticket");
+        super("缺少ticke参数或为空");
     }
 }

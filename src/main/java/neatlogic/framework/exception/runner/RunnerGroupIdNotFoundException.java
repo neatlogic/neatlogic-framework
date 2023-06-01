@@ -22,10 +22,10 @@ public class RunnerGroupIdNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -7392923556010588732L;
 
     public RunnerGroupIdNotFoundException(Long id) {
-        super("exception.framework.runnergroupidnotfoundexception.b", id);
+        super("runner组id:{0}不存在", id);
     }
 
     public RunnerGroupIdNotFoundException(String agentIp) {
-        super("exception.framework.runnergroupidnotfoundexception.c", agentIp);
+        super("通过tagentIp：{0}找不到match network 的 runner组id", agentIp);
     }
 }

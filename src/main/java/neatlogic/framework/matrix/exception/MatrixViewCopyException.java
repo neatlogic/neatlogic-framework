@@ -11,6 +11,6 @@ public class MatrixViewCopyException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508234325299797532L;
 
     public MatrixViewCopyException() {
-        super("exception.framework.matrixviewcopyexception");
+        super("视图矩阵不能复制");
     }
 }

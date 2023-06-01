@@ -23,6 +23,6 @@ public class MatrixViewCreateSchemaException extends ApiRuntimeException {
     private static final long serialVersionUID = 744402997944691354L;
 
     public MatrixViewCreateSchemaException(String name) {
-        super("exception.framework.matrixviewcreateschemaexception", name);
+        super("创建矩阵：{0}数据表失败。", name);
     }
 }

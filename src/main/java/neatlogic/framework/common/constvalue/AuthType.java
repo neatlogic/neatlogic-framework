@@ -25,10 +25,10 @@ import java.util.List;
 
 
 public enum AuthType implements IEnum {
-    USER("user", new I18n("common.user")),
-    TEAM("team", new I18n("common.group")),
-    ROLE("role", new I18n("common.role")),
-    COMMON("common", new I18n("enum.framework.authtype.common"));
+    USER("user", new I18n("用户")),
+    TEAM("team", new I18n("组")),
+    ROLE("role", new I18n("角色")),
+    COMMON("common", new I18n("内置"));
 
     private final String value;
     private final I18n text;

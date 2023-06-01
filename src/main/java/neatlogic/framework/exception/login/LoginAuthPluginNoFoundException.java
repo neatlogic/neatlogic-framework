@@ -22,6 +22,6 @@ public class LoginAuthPluginNoFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 999623777857022003L;
 
     public LoginAuthPluginNoFoundException() {
-        super("exception.framework.login.auth.plugin_not_found");
+        super("找不到认证插件");
     }
 }

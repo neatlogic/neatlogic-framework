@@ -12,6 +12,6 @@ public class MatrixViewImportException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508124752209784332L;
 
     public MatrixViewImportException() {
-        super("exception.framework.matrixviewimportexception");
+        super("视图矩阵不支持导入");
     }
 }

@@ -7,6 +7,6 @@ public class NotifyPolicyMoreThanOneException extends ApiRuntimeException {
     private static final long serialVersionUID = 2624421172651499894L;
 
     public NotifyPolicyMoreThanOneException(String handler) {
-        super("exception.framework.notifypolicymorethanoneexception", handler);
+        super("{0}只允许存在一个策略", handler);
     }
 }

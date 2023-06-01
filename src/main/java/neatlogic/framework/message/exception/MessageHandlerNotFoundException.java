@@ -12,6 +12,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class MessageHandlerNotFoundException extends ApiRuntimeException {
 
     public MessageHandlerNotFoundException(String handler) {
-        super("exception.framework.messagehandlernotfoundexception", handler);
+        super("消息类型处理器：‘{0}’不存在", handler);
     }
 }

@@ -23,7 +23,7 @@ public class RunnerConnectRefusedException extends ApiRuntimeException {
     private static final long serialVersionUID = 1799177301356468646L;
 
     public RunnerConnectRefusedException(String uk, String msg) {
-        super("exception.framework.runnerconnectrefusedexception", uk, msg);
+        super("Runner url：“{0}”connect failed, errorMsg:{1}", uk, msg);
     }
 
     public RunnerConnectRefusedException(String uk) {

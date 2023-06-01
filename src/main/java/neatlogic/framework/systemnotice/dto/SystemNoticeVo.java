@@ -25,9 +25,9 @@ import java.util.List;
 public class SystemNoticeVo extends BaseEditorVo {
 
     public enum Status {
-        NOTISSUED("not_issued", new I18n("enum.framework.status.notissued"), ""),
-        ISSUED("issued", new I18n("enum.framework.status.issued"), "#15bf81"),
-        STOPPED("stopped", new I18n("enum.framework.status.stopped"), "#ff8484");
+        NOTISSUED("not_issued", new I18n("未下发"), ""),
+        ISSUED("issued", new I18n("已下发"), "#15bf81"),
+        STOPPED("stopped", new I18n("已停用"), "#ff8484");
         private String value;
         private I18n text;
         private String color;

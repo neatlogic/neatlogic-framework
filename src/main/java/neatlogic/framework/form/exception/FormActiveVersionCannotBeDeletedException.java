@@ -23,6 +23,6 @@ public class FormActiveVersionCannotBeDeletedException extends ApiRuntimeExcepti
     private static final long serialVersionUID = -8664693189378478063L;
 
     public FormActiveVersionCannotBeDeletedException(String uuid) {
-        super("exception.framework.formactiveversioncannotbedeletedexception", uuid);
+        super("表单版本：{0}为当前激活版本，不能删除", uuid);
     }
 }

@@ -32,12 +32,12 @@ public class TenantVo extends BasePageVo {
     private static final long serialVersionUID = 5037087043421533431L;
 
     public enum Status {
-        BUILDING("building", "enum.master.tenantvo.status.building"),
-        BUILT("built", "common.completed"),
-        DDL("ddl", "enum.master.tenantvo.status.ddl"),
-        DML("dml", "enum.master.tenantvo.status.dml"),
+        BUILDING("building", "创建中"),
+        BUILT("built", "已完成"),
+        DDL("ddl", "执行ddl"),
+        DML("dml", "执行dml"),
         DML_DEMO("dmldemo", "enum.master.tenantvo.status.dmldemo"),
-        ERROR("error", "common.exception");
+        ERROR("error", "异常");
 
         private String value;
         private String text;

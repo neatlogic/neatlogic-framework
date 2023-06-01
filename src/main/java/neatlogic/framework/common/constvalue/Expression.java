@@ -25,18 +25,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Expression implements IEnum {
-    LIKE("like", new I18n("common.include"), " %s contains %s ", " %s.%s like '%s%%' ", 1),
-    NOTLIKE("notlike", new I18n("common.exclude"), " not %s contains %s ", " %s.%s not like '%s%%' ", 1),
-    EQUAL("equal", new I18n("common.equals"), " %s = %s ", " %s.%s = '%s' ", 1),
-    UNEQUAL("unequal", new I18n("common.unequal"), " not %s = %s ", " %s.%s != '%s' ", 1),
-    INCLUDE("include", new I18n("enum.framework.expression.include"), " %s contains any ( %s ) ", " %s.%s in ( '%s' ) ", 1),
-    EXCLUDE("exclude", new I18n("enum.framework.expression.exclude"), " not %s contains any ( %s ) ", " %s.%s not in ( '%s' ) ", 1),
-    BETWEEN("between", new I18n("enum.framework.expression.between"), " %s between '%s' and '%s' ", " %s.%s between '%s' and '%s' ", 1),
-    GREATERTHAN("greater-than", new I18n("enum.framework.expression.greaterthan"), " %s > %s ", " %s.%s > '%s' ", 1),
-    LESSTHAN("less-than", new I18n("enum.framework.expression.lessthan"), " %s < %s ", " %s.%s < '%s' ", 1),
-    ISNULL("is-null", new I18n("common.null"), " %s = '' ", " %s.%s is null ", 0),
-    MATCH("match", new I18n("enum.framework.expression.match"), " %s match '%s'", " %s.%s match ( %s ) against (' %s ' IN BOOLEAN MODE) ", 0),
-    ISNOTNULL("is-not-null", new I18n("common.notempty"), " not %s = '' ", " %s.%s is not null ", 0);
+    LIKE("like", new I18n("包含"), " %s contains %s ", " %s.%s like '%s%%' ", 1),
+    NOTLIKE("notlike", new I18n("不包含"), " not %s contains %s ", " %s.%s not like '%s%%' ", 1),
+    EQUAL("equal", new I18n("等于"), " %s = %s ", " %s.%s = '%s' ", 1),
+    UNEQUAL("unequal", new I18n("不等于"), " not %s = %s ", " %s.%s != '%s' ", 1),
+    INCLUDE("include", new I18n("包括"), " %s contains any ( %s ) ", " %s.%s in ( '%s' ) ", 1),
+    EXCLUDE("exclude", new I18n("不包括"), " not %s contains any ( %s ) ", " %s.%s not in ( '%s' ) ", 1),
+    BETWEEN("between", new I18n("属于"), " %s between '%s' and '%s' ", " %s.%s between '%s' and '%s' ", 1),
+    GREATERTHAN("greater-than", new I18n("晚于"), " %s > %s ", " %s.%s > '%s' ", 1),
+    LESSTHAN("less-than", new I18n("早于"), " %s < %s ", " %s.%s < '%s' ", 1),
+    ISNULL("is-null", new I18n("为空"), " %s = '' ", " %s.%s is null ", 0),
+    MATCH("match", new I18n("包含(分词)"), " %s match '%s'", " %s.%s match ( %s ) against (' %s ' IN BOOLEAN MODE) ", 0),
+    ISNOTNULL("is-not-null", new I18n("不为空"), " not %s = '' ", " %s.%s is not null ", 0);
     private final String expression;
     private final I18n expressionName;
     private final String expressionEs;

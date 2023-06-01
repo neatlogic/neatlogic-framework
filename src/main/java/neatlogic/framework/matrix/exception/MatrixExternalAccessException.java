@@ -23,6 +23,6 @@ public class MatrixExternalAccessException extends ApiRuntimeException {
     private static final long serialVersionUID = 4614356458155658127L;
 
     public MatrixExternalAccessException(String name) {
-        super("exception.framework.matrixexternalaccessexception", name);
+        super("集成：“{0}”外部接口访问异常", name);
     }
 }

@@ -27,6 +27,6 @@ public class MoveTargetNodeIllegalException extends ApiRuntimeException {
     private static final long serialVersionUID = 4478080139019340483L;
 
     public MoveTargetNodeIllegalException(){
-        super("exception.framework.movetargetnodeillegalexception");
+        super("移动到的目标节点不可以是当前节点及其后代节点");
     }
 }

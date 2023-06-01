@@ -21,7 +21,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class FullTextIndexTypeNotFoundException extends ApiRuntimeException {
 
     public FullTextIndexTypeNotFoundException(String type) {
-        super("exception.framework.fulltextindextypenotfoundexception", type);
+        super("索引类型“{0}”不存在", type);
     }
 
 }

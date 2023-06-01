@@ -22,12 +22,12 @@ public class SCHEDULE_JOB_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.schedulejobmodify.name";
+		return "定时作业管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.schedulejobmodify.introduction";
+		return "对定时作业进行添加、修改和删除";
 	}
 
 	@Override

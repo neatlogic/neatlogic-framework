@@ -24,10 +24,10 @@ import neatlogic.framework.util.I18nUtils;
  */
 
 public enum FontFamily {
-    SONG(new I18n("enum.framework.fontfamily.song")),
-    BLACK(new I18n("enum.framework.fontfamily.black")),
-    FANG_SONG(new I18n("enum.framework.fontfamily.fang_song")),
-    REGULAR_SCRIPT(new I18n("common.regularscript")),
+    SONG(new I18n("宋体")),
+    BLACK(new I18n("黑体")),
+    FANG_SONG(new I18n("仿宋")),
+    REGULAR_SCRIPT(new I18n("楷体")),
     ;
 
     private final I18n value;

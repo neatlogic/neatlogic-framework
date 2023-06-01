@@ -20,11 +20,11 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FieldInputType {
-    TEXT("text", new I18n("common.textbox")),
-    DATETIME("datetime", new I18n("common.datatime")),
-    SELECT("select", new I18n("common.select")),
-    RADIO("radio", new I18n("common.radiobutton")),
-    CHECKBOX("checkbox", new I18n("common.checkbox"));
+    TEXT("text", new I18n("文本框")),
+    DATETIME("datetime", new I18n("日期时间")),
+    SELECT("select", new I18n("下拉框")),
+    RADIO("radio", new I18n("单选框")),
+    CHECKBOX("checkbox", new I18n("复选框"));
 
     private final String value;
     private final I18n text;

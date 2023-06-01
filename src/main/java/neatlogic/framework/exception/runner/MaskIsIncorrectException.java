@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class MaskIsIncorrectException extends ApiRuntimeException {
     public MaskIsIncorrectException(String ip) {
-        super("exception.framework.maskisincorrectexception", ip);
+        super("ip为：{0}对应的掩码不合法", ip);
     }
 }

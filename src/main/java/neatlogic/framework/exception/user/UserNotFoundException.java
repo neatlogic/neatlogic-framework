@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class UserNotFoundException extends ApiRuntimeException {
 
     public UserNotFoundException(String userid) {
-        super("exception.framework.usernotfoundexception", userid);
+        super("用户“{0}”不存在", userid);
     }
 }

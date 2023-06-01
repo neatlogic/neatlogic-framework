@@ -21,8 +21,8 @@ import neatlogic.framework.util.I18n;
 
 public enum ExceptionNotifyTriggerType implements INotifyTriggerType {
 
-    EMAILNOTIFYEXCEPTION("emailnotifyexception", new I18n("enum.framework.exceptionnotifytriggertype.emailnotifyexception.a"), new I18n("enum.framework.exceptionnotifytriggertype.emailnotifyexception.b")),
-    WECHATNOTIFYEXCEPTION("wechatnotifyexception", new I18n("enum.framework.exceptionnotifytriggertype.wechatnotifyexception.a"), new I18n("enum.framework.exceptionnotifytriggertype.wechatnotifyexception.b"));
+    EMAILNOTIFYEXCEPTION("emailnotifyexception", new I18n("邮件通知异常"), new I18n("邮件通知发生异常时触发通知")),
+    WECHATNOTIFYEXCEPTION("wechatnotifyexception", new I18n("微信通知异常"), new I18n("微信通知发生异常时触发通知"));
     private final String trigger;
     private final I18n text;
     private final I18n description;

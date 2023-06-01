@@ -27,6 +27,6 @@ public class IntegrationRequestResultIsEmptyException extends ApiRuntimeExceptio
     private static final long serialVersionUID = 1161501312345475176L;
 
     public IntegrationRequestResultIsEmptyException() {
-        super("exception.framework.integrationrequestresultisemptyexception");
+        super("集成请求结果为空");
     }
 }

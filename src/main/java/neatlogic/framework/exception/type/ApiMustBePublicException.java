@@ -7,7 +7,7 @@ public class ApiMustBePublicException extends ApiRuntimeException {
     private static final long serialVersionUID = -925235736439720896L;
 
     public ApiMustBePublicException(String token) {
-        super("exception.framework.apimustbepublicexception", token);
+        super("不存在 “{0}” 的自定义接口", token);
     }
 
 }

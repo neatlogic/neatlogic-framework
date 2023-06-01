@@ -24,9 +24,9 @@ import neatlogic.framework.util.I18nUtils;
  * limitations under the License.
  **/
 public enum MoveType {
-    INNER("inner", new I18n("enum.framework.movetype.inner")),
-    PREV("prev", new I18n("enum.framework.movetype.prev")),
-    NEXT("next", new I18n("enum.framework.movetype.next"));
+    INNER("inner", new I18n("移动到目标节点里面")),
+    PREV("prev", new I18n("移动到目标节点前面")),
+    NEXT("next", new I18n("移动到目标节点后面"));
     private String value;
     private I18n text;
 

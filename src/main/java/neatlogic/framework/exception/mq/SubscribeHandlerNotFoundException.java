@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class SubscribeHandlerNotFoundException extends ApiRuntimeException {
     public SubscribeHandlerNotFoundException(String name) {
-        super("exception.framework.subscribehandlernotfoundexception", name);
+        super("订阅处理器：{0}不存在", name);
     }
 }

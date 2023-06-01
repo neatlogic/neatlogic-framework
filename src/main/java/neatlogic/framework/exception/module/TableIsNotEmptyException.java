@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class TableIsNotEmptyException extends ApiRuntimeException {
     public TableIsNotEmptyException(String name) {
-        super("exception.framework.tableisnotemptyexception", name);
+        super("表“{0}”不为空，初始化失败", name);
     }
 }

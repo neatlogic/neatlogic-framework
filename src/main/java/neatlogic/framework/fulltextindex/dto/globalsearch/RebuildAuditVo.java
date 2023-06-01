@@ -25,8 +25,8 @@ import neatlogic.framework.common.config.Config;
 
 public class RebuildAuditVo {
     public enum Status {
-        DOING("doing", new I18n("common.rebuilding")),
-        DONE("done", new I18n("common.rebuildingcompleted"));
+        DOING("doing", new I18n("重建中")),
+        DONE("done", new I18n("重建完毕"));
 
         private String value;
         private I18n name;

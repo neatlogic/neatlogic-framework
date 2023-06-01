@@ -10,16 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ChartType {
-	BARCHART("barchart",new I18n("common.barchart"),Chart.BARCHART,false),
-	STACKBARCHART("stackbarchart",new I18n("enum.framework.charttype.stackbarchart"),Chart.BARCHART,false),
-	COLUMNCHART("columnchart",new I18n("enum.framework.charttype.columnchart"),Chart.BARCHART,true),
-	STACKCOLUMNCHART("stackcolumnchart",new I18n("enum.framework.charttype.stackcolumnchart"),Chart.BARCHART,false),
-	PIECHART("piechart",new I18n("common.piechart"),Chart.PIECHART,true),
-	DONUTCHART("donutchart",new I18n("enum.framework.charttype.donutchart"),Chart.PIECHART,true),
-	AREACHART("areachart",new I18n("common.areachart"),Chart.AREACHART,true),
-	LINECHART("linechart",new I18n("common.curvechart"),Chart.LINECHART,true),
-	TABLECHART("tablechart",new I18n("common.table"),Chart.TABLECHART,true),
-	NUMBERCHART("numberchart",new I18n("common.valuemap"),Chart.NUMBERCHART,true)
+	BARCHART("barchart",new I18n("柱状图"),Chart.BARCHART,false),
+	STACKBARCHART("stackbarchart",new I18n("堆叠柱状图"),Chart.BARCHART,false),
+	COLUMNCHART("columnchart",new I18n("条形图"),Chart.BARCHART,true),
+	STACKCOLUMNCHART("stackcolumnchart",new I18n("堆叠条形图"),Chart.BARCHART,false),
+	PIECHART("piechart",new I18n("饼图"),Chart.PIECHART,true),
+	DONUTCHART("donutchart",new I18n("环形图"),Chart.PIECHART,true),
+	AREACHART("areachart",new I18n("面积图"),Chart.AREACHART,true),
+	LINECHART("linechart",new I18n("曲线图"),Chart.LINECHART,true),
+	TABLECHART("tablechart",new I18n("表格"),Chart.TABLECHART,true),
+	NUMBERCHART("numberchart",new I18n("值图"),Chart.NUMBERCHART,true)
 	;
 
 	private String value;

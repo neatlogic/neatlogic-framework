@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class IPIsIncorrectException extends ApiRuntimeException {
     public IPIsIncorrectException(String ip) {
-        super("exception.framework.ipisincorrectexception", ip);
+        super("ip:{0}不合法", ip);
     }
 }

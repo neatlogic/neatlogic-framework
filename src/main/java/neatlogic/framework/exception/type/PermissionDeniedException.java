@@ -15,7 +15,7 @@ public class PermissionDeniedException extends ApiException {
     private static final long serialVersionUID = 6148939003449322484L;
 
     public PermissionDeniedException() {
-        super("exception.framework.permissiondeniedexception.a");
+        super("没有权限执行该操作，请联系管理员");
     }
     public PermissionDeniedException(String message) {
         super(message);
@@ -24,11 +24,11 @@ public class PermissionDeniedException extends ApiException {
         super(key, values);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {
-        super("exception.lackauth", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
+        super("当前用户缺少“{0}”权限，请联系管理员", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
     }
 
     public PermissionDeniedException(List<String> authNameList) {
-        super("exception.lackauth", String.join("、", authNameList));
+        super("当前用户缺少“{0}”权限，请联系管理员", String.join("、", authNameList));
     }
 
 }

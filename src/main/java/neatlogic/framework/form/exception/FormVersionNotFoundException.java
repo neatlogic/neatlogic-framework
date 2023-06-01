@@ -23,6 +23,6 @@ public class FormVersionNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -3137999499740470766L;
 
     public FormVersionNotFoundException(String uuid) {
-        super("exception.framework.formversionnotfoundexception", uuid);
+        super("表单版本：“{0}”不存在", uuid);
     }
 }

@@ -7,6 +7,6 @@ public class MatrixExternalNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1708428607162097984L;
 
     public MatrixExternalNotFoundException(String name) {
-        super("exception.framework.matrixexternalnotfoundexception", name);
+        super("{0}的数据源关联的集成配置信息异常", name);
     }
 }

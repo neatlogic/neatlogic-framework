@@ -6,6 +6,6 @@ public class NoUserException extends ApiRuntimeException {
 	private static final long serialVersionUID = 4864658649046286690L;
 
 	public NoUserException() {
-		super("exception.framework.nouserexception");
+		super("没有找到任何用户信息");
 	}
 }

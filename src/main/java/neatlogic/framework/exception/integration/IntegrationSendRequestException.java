@@ -7,6 +7,6 @@ public class IntegrationSendRequestException extends ApiRuntimeException {
     private static final long serialVersionUID = 2626448627649753817L;
 
     public IntegrationSendRequestException(String uuid) {
-        super("exception.framework.integrationsendrequestexception", uuid);
+        super("集成配置：“{0}”发送请求异常", uuid);
     }
 }

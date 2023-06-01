@@ -40,8 +40,8 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
 
     public enum ConversionType {
 
-        TOVALUE("toValue", new I18n("enum.framework.conversiontype.tovalue")),
-        TOTEXT("toText", new I18n("enum.framework.conversiontype.totext"));
+        TOVALUE("toValue", new I18n("text转换成value")),
+        TOTEXT("toText", new I18n("value转换成text"));
 
         private String value;
         private I18n text;

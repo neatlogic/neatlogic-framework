@@ -22,12 +22,12 @@ public class AUTHORITY_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.authoritymodify.name";
+		return "权限管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.authoritymodify.introduction";
+		return "对权限进行添加、修改和删除";
 	}
 
 	@Override

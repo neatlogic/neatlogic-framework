@@ -28,12 +28,12 @@ public class ExceptionMessageHandler extends MessageHandlerBase {
 
     @Override
     public String getName() {
-        return "handler.message.exception.a";
+        return "通知异常消息处理器";
     }
 
     @Override
     public String getDescription() {
-        return "handler.message.exception.description";
+        return "异常消息发送时使用该处理器处理消息";
     }
 
     @Override

@@ -22,12 +22,12 @@ public class ROLE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.rolemodify.name";
+		return "角色管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.rolemodify.introduction";
+		return "对角色进行添加、修改和删除";
 	}
 
 	@Override

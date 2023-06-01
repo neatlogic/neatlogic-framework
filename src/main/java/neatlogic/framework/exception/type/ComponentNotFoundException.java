@@ -10,7 +10,7 @@ public class ComponentNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -6165807991291970685L;
 
     public ComponentNotFoundException(String msg) {
-        super("exception.framework.componentnotfoundexception", msg);
+        super("接口组件:{0}不存在", msg);
     }
 
 }

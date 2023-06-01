@@ -23,6 +23,6 @@ public class MatrixExternalDataLostKeyOrTitleInTheadListException extends ApiRun
     private static final long serialVersionUID = -4051698659616459991L;
 
     public MatrixExternalDataLostKeyOrTitleInTheadListException() {
-        super("exception.framework.matrixexternaldatalostkeyortitleintheadlistexception");
+        super("集成配置接口返回结果不符合格式,theadList缺少key或title");
     }
 }

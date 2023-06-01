@@ -22,12 +22,12 @@ public class FORM_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.formmodify.name";
+        return "表单管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.formmodify.introduction";
+        return "对表单进行添加、修改和删除";
     }
 
     @Override

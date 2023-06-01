@@ -20,9 +20,9 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum TreeMenuType {
-    SYSTEM("system", new I18n("enum.framework.treemenutype.system")),
-    CUSTOM("custom", new I18n("enum.framework.treemenutype.custom")),
-    AUDIT("audit", new I18n("enum.framework.treemenutype.audit"));
+    SYSTEM("system", new I18n("系统接口目录")),
+    CUSTOM("custom", new I18n("自定义接口目录")),
+    AUDIT("audit", new I18n("操作审计目录"));
 
     private final String name;
     private final I18n text;

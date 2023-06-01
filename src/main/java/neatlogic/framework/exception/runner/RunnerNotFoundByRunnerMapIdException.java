@@ -22,6 +22,6 @@ public class RunnerNotFoundByRunnerMapIdException extends ApiRuntimeException {
     private static final long serialVersionUID = -3849705005655724969L;
 
     public RunnerNotFoundByRunnerMapIdException(Long runnerMapId) {
-        super("exception.framework.runnernotfoundbyrunnermapIdexception", runnerMapId);
+        super("未找到{0}对应的runner", runnerMapId);
     }
 }

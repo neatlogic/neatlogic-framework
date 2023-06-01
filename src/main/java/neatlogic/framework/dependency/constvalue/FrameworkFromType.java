@@ -27,16 +27,16 @@ import neatlogic.framework.util.I18nUtils;
  * @since: 2021/4/2 10:30
  **/
 public enum FrameworkFromType implements IFromType {
-    MATRIX("matrix", new I18n("enum.framework.frameworkfromtype.matrix.a")),
-    MATRIXATTR("matrixattr", new I18n("enum.framework.frameworkfromtype.matrixattr")),
-    FORM("form", new I18n("common.form")),
-    FORMSCENE("formscene", new I18n("enum.framework.frameworkfromtype.formscene")),
-    FORMATTR("formattr", new I18n("common.formproperty")),
-    INTEGRATION("integration", new I18n("enum.framework.frameworkfromtype.integration")),
-    CMDBCI("cmdbci", new I18n("enum.framework.frameworkfromtype.cmdbci.a")),
-    CMDBCIATTR("cmdbciattr", new I18n("enum.framework.frameworkfromtype.cmdbciattr")),
-    WORKTIME("worktime", new I18n("enum.framework.frameworkfromtype.worktime")),
-    NOTIFY_POLICY("notifypolicy", new I18n("enum.framework.frameworkfromtype.notify_policy"));
+    MATRIX("matrix", new I18n("矩阵")),
+    MATRIXATTR("matrixattr", new I18n("矩阵属性")),
+    FORM("form", new I18n("表单")),
+    FORMSCENE("formscene", new I18n("表单场景")),
+    FORMATTR("formattr", new I18n("表单属性")),
+    INTEGRATION("integration", new I18n("集成")),
+    CMDBCI("cmdbci", new I18n("cmdb模型")),
+    CMDBCIATTR("cmdbciattr", new I18n("cmdb模型属性")),
+    WORKTIME("worktime", new I18n("服务窗口")),
+    NOTIFY_POLICY("notifypolicy", new I18n("通知策略"));
 
     private String value;
     private I18n text;

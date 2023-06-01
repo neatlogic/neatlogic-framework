@@ -5,6 +5,6 @@ public class ElatsticSearchDocumentIdNotFoundException extends RuntimeException 
     private static final long serialVersionUID = -8402781750711525455L;
 
     public ElatsticSearchDocumentIdNotFoundException() {
-		super("exception.framework.elatsticsearchdocumentidnotfoundexception");
+		super("找不到documentId");
 	}
 }

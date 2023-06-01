@@ -23,7 +23,7 @@ public class IntegrationTableColumnNotFoundException extends ApiRuntimeException
     private static final long serialVersionUID = 1061691151919475176L;
 
     public IntegrationTableColumnNotFoundException(String integration, String columnUuid) {
-        super("exception.framework.integrationtablecolumnnotfoundexception", integration, columnUuid);
+        super("在{0}集成配置输出转换theadList列表中找不到：“{1}”列信息", integration, columnUuid);
     }
 
 }

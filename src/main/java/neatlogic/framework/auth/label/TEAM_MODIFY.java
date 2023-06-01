@@ -22,12 +22,12 @@ public class TEAM_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "auth.framework.teammodify.name";
+		return "分组管理权限";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "auth.framework.teammodify.introduction";
+		return "对分组进行添加、修改和删除";
 	}
 
 	@Override

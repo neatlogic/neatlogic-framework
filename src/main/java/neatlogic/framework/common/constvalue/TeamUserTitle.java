@@ -9,11 +9,11 @@ import java.util.List;
 
 public enum TeamUserTitle implements IEnum {
 
-    DEPARTMENTLEADER("departmentleader", new I18n("enum.framework.teamusertitle.departmentleader")),
-    TEAMLEADER("teamleader", new I18n("enum.framework.teamusertitle.teamleader")),
-    CENTERLEADER("centerleader", new I18n("enum.framework.teamusertitle.centerleader")),
-    COMPANYLEADER("companyleader", new I18n("enum.framework.teamusertitle.companyleader")),
-    GROUPLEADER("groupleader", new I18n("enum.framework.teamusertitle.groupleader"));
+    DEPARTMENTLEADER("departmentleader", new I18n("部门长")),
+    TEAMLEADER("teamleader", new I18n("组长")),
+    CENTERLEADER("centerleader", new I18n("中心总监")),
+    COMPANYLEADER("companyleader", new I18n("公司领导")),
+    GROUPLEADER("groupleader", new I18n("集团领导"));
     private String value;
     private I18n text;
 

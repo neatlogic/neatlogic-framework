@@ -8,6 +8,6 @@ public class ConditionNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 5850556181926874174L;
 
     public ConditionNotFoundException(String condition) {
-        super("exception.framework.conditionnotfoundexception", condition);
+        super("条件：“{0}”不存在", condition);
     }
 }

@@ -17,12 +17,12 @@ import neatlogic.framework.util.I18nUtils;
  * @Returns: * @return: null
  **/
 public enum CacheControlType {
-    NOSTORE("no-store", new I18n("enum.framework.cachecontroltype.nostore")),
-    NOCACHE("no-cache", new I18n("enum.framework.cachecontroltype.nocache")),
-    PRIVATE("private", new I18n("enum.framework.cachecontroltype.private")),
-    PUBLIC("public", new I18n("enum.framework.cachecontroltype.public")),
-    MAXAGE("max-age", new I18n("enum.framework.cachecontroltype.maxage")),
-    MUSTREVALIDATE("must-revalidate", new I18n("enum.framework.cachecontroltype.mustrevalidate"));
+    NOSTORE("no-store", new I18n("没有缓存")),
+    NOCACHE("no-cache", new I18n("缓存但重新验证")),
+    PRIVATE("private", new I18n("私有缓存")),
+    PUBLIC("public", new I18n("公共缓存")),
+    MAXAGE("max-age", new I18n("过期")),
+    MUSTREVALIDATE("must-revalidate", new I18n("验证方式"));
     private final String value;
     private final I18n text;
 

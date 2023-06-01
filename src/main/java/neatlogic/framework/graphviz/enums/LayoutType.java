@@ -25,14 +25,14 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum LayoutType implements IEnum {
-    DOT("dot", new I18n("enum.framework.layouttype.dot"), true),
-    CIRCO("circo", new I18n("enum.framework.layouttype.circo"), false),
-    NEATO("neato", new I18n("enum.framework.layouttype.neato"), false),
-    OSAGE("osage", new I18n("enum.framework.layouttype.osage"), false),
-    TWOPI("twopi", new I18n("enum.framework.layouttype.twopi"), false),
-    FDP("fdp", new I18n("enum.framework.layouttype.fdp"), false),
-    SFDP("sfdp", new I18n("common.undirectedlayout2"), false),
-    PATCHWORK("patchwork", new I18n("common.undirectedlayout2"), false);
+    DOT("dot", new I18n("分层布局"), true),
+    CIRCO("circo", new I18n("环形布局"), false),
+    NEATO("neato", new I18n("张力布局"), false),
+    OSAGE("osage", new I18n("阵列布局"), false),
+    TWOPI("twopi", new I18n("星形布局"), false),
+    FDP("fdp", new I18n("无向布局"), false),
+    SFDP("sfdp", new I18n("无向布局2"), false),
+    PATCHWORK("patchwork", new I18n("无向布局2"), false);
 
 
     private final String value;

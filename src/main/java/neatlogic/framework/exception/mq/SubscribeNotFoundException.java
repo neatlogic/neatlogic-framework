@@ -22,10 +22,10 @@ public class SubscribeNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 7639299514600053520L;
 
     public SubscribeNotFoundException(String name) {
-        super("exception.framework.subscribenotfoundexception", name);
+        super("订阅：{0}不存在", name);
     }
 
     public SubscribeNotFoundException(Long id) {
-        super("exception.framework.subscribenotfoundexception", id);
+        super("订阅：{0}不存在", id);
     }
 }

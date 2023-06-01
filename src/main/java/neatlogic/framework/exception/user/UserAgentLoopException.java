@@ -9,6 +9,6 @@ public class UserAgentLoopException extends ApiRuntimeException {
 
     @Deprecated
     public UserAgentLoopException(String userId, String agentId) {
-        super("exception.framework.useragentloopexception", agentId, userId);
+        super("用户：{1}已代理{0}，不可循环代理", agentId, userId);
     }
 }

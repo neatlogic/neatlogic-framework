@@ -20,8 +20,8 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum Mode {
-    APPEND("append", new I18n("enum.framework.mode.append")),
-    REPLACE("replace", new I18n("common.replace"));
+    APPEND("append", new I18n("追加")),
+    REPLACE("replace", new I18n("替换"));
 
     private final String value;
     private final I18n text;

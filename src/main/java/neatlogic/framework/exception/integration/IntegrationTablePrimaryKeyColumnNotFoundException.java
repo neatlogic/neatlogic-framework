@@ -27,6 +27,6 @@ public class IntegrationTablePrimaryKeyColumnNotFoundException extends ApiRuntim
     private static final long serialVersionUID = 1061691151919475176L;
 
     public IntegrationTablePrimaryKeyColumnNotFoundException(String integration) {
-        super("exception.framework.integrationtableprimarykeycolumnnotfoundexception", integration);
+        super("在{0}集成配置输出转换theadList列表中找不到主键列", integration);
     }
 }

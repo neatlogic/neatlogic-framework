@@ -25,10 +25,10 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum AuthenticateType implements IEnum {
-    NOAUTH("noauth", new I18n("enum.framework.authenticatetype.noauth")),
-    BUILDIN("buildin", new I18n("enum.framework.authenticatetype.buildin")),
-    BASIC("basicauth", new I18n("common.basicauth")),
-    BEARER("bearertoken", new I18n("enum.framework.authenticatetype.bearer"));
+    NOAUTH("noauth", new I18n("无需认证")),
+    BUILDIN("buildin", new I18n("内部验证")),
+    BASIC("basicauth", new I18n("Basic认证")),
+    BEARER("bearertoken", new I18n("Bearer Token"));
 
     private String type;
     private I18n text;

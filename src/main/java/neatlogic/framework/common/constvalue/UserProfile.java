@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum UserProfile implements IUserProfile {
-    USER_CREATE_SUCESS("usercreatesuccess", new I18n("enum.framework.userprofile.user_create_sucess"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_USER, UserProfileOperate.BACK_USER_LIST)),
-    ROLE_CREATE_SUCESS("rolecreatesuccess", new I18n("enum.framework.userprofile.team_create_sucess"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_ROLE, UserProfileOperate.BACK_ROLE_LIST)),
-    TEAM_CREATE_SUCESS("teamcreatesuccess", new I18n("enum.framework.userprofile.team_create_sucess"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_TEAM, UserProfileOperate.BACK_TEAM_LIST));
+    USER_CREATE_SUCESS("usercreatesuccess", new I18n("用户创建成功"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_USER, UserProfileOperate.BACK_USER_LIST)),
+    ROLE_CREATE_SUCESS("rolecreatesuccess", new I18n("用户组创建成功"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_ROLE, UserProfileOperate.BACK_ROLE_LIST)),
+    TEAM_CREATE_SUCESS("teamcreatesuccess", new I18n("用户组创建成功"), Arrays.asList(UserProfileOperate.KEEP_ON_CREATE, UserProfileOperate.EDIT_TEAM, UserProfileOperate.BACK_TEAM_LIST));
 
     private String value;
     private I18n text;

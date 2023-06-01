@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class InitialDataFileIrregularException extends ApiRuntimeException {
     public InitialDataFileIrregularException() {
-        super("exception.framework.initialdatafileirregularexception");
+        super("导入文件没通过校验，请选择正确的导入文件");
     }
 }

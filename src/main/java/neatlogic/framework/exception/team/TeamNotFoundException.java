@@ -7,6 +7,6 @@ public class TeamNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1898956131442742449L;
 
     public TeamNotFoundException(String teamUuid) {
-        super("exception.framework.teamnotfoundexception", teamUuid);
+        super("分组：{0}不存在", teamUuid);
     }
 }

@@ -23,6 +23,6 @@ public class AttributeValidException extends ApiRuntimeException {
     private static final long serialVersionUID = 8106412352004757576L;
 
     public AttributeValidException(String label) {
-        super("exception.framework.attributevalidexception", label);
+        super("表单组件：”{0}“保存的数值不合法", label);
     }
 }

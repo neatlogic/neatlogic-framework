@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum MatrixAttributeType implements IEnum {
-    INPUT("input", new I18n("common.textbox"), Arrays.asList(Expression.EQUAL, Expression.LIKE), Expression.LIKE),
-    SELECT("select", new I18n("common.select"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    DATE("date", new I18n("common.date"), Arrays.asList(Expression.EQUAL, Expression.LESSTHAN, Expression.GREATERTHAN), Expression.EQUAL),
-    USER("user", new I18n("common.user"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    TEAM("team", new I18n("enum.framework.matrixattributetype.team"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    ROLE("role", new I18n("common.role"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE);
+    INPUT("input", new I18n("文本框"), Arrays.asList(Expression.EQUAL, Expression.LIKE), Expression.LIKE),
+    SELECT("select", new I18n("下拉框"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
+    DATE("date", new I18n("日期"), Arrays.asList(Expression.EQUAL, Expression.LESSTHAN, Expression.GREATERTHAN), Expression.EQUAL),
+    USER("user", new I18n("用户"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
+    TEAM("team", new I18n("分组"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
+    ROLE("role", new I18n("角色"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE);
 
     private String value;
     private I18n text;

@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueNotWithinRangeException extends ApiRuntimeException {
     public ValueNotWithinRangeException(String prefix, String dataValue, String valueBefore, String valueAfter) {
-        super("exception.framework.valuenotwithinrangeexception", prefix, dataValue, valueBefore, valueAfter);
+        super("{0}值{1}不在{2}和{3}范围内", prefix, dataValue, valueBefore, valueAfter);
     }
 }

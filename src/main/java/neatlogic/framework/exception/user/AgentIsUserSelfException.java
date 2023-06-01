@@ -7,6 +7,6 @@ public class AgentIsUserSelfException extends ApiRuntimeException {
 	private static final long serialVersionUID = 8784255855238341892L;
 
 	public AgentIsUserSelfException() {
-		super("exception.framework.agentisuserselfexception");
+		super("请不要授权给自己");
 	}
 }

@@ -9,11 +9,11 @@ import java.util.List;
 
 public enum TeamLevel implements IEnum {
 
-    GROUP("group", new I18n("enum.framework.teamlevel.group"), 1),
-    COMPANY("company", new I18n("enum.framework.teamlevel.company"), 2),
-    CENTER("center", new I18n("enum.framework.teamlevel.center"), 3),
-    DEPARTMENT("department", new I18n("enum.framework.teamlevel.department"), 4),
-    TEAM("team", new I18n("common.group"), 5);
+    GROUP("group", new I18n("集团"), 1),
+    COMPANY("company", new I18n("公司"), 2),
+    CENTER("center", new I18n("中心"), 3),
+    DEPARTMENT("department", new I18n("部门"), 4),
+    TEAM("team", new I18n("组"), 5);
     private String value;
     private I18n text;
     private int level;

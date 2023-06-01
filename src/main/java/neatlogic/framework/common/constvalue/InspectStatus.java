@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 public enum InspectStatus implements IEnum {
-    NORMAL("normal", new I18n("common.normal"), "text-success"),
-    WARN("warn", new I18n("enum.framework.inspectstatus.warn"), "text-warning"),
-    CRITICAL("critical", new I18n("enum.framework.inspectstatus.critical"), "text-error"),
-    FATAL("fatal", new I18n("enum.framework.inspectstatus.fatal"), "text-error");
+    NORMAL("normal", new I18n("正常"), "text-success"),
+    WARN("warn", new I18n("告警"), "text-warning"),
+    CRITICAL("critical", new I18n("严重"), "text-error"),
+    FATAL("fatal", new I18n("致命"), "text-error");
 
     private final String value;
     private final I18n text;

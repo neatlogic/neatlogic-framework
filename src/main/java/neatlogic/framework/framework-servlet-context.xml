@@ -21,8 +21,8 @@
 		http://neatlogic.com/schema/neatlogic
 		http://neatlogic.com/schema/neatlogic.xsd">
 
-	<neatlogic:module id="framework" name="基础框架" groupName="modulegroup.framework.a" group="framework" groupSort="99"
-					  groupDescription="modulegroup.framework.desc"/>
+	<neatlogic:module id="framework" name="基础框架" groupName="系统配置" group="framework" groupSort="99"
+					  groupDescription="基础框架"/>
 
 	<context:component-scan base-package="neatlogic.module.framework"/>
 

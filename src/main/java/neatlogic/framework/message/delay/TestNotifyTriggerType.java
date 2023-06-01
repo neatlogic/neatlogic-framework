@@ -24,7 +24,7 @@ import neatlogic.framework.notify.core.INotifyTriggerType;
  **/
 public enum TestNotifyTriggerType implements INotifyTriggerType {
 
-    TEST("test", "enum.framework.testnotifytriggertype.test.a", "enum.framework.testnotifytriggertype.test.b");
+    TEST("test", "测试触发点", "用于测试消息缓存");
 
     private String trigger;
     private String text;

@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueNumberIsNotEqualException extends ApiRuntimeException {
     public ValueNumberIsNotEqualException(String prefix) {
-        super("exception.framework.valuenumberisnotequalexception", prefix);
+        super("{0}值个数和条件值个数不一致", prefix);
     }
 }

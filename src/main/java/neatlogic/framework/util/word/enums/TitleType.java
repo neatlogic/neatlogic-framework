@@ -24,10 +24,10 @@ import neatlogic.framework.util.I18nUtils;
  */
 
 public enum TitleType {
-    H1("h1", new I18n("enum.framework.titletype.h1"), true, "000000", new I18n("common.regularscript"), 18, 1),
-    H2("h2", new I18n("enum.framework.titletype.h2"), true, "000000", new I18n("common.regularscript"), 15, 2),
-    H3("h3", new I18n("enum.framework.titletype.h3"), true, "000000", new I18n("common.regularscript"), 14, 3),
-    TILE("centered_tile", new I18n("enum.framework.titletype.tile.a"), true, "000000", new I18n("common.regularscript"), 15, 0),
+    H1("h1", new I18n("标题 1"), true, "000000", new I18n("楷体"), 18, 1),
+    H2("h2", new I18n("标题 2"), true, "000000", new I18n("楷体"), 15, 2),
+    H3("h3", new I18n("标题 3"), true, "000000", new I18n("楷体"), 14, 3),
+    TILE("centered_tile", new I18n("居中标题"), true, "000000", new I18n("楷体"), 15, 0),
     ;
 
     private final String value;

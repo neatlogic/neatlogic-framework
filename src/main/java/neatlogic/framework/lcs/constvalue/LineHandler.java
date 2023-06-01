@@ -20,7 +20,7 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum LineHandler {
-    TEXT("text", new I18n("enum.framework.linehandler.text"));
+    TEXT("text", new I18n("纯文本"));
     String value;
     I18n text;
 

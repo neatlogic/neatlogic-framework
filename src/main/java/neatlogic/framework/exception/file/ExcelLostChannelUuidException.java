@@ -7,7 +7,7 @@ public class ExcelLostChannelUuidException extends ApiRuntimeException {
 	private static final long serialVersionUID = -3954829429859732138L;
 
 	public ExcelLostChannelUuidException() {
-		super("exception.framework.excellostchanneluuidexception");
+		super("Excel内没有找到服务UUID");
 	}
 
 }

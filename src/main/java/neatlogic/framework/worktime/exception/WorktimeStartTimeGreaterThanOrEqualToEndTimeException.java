@@ -27,6 +27,6 @@ public class WorktimeStartTimeGreaterThanOrEqualToEndTimeException extends ApiRu
     private static final long serialVersionUID = -1703889762006158707L;
 
     public WorktimeStartTimeGreaterThanOrEqualToEndTimeException() {
-        super("exception.framework.worktimestarttimegreaterthanorequaltoendtimeexception");
+        super("开始时间不能大于或等于结束时间");
     }
 }

@@ -11,6 +11,6 @@ public class MatrixFileNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508274752209783532L;
 
     public MatrixFileNotFoundException() {
-        super("exception.framework.matrixfilenotfoundexception");
+        super("矩阵导入文件不存在");
     }
 }

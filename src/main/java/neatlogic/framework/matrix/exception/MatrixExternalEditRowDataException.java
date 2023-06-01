@@ -11,6 +11,6 @@ public class MatrixExternalEditRowDataException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508276752259783532L;
 
     public MatrixExternalEditRowDataException() {
-        super("exception.framework.matrixexternaleditrowdataexception");
+        super("外部数据源矩阵不能编辑一行数据");
     }
 }

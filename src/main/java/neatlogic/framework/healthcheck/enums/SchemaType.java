@@ -25,7 +25,7 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum SchemaType implements IEnum {
-    MAIN("main", new I18n("enum.framework.schematype.main")), DATA("data", new I18n("common.database"));
+    MAIN("main", new I18n("核心库")), DATA("data", new I18n("数据库"));
     private final String type;
     private final I18n text;
 

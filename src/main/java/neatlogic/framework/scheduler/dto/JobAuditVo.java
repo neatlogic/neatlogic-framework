@@ -40,9 +40,9 @@ public class JobAuditVo extends BasePageVo {
 //	public final static String FAILED = "failed";
 
     public enum Status {
-        SUCCEED("succeed", new I18n("common.success"), "#25b865"),
-        RUNNING("running", new I18n("common.ongoing"), "#2d84fb"),
-        FAILED("failed", new I18n("common.fail"), "#f71010");
+        SUCCEED("succeed", new I18n("成功"), "#25b865"),
+        RUNNING("running", new I18n("进行中"), "#2d84fb"),
+        FAILED("failed", new I18n("失败"), "#f71010");
 
         private final String value;
         private final I18n text;

@@ -21,12 +21,12 @@ import neatlogic.framework.auth.core.AuthBase;
 public class MODULE_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.modulemodify.name";
+        return "系统模块管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.modulemodify.introduction";
+        return "查看模块版本信息，导入导出模块初始化数据文件";
     }
 
     @Override

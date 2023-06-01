@@ -23,6 +23,6 @@ public class FormReferencedCannotBeDeletedException extends ApiRuntimeException 
     private static final long serialVersionUID = 3459303366397256808L;
 
     public FormReferencedCannotBeDeletedException(String uuid) {
-        super("exception.framework.formreferencedcannotbedeletedexception", uuid);
+        super("表单：“{0}”有被引用，不能删除", uuid);
     }
 }

@@ -25,22 +25,22 @@ public class ParamNotExistsException extends ApiRuntimeException {
     private static final long serialVersionUID = -2608671566655133328L;
 
     public ParamNotExistsException(String paramNames) {
-        super("exception.framework.paramnotexistsexception.b",paramNames);
+        super("参数：“{0}”不能为空",paramNames);
     }
 
     public ParamNotExistsException(int index, String keyName) {
-        super("exception.framework.paramnotexistsexception.c", index, keyName);
+        super("第：{0}个参数的“{2}”不能为空", index, keyName);
     }
 
     public ParamNotExistsException(int index, String paramName, String keyName) {
-        super("exception.framework.paramnotexistsexception.d", index, paramName, keyName);
+        super("第：{0}个参数“{1}”的“{2}”不能为空", index, paramName, keyName);
     }
 
     public ParamNotExistsException(String... paramNames) {
-        super("exception.framework.paramnotexistsexception.4", String.join("、", paramNames));
+        super("参数：“{0}”不能同时为空", String.join("、", paramNames));
     }
 
     public ParamNotExistsException(List<String> eitherParamList, List<String> orParamList) {
-        super("exception.framework.paramnotexistsexception.f", String.join("、", eitherParamList), String.join("、", orParamList));
+        super("必须在[{0}]与[{1}}]两组参数中选择一组填写", String.join("、", eitherParamList), String.join("、", orParamList));
     }
 }

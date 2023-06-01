@@ -22,12 +22,12 @@ public class GLOBALSEARCH_BASE extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.globalsearchbase.name";
+        return "搜索中心基础权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.globalsearchbase.introduction";
+        return "拥有此权限才能使用搜索中心基础权限功能";
     }
 
     @Override

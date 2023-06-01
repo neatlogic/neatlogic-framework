@@ -27,6 +27,6 @@ public class TreeNodeNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 4478080139019340482L;
 
     public TreeNodeNotFoundException(String tableName, Object idValue) {
-        super("exception.framework.treenodenotfoundexception", tableName, idValue);
+        super("“{0}”表中树节点：“{1}”不存在", tableName, idValue);
     }
 }

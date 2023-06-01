@@ -20,7 +20,7 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ApiKind {
-    SYSTEM("system", new I18n("enum.framework.apikind.system")), CUSTOM("custom", new I18n("enum.framework.apikind.custom"));
+    SYSTEM("system", new I18n("内部接口")), CUSTOM("custom", new I18n("外部接口"));
 
     private final String name;
     private final I18n text;

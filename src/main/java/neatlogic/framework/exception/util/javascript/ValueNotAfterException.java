@@ -25,6 +25,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class ValueNotAfterException extends ApiRuntimeException {
 
     public ValueNotAfterException(String prefix, String dataValue, String valueBefore) {
-        super("exception.framework.valuenotafterexception", prefix, dataValue, valueBefore);
+        super("{0}值{1}不在{2}之后", prefix, dataValue, valueBefore);
     }
 }

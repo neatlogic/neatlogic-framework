@@ -29,8 +29,8 @@ import java.util.List;
  */
 
 public enum FileOperationType implements IEnum {
-    DELETE("delete", new I18n("common.delete")),
-    DOWNLOAD("download", new I18n("enum.framework.fileoperationtype.download"));
+    DELETE("delete", new I18n("删除")),
+    DOWNLOAD("download", new I18n("下载"));
     private final String value;
     private final I18n text;
 

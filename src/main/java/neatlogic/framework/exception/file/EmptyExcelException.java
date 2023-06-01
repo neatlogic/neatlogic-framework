@@ -7,7 +7,7 @@ public class EmptyExcelException extends ApiRuntimeException {
 	private static final long serialVersionUID = 4120489899073719516L;
 
 	public EmptyExcelException() {
-		super("exception.framework.emptyexcelexception");
+		super("Excel文件无内容");
 	}
 
 }

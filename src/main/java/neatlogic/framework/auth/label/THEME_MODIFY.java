@@ -10,12 +10,12 @@ public class THEME_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.thememodify.name";
+        return "主题设置权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.thememodify.introduction";
+        return "对主题色的设置";
     }
 
     @Override

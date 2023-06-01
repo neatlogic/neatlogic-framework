@@ -20,8 +20,8 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FormAttributeAuthType {
-    COMPONENT("component", new I18n("enum.framework.formattributeauthtype.component")),
-    ROW("row", new I18n("enum.framework.formattributeauthtype.row"));
+    COMPONENT("component", new I18n("组件")),
+    ROW("row", new I18n("行"));
     private String value;
     private I18n text;
 

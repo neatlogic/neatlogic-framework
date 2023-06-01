@@ -22,6 +22,6 @@ public class LoginAuthUserNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 999623777857022003L;
 
     public LoginAuthUserNotFoundException() {
-        super("exception.framework.login.auth.user_not_found");
+        super("数据库不存在登录用户");
     }
 }

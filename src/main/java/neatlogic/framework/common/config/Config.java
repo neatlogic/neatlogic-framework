@@ -175,8 +175,8 @@ public class Config {
             }
             SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
         } catch (Exception ex) {
-            logger.error(I18nUtils.getStaticMessage("config.serverid.notfound", SERVER_ID_FILE));
-            System.out.println(I18nUtils.getStaticMessage("config.serverid.notfound", SERVER_ID_FILE));
+            logger.error(I18nUtils.getStaticMessage("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
+            System.out.println(I18nUtils.getStaticMessage("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
             throw ex;
         }
 

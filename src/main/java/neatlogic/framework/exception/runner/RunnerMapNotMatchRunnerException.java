@@ -23,7 +23,7 @@ public class RunnerMapNotMatchRunnerException extends ApiRuntimeException {
     private static final long serialVersionUID = -3778764909903770647L;
 
     public RunnerMapNotMatchRunnerException(Long runnerMapId) {
-        super("exception.framework.runnermapnotmatchrunnerexception", runnerMapId);
+        super("runnerMapId: {0}没有匹配的runner", runnerMapId);
     }
 
 

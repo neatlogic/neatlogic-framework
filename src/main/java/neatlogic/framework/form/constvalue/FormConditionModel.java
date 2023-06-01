@@ -20,8 +20,8 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum FormConditionModel {
-    SIMPLE("simple", new I18n("enum.framework.formconditionmodel.simple")),
-    CUSTOM("custom", new I18n("enum.framework.formconditionmodel.custom"));
+    SIMPLE("simple", new I18n("简单模式")),
+    CUSTOM("custom", new I18n("自定义模式"));
     private final String value;
     private final I18n name;
 

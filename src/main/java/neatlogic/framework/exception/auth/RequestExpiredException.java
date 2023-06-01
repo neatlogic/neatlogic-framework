@@ -22,6 +22,6 @@ public class RequestExpiredException extends ApiRuntimeException {
 
 
     public RequestExpiredException() {
-        super("exception.framework.requestexpiredexception");
+        super("请求已超时");
     }
 }

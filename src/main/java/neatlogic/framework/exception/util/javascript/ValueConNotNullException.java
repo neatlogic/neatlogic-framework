@@ -24,11 +24,11 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueConNotNullException extends ApiRuntimeException {
     public ValueConNotNullException(String prefix) {
-        super("exception.framework.valueconnotnullexception.a", prefix);
+        super("{0}值不能为空", prefix);
     }
 
     public ValueConNotNullException(String prefix, String value) {
-        super("exception.framework.valueconnotnullexception.b", prefix, value);
+        super("{0}值要求是{1}，不能是空值", prefix, value);
 
     }
 }

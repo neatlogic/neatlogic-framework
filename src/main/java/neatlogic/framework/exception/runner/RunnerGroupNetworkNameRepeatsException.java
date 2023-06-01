@@ -20,7 +20,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerGroupNetworkNameRepeatsException extends ApiRuntimeException {
     public RunnerGroupNetworkNameRepeatsException(String name) {
-        super("exception.framework.runnergroupnetworknamerepeatsexception", name);
+        super("runner组名:{0}已经存在", name);
 
     }
 }

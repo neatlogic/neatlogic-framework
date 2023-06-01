@@ -11,6 +11,6 @@ public class EmailServerNotFoundException extends ApiRuntimeException {
 	private static final long serialVersionUID = 3293831889717207715L;
 
 	public EmailServerNotFoundException() {
-		super("exception.framework.emailservernotfoundexception");
+		super("没有激活的邮件服务器");
 	}
 }

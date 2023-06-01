@@ -20,6 +20,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class MatrixViewHasNoAttrException extends ApiRuntimeException {
     public MatrixViewHasNoAttrException() {
-        super("exception.framework.matrixviewhasnoattrexception");
+        super("矩阵视图配置信息属性定义不能为空");
     }
 }

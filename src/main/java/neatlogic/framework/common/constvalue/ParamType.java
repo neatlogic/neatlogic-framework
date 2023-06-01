@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum ParamType implements IEnum{
-	STRING("string",new I18n("common.string"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
-	NUMBER("number",new I18n("common.number"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
-	ENUM("enum",new I18n("enum.framework.paramtype.enum"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL),Expression.EQUAL),
-	ARRAY("array",new I18n("enum.framework.paramtype.array"),Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
-	DATE("date",new I18n("common.date"),Arrays.asList(Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.BETWEEN)
+	STRING("string",new I18n("字符串"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LIKE,Expression.NOTLIKE,Expression.ISNULL,Expression.ISNOTNULL),Expression.LIKE),
+	NUMBER("number",new I18n("数字"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL,Expression.LESSTHAN,Expression.GREATERTHAN,Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.EQUAL),
+	ENUM("enum",new I18n("枚举"),Arrays.asList(Expression.EQUAL,Expression.UNEQUAL),Expression.EQUAL),
+	ARRAY("array",new I18n("数组"),Arrays.asList(Expression.INCLUDE,Expression.EXCLUDE,Expression.ISNULL,Expression.ISNOTNULL),Expression.INCLUDE),
+	DATE("date",new I18n("日期"),Arrays.asList(Expression.BETWEEN,Expression.ISNULL,Expression.ISNOTNULL),Expression.BETWEEN)
 	;
 	private String name;
 	private I18n text;

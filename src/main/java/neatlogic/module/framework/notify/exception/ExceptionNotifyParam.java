@@ -27,8 +27,8 @@ import neatlogic.framework.util.I18nUtils;
  **/
 public enum ExceptionNotifyParam implements INotifyParam {
 
-    EXCEPTIONSTACK("exceptionstack", new I18n("enum.framework.exceptionnotifyparam.exceptionstack"), ParamType.STRING),
-    EXCEPTIONCALLER("exceptioncaller", new I18n("enum.framework.exceptionnotifyparam.exceptioncaller"), ParamType.STRING);
+    EXCEPTIONSTACK("exceptionstack", new I18n("异常信息"), ParamType.STRING),
+    EXCEPTIONCALLER("exceptioncaller", new I18n("发起方信息"), ParamType.STRING);
 
     private final String value;
     private final I18n text;

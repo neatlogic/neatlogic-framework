@@ -25,12 +25,12 @@ public class DATA_WAREHOUSE_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.datawarehousemodify.name";
+        return "数据仓库管理权限";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.datawarehousemodify.introduction";
+        return "对数据仓库添加、修改和删除";
     }
 
     @Override

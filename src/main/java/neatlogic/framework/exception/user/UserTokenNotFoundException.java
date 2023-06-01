@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class UserTokenNotFoundException extends ApiRuntimeException {
 
     public UserTokenNotFoundException(String userid) {
-        super("exception.framework.usertokennotfoundexception", userid);
+        super("用户“{0}”的令牌不存在，请在页面重新生成", userid);
     }
 }

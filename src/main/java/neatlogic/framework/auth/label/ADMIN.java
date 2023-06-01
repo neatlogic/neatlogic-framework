@@ -22,12 +22,12 @@ public class ADMIN extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "auth.framework.admin.name";
+        return "管理员";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "auth.framework.admin.introduction";
+        return "对某些系统功能进行管理，例如重建左右编码等";
     }
 
     @Override

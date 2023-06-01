@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class ValueContainException extends ApiRuntimeException {
     public ValueContainException(String prefix, String value, String otherValue) {
-        super("exception.framework.valuecontainexception", prefix, value, otherValue);
+        super("{0}值{1}包含{2}", prefix, value, otherValue);
     }
 }

@@ -5,7 +5,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 @SuppressWarnings("serial")
 public class FileAccessDeniedException extends ApiRuntimeException {
     public FileAccessDeniedException(String filename, String operation) {
-        super("exception.framework.fileaccessdeniedexception", operation, filename);
+        super("您没有权限{0}文件：{1}", operation, filename);
     }
 
 }

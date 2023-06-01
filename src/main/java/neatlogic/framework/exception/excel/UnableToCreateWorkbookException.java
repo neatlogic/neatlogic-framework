@@ -24,6 +24,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class UnableToCreateWorkbookException extends ApiRuntimeException {
     public UnableToCreateWorkbookException(String simpleName, String message) {
-        super("exception.framework.unabletocreateworkbookexception", simpleName, message);
+        super("无法使用{0}创建工作簿:{1}", simpleName, message);
     }
 }

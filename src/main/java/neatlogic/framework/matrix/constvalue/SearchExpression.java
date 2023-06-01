@@ -20,13 +20,13 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum SearchExpression {
-    EQ("eq", "equal", new I18n("common.equals")),
-    BT("bt", "between", new I18n("common.inthisrange")),
-    NE("ne", "notequal", new I18n("common.unequal")),
-    NL("nl", "notlike", new I18n("common.exclude")),
-    LI("li", "like", new I18n("common.include")),
-    NULL("null", "is-null", new I18n("common.null")),
-    NOTNULL("notnull", "is-not-null", new I18n("common.notempty"));
+    EQ("eq", "equal", new I18n("等于")),
+    BT("bt", "between", new I18n("在此区间")),
+    NE("ne", "notequal", new I18n("不等于")),
+    NL("nl", "notlike", new I18n("不包含")),
+    LI("li", "like", new I18n("包含")),
+    NULL("null", "is-null", new I18n("为空")),
+    NOTNULL("notnull", "is-not-null", new I18n("不为空"));
 
     private final String value;
     private final I18n text;

@@ -11,8 +11,8 @@ import neatlogic.framework.util.I18nUtils;
 * @Description: 操作类型枚举类
  */
 public enum ActionType {
-    CREATE("create", new I18n("enum.framework.actiontype.create")),
-    UPDATE("update", new I18n("common.modify"));
+    CREATE("create", new I18n("创建")),
+    UPDATE("update", new I18n("修改"));
     private final String value;
     private final I18n text;
     private ActionType(String value, I18n text) {

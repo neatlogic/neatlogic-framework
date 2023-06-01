@@ -9,6 +9,6 @@ public class UserAgentRepeatException extends ApiRuntimeException {
 
     @Deprecated
     public UserAgentRepeatException(String userId) {
-        super("exception.framework.useragentrepeatexception", userId);
+        super("用户：{0}已存在代理关系", userId);
     }
 }

@@ -25,14 +25,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public enum InputFrom implements IEnum {
-    PAGE("page", new I18n("enum.framework.inputfrom.page")),
-    IMPORT("import", new I18n("enum.framework.inputfrom.import")),
-    RESTFUL("restful", new I18n("enum.framework.inputfrom.restful")),
-    ITSM("itsm", new I18n("enum.framework.inputfrom.itsm")),
-    UNKNOWN("unknown", new I18n("enum.framework.inputfrom.unknown")),
-    CRON("cron", new I18n("common.scheduledtask")),
-    AUTOEXEC("autoexec", new I18n("common.automaticcollection")),
-    RELATIVE("relative", new I18n("enum.framework.inputfrom.relative"));
+    PAGE("page", new I18n("页面操作")),
+    IMPORT("import", new I18n("excel导入")),
+    RESTFUL("restful", new I18n("接口调用")),
+    ITSM("itsm", new I18n("流程修改")),
+    UNKNOWN("unknown", new I18n("未知")),
+    CRON("cron", new I18n("定时任务")),
+    AUTOEXEC("autoexec", new I18n("自动采集")),
+    RELATIVE("relative", new I18n("级联更新"));
 
     private final String value;
     private final I18n text;

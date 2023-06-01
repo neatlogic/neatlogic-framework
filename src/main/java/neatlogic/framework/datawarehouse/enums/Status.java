@@ -20,9 +20,9 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum Status {
-    DOING("doing", new I18n("enum.framework.status.doing")),
-    DONE("done", new I18n("enum.framework.status.done")),
-    FAILED("failed", new I18n("enum.framework.status.failed"));
+    DOING("doing", new I18n("同步数据中")),
+    DONE("done", new I18n("同步完成")),
+    FAILED("failed", new I18n("同步失败"));
 
     private final String value;
     private final I18n text;

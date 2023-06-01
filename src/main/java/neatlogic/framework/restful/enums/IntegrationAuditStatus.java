@@ -13,8 +13,8 @@ import java.util.List;
  * @date 2022/3/31 5:12 下午
  */
 public enum IntegrationAuditStatus implements IEnum {
-    SUCCEED("succeed", new I18n("common.success")),
-    FAILED("failed", new I18n("common.fail"));
+    SUCCEED("succeed", new I18n("成功")),
+    FAILED("failed", new I18n("失败"));
     private final String value;
     private final I18n text;
 

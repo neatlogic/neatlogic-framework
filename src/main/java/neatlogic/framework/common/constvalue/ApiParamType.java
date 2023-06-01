@@ -20,19 +20,19 @@ import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ApiParamType {
-    INTEGER("int", new I18n("common.int")),
-    ENUM("enum", new I18n("enum.framework.apiparamtype.enum")),
-    BOOLEAN("boolean", new I18n("enum.framework.apiparamtype.boolean")),
-    STRING("string", new I18n("common.char")),
-    LONG("long", new I18n("enum.framework.apiparamtype.long")),
-    JSONOBJECT("jsonObject", new I18n("common.jsonobject")),
-    JSONARRAY("jsonArray", new I18n("common.jsonarray")),
-    IP("ip", new I18n("enum.framework.apiparamtype.ip")),
-    EMAIL("email", new I18n("common.email")),
-    REGEX("regex", new I18n("enum.framework.apiparamtype.regex")),
-    DOUBLE("double", new I18n("enum.framework.apiparamtype.double")),
-    NOAUTH("noAuth", new I18n("enum.framework.apiparamtype.noauth")),
-    FILE("file", new I18n("common.attachment"));
+    INTEGER("int", new I18n("整型")),
+    ENUM("enum", new I18n("枚举型")),
+    BOOLEAN("boolean", new I18n("布尔型")),
+    STRING("string", new I18n("字符型")),
+    LONG("long", new I18n("长整型")),
+    JSONOBJECT("jsonObject", new I18n("json对象")),
+    JSONARRAY("jsonArray", new I18n("json数组")),
+    IP("ip", new I18n("ip")),
+    EMAIL("email", new I18n("邮箱")),
+    REGEX("regex", new I18n("正则表达式")),
+    DOUBLE("double", new I18n("双精度浮点数")),
+    NOAUTH("noAuth", new I18n("任意对象，无需校验")),
+    FILE("file", new I18n("附件"));
 
     private String name;
     private I18n text;

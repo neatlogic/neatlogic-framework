@@ -167,6 +167,15 @@ limitations under the License.
         where `name` = #{value}
     </select>
 
+    <select id="getRoleUuidByNameList" parameterType="java.util.List" resultType="java.lang.String">
+        select `uuid`
+        from `role`
+        where `name` in
+        <foreach collection="nameList" item="text" separator="," open="(" close=")">
+            #{text}
+        </foreach>
+    </select>
+
     <select id="getRoleUuidAndNameMapList" resultType="neatlogic.framework.common.dto.ValueTextVo">
         SELECT
         CONCAT('role#', `uuid`) as `value`,

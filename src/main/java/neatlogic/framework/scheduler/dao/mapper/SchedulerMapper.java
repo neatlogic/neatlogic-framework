@@ -50,6 +50,8 @@ public interface SchedulerMapper {
 
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 
+    String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid , @Param("status") String status);
+
     int checkJobNameIsExists(JobVo job);
 
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);

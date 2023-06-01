@@ -295,6 +295,17 @@ limitations under the License.
           AND `job_group` = #{jobGroup}
     </select>-->
 
+    <select id="getJobLastExecAuditStartTime"  resultType="java.lang.String">
+        SELECT
+            DATE_FORMAT(a.`start_time`,'%Y-%m-%d %H:%i:%s')
+        FROM
+            `schedule_job_audit` a
+        WHERE a.job_uuid = #{jobUuid}
+          AND a.`status` = #{status}
+        ORDER BY a.end_time
+        LIMIT 1
+    </select>
+
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
             `schedule_job_lock`

@@ -645,6 +645,14 @@ limitations under the License.
         WHERE `user_uuid` = #{value}
     </select>
 
+    <select id="getTeamUuidbyUpwardNamePath" parameterType="java.util.List" resultType="neatlogic.framework.dto.TeamVo">
+        SELECT  upward_name_path AS upwardNamePath ,`uuid` FROM `team`
+        WHERE upward_name_path in
+        <foreach collection="list" item="namePath" open="(" separator="," close=")">
+            #{namePath}
+        </foreach>
+    </select>
+
     <insert id="insertTeam" parameterType="neatlogic.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,
                             `uuid`,
@@ -655,7 +663,9 @@ limitations under the License.
                             `level`,
                             `upward_uuid_path`,
                             `upward_name_path`,
-                            `is_delete`)
+                            `is_delete`,
+                            `source`,
+                            `lcd`)
         VALUES (#{id},
                 #{uuid},
                 #{name},
@@ -665,7 +675,53 @@ limitations under the License.
                 #{level},
                 #{upwardUuidPath},
                 #{upwardNamePath},
-                0)
+                0,
+                #{source},
+                NOW())
+    </insert>
+
+    <insert id="batchSaveTeam" parameterType="java.util.List">
+        INSERT INTO `team` (`id`,
+                            `uuid`,
+                            `name`,
+                            `parent_uuid`,
+                            `lft`,
+                            `rht`,
+                            `level`,
+                            `upward_uuid_path`,
+                            `upward_name_path`,
+                            `is_delete`,
+                            `source`,
+                            `lcd`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.uuid},
+            #{item.name},
+            #{item.parentUuid},
+            #{item.lft},
+            #{item.rht},
+            #{item.level},
+            #{item.upwardUuidPath},
+            #{item.upwardNamePath},
+            0,
+            #{item.source},
+            NOW()
+            )
+        </foreach>
+        on DUPLICATE KEY UPDATE
+        uuid=values(uuid),
+        `name`=values(name),
+        parent_uuid=values(parent_uuid),
+        lft=values(lft),
+        rht=values(rht),
+        `level`=values(`level`),
+        upward_uuid_path=values(upward_uuid_path),
+        upward_name_path=values(upward_name_path),
+        is_delete=values(is_delete),
+        `source`=values(source),
+        lcd=values(lcd)
     </insert>
 
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
@@ -688,7 +744,8 @@ limitations under the License.
         <if test="level != null and level != ''">
             `level` = #{level},
         </if>
-        `name` = #{name}
+        `name` = #{name},
+        `lcd` = NOW()
         WHERE `uuid` = #{uuid}
     </update>
 
@@ -805,6 +862,14 @@ limitations under the License.
         GROUP BY b.`uuid`
         ) c ON c.`uuid` = d.`uuid`
         SET d.`upward_name_path` = c.`upward_name_path`
+    </update>
+
+    <update id="updateTeamIsDeleteBySource" parameterType="java.lang.String">
+        UPDATE
+            `team`
+        SET
+            `is_delete` = 1
+        WHERE `source` = #{value}  AND UNIX_TIMESTAMP(`lcd`) &lt; UNIX_TIMESTAMP(DATE_FORMAT(NOW(),'%Y-%m-%d'))
     </update>
 
     <!--	<delete id="deleteTeamByLeftRightCode">-->

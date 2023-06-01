@@ -621,19 +621,21 @@ public class ReloadableJsonBundleMessageSource extends AbstractResourceBasedMess
                 }
             }
             String msg = this.properties.getProperty(code);
-            if (msg != null) {
-                if (localeMap == null) {
-                    localeMap = new ConcurrentHashMap<>();
-                    Map<Locale, MessageFormat> existing = this.cachedMessageFormats.putIfAbsent(code, localeMap);
-                    if (existing != null) {
-                        localeMap = existing;
-                    }
+            if (localeMap == null) {
+                localeMap = new ConcurrentHashMap<>();
+                Map<Locale, MessageFormat> existing = this.cachedMessageFormats.putIfAbsent(code, localeMap);
+                if (existing != null) {
+                    localeMap = existing;
                 }
-                MessageFormat result = createMessageFormat(msg, locale);
-                localeMap.put(locale, result);
-                return result;
             }
-            return null;
+            MessageFormat result;
+            if (msg != null) {
+                result = createMessageFormat(msg, locale);
+            }else{
+                result = createMessageFormat(code, locale);
+            }
+            localeMap.put(locale, result);
+            return result;
         }
     }
 

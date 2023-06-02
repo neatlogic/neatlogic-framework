@@ -26,7 +26,7 @@ public class $ {
      * @return 返回翻译后的值
      */
     public static String t (String key){
-        return I18nUtils.getMessage(key);
+        return key;
     }
 
     /**

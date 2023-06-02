@@ -20,7 +20,21 @@ package neatlogic.framework.util;
  * 主要用于翻译封装字符串
  */
 public class $ {
+    /**
+     * 返回翻译后的值
+     * @param key key
+     * @return 返回翻译后的值
+     */
     public static String t (String key){
+        return I18nUtils.getMessage(key);
+    }
+
+    /**
+     * 直接返回key
+     * @param key key
+     * @return 返回key，用于延迟翻译的场景
+     */
+    public static String dt (String key){
         return key;
     }
 }

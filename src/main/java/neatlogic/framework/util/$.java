@@ -23,9 +23,18 @@ public class $ {
     /**
      * 返回翻译后的值
      * @param key key
-     * @return 返回翻译后的值
+     * @return 翻译后的值（服务启动后使用）
      */
     public static String t (String key){
+        return I18nUtils.getMessage(key);
+    }
+
+    /**
+     * 直接返回key
+     * @param key key
+     * @return 翻译后的值（服务启动前，或者启动时使用）
+     */
+    public static String st (String key){
         return I18nUtils.getStaticMessage(key);
     }
 

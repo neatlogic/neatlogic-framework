@@ -9,11 +9,11 @@ import neatlogic.framework.util.I18nUtils;
 import java.util.List;
 
 public enum OperationTypeEnum implements IEnum {
-    CREATE("create", $.st("增加")),
-    DELETE("delete", $.st("删除")),
-    UPDATE("update", $.st("更新")),
-    SEARCH("search", $.st("查询")),
-    OPERATE("operate", $.st("操作"));
+    CREATE("create", $.t("增加")),
+    DELETE("delete", $.t("删除")),
+    UPDATE("update", $.t("更新")),
+    SEARCH("search", $.t("查询")),
+    OPERATE("operate", $.t("操作"));
     private String name;
     private String text;
 

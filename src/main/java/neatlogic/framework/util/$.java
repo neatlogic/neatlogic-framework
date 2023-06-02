@@ -30,7 +30,7 @@ public class $ {
     }
 
     /**
-     * 直接返回key
+     * 返回翻译后的值
      * @param key key
      * @return 翻译后的值（服务启动前，或者启动时使用）
      */

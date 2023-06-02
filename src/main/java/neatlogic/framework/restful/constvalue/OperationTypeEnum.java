@@ -1,23 +1,23 @@
 package neatlogic.framework.restful.constvalue;
 
-import neatlogic.framework.common.constvalue.IEnum;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.util.I18n;
+import neatlogic.framework.common.constvalue.IEnum;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum OperationTypeEnum implements IEnum {
-    CREATE("create", new I18n("增加")),
-    DELETE("delete", new I18n("删除")),
-    UPDATE("update", new I18n("更新")),
-    SEARCH("search", new I18n("查询")),
-    OPERATE("operate", new I18n("操作"));
+    CREATE("create", $.t("增加")),
+    DELETE("delete", $.t("删除")),
+    UPDATE("update", $.t("更新")),
+    SEARCH("search", $.t("查询")),
+    OPERATE("operate", $.t("操作"));
     private String name;
-    private I18n text;
+    private String text;
 
-    private OperationTypeEnum(String _value, I18n _text) {
+    private OperationTypeEnum(String _value, String _text) {
         this.name = _value;
         this.text = _text;
     }
@@ -27,7 +27,7 @@ public enum OperationTypeEnum implements IEnum {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return I18nUtils.getMessage(text);
     }
 
     public static String getText(String value) {

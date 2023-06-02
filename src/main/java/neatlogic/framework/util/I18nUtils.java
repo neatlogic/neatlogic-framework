@@ -17,11 +17,11 @@
 package neatlogic.framework.util;
 
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.i18n.JsonResourceBundleControl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -108,16 +108,14 @@ public class I18nUtils {
         if (locale == null) {
             locale = Locale.CHINESE;
         }
-        // 获得资源文件
-        ResourceBundle rb = ResourceBundle.getBundle("i18n/language", locale);
-        // 获得相应的key值
-        String value = key;
+        Locale.setDefault(locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("i18n/language", new JsonResourceBundleControl());
+        String value;
         try {
-            value = new String(rb.getString(key).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            value = bundle.getString(key);
         } catch (Exception ignored) {
+            value = key;
         }
         return MessageFormat.format(value, args);
     }
-
-
 }

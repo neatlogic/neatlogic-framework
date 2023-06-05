@@ -35,13 +35,13 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private boolean needPage = true;
     @JSONField(serialize = false)
-    @EntityField(name = "每页条数", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.pagesize", type = ApiParamType.INTEGER)
     private Integer pageSize = 20;
     @JSONField(serialize = false)
-    @EntityField(name = "当前页数", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.currentpage", type = ApiParamType.INTEGER)
     private Integer currentPage = 1;
     @JSONField(serialize = false)
-    @EntityField(name = "页数", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.pagecount", type = ApiParamType.INTEGER)
     private Integer pageCount = 0;
 
     @JSONField(serialize = false)//数据页范围，用于查询一定范围内的数据

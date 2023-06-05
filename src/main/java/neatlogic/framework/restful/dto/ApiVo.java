@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ApiVo extends BasePageVo implements Serializable {
+public class ApiVo extends BasePageVo implements Serializable,Cloneable {
 
     private static final long serialVersionUID = 3689437871016436622L;
 
@@ -648,6 +648,9 @@ public class ApiVo extends BasePageVo implements Serializable {
     public void setPasswordCipher(String passwordCipher) {
         this.passwordCipher = passwordCipher;
     }
-
+    @Override
+    public ApiVo clone() throws CloneNotSupportedException {
+        return (ApiVo) super.clone();
+    }
 
 }

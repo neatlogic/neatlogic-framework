@@ -16,28 +16,28 @@
 
 package neatlogic.framework.common.constvalue;
 
-import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18nUtils;
 
 public enum ApiParamType {
-    INTEGER("int", new I18n("整型")),
-    ENUM("enum", new I18n("枚举型")),
-    BOOLEAN("boolean", new I18n("布尔型")),
-    STRING("string", new I18n("字符型")),
-    LONG("long", new I18n("长整型")),
-    JSONOBJECT("jsonObject", new I18n("json对象")),
-    JSONARRAY("jsonArray", new I18n("json数组")),
-    IP("ip", new I18n("ip")),
-    EMAIL("email", new I18n("邮箱")),
-    REGEX("regex", new I18n("正则表达式")),
-    DOUBLE("double", new I18n("双精度浮点数")),
-    NOAUTH("noAuth", new I18n("任意对象，无需校验")),
-    FILE("file", new I18n("附件"));
+    INTEGER("int", $.t("common.int")),
+    ENUM("enum", $.t("枚举型")),
+    BOOLEAN("boolean", $.t("布尔型")),
+    STRING("string", $.t("字符型")),
+    LONG("long", $.t("长整型")),
+    JSONOBJECT("jsonObject", $.t("json对象")),
+    JSONARRAY("jsonArray", $.t("json数组")),
+    IP("ip", $.t("ip")),
+    EMAIL("email", $.t("邮箱")),
+    REGEX("regex", $.t("正则表达式")),
+    DOUBLE("double", $.t("双精度浮点数")),
+    NOAUTH("noAuth", $.t("任意对象，无需校验")),
+    FILE("file", $.t("附件"));
 
     private String name;
-    private I18n text;
+    private String text;
 
-    private ApiParamType(String _name, I18n _text) {
+    private ApiParamType(String _name, String _text) {
         this.name = _name;
         this.text = _text;
     }
@@ -47,7 +47,7 @@ public enum ApiParamType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return I18nUtils.getMessage(text);
     }
 
     public static String getText(String name) {

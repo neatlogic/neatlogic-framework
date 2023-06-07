@@ -83,30 +83,31 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {
         ApiVo api = apiMap.get(token);
-        ApiVo apiVo = api.clone();
-        if (apiVo == null) {
+        if (api == null) {
             for (String regex : regexApiMap.keySet()) {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(token);
                 if (matcher.find()) {
-                    apiVo = regexApiMap.get(regex);
-                    if (apiVo.getPathVariableList() != null
-                            && apiVo.getPathVariableList().size() == matcher.groupCount()) {
+                    api = regexApiMap.get(regex);
+                    if (api.getPathVariableList() != null
+                            && api.getPathVariableList().size() == matcher.groupCount()) {
                         JSONObject pathVariableObj = new JSONObject();
-                        for (int i = 0; i < apiVo.getPathVariableList().size(); i++) {
+                        for (int i = 0; i < api.getPathVariableList().size(); i++) {
                             try {
-                                pathVariableObj.put(apiVo.getPathVariableList().get(i), matcher.group(i + 1));
+                                pathVariableObj.put(api.getPathVariableList().get(i), matcher.group(i + 1));
                             } catch (JSONException e) {
                                 logger.error(e.getMessage(), e);
                             }
                         }
-                        apiVo.setPathVariableObj(pathVariableObj);
+                        api.setPathVariableObj(pathVariableObj);
                     }
                     break;
                 }
             }
         }
-        if(apiVo != null) {
+        ApiVo apiVo = null;
+        if(api != null) {
+            apiVo = api.clone();
             apiVo.setName(I18nUtils.getMessage(apiVo.getName()));
             apiVo.setHandlerName(I18nUtils.getMessage(apiVo.getHandlerName()));
         }

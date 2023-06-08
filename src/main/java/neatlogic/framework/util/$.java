@@ -21,14 +21,20 @@ package neatlogic.framework.util;
  */
 public class $ {
     /**
-     * 直接返回key
-     * @param key key
-     * @return key
+     * 翻译
+     * @param key 翻译的key
+     * @return 翻译后的值
      */
     public static String t (String key){
         return I18nUtils.getMessage(key);
     }
 
+    /**
+     * 翻译
+     * @param key 翻译的key
+     * @param args key里面需要替换的变量
+     * @return 翻译后的值
+     */
     public static String t (String key, Object... args){
         return I18nUtils.getMessage(key,args);
     }

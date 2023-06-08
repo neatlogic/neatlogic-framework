@@ -16,8 +16,8 @@
 
 package neatlogic.framework.fulltextindex.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum Status {
     DOING("doing", new I18n("重建中")),
@@ -36,7 +36,7 @@ public enum Status {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getValue(String _status) {

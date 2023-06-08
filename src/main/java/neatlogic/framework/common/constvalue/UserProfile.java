@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.UserProfileVo;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ public enum UserProfile implements IUserProfile {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     @Override

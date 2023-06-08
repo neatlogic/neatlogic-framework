@@ -27,7 +27,7 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.notify.dto.NotifyPolicyHandlerVo;
 import neatlogic.framework.notify.dto.NotifyTreeVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         notifyPolicyHandlerList.forEach(o -> {
             try {
                 NotifyPolicyHandlerVo handlerVo = o.clone();
-                handlerVo.setName(I18nUtils.getMessage(handlerVo.getName()));
+                handlerVo.setName($.t(handlerVo.getName()));
                 notifyPolicyHandlerVoList.add(handlerVo);
             } catch (CloneNotSupportedException e) {
                 notifyPolicyHandlerVoList.add(o);
@@ -73,13 +73,13 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
             List<NotifyTreeVo> moduleTreeListTmp = JSONArray.parseArray(JSON.toJSONString(moduleTreeVoList), NotifyTreeVo.class);
             for (NotifyTreeVo notifyTreeVo : moduleTreeListTmp) {
-                notifyTreeVo.setName(I18nUtils.getMessage(notifyTreeVo.getName()));
+                notifyTreeVo.setName($.t(notifyTreeVo.getName()));
                 if (CollectionUtils.isNotEmpty(notifyTreeVo.getChildren())) {
                     for (NotifyTreeVo childNotifyTreeVo : notifyTreeVo.getChildren()) {
-                        childNotifyTreeVo.setName(I18nUtils.getMessage(childNotifyTreeVo.getName()));
+                        childNotifyTreeVo.setName($.t(childNotifyTreeVo.getName()));
                         if (CollectionUtils.isNotEmpty(childNotifyTreeVo.getChildren())) {
                             for (NotifyTreeVo secondChildNotifyTreeVo : childNotifyTreeVo.getChildren()) {
-                                secondChildNotifyTreeVo.setName(I18nUtils.getMessage(secondChildNotifyTreeVo.getName()));
+                                secondChildNotifyTreeVo.setName($.t(secondChildNotifyTreeVo.getName()));
                             }
                         }
                     }

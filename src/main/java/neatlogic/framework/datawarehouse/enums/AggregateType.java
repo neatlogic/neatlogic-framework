@@ -16,8 +16,8 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum AggregateType {
     COUNT("count", new I18n("计数")),
@@ -36,7 +36,7 @@ public enum AggregateType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
 

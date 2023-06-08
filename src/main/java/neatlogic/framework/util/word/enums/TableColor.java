@@ -15,8 +15,8 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author longrf
@@ -44,6 +44,6 @@ public enum TableColor {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 }

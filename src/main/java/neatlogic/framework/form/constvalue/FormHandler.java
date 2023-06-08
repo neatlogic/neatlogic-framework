@@ -16,8 +16,8 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum FormHandler implements IFormHandler {
     FORMLABEL("formlabel", new I18n("标签")),
@@ -59,6 +59,6 @@ public enum FormHandler implements IFormHandler {
 
     @Override
     public String getHandlerName() {
-        return I18nUtils.getMessage(handlerName.toString());
+        return $.t(handlerName.toString());
     }
 }

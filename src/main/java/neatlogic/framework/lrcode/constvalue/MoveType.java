@@ -1,7 +1,7 @@
 package neatlogic.framework.lrcode.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @Title: MoveType
@@ -44,7 +44,7 @@ public enum MoveType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public void setText(String text) {

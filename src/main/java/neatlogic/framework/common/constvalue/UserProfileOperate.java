@@ -1,7 +1,7 @@
 package neatlogic.framework.common.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum UserProfileOperate {
     KEEP_ON_CREATE("keeponcreate", new I18n("继续创建")),
@@ -25,7 +25,7 @@ public enum UserProfileOperate {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
 }

@@ -21,7 +21,7 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.message.dto.MessageHandlerVo;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ public class MessageHandlerFactory extends ModuleInitializedListenerBase {
         if(CollectionUtils.isNotEmpty(messageHandlerVoList)){
             List<MessageHandlerVo> messageHandlerVos = JSONArray.parseArray(JSONArray.toJSONString(messageHandlerVoList),MessageHandlerVo.class);
             messageHandlerVos.forEach(o-> {
-                o.setModuleName(I18nUtils.getMessage(o.getModuleName()));
-                o.setName(I18nUtils.getMessage(o.getName()));
-                o.setDescription(I18nUtils.getMessage(o.getDescription()));
+                o.setModuleName($.t(o.getModuleName()));
+                o.setName($.t(o.getName()));
+                o.setDescription($.t(o.getDescription()));
             });
             return messageHandlerVos;
         }

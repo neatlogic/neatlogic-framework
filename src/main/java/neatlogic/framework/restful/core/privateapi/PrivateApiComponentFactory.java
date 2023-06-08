@@ -16,6 +16,8 @@
 
 package neatlogic.framework.restful.core.privateapi;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthAction;
@@ -31,9 +33,7 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
 import neatlogic.framework.restful.enums.ApiType;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,8 +108,8 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         ApiVo apiVo = null;
         if(api != null) {
             apiVo = api.clone();
-            apiVo.setName(I18nUtils.getMessage(apiVo.getName()));
-            apiVo.setHandlerName(I18nUtils.getMessage(apiVo.getHandlerName()));
+            apiVo.setName($.t(apiVo.getName()));
+            apiVo.setHandlerName($.t(apiVo.getHandlerName()));
         }
         return apiVo;
     }
@@ -410,8 +410,8 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
             if(Objects.equals("api.nmpaw.searchworkcenterapi.name",a.getName())) {
                 System.out.println(a.getName());
             }
-            a.setName(I18nUtils.getMessage(a.getName()));
-            a.setHandlerName(I18nUtils.getMessage(a.getHandlerName()));
+            a.setName($.t(a.getName()));
+            a.setHandlerName($.t(a.getHandlerName()));
         });
         return clonedList;
     }

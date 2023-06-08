@@ -16,11 +16,11 @@ limitations under the License.
 
 package neatlogic.framework.dependency.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dependency.dao.mapper.DependencyMapper;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.dependency.dto.DependencyVo;
-import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public abstract class FixedTableDependencyHandlerBase implements IDependencyHand
 
     @Override
     public String getGroupName() {
-        return I18nUtils.getMessage(groupName);
+        return $.t(groupName);
     }
 
     @Override

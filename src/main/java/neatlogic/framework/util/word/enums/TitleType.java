@@ -15,8 +15,8 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author longrf
@@ -53,7 +53,7 @@ public enum TitleType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public Boolean getBold() {
@@ -65,7 +65,7 @@ public enum TitleType {
     }
 
     public String getFontFamily() {
-        return I18nUtils.getMessage(fontFamily.toString());
+        return $.t(fontFamily.toString());
     }
 
     public Integer getFontSize() {

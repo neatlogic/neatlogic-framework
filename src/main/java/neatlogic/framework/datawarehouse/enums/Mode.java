@@ -16,8 +16,8 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum Mode {
     APPEND("append", new I18n("追加")),
@@ -36,7 +36,7 @@ public enum Mode {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
 

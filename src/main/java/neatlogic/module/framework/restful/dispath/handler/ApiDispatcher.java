@@ -42,8 +42,8 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.HttpRequestUtil;
-import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.mongodb.IJsonSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -268,7 +268,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", I18nUtils.getMessage(ex.getMessage(), ex.getValues()));
+            returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             response.setStatus(500);
@@ -339,7 +339,7 @@ public class ApiDispatcher {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
-            returnObj.put("Message", I18nUtils.getMessage(ex.getMessage(), ex.getValues()));
+            returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
         } catch (Exception ex) {
             response.setStatus(500);
             returnObj.put("Status", "ERROR");

@@ -1,8 +1,8 @@
 package neatlogic.framework.notify.constvalue;
 
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * 通知接收者类型
@@ -31,7 +31,7 @@ public enum NotifyRecipientType {
 	}
 
 	public String getText() {
-		return I18nUtils.getMessage(text.toString());
+		return $.t(text.toString());
 	}
 	
 	public static String getValue(String _value) {

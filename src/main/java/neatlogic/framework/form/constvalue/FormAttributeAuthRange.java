@@ -16,8 +16,8 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum FormAttributeAuthRange {
     ALL("all", new I18n("所有"));
@@ -29,7 +29,7 @@ public enum FormAttributeAuthRange {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     private FormAttributeAuthRange(String value, I18n text) {

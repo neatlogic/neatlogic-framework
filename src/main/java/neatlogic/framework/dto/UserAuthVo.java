@@ -7,7 +7,7 @@ import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -78,7 +78,7 @@ public class UserAuthVo extends BasePageVo implements Serializable {
         if (StringUtils.isNotBlank(auth)) {
             AuthBase authVo = AuthFactory.getAuthInstance(auth);
             if (authVo != null) {
-                return I18nUtils.getMessage(authVo.getAuthDisplayName());
+                return $.t(authVo.getAuthDisplayName());
             }
         }
         return authName;

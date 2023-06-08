@@ -26,6 +26,10 @@ public class $ {
      * @return key
      */
     public static String t (String key){
-        return key;
+        return I18nUtils.getMessage(key);
+    }
+
+    public static String t (String key, Object... args){
+        return I18nUtils.getMessage(key,args);
     }
 }

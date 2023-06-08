@@ -18,8 +18,8 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public enum AuthType implements IEnum {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getValue(String _value) {

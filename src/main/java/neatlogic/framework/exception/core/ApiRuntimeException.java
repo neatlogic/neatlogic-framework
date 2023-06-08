@@ -17,7 +17,7 @@
 package neatlogic.framework.exception.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 
 public class ApiRuntimeException extends RuntimeException {
     private static final long serialVersionUID = 9206337410118158624L;
@@ -34,19 +34,19 @@ public class ApiRuntimeException extends RuntimeException {
     }
 
     public ApiRuntimeException(String message, Throwable ex) {
-        super(I18nUtils.getMessage(message), ex);
+        super($.t(message), ex);
     }
 
     public ApiRuntimeException(String message, Throwable ex, Object... values) {
-        super(I18nUtils.getMessage(message, values), ex);
+        super($.t(message, values), ex);
     }
 
     public ApiRuntimeException(String key) {
-        super(I18nUtils.getMessage(key));
+        super($.t(key));
     }
 
     public ApiRuntimeException(String key, Object... values) {
-        super(I18nUtils.getMessage(key, values));
+        super($.t(key, values));
     }
 
     public String getErrorCode() {

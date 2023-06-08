@@ -16,12 +16,12 @@
 
 package neatlogic.framework.matrix.constvalue;
 
-import neatlogic.framework.common.constvalue.IEnum;
-import neatlogic.framework.matrix.core.IMatrixType;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.constvalue.IEnum;
+import neatlogic.framework.matrix.core.IMatrixType;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public enum MatrixType implements IMatrixType, IEnum {
 
     @Override
     public String getName() {
-        return I18nUtils.getMessage(name.toString());
+        return $.t(name.toString());
     }
 
     @Override

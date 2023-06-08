@@ -2,8 +2,8 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public enum ParamType implements IEnum{
 	}
 
 	public String getText() {
-		return I18nUtils.getMessage(text.toString());
+		return $.t(text.toString());
 	}
 
 	public List<Expression> getExpressionList() {

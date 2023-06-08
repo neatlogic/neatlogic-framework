@@ -28,8 +28,8 @@ import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,7 +51,7 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text.toString());
+            return $.t(text.toString());
         }
 
         private ConversionType(String _value, I18n _text) {

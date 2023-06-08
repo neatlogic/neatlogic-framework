@@ -1,7 +1,7 @@
 package neatlogic.framework.dto;
 
 import neatlogic.framework.auth.core.AuthBase;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 
 public class AuthVo {
 
@@ -44,7 +44,7 @@ public class AuthVo {
     }
 
     public String getDescription() {
-        return I18nUtils.getMessage(description);
+        return $.t(description);
     }
 
     public void setDescription(String description) {
@@ -76,7 +76,7 @@ public class AuthVo {
     }
 
     public String getDisplayName() {
-        return I18nUtils.getMessage(displayName);
+        return $.t(displayName);
     }
 
     public void setDisplayName(String displayName) {

@@ -18,8 +18,8 @@ package neatlogic.framework.common.constvalue;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +46,7 @@ public enum InspectStatus implements IEnum {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public String getCssClass() {

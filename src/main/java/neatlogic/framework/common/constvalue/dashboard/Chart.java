@@ -2,8 +2,8 @@ package neatlogic.framework.common.constvalue.dashboard;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum Chart {
 
@@ -30,7 +30,7 @@ public enum Chart {
 	}
 
 	public String getText() {
-		return I18nUtils.getMessage(text.toString());
+		return $.t(text.toString());
 	}
 
 	public String getIcon() {

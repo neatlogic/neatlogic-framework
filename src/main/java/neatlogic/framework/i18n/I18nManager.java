@@ -18,13 +18,18 @@ package neatlogic.framework.i18n;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.Locale;
 
+@DependsOn("springContextUtil")
 @Configuration
 public class I18nManager {
+    public I18nManager() {
+        System.out.println(1);
+    }
     @Bean
     public AcceptHeaderLocaleResolver localeResolver() {
         final AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();

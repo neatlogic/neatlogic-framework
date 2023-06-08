@@ -16,8 +16,8 @@
 
 package neatlogic.framework.restful.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum ApiKind {
     SYSTEM("system", new I18n("内部接口")), CUSTOM("custom", new I18n("外部接口"));
@@ -35,7 +35,7 @@ public enum ApiKind {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getText(String name) {

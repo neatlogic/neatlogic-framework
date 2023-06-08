@@ -73,6 +73,8 @@ public class InitializeIndexHandler extends StartupBase {
 
     private final static List<String> configuredFilePathList = new ArrayList<>();
 
+    private final static List<String> existingFilePathList = new ArrayList<>();
+
     public static JSONArray getDocumentOnlineDirectory() {
         JSONArray resultList = new JSONArray();
         List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
@@ -288,6 +290,10 @@ public class InitializeIndexHandler extends StartupBase {
                 String path = resource.getURL().getPath();
                 int classpathRootIndex = path.indexOf(classpathRoot);
                 String filePath = path.substring(classpathRootIndex);
+                if (existingFilePathList.contains(filePath)) {
+                    logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
+                    System.exit(1);
+                }
                 JSONObject mappingConfig = getMappingConfigByFilePath(filePath);
                 if (MapUtils.isNotEmpty(mappingConfig)) {
                     moduleGroup = mappingConfig.getString("moduleGroup");

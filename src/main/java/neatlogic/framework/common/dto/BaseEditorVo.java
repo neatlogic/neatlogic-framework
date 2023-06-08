@@ -16,12 +16,12 @@
 
 package neatlogic.framework.common.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.restful.annotation.EntityField;
-import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -34,27 +34,27 @@ import java.util.Objects;
  */
 public class BaseEditorVo extends BasePageVo {
     private static final long serialVersionUID = -3871232273093802236L;
-    @EntityField(name = "创建者", type = ApiParamType.STRING)
+    @EntityField(name = "common.createuser", type = ApiParamType.STRING)
     private String fcu;
-    @EntityField(name = "创建者中文名", type = ApiParamType.STRING)
+    @EntityField(name = "common.createusername", type = ApiParamType.STRING)
     private String fcuName;
-    @EntityField(name = "创建日期", type = ApiParamType.STRING)
+    @EntityField(name = "common.createdate", type = ApiParamType.STRING)
     private Date fcd;
-    @EntityField(name = "修改者", type = ApiParamType.STRING)
+    @EntityField(name = "common.editor", type = ApiParamType.STRING)
     private String lcu;
-    @EntityField(name = "修改者中文名", type = ApiParamType.STRING)
+    @EntityField(name = "common.editorname", type = ApiParamType.STRING)
     private String lcuName;
-    @EntityField(name = "修改日期", type = ApiParamType.STRING)
+    @EntityField(name = "common.editdate", type = ApiParamType.STRING)
     private Date lcd;
     @JSONField(serialize = false)
     public String tenantUuid;//当前租户uuid
 
-    @EntityField(name = "创建者VO")
+    @EntityField(name = "common.createrobject")
     private UserVo fcuVo;
-    @EntityField(name = "修改者VO")
+    @EntityField(name = "common.editorobject")
     private UserVo lcuVo;
 
-    @EntityField(name = "操作类型，创建或修改")
+    @EntityField(name = "common.actiontype")
     private String actionType;
 
     public BaseEditorVo() {
@@ -129,9 +129,9 @@ public class BaseEditorVo extends BasePageVo {
 
     public final String getActionType() {
         if (Objects.equals(fcd, lcd)) {
-            actionType = "创建";
+            actionType = $.t("common.create");
         } else {
-            actionType = "修改";
+            actionType = $.t("common.edit");
         }
         return actionType;
     }

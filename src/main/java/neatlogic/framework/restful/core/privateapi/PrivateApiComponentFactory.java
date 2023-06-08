@@ -33,6 +33,7 @@ import neatlogic.framework.restful.enums.ApiKind;
 import neatlogic.framework.restful.enums.ApiType;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,29 +81,35 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         return binaryComponentMap.get(componentId);
     }
 
-    public static ApiVo getApiByToken(String token) {
-        ApiVo apiVo = apiMap.get(token);
-        if (apiVo == null) {
+    public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {
+        ApiVo api = apiMap.get(token);
+        if (api == null) {
             for (String regex : regexApiMap.keySet()) {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(token);
                 if (matcher.find()) {
-                    apiVo = regexApiMap.get(regex);
-                    if (apiVo.getPathVariableList() != null
-                            && apiVo.getPathVariableList().size() == matcher.groupCount()) {
+                    api = regexApiMap.get(regex);
+                    if (api.getPathVariableList() != null
+                            && api.getPathVariableList().size() == matcher.groupCount()) {
                         JSONObject pathVariableObj = new JSONObject();
-                        for (int i = 0; i < apiVo.getPathVariableList().size(); i++) {
+                        for (int i = 0; i < api.getPathVariableList().size(); i++) {
                             try {
-                                pathVariableObj.put(apiVo.getPathVariableList().get(i), matcher.group(i + 1));
+                                pathVariableObj.put(api.getPathVariableList().get(i), matcher.group(i + 1));
                             } catch (JSONException e) {
                                 logger.error(e.getMessage(), e);
                             }
                         }
-                        apiVo.setPathVariableObj(pathVariableObj);
+                        api.setPathVariableObj(pathVariableObj);
                     }
                     break;
                 }
             }
+        }
+        ApiVo apiVo = null;
+        if(api != null) {
+            apiVo = api.clone();
+            apiVo.setName(I18nUtils.getMessage(apiVo.getName()));
+            apiVo.setHandlerName(I18nUtils.getMessage(apiVo.getHandlerName()));
         }
         return apiVo;
     }
@@ -392,8 +399,20 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     }
 
-    public static List<ApiVo> getTenantActiveApiList() {
+    public static List<ApiVo> getTenantActiveApiList() throws CloneNotSupportedException {
         List<String> activeModuleIdList = TenantContext.get().getActiveModuleList().stream().map(ModuleVo::getId).collect(Collectors.toList());
-        return apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
+        List<ApiVo> apiVoList =  apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
+        List<ApiVo> clonedList = new ArrayList<>();
+        for (ApiVo apiVo : apiVoList) {
+            clonedList.add(apiVo.clone());
+        }
+        clonedList.forEach(a->{
+            if(Objects.equals("api.nmpaw.searchworkcenterapi.name",a.getName())) {
+                System.out.println(a.getName());
+            }
+            a.setName(I18nUtils.getMessage(a.getName()));
+            a.setHandlerName(I18nUtils.getMessage(a.getHandlerName()));
+        });
+        return clonedList;
     }
 }

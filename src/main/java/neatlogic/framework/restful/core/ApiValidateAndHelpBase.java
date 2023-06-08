@@ -476,6 +476,9 @@ public class ApiValidateAndHelpBase {
                             String help = p.help();
                             JSONObject paramObj = new JSONObject();
                             paramObj.put("name", p.name());
+                            if (p.maxLength() > 0) {
+                                paramObj.put("maxLength", p.maxLength());
+                            }
                             String rule;
                             if (Objects.equals(p.type().getValue(), ApiParamType.REGEX.getValue())) {
                                 paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");

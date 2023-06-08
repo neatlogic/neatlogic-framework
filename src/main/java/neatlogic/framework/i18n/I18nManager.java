@@ -27,9 +27,6 @@ import java.util.Locale;
 @DependsOn("springContextUtil")
 @Configuration
 public class I18nManager {
-    public I18nManager() {
-        System.out.println(1);
-    }
     @Bean
     public AcceptHeaderLocaleResolver localeResolver() {
         final AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();

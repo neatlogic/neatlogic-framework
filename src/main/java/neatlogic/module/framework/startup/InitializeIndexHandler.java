@@ -60,24 +60,34 @@ public class InitializeIndexHandler extends StartupBase {
     private final Logger logger = LoggerFactory.getLogger(InitializeIndexHandler.class);
 
     /**
-     * 模块组集合
+     * 在线帮助文档所属模块组集合
      */
     private final static Set<String> moduleGroupSet = new LinkedHashSet<>();
-
+    /**
+     * 用于存储模块组与菜单映射关系，一个模块组可以有多个菜单
+     */
     private final static Map<String, Set<String>> moduleGroupToMenuSetMap = new HashMap<>();
-
+    /**
+     * 用于存储模块组与在线文档路径映射关系，一个模块组可以有多个在线文档
+     */
     private final static Map<String, Set<String>> moduleGroupToFilePathSetMap = new HashMap<>();
-
+    /**
+     * 用于存储菜单与在线文档路径映射关系，一个菜单可以有多个在线文档
+     */
     private final static Map<String, Set<String>> menuToFilePathSetMap = new HashMap<>();
-
+    /**
+     * 在documentonline-mapping.json配置文件中没有设置的在线文档文件路径集合，它们不属于任何模块、任何菜单
+     */
     private final static List<String> notConfiguredFilePathList = new ArrayList<>();
-
+    /**
+     * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
+     */
     private final static List<JSONObject> mappingConfigList = new ArrayList();
 
-    private final static List<String> configuredFilePathList = new ArrayList<>();
-
-    private final static List<String> existingFilePathList = new ArrayList<>();
-
+    /**
+     * 生成在线文档树结构目录
+     * @return
+     */
     public static JSONArray getDocumentOnlineDirectory() {
         JSONArray resultList = new JSONArray();
         List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
@@ -139,6 +149,11 @@ public class InitializeIndexHandler extends StartupBase {
         return resultList;
     }
 
+    /**
+     * 返回在线文档首页数据，包含各个模块的在线文档列表，支持分页
+     * @param basePageVo
+     * @return
+     */
     public static JSONArray getDocumentOnlineTableList(BasePageVo basePageVo) {
         JSONArray resultList = new JSONArray();
         List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
@@ -189,6 +204,13 @@ public class InitializeIndexHandler extends StartupBase {
         return resultList;
     }
 
+    /**
+     * 根据模块组、菜单返回在线文档列表，支持分页
+     * @param moduleGroup
+     * @param menu
+     * @param basePageVo
+     * @return
+     */
     public static JSONObject getDocumentOnlineList(String moduleGroup, String menu, BasePageVo basePageVo) {
         List<JSONObject> tbodyList = new ArrayList<>();
         List<ModuleGroupVo> activeModuleGroupVoList = TenantContext.get().getActiveModuleGroupList();
@@ -241,17 +263,8 @@ public class InitializeIndexHandler extends StartupBase {
         }
         IndexWriter indexWriter = null;
         try {
-            // 3.创建分词器
-            Analyzer analyzer = new IKAnalyzer(true);
-            // 4.创建Directory目录对象，目录对象表示索引库的位置
-            Directory dir = FSDirectory.open(Paths.get(Config.DOCUMENT_ONLINE_INDEX_DIR()));
-            // 5.创建IndexWriterConfig对象，这个对象中指定切分词使用的分词器
-            IndexWriterConfig config = new IndexWriterConfig(analyzer);
-            // 6.创建IndexWriter输出流对象，指定输出的位置和使用的config初始化对象
-            indexWriter = new IndexWriter(dir, config);
-            // 删除索引
-            indexWriter.deleteAll();
-
+            // 在documentonline-mapping.json配置文件中已设置在线文档文件路径集合，用于防止同个在线文档重复配置
+            List<String> configuredFilePathList = new ArrayList<>();
             String classpathRoot = "documentonline/";
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] jsonResources = resolver.getResources("classpath*:" + classpathRoot + "**/documentonline-mapping.json");
@@ -284,6 +297,19 @@ public class InitializeIndexHandler extends StartupBase {
                     logger.error(e.getMessage(), e);
                 }
             }
+
+            // 存储所有在线文档的路径集合，用于判断不同jar包中有相同路径的文档
+            List<String> existingFilePathList = new ArrayList<>();
+            // 1.创建分词器
+            Analyzer analyzer = new IKAnalyzer(true);
+            // 2.创建Directory目录对象，目录对象表示索引库的位置
+            Directory dir = FSDirectory.open(Paths.get(Config.DOCUMENT_ONLINE_INDEX_DIR()));
+            // 3.创建IndexWriterConfig对象，这个对象中指定切分词使用的分词器
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            // 4.创建IndexWriter输出流对象，指定输出的位置和使用的config初始化对象
+            indexWriter = new IndexWriter(dir, config);
+            // 5.删除之前索引数据，然后在重新生成
+            indexWriter.deleteAll();
             // 1.采集数据
             Resource[] mdResources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
             for (Resource resource : mdResources) {
@@ -297,6 +323,7 @@ public class InitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
+                // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单
                 JSONObject mappingConfig = getMappingConfigByFilePath(filePath);
                 if (MapUtils.isNotEmpty(mappingConfig)) {
                     moduleGroup = mappingConfig.getString("moduleGroup");
@@ -315,56 +342,29 @@ public class InitializeIndexHandler extends StartupBase {
                 } else {
                     notConfiguredFilePathList.add(filePath);
                 }
+                // 读取文件内容
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(resource.getInputStream(), writer, StandardCharsets.UTF_8);
                 String str = writer.toString();
+
                 Document document = new Document();
-                // 创建域对象并且放入到文档集合中
+                // 创建域对象并且放入到文档中
                 if (StringUtils.isNotBlank(moduleGroup)) {
+                    // 模块组字段不分词
                     document.add(new StringField("moduleGroup", moduleGroup, Field.Store.YES));
                 }
                 if (StringUtils.isNotBlank(menu)) {
+                    // 菜单字段不分词
                     document.add(new StringField("menu", menu, Field.Store.YES));
                 }
-                document.add(new TextField("fileName", filename, Field.Store.YES));
+                // 文件路径字段不分词
                 document.add(new StringField("filePath", filePath, Field.Store.YES));
+                // 文件名称字段分词
+                document.add(new TextField("fileName", filename, Field.Store.YES));
+                // 文件内容字段分词
                 document.add(new TextField("content", str, Field.Store.YES));
                 indexWriter.addDocument(document);
             }
-//            String classpathRoot = "neatlogic/module/documentonline/document/";
-//            // 1.采集数据
-//            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-//            Resource[] resources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
-//            for (Resource resource : resources) {
-//                String path = resource.getURL().getPath();
-//                int classpathRootIndex = path.indexOf(classpathRoot);
-//                int endIndex = path.lastIndexOf("/");
-//                String moduleNameAndMenuName = path.substring(classpathRootIndex + classpathRoot.length(), endIndex);
-//                if (StringUtils.isBlank(moduleNameAndMenuName)) {
-//                    continue;
-//                }
-//                String[] split = moduleNameAndMenuName.split("/");
-//                String moduleGroup = split[0];
-//                String menu = null;
-//                if (split.length >= 2) {
-//                    menu = split[1];
-//                }
-//                String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
-//                StringWriter writer = new StringWriter();
-//                IOUtils.copy(resource.getInputStream(), writer, StandardCharsets.UTF_8);
-//                String str = writer.toString();
-//                Document document = new Document();
-//                // 创建域对象并且放入到文档集合中
-//                document.add(new StringField("moduleGroup", moduleGroup, Field.Store.YES));
-//                moduleGroupList.add(moduleGroup);
-//                if (StringUtils.isNotBlank(menu)) {
-//                    document.add(new StringField("menu", menu, Field.Store.YES));
-//                    moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new HashSet<>()).add(menu);
-//                }
-//                document.add(new TextField("fileName", filename, Field.Store.YES));
-//                document.add(new TextField("content", str, Field.Store.YES));
-//                indexWriter.addDocument(document);
-//            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw e;
@@ -382,6 +382,11 @@ public class InitializeIndexHandler extends StartupBase {
         return 10;
     }
 
+    /**
+     * 根据文件路径找到documentonline-mapping.json配置文件设置的映射信息
+     * @param filePath 文件路径
+     * @return 映射信息
+     */
     private JSONObject getMappingConfigByFilePath(String filePath) {
         for (JSONObject mappingConfig : mappingConfigList) {
             if (Objects.equals(filePath, mappingConfig.getString("filePath"))) {
@@ -391,6 +396,11 @@ public class InitializeIndexHandler extends StartupBase {
         return null;
     }
 
+    /**
+     * 从文件路径中截取文件名称
+     * @param filePath 文件路径
+     * @return 文件名称
+     */
     private static String getFileNameByFilePath(String filePath) {
         int index = filePath.lastIndexOf("/");
         return filePath.substring(index + 1, filePath.length() - 3);

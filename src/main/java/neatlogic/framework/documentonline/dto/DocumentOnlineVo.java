@@ -20,43 +20,12 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
 public class DocumentOnlineVo {
-
-//    @EntityField(name = "文件ID", type = ApiParamType.INTEGER)
-//    private Integer docID;
-//    @EntityField(name = "所属模块组标识", type = ApiParamType.STRING)
-//    private String moduleGroup;
-//    @EntityField(name = "所属功能标识", type = ApiParamType.STRING)
-//    private String function;
     @EntityField(name = "文件名", type = ApiParamType.STRING)
     private String fileName;
     @EntityField(name = "文件路径", type = ApiParamType.STRING)
     private String filePath;
     @EntityField(name = "内容", type = ApiParamType.STRING)
     private String content;
-
-//    public Integer getDocID() {
-//        return docID;
-//    }
-//
-//    public void setDocID(Integer docID) {
-//        this.docID = docID;
-//    }
-//
-//    public String getModuleGroup() {
-//        return moduleGroup;
-//    }
-//
-//    public void setModuleGroup(String moduleGroup) {
-//        this.moduleGroup = moduleGroup;
-//    }
-//
-//    public String getFunction() {
-//        return function;
-//    }
-//
-//    public void setFunction(String function) {
-//        this.function = function;
-//    }
 
     public String getFileName() {
         return fileName;

@@ -21,7 +21,7 @@ import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.SnowflakeUtil;
 
 import java.util.Date;
@@ -65,7 +65,7 @@ public class TenantVo extends BasePageVo {
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text);
+            return $.t(text);
         }
 
         public void setText(String text) {

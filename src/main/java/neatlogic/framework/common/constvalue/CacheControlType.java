@@ -1,7 +1,7 @@
 package neatlogic.framework.common.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @Description: Cache-control头类型
@@ -36,7 +36,7 @@ public enum CacheControlType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getText(String value) {

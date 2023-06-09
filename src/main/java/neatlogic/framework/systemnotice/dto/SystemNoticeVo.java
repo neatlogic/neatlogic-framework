@@ -1,14 +1,14 @@
 package neatlogic.framework.systemnotice.dto;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class SystemNoticeVo extends BaseEditorVo {
         }
 
         public String getText() {
-            return I18nUtils.getMessage(text.toString());
+            return $.t(text.toString());
         }
 
         public String getColor() {

@@ -16,8 +16,8 @@ limitations under the License.
 
 package neatlogic.framework.lcs.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum LineHandler {
     TEXT("text", new I18n("纯文本"));
@@ -34,6 +34,6 @@ public enum LineHandler {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 }

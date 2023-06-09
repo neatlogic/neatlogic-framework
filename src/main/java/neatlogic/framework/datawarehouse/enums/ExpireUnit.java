@@ -16,8 +16,8 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum ExpireUnit {
     MINUTE("minute", new I18n("分钟")),
@@ -37,7 +37,7 @@ public enum ExpireUnit {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
 

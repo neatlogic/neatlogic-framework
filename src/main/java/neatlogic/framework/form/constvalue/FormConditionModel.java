@@ -16,8 +16,8 @@
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum FormConditionModel {
     SIMPLE("simple", new I18n("简单模式")),
@@ -35,7 +35,7 @@ public enum FormConditionModel {
     }
 
     public String getName() {
-        return I18nUtils.getMessage(name.toString());
+        return $.t(name.toString());
     }
 
     public static FormConditionModel getFormConditionModel(String _value) {

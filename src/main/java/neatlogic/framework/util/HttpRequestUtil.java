@@ -52,7 +52,11 @@ public class HttpRequestUtil {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
 
     public enum ContentType {
-        CONTENT_TYPE_APPLICATION_JSON("application/json"), CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY), CONTENT_TYPE_TEXT_HTML("text/html"), CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded"), CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY);
+        CONTENT_TYPE_APPLICATION_JSON("application/json"),
+        CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY),
+        CONTENT_TYPE_TEXT_HTML("text/html"),
+        CONTENT_TYPE_APPLICATION_FORM("application/x-www-form-urlencoded"),
+        CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM("multipart/form-data; boundary=" + FORM_DATA_BOUNDARY);
         private final String value;
 
         ContentType(String value) {

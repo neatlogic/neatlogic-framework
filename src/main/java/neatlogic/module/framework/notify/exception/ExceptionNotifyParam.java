@@ -18,8 +18,8 @@ package neatlogic.module.framework.notify.exception;
 
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.notify.core.INotifyParam;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author laiwt
@@ -47,7 +47,7 @@ public enum ExceptionNotifyParam implements INotifyParam {
 
     @Override
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     @Override

@@ -16,8 +16,8 @@
 
 package neatlogic.framework.restful.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum ApiType {
     OBJECT("object", new I18n("对象模式"), "rest/"),
@@ -39,7 +39,7 @@ public enum ApiType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public String getUrlPre() {

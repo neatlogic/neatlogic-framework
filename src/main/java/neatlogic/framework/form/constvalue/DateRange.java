@@ -16,8 +16,8 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.Objects;
 
@@ -47,7 +47,7 @@ public enum DateRange {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getText(Integer timeRange, String timeUnit) {

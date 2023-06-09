@@ -17,8 +17,8 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.dto.UserTypeVo;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +46,7 @@ public enum UserType implements IUserType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public Boolean getIsDefaultShow() {

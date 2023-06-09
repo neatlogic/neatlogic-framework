@@ -20,8 +20,8 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public enum SystemUser {
     }
 
     public String getUserName() {
-        return I18nUtils.getMessage(userName.toString());
+        return $.t(userName.toString());
     }
 
     public String getTimezone() {

@@ -1,8 +1,8 @@
 package neatlogic.framework.common.constvalue.dashboard;
 
 import neatlogic.framework.common.constvalue.FormHandlerType;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum DashboardShowConfig {
 	TYPE("type", new I18n("类型"),FormHandlerType.RADIO.toString(),false),
@@ -29,7 +29,7 @@ public enum DashboardShowConfig {
 	}
 	
 	public String getText() {
-		return I18nUtils.getMessage(text.toString());
+		return $.t(text.toString());
 	}
 	
 	public String getFormHandlerType() {

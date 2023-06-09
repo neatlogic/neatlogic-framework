@@ -37,8 +37,8 @@ import neatlogic.framework.file.core.appender.AppenderManager;
 import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.RegexUtils;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
@@ -178,7 +178,7 @@ public class ApiValidateAndHelpBase {
             for (Param p : params) {
                 if (!p.explode().getName().equals(NotDefined.class.getName())) {
                     if (p.explode().isArray()) {
-                        outputObj.put(I18nUtils.getMessage(p.name()), "jsonArray");
+                        outputObj.put($.t(p.name()), "jsonArray");
                     } else {
                         for (Field field : p.explode().getDeclaredFields()) {
                             Annotation[] annotations = field.getDeclaredAnnotations();
@@ -192,7 +192,7 @@ public class ApiValidateAndHelpBase {
                                     } else {
                                         type = entityField.type().getValue().toLowerCase();
                                     }
-                                    outputObj.put(I18nUtils.getMessage(field.getName()), type);
+                                    outputObj.put($.t(field.getName()), type);
                                 }
                             }
                         }
@@ -439,7 +439,7 @@ public class ApiValidateAndHelpBase {
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("name", field.getName());
                 paramObj.put("type", entityField.type().getValue() + "[" + entityField.type().getText() + "]");
-                paramObj.put("description", I18nUtils.getMessage(entityField.name()));
+                paramObj.put("description", $.t(entityField.name()));
 
                 if (loop && field.getType().isAssignableFrom(List.class)) {
                     Type genericType = field.getGenericType();
@@ -500,8 +500,8 @@ public class ApiValidateAndHelpBase {
                                 paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
                             }
                             paramObj.put("isRequired", p.isRequired());
-                            paramObj.put("description", I18nUtils.getMessage(p.desc()));
-                            paramObj.put("help", I18nUtils.getMessage(help));
+                            paramObj.put("description", $.t(p.desc()));
+                            paramObj.put("help", $.t(help));
                             inputList.add(paramObj);
                             // }
                         }
@@ -520,8 +520,8 @@ public class ApiValidateAndHelpBase {
                                     JSONObject paramObj = new JSONObject();
                                     paramObj.put("name", p.name());
                                     paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
-                                    paramObj.put("description", I18nUtils.getMessage(p.desc()));
-                                    paramObj.put("help", I18nUtils.getMessage(p.help()));
+                                    paramObj.put("description", $.t(p.desc()));
+                                    paramObj.put("help", $.t(p.help()));
                                     JSONArray elementObjList = new JSONArray();
                                     for (Field field : p.explode().getComponentType().getDeclaredFields()) {
                                         drawFieldMessageRecursive(field, elementObjList, true);
@@ -536,14 +536,14 @@ public class ApiValidateAndHelpBase {
                                 JSONObject paramObj = new JSONObject();
                                 paramObj.put("name", p.name());
                                 paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
-                                paramObj.put("description", I18nUtils.getMessage(p.desc()));
-                                paramObj.put("help", I18nUtils.getMessage(p.help()));
+                                paramObj.put("description", $.t(p.desc()));
+                                paramObj.put("help", $.t(p.help()));
                                 outputList.add(paramObj);
                             }
                         }
                     } else if (anno.annotationType().equals(Description.class)) {
                         Description description = (Description) anno;
-                        jsonObj.put("description", I18nUtils.getMessage(description.desc()));
+                        jsonObj.put("description", $.t(description.desc()));
                     } else if (anno.annotationType().equals(Example.class)) {
                         Example example = (Example) anno;
                         String content = example.example();

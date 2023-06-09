@@ -27,7 +27,7 @@ public class I18n {
 
     public String toString() {
         if (StringUtils.isNotBlank(this.key)) {
-            return I18nUtils.getMessage(this.key);
+            return $.t(this.key);
         }
         return "";
     }

@@ -16,12 +16,11 @@
 
 package neatlogic.framework.fulltextindex.dto.globalsearch;
 
-import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.util.$;
+import neatlogic.framework.util.I18n;
+import org.apache.commons.lang3.StringUtils;
 
 public class RebuildAuditVo {
     public enum Status {
@@ -41,7 +40,7 @@ public class RebuildAuditVo {
         }
 
         public String getName() {
-            return I18nUtils.getMessage(name.toString());
+            return $.t(name.toString());
         }
 
         public static String getName(String v) {

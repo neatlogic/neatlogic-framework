@@ -1,8 +1,8 @@
 package neatlogic.framework.common.constvalue.integration;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum IntegrationParamType {
     NUMBER("number", new I18n("数字")),
@@ -23,7 +23,7 @@ public enum IntegrationParamType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getText(String name) {

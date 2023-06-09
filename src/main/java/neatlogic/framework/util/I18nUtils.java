@@ -18,7 +18,7 @@ package neatlogic.framework.util;
 
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.i18n.JsonResourceBundleControl;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 
@@ -36,7 +36,7 @@ public class I18nUtils {
      * @return 翻译值
      */
     public static String getMessage(String key, Object... args) {
-        MessageSourceAccessor messageSource = SpringContextUtil.getBean(MessageSourceAccessor.class);
+        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor",MessageSourceAccessor.class);
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;
         try {

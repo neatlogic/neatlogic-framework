@@ -27,7 +27,7 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentBase;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +78,7 @@ public class ModuleListApi extends PrivateApiComponentBase {
 				checkSet.add(moduleVo.getGroup());
 				JSONObject returnObj = new JSONObject();
 				returnObj.put("value", moduleVo.getGroup());
-				returnObj.put("text", I18nUtils.getMessage(moduleVo.getGroupName()));
+				returnObj.put("text", $.t(moduleVo.getGroupName()));
 				returnObj.put("sort", moduleVo.getGroupSort());
 				resultArray.add(returnObj);
 			}

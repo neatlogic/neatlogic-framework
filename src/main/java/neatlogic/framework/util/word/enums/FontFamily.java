@@ -15,8 +15,8 @@
  */
 package neatlogic.framework.util.word.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @author longrf
@@ -37,6 +37,6 @@ public enum FontFamily {
     }
 
     public String getValue() {
-        return I18nUtils.getMessage(value.toString());
+        return $.t(value.toString());
     }
 }

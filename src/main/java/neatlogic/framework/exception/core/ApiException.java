@@ -16,7 +16,7 @@
 
 package neatlogic.framework.exception.core;
 
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 
 public class ApiException extends Exception {
     private static final long serialVersionUID = 9163793348080280240L;
@@ -37,11 +37,11 @@ public class ApiException extends Exception {
     }
 
     public ApiException(String message, Throwable ex) {
-        super(I18nUtils.getMessage(message), ex);
+        super($.t(message), ex);
     }
 
     public ApiException(String message) {
-        super(I18nUtils.getMessage(message));
+        super($.t(message));
     }
 
     public String getErrorCode() {
@@ -53,7 +53,7 @@ public class ApiException extends Exception {
     }
 
     public ApiException(String message, Object... values) {
-        super(I18nUtils.getMessage(message,values));
+        super($.t(message,values));
     }
 
 }

@@ -17,8 +17,8 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.dto.ExpressionVo;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public enum Expression implements IEnum {
     }
 
     public String getExpressionName() {
-        return I18nUtils.getMessage(expressionName.toString());
+        return $.t(expressionName.toString());
     }
 
     public String getExpressionEs() {

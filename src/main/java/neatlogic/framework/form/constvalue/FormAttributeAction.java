@@ -16,8 +16,8 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum FormAttributeAction {
     HIDE("hide", new I18n("隐藏")),
@@ -31,7 +31,7 @@ public enum FormAttributeAction {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     private FormAttributeAction(String value, I18n text) {

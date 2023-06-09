@@ -21,11 +21,12 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import neatlogic.framework.common.RootConfiguration;
-import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -35,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+@DependsOn({"i18nManager", "localeResolver", "messageSourceAccessor"})
 @RootConfiguration
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -43,8 +45,8 @@ public class Config {
     private static final String CONFIG_FILE = "config.properties";
     private static final String SERVER_ID_FILE = "serverid.conf";
 
-    public static final int SCHEDULE_SERVER_ID;
-    public static final String SERVER_HOST;
+    public static int SCHEDULE_SERVER_ID;
+    public static String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
     private static String JWT_SECRET = "neatlogic#neatlogic$secret";
@@ -119,8 +121,6 @@ public class Config {
 
     private static String LDAP_USER_DN;//ldap userDn格式
 
-    private static String DOCUMENT_ONLINE_INDEX_DIR;//在线帮助文档索引目录
-
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -160,35 +160,6 @@ public class Config {
             ENABLE_SUPERADMIN = false;
         }
 
-        try {
-            StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
-            BufferedReader br;
-            try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
-                assert is != null;
-                try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
-                    br = new BufferedReader(in);
-                    String inLine = "";
-                    while ((inLine = br.readLine()) != null) {
-                        sid.append(inLine);
-                    }
-                }
-            } catch (Exception e) {
-                // logger.error(e.getMessage(), e);
-            }
-            SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
-        } catch (Exception ex) {
-            logger.error(I18nUtils.getStaticMessage("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
-            System.out.println(I18nUtils.getStaticMessage("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
-            throw ex;
-        }
-
-        try {
-            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
-        } catch (Exception ex) {
-            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-            throw ex;
-        }
     }
 
     public static String NEATLOGIC_HOME() {
@@ -385,28 +356,58 @@ public class Config {
         return SSO_TICKET_KEY;
     }
 
-    public static String LOGIN_AUTH_TYPE(){
+    public static String LOGIN_AUTH_TYPE() {
         return LOGIN_AUTH_TYPE;
     }
 
-    public static String LOGIN_AUTH_PASSWORD_ENCRYPT(){
+    public static String LOGIN_AUTH_PASSWORD_ENCRYPT() {
         return LOGIN_AUTH_PASSWORD_ENCRYPT;
     }
 
-    public static String LDAP_SERVER_URL(){
+    public static String LDAP_SERVER_URL() {
         return LDAP_SERVER_URL;
     }
-    public static String LDAP_USER_DN(){
+
+    public static String LDAP_USER_DN() {
         return LDAP_USER_DN;
     }
 
-    public static String DOCUMENT_ONLINE_INDEX_DIR(){
-        return DOCUMENT_ONLINE_INDEX_DIR;
-    }
 
+    private void initConfigFile(){
+        try {
+            StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
+            BufferedReader br;
+            try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
+                assert is != null;
+                try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
+                    br = new BufferedReader(in);
+                    String inLine = "";
+                    while ((inLine = br.readLine()) != null) {
+                        sid.append(inLine);
+                    }
+                }
+            } catch (Exception e) {
+                // logger.error(e.getMessage(), e);
+            }
+            SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
+        } catch (Exception ex) {
+            logger.error($.t("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
+            System.out.println($.t("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
+            throw ex;
+        }
+
+        try {
+            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
+        } catch (Exception ex) {
+            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
+            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
+            throw ex;
+        }
+    }
     @PostConstruct
     public void init() {
         try {
+            initConfigFile();
             String propertiesString = configService.getConfig("config", "neatlogic.framework", 3000);
             loadNacosProperties(propertiesString);
             if (StringUtils.isNotBlank(propertiesString)) {
@@ -487,13 +488,11 @@ public class Config {
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");
 
-            LOGIN_AUTH_TYPE = prop.getProperty("login.auth.type" );
-            LOGIN_AUTH_PASSWORD_ENCRYPT =  prop.getProperty("login.auth.password.encrypt" , "md5");
+            LOGIN_AUTH_TYPE = prop.getProperty("login.auth.type");
+            LOGIN_AUTH_PASSWORD_ENCRYPT = prop.getProperty("login.auth.password.encrypt", "md5");
 
-            LDAP_SERVER_URL = prop.getProperty("ldap.server.url","");
-            LDAP_USER_DN = prop.getProperty("ldap.user.dn","");
-
-            DOCUMENT_ONLINE_INDEX_DIR = prop.getProperty("document.online.index.dir","");
+            LDAP_SERVER_URL = prop.getProperty("ldap.server.url", "");
+            LDAP_USER_DN = prop.getProperty("ldap.user.dn", "");
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

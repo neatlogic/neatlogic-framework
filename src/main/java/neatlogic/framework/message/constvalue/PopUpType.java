@@ -1,7 +1,7 @@
 package neatlogic.framework.message.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * @Title: PopUpType
@@ -28,6 +28,6 @@ public enum PopUpType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 }

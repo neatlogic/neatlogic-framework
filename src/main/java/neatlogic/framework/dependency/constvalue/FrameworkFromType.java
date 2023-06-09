@@ -17,8 +17,8 @@ limitations under the License.
 package neatlogic.framework.dependency.constvalue;
 
 import neatlogic.framework.dependency.core.IFromType;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 /**
  * 被引用者（上游）类型
@@ -53,6 +53,6 @@ public enum FrameworkFromType implements IFromType {
 
     @Override
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 }

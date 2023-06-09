@@ -17,22 +17,21 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18nUtils;
 
 public enum ApiParamType {
-    INTEGER("int", $.t("common.int")),
-    ENUM("enum", $.t("枚举型")),
-    BOOLEAN("boolean", $.t("布尔型")),
-    STRING("string", $.t("字符型")),
-    LONG("long", $.t("长整型")),
-    JSONOBJECT("jsonObject", $.t("json对象")),
-    JSONARRAY("jsonArray", $.t("json数组")),
-    IP("ip", $.t("ip")),
-    EMAIL("email", $.t("邮箱")),
-    REGEX("regex", $.t("正则表达式")),
-    DOUBLE("double", $.t("双精度浮点数")),
-    NOAUTH("noAuth", $.t("任意对象，无需校验")),
-    FILE("file", $.t("附件"));
+    INTEGER("int", "common.int"),
+    ENUM("enum", "枚举型"),
+    BOOLEAN("boolean", "布尔型"),
+    STRING("string", "字符型"),
+    LONG("long", "长整型"),
+    JSONOBJECT("jsonObject", "json对象"),
+    JSONARRAY("jsonArray", "json数组"),
+    IP("ip", "ip"),
+    EMAIL("email", "邮箱"),
+    REGEX("regex", "正则表达式"),
+    DOUBLE("double", "双精度浮点数"),
+    NOAUTH("noAuth", "任意对象，无需校验"),
+    FILE("file", "附件");
 
     private String name;
     private String text;
@@ -47,7 +46,7 @@ public enum ApiParamType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text);
+        return $.t(text);
     }
 
     public static String getText(String name) {

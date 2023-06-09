@@ -16,8 +16,8 @@
 
 package neatlogic.framework.datawarehouse.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum DatabaseVersion {
     MYSQL8("MySql8.x", new I18n("文本框"));
@@ -35,7 +35,7 @@ public enum DatabaseVersion {
     }
 
     public String getDriver() {
-        return I18nUtils.getMessage(driver.toString());
+        return $.t(driver.toString());
     }
 
 

@@ -16,8 +16,8 @@
 
 package neatlogic.framework.matrix.constvalue;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum SearchExpression {
     EQ("eq", "equal", new I18n("等于")),
@@ -43,7 +43,7 @@ public enum SearchExpression {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public String getExpression() {

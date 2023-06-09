@@ -4,16 +4,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 
 public enum OperationTypeEnum implements IEnum {
-    CREATE("create", $.t("增加")),
-    DELETE("delete", $.t("删除")),
-    UPDATE("update", $.t("更新")),
-    SEARCH("search", $.t("查询")),
-    OPERATE("operate", $.t("操作"));
+    CREATE("create", "增加"),
+    DELETE("delete", "删除"),
+    UPDATE("update", "更新"),
+    SEARCH("search", "查询"),
+    OPERATE("operate", "操作");
     private String name;
     private String text;
 
@@ -27,7 +26,7 @@ public enum OperationTypeEnum implements IEnum {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text);
+        return $.t(text);
     }
 
     public static String getText(String value) {

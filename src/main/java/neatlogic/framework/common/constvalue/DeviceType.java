@@ -16,11 +16,11 @@
 
 package neatlogic.framework.common.constvalue;
 
-import neatlogic.framework.common.config.Config;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public enum DeviceType implements IEnum {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
     }
 
     public static String getValue(String _status) {

@@ -16,8 +16,8 @@
 
 package neatlogic.framework.restful.enums;
 
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
-import neatlogic.framework.util.I18nUtils;
 
 public enum TreeMenuType {
     SYSTEM("system", new I18n("系统接口目录")),
@@ -37,7 +37,7 @@ public enum TreeMenuType {
     }
 
     public String getText() {
-        return I18nUtils.getMessage(text.toString());
+        return $.t(text.toString());
 
     }
 

@@ -59,13 +59,16 @@ public class InitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(InitializeIndexHandler.class);
 
+    /**
+     * 模块组集合
+     */
     private final static Set<String> moduleGroupSet = new LinkedHashSet<>();
 
-    private final static Map<String, Set<String>> moduleGroupToFunctionSetMap = new HashMap<>();
+    private final static Map<String, Set<String>> moduleGroupToMenuSetMap = new HashMap<>();
 
     private final static Map<String, Set<String>> moduleGroupToFilePathSetMap = new HashMap<>();
 
-    private final static Map<String, Set<String>> functionToFilePathSetMap = new HashMap<>();
+    private final static Map<String, Set<String>> menuToFilePathSetMap = new HashMap<>();
 
     private final static List<String> notConfiguredFilePathList = new ArrayList<>();
 
@@ -89,26 +92,26 @@ public class InitializeIndexHandler extends StartupBase {
             obj.put("name", moduleGroupVo.getGroupName());
             List<JSONObject> children = new ArrayList<>();
             obj.put("children", children);
-            Set<String> functionSet = moduleGroupToFunctionSetMap.get(moduleGroup);
-            if (CollectionUtils.isNotEmpty(functionSet)) {
-                for (String function : functionSet) {
-                    JSONObject functionObj = new JSONObject();
-                    functionObj.put("moduleGroup", moduleGroup);
-                    functionObj.put("type", "function");
-                    functionObj.put("id", function);
-                    List<JSONObject> functionChildren = new ArrayList<>();
-                    functionObj.put("children", functionChildren);
-                    children.add(functionObj);
-                    Set<String> filePathSet = functionToFilePathSetMap.get(function);
+            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
+            if (CollectionUtils.isNotEmpty(menuSet)) {
+                for (String menu : menuSet) {
+                    JSONObject menuObj = new JSONObject();
+                    menuObj.put("moduleGroup", moduleGroup);
+                    menuObj.put("type", "menu");
+                    menuObj.put("id", menu);
+                    List<JSONObject> menuChildren = new ArrayList<>();
+                    menuObj.put("children", menuChildren);
+                    children.add(menuObj);
+                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
                     if (CollectionUtils.isNotEmpty(filePathSet)) {
                         for (String filePath : filePathSet) {
                             JSONObject fileInfoObj = new JSONObject();
                             fileInfoObj.put("moduleGroup", moduleGroup);
-                            fileInfoObj.put("function", function);
+                            fileInfoObj.put("menu", menu);
                             fileInfoObj.put("type", "file");
                             fileInfoObj.put("id", filePath);
                             fileInfoObj.put("name", getFileNameByFilePath(filePath));
-                            functionChildren.add(fileInfoObj);
+                            menuChildren.add(fileInfoObj);
                         }
                     }
                 }
@@ -148,15 +151,15 @@ public class InitializeIndexHandler extends StartupBase {
             tableObj.put("moduleGroup", moduleGroup);
             tableObj.put("moduleGroupName", moduleGroupVo.getGroupName());
             List<JSONObject> tbodyList = new ArrayList<>();
-            Set<String> functionSet = moduleGroupToFunctionSetMap.get(moduleGroup);
-            if (CollectionUtils.isNotEmpty(functionSet)) {
-                for (String function : functionSet) {
-                    Set<String> filePathSet = functionToFilePathSetMap.get(function);
+            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
+            if (CollectionUtils.isNotEmpty(menuSet)) {
+                for (String menu : menuSet) {
+                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
                     if (CollectionUtils.isNotEmpty(filePathSet)) {
                         for (String filePath : filePathSet) {
                             JSONObject tbodyObj = new JSONObject();
                             tbodyObj.put("moduleGroup", moduleGroup);
-                            tbodyObj.put("function", function);
+                            tbodyObj.put("menu", menu);
                             tbodyObj.put("filePath", filePath);
                             tbodyObj.put("fileName", getFileNameByFilePath(filePath));
                             tbodyList.add(tbodyObj);
@@ -186,25 +189,25 @@ public class InitializeIndexHandler extends StartupBase {
         return resultList;
     }
 
-    public static JSONObject getDocumentOnlineList(String moduleGroup, String function, BasePageVo basePageVo) {
+    public static JSONObject getDocumentOnlineList(String moduleGroup, String menu, BasePageVo basePageVo) {
         List<JSONObject> tbodyList = new ArrayList<>();
         List<ModuleGroupVo> activeModuleGroupVoList = TenantContext.get().getActiveModuleGroupList();
         List<String> activeModuleGroupList = activeModuleGroupVoList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
         if (!activeModuleGroupList.contains(moduleGroup)) {
             return TableResultUtil.getResult(tbodyList, basePageVo);
         }
-        Set<String> functionSet = moduleGroupToFunctionSetMap.get(moduleGroup);
-        if (CollectionUtils.isNotEmpty(functionSet)) {
-            for (String func : functionSet) {
-                if (StringUtils.isNotBlank(function) && !Objects.equals(function, func)) {
+        Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
+        if (CollectionUtils.isNotEmpty(menuSet)) {
+            for (String func : menuSet) {
+                if (StringUtils.isNotBlank(menu) && !Objects.equals(menu, func)) {
                     continue;
                 }
-                Set<String> filePathSet = functionToFilePathSetMap.get(func);
+                Set<String> filePathSet = menuToFilePathSetMap.get(func);
                 if (CollectionUtils.isNotEmpty(filePathSet)) {
                     for (String filePath : filePathSet) {
                         JSONObject tbodyObj = new JSONObject();
                         tbodyObj.put("moduleGroup", moduleGroup);
-                        tbodyObj.put("function", func);
+                        tbodyObj.put("menu", func);
                         tbodyObj.put("filePath", filePath);
                         tbodyObj.put("fileName", getFileNameByFilePath(filePath));
                         tbodyList.add(tbodyObj);
@@ -285,7 +288,7 @@ public class InitializeIndexHandler extends StartupBase {
             Resource[] mdResources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
             for (Resource resource : mdResources) {
                 String moduleGroup = null;
-                String function = null;
+                String menu = null;
                 String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
                 String path = resource.getURL().getPath();
                 int classpathRootIndex = path.indexOf(classpathRoot);
@@ -299,10 +302,10 @@ public class InitializeIndexHandler extends StartupBase {
                     moduleGroup = mappingConfig.getString("moduleGroup");
                     if (StringUtils.isNotBlank(moduleGroup)) {
                         moduleGroupSet.add(moduleGroup);
-                        function = mappingConfig.getString("function");
-                        if (StringUtils.isNotBlank(function)) {
-                            functionToFilePathSetMap.computeIfAbsent(function, k -> new LinkedHashSet<>()).add(filePath);
-                            moduleGroupToFunctionSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(function);
+                        menu = mappingConfig.getString("menu");
+                        if (StringUtils.isNotBlank(menu)) {
+                            menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
+                            moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
                         } else {
                             moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
                         }
@@ -320,8 +323,8 @@ public class InitializeIndexHandler extends StartupBase {
                 if (StringUtils.isNotBlank(moduleGroup)) {
                     document.add(new StringField("moduleGroup", moduleGroup, Field.Store.YES));
                 }
-                if (StringUtils.isNotBlank(function)) {
-                    document.add(new StringField("function", function, Field.Store.YES));
+                if (StringUtils.isNotBlank(menu)) {
+                    document.add(new StringField("menu", menu, Field.Store.YES));
                 }
                 document.add(new TextField("fileName", filename, Field.Store.YES));
                 document.add(new StringField("filePath", filePath, Field.Store.YES));
@@ -336,15 +339,15 @@ public class InitializeIndexHandler extends StartupBase {
 //                String path = resource.getURL().getPath();
 //                int classpathRootIndex = path.indexOf(classpathRoot);
 //                int endIndex = path.lastIndexOf("/");
-//                String moduleNameAndFunctionName = path.substring(classpathRootIndex + classpathRoot.length(), endIndex);
-//                if (StringUtils.isBlank(moduleNameAndFunctionName)) {
+//                String moduleNameAndMenuName = path.substring(classpathRootIndex + classpathRoot.length(), endIndex);
+//                if (StringUtils.isBlank(moduleNameAndMenuName)) {
 //                    continue;
 //                }
-//                String[] split = moduleNameAndFunctionName.split("/");
+//                String[] split = moduleNameAndMenuName.split("/");
 //                String moduleGroup = split[0];
-//                String function = null;
+//                String menu = null;
 //                if (split.length >= 2) {
-//                    function = split[1];
+//                    menu = split[1];
 //                }
 //                String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
 //                StringWriter writer = new StringWriter();
@@ -354,9 +357,9 @@ public class InitializeIndexHandler extends StartupBase {
 //                // 创建域对象并且放入到文档集合中
 //                document.add(new StringField("moduleGroup", moduleGroup, Field.Store.YES));
 //                moduleGroupList.add(moduleGroup);
-//                if (StringUtils.isNotBlank(function)) {
-//                    document.add(new StringField("function", function, Field.Store.YES));
-//                    moduleGroupToFunctionSetMap.computeIfAbsent(moduleGroup, k -> new HashSet<>()).add(function);
+//                if (StringUtils.isNotBlank(menu)) {
+//                    document.add(new StringField("menu", menu, Field.Store.YES));
+//                    moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new HashSet<>()).add(menu);
 //                }
 //                document.add(new TextField("fileName", filename, Field.Store.YES));
 //                document.add(new TextField("content", str, Field.Store.YES));

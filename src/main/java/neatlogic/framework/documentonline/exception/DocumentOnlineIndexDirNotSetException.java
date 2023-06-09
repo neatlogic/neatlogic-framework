@@ -23,6 +23,6 @@ public class DocumentOnlineIndexDirNotSetException extends ApiRuntimeException {
     private static final long serialVersionUID = -928973151311839787L;
 
     public DocumentOnlineIndexDirNotSetException() {
-        super("在线帮助文档索引目录document.online.index.dir属性没有设置");
+        super("nfde.documentonlineindexdirnotsetexception.documentonlineindexdirnotsetexception");
     }
 }

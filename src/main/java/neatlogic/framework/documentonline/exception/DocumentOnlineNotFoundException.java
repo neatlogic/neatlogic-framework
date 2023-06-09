@@ -23,6 +23,6 @@ public class DocumentOnlineNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -928973151311839787L;
 
     public DocumentOnlineNotFoundException(String filePath) {
-        super("在线帮助文档：“" + filePath + "”不存在");
+        super("nfde.documentonlinenotfoundexception.documentonlinenotfoundexception", filePath);
     }
 }

@@ -18,13 +18,14 @@ package neatlogic.framework.apiparam.validator;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 public class BooleanApiParam extends ApiParamValidatorBase {
 
     @Override
     public String getName() {
-        return "布尔型";
+        return $.t("common.boolean");
     }
 
     @Override

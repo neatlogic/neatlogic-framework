@@ -18,20 +18,45 @@ package neatlogic.framework.apiparam.validator;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 public class DoubleApiParam extends ApiParamValidatorBase {
 
     @Override
     public String getName() {
-        return "双精度浮点数";
+        return $.t("common.double");
     }
 
     @Override
     public boolean validate(Object param, String rule) {
         if (param != null && StringUtils.isNotBlank(param.toString())) {
             try {
-                Double.valueOf(param.toString());
+                double i = Double.parseDouble(param.toString());
+                if (StringUtils.isNotBlank(rule)) {
+                    if (rule.contains(",")) {
+                        for (String r : rule.split(",")) {
+                            try {
+                                double ruleNumber = Double.parseDouble(r);
+                                if (i == ruleNumber) {
+                                    return true;
+                                }
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                    } else {
+                        try {
+                            double ruleNumber = Double.parseDouble(rule);
+                            if (i == ruleNumber) {
+                                return true;
+                            }
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                    return false;
+                }
                 return true;
             } catch (Exception ex) {
                 return false;

@@ -16,10 +16,11 @@
 
 package neatlogic.framework.apiparam.validator;
 
-import neatlogic.framework.common.constvalue.ApiParamType;
-import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ public class JSONArrayApiParam extends ApiParamValidatorBase {
 
     @Override
     public String getName() {
-        return "json数组";
+        return $.t("common.jsonarray");
     }
 
     @Override

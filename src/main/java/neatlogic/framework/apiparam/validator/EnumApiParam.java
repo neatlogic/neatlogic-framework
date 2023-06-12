@@ -16,16 +16,16 @@
 
 package neatlogic.framework.apiparam.validator;
 
-import org.apache.commons.lang3.StringUtils;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
+import neatlogic.framework.util.$;
+import org.apache.commons.lang3.StringUtils;
 
 public class EnumApiParam extends ApiParamValidatorBase {
 
     @Override
     public String getName() {
-        return "枚举";
+        return $.t("common.enum");
     }
 
     @Override

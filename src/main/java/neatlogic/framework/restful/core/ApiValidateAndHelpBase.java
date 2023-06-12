@@ -417,7 +417,7 @@ public class ApiValidateAndHelpBase {
                         rule = p.rule();
                     }
                     if (!ParamValidatorFactory.getAuthInstance(p.type()).validate(paramValue, rule)) {
-                        throw new ParamIrregularException(p.desc() + "（" + p.name() + "）");
+                        throw new ParamIrregularException($.t(p.desc()) + "（" + p.name() + "）");
                     }
                 }
             }

@@ -235,14 +235,35 @@
                 <foreach collection="filterList" item="filter" separator="AND">
                     <choose>
                         <when test="filter.expression == 'equal'">
-                            a.`${filter.uuid}` = #{filter.valueList[0]}
+                            <choose>
+                                <when test="filter.valueList.size() > 1">
+                                    a.`${filter.uuid}` IN
+                                    <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                        #{item}
+                                    </foreach>
+                                </when>
+                                <otherwise>
+                                    a.`${filter.uuid}` = #{filter.valueList[0]}
+                                </otherwise>
+                            </choose>
                         </when>
                         <when test="filter.expression == 'notequal'">
-                            a.`${filter.uuid}` != #{filter.valueList[0]}
+                            <choose>
+                                <when test="filter.valueList.size() > 1">
+                                    (a.`${filter.uuid}` NOT IN
+                                    <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                        #{item}
+                                    </foreach>
+                                    OR a.`${filter.uuid}` IS NULL)
+                                </when>
+                                <otherwise>
+                                    a.`${filter.uuid}` != #{filter.valueList[0]}
+                                </otherwise>
+                            </choose>
                         </when>
                         <when test="filter.expression == 'like'">
                             <choose>
-                                <when test="filter.type == 'select' or filter.type == 'user' or filter.type == 'team' or filter.type == 'role'">
+                                <when test="filter.type == 'select' or filter.type == 'user' or filter.type == 'team' or filter.type == 'role' or filter.valueList.size() > 1">
                                     a.`${filter.uuid}` IN
                                     <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                         #{item}
@@ -255,7 +276,7 @@
                         </when>
                         <when test="filter.expression == 'notlike'">
                             <choose>
-                                <when test="filter.type == 'select' or filter.type == 'user' or filter.type == 'team' or filter.type == 'role'">
+                                <when test="filter.type == 'select' or filter.type == 'user' or filter.type == 'team' or filter.type == 'role' or filter.valueList.size() > 1">
                                     (a.`${filter.uuid}` NOT IN
                                     <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                         #{item}
@@ -266,7 +287,6 @@
                                     (a.`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR a.`${filter.uuid}` IS NULL)
                                 </otherwise>
                             </choose>
-
                         </when>
                         <when test="filter.expression == 'is-null'">
                             a.`${filter.uuid}` IS NULL
@@ -278,7 +298,17 @@
                             a.`${filter.uuid}` BETWEEN #{filter.valueList[0]} AND #{filter.valueList[1]}
                         </when>
                         <otherwise>
-                            a.`${filter.uuid}` = #{filter.valueList[0]}
+                            <choose>
+                                <when test="filter.valueList.size() > 1">
+                                    a.`${filter.uuid}` IN
+                                    <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                        #{item}
+                                    </foreach>
+                                </when>
+                                <otherwise>
+                                    a.`${filter.uuid}` = #{filter.valueList[0]}
+                                </otherwise>
+                            </choose>
                         </otherwise>
                     </choose>
                 </foreach>

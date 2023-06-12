@@ -639,10 +639,10 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 for (MatrixFilterVo filterVo : filterList) {
                     MatrixAttributeVo matrixAttributeVo = matrixAttributeMap.get(filterVo.getUuid());
                     if (matrixAttributeVo != null) {
-                        filterVo.setType(matrixAttributeVo.getType());
                         if (Objects.equals(MatrixAttributeType.USER.getValue(), matrixAttributeVo.getType())
                                 || Objects.equals(MatrixAttributeType.TEAM.getValue(), matrixAttributeVo.getType())
                                 || Objects.equals(MatrixAttributeType.ROLE.getValue(), matrixAttributeVo.getType())) {
+                            filterVo.setType(matrixAttributeVo.getType());
                             if (CollectionUtils.isNotEmpty(filterVo.getValueList())) {
                                 List<String> valueList = new ArrayList<>();
                                 for (String value : filterVo.getValueList()) {
@@ -650,6 +650,10 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 }
                                 filterVo.setValueList(valueList);
                             }
+                        } else {
+//                            if (StringUtils.isBlank(filterVo.getType())) {
+                                filterVo.setType(matrixAttributeVo.getType());
+//                            }
                         }
                     }
                 }

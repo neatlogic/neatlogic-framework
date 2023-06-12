@@ -40,7 +40,6 @@ import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.Md5Util;
-import neatlogic.framework.util.RegexUtils;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import org.apache.commons.collections4.MapUtils;
@@ -473,37 +472,23 @@ public class ApiValidateAndHelpBase {
                         Input input = (Input) anno;
                         Param[] params = input.value();
                         for (Param p : params) {
-                            String help = p.help();
                             JSONObject paramObj = new JSONObject();
                             paramObj.put("name", p.name());
                             if (p.maxLength() > 0) {
                                 paramObj.put("maxLength", p.maxLength());
                             }
-                            String rule;
-                            if (Objects.equals(p.type().getValue(), ApiParamType.REGEX.getValue())) {
-                                paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
-                                rule = p.rule();
-                                if (StringUtils.isNotBlank(help)) {
-                                    help += "，";
-                                }
-                                help = help + "需满足正则表达式：" + RegexUtils.regexPatternMap.get(rule).toString();
-                            } else if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
-                                paramObj.put("type", ApiParamType.STRING.getValue() + "[" + ApiParamType.STRING.getText() + "]");
-                                rule = getEnumMember(p);
-                                if (StringUtils.isNotBlank(help)) {
-                                    help += "，";
-                                }
-                                help = help + "需满足枚举：" + rule;
-                            } else if (ApiParamType.NOAUTH.equals(p.type())) {
-                                paramObj.put("type", "object[任意对象]");
-                            } else {
-                                paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
+                            paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
+                            if (StringUtils.isNotBlank(p.rule())) {
+                                paramObj.put("rule", p.rule());
                             }
                             paramObj.put("isRequired", p.isRequired());
-                            paramObj.put("description", $.t(p.desc()));
-                            paramObj.put("help", $.t(help));
+                            if (StringUtils.isNotBlank(p.desc())) {
+                                paramObj.put("description", $.t(p.desc()));
+                            }
+                            if (StringUtils.isNotBlank(p.help())) {
+                                paramObj.put("help", $.t(p.help()));
+                            }
                             inputList.add(paramObj);
-                            // }
                         }
                     } else if (anno.annotationType().equals(Output.class)) {
                         Output output = (Output) anno;
@@ -520,8 +505,12 @@ public class ApiValidateAndHelpBase {
                                     JSONObject paramObj = new JSONObject();
                                     paramObj.put("name", p.name());
                                     paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
-                                    paramObj.put("description", $.t(p.desc()));
-                                    paramObj.put("help", $.t(p.help()));
+                                    if (StringUtils.isNotBlank(p.desc())) {
+                                        paramObj.put("description", p.desc());
+                                    }
+                                    if (StringUtils.isNotBlank(p.help())) {
+                                        paramObj.put("help", p.help());
+                                    }
                                     JSONArray elementObjList = new JSONArray();
                                     for (Field field : p.explode().getComponentType().getDeclaredFields()) {
                                         drawFieldMessageRecursive(field, elementObjList, true);

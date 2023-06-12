@@ -20,20 +20,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.List;
 import java.util.Objects;
 
 public enum DeviceType implements IEnum {
-    ALL("all", new I18n("所有")),
-    MOBILE("mobile", new I18n("手机端")),
-    PC("pc", new I18n("电脑端"));
+    ALL("all", "common.all"),
+    MOBILE("mobile", "common.mobile"),
+    PC("pc", "common.pc");
 
     private final String status;
-    private final I18n text;
+    private final String text;
 
-    DeviceType(String _status, I18n _text) {
+    DeviceType(String _status, String _text) {
         this.status = _status;
         this.text = _text;
     }
@@ -43,7 +42,7 @@ public enum DeviceType implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getValue(String _status) {

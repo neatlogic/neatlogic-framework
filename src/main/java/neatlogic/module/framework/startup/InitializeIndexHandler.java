@@ -19,10 +19,12 @@ package neatlogic.module.framework.startup;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.util.PageUtil;
+import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineIndexDirNotSetException;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.startup.StartupBase;
@@ -84,69 +86,79 @@ public class InitializeIndexHandler extends StartupBase {
      */
     private final static List<JSONObject> mappingConfigList = new ArrayList();
 
+    private final static DocumentOnlineDirectoryVo root = new DocumentOnlineDirectoryVo("root", false);
     /**
      * 生成在线文档树结构目录
      * @return
      */
-    public static JSONArray getDocumentOnlineDirectory() {
-        JSONArray resultList = new JSONArray();
-        List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
-        for (ModuleGroupVo moduleGroupVo : moduleGroupList) {
-            String moduleGroup = moduleGroupVo.getGroup();
-            if (!moduleGroupSet.contains(moduleGroup)) {
-                continue;
+    public static List<DocumentOnlineDirectoryVo> getDocumentOnlineDirectory() {
+
+        Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
+//        System.out.println("locale.getLanguage()=" + locale.getLanguage());
+        for (DocumentOnlineDirectoryVo child : root.getChildren()) {
+            if (Objects.equals(child.getName(), locale.getLanguage())) {
+                return child.getChildren();
             }
-            JSONObject obj = new JSONObject();
-            obj.put("type", "moduleGroup");
-            obj.put("id", moduleGroup);
-            obj.put("name", moduleGroupVo.getGroupName());
-            List<JSONObject> children = new ArrayList<>();
-            obj.put("children", children);
-            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
-            if (CollectionUtils.isNotEmpty(menuSet)) {
-                for (String menu : menuSet) {
-                    JSONObject menuObj = new JSONObject();
-                    menuObj.put("moduleGroup", moduleGroup);
-                    menuObj.put("type", "menu");
-                    menuObj.put("id", menu);
-                    List<JSONObject> menuChildren = new ArrayList<>();
-                    menuObj.put("children", menuChildren);
-                    children.add(menuObj);
-                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
-                    if (CollectionUtils.isNotEmpty(filePathSet)) {
-                        for (String filePath : filePathSet) {
-                            JSONObject fileInfoObj = new JSONObject();
-                            fileInfoObj.put("moduleGroup", moduleGroup);
-                            fileInfoObj.put("menu", menu);
-                            fileInfoObj.put("type", "file");
-                            fileInfoObj.put("id", filePath);
-                            fileInfoObj.put("name", getFileNameByFilePath(filePath));
-                            menuChildren.add(fileInfoObj);
-                        }
-                    }
-                }
-            }
-            Set<String> filePathSet = moduleGroupToFilePathSetMap.get(moduleGroup);
-            if (CollectionUtils.isNotEmpty(filePathSet)) {
-                for (String filePath : filePathSet) {
-                    JSONObject fileInfoObj = new JSONObject();
-                    fileInfoObj.put("moduleGroup", moduleGroup);
-                    fileInfoObj.put("type", "file");
-                    fileInfoObj.put("id", filePath);
-                    fileInfoObj.put("name", getFileNameByFilePath(filePath));
-                    children.add(fileInfoObj);
-                }
-            }
-            resultList.add(obj);
         }
-        for (String filePath : notConfiguredFilePathList) {
-            JSONObject fileInfoObj = new JSONObject();
-            fileInfoObj.put("type", "file");
-            fileInfoObj.put("id", filePath);
-            fileInfoObj.put("name", getFileNameByFilePath(filePath));
-            resultList.add(fileInfoObj);
-        }
-        return resultList;
+        return new ArrayList<>();
+//        JSONArray resultList = new JSONArray();
+//        List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
+//        for (ModuleGroupVo moduleGroupVo : moduleGroupList) {
+//            String moduleGroup = moduleGroupVo.getGroup();
+//            if (!moduleGroupSet.contains(moduleGroup)) {
+//                continue;
+//            }
+//            JSONObject obj = new JSONObject();
+//            obj.put("type", "moduleGroup");
+//            obj.put("id", moduleGroup);
+//            obj.put("name", moduleGroupVo.getGroupName());
+//            List<JSONObject> children = new ArrayList<>();
+//            obj.put("children", children);
+//            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
+//            if (CollectionUtils.isNotEmpty(menuSet)) {
+//                for (String menu : menuSet) {
+//                    JSONObject menuObj = new JSONObject();
+//                    menuObj.put("moduleGroup", moduleGroup);
+//                    menuObj.put("type", "menu");
+//                    menuObj.put("id", menu);
+//                    List<JSONObject> menuChildren = new ArrayList<>();
+//                    menuObj.put("children", menuChildren);
+//                    children.add(menuObj);
+//                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
+//                    if (CollectionUtils.isNotEmpty(filePathSet)) {
+//                        for (String filePath : filePathSet) {
+//                            JSONObject fileInfoObj = new JSONObject();
+//                            fileInfoObj.put("moduleGroup", moduleGroup);
+//                            fileInfoObj.put("menu", menu);
+//                            fileInfoObj.put("type", "file");
+//                            fileInfoObj.put("id", filePath);
+//                            fileInfoObj.put("name", getFileNameByFilePath(filePath));
+//                            menuChildren.add(fileInfoObj);
+//                        }
+//                    }
+//                }
+//            }
+//            Set<String> filePathSet = moduleGroupToFilePathSetMap.get(moduleGroup);
+//            if (CollectionUtils.isNotEmpty(filePathSet)) {
+//                for (String filePath : filePathSet) {
+//                    JSONObject fileInfoObj = new JSONObject();
+//                    fileInfoObj.put("moduleGroup", moduleGroup);
+//                    fileInfoObj.put("type", "file");
+//                    fileInfoObj.put("id", filePath);
+//                    fileInfoObj.put("name", getFileNameByFilePath(filePath));
+//                    children.add(fileInfoObj);
+//                }
+//            }
+//            resultList.add(obj);
+//        }
+//        for (String filePath : notConfiguredFilePathList) {
+//            JSONObject fileInfoObj = new JSONObject();
+//            fileInfoObj.put("type", "file");
+//            fileInfoObj.put("id", filePath);
+//            fileInfoObj.put("name", getFileNameByFilePath(filePath));
+//            resultList.add(fileInfoObj);
+//        }
+//        return resultList;
     }
 
     /**
@@ -156,6 +168,26 @@ public class InitializeIndexHandler extends StartupBase {
      */
     public static JSONArray getDocumentOnlineTableList(BasePageVo basePageVo) {
         JSONArray resultList = new JSONArray();
+        Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
+        for (DocumentOnlineDirectoryVo localeLevel : root.getChildren()) {
+            if (!Objects.equals(localeLevel.getName(), locale.getLanguage())) {
+                continue;
+            }
+            for (DocumentOnlineDirectoryVo firstLevelDirectory : localeLevel.getChildren()) {
+                JSONObject tableObj = new JSONObject();
+                tableObj.put("firstLevelDirectory", firstLevelDirectory.getName());
+                List<JSONObject> tbodyList = new ArrayList<>();
+                basePageVo.setRowNum(tbodyList.size());
+                tableObj.put("currentPage", basePageVo.getCurrentPage());
+                tableObj.put("pageSize", basePageVo.getPageSize());
+                tableObj.put("pageCount", basePageVo.getPageCount());
+                tableObj.put("rowNum", basePageVo.getRowNum());
+                tbodyList = PageUtil.subList(tbodyList, basePageVo);
+                tableObj.put("tbodyList", tbodyList);
+                resultList.add(tableObj);
+
+            }
+        }
         List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
         for (ModuleGroupVo moduleGroupVo : moduleGroupList) {
             String moduleGroup = moduleGroupVo.getGroup();
@@ -323,6 +355,7 @@ public class InitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
+                buildDirectory(root, path.substring(classpathRootIndex + classpathRoot.length()));
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单
                 JSONObject mappingConfig = getMappingConfigByFilePath(filePath);
                 if (MapUtils.isNotEmpty(mappingConfig)) {
@@ -406,4 +439,45 @@ public class InitializeIndexHandler extends StartupBase {
         return filePath.substring(index + 1, filePath.length() - 3);
     }
 
+    /**
+     * 构建在线帮助文档目录
+     * @param root
+     * @param filePath
+     */
+    private void buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
+//        System.out.println(filePath);
+        List<String> nameList = new ArrayList<>();
+        DocumentOnlineDirectoryVo parent = root;
+        String[] split = filePath.split("/");
+        for (String name : split) {
+            boolean isFile = false;
+            if (name.endsWith(".md")) {
+                isFile = true;
+                name = name.substring(0, name.length() - 3);
+            }
+            nameList.add(name);
+            if (isFile) {
+                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true);
+                List<String> upwardNameList = new LinkedList<>(nameList);
+                upwardNameList.remove(0);
+                child.setUpwardNameList(upwardNameList);
+                return;
+            }
+            DocumentOnlineDirectoryVo child = null;
+            List<DocumentOnlineDirectoryVo> children = parent.getChildren();
+            for (DocumentOnlineDirectoryVo childVo : children) {
+                if (Objects.equals(childVo.getName(), name)) {
+                    child = childVo;
+                }
+            }
+            if (child == null) {
+                child = new DocumentOnlineDirectoryVo(name, false);
+                List<String> upwardNameList = new LinkedList<>(nameList);
+                upwardNameList.remove(0);
+                child.setUpwardNameList(upwardNameList);
+                parent.addChild(child);
+            }
+            parent = child;
+        }
+    }
 }

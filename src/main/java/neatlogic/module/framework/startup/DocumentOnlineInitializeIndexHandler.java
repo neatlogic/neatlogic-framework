@@ -64,23 +64,23 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     /**
      * 在线帮助文档所属模块组集合
      */
-    private static Set<String> moduleGroupSet = new LinkedHashSet<>();
+//    private static Set<String> moduleGroupSet = new LinkedHashSet<>();
     /**
      * 用于存储模块组与菜单映射关系，一个模块组可以有多个菜单
      */
-    private static Map<String, Set<String>> moduleGroupToMenuSetMap = new HashMap<>();
+//    private static Map<String, Set<String>> moduleGroupToMenuSetMap = new HashMap<>();
     /**
      * 用于存储模块组与在线文档路径映射关系，一个模块组可以有多个在线文档
      */
-    private static Map<String, Set<String>> moduleGroupToFilePathSetMap = new HashMap<>();
+//    private static Map<String, Set<String>> moduleGroupToFilePathSetMap = new HashMap<>();
     /**
      * 用于存储菜单与在线文档路径映射关系，一个菜单可以有多个在线文档
      */
-    private static Map<String, Set<String>> menuToFilePathSetMap = new HashMap<>();
+//    private static Map<String, Set<String>> menuToFilePathSetMap = new HashMap<>();
     /**
      * 在documentonline-mapping.json配置文件中没有设置的在线文档文件路径集合，它们不属于任何模块、任何菜单
      */
-    private static List<String> notConfiguredFilePathList = new ArrayList<>();
+//    private static List<String> notConfiguredFilePathList = new ArrayList<>();
     /**
      * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
      */
@@ -333,21 +333,21 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                         String moduleGroup = mappingConfig.getString("moduleGroup");
                         if (StringUtils.isNotBlank(moduleGroup)) {
                             moduleGroupList.add(moduleGroup);
-                            moduleGroupSet.add(moduleGroup);
+//                            moduleGroupSet.add(moduleGroup);
                             String menu = mappingConfig.getString("menu");
                             if (StringUtils.isNotBlank(menu)) {
                                 menuList.add(menu);
-                                menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
-                                moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
+//                                menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
+//                                moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
                             } else {
-                                moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
+//                                moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
                             }
                         } else {
-                            notConfiguredFilePathList.add(filePath);
+//                            notConfiguredFilePathList.add(filePath);
                         }
                     }
                 } else {
-                    notConfiguredFilePathList.add(filePath);
+//                    notConfiguredFilePathList.add(filePath);
                 }
                 // 读取文件内容
                 StringWriter writer = new StringWriter();

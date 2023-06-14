@@ -26,6 +26,7 @@ import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineIndexDirNotSetException;
 import neatlogic.framework.startup.StartupBase;
 import neatlogic.framework.util.TableResultUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -286,10 +287,10 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                             logger.warn(path + "文件中第" + i + "个元素中的filePath字段没有设置值" + filePath);
                             continue;
                         }
-                        if (configuredFilePathList.contains(filePath)) {
-                            logger.warn(path + "文件中第" + i + "个元素中的filePath字段值为”" + filePath + "“，已在其他文件中配置，该配置将不生效");
-                            continue;
-                        }
+//                        if (configuredFilePathList.contains(filePath)) {
+//                            logger.warn(path + "文件中第" + i + "个元素中的filePath字段值为”" + filePath + "“，已在其他文件中配置，该配置将不生效");
+//                            continue;
+//                        }
                         mappingObj.put("source", path);
                         mappingConfigList.add(mappingObj);
                         configuredFilePathList.add(filePath);
@@ -314,8 +315,8 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             // 1.采集数据
             Resource[] mdResources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
             for (Resource resource : mdResources) {
-                String moduleGroup = null;
-                String menu = null;
+                List<String> moduleGroupList = new ArrayList<>();
+                List<String> menuList = new ArrayList<>();
                 String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
                 String path = resource.getURL().getPath();
                 int classpathRootIndex = path.indexOf(classpathRoot);
@@ -324,22 +325,26 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
-                buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath);
+                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath);
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单
-                JSONObject mappingConfig = getMappingConfigByFilePath(filePath);
-                if (MapUtils.isNotEmpty(mappingConfig)) {
-                    moduleGroup = mappingConfig.getString("moduleGroup");
-                    if (StringUtils.isNotBlank(moduleGroup)) {
-                        moduleGroupSet.add(moduleGroup);
-                        menu = mappingConfig.getString("menu");
-                        if (StringUtils.isNotBlank(menu)) {
-                            menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
-                            moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
+                List<JSONObject> mappingConfigs = getMappingConfigByFilePath(filePath);
+                if (CollectionUtils.isNotEmpty(mappingConfigs)) {
+                    for (JSONObject mappingConfig : mappingConfigs) {
+                        String moduleGroup = mappingConfig.getString("moduleGroup");
+                        if (StringUtils.isNotBlank(moduleGroup)) {
+                            moduleGroupList.add(moduleGroup);
+                            moduleGroupSet.add(moduleGroup);
+                            String menu = mappingConfig.getString("menu");
+                            if (StringUtils.isNotBlank(menu)) {
+                                menuList.add(menu);
+                                menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
+                                moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
+                            } else {
+                                moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
+                            }
                         } else {
-                            moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
+                            notConfiguredFilePathList.add(filePath);
                         }
-                    } else {
-                        notConfiguredFilePathList.add(filePath);
                     }
                 } else {
                     notConfiguredFilePathList.add(filePath);
@@ -351,16 +356,18 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
                 Document document = new Document();
                 // 创建域对象并且放入到文档中
-                if (StringUtils.isNotBlank(moduleGroup)) {
+                if (CollectionUtils.isNotEmpty(moduleGroupList)) {
                     // 模块组字段不分词
-                    document.add(new StringField("moduleGroup", moduleGroup, Field.Store.YES));
+                    document.add(new TextField("moduleGroup", StringUtils.join(" ", moduleGroupList), Field.Store.YES));
                 }
-                if (StringUtils.isNotBlank(menu)) {
+                if (CollectionUtils.isNotEmpty(menuList)) {
                     // 菜单字段不分词
-                    document.add(new StringField("menu", menu, Field.Store.YES));
+                    document.add(new TextField("menu", StringUtils.join(" ", menuList), Field.Store.YES));
                 }
                 // 文件路径字段不分词
                 document.add(new StringField("filePath", filePath, Field.Store.YES));
+                // 上层名称列表字段不分词
+                document.add(new StringField("upwardNameList", JSONArray.toJSONString(directory.getUpwardNameList()), Field.Store.YES));
                 // 文件名称字段分词
                 document.add(new TextField("fileName", filename, Field.Store.YES));
                 // 文件内容字段分词
@@ -389,13 +396,14 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param filePath 文件路径
      * @return 映射信息
      */
-    private JSONObject getMappingConfigByFilePath(String filePath) {
+    private List<JSONObject> getMappingConfigByFilePath(String filePath) {
+        List<JSONObject> resultList = new ArrayList<>();
         for (JSONObject mappingConfig : mappingConfigList) {
-            if (Objects.equals(filePath, mappingConfig.getString("filePath"))) {
-                return mappingConfig;
+            if (filePath.startsWith(mappingConfig.getString("filePath"))) {
+                resultList.add(mappingConfig);
             }
         }
-        return null;
+        return resultList;
     }
 
     /**
@@ -413,7 +421,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param root
      * @param filePath
      */
-    private void buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
+    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
         String path = filePath.substring(classpathRoot.length());
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
@@ -432,7 +440,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 child.setUpwardNameList(upwardNameList);
                 child.setFilePath(filePath);
                 parent.addChild(child);
-                return;
+                return child;
             }
             DocumentOnlineDirectoryVo child = null;
             List<DocumentOnlineDirectoryVo> children = parent.getChildren();
@@ -450,5 +458,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             }
             parent = child;
         }
+        return null;
     }
 }

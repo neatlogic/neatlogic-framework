@@ -19,11 +19,15 @@ package neatlogic.framework.documentonline.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
+import java.util.List;
+
 public class DocumentOnlineVo {
     @EntityField(name = "文件名", type = ApiParamType.STRING)
     private String fileName;
     @EntityField(name = "文件路径", type = ApiParamType.STRING)
     private String filePath;
+    @EntityField(name = "文件上层名称列表", type = ApiParamType.JSONARRAY)
+    private List<String> upwardNameList;
     @EntityField(name = "内容", type = ApiParamType.STRING)
     private String content;
 
@@ -41,6 +45,14 @@ public class DocumentOnlineVo {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public List<String> getUpwardNameList() {
+        return upwardNameList;
+    }
+
+    public void setUpwardNameList(List<String> upwardNameList) {
+        this.upwardNameList = upwardNameList;
     }
 
     public String getContent() {

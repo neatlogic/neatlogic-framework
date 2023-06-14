@@ -19,17 +19,13 @@ package neatlogic.module.framework.startup;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.util.PageUtil;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineIndexDirNotSetException;
-import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.startup.StartupBase;
 import neatlogic.framework.util.TableResultUtil;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -415,7 +411,7 @@ public class InitializeIndexHandler extends StartupBase {
     /**
      * 构建在线帮助文档目录
      * @param root
-     * @param path
+     * @param filePath
      */
     private void buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
         String path = filePath.substring(classpathRoot.length());

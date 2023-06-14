@@ -19,21 +19,20 @@ package neatlogic.framework.common.constvalue;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.List;
 
 
 public enum AuthType implements IEnum {
-    USER("user", new I18n("用户")),
-    TEAM("team", new I18n("组")),
-    ROLE("role", new I18n("角色")),
-    COMMON("common", new I18n("内置"));
+    USER("user", "common.user"),
+    TEAM("team", "common.team"),
+    ROLE("role", "common.role"),
+    COMMON("common", "common.embed");
 
     private final String value;
-    private final I18n text;
+    private final String text;
 
-    AuthType(String value, I18n text) {
+    AuthType(String value, String text) {
         this.value = value;
         this.text = text;
     }
@@ -47,7 +46,7 @@ public enum AuthType implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getValue(String _value) {

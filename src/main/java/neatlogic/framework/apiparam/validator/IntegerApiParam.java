@@ -31,7 +31,31 @@ public class IntegerApiParam extends ApiParamValidatorBase {
     public boolean validate(Object param, String rule) {
         if (param != null && StringUtils.isNotBlank(param.toString())) {
             try {
-                Integer.valueOf(param.toString());
+                int i = Integer.parseInt(param.toString());
+                if (StringUtils.isNotBlank(rule)) {
+                    if (rule.contains(",")) {
+                        for (String r : rule.split(",")) {
+                            try {
+                                int ruleNumber = Integer.parseInt(r);
+                                if (i == ruleNumber) {
+                                    return true;
+                                }
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                    } else {
+                        try {
+                            int ruleNumber = Integer.parseInt(rule);
+                            if (i == ruleNumber) {
+                                return true;
+                            }
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                    return false;
+                }
                 return true;
             } catch (Exception ex) {
                 return false;

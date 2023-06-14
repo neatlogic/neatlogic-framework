@@ -1,7 +1,22 @@
+/*
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 /**
  * @Description: Cache-control头类型
@@ -17,16 +32,16 @@ import neatlogic.framework.util.I18n;
  * @Returns: * @return: null
  **/
 public enum CacheControlType {
-    NOSTORE("no-store", new I18n("没有缓存")),
-    NOCACHE("no-cache", new I18n("缓存但重新验证")),
-    PRIVATE("private", new I18n("私有缓存")),
-    PUBLIC("public", new I18n("公共缓存")),
-    MAXAGE("max-age", new I18n("过期")),
-    MUSTREVALIDATE("must-revalidate", new I18n("验证方式"));
+    NOSTORE("no-store", "common.nocache"),
+    NOCACHE("no-cache", "common.cacheandvalid"),
+    PRIVATE("private", "common.privatecache"),
+    PUBLIC("public", "common.publiccache"),
+    MAXAGE("max-age", "common.expired"),
+    MUSTREVALIDATE("must-revalidate", "common.validtype");
     private final String value;
-    private final I18n text;
+    private final String text;
 
-    private CacheControlType(String value, I18n text) {
+    private CacheControlType(String value, String text) {
         this.value = value;
         this.text = text;
     }
@@ -36,7 +51,7 @@ public enum CacheControlType {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getText(String value) {

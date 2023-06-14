@@ -20,21 +20,21 @@ import neatlogic.framework.util.$;
 
 public enum ApiParamType {
     INTEGER("int", "common.int"),
-    ENUM("enum", "枚举型"),
-    BOOLEAN("boolean", "布尔型"),
-    STRING("string", "字符型"),
-    LONG("long", "长整型"),
-    JSONOBJECT("jsonObject", "json对象"),
-    JSONARRAY("jsonArray", "json数组"),
+    ENUM("enum", "common.enum"),
+    BOOLEAN("boolean", "common.boolean"),
+    STRING("string", "common.string"),
+    LONG("long", "common.long"),
+    JSONOBJECT("jsonObject", "common.jsonobject"),
+    JSONARRAY("jsonArray", "common.jsonarray"),
     IP("ip", "ip"),
-    EMAIL("email", "邮箱"),
-    REGEX("regex", "正则表达式"),
-    DOUBLE("double", "双精度浮点数"),
-    NOAUTH("noAuth", "任意对象，无需校验"),
-    FILE("file", "附件");
+    EMAIL("email", "common.email"),
+    REGEX("regex", "common.regex"),
+    DOUBLE("double", "common.double"),
+    NOAUTH("noAuth", "common.object"),
+    FILE("file", "common.attachment");
 
-    private String name;
-    private String text;
+    private final String name;
+    private final String text;
 
     private ApiParamType(String _name, String _text) {
         this.name = _name;

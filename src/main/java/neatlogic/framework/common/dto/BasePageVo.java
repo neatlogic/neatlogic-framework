@@ -73,6 +73,7 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private Integer expectOffsetRowNum;
 
+
     public BasePageVo() {
     }
 

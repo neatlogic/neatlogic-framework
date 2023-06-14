@@ -1,33 +1,51 @@
+/*
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 /**
- *
-* @Author:linbq
-* @Time:2020年8月18日
-* @ClassName: ActionType
-* @Description: 操作类型枚举类
+ * @Author:linbq
+ * @Time:2020年8月18日
+ * @ClassName: ActionType
+ * @Description: 操作类型枚举类
  */
 public enum ActionType {
-    CREATE("create", new I18n("创建")),
-    UPDATE("update", new I18n("修改"));
+    CREATE("create", "common.create"),
+    UPDATE("update", "common.edit");
     private final String value;
-    private final I18n text;
-    private ActionType(String value, I18n text) {
+    private final String text;
+
+    private ActionType(String value, String text) {
         this.value = value;
         this.text = text;
     }
+
     public String getValue() {
         return value;
     }
+
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
+
     public static String getText(String value) {
-        for(ActionType type : values()) {
-            if(type.getValue().equals(value)) {
+        for (ActionType type : values()) {
+            if (type.getValue().equals(value)) {
                 return type.getText();
             }
         }

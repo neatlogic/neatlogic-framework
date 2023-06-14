@@ -417,12 +417,11 @@ public class InitializeIndexHandler extends StartupBase {
      * @param root
      * @param path
      */
-    private void buildDirectory(DocumentOnlineDirectoryVo root, String path) {
-        System.out.println(path);
-        String filePath = path.substring(classpathRoot.length());
+    private void buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
+        String path = filePath.substring(classpathRoot.length());
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
-        String[] split = filePath.split("/");
+        String[] split = path.split("/");
         for (String name : split) {
             boolean isFile = false;
             if (name.endsWith(".md")) {
@@ -435,7 +434,7 @@ public class InitializeIndexHandler extends StartupBase {
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
                 child.setUpwardNameList(upwardNameList);
-                child.setPath(path);
+                child.setFilePath(filePath);
                 parent.addChild(child);
                 return;
             }

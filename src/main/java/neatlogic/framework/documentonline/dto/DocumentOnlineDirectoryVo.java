@@ -23,7 +23,7 @@ public class DocumentOnlineDirectoryVo {
 
     private final String name;
     private final boolean isFile;
-    private String path;
+    private String filePath;
     private List<String> upwardNameList = new ArrayList<>();
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
 
@@ -48,12 +48,12 @@ public class DocumentOnlineDirectoryVo {
         this.upwardNameList = upwardNameList;
     }
 
-    public String getPath() {
-        return path;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public List<DocumentOnlineDirectoryVo> getChildren() {

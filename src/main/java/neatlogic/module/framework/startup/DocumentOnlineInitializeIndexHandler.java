@@ -52,9 +52,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Component
-public class InitializeIndexHandler extends StartupBase {
+public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
-    private final Logger logger = LoggerFactory.getLogger(InitializeIndexHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
 
     /**
      * 在线帮助文档根目录

@@ -38,7 +38,6 @@ import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
@@ -284,7 +283,7 @@ public class ApiValidateAndHelpBase {
                             break;
                         }
                     }
-                    authNameList.add(new I18n(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName()).toString());
+                    authNameList.add($.t(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName()));
                 }
             } else {
                 isAuth = true;

@@ -20,14 +20,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.common.util.PageUtil;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineIndexDirNotSetException;
 import neatlogic.framework.startup.StartupBase;
-import neatlogic.framework.util.TableResultUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -62,197 +58,11 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      */
     private static String classpathRoot = "documentonline/";
     /**
-     * 在线帮助文档所属模块组集合
-     */
-//    private static Set<String> moduleGroupSet = new LinkedHashSet<>();
-    /**
-     * 用于存储模块组与菜单映射关系，一个模块组可以有多个菜单
-     */
-//    private static Map<String, Set<String>> moduleGroupToMenuSetMap = new HashMap<>();
-    /**
-     * 用于存储模块组与在线文档路径映射关系，一个模块组可以有多个在线文档
-     */
-//    private static Map<String, Set<String>> moduleGroupToFilePathSetMap = new HashMap<>();
-    /**
-     * 用于存储菜单与在线文档路径映射关系，一个菜单可以有多个在线文档
-     */
-//    private static Map<String, Set<String>> menuToFilePathSetMap = new HashMap<>();
-    /**
-     * 在documentonline-mapping.json配置文件中没有设置的在线文档文件路径集合，它们不属于任何模块、任何菜单
-     */
-//    private static List<String> notConfiguredFilePathList = new ArrayList<>();
-    /**
      * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
      */
     private static List<JSONObject> mappingConfigList = new ArrayList();
 
     public final static DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
-    /**
-     * 生成在线文档树结构目录
-     * @return
-     */
-    public static List<DocumentOnlineDirectoryVo> getDocumentOnlineDirectory() {
-        return null;
-//        JSONArray resultList = new JSONArray();
-//        List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
-//        for (ModuleGroupVo moduleGroupVo : moduleGroupList) {
-//            String moduleGroup = moduleGroupVo.getGroup();
-//            if (!moduleGroupSet.contains(moduleGroup)) {
-//                continue;
-//            }
-//            JSONObject obj = new JSONObject();
-//            obj.put("type", "moduleGroup");
-//            obj.put("id", moduleGroup);
-//            obj.put("name", moduleGroupVo.getGroupName());
-//            List<JSONObject> children = new ArrayList<>();
-//            obj.put("children", children);
-//            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
-//            if (CollectionUtils.isNotEmpty(menuSet)) {
-//                for (String menu : menuSet) {
-//                    JSONObject menuObj = new JSONObject();
-//                    menuObj.put("moduleGroup", moduleGroup);
-//                    menuObj.put("type", "menu");
-//                    menuObj.put("id", menu);
-//                    List<JSONObject> menuChildren = new ArrayList<>();
-//                    menuObj.put("children", menuChildren);
-//                    children.add(menuObj);
-//                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
-//                    if (CollectionUtils.isNotEmpty(filePathSet)) {
-//                        for (String filePath : filePathSet) {
-//                            JSONObject fileInfoObj = new JSONObject();
-//                            fileInfoObj.put("moduleGroup", moduleGroup);
-//                            fileInfoObj.put("menu", menu);
-//                            fileInfoObj.put("type", "file");
-//                            fileInfoObj.put("id", filePath);
-//                            fileInfoObj.put("name", getFileNameByFilePath(filePath));
-//                            menuChildren.add(fileInfoObj);
-//                        }
-//                    }
-//                }
-//            }
-//            Set<String> filePathSet = moduleGroupToFilePathSetMap.get(moduleGroup);
-//            if (CollectionUtils.isNotEmpty(filePathSet)) {
-//                for (String filePath : filePathSet) {
-//                    JSONObject fileInfoObj = new JSONObject();
-//                    fileInfoObj.put("moduleGroup", moduleGroup);
-//                    fileInfoObj.put("type", "file");
-//                    fileInfoObj.put("id", filePath);
-//                    fileInfoObj.put("name", getFileNameByFilePath(filePath));
-//                    children.add(fileInfoObj);
-//                }
-//            }
-//            resultList.add(obj);
-//        }
-//        for (String filePath : notConfiguredFilePathList) {
-//            JSONObject fileInfoObj = new JSONObject();
-//            fileInfoObj.put("type", "file");
-//            fileInfoObj.put("id", filePath);
-//            fileInfoObj.put("name", getFileNameByFilePath(filePath));
-//            resultList.add(fileInfoObj);
-//        }
-//        return resultList;
-    }
-
-    /**
-     * 返回在线文档首页数据，包含各个模块的在线文档列表，支持分页
-     * @param basePageVo
-     * @return
-     */
-    public static JSONArray getDocumentOnlineTableList(BasePageVo basePageVo) {
-        JSONArray resultList = new JSONArray();
-//        List<ModuleGroupVo> moduleGroupList = TenantContext.get().getActiveModuleGroupList();
-//        for (ModuleGroupVo moduleGroupVo : moduleGroupList) {
-//            String moduleGroup = moduleGroupVo.getGroup();
-//            if (!moduleGroupSet.contains(moduleGroup)) {
-//                continue;
-//            }
-//            JSONObject tableObj = new JSONObject();
-//            tableObj.put("moduleGroup", moduleGroup);
-//            tableObj.put("moduleGroupName", moduleGroupVo.getGroupName());
-//            List<JSONObject> tbodyList = new ArrayList<>();
-//            Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
-//            if (CollectionUtils.isNotEmpty(menuSet)) {
-//                for (String menu : menuSet) {
-//                    Set<String> filePathSet = menuToFilePathSetMap.get(menu);
-//                    if (CollectionUtils.isNotEmpty(filePathSet)) {
-//                        for (String filePath : filePathSet) {
-//                            JSONObject tbodyObj = new JSONObject();
-//                            tbodyObj.put("moduleGroup", moduleGroup);
-//                            tbodyObj.put("menu", menu);
-//                            tbodyObj.put("filePath", filePath);
-//                            tbodyObj.put("fileName", getFileNameByFilePath(filePath));
-//                            tbodyList.add(tbodyObj);
-//                        }
-//                    }
-//                }
-//            }
-//            Set<String> filePathSet = moduleGroupToFilePathSetMap.get(moduleGroup);
-//            if (CollectionUtils.isNotEmpty(filePathSet)) {
-//                for (String filePath : filePathSet) {
-//                    JSONObject tbodyObj = new JSONObject();
-//                    tbodyObj.put("moduleGroup", moduleGroup);
-//                    tbodyObj.put("filePath", filePath);
-//                    tbodyObj.put("fileName", getFileNameByFilePath(filePath));
-//                    tbodyList.add(tbodyObj);
-//                }
-//            }
-//            basePageVo.setRowNum(tbodyList.size());
-//            tableObj.put("currentPage", basePageVo.getCurrentPage());
-//            tableObj.put("pageSize", basePageVo.getPageSize());
-//            tableObj.put("pageCount", basePageVo.getPageCount());
-//            tableObj.put("rowNum", basePageVo.getRowNum());
-//            tbodyList = PageUtil.subList(tbodyList, basePageVo);
-//            tableObj.put("tbodyList", tbodyList);
-//            resultList.add(tableObj);
-//        }
-        return resultList;
-    }
-
-    /**
-     * 根据模块组、菜单返回在线文档列表，支持分页
-     * @param upwardNameList
-     * @param basePageVo
-     * @return
-     */
-    public static JSONObject getDocumentOnlineList(List<String> upwardNameList, BasePageVo basePageVo) {
-        List<JSONObject> tbodyList = new ArrayList<>();
-//        List<ModuleGroupVo> activeModuleGroupVoList = TenantContext.get().getActiveModuleGroupList();
-//        List<String> activeModuleGroupList = activeModuleGroupVoList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
-//        if (!activeModuleGroupList.contains(moduleGroup)) {
-//            return TableResultUtil.getResult(tbodyList, basePageVo);
-//        }
-//        Set<String> menuSet = moduleGroupToMenuSetMap.get(moduleGroup);
-//        if (CollectionUtils.isNotEmpty(menuSet)) {
-//            for (String func : menuSet) {
-//                if (StringUtils.isNotBlank(menu) && !Objects.equals(menu, func)) {
-//                    continue;
-//                }
-//                Set<String> filePathSet = menuToFilePathSetMap.get(func);
-//                if (CollectionUtils.isNotEmpty(filePathSet)) {
-//                    for (String filePath : filePathSet) {
-//                        JSONObject tbodyObj = new JSONObject();
-//                        tbodyObj.put("moduleGroup", moduleGroup);
-//                        tbodyObj.put("menu", func);
-//                        tbodyObj.put("filePath", filePath);
-//                        tbodyObj.put("fileName", getFileNameByFilePath(filePath));
-//                        tbodyList.add(tbodyObj);
-//                    }
-//                }
-//            }
-//        }
-//        Set<String> filePathSet = moduleGroupToFilePathSetMap.get(moduleGroup);
-//        if (CollectionUtils.isNotEmpty(filePathSet)) {
-//            for (String filePath : filePathSet) {
-//                JSONObject tbodyObj = new JSONObject();
-//                tbodyObj.put("moduleGroup", moduleGroup);
-//                tbodyObj.put("filePath", filePath);
-//                tbodyObj.put("fileName", getFileNameByFilePath(filePath));
-//                tbodyList.add(tbodyObj);
-//            }
-//        }
-        basePageVo.setRowNum(tbodyList.size());
-        return TableResultUtil.getResult(PageUtil.subList(tbodyList, basePageVo), basePageVo);
-    }
 
     @Override
     public String getName() {
@@ -325,7 +135,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
-                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath);
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单
                 List<JSONObject> mappingConfigs = getMappingConfigByFilePath(filePath);
                 if (CollectionUtils.isNotEmpty(mappingConfigs)) {
@@ -333,22 +142,14 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                         String moduleGroup = mappingConfig.getString("moduleGroup");
                         if (StringUtils.isNotBlank(moduleGroup)) {
                             moduleGroupList.add(moduleGroup);
-//                            moduleGroupSet.add(moduleGroup);
                             String menu = mappingConfig.getString("menu");
                             if (StringUtils.isNotBlank(menu)) {
                                 menuList.add(menu);
-//                                menuToFilePathSetMap.computeIfAbsent(menu, k -> new LinkedHashSet<>()).add(filePath);
-//                                moduleGroupToMenuSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(menu);
-                            } else {
-//                                moduleGroupToFilePathSetMap.computeIfAbsent(moduleGroup, k -> new LinkedHashSet<>()).add(filePath);
                             }
-                        } else {
-//                            notConfiguredFilePathList.add(filePath);
                         }
                     }
-                } else {
-//                    notConfiguredFilePathList.add(filePath);
                 }
+                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath, moduleGroupList, menuList);
                 // 读取文件内容
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(resource.getInputStream(), writer, StandardCharsets.UTF_8);
@@ -356,14 +157,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
                 Document document = new Document();
                 // 创建域对象并且放入到文档中
-                if (CollectionUtils.isNotEmpty(moduleGroupList)) {
-                    // 模块组字段不分词
-                    document.add(new TextField("moduleGroup", StringUtils.join(" ", moduleGroupList), Field.Store.YES));
-                }
-                if (CollectionUtils.isNotEmpty(menuList)) {
-                    // 菜单字段不分词
-                    document.add(new TextField("menu", StringUtils.join(" ", menuList), Field.Store.YES));
-                }
                 // 文件路径字段不分词
                 document.add(new StringField("filePath", filePath, Field.Store.YES));
                 // 上层名称列表字段不分词
@@ -421,7 +214,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param root
      * @param filePath
      */
-    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath) {
+    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<String> moduleGroupList, List<String> menuList) {
         String path = filePath.substring(classpathRoot.length());
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
@@ -434,11 +227,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             }
             nameList.add(name);
             if (isFile) {
-                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true);
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                child.setUpwardNameList(upwardNameList);
-                child.setFilePath(filePath);
+                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, moduleGroupList, menuList);
                 parent.addChild(child);
                 return child;
             }
@@ -450,10 +241,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 }
             }
             if (child == null) {
-                child = new DocumentOnlineDirectoryVo(name, false);
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                child.setUpwardNameList(upwardNameList);
+                child = new DocumentOnlineDirectoryVo(name, false, upwardNameList);
                 parent.addChild(child);
             }
             parent = child;

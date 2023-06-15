@@ -125,8 +125,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             // 1.采集数据
             Resource[] mdResources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
             for (Resource resource : mdResources) {
-                List<String> moduleGroupList = new ArrayList<>();
-                List<String> menuList = new ArrayList<>();
                 String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
                 String path = resource.getURL().getPath();
                 int classpathRootIndex = path.indexOf(classpathRoot);
@@ -135,21 +133,27 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
-                // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单
+                List<String> ownerList = new ArrayList<>();
+                // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单，定位的锚点
                 List<JSONObject> mappingConfigs = getMappingConfigByFilePath(filePath);
                 if (CollectionUtils.isNotEmpty(mappingConfigs)) {
                     for (JSONObject mappingConfig : mappingConfigs) {
                         String moduleGroup = mappingConfig.getString("moduleGroup");
                         if (StringUtils.isNotBlank(moduleGroup)) {
-                            moduleGroupList.add(moduleGroup);
+                            String owner = "moduleGroup=" + moduleGroup;
                             String menu = mappingConfig.getString("menu");
                             if (StringUtils.isNotBlank(menu)) {
-                                menuList.add(menu);
+                                owner += "&menu=" + menu;
                             }
+                            String anchorPoint = mappingConfig.getString("anchorPoint");
+                            if (StringUtils.isNotBlank(anchorPoint)) {
+                                owner += "&anchorPoint=" + anchorPoint;
+                            }
+                            ownerList.add(owner);
                         }
                     }
                 }
-                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath, moduleGroupList, menuList);
+                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath, ownerList);
                 // 读取文件内容
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(resource.getInputStream(), writer, StandardCharsets.UTF_8);
@@ -214,7 +218,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param root
      * @param filePath
      */
-    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<String> moduleGroupList, List<String> menuList) {
+    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<String> ownerList) {
         String path = filePath.substring(classpathRoot.length());
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
@@ -229,7 +233,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             if (isFile) {
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, moduleGroupList, menuList);
+                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, ownerList);
                 parent.addChild(child);
                 return child;
             }

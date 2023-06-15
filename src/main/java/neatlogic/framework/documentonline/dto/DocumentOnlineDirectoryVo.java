@@ -16,6 +16,8 @@
 
 package neatlogic.framework.documentonline.dto;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -29,8 +31,7 @@ public class DocumentOnlineDirectoryVo {
     private final boolean isFile;
     private String filePath;
     private final List<String> upwardNameList = new ArrayList<>();
-    private final List<String> moduleGroupList = new ArrayList<>();
-    private final List<String> menuList = new ArrayList<>();
+    private final List<String> ownerList = new ArrayList<>();
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
 
     public DocumentOnlineDirectoryVo(String name, boolean isFile) {
@@ -44,13 +45,12 @@ public class DocumentOnlineDirectoryVo {
         this.upwardNameList.addAll(upwardNameList);
     }
 
-    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList, String filePath, List<String> moduleGroupList, List<String> menuList) {
+    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList, String filePath, List<String> ownerList) {
         this.name = name;
         this.isFile = isFile;
         this.upwardNameList.addAll(upwardNameList);
         this.filePath = filePath;
-        this.moduleGroupList.addAll(moduleGroupList);
-        this.menuList.addAll(menuList);
+        this.ownerList.addAll(ownerList);
     }
 
     public String getName() {
@@ -65,14 +65,6 @@ public class DocumentOnlineDirectoryVo {
         return new ArrayList<>(upwardNameList);
     }
 
-    public List<String> getModuleGroupList() {
-        return new ArrayList<>(moduleGroupList);
-    }
-
-    public List<String> getMenuList() {
-        return new ArrayList<>(menuList);
-    }
-
     public String getFilePath() {
         return filePath;
     }
@@ -85,22 +77,35 @@ public class DocumentOnlineDirectoryVo {
         children.add(child);
     }
 
-    public boolean belongToModuleGroup(String moduleGroup) {
-        return moduleGroupList.contains(moduleGroup);
-    }
-
-    public boolean belongToMenu(String menu) {
-        for (String wildcardPattern : menuList) {
-            if (Objects.equals(wildcardPattern, menu)) {
-                return true;
-            }
-            if(wildcardMatches(wildcardPattern, menu)) {
-                return true;
+    public boolean belongToOwner(String moduleGroup, String menu, JSONObject returnObj) {
+        if (CollectionUtils.isEmpty(ownerList)) {
+            return false;
+        }
+        for (String owner : ownerList) {
+            String[] keyAndValueArray = owner.split("&");
+            for (String keyAndValue : keyAndValueArray) {
+                String[] split = keyAndValue.split("=");
+                if (Objects.equals(split[0], "moduleGroup")) {
+                    if (!Objects.equals(split[1], moduleGroup)) {
+                        return false;
+                    }
+                } else if (Objects.equals(split[0], "menu")) {
+                    if (StringUtils.isNotBlank(menu)) {
+                        if (!Objects.equals(split[1], menu)) {
+                            if (!wildcardMatches(split[1], menu)) {
+                                return false;
+                            }
+                        }
+                    }
+                }  else if (Objects.equals(split[0], "anchorPoint")) {
+                    if (returnObj != null) {
+                        returnObj.put("anchorPoint", split[1]);
+                    }
+                }
             }
         }
-        return false;
+        return true;
     }
-
     /**
      * 通配符匹配，*代表任意个数的字符，?代表有且仅有一个字符。
      * @param wildcardPattern 通配符模板

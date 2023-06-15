@@ -91,6 +91,9 @@ public class DocumentOnlineDirectoryVo {
 
     public boolean belongToMenu(String menu) {
         for (String wildcardPattern : menuList) {
+            if (Objects.equals(wildcardPattern, menu)) {
+                return true;
+            }
             if(wildcardMatches(wildcardPattern, menu)) {
                 return true;
             }

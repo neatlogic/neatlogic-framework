@@ -17,6 +17,8 @@
 package neatlogic.framework.documentonline.dto;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,13 +28,20 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class DocumentOnlineDirectoryVo {
-
+    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
     private final String name;
+    @EntityField(name = "是否是文件", type = ApiParamType.BOOLEAN)
     private final boolean isFile;
+    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
     private String filePath;
+    @EntityField(name = "上层目录名称列表", type = ApiParamType.STRING)
     private final List<String> upwardNameList = new ArrayList<>();
-    private final List<String> ownerList = new ArrayList<>();
+    @EntityField(name = "子目录或文件", type = ApiParamType.JSONARRAY)
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
+
+    private final List<String> ownerList = new ArrayList<>();
+
+    private boolean allowAddChild = true;
 
     public DocumentOnlineDirectoryVo(String name, boolean isFile) {
         this.name = name;
@@ -70,11 +79,22 @@ public class DocumentOnlineDirectoryVo {
     }
 
     public List<DocumentOnlineDirectoryVo> getChildren() {
-        return children;
+        return new ArrayList<>(children);
     }
 
-    public void addChild(DocumentOnlineDirectoryVo child) {
+    public boolean addChild(DocumentOnlineDirectoryVo child) {
+        if (!allowAddChild) {
+            return false;
+        }
         children.add(child);
+        return true;
+    }
+
+    public void noAllowedAddChild() {
+        this.allowAddChild = false;
+        for (DocumentOnlineDirectoryVo child : children) {
+            child.noAllowedAddChild();
+        }
     }
 
     public boolean belongToOwner(String moduleGroup, String menu, JSONObject returnObj) {

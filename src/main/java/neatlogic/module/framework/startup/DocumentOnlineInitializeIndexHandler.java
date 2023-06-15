@@ -47,11 +47,14 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Component
 public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
+
+    public final static Pattern MARKDOWN_IMAGE_PATTERN = Pattern.compile("!\\[[\u4E00-\u9FA5_\\w]*\\]\\((\\.\\./)*([\u4E00-\u9FA5_\\w]+/)*[\u4E00-\u9FA5_\\w]+\\.\\w+\\)");
 
     /**
      * 在线帮助文档根目录
@@ -97,10 +100,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                             logger.warn(path + "文件中第" + i + "个元素中的filePath字段没有设置值" + filePath);
                             continue;
                         }
-//                        if (configuredFilePathList.contains(filePath)) {
-//                            logger.warn(path + "文件中第" + i + "个元素中的filePath字段值为”" + filePath + "“，已在其他文件中配置，该配置将不生效");
-//                            continue;
-//                        }
                         mappingObj.put("source", path);
                         mappingConfigList.add(mappingObj);
                         configuredFilePathList.add(filePath);
@@ -179,6 +178,8 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             if (indexWriter != null) {
                 indexWriter.close();
             }
+            // 禁止添加子节点
+            DOCUMENT_ONLINE_DIRECTORY_ROOT.noAllowedAddChild();
         }
         return 1;
     }

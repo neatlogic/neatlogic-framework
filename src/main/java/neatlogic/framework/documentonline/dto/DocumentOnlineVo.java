@@ -30,6 +30,8 @@ public class DocumentOnlineVo {
     private List<String> upwardNameList;
     @EntityField(name = "内容", type = ApiParamType.STRING)
     private String content;
+    @EntityField(name = "锚点", type = ApiParamType.STRING)
+    private String anchorPoint;
 
     public String getFileName() {
         return fileName;
@@ -61,5 +63,13 @@ public class DocumentOnlineVo {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getAnchorPoint() {
+        return anchorPoint;
+    }
+
+    public void setAnchorPoint(String anchorPoint) {
+        this.anchorPoint = anchorPoint;
     }
 }

@@ -19,9 +19,13 @@ package neatlogic.framework.documentonline.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DocumentOnlineVo {
+public class DocumentOnlineVo implements Serializable {
+
+    private static final long serialVersionUID = -928973151322839787L;
+
     @EntityField(name = "文件名", type = ApiParamType.STRING)
     private String fileName;
     @EntityField(name = "文件路径", type = ApiParamType.STRING)

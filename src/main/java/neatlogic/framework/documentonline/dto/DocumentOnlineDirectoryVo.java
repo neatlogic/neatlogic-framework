@@ -22,12 +22,16 @@ import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class DocumentOnlineDirectoryVo {
+public class DocumentOnlineDirectoryVo implements Serializable {
+
+    private static final long serialVersionUID = -928973333311839787L;
+
     @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
     private final String name;
     @EntityField(name = "是否是文件", type = ApiParamType.BOOLEAN)

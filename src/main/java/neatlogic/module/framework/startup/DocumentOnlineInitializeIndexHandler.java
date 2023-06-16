@@ -54,7 +54,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
 
-    public final static Pattern MARKDOWN_IMAGE_PATTERN = Pattern.compile("!\\[[\u4E00-\u9FA5_\\S]*\\]\\((\\.\\./)*([\u4E00-\u9FA5_\\S]+/)*[\u4E00-\u9FA5_\\S]+\\.\\S+\\)");
+    public final static Pattern MARKDOWN_IMAGE_PATTERN = Pattern.compile("!\\[\\S*\\]\\((\\.\\./)*(\\S+/)*\\S+\\.\\S+\\)");
 
     /**
      * 在线帮助文档根目录

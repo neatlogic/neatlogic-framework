@@ -3,7 +3,7 @@ package neatlogic.framework.exception.type;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.exception.core.ApiException;
-import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.$;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class PermissionDeniedException extends ApiException {
         super(key, values);
     }
     public PermissionDeniedException(Class<? extends AuthBase> authClass) {
-        super("当前用户缺少“{0}”权限，请联系管理员", new I18n(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()).toString());
+        super("当前用户缺少“{0}”权限，请联系管理员", $.t(AuthFactory.getAuthInstance(authClass.getSimpleName()).getAuthDisplayName()));
     }
 
     public PermissionDeniedException(List<String> authNameList) {

@@ -47,14 +47,11 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Component
 public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
-
-    public final static Pattern MARKDOWN_IMAGE_PATTERN = Pattern.compile("!?\\[.*\\]\\((\\.\\./)*(.+/)*.+\\.\\S+\\)");
 
     /**
      * 在线帮助文档根目录

@@ -81,6 +81,10 @@ public final class RegexUtils {
      * URL
      */
     public static final String URL = "url";
+    /**
+     * markdown文件中的图片链接和跳转链接语法格式匹配
+     */
+    public static final String MARKDOWN_LINK = "markdown_link";
 
     public static final Map<String, Pattern> regexPatternMap = new HashMap<String, Pattern>() {
         private static final long serialVersionUID = -960685874597441494L;
@@ -97,6 +101,7 @@ public final class RegexUtils {
             put(PASSWORD, Pattern.compile("^(?!.*[\\u4E00-\\u9FA5\\s])(?!^[a-zA-Z]+$)(?!^[\\d]+$)(?!^[^a-zA-Z\\d]+$)^.{8,20}$"));
             put(CONNECT_URL, Pattern.compile("^((http|ftp|https)://)(([a-zA-Z0-9\\._-]+)|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?"));
             put(DB_SCHEMA, Pattern.compile("([^.])+\\.([^.])+"));
+            put(MARKDOWN_LINK, Pattern.compile("!?\\[.*\\]\\((\\.\\./)*(.+/)*.+\\.\\S+(\\s+\".*\")?\\s*\\)"));
 
             // 以下正则表达式参考前端TsValidtor.js
             put(UNIQUE_IDENT, Pattern.compile("^[a-zA-Z_][a-zA-Z\\_]*$"));

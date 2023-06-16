@@ -153,9 +153,9 @@ public class DocumentOnlineDirectoryVo implements Serializable {
             if (beginIndex < index) {
                 String wildcardCharacter = wildcardPattern.substring(beginIndex, index);
                 if (Objects.equals(wildcardCharacter, "*")) {
-                    stringBuilder.append("[\\u4E00-\\u9FA5_\\w]*");
+                    stringBuilder.append("\\S*");
                 } else if (Objects.equals(wildcardCharacter, "?")) {
-                    stringBuilder.append("[\\u4E00-\\u9FA5_\\w]{1}");
+                    stringBuilder.append("\\S{1}");
                 }
             }
             stringBuilder.append("(");
@@ -166,9 +166,9 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         if (beginIndex < wildcardPattern.length()) {
             String wildcardCharacter = wildcardPattern.substring(beginIndex);
             if (Objects.equals(wildcardCharacter, "*")) {
-                stringBuilder.append("[\\u4E00-\\u9FA5_\\w]*");
+                stringBuilder.append("\\S*");
             } else if (Objects.equals(wildcardCharacter, "?")) {
-                stringBuilder.append("[\\u4E00-\\u9FA5_\\w]{1}");
+                stringBuilder.append("\\S{1}");
             }
         }
         String regex = stringBuilder.toString();

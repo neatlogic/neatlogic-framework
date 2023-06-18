@@ -20,20 +20,21 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.List;
 
 public enum AuthenticateType implements IEnum {
-    NOAUTH("noauth", new I18n("无需认证")),
-    BUILDIN("buildin", new I18n("内部验证")),
-    BASIC("basicauth", new I18n("Basic认证")),
-    BEARER("bearertoken", new I18n("Bearer Token"));
+    NOAUTH("noauth", "common.noauth"),
+    BUILDIN("buildin", "common.buildinauth"),
 
-    private String type;
-    private I18n text;
+    BASIC("basicauth", "common.basicauth"),
 
-    AuthenticateType(String _type, I18n _text) {
+    BEARER("bearertoken", "common.bearerauth");
+
+    private final String type;
+    private final String text;
+
+    AuthenticateType(String _type, String _text) {
         this.type = _type;
         this.text = _text;
     }
@@ -43,7 +44,7 @@ public enum AuthenticateType implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getText(String value) {

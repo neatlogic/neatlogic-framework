@@ -82,6 +82,10 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         return filePath;
     }
 
+    public List<String> getOwnerList() {
+        return ownerList;
+    }
+
     public List<DocumentOnlineDirectoryVo> getChildren() {
         return new ArrayList<>(children);
     }

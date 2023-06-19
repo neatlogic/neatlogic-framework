@@ -19,8 +19,10 @@ package neatlogic.module.framework.startup;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.startup.StartupBase;
+import neatlogic.module.framework.dao.mapper.doumentonline.DocumentOnlineMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +53,10 @@ import java.util.*;
 public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
+
+    @javax.annotation.Resource
+    private DocumentOnlineMapper documentOnlineMapper;
+
     /**
      * 在线帮助文档索引库位置
      */
@@ -62,7 +68,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     /**
      * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
      */
-    private static List<JSONObject> mappingConfigList = new ArrayList();
+    private static List<DocumentOnlineConfigVo> mappingConfigList = new ArrayList();
 
     public final static DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
 
@@ -76,7 +82,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
         IndexWriter indexWriter = null;
         try {
             // 在documentonline-mapping.json配置文件中已设置在线文档文件路径集合，用于防止同个在线文档重复配置
-            List<String> configuredFilePathList = new ArrayList<>();
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] jsonResources = resolver.getResources("classpath*:" + classpathRoot + "**/documentonline-mapping.json");
             for (Resource resource : jsonResources) {
@@ -91,14 +96,16 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     JSONArray mappingArray = JSONArray.parseArray(content);
                     for (int i = 0; i < mappingArray.size(); i++) {
                         JSONObject mappingObj = mappingArray.getJSONObject(i);
-                        String filePath = mappingObj.getString("filePath");
+                        DocumentOnlineConfigVo documentOnlineConfigVo = mappingObj.toJavaObject(DocumentOnlineConfigVo.class);
+                        String filePath = documentOnlineConfigVo.getFilePath();
                         if (StringUtils.isBlank(filePath)) {
                             logger.warn(path + "文件中第" + i + "个元素中的filePath字段没有设置值" + filePath);
                             continue;
                         }
-                        mappingObj.put("source", path);
-                        mappingConfigList.add(mappingObj);
-                        configuredFilePathList.add(filePath);
+                        documentOnlineConfigVo.setSource(path);
+                        mappingConfigList.add(documentOnlineConfigVo);
+                        // 初始化的时候以documentonline-mapping.json配置文件数据为主，根据删除主键数据库中数据
+                        documentOnlineMapper.deleteDocumentOnlineConfig(documentOnlineConfigVo);
                     }
                 } catch (JSONException e) {
                     logger.error(e.getMessage(), e);
@@ -131,17 +138,17 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 }
                 List<String> ownerList = new ArrayList<>();
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单，定位的锚点
-                List<JSONObject> mappingConfigs = getMappingConfigByFilePath(filePath);
+                List<DocumentOnlineConfigVo> mappingConfigs = getMappingConfigByFilePath(filePath);
                 if (CollectionUtils.isNotEmpty(mappingConfigs)) {
-                    for (JSONObject mappingConfig : mappingConfigs) {
-                        String moduleGroup = mappingConfig.getString("moduleGroup");
+                    for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigs) {
+                        String moduleGroup = documentOnlineConfigVo.getModuleGroup();
                         if (StringUtils.isNotBlank(moduleGroup)) {
                             String owner = "moduleGroup=" + moduleGroup;
-                            String menu = mappingConfig.getString("menu");
+                            String menu = documentOnlineConfigVo.getMenu();
                             if (StringUtils.isNotBlank(menu)) {
                                 owner += "&menu=" + menu;
                             }
-                            String anchorPoint = mappingConfig.getString("anchorPoint");
+                            String anchorPoint = documentOnlineConfigVo.getAnchorPoint();
                             if (StringUtils.isNotBlank(anchorPoint)) {
                                 owner += "&anchorPoint=" + anchorPoint;
                             }
@@ -191,11 +198,40 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param filePath 文件路径
      * @return 映射信息
      */
-    private List<JSONObject> getMappingConfigByFilePath(String filePath) {
-        List<JSONObject> resultList = new ArrayList<>();
-        for (JSONObject mappingConfig : mappingConfigList) {
-            if (filePath.startsWith(mappingConfig.getString("filePath"))) {
-                resultList.add(mappingConfig);
+    private List<DocumentOnlineConfigVo> getMappingConfigByFilePath(String filePath) {
+        List<DocumentOnlineConfigVo> resultList = new ArrayList<>();
+        List<String> filePathList = new ArrayList<>();
+        List<String> directoryList = new ArrayList<>();
+        String[] split = filePath.split("/");
+        for (String directory : split) {
+            directoryList.add(directory);
+            if (directoryList.size() > 2) {
+                filePathList.add(String.join("/", directoryList));
+            }
+        }
+        if (CollectionUtils.isNotEmpty(filePathList)) {
+            List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineMapper.getDocumentOnlineConfigListByFilePathList(filePathList);
+            for (DocumentOnlineConfigVo documentOnlineConfigVo : documentOnlineConfigList) {
+                documentOnlineConfigVo.setSource("database");
+                resultList.add(documentOnlineConfigVo);
+            }
+        }
+        for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigList) {
+            if (filePath.startsWith(documentOnlineConfigVo.getFilePath())) {
+                boolean flag = false;
+                for (DocumentOnlineConfigVo existingConfig : resultList) {
+                    if (Objects.equals(documentOnlineConfigVo.getFilePath(), existingConfig.getFilePath())) {
+                        if (Objects.equals(documentOnlineConfigVo.getModuleGroup(), existingConfig.getModuleGroup())) {
+                            if (Objects.equals(documentOnlineConfigVo.getMenu(), existingConfig.getMenu())) {
+                                flag = true;
+                            }
+                        }
+                    }
+                }
+                if (flag) {
+                    break;
+                }
+                resultList.add(documentOnlineConfigVo);
             }
         }
         return resultList;

@@ -33,6 +33,29 @@ public class EmailUtil {
     /**
      * 发送带附件的邮件
      *
+     * @param title   邮件标题
+     * @param content 邮件正文
+     * @param to      收件人
+     */
+    public static void sendEmailWithFile(String title, String content, String to) throws MessagingException, IOException {
+        sendEmailWithFile(title, content, to, null, null);
+    }
+
+    /**
+     * 发送带附件的邮件
+     *
+     * @param title   邮件标题
+     * @param content 邮件正文
+     * @param to      收件人
+     */
+    public static void sendEmailWithFileWithMailServer(String title, String content, String to, MailServerVo mailServerVo) throws MessagingException, IOException {
+        sendEmailWithFile(title, content, to, null, null, mailServerVo);
+    }
+
+
+    /**
+     * 发送带附件的邮件
+     *
      * @param title         邮件标题
      * @param content       邮件正文
      * @param to            收件人
@@ -41,6 +64,19 @@ public class EmailUtil {
      */
     public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
         MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
+        sendEmailWithFile(title, content, to, cc, attachmentMap, mailServerVo);
+    }
+
+    /**
+     * 发送带附件的邮件
+     *
+     * @param title         邮件标题
+     * @param content       邮件正文
+     * @param to            收件人
+     * @param cc            抄送人
+     * @param attachmentMap 附件(key:文件名;value:流)，根据附件名后缀自动匹配MimeType，如果没有后缀名或未匹配到MimeType，则默认为application/octet-stream
+     */
+    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap, MailServerVo mailServerVo) throws MessagingException, IOException {
         if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
             /** 开启邮箱服务器连接会话 */
             Properties props = new Properties();

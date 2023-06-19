@@ -16,6 +16,7 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
@@ -101,6 +102,11 @@ public class TenantVo extends BasePageVo {
     private DatasourceVo datasource;
     @EntityField(name = "数据库数据源", type = ApiParamType.JSONOBJECT)
     private boolean isLocalDb = true;
+
+    @JSONField(serialize = false)
+    @EntityField(name = "超级管理员 租户创建时使用", type = ApiParamType.JSONOBJECT)
+    private UserVo superAdminVo;
+
     public TenantVo() {
         this.setPageSize(20);
     }
@@ -226,5 +232,13 @@ public class TenantVo extends BasePageVo {
 
     public void setIsLocalDb(boolean localDb) {
         isLocalDb = localDb;
+    }
+
+    public UserVo getSuperAdminVo() {
+        return superAdminVo;
+    }
+
+    public void setSuperAdminVo(UserVo superAdminVo) {
+        this.superAdminVo = superAdminVo;
     }
 }

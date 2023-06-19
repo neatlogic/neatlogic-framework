@@ -36,11 +36,4 @@ public interface LoginService {
      * @param resultJson 目前用于告知前端是否需要重新获取验证码，此处如果登录失败超过制定次数，则设置需要验证码
      */
     void loginCaptchaValid(JSONObject jsonObj, JSONObject resultJson);
-
-    /**
-     * 获取验证码
-     *
-     * @return 验证码text 和 验证码base64图片
-     */
-    JSONObject getCaptcha();
 }

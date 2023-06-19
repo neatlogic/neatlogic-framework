@@ -61,6 +61,7 @@ public class Config {
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
     private static int MQ_SUBSCRIBE_RECONNECT_PERIOD;//MQ连接重试间隔
     private static String HOME_URL;// 前端服务器地址，例如：http://192.168.0.10:8099
+    private static String MASTER_HOME_URL;// 前端租户管理服务器地址，例如：http://192.168.0.10:9099
     private static String BACK_END_URL;// 后端服务器地址，例如：http://192.168.0.25:8282/neatlogic
     private static String USER_EXPIRETIME; // 会话超时时间(分)
     private static int LOGIN_CAPTCHA_EXPIRED_TIME; //验证码超时时间(秒)
@@ -233,9 +234,17 @@ public class Config {
         return HOME_URL;
     }
 
+    public static String MASTER_HOME_URL() {
+        if (!MASTER_HOME_URL.endsWith("/")) {
+            return MASTER_HOME_URL + "/";
+        }
+        return MASTER_HOME_URL;
+    }
+
     public static String BACK_END_URL() {
         return BACK_END_URL;
     }
+
     public static int USER_EXPIRETIME() {
         return Integer.parseInt(USER_EXPIRETIME);
     }
@@ -372,7 +381,7 @@ public class Config {
         return LDAP_USER_DN;
     }
 
-    private void initConfigFile(){
+    private void initConfigFile() {
         try {
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
             BufferedReader br;
@@ -403,6 +412,7 @@ public class Config {
             throw ex;
         }
     }
+
     @PostConstruct
     public void init() {
         try {
@@ -443,6 +453,7 @@ public class Config {
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
             MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "5"));
             HOME_URL = prop.getProperty("home.url");
+            MASTER_HOME_URL = prop.getProperty("master.home.url");
             BACK_END_URL = prop.getProperty("back.end.url");
             JWT_SECRET = prop.getProperty("jwt.secret", "neatlogic#neatlogic$secret");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");

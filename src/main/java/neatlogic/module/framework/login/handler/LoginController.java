@@ -43,6 +43,7 @@ import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.TenantService;
+import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
@@ -64,7 +65,6 @@ import java.util.Objects;
 @RequestMapping("/login/")
 public class LoginController {
     Logger logger = LoggerFactory.getLogger(LoginController.class);
-
     @Resource
     private UserMapper userMapper;
 
@@ -199,7 +199,7 @@ public class LoginController {
             tenantContext.setUseDefaultDatasource(false);
         }
         String sessionId = jsonObj.getString("sessionId");
-        JSONObject result = loginService.getCaptcha();
+        JSONObject result = CaptchaUtil.getCaptcha();
         if (StringUtils.isNotBlank(sessionId)) {
             LoginCaptchaVo loginCaptchaVo = loginMapper.getLoginCaptchaBySessionId(sessionId);
             if (loginCaptchaVo == null) {

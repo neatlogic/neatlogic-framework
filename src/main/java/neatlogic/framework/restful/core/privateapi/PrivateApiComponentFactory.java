@@ -407,9 +407,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
             clonedList.add(apiVo.clone());
         }
         clonedList.forEach(a->{
-            if(Objects.equals("api.nmpaw.searchworkcenterapi.name",a.getName())) {
-                System.out.println(a.getName());
-            }
             a.setName($.t(a.getName()));
             a.setHandlerName($.t(a.getHandlerName()));
         });

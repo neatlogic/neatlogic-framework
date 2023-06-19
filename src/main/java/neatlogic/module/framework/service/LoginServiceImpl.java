@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.service;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
@@ -24,15 +25,12 @@ import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.exception.captcha.LoginCaptchaIsEmptyException;
 import neatlogic.framework.exception.captcha.LoginCaptchaNotInvalidException;
+import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.TimeUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.wf.captcha.SpecCaptcha;
-import com.wf.captcha.base.Captcha;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.awt.*;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -80,7 +78,7 @@ public class LoginServiceImpl implements LoginService {
                     loginMapper.deleteLoginCaptchaBySessionId(sessionId);
                 } else {
                     long expiredTime = System.currentTimeMillis() + Config.LOGIN_CAPTCHA_EXPIRED_TIME() * 1000L;
-                    JSONObject result = getCaptcha();
+                    JSONObject result = CaptchaUtil.getCaptcha();
                     loginMapper.updateLoginCaptcha(new LoginCaptchaVo(sessionId, result.getString("code"), new Date(expiredTime)));
                     throw new LoginCaptchaNotInvalidException();
                 }
@@ -88,24 +86,5 @@ public class LoginServiceImpl implements LoginService {
                 throw new LoginCaptchaIsEmptyException(Config.LOGIN_FAILED_TIMES_CAPTCHA());
             }
         }
-    }
-
-
-    /**
-     * 获取验证码
-     *
-     * @return 验证码text 和 验证码base64图片
-     */
-    @Override
-    public JSONObject getCaptcha() {
-        JSONObject specCaptchaJson = new JSONObject();
-        SpecCaptcha specCaptcha = new SpecCaptcha(130, 48, 5);
-        // 设置字体
-        specCaptcha.setFont(new Font("Verdana", Font.PLAIN, 32));  // 有默认字体，可以不用设置
-        // 设置类型，纯数字、纯字母、字母数字混合
-        specCaptcha.setCharType(Captcha.TYPE_NUM_AND_UPPER);
-        specCaptchaJson.put("code", specCaptcha.text());
-        specCaptchaJson.put("img", specCaptcha.toBase64());
-        return specCaptchaJson;
     }
 }

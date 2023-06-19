@@ -121,8 +121,6 @@ public class Config {
 
     private static String LDAP_USER_DN;//ldap userDn格式
 
-    private static String DOCUMENT_ONLINE_INDEX_DIR;//在线帮助文档索引目录
-
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -374,10 +372,6 @@ public class Config {
         return LDAP_USER_DN;
     }
 
-    public static String DOCUMENT_ONLINE_INDEX_DIR(){
-        return DOCUMENT_ONLINE_INDEX_DIR;
-    }
-
     private void initConfigFile(){
         try {
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
@@ -498,8 +492,6 @@ public class Config {
 
             LDAP_SERVER_URL = prop.getProperty("ldap.server.url", "");
             LDAP_USER_DN = prop.getProperty("ldap.user.dn", "");
-
-            DOCUMENT_ONLINE_INDEX_DIR = prop.getProperty("document.online.index.dir","");
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

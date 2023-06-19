@@ -19,9 +19,7 @@ package neatlogic.module.framework.startup;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
-import neatlogic.framework.documentonline.exception.DocumentOnlineIndexDirNotSetException;
 import neatlogic.framework.startup.StartupBase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -34,7 +32,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.MMapDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -43,6 +41,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -52,7 +51,10 @@ import java.util.*;
 public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentOnlineInitializeIndexHandler.class);
-
+    /**
+     * 在线帮助文档索引库位置
+     */
+    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + "documentonline";
     /**
      * 在线帮助文档根目录
      */
@@ -71,9 +73,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     @Override
     public int executeForAllTenant() throws Exception {
-        if (StringUtils.isBlank(Config.DOCUMENT_ONLINE_INDEX_DIR())) {
-            throw new DocumentOnlineIndexDirNotSetException();
-        }
         IndexWriter indexWriter = null;
         try {
             // 在documentonline-mapping.json配置文件中已设置在线文档文件路径集合，用于防止同个在线文档重复配置
@@ -110,8 +109,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             List<String> existingFilePathList = new ArrayList<>();
             // 1.创建分词器
             Analyzer analyzer = new IKAnalyzer(true);
-            // 2.创建Directory目录对象，目录对象表示索引库的位置
-            Directory dir = FSDirectory.open(Paths.get(Config.DOCUMENT_ONLINE_INDEX_DIR()));
+            System.out.println("在线文档索引库位置为" + INDEX_DIRECTORY);
+            // 2.创建dir目录对象，目录对象表示索引库的位置
+            Directory dir = MMapDirectory.open(Paths.get(INDEX_DIRECTORY));
             // 3.创建IndexWriterConfig对象，这个对象中指定切分词使用的分词器
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             // 4.创建IndexWriter输出流对象，指定输出的位置和使用的config初始化对象
@@ -199,16 +199,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             }
         }
         return resultList;
-    }
-
-    /**
-     * 从文件路径中截取文件名称
-     * @param filePath 文件路径
-     * @return 文件名称
-     */
-    private static String getFileNameByFilePath(String filePath) {
-        int index = filePath.lastIndexOf("/");
-        return filePath.substring(index + 1, filePath.length() - 3);
     }
 
     /**

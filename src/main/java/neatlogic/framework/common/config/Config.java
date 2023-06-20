@@ -381,7 +381,6 @@ public class Config {
 
     private void initConfigFile() {
         try {
-
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
             BufferedReader br;
             try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {

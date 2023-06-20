@@ -31,9 +31,7 @@ import org.springframework.context.annotation.DependsOn;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 @DependsOn({"i18nManager", "localeResolver", "messageSourceAccessor"})
@@ -383,15 +381,38 @@ public class Config {
 
     private void initConfigFile() {
         try {
+
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
             BufferedReader br;
             try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
-                assert is != null;
-                try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
-                    br = new BufferedReader(in);
-                    String inLine = "";
-                    while ((inLine = br.readLine()) != null) {
-                        sid.append(inLine);
+                if (is != null) {
+                    try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
+                        br = new BufferedReader(in);
+                        String inLine = "";
+                        while ((inLine = br.readLine()) != null) {
+                            sid.append(inLine);
+                        }
+                    }
+                } else {
+                    String classpath = System.getenv("CLASSPATH");
+                    String[] split = classpath.split(":");
+                    System.out.println("配置文件目录：" + split[0]);
+                    File file = new File(split[0] + File.separator + SERVER_ID_FILE);
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+                    file.createNewFile();
+                    try (FileWriter fw = new FileWriter(file)) {
+                        Random random = new Random();
+                        int i = random.nextInt();
+                        if (i < 0) {
+                            i = Math.abs(i);
+                        }
+                        sid.append(i);
+                        fw.write(sid.toString());
+                        fw.flush();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
                 }
             } catch (Exception e) {

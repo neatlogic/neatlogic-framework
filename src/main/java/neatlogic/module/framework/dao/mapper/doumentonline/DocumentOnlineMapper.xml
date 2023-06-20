@@ -31,6 +31,15 @@
         </foreach>
     </select>
 
+    <select id="getAllDocumentOnlineConfigList" resultType="neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo">
+        SELECT
+            `file_path` AS filePath,
+            `module_group` AS moduleGroup,
+            `menu`,
+            `anchor_point` AS anchorPoint
+        FROM `documentonline_config`
+    </select>
+
     <insert id="insertDocumentOnlineConfig" parameterType="neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo">
         INSERT INTO `documentonline_config` (
             `file_path`,

@@ -19,7 +19,11 @@ package neatlogic.framework.documentonline.crossover;
 import neatlogic.framework.crossover.ICrossoverService;
 import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
 
+import java.util.List;
+
 public interface IDocumentOnlineCrossoverMapper extends ICrossoverService {
 
     int insertDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
+
+    List<DocumentOnlineConfigVo> getAllDocumentOnlineConfigList();
 }

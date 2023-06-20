@@ -72,6 +72,10 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     public final static DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
 
+    public static List<DocumentOnlineConfigVo> getMappingConfigList() {
+        return mappingConfigList;
+    }
+
     @Override
     public String getName() {
         return "初始化在线帮助文档索引";
@@ -218,20 +222,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
         }
         for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigList) {
             if (filePath.startsWith(documentOnlineConfigVo.getFilePath())) {
-                boolean flag = false;
-                for (DocumentOnlineConfigVo existingConfig : resultList) {
-                    if (Objects.equals(documentOnlineConfigVo.getFilePath(), existingConfig.getFilePath())) {
-                        if (Objects.equals(documentOnlineConfigVo.getModuleGroup(), existingConfig.getModuleGroup())) {
-                            if (Objects.equals(documentOnlineConfigVo.getMenu(), existingConfig.getMenu())) {
-                                flag = true;
-                            }
-                        }
-                    }
+                if (!resultList.contains(documentOnlineConfigVo)) {
+                    resultList.add(documentOnlineConfigVo);
                 }
-                if (flag) {
-                    break;
-                }
-                resultList.add(documentOnlineConfigVo);
             }
         }
         return resultList;

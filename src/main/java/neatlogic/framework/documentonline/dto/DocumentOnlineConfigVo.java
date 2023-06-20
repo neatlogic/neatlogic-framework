@@ -20,6 +20,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class DocumentOnlineConfigVo implements Serializable {
 
@@ -73,5 +74,18 @@ public class DocumentOnlineConfigVo implements Serializable {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DocumentOnlineConfigVo)) return false;
+        DocumentOnlineConfigVo that = (DocumentOnlineConfigVo) o;
+        return filePath.equals(that.filePath) && moduleGroup.equals(that.moduleGroup) && menu.equals(that.menu);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(filePath, moduleGroup, menu);
     }
 }

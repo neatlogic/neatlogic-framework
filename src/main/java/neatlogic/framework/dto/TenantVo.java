@@ -105,7 +105,7 @@ public class TenantVo extends BasePageVo {
 
     @JSONField(serialize = false)
     @EntityField(name = "超级管理员 租户创建时使用", type = ApiParamType.JSONOBJECT)
-    private UserVo superAdminVo;
+    private UserVo superAdmin;
 
     public TenantVo() {
         this.setPageSize(20);
@@ -234,11 +234,11 @@ public class TenantVo extends BasePageVo {
         isLocalDb = localDb;
     }
 
-    public UserVo getSuperAdminVo() {
-        return superAdminVo;
+    public UserVo getSuperAdmin() {
+        return superAdmin;
     }
 
-    public void setSuperAdminVo(UserVo superAdminVo) {
-        this.superAdminVo = superAdminVo;
+    public void setSuperAdmin(UserVo superAdmin) {
+        this.superAdmin = superAdmin;
     }
 }

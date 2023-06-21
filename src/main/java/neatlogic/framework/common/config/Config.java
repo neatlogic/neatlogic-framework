@@ -233,7 +233,7 @@ public class Config {
     }
 
     public static String MASTER_HOME_URL() {
-        if (!MASTER_HOME_URL.endsWith("/")) {
+        if (StringUtils.isNotBlank(MASTER_HOME_URL) && !MASTER_HOME_URL.endsWith("/")) {
             return MASTER_HOME_URL + "/";
         }
         return MASTER_HOME_URL;

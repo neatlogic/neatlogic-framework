@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,7 +68,9 @@ public class TenantInitManager extends ModuleInitializedListenerBase {
                 TenantContext.get().switchTenant(tenantVo.getUuid());
                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
                 List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
-                for (ITenantInit tenantInit : getTenantInitList()) {
+                List<ITenantInit> iTenantInits = getTenantInitList();
+                iTenantInits.sort(Comparator.comparing(ITenantInit::sort));
+                for (ITenantInit tenantInit : iTenantInits) {
                     try {
                         if (groupList.contains(tenantInit.getGroup())) {
                             tenantInit.execute();

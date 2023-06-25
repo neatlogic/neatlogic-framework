@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.dao.mapper;
+package neatlogic.framework.auth.label;
 
-import neatlogic.framework.dto.ConfigVo;
+import neatlogic.framework.auth.core.AuthBase;
 
-import java.util.List;
+public class TENANT_CONFIG_BASE extends AuthBase {
+    @Override
+    public String getAuthDisplayName() {
+        return "nfal.tenant_config_base.getauthdisplayname";
+    }
 
-public interface ConfigMapper {
+    @Override
+    public String getAuthIntroduction() {
+        return "nfal.tenant_config_base.getauthintroduction";
+    }
 
-    ConfigVo getConfigByKey(String key);
+    @Override
+    public String getAuthGroup() {
+        return "framework";
+    }
 
-    List<ConfigVo> getConfigListByKeyList(List<String> keyList);
-
-    int insertConfig(ConfigVo configVo);
+    @Override
+    public Integer getSort() {
+        return 99;
+    }
 }

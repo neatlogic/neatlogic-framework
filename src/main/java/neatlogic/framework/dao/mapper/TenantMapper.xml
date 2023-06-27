@@ -111,6 +111,7 @@
                `name`,
                `is_active`   AS isActive,
                `expire_date` AS expireDate,
+               `status`,
                `description`
         FROM `tenant`
         WHERE `uuid` = #{value}

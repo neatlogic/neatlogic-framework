@@ -16,7 +16,6 @@
 
 package neatlogic.framework.auth.core;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.util.ModuleUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;

@@ -1,17 +1,17 @@
 /*
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License. 
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package neatlogic.framework.dependency.core;
@@ -19,14 +19,12 @@ package neatlogic.framework.dependency.core;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * 被引用者（上游）类型工厂
- *
- * @author: linbq
- * @since: 2021/4/2 11:37
  **/
 public class FromTypeFactory {
     /**
@@ -34,14 +32,13 @@ public class FromTypeFactory {
      **/
     private static volatile boolean isUninitialized = true;
 
-    private static Set<IFromType> set = new HashSet<>();
+    private static final Set<IFromType> set = new HashSet<>();
 
     private static String allCalleeTypeToString;
 
     /**
      * 获取IFromType接口所有实现枚举类集合
      *
-     * @return
      */
     public static Set<IFromType> getCalleeTypeSet() {
         if (isUninitialized) {
@@ -50,9 +47,7 @@ public class FromTypeFactory {
                     Reflections reflections = new Reflections("neatlogic");
                     Set<Class<? extends IFromType>> classSet = reflections.getSubTypesOf(IFromType.class);
                     for (Class<? extends IFromType> c : classSet) {
-                        for (IFromType obj : c.getEnumConstants()) {
-                            set.add(obj);
-                        }
+                        Collections.addAll(set, c.getEnumConstants());
                     }
                     isUninitialized = false;
                 }
@@ -64,8 +59,6 @@ public class FromTypeFactory {
     /**
      * 通过_value值查询对应的枚举类
      *
-     * @param _value
-     * @return
      */
     public static IFromType getCalleeType(String _value) {
         for (IFromType type : getCalleeTypeSet()) {

@@ -40,21 +40,52 @@ public class EnumFactory {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
-            //处理具名枚举
-            try {
-                Object instance = null;
-                Object[] objects = c.getEnumConstants();
-                if (objects != null && objects.length > 0) {
-                    instance = objects[0];
-                } else {
-                    instance = c.newInstance();
+            if (!c.isInterface()) {
+                //处理具名枚举
+                try {
+                    Object instance;
+                    Object[] objects = c.getEnumConstants();
+                    if (objects != null && objects.length > 0) {
+                        instance = objects[0];
+                    } else {
+                        instance = c.newInstance();
+                    }
+                    Object name = c.getMethod("getEnumName").invoke(instance);
+                    if (name != null && StringUtils.isNotBlank(name.toString())) {
+                        namedEnumNameMap.put(name.toString(), c.getName());
+                    }
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
                 }
-                Object name = c.getMethod("getEnumName").invoke(instance);
-                if (name != null && StringUtils.isNotBlank(name.toString())) {
-                    namedEnumNameMap.put(name.toString(), c.getName());
+            } else {
+                for (Class<?> cls : reflections.getSubTypesOf(c)) {
+                    if (!cls.isInterface()) {
+                        Object instance = null;
+                        Object[] objects = cls.getEnumConstants();
+                        if (objects != null && objects.length > 0) {
+                            instance = objects[0];
+                        } else {
+                            try {
+                                instance = cls.newInstance();
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                        if (instance != null) {
+                            Object name = null;
+                            try {
+                                name = cls.getMethod("getEnumName").invoke(instance);
+                            } catch (Exception ignored) {
+
+                            }
+                            if (name != null && StringUtils.isNotBlank(name.toString())) {
+                                //随便找到一个实现类能返回名称就退出循环，正常情况相爱getEnumName应该写在接口的default方法里。
+                                namedEnumNameMap.put(name.toString(), c.getName());
+                                break;
+                            }
+                        }
+                    }
                 }
-            } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
             }
         }
     }
@@ -71,7 +102,7 @@ public class EnumFactory {
         if (value != null) {
             return value;
         }
-        for(String key : enumMap.keySet()) {
+        for (String key : enumMap.keySet()) {
             if (key.endsWith("." + enumClass)) {
                 return enumMap.get(key);
             }

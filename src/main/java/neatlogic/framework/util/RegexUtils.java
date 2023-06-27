@@ -20,9 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,6 +120,26 @@ public final class RegexUtils {
 
     public static Pattern getPattern(String key) {
         return regexPatternMap.get(key);
+    }
+
+    public static String[] getMatches(String content, String regex, int group) {
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            if (matcher.groupCount() >= group) {
+                matches.add(matcher.group(group));
+            }
+        }
+        return matches.toArray(new String[0]);
+    }
+
+    public static void main(String[] a) {
+        String[] r = getMatches("#[123]测试内容 http://localhost:8081/develop/rdm.html#/story-detail/9130169265  #[915366961545216]测试内容 http://localhost:8081/develop/rdm.html#/story-detail/913016926568448/913016926568450/915366961545216",
+                "#\\[([\\d]+)\\]", 1);
+        for (String aa : r) {
+            System.out.println(aa);
+        }
     }
 
     public static boolean isMatch(String source, String regex) {

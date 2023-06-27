@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.framework.dao.plugin;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -95,6 +96,15 @@ public class ExceptionCatchInterceptor implements Interceptor {
                         logger.error(e.getMessage(), e);
                     }
                 }
+            } else if ("MySQLQueryInterruptedException".equals(targetException.getClass().getSimpleName())) {
+                Logger logger = LoggerFactory.getLogger("sqlTimeoutAudit");
+                // 获取Sql入参
+                Object parameterObject = invocation.getArgs()[1];
+                logger.error("The error may exist in " + ms.getResource());
+                logger.error("The error may involve " + ms.getId() + "-Inline");
+                logger.error("SQL: " + ms.getBoundSql(parameterObject).getSql());
+                logger.error("parameters: " + JSONObject.toJSONString(parameterObject));
+                logger.error(targetException.getMessage(), targetException);
             }
             throw targetException;
         }

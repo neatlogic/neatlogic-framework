@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.dao.mapper;
+package neatlogic.framework.exception.tenantconfig;
 
-import neatlogic.framework.dto.ConfigVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import java.util.List;
+public class TenantConfigNotFoundException extends ApiRuntimeException {
 
-public interface ConfigMapper {
+    private static final long serialVersionUID = 1099170785444348169L;
 
-    ConfigVo getConfigByKey(String key);
-
-    List<ConfigVo> getConfigListByKeyList(List<String> keyList);
-
-    int insertConfig(ConfigVo configVo);
+    public TenantConfigNotFoundException(String key) {
+        super("nfet.tenantconfignotfoundexception.tenantconfignotfoundexception", key);
+    }
 }

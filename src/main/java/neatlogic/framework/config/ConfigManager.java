@@ -1,6 +1,5 @@
 package neatlogic.framework.config;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +15,11 @@ public class ConfigManager {
 		configMapper = _configMapper;
 	}
 
-	public static String getConfig(String key, String defaultValue) {
-		ConfigVo configVo = configMapper.getConfigByKey(key);
-		if (configVo != null && StringUtils.isNotBlank(configVo.getValue())) {
+	public static String getConfig(ITenantConfig tenantConfig) {
+		ConfigVo configVo = configMapper.getConfigByKey(tenantConfig.getKey());
+		if (configVo != null) {
 			return configVo.getValue();
 		}
-		return defaultValue;
+		return tenantConfig.getValue();
 	}
 }

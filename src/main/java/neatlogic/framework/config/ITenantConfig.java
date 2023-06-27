@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.dao.mapper;
+package neatlogic.framework.config;
 
-import neatlogic.framework.dto.ConfigVo;
-
-import java.util.List;
-
-public interface ConfigMapper {
-
-    ConfigVo getConfigByKey(String key);
-
-    List<ConfigVo> getConfigListByKeyList(List<String> keyList);
-
-    int insertConfig(ConfigVo configVo);
+/**
+ * 租户级别配置接口
+ */
+public interface ITenantConfig {
+    /**
+     * 变量
+     * @return
+     */
+    String getKey();
+    /**
+     * 默认值
+     * @return
+     */
+    String getValue();
+    /**
+     * 描述
+     * @return
+     */
+    String getDescription();
 }

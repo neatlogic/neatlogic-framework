@@ -16,14 +16,12 @@ limitations under the License.
 
 package neatlogic.framework.restful.ratelimiter;
 
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.dao.mapper.ConfigMapper;
-import neatlogic.framework.dto.ConfigVo;
+import neatlogic.framework.config.ConfigManager;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 @Component
@@ -31,24 +29,15 @@ public class RateLimiterTokenBucket {
 
     private static final SoftReferenceCache<TenantRateLimiter> tenantRateLimiterMap = new SoftReferenceCache<>(new HashMap<>());
 
-    private static ConfigMapper configMapper;
-
-    @Resource
-    public void setConfigMapper(ConfigMapper _configMapper) {
-        configMapper = _configMapper;
-    }
     /**
      * 尝试获取令牌
      * @return
      */
     public static boolean tryAcquire() {
         Double apiQPS = null;
-        ConfigVo configVo = configMapper.getConfigByKey("apiqps");
-        if (configVo != null) {
-            String value = configVo.getValue();
-            if (StringUtils.isNotBlank(value)) {
-                apiQPS = new Double(value);
-            }
+        String apiQPSStr = ConfigManager.getConfig(FrameworkTenantConfig.API_QPS);
+        if (StringUtils.isNotBlank(apiQPSStr)) {
+            apiQPS = new Double(apiQPSStr);
         }
         String tenantUuid = TenantContext.get().getTenantUuid();
         TenantRateLimiter tenantRateLimiter = tenantRateLimiterMap.get(tenantUuid);

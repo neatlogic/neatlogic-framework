@@ -26,9 +26,21 @@ limitations under the License.
         WHERE `key` = #{value}
     </select>
 
-    <insert id="replaceConfig" parameterType="neatlogic.framework.dto.ConfigVo">
-        REPLACE INTO `config` (`key`, `value`, `description`)
+    <select id="getConfigListByKeyList" parameterType="java.util.List" resultType="neatlogic.framework.dto.ConfigVo"
+            useCache="true">
+        SELECT `key`, `value`, `description`
+        FROM `config`
+        WHERE `key` IN
+        <foreach collection="list" item="key" open="(" separator="," close=")">
+            #{key}
+        </foreach>
+    </select>
+
+    <insert id="insertConfig" parameterType="neatlogic.framework.dto.ConfigVo">
+        INSERT INTO `config` (`key`, `value`, `description`)
         VALUES (#{key}, #{value}, #{description})
+        ON DUPLICATE KEY UPDATE
+        `value` = #{value}
     </insert>
 
 

@@ -35,6 +35,7 @@ import neatlogic.framework.file.core.AuditType;
 import neatlogic.framework.file.core.Event;
 import neatlogic.framework.file.core.appender.AppenderManager;
 import neatlogic.framework.param.validate.core.ParamValidatorFactory;
+import neatlogic.framework.reflection.ReflectionManager;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.util.$;
@@ -637,7 +638,7 @@ public class ApiValidateAndHelpBase {
                     return String.join(",", valueList);
                 }
             } else {
-                Reflections reflections = new Reflections("neatlogic");
+                Reflections reflections = ReflectionManager.getInstance();
                 List<String> valueList = new ArrayList<>();
                 for (Class<?> cls : reflections.getSubTypesOf(p.member())) {
                     if (!cls.isInterface()) {

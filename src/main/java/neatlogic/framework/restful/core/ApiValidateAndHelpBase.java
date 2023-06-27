@@ -43,6 +43,7 @@ import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
@@ -477,9 +478,13 @@ public class ApiValidateAndHelpBase {
                                 paramObj.put("maxLength", p.maxLength());
                             }
                             paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
-                            if (StringUtils.isNotBlank(p.rule())) {
-                                paramObj.put("rule", p.rule());
+                            String rule = "";
+                            if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                                rule = getEnumMember(p);
+                            } else if (StringUtils.isNotBlank(p.rule())) {
+                                rule = p.rule();
                             }
+                            paramObj.put("rule", rule);
                             paramObj.put("isRequired", p.isRequired());
                             if (StringUtils.isNotBlank(p.desc())) {
                                 paramObj.put("description", $.t(p.desc()));
@@ -619,20 +624,41 @@ public class ApiValidateAndHelpBase {
      */
     private String getEnumMember(Param p) {
         try {
-            Object[] objects = p.member().getEnumConstants();
-            List<String> valueList = new ArrayList<>();
-            for (Object object : objects) {
-                String value = ((IEnum) object).getValue();
-                if (value != null) {
-                    valueList.add(value);
+            if (!p.member().isInterface()) {
+                Object[] objects = p.member().getEnumConstants();
+                List<String> valueList = new ArrayList<>();
+                for (Object object : objects) {
+                    String value = ((IEnum) object).getValue();
+                    if (value != null) {
+                        valueList.add(value);
+                    }
                 }
-            }
-            if (valueList.size() > 0) {
-                return String.join(",", valueList);
+                if (valueList.size() > 0) {
+                    return String.join(",", valueList);
+                }
+            } else {
+                Reflections reflections = new Reflections("neatlogic");
+                List<String> valueList = new ArrayList<>();
+                for (Class<?> cls : reflections.getSubTypesOf(p.member())) {
+                    if (!cls.isInterface()) {
+                        Object[] objects = cls.getEnumConstants();
+
+                        for (Object object : objects) {
+                            String value = ((IEnum) object).getValue();
+                            if (value != null) {
+                                valueList.add(value);
+                            }
+                        }
+
+                    }
+                }
+                if (valueList.size() > 0) {
+                    return String.join(",", valueList);
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        return null;
+        return "";
     }
 }

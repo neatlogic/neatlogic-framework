@@ -321,7 +321,6 @@ INSERT INTO `task_config` VALUES (849215211184128, '系统下线审批', -1, 'al
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (847637733449728, 'admin', 'admin', 'admin', NULL, NULL, 'admin', 1, NULL, 0, 0, NULL, 1);
 INSERT INTO `user` VALUES (856992784588800, 'e82967ae7fe642c6a126758d29ffb5d6', 'autoexec', 'autoexec', NULL, NULL, 'autoexec', 1, NULL, 0, 0, '7c2a959ab686840ce9da3ccf6e91accf', NULL);
 -- ----------------------------
 -- Records of user_authority
@@ -339,8 +338,7 @@ INSERT INTO `user_authority` VALUES (11737, 'e82967ae7fe642c6a126758d29ffb5d6', 
 -- ----------------------------
 -- Records of user_password
 -- ----------------------------
-INSERT INTO `user_password` VALUES (8442, 'admin', 'admin', '{MD5}e10adc3949ba59abbe56e057f20f883e', '2023-03-15 12:24:53', 1);
-INSERT INTO `user_password` VALUES (8443, 'e82967ae7fe642c6a126758d29ffb5d6', 'autoexec', '{MD5}defe12aad396f90e6b179c239de260d4', '2023-03-28 10:11:42', 1);
+INSERT INTO `user_password` VALUES (8443, 'e82967ae7fe642c6a126758d29ffb5d6', 'autoexec', '{MD5}123456', '2023-03-28 10:11:42', 1);
 -- ----------------------------
 -- Records of worktime
 -- ----------------------------

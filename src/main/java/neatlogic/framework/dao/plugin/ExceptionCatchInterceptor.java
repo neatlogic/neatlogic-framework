@@ -102,7 +102,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
                 // 获取Sql入参
                 Object parameterObject = invocation.getArgs()[1];
                 logger.error("The error may exist in " + ms.getResource());
-                logger.error("The error may involve " + ms.getId() + "-Inline");
+                logger.error("The error may involve " + ms.getId() + " -Inline");
                 logger.error("SQL: " + ms.getBoundSql(parameterObject).getSql());
                 logger.error("parameters: " + JSONObject.toJSONString(parameterObject));
                 logger.error(targetException.getMessage(), targetException);

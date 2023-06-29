@@ -18,6 +18,7 @@ package neatlogic.framework.documentonline.dto;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -36,6 +37,16 @@ public class DocumentOnlineConfigVo implements Serializable {
     @EntityField(name = "配置信息来源", type = ApiParamType.STRING)
     private String source;
 
+    public DocumentOnlineConfigVo() {}
+
+    public DocumentOnlineConfigVo(DocumentOnlineConfigVo configVo) {
+        this.filePath = configVo.getFilePath();
+        this.moduleGroup = configVo.getModuleGroup();
+        this.menu = configVo.getMenu();
+        this.anchorPoint = configVo.getAnchorPoint();
+        this.source = configVo.getSource();
+    }
+
     public String getFilePath() {
         return filePath;
     }
@@ -53,6 +64,9 @@ public class DocumentOnlineConfigVo implements Serializable {
     }
 
     public String getMenu() {
+        if (menu == null) {
+            menu = StringUtils.EMPTY;
+        }
         return menu;
     }
 

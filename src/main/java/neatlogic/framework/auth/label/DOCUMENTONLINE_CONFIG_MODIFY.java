@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.documentonline.crossover;
+package neatlogic.framework.auth.label;
 
-import neatlogic.framework.crossover.ICrossoverService;
-import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
+import neatlogic.framework.auth.core.AuthBase;
 
-import java.util.List;
+public class DOCUMENTONLINE_CONFIG_MODIFY extends AuthBase {
+    @Override
+    public String getAuthDisplayName() {
+        return "在线帮助文档配置管理权限";
+    }
 
-public interface IDocumentOnlineCrossoverMapper extends ICrossoverService {
+    @Override
+    public String getAuthIntroduction() {
+        return "对模块和菜单绑定的在线帮助文档进行添加、移除等修改操作";
+    }
 
-    int insertDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
+    @Override
+    public String getAuthGroup() {
+        return "framework";
+    }
 
-    int deleteDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
+    @Override
+    public Integer getSort() {
+        return 99;
+    }
 }

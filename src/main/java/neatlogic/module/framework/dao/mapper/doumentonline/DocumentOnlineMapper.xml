@@ -62,6 +62,5 @@
         WHERE `file_path` = #{filePath}
           AND `module_group` = #{moduleGroup}
           AND `menu` = #{menu}
-          AND `anchor_point` = #{anchorPoint}
     </delete>
 </mapper>

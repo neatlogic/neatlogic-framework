@@ -36,6 +36,8 @@ public class DocumentOnlineVo implements Serializable {
     private String content;
     @EntityField(name = "锚点", type = ApiParamType.STRING)
     private String anchorPoint;
+    @EntityField(name = "映射配置列表", type = ApiParamType.JSONARRAY)
+    private List<DocumentOnlineConfigVo> configList;
 
     public String getFileName() {
         return fileName;
@@ -75,5 +77,13 @@ public class DocumentOnlineVo implements Serializable {
 
     public void setAnchorPoint(String anchorPoint) {
         this.anchorPoint = anchorPoint;
+    }
+
+    public List<DocumentOnlineConfigVo> getConfigList() {
+        return configList;
+    }
+
+    public void setConfigList(List<DocumentOnlineConfigVo> configList) {
+        this.configList = configList;
     }
 }

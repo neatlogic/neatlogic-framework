@@ -19,8 +19,7 @@ package neatlogic.module.framework.startup;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
-import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
+import neatlogic.framework.documentonline.dto.*;
 import neatlogic.framework.startup.StartupBase;
 import neatlogic.module.framework.dao.mapper.doumentonline.DocumentOnlineMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -85,6 +84,12 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     public int executeForAllTenant() throws Exception {
         IndexWriter indexWriter = null;
         try {
+            // 先查询出数据库中数据
+            List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineMapper.getAllDocumentOnlineConfigList();
+            for (DocumentOnlineConfigVo documentOnlineConfigVo : documentOnlineConfigList) {
+                documentOnlineConfigVo.setSource("database");
+                mappingConfigList.add(documentOnlineConfigVo);
+            }
             // 在documentonline-mapping.json配置文件中已设置在线文档文件路径集合，用于防止同个在线文档重复配置
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] jsonResources = resolver.getResources("classpath*:" + classpathRoot + "**/documentonline-mapping.json");
@@ -101,6 +106,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     for (int i = 0; i < mappingArray.size(); i++) {
                         JSONObject mappingObj = mappingArray.getJSONObject(i);
                         DocumentOnlineConfigVo documentOnlineConfigVo = mappingObj.toJavaObject(DocumentOnlineConfigVo.class);
+                        if (mappingConfigList.contains(documentOnlineConfigVo)) {
+                            continue;
+                        }
                         String filePath = documentOnlineConfigVo.getFilePath();
                         if (StringUtils.isBlank(filePath)) {
                             logger.warn(path + "文件中第" + i + "个元素中的filePath字段没有设置值" + filePath);
@@ -109,7 +117,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                         documentOnlineConfigVo.setSource(path);
                         mappingConfigList.add(documentOnlineConfigVo);
                         // 初始化的时候以documentonline-mapping.json配置文件数据为主，根据删除主键数据库中数据
-                        documentOnlineMapper.deleteDocumentOnlineConfig(documentOnlineConfigVo);
+//                        documentOnlineMapper.deleteDocumentOnlineConfig(documentOnlineConfigVo);
                     }
                 } catch (JSONException e) {
                     logger.error(e.getMessage(), e);
@@ -140,27 +148,19 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
                     System.exit(1);
                 }
-                List<String> ownerList = new ArrayList<>();
+                List<DocumentOnlineConfigVo> configList = new ArrayList<>();
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单，定位的锚点
                 List<DocumentOnlineConfigVo> mappingConfigs = getMappingConfigByFilePath(filePath);
                 if (CollectionUtils.isNotEmpty(mappingConfigs)) {
                     for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigs) {
-                        String moduleGroup = documentOnlineConfigVo.getModuleGroup();
-                        if (StringUtils.isNotBlank(moduleGroup)) {
-                            String owner = "moduleGroup=" + moduleGroup;
-                            String menu = documentOnlineConfigVo.getMenu();
-                            if (StringUtils.isNotBlank(menu)) {
-                                owner += "&menu=" + menu;
-                            }
-                            String anchorPoint = documentOnlineConfigVo.getAnchorPoint();
-                            if (StringUtils.isNotBlank(anchorPoint)) {
-                                owner += "&anchorPoint=" + anchorPoint;
-                            }
-                            ownerList.add(owner);
+                        if (StringUtils.isNotBlank(documentOnlineConfigVo.getModuleGroup())) {
+                            DocumentOnlineConfigVo configVo = new DocumentOnlineConfigVo(documentOnlineConfigVo);
+                            configVo.setFilePath(filePath);
+                            configList.add(configVo);
                         }
                     }
                 }
-                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath, ownerList);
+                DocumentOnlineDirectoryVo directory = buildDirectory(DOCUMENT_ONLINE_DIRECTORY_ROOT, filePath, configList);
                 // 读取文件内容
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(resource.getInputStream(), writer, StandardCharsets.UTF_8);
@@ -235,7 +235,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param root
      * @param filePath
      */
-    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<String> ownerList) {
+    private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<DocumentOnlineConfigVo> configList) {
         String path = filePath.substring(classpathRoot.length());
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
@@ -250,7 +250,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             if (isFile) {
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, ownerList);
+                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, configList);
                 parent.addChild(child);
                 return child;
             }

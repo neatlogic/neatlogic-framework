@@ -80,6 +80,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
         paramMap.put("db.url", this.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
         paramMap.put("db.username", this.getProperty("db.username", "username"));
         paramMap.put("db.password", this.getProperty("db.password", "password"));
+        paramMap.put("db.transaction.timeout", this.getProperty("db.transaction.timeout", "-1"));
         paramMap.put("conn.validationQuery", this.getProperty("conn.validationQuery", "select 1"));
         paramMap.put("conn.testOnBorrow", this.getProperty("conn.testOnBorrow", "true"));
         paramMap.put("conn.maxIdle", this.getProperty("conn.maxIdle", "16"));

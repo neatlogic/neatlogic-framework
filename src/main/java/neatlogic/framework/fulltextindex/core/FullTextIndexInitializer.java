@@ -34,7 +34,7 @@ import java.util.Set;
 
 @RootComponent
 public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
-    private static final Set<String> FULLTEXTINDEX_MODULE_MAP = new HashSet<>();
+    private static final Set<String> FULLTEXT_INDEX_MODULE_MAP = new HashSet<>();
     @Resource
     private TenantMapper tenantMapper;
 
@@ -46,18 +46,18 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
     @Override
     protected void myInit() {
         tenantList = tenantMapper.getAllActiveTenant();
-        FULLTEXTINDEX_MODULE_MAP.add("process");
-        FULLTEXTINDEX_MODULE_MAP.add("knowledge");
-        FULLTEXTINDEX_MODULE_MAP.add("cmdb");
-        FULLTEXTINDEX_MODULE_MAP.add("autoexec");
-        FULLTEXTINDEX_MODULE_MAP.add("rdm");
+        FULLTEXT_INDEX_MODULE_MAP.add("process");
+        FULLTEXT_INDEX_MODULE_MAP.add("knowledge");
+        FULLTEXT_INDEX_MODULE_MAP.add("cmdb");
+        FULLTEXT_INDEX_MODULE_MAP.add("autoexec");
+        FULLTEXT_INDEX_MODULE_MAP.add("rdm");
     }
 
     @Override
     public void onInitialized(NeatLogicWebApplicationContext context) {
         String moduleId = context.getId();
-        if (FULLTEXTINDEX_MODULE_MAP.contains(moduleId)) {
-            CachedThreadPool.execute(new NeatLogicThread("FULLTEXTINDEX-SCHEMA-BUILDER") {
+        if (FULLTEXT_INDEX_MODULE_MAP.contains(moduleId)) {
+            CachedThreadPool.execute(new NeatLogicThread("FULLTEXT-INDEX-SCHEMA-BUILDER") {
                 @Override
                 protected void execute() {
                     for (TenantVo tenantVo : tenantList) {

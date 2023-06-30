@@ -72,7 +72,7 @@
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="defaultTimeout" value="180"/><!--事务默认超时时间，3分钟-->
+        <property name="defaultTimeout" value="${db.transaction.timeout}"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
     <!--class="org.springframework.context.support.ReloadableResourceBundleMessageSource"-->

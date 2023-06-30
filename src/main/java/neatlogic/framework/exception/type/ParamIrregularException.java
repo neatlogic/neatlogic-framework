@@ -26,6 +26,7 @@ public class ParamIrregularException extends ApiRuntimeException {
     }
 
     public ParamIrregularException(String paramName, String rule) {
+
         super("参数“{0}”不符合格式要求，{1}", paramName, rule);
     }
 

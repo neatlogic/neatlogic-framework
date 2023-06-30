@@ -147,7 +147,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 int classpathRootIndex = path.indexOf(classpathRoot);
                 String filePath = path.substring(classpathRootIndex);
                 if (existingFilePathList.contains(filePath)) {
-                    logger.error("有两个文件路径相同，路径为：“" + filePath + "“，请将其中一个文件重命名文件或移动到不同路径中");
+                    logger.error($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.error", filePath));
                     System.exit(1);
                 }
                 List<DocumentOnlineConfigVo> configList = new ArrayList<>();

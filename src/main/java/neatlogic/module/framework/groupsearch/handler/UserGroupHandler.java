@@ -65,6 +65,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
         userVo.setPageSize(total);
         userVo.setCurrentPage(1);
         userVo.setIsActive(1);
+        userVo.setIsDelete(0);
         userVo.setKeyword(jsonObj.getString("keyword"));
         //如果存在rangeList 则需要过滤option
         JSONArray rangeList = jsonObj.getJSONArray("rangeList");

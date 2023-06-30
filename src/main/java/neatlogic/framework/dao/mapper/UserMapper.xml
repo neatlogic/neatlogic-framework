@@ -50,6 +50,7 @@ limitations under the License.
         SELECT COUNT(`uuid`)
         FROM `user`
         WHERE `uuid` = #{value}
+        AND `is_delete` = 0
     </select>
 
     <select id="getUserBaseInfoByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
@@ -62,6 +63,7 @@ limitations under the License.
                a.`phone`,
                a.`pinyin`,
                a.`is_active`      as isActive,
+               a.`is_delete`      as isDelete,
                a.`user_info`      as userInfo,
                a.`vip_level`      as vipLevel,
                a.`is_super_admin` as isSuperAdmin
@@ -110,6 +112,7 @@ limitations under the License.
         <result property="phone" column="phone"/>
         <result property="pinyin" column="pinyin"/>
         <result property="isActive" column="isActive"/>
+        <result property="isDelete" column="isDelete"/>
         <result property="userInfo" column="userInfo"/>
         <result property="vipLevel" column="vipLevel"/>
         <result property="isSuperAdmin" column="isSuperAdmin"/>
@@ -174,7 +177,9 @@ limitations under the License.
                a.`user_id`   AS userId,
                a.`user_info` AS userInfo,
                a.`vip_level` AS vipLevel,
-               a.`user_name` AS userName
+               a.`user_name` AS userName,
+               a.`is_active` AS isActive,
+               a.`is_delete` AS isDelete
         FROM `user` a
         WHERE a.`uuid` = #{value}
     </select>
@@ -595,6 +600,7 @@ limitations under the License.
         WHERE a.user_id = #{userId}
           AND c.password = #{password}
           AND a.`is_active` = 1
+          AND a.`is_delete` = 0
     </select>
 
     <select id="getUserByUserUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
@@ -878,6 +884,7 @@ limitations under the License.
         FROM `user`
         WHERE `user_id` = #{userId}
           AND `uuid` != #{uuid}
+        AND `is_delete` = 0
     </select>
 
     <select id="getUserListByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
@@ -1269,7 +1276,6 @@ limitations under the License.
     <update id="updateUser" parameterType="neatlogic.framework.dto.UserVo">
         UPDATE `user`
         SET
-        `user_id` = #{userId},
         `user_name` = #{userName},
         `email` = #{email},
         `phone` = #{phone},
@@ -1328,6 +1334,19 @@ limitations under the License.
         UPDATE `user_team`
         SET `team_uuid` = #{teamUuid}
         WHERE `user_uuid` = #{userUuid}
+    </update>
+
+    <update id="updateUserIsDeletedByUuid" parameterType="java.lang.String">
+        UPDATE `user`
+        SET `is_delete` = 1,
+            `is_active` = 0
+        WHERE `uuid` = #{value}
+    </update>
+
+    <update id="updateUserIsNotDeletedByUuid" parameterType="java.lang.String">
+        UPDATE `user`
+        SET `is_delete` = 0
+        WHERE `uuid` = #{value}
     </update>
 
     <delete id="deleteUserPasswordByLimit">
@@ -1400,6 +1419,10 @@ limitations under the License.
         <foreach collection="userUuidlist" item="value" separator="," open="(" close=")">
             #{value}
         </foreach>
+    </delete>
+
+    <delete id="deleteUserDataByUserUuid" parameterType="java.lang.String">
+        DELETE  FROM `user_data` WHERE `user_uuid` = #{value}
     </delete>
 
     <update id="updateUserTokenByUuid">

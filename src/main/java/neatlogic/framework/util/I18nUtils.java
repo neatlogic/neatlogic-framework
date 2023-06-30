@@ -53,7 +53,7 @@ public class I18nUtils {
      * @return 翻译值
      */
     public static String getMessage(String key) {
-        MessageSourceAccessor messageSource = SpringContextUtil.getBean(MessageSourceAccessor.class);
+        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor",MessageSourceAccessor.class);
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;
         try {

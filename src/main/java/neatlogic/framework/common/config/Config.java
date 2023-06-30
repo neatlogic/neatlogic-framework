@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-@DependsOn({"i18nManager", "localeResolver", "messageSourceAccessor"})
+@DependsOn({"i18nManager", "messageSourceAccessor"})
 @RootConfiguration
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);

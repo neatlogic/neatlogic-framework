@@ -32,18 +32,18 @@ public class DocumentOnlineDirectoryVo implements Serializable {
 
     private static final long serialVersionUID = -928973333311839787L;
 
-    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private final String name;
-    @EntityField(name = "是否是文件", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "common.isfile", type = ApiParamType.BOOLEAN)
     private final boolean isFile;
-    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.filepath", type = ApiParamType.STRING)
     private String filePath;
-    @EntityField(name = "上层目录名称列表", type = ApiParamType.STRING)
+    @EntityField(name = "common.upwardnamelist", type = ApiParamType.STRING)
     private final List<String> upwardNameList = new ArrayList<>();
-    @EntityField(name = "子目录或文件", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.children", type = ApiParamType.JSONARRAY)
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
-
-    private final List<String> ownerList = new ArrayList<>();
+    @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
+    private final List<DocumentOnlineConfigVo> configList = new ArrayList<>();
 
     private boolean allowAddChild = true;
 
@@ -58,12 +58,12 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         this.upwardNameList.addAll(upwardNameList);
     }
 
-    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList, String filePath, List<String> ownerList) {
+    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList, String filePath, List<DocumentOnlineConfigVo> configList) {
         this.name = name;
         this.isFile = isFile;
         this.upwardNameList.addAll(upwardNameList);
         this.filePath = filePath;
-        this.ownerList.addAll(ownerList);
+        this.configList.addAll(configList);
     }
 
     public String getName() {
@@ -80,10 +80,6 @@ public class DocumentOnlineDirectoryVo implements Serializable {
 
     public String getFilePath() {
         return filePath;
-    }
-
-    public List<String> getOwnerList() {
-        return ownerList;
     }
 
     public List<DocumentOnlineDirectoryVo> getChildren() {
@@ -105,34 +101,63 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         }
     }
 
+    public List<DocumentOnlineConfigVo> getConfigList() {
+        return configList;
+    }
+
     public boolean belongToOwner(String moduleGroup, String menu, JSONObject returnObj) {
-        if (CollectionUtils.isEmpty(ownerList)) {
+        if (CollectionUtils.isEmpty(configList)) {
             return false;
         }
-        for (String owner : ownerList) {
-            String[] keyAndValueArray = owner.split("&");
-            for (String keyAndValue : keyAndValueArray) {
-                String[] split = keyAndValue.split("=");
-                if (Objects.equals(split[0], "moduleGroup")) {
-                    if (!Objects.equals(split[1], moduleGroup)) {
-                        return false;
-                    }
-                } else if (Objects.equals(split[0], "menu")) {
-                    if (StringUtils.isNotBlank(menu)) {
-                        if (!Objects.equals(split[1], menu)) {
-                            if (!wildcardMatches(split[1], menu)) {
-                                return false;
-                            }
-                        }
-                    }
-                }  else if (Objects.equals(split[0], "anchorPoint")) {
-                    if (returnObj != null) {
-                        returnObj.put("anchorPoint", split[1]);
-                    }
-                }
+        String anchorPoint = null;
+        boolean result = false;
+        for (DocumentOnlineConfigVo config : configList) {
+            if (!Objects.equals(config.getModuleGroup(), moduleGroup)) {
+                continue;
+            }
+            if (Objects.equals(config.getMenu(), menu)) {
+                anchorPoint = config.getAnchorPoint();
+                result = true;
+                break;
+            } else if (StringUtils.isBlank(config.getMenu()) || StringUtils.isBlank(menu)) {
+                continue;
+            } else if (wildcardMatches(config.getMenu(), menu)) {
+                anchorPoint = config.getAnchorPoint();
+                result = true;
+                break;
             }
         }
-        return true;
+        if (returnObj != null) {
+            returnObj.put("anchorPoint", anchorPoint);
+        }
+        return result;
+//        if (CollectionUtils.isEmpty(ownerList)) {
+//            return false;
+//        }
+//        for (String owner : ownerList) {
+//            String[] keyAndValueArray = owner.split("&");
+//            for (String keyAndValue : keyAndValueArray) {
+//                String[] split = keyAndValue.split("=");
+//                if (Objects.equals(split[0], "moduleGroup")) {
+//                    if (!Objects.equals(split[1], moduleGroup)) {
+//                        return false;
+//                    }
+//                } else if (Objects.equals(split[0], "menu")) {
+//                    if (StringUtils.isNotBlank(menu)) {
+//                        if (!Objects.equals(split[1], menu)) {
+//                            if (!wildcardMatches(split[1], menu)) {
+//                                return false;
+//                            }
+//                        }
+//                    }
+//                }  else if (Objects.equals(split[0], "anchorPoint")) {
+//                    if (returnObj != null) {
+//                        returnObj.put("anchorPoint", split[1]);
+//                    }
+//                }
+//            }
+//        }
+//        return true;
     }
     /**
      * 通配符匹配，*代表任意个数的字符，?代表有且仅有一个字符。

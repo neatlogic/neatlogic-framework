@@ -18,6 +18,7 @@ package neatlogic.framework.documentonline.dto;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -25,16 +26,26 @@ import java.util.Objects;
 public class DocumentOnlineConfigVo implements Serializable {
 
     private static final long serialVersionUID = -928973151356839787L;
-    @EntityField(name = "文件路径", type = ApiParamType.STRING)
+    @EntityField(name = "common.filepath", type = ApiParamType.STRING)
     private String filePath;
-    @EntityField(name = "模块组标识", type = ApiParamType.STRING)
+    @EntityField(name = "common.modulegroup", type = ApiParamType.STRING)
     private String moduleGroup;
-    @EntityField(name = "菜单标识", type = ApiParamType.STRING)
+    @EntityField(name = "common.menu", type = ApiParamType.STRING)
     private String menu;
-    @EntityField(name = "锚点", type = ApiParamType.STRING)
+    @EntityField(name = "common.anchorpoint", type = ApiParamType.STRING)
     private String anchorPoint;
-    @EntityField(name = "配置信息来源", type = ApiParamType.STRING)
+    @EntityField(name = "common.source", type = ApiParamType.STRING)
     private String source;
+
+    public DocumentOnlineConfigVo() {}
+
+    public DocumentOnlineConfigVo(DocumentOnlineConfigVo configVo) {
+        this.filePath = configVo.getFilePath();
+        this.moduleGroup = configVo.getModuleGroup();
+        this.menu = configVo.getMenu();
+        this.anchorPoint = configVo.getAnchorPoint();
+        this.source = configVo.getSource();
+    }
 
     public String getFilePath() {
         return filePath;
@@ -53,6 +64,9 @@ public class DocumentOnlineConfigVo implements Serializable {
     }
 
     public String getMenu() {
+        if (menu == null) {
+            menu = StringUtils.EMPTY;
+        }
         return menu;
     }
 

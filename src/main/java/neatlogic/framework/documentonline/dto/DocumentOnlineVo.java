@@ -26,16 +26,18 @@ public class DocumentOnlineVo implements Serializable {
 
     private static final long serialVersionUID = -928973151322839787L;
 
-    @EntityField(name = "文件名", type = ApiParamType.STRING)
+    @EntityField(name = "common.filename", type = ApiParamType.STRING)
     private String fileName;
-    @EntityField(name = "文件路径", type = ApiParamType.STRING)
+    @EntityField(name = "common.filepath", type = ApiParamType.STRING)
     private String filePath;
-    @EntityField(name = "文件上层名称列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.upwardnamelist", type = ApiParamType.JSONARRAY)
     private List<String> upwardNameList;
-    @EntityField(name = "内容", type = ApiParamType.STRING)
+    @EntityField(name = "common.content", type = ApiParamType.STRING)
     private String content;
-    @EntityField(name = "锚点", type = ApiParamType.STRING)
+    @EntityField(name = "common.anchorpoint", type = ApiParamType.STRING)
     private String anchorPoint;
+    @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
+    private List<DocumentOnlineConfigVo> configList;
 
     public String getFileName() {
         return fileName;
@@ -75,5 +77,13 @@ public class DocumentOnlineVo implements Serializable {
 
     public void setAnchorPoint(String anchorPoint) {
         this.anchorPoint = anchorPoint;
+    }
+
+    public List<DocumentOnlineConfigVo> getConfigList() {
+        return configList;
+    }
+
+    public void setConfigList(List<DocumentOnlineConfigVo> configList) {
+        this.configList = configList;
     }
 }

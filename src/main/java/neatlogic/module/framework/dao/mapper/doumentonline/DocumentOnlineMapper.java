@@ -25,6 +25,8 @@ public interface DocumentOnlineMapper extends IDocumentOnlineCrossoverMapper {
 
     List<DocumentOnlineConfigVo> getDocumentOnlineConfigListByFilePathList(List<String> filePathList);
 
+    List<DocumentOnlineConfigVo> getAllDocumentOnlineConfigList();
+
     int insertDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
 
     int deleteDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);

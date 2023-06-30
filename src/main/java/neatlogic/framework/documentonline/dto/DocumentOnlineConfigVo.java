@@ -26,15 +26,15 @@ import java.util.Objects;
 public class DocumentOnlineConfigVo implements Serializable {
 
     private static final long serialVersionUID = -928973151356839787L;
-    @EntityField(name = "文件路径", type = ApiParamType.STRING)
+    @EntityField(name = "common.filepath", type = ApiParamType.STRING)
     private String filePath;
-    @EntityField(name = "模块组标识", type = ApiParamType.STRING)
+    @EntityField(name = "common.modulegroup", type = ApiParamType.STRING)
     private String moduleGroup;
-    @EntityField(name = "菜单标识", type = ApiParamType.STRING)
+    @EntityField(name = "common.menu", type = ApiParamType.STRING)
     private String menu;
-    @EntityField(name = "锚点", type = ApiParamType.STRING)
+    @EntityField(name = "common.anchorpoint", type = ApiParamType.STRING)
     private String anchorPoint;
-    @EntityField(name = "配置信息来源", type = ApiParamType.STRING)
+    @EntityField(name = "common.source", type = ApiParamType.STRING)
     private String source;
 
     public DocumentOnlineConfigVo() {}

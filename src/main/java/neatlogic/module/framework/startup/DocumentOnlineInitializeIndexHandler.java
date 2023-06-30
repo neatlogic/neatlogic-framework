@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.documentonline.dto.*;
 import neatlogic.framework.startup.StartupBase;
+import neatlogic.framework.util.$;
 import neatlogic.module.framework.dao.mapper.doumentonline.DocumentOnlineMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -71,13 +72,9 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     public final static DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
 
-    public static List<DocumentOnlineConfigVo> getMappingConfigList() {
-        return mappingConfigList;
-    }
-
     @Override
     public String getName() {
-        return "初始化在线帮助文档索引";
+        return "nmfs.documentonlineinitializeindexhandler.getname";
     }
 
     @Override
@@ -111,7 +108,12 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                         }
                         String filePath = documentOnlineConfigVo.getFilePath();
                         if (StringUtils.isBlank(filePath)) {
-                            logger.warn(path + "文件中第" + i + "个元素中的filePath字段没有设置值" + filePath);
+                            logger.warn($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.warn_a", path, i));
+                            continue;
+                        }
+                        String moduleGroup = documentOnlineConfigVo.getModuleGroup();
+                        if (StringUtils.isBlank(moduleGroup)) {
+                            logger.warn($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.warn_b", path, i));
                             continue;
                         }
                         documentOnlineConfigVo.setSource(path);
@@ -128,7 +130,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             List<String> existingFilePathList = new ArrayList<>();
             // 1.创建分词器
             Analyzer analyzer = new IKAnalyzer(true);
-            System.out.println("在线文档索引库位置为" + INDEX_DIRECTORY);
+            System.out.println($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.system_out_println", INDEX_DIRECTORY));
             // 2.创建dir目录对象，目录对象表示索引库的位置
             Directory dir = MMapDirectory.open(Paths.get(INDEX_DIRECTORY));
             // 3.创建IndexWriterConfig对象，这个对象中指定切分词使用的分词器

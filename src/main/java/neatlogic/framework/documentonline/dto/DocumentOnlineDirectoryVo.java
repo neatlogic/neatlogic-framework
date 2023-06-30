@@ -32,17 +32,17 @@ public class DocumentOnlineDirectoryVo implements Serializable {
 
     private static final long serialVersionUID = -928973333311839787L;
 
-    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private final String name;
-    @EntityField(name = "是否是文件", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "common.isfile", type = ApiParamType.BOOLEAN)
     private final boolean isFile;
-    @EntityField(name = "目录或文件名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.filepath", type = ApiParamType.STRING)
     private String filePath;
-    @EntityField(name = "上层目录名称列表", type = ApiParamType.STRING)
+    @EntityField(name = "common.upwardnamelist", type = ApiParamType.STRING)
     private final List<String> upwardNameList = new ArrayList<>();
-    @EntityField(name = "子目录或文件", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.children", type = ApiParamType.JSONARRAY)
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
-    @EntityField(name = "映射配置列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
     private final List<DocumentOnlineConfigVo> configList = new ArrayList<>();
 
     private boolean allowAddChild = true;

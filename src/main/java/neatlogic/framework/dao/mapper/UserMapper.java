@@ -211,6 +211,10 @@ public interface UserMapper {
 
     int updateUserTeamByUserUuid(TeamUserVo vo);
 
+    int updateUserIsDeletedByUuid(String uuid);
+
+    int updateUserIsNotDeletedByUuid(String uuid);
+
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
 
     int deleteUserPasswordByUserUuid(String userUuid);
@@ -241,4 +245,5 @@ public interface UserMapper {
 
     void updateDelSuperAdmin();
 
+    void deleteUserDataByUserUuid(String userUuid);
 }

@@ -19,6 +19,7 @@ package neatlogic.framework.dto.module;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.initialdata.core.InitialDataManager;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 public class ModuleVo {
@@ -55,7 +56,7 @@ public class ModuleVo {
     }
 
     public String getName() {
-        return name;
+        return $.t(name);
     }
 
     public void setName(String name) {
@@ -63,7 +64,7 @@ public class ModuleVo {
     }
 
     public String getDescription() {
-        return description;
+        return $.t(description);
     }
 
     public void setDescription(String description) {
@@ -95,7 +96,7 @@ public class ModuleVo {
     }
 
     public String getGroupName() {
-        return groupName;
+        return $.t(groupName);
     }
 
     public void setGroupName(String groupName) {

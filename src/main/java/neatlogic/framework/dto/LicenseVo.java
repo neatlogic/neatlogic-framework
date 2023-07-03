@@ -1,48 +1,80 @@
 /*
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package neatlogic.framework.dto;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LicenseVo implements Serializable {
-    private static final long serialVersionUID = -4515626151148587123L;
-    //客户名
-    private String purchaser;
-    //数据库链接
+public class LicenseVo {
+    @EntityField(name = "nfd.licensevo.entityfield.name.dburl", type = ApiParamType.STRING)
     private String dbUrl;
-    //到期时间
-    private Date expireTime;
-    //签发时间
-    private Date issueTime;
-    //到期后仍可以使用天数
-    private Integer expiredDay = 30;
-    //即将到期前提醒天数
-    private Integer willExpiredDay = 30;
-    //创建时间
-    private Date createTime;
+    @EntityField(name = "nfd.licensevo.entityfield.name.purchaser", type = ApiParamType.STRING)
+    private String purchaser;
+    @EntityField(name = "common.createdate", type = ApiParamType.LONG)
+    private Long createDate;
+    @EntityField(name = "nfd.licensevo.entityfield.name.expirationdate", type = ApiParamType.LONG)
+    private Long expirationDate;
+    @EntityField(name = "nfd.licensevo.entityfield.name.enddate", type = ApiParamType.LONG)
+    private Long endDate;
+    @EntityField(name = "nfd.licensevo.entityfield.name.graceperiod", type = ApiParamType.INTEGER)
+    private int gracePeriod;
     @JSONField(serialize = false)
-    //加密后的license
-    private String licenseStr;
-    //授权模块
-    private JSONObject modulePackage;
+    private List<String> modules;
+    @EntityField(name = "nfd.licensevo.entityfield.name.modules", type = ApiParamType.JSONARRAY)
+    private List<ModuleVo> moduleList;
+    @EntityField(name = "common.isexpired", type = ApiParamType.BOOLEAN)
+    private Boolean isExpired;
+    @EntityField(name = "nfd.licensevo.entityfield.name.isend", type = ApiParamType.BOOLEAN)
+    private Boolean isEnd;
+    @EntityField(name = "nfd.licensevo.entityfield.name.isvalid", type = ApiParamType.BOOLEAN)
+    private Boolean isValid;
+
+    public Boolean getIsValid() {
+        return expirationDate != null && StringUtils.isNotBlank(dbUrl) && Config.DB_URL().startsWith(dbUrl);
+    }
+
+    public Long getEndDate() {
+        return expirationDate + (long) gracePeriod * 24 * 60 * 60 * 1000;
+    }
+
+
+    public Boolean getIsExpired() {
+        return expirationDate != null && expirationDate < System.currentTimeMillis();
+    }
+
+    public Boolean getIsEnd() {
+        return expirationDate != null && expirationDate + (long) gracePeriod * 24 * 60 * 60 * 1000 < System.currentTimeMillis();
+    }
+
+    public Long getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Long createDate) {
+        this.createDate = createDate;
+    }
 
     public String getDbUrl() {
         return dbUrl;
@@ -50,72 +82,6 @@ public class LicenseVo implements Serializable {
 
     public void setDbUrl(String dbUrl) {
         this.dbUrl = dbUrl;
-    }
-
-    public Date getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(Date expireTime) {
-        this.expireTime = expireTime;
-    }
-
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public boolean isExpiredOutOfDay(Long diffTime) {
-        if (diffTime < 0) {
-            return (-diffTime / (1000L * 24 * 60 * 60)) >= expiredDay;
-        }
-        return false;
-    }
-
-    public Long getCurrentWillExpiredDay(Long diffTime) {
-        if (diffTime > 0) {
-            long day = diffTime / (1000L * 24 * 60 * 60);
-            if (day < willExpiredDay)
-                return willExpiredDay - day;
-        }
-        return null;
-    }
-
-    public Long getCurrentExpireDay(Long diffTime) {
-        if (diffTime < 0) {
-            long day = -diffTime / (1000L * 24 * 60 * 60);
-            if (day < expiredDay)
-                return expiredDay - day;
-        }
-        return null;
-    }
-
-    public String getLicenseStr() {
-        return licenseStr;
-    }
-
-    public void setLicenseStr(String licenseStr) {
-        this.licenseStr = licenseStr;
-    }
-
-    public Integer getExpiredDay() {
-        return expiredDay;
-    }
-
-    public void setExpiredDay(Integer expiredDay) {
-        this.expiredDay = expiredDay;
-    }
-
-    public Integer getWillExpiredDay() {
-        return willExpiredDay;
-    }
-
-    public void setWillExpiredDay(Integer willExpiredDay) {
-        this.willExpiredDay = willExpiredDay;
     }
 
     public String getPurchaser() {
@@ -126,19 +92,35 @@ public class LicenseVo implements Serializable {
         this.purchaser = purchaser;
     }
 
-    public Date getIssueTime() {
-        return issueTime;
+    public Long getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setIssueTime(Date issueTime) {
-        this.issueTime = issueTime;
+    public void setExpirationDate(Long expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
-    public JSONObject getModulePackage() {
-        return modulePackage;
+    public int getGracePeriod() {
+        return gracePeriod;
     }
 
-    public void setModulePackage(JSONObject modulePackage) {
-        this.modulePackage = modulePackage;
+    public void setGracePeriod(int gracePeriod) {
+        this.gracePeriod = gracePeriod;
+    }
+
+    public List<String> getModules() {
+        return modules;
+    }
+
+    public List<ModuleVo> getModuleList() {
+        List<ModuleVo> moduleList = new ArrayList<>();
+        for (String module : modules) {
+            moduleList.add(ModuleUtil.getModuleById(module));
+        }
+        return moduleList;
+    }
+
+    public void setModules(List<String> modules) {
+        this.modules = modules;
     }
 }

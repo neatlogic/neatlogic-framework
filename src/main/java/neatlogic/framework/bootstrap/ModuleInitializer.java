@@ -61,7 +61,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 Element rootE = document.getRootElement();
                 Element neatlogicE = rootE.element("module");
                 // Element nameE = rootE.element("name");
-                String moduleName = null, urlMapping = null, moduleDescription = null, version = null, group = null, groupName = null, groupSort = null, groupDescription = null;
+                String moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
                 moduleId = neatlogicE.attributeValue("id");
                 moduleName = neatlogicE.attributeValue("name");
                 urlMapping = neatlogicE.attributeValue("urlMapping");

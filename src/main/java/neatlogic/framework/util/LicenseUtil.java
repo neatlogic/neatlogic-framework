@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -35,37 +35,25 @@ public class LicenseUtil {
      *
      * @param licenseStr license串
      */
-    public static String deLicense(String licenseStr, String licencePK, String dbUrl) {
+    public static LicenseVo deLicense(String licenseStr, String licencePK) {
         licenseStr = licenseStr.replaceAll("\\r\\n", StringUtils.EMPTY).replaceAll("\\n", StringUtils.EMPTY).trim();
         String[] licenses = licenseStr.split("#");
         if (licenses.length != 2) {
             logger.error("license invalid (length):" + licenseStr);
-            System.exit(1);
+            return null;
         }
         String sign = licenses[1];
-        byte[] decodeData = Base64.getDecoder().decode(licenses[0].getBytes(Charset.forName("GBK")));
+        byte[] decodeData = Base64.getDecoder().decode(licenses[0].getBytes(StandardCharsets.UTF_8));
         if (StringUtils.isBlank(licencePK)) {
             logger.error("license pk is blank:" + licenseStr);
-            System.exit(1);
+            return null;
         }
         if (!RSAUtils.verify(decodeData, licencePK, sign)) {
             logger.error("license invalid (verify):" + licenseStr);
-            System.exit(1);
+            return null;
         }
-        String license = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, licencePK)), Charset.forName("GBK"));
-        LicenseVo licenseVo = JSONObject.parseObject(license).toJavaObject(LicenseVo.class);
-        //判断数据库连接串是否匹配
-        if (!dbUrl.startsWith(licenseVo.getDbUrl())) {
-            logger.error("license invalid (dbUrl):" + licenseStr);
-            System.exit(1);
-        }
-        //判断是否停止服务
-        long diffTime = licenseVo.getExpireTime().getTime() - System.currentTimeMillis();
-        if (licenseVo.isExpiredOutOfDay(diffTime)) {
-            logger.error("license is expired:" + licenseStr);
-            System.exit(1);
-        }
-        return JSONObject.toJSONString(licenseVo);
+        String license = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(decodeData, licencePK)), StandardCharsets.UTF_8);
+        return JSONObject.parseObject(license).toJavaObject(LicenseVo.class);
     }
 
 }

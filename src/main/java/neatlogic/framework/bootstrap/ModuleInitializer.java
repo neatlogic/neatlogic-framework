@@ -20,6 +20,7 @@ import neatlogic.framework.asynchronization.thread.ModuleInitApplicationListener
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -93,7 +94,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     moduleVo.setGroupDescription(groupDescription);
                     ModuleUtil.addModule(moduleVo);
 
-                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + moduleName + "] " + version, new NeatLogicDispatcherServlet(moduleVo, appContext));
+                    ServletRegistration.Dynamic sr = context.addServlet(moduleId + "[" + I18nUtils.getStaticMessage(moduleName) + "] " + version, new NeatLogicDispatcherServlet(moduleVo, appContext));
                     if (StringUtils.isNotBlank(urlMapping)) {
                         sr.addMapping(urlMapping);
                     }

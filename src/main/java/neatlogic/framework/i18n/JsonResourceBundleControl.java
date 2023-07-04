@@ -41,7 +41,7 @@ public class JsonResourceBundleControl extends ResourceBundle.Control {
         if (locale == null || StringUtils.isBlank(locale.getLanguage())) {
             locale = Locale.getDefault();
         }
-        String bundleName = toBundleName(baseName,  locale);
+        String bundleName = toBundleName(baseName, locale);
         String resourceName = toResourceName(bundleName, format);
         InputStream stream = loader.getResourceAsStream(resourceName);
         if (stream == null) {
@@ -52,9 +52,8 @@ public class JsonResourceBundleControl extends ResourceBundle.Control {
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> map = mapper.readValue(stream, Map.class);
             Properties props = new Properties();
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                props.put(entry.getKey(), entry.getValue().toString());
-            }
+            String key = StringUtils.EMPTY;
+            getProps(map, props, key);
             // 将 Properties 对象转换为字节数组输出流
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             props.store(byteArrayOutputStream, "comments");
@@ -64,6 +63,27 @@ public class JsonResourceBundleControl extends ResourceBundle.Control {
             return new PropertyResourceBundle(byteArrayInputStream);
         } finally {
             stream.close();
+        }
+    }
+
+    /**
+     * 递归获取props
+     *
+     * @param map   原始数据
+     * @param props 返回的props
+     */
+    private void getProps(Map<String, Object> map, Properties props, String key) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String tmpKey = StringUtils.EMPTY;
+            if (StringUtils.isNotBlank(key)) {
+                tmpKey = key + ".";
+            }
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                getProps((Map) value, props, tmpKey + entry.getKey());
+            } else {
+                props.put(tmpKey + entry.getKey(), entry.getValue().toString());
+            }
         }
     }
 }

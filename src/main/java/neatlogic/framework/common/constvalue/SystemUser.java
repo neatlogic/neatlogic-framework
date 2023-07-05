@@ -68,6 +68,8 @@ public enum SystemUser {
         userVo.setUserId(userId);
         userVo.setUserName(getUserName());
         userVo.setTenant(TenantContext.get().getTenantUuid());
+        userVo.setIsDelete(0);
+        userVo.setIsActive(1);
         try {
             JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(userVo);
             String authorization = "Bearer_" + jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign();

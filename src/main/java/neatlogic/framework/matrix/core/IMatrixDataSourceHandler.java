@@ -96,6 +96,19 @@ public interface IMatrixDataSourceHandler {
     Workbook exportMatrix2Excel(MatrixVo matrixVo);
 
     /**
+     * 导出矩阵的定义及数据
+     * @param matrixVo
+     * @return
+     */
+    MatrixVo exportMatrix(MatrixVo matrixVo);
+    /**
+     * 导入矩阵的定义及数据
+     * @param matrixVo
+     * @return
+     */
+    void importMatrix(MatrixVo matrixVo);
+
+    /**
      * 保存矩阵属性列表信息
      *
      * @param matrixUuid

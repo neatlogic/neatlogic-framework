@@ -190,6 +190,21 @@ public class TimeUtil {
         return TimeUtil.convertDateToString(calendar.getTime(), format);
     }
 
+    /**
+     * 获取n天后的时间,返回long类型
+     * @param date 时间
+     * @param day 天数
+     * @return n天后的时间
+     */
+    public static Long getAddDateLongByDay(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        for (int i = 0; i < day; i++) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return calendar.getTime().getTime();
+    }
+
     public static String addDateByWorkDay(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

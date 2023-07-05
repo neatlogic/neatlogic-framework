@@ -1,23 +1,20 @@
 package neatlogic.framework.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.fastjson.JSONObject;
-
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
-import neatlogic.framework.exception.util.FreemarkerTransformException;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.exception.util.FreemarkerTransformException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 
 public class FreemarkerUtil {
 	static Logger logger = LoggerFactory.getLogger(FreemarkerUtil.class);
@@ -27,7 +24,7 @@ public class FreemarkerUtil {
 		JSONObject dataObj = new JSONObject();
 		dataObj.put("DATA", paramObj);
 		String homeUrl = Config.HOME_URL();
-		if(StringUtils.isNotBlank(homeUrl)) {
+		if(StringUtils.isNotBlank(homeUrl) && TenantContext.get() != null) {
 		    if(!homeUrl.endsWith("/")) {
 	            homeUrl += "/";
 	        }

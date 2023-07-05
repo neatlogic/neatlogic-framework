@@ -301,19 +301,23 @@ INSERT INTO `notify_policy` VALUES (851246982373377, '节点通知', 'neatlogic.
 -- ----------------------------
 -- Records of runner
 -- ----------------------------
-INSERT INTO `runner` VALUES (856399315738624, 'local', 'localhost', 8084, 'http://localhost:8084/autoexecrunner/', NULL, NULL, NULL, NULL, NULL, NULL, 'localhost', '8888', 0);
+INSERT INTO `runner` VALUES (544678298525696, 'local', '127.0.0.1', 8084, 'http://127.0.0.1:8084/autoexecrunner/', NULL, NULL, NULL, NULL, NULL, NULL, '127.0.0.1', '8888', 0);
 -- ----------------------------
 -- Records of runner_map
 -- ----------------------------
-INSERT INTO `runner_map` VALUES (856399315738624, 856399315738624);
+INSERT INTO `runner_map` VALUES (544678298525696, 544678298525696);
+-- ----------------------------
+-- Records of runnergroup
+-- ----------------------------
+INSERT INTO `runnergroup` VALUES (544678650847232, '全网段', '全网段');
 -- ----------------------------
 -- Records of runnergroup_network
 -- ----------------------------
-INSERT INTO `runnergroup_network` VALUES (856399533842433, 856399533842432, '0.0.0.0', 0);
+INSERT INTO `runnergroup_network` VALUES (544678650847233, 544678650847232, '0.0.0.0', 0);
 -- ----------------------------
 -- Records of runnergroup_runner
 -- ----------------------------
-INSERT INTO `runnergroup_runner` VALUES (856399533842432, 856399315738624);
+INSERT INTO `runnergroup_runner` VALUES (544678650847232, 544678298525696);
 -- ----------------------------
 -- Records of task_config
 -- ----------------------------

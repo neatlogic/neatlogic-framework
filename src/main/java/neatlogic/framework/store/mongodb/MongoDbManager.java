@@ -16,11 +16,11 @@
 
 package neatlogic.framework.store.mongodb;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.MongoDbMapper;
 import neatlogic.framework.dto.MongoDbVo;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -47,6 +47,12 @@ public class MongoDbManager {
                 mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
             }
         }
+    }
+
+    public static void addDynamicDataSource(MongoDbVo mongoDbVo) {
+        MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + "/" + mongoDbVo.getDatabase() + (StringUtils.isNotBlank(mongoDbVo.getOption()) ? "?" + mongoDbVo.getOption() : ""));
+        mongoDbMap.put(mongoDbVo.getTenantUuid(), client);
+        mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
     }
 
     public static String getDatabase(String tenantUuid) {

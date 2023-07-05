@@ -62,6 +62,7 @@ public class MaintenanceMode {
         userVo.setUserId(Config.SUPERADMIN());
         userVo.setUserName("厂商维护人员");
         userVo.setIsActive(1);
+        userVo.setIsDelete(0);
         userVo.setVipLevel(0);
         List<UserAuthVo> authList = new ArrayList<>();
         for (String auth : maintenanceAuthSet) {

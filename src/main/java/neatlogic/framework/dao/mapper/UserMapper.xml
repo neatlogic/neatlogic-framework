@@ -138,6 +138,7 @@ limitations under the License.
                e.`password`,
                a.`pinyin`,
                a.`is_active`        AS isActive,
+               a.`is_delete`        AS isDelete,
                a.`user_info`        AS userInfo,
                a.`vip_level`        AS vipLevel,
                b.`role_uuid`        AS roleUuid,

@@ -87,6 +87,16 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
+    protected MatrixVo myExportMatrix(MatrixVo matrixVo) {
+        return null;
+    }
+
+    @Override
+    protected void myImportMatrix(MatrixVo matrixVo) {
+
+    }
+
+    @Override
     protected void mySaveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {
 
     }

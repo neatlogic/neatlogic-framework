@@ -126,6 +126,26 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     }
 
     @Override
+    public MatrixVo exportMatrix(MatrixVo matrixVo) {
+        return myExportMatrix(matrixVo);
+    }
+
+    protected abstract MatrixVo myExportMatrix(MatrixVo matrixVo);
+
+    @Override
+    public void importMatrix(MatrixVo matrixVo) {
+        if (matrixMapper.checkMatrixIsExists(matrixVo.getUuid()) > 0) {
+            matrixMapper.deleteMatrixByUuid(matrixVo.getUuid());
+        }
+        matrixVo.setFcu(UserContext.get().getUserUuid());
+        matrixVo.setLcu(UserContext.get().getUserUuid());
+        matrixMapper.insertMatrix(matrixVo);
+        myImportMatrix(matrixVo);
+    }
+
+    protected abstract void myImportMatrix(MatrixVo matrixVo);
+
+    @Override
     public void saveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {
         mySaveAttributeList(matrixUuid, matrixAttributeList);
     }

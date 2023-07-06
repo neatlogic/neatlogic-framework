@@ -52,7 +52,7 @@ public class LicenseVo {
     private Boolean isValid;
 
     public Boolean getIsValid() {
-        return expirationDate != null && StringUtils.isNotBlank(dbUrl) && Config.DB_URL().startsWith(dbUrl);
+        return expirationDate != null && StringUtils.isNotBlank(dbUrl) && Config.DB_URL().equalsIgnoreCase(dbUrl);
     }
 
     public Long getEndDate() {

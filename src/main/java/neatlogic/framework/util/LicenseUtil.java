@@ -55,11 +55,4 @@ public class LicenseUtil {
         String license = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(Base64Utils.decode(decodeData), licencePK)), StandardCharsets.UTF_8);
         return JSONObject.parseObject(license).toJavaObject(LicenseVo.class);
     }
-
-    public static void main(String[] a) {
-        String s = "gWKDaBcSaeAXcCXlrO7nLHbcYfqeIsZgxkreDIlGXamjfEAvQVHtFUWsbwiANl1jkRMXkum7auBF1qfSsfd4IkXREBj1WHumHqhqZRlkfyM37UDtdyd6x/hUri3/quYiwocPnYuXcWXcrN9Oko76dv1giDptNzceteTCASu+v0s9I42RLWTHMbbUN+tufU42yqTHVsbz0H69iPtDssRhJ4NcLaWM7Do5apCRlZsxheJAH3qsBFWu5zvCUEOHlzVtW7II/AkiIDtVUDEJoGctvzcsWvlxtLfRbq1kGnzi+q92ryex5LKBf62z/eiBTa3LDsEpS9ki0rnNOlPCOUHd7g==#HNsh1a4RNkkJIrXMf4VhNzVtusjwK8PkzP9A8rU154DBvRuF6tawreg3xJiYYB1yDI5bjk1xUmjfv+3m0X8ExLd+XrAQfZWoLxQTvff8g26kIpYVmxWS7M+sIyj3Qlgu+NbJHG8K1YJ+vOOLtfJMBghla3qkSATrbWAOqw5hbB4=";
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHfhFEod4K3VlDdF0zGFLeavGyokUt/Njczl/4yAwpOvTUNW0x3C4Uc49NjP3Vr8KYYbsXk7DKv+8hoENGfltSzepmPpX4Mu+iclUqyaLbLHoX+rB7SagjiekuG3B1/ADPLsuG6VFkC00yEFkMUmZhU5IVbTTTKEpCtH8bJxa1aQIDAQAB";
-        System.out.println(String.join(",", Objects.requireNonNull(deLicense(s, publicKey)).getModules()));
-    }
-
 }

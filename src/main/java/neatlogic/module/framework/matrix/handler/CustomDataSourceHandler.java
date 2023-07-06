@@ -276,6 +276,73 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
+    protected MatrixVo myExportMatrix(MatrixVo matrixVo) {
+        List<MatrixAttributeVo> attributeList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixVo.getUuid());
+        JSONObject config = new JSONObject();
+        config.put("attributeList", attributeList);
+        List<String> columnList = attributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
+        MatrixDataVo matrixDataVo = new MatrixDataVo();
+        matrixDataVo.setMatrixUuid(matrixVo.getUuid());
+        matrixDataVo.setColumnList(columnList);
+        int rowNum = matrixDataMapper.getDynamicTableDataCount(matrixDataVo);
+        if (rowNum > 0) {
+            List<Map<String, String>> allDataList = new ArrayList<>(rowNum);
+            matrixDataVo.setRowNum(rowNum);
+            matrixDataVo.setPageSize(100);
+            int pageCount = matrixDataVo.getPageCount();
+            for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                matrixDataVo.setCurrentPage(currentPage);
+                List<Map<String, String>> dataList = matrixDataMapper.searchDynamicTableData(matrixDataVo);
+                allDataList.addAll(dataList);
+            }
+            config.put("dataList", allDataList);
+        }
+        matrixVo.setConfig(config);
+        return matrixVo;
+    }
+
+    @Override
+    protected void myImportMatrix(MatrixVo matrixVo) {
+        JSONObject config = matrixVo.getConfig();
+        if (MapUtils.isEmpty(config)) {
+            return;
+        }
+        JSONArray attributeArray = config.getJSONArray("attributeList");
+        if (CollectionUtils.isEmpty(attributeArray)) {
+            return;
+        }
+        String matrixUuid = matrixVo.getUuid();
+        List<MatrixAttributeVo> attributeList = attributeArray.toJavaList(MatrixAttributeVo.class);
+        List<MatrixAttributeVo> oldMatrixAttributeList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixUuid);
+        if (CollectionUtils.isNotEmpty(oldMatrixAttributeList)) {
+            // 删除旧字段配置
+            attributeMapper.deleteAttributeByMatrixUuid(matrixUuid);
+            // 删除动态表及数据
+            attributeMapper.dropMatrixDynamicTable(matrixUuid);
+        }
+        for (MatrixAttributeVo attributeVo : attributeList) {
+            attributeVo.setMatrixUuid(matrixUuid);
+            attributeMapper.insertMatrixAttribute(attributeVo);
+        }
+        attributeMapper.createMatrixDynamicTable(attributeList, matrixUuid);
+
+        JSONArray dataArray = config.getJSONArray("dataList");
+        if (CollectionUtils.isNotEmpty(dataArray)) {
+            for (int i = 0; i < dataArray.size(); i++) {
+                Map<String, Object> map = dataArray.getObject(i, Map.class);
+                if (MapUtils.isNotEmpty(map)) {
+                    List<MatrixColumnVo> columnlist = new ArrayList<>();
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        String value = entry.getValue() == null ? null : entry.getValue().toString();
+                        columnlist.add(new MatrixColumnVo(entry.getKey(), value));
+                    }
+                    matrixDataMapper.insertDynamicTableData(columnlist, matrixUuid);
+                }
+            }
+        }
+    }
+
+    @Override
     protected void mySaveAttributeList(String matrixUuid, List<MatrixAttributeVo> attributeVoList) {
 //        List<MatrixAttributeVo> attributeVoList = jsonObj.getJSONArray("matrixAttributeList").toJavaList(MatrixAttributeVo.class);
         List<MatrixAttributeVo> oldMatrixAttributeList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixUuid);

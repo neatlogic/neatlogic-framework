@@ -194,6 +194,34 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
+    protected MatrixVo myExportMatrix(MatrixVo matrixVo) {
+        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(matrixVo.getUuid());
+        if (matrixViewVo == null) {
+            throw new MatrixViewNotFoundException(matrixVo.getName());
+        }
+        JSONObject config = new JSONObject();
+        config.put("config", matrixViewVo.getConfig());
+        config.put("xml", matrixViewVo.getXml());
+        matrixVo.setConfig(config);
+        matrixVo.setFileName(matrixViewVo.getFileName());
+        return matrixVo;
+    }
+
+    @Override
+    protected void myImportMatrix(MatrixVo matrixVo) {
+        myDeleteMatrix(matrixVo.getUuid());
+        JSONObject config = matrixVo.getConfig();
+        String xml = config.getString("xml");
+        buildView(matrixVo.getUuid(), matrixVo.getName(), xml);
+        MatrixViewVo matrixViewVo = new MatrixViewVo();
+        matrixViewVo.setMatrixUuid(matrixVo.getUuid());
+        matrixViewVo.setFileName(matrixVo.getFileName());
+        matrixViewVo.setXml(xml);
+        matrixViewVo.setConfig(config.getString("config"));
+        matrixMapper.insertMatrixView(matrixViewVo);
+    }
+
+    @Override
     protected void mySaveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {
 
     }

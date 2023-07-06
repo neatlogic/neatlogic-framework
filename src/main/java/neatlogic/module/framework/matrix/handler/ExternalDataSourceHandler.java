@@ -154,6 +154,18 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
+    protected MatrixVo myExportMatrix(MatrixVo matrixVo) {
+        myGetMatrix(matrixVo);
+        return matrixVo;
+    }
+
+    @Override
+    protected void myImportMatrix(MatrixVo matrixVo) {
+        MatrixExternalVo externalVo = new MatrixExternalVo(matrixVo.getUuid(), matrixVo.getIntegrationUuid());
+        matrixMapper.replaceMatrixExternal(externalVo);
+    }
+
+    @Override
     protected void mySaveAttributeList(String matrixUuid, List<MatrixAttributeVo> matrixAttributeList) {
 
     }

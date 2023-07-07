@@ -64,7 +64,7 @@ public class NotifyHandlerFactory extends ModuleInitializedListenerBase {
         for (Map.Entry<String, INotifyHandler> entry : myMap.entrySet()) {
             INotifyHandler plugin = entry.getValue();
             if (plugin.getClassName() != null) {
-                notifyHandlerMap.put(plugin.getClassName(), plugin);
+                notifyHandlerMap.put(ClassUtils.getUserClass(plugin.getClass()).getSimpleName(), plugin);
 //                notifyHandlerTypeList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getName()));
 //                notifyHandlerNameList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getType()));
             }

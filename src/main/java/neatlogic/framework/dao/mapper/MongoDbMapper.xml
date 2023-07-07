@@ -29,7 +29,7 @@ limitations under the License.
         on duplicate key
             update `database` = #{database},
                    `username` = #{username},
-                   `password` = #{passwordPlain},
+                   `password` = #{passwordCipher},
                    `host`     = #{host},
                    `option`   = #{option}
     </insert>

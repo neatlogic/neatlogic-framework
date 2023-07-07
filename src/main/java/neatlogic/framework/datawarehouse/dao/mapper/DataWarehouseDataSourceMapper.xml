@@ -128,6 +128,11 @@ limitations under the License.
         where a.id = #{value}
     </select>
 
+    <select id="getAllDataSource" parameterType="java.lang.Long"
+            resultMap="dataSourceResultMap">
+        <include refid="getDataSourceDetailSql"/>
+    </select>
+
     <select id="getDataSourceDetailByName" parameterType="java.lang.String"
             resultMap="dataSourceResultMap">
         <include refid="getDataSourceDetailSql"/>

@@ -32,6 +32,8 @@ public interface DataWarehouseDataSourceMapper {
 
     DataSourceVo getDataSourceById(Long id);
 
+    List<DataSourceVo> getAllDataSource();
+
     DataSourceVo getDataSourceDetailByName(String name);
 
     List<DataSourceVo> searchDataSource(DataSourceVo dataSourceVo);

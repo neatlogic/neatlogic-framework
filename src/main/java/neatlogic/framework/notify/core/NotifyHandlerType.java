@@ -16,21 +16,37 @@
 
 package neatlogic.framework.notify.core;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
-public enum NotifyHandlerType {
+import java.util.List;
 
-    EMAIL("email", new I18n("邮件通知")),
-    MESSAGE("message", new I18n("消息通知")),
-    WECHAT("wechat", new I18n("微信通知"));
+public enum NotifyHandlerType implements IEnum {
+
+    EMAIL("email", "common.emailnotify"),
+    MESSAGE("message", "common.messagenotify"),
+    WECHAT("wechat", "common.wechatnotify");
 
     private final String value;
-    private final I18n text;
+    private final String text;
 
-    NotifyHandlerType(String value, I18n text) {
+    NotifyHandlerType(String value, String text) {
         this.value = value;
         this.text = text;
+    }
+
+    @Override
+    public List getValueTextList() {
+        JSONArray array = new JSONArray();
+        for (NotifyHandlerType type : NotifyHandlerType.values()) {
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put("value", type.getValue());
+            jsonObj.put("text", type.getText());
+            array.add(jsonObj);
+        }
+        return array;
     }
 
     public String getValue() {
@@ -38,7 +54,7 @@ public enum NotifyHandlerType {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getText(String _value) {

@@ -20,6 +20,7 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.dto.ValueTextVo;
+import org.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,16 +31,26 @@ import java.util.Map;
 public class NotifyHandlerFactory extends ModuleInitializedListenerBase {
     private static final Map<String, INotifyHandler> notifyHandlerMap = new HashMap<>();
 
-    private static final List<ValueTextVo> notifyHandlerTypeList = new ArrayList<>();
-
-    private static final List<ValueTextVo> notifyHandlerNameList = new ArrayList<>();
+//    private static final List<ValueTextVo> notifyHandlerTypeList = new ArrayList<>();
+//
+//    private static final List<ValueTextVo> notifyHandlerNameList = new ArrayList<>();
 
     public static List<ValueTextVo> getNotifyHandlerTypeList() {
-        return notifyHandlerTypeList;
+        List<ValueTextVo> resultList = new ArrayList<>();
+        for (Map.Entry<String, INotifyHandler> entry : notifyHandlerMap.entrySet()) {
+            INotifyHandler notifyHandler = entry.getValue();
+            resultList.add(new ValueTextVo(ClassUtils.getUserClass(notifyHandler.getClass()).getSimpleName(), notifyHandler.getName()));
+        }
+        return resultList;
     }
 
     public static List<ValueTextVo> getNotifyHandlerNameList() {
-        return notifyHandlerNameList;
+        List<ValueTextVo> resultList = new ArrayList<>();
+        for (Map.Entry<String, INotifyHandler> entry : notifyHandlerMap.entrySet()) {
+            INotifyHandler notifyHandler = entry.getValue();
+            resultList.add(new ValueTextVo(ClassUtils.getUserClass(notifyHandler.getClass()).getSimpleName(), notifyHandler.getType()));
+        }
+        return resultList;
     }
 
     public static INotifyHandler getHandler(String handler) {
@@ -53,9 +64,9 @@ public class NotifyHandlerFactory extends ModuleInitializedListenerBase {
         for (Map.Entry<String, INotifyHandler> entry : myMap.entrySet()) {
             INotifyHandler plugin = entry.getValue();
             if (plugin.getClassName() != null) {
-                notifyHandlerMap.put(plugin.getClass().getSimpleName(), plugin);
-                notifyHandlerTypeList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getName()));
-                notifyHandlerNameList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getType()));
+                notifyHandlerMap.put(plugin.getClassName(), plugin);
+//                notifyHandlerTypeList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getName()));
+//                notifyHandlerNameList.add(new ValueTextVo(plugin.getClass().getSimpleName(), plugin.getType()));
             }
         }
     }

@@ -30,10 +30,7 @@ import neatlogic.framework.notify.dto.NotifyTriggerVo;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @RootComponent
@@ -55,6 +52,18 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         return notifyPolicyHandlerMap.get(handler);
     }
 
+    public static NotifyPolicyHandlerVo getNotifyPolicyHandlerVo(String handler) {
+        for (NotifyPolicyHandlerVo notifyPolicyHandlerVo : notifyPolicyHandlerList) {
+            if (Objects.equals(notifyPolicyHandlerVo.getHandler(), handler)) {
+                try {
+                    return notifyPolicyHandlerVo.clone();
+                } catch (CloneNotSupportedException e) {
+                    return notifyPolicyHandlerVo;
+                }
+            }
+        }
+        return null;
+    }
     public static List<NotifyPolicyHandlerVo> getNotifyPolicyHandlerList() {
         List<NotifyPolicyHandlerVo> notifyPolicyHandlerVoList = new ArrayList<>();
         notifyPolicyHandlerList.forEach(o -> {

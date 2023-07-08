@@ -120,10 +120,10 @@ public class StartupManager extends ModuleInitializedListenerBase {
 
                                     int i = startup.executeForCurrentTenant();
                                     if (i != -999) {
-                                        System.out.println("[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is completed.");
+                                        System.out.println("⚡[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is completed.");
                                     }
                                 } catch (Exception ex) {
-                                    System.out.println("[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is failed.");
+                                    System.out.println("⚡[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is failed.");
                                     logger.error(ex.getMessage(), ex);
                                 }
                             }
@@ -134,10 +134,10 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             try {
                                 int i = startup.executeForAllTenant();
                                 if (i != -999) {
-                                    System.out.println("[All Tenant]Startup Job:" + startup.getName() + " is completed.");
+                                    System.out.println("⚡[All Tenant]Startup Job:" + startup.getName() + " is completed.");
                                 }
                             } catch (Exception ex) {
-                                System.out.println("[All Tenant]Startup Job:" + startup.getName() + " is failed.");
+                                System.out.println("⚡[All Tenant]Startup Job:" + startup.getName() + " is failed.");
                                 logger.error(ex.getMessage(), ex);
                             }
                         }

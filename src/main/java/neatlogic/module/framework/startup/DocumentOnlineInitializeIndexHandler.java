@@ -56,15 +56,18 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     @javax.annotation.Resource
     private DocumentOnlineMapper documentOnlineMapper;
-
-    /**
-     * 在线帮助文档索引库位置
-     */
-    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + "documentonline";
     /**
      * 在线帮助文档根目录
      */
-    private static String classpathRoot = "documentonline/";
+    private static String directoryRoot = "documentonline";
+    /**
+     * 在线帮助文档索引库位置
+     */
+    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + directoryRoot;
+    /**
+     * 在线帮助文档类路径根目录
+     */
+    private static String classpathRoot = "neatlogic/resources/**/" + directoryRoot + "/";
     /**
      * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
      */
@@ -144,12 +147,15 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             for (Resource resource : mdResources) {
                 String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
                 String path = resource.getURL().getPath();
-                int classpathRootIndex = path.indexOf(classpathRoot);
-                String filePath = path.substring(classpathRootIndex);
+                int separatorIndex = path.indexOf("!/");
+                String filePath = path.substring(separatorIndex + 2);
+                int directoryRootIndex = filePath.indexOf(directoryRoot);
+                filePath = filePath.substring(directoryRootIndex);
                 if (existingFilePathList.contains(filePath)) {
                     logger.error($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.error", filePath));
                     System.exit(1);
                 }
+                existingFilePathList.add(filePath);
                 List<DocumentOnlineConfigVo> configList = new ArrayList<>();
                 // 根据文件路径找到配置映射信息，分析出文件所属的模块组、菜单，定位的锚点
                 List<DocumentOnlineConfigVo> mappingConfigs = getMappingConfigByFilePath(filePath);
@@ -238,7 +244,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param filePath
      */
     private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<DocumentOnlineConfigVo> configList) {
-        String path = filePath.substring(classpathRoot.length());
+        String path = filePath.substring(directoryRoot.length() + 1);
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
         String[] split = path.split("/");

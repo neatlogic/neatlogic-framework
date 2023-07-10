@@ -23,14 +23,16 @@ package neatlogic.framework.notify.dto;
 public class NotifyPolicyHandlerVo implements Cloneable{
     private String handler;
     private String name;
+    private String module;
     private String moduleGroup;
     private String authName;
     private Integer isAllowMultiPolicy;
 
-    public NotifyPolicyHandlerVo(String handler, String name, String authName, String moduleGroup, Integer isAllowMultiPolicy) {
+    public NotifyPolicyHandlerVo(String handler, String name, String authName, String module, String moduleGroup, Integer isAllowMultiPolicy) {
         this.handler = handler;
         this.name = name;
         this.authName = authName;
+        this.module = module;
         this.moduleGroup = moduleGroup;
         this.isAllowMultiPolicy = isAllowMultiPolicy;
     }
@@ -49,6 +51,14 @@ public class NotifyPolicyHandlerVo implements Cloneable{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
     }
 
     public String getModuleGroup() {

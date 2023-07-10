@@ -58,7 +58,7 @@ limitations under the License.
     </select>
 
     <select id="getUserGrants" resultType="java.lang.String">
-        SHOW GRANTS FOR '${value}'@'%'
+        SELECT USER FROM mysql.user WHERE USER = '${value}';
     </select>
 
     <update id="updateDatasourcePasswordByTenantId">

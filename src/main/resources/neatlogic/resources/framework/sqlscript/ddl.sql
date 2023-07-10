@@ -1391,7 +1391,7 @@ CREATE TABLE IF NOT EXISTS `worktime_range` (
   PRIMARY KEY (`worktime_uuid`,`start_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='服务窗口时间段范围表';
 
-CREATE TABLE `documentonline_config` (
+CREATE TABLE IF NOT EXISTS `documentonline_config` (
   `file_path` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文档路径',
   `module_group` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块组标识',
   `menu` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单路由',

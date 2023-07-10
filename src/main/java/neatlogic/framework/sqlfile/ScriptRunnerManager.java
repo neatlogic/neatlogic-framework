@@ -47,9 +47,22 @@ public class ScriptRunnerManager {
         tenantMapper = _tenantMapper;
     }
 
-    public static void runScript(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter) throws Exception {
+    /**
+     * 执行sql
+     *
+     * @param tenant       租户
+     * @param moduleId     模块id
+     * @param scriptReader 脚本读取
+     * @param logWriter    日志
+     * @param errWriter    错误日志
+     */
+    public static void runScript(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) {
         Connection conn = null;
-        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenant.getUuid());
+        String tenantUuid = tenant.getUuid();
+        if (isDataDb) {
+            tenantUuid = tenantUuid + "_data";
+        }
+        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
         try {
             conn = tenantDatasource.getConnection();
             ScriptRunner runner = new ScriptRunner(conn);
@@ -86,11 +99,29 @@ public class ScriptRunnerManager {
      * @param errWriter    错误日志
      */
     public static void runScriptOnce(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter) {
+        runScriptOnce(tenant, moduleId, scriptReader, logWriter, errWriter, false);
+    }
+
+    /**
+     * 仅执行一次sql，执行过的sql跳过不执行
+     *
+     * @param tenant       租户
+     * @param moduleId     模块id
+     * @param scriptReader 脚本读取
+     * @param logWriter    日志
+     * @param errWriter    错误日志
+     * @param isDataDb     是否data库
+     */
+    public static void runScriptOnce(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, Boolean isDataDb) {
         TenantContext.get().setUseDefaultDatasource(true);
         List<String> hasRunSqlMd5List = tenantMapper.getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(tenant.getUuid(), moduleId);
         List<String> currentRunSqlMd5List = new ArrayList<>();
         Connection conn = null;
-        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenant.getUuid());
+        String tenantUuid = tenant.getUuid();
+        if (isDataDb) {
+            tenantUuid = tenantUuid + "_data";
+        }
+        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
         try {
             BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
             conn = tenantDatasource.getConnection();
@@ -113,7 +144,7 @@ public class ScriptRunnerManager {
                 }
             }
             runner.closeConnection();
-            if(CollectionUtils.isNotEmpty(currentRunSqlMd5List)) {
+            if (CollectionUtils.isNotEmpty(currentRunSqlMd5List)) {
                 tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, currentRunSqlMd5List, 1);
             }
         } catch (SQLException ex) {

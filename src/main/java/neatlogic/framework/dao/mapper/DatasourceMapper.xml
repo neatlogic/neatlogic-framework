@@ -57,10 +57,18 @@ limitations under the License.
         where `tenant_uuid` = #{value}
     </select>
 
+    <select id="getUserGrants" resultType="java.lang.String">
+        SHOW GRANTS FOR '${value}'@'%'
+    </select>
+
     <update id="updateDatasourcePasswordByTenantId">
         update `datasource`
         set `password` = #{password}
         where `tenant_id` = #{tenantId}
+    </update>
+
+    <update id="updateDatabaseUserPwd">
+        ALTER USER '${tenantUuid}'@'%' IDENTIFIED BY '${password}';
     </update>
 
     <insert id="insertDatasource" parameterType="neatlogic.framework.dto.DatasourceVo">
@@ -87,10 +95,12 @@ limitations under the License.
                    `port`     = #{port}
     </insert>
 
+    <insert id="createDatabaseUser" parameterType="neatlogic.framework.dto.DatasourceVo">
+        CREATE USER '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
+    </insert>
+
     <insert id="createDatasource" parameterType="neatlogic.framework.dto.DatasourceVo">
         CREATE DATABASE IF NOT EXISTS `neatlogic_${tenantUuid}` character set utf8mb4 COLLATE utf8mb4_general_ci;
-        DROP USER IF EXISTS '${tenantUuid}'@'%';
-        CREATE USER '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
         GRANT ALL PRIVILEGES ON `neatlogic_${tenantUuid}`.* to '${tenantUuid}'@'%';
         CREATE DATABASE IF NOT EXISTS `neatlogic_${tenantUuid}_data` character set utf8mb4 COLLATE utf8mb4_general_ci;
         GRANT ALL PRIVILEGES ON `neatlogic_${tenantUuid}_data`.* to '${tenantUuid}'@'%';

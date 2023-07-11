@@ -3,9 +3,12 @@ package neatlogic.framework.util;
 import neatlogic.framework.common.constvalue.MimeType;
 import neatlogic.framework.dao.mapper.MailServerMapper;
 import neatlogic.framework.dto.MailServerVo;
+import neatlogic.framework.notify.exception.EmailSendException;
 import neatlogic.framework.notify.exception.EmailServerNotFoundException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +25,7 @@ import java.util.Properties;
 
 @Component
 public class EmailUtil {
-
+    static Logger logger = LoggerFactory.getLogger(EmailUtil.class);
     private static MailServerMapper mailServerMapper;
 
     @Autowired
@@ -131,7 +134,12 @@ public class EmailUtil {
             }
             msg.setContent(multipart);
             /** 发送邮件 */
-            Transport.send(msg);
+            try {
+                Transport.send(msg);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+                throw new EmailSendException();
+            }
         } else {
             throw new EmailServerNotFoundException();
         }

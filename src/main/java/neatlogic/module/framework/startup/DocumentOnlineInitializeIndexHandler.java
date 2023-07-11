@@ -58,16 +58,17 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     private DocumentOnlineMapper documentOnlineMapper;
     /**
      * 在线帮助文档根目录
+     *
      */
-    private static String directoryRoot = "documentonline";
+    public final static String DIRECTORY_ROOT = "documentonline";
     /**
      * 在线帮助文档索引库位置
      */
-    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + directoryRoot;
+    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + DIRECTORY_ROOT;
     /**
      * 在线帮助文档类路径根目录
      */
-    private static String classpathRoot = "neatlogic/resources/**/" + directoryRoot + "/";
+    private static String classpathRoot = "neatlogic/resources/**/" + DIRECTORY_ROOT + "/";
     /**
      * 用于存储documentonline-mapping.json配置文件中的数据，不同模块jar包中都可能存在documentonline-mapping.json配置文件，可能有多个
      */
@@ -149,8 +150,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 String path = resource.getURL().getPath();
                 int separatorIndex = path.indexOf("!/");
                 String filePath = path.substring(separatorIndex + 2);
-                int directoryRootIndex = filePath.indexOf(directoryRoot);
-                filePath = filePath.substring(directoryRootIndex);
                 if (existingFilePathList.contains(filePath)) {
                     logger.error($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.error", filePath));
                     System.exit(1);
@@ -244,7 +243,8 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      * @param filePath
      */
     private DocumentOnlineDirectoryVo buildDirectory(DocumentOnlineDirectoryVo root, String filePath, List<DocumentOnlineConfigVo> configList) {
-        String path = filePath.substring(directoryRoot.length() + 1);
+        int directoryRootIndex = filePath.indexOf(DIRECTORY_ROOT);
+        String path = filePath.substring(directoryRootIndex + DIRECTORY_ROOT.length() + 1);
         List<String> nameList = new ArrayList<>();
         DocumentOnlineDirectoryVo parent = root;
         String[] split = path.split("/");

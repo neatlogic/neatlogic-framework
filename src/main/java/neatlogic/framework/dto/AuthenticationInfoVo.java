@@ -18,6 +18,7 @@ package neatlogic.framework.dto;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,9 +27,9 @@ import java.util.List;
  **/
 public class AuthenticationInfoVo {
     private String userUuid;
-    private List<String> userUuidList;
-    private List<String> teamUuidList;
-    private List<String> roleUuidList;
+    private final List<String> userUuidList = new ArrayList<>();
+    private final List<String> teamUuidList = new ArrayList<>();
+    private final List<String> roleUuidList = new ArrayList<>();
 
     public boolean validUser(List<String> userUuidList) {
         return userUuidList.contains(userUuid);
@@ -56,6 +57,18 @@ public class AuthenticationInfoVo {
         return false;
     }
 
+    public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList) {
+        this.userUuid = userUuid;
+        this.teamUuidList.addAll(teamUuidList);
+        this.roleUuidList.addAll(roleUuidList);
+    }
+
+    public AuthenticationInfoVo(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList) {
+        this.userUuidList.addAll(userUuidList);
+        this.teamUuidList.addAll(teamUuidList);
+        this.roleUuidList.addAll(roleUuidList);
+    }
+
     public String getUserUuid() {
         return userUuid;
     }
@@ -68,23 +81,11 @@ public class AuthenticationInfoVo {
         return userUuidList;
     }
 
-    public void setUserUuidList(List<String> userUuidList) {
-        this.userUuidList = userUuidList;
-    }
-
     public List<String> getTeamUuidList() {
         return teamUuidList;
     }
 
-    public void setTeamUuidList(List<String> teamUuidList) {
-        this.teamUuidList = teamUuidList;
-    }
-
     public List<String> getRoleUuidList() {
         return roleUuidList;
-    }
-
-    public void setRoleUuidList(List<String> roleUuidList) {
-        this.roleUuidList = roleUuidList;
     }
 }

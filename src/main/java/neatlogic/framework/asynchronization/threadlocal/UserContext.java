@@ -46,7 +46,6 @@ public class UserContext implements Serializable {
     private String userUuid;
     private String timezone = "+8:00";
     private String token;
-    private List<String> roleUuidList = new ArrayList<>();
     private AuthenticationInfoVo authenticationInfoVo;
     //是否超级管理员
     private Boolean isSuperAdmin = false;
@@ -62,7 +61,6 @@ public class UserContext implements Serializable {
             context.setToken(_userContext.getToken());
             // context.setRequest(_userContext.getRequest());
             // context.setResponse(_userContext.getResponse());
-            context.setRoleUuidList(_userContext.getRoleUuidList());
             context.setAuthenticationInfoVo(_userContext.getAuthenticationInfoVo());
             context.setIsSuperAdmin(_userContext.getIsSuperAdmin());
         }
@@ -80,12 +78,14 @@ public class UserContext implements Serializable {
         context.setToken(token);
         context.setResponse(response);
         context.setTimezone(timezone);
+        List<String> roleUuidList = new ArrayList<>();
         JSONArray roleList = jsonObj.getJSONArray("rolelist");
         if (roleList != null && roleList.size() > 0) {
             for (int i = 0; i < roleList.size(); i++) {
-                context.addRole(roleList.getString(i));
+                roleUuidList.add(roleList.getString(i));
             }
         }
+        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList));
         instance.set(context);
         return context;
     }
@@ -102,9 +102,6 @@ public class UserContext implements Serializable {
         context.setResponse(response);
         context.setTimezone(timezone);
         context.setAuthenticationInfoVo(authenticationInfoVo);
-        for (String roleUuid : userVo.getRoleUuidList()) {
-            context.addRole(roleUuid);
-        }
         instance.set(context);
         return context;
     }
@@ -119,12 +116,6 @@ public class UserContext implements Serializable {
 
     public static UserContext init(UserVo userVo, String timezone) {
         return init(userVo, null, timezone, null, null);
-    }
-
-    public void addRole(String role) {
-        if (!roleUuidList.contains(role)) {
-            roleUuidList.add(role);
-        }
     }
 
     public String getTimezone() {
@@ -186,14 +177,6 @@ public class UserContext implements Serializable {
         this.userUuid = userUuid;
     }
 
-    public List<String> getRoleUuidList() {
-        return roleUuidList;
-    }
-
-    public void setRoleUuidList(List<String> roleUuidList) {
-        this.roleUuidList = roleUuidList;
-    }
-
     public String getTenant() {
         return tenant;
     }
@@ -227,6 +210,9 @@ public class UserContext implements Serializable {
     }
 
     public AuthenticationInfoVo getAuthenticationInfoVo() {
+        if (authenticationInfoVo == null) {
+            authenticationInfoVo = new AuthenticationInfoVo(userUuid, new ArrayList<>(), new ArrayList<>());
+        }
         return authenticationInfoVo;
     }
 

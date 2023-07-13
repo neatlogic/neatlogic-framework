@@ -56,10 +56,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid){
-        AuthenticationInfoVo authenticationInfoVo = new AuthenticationInfoVo();
-        authenticationInfoVo.setUserUuid(userUuid);
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
-        authenticationInfoVo.setTeamUuidList(teamUuidList);
         List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
         Set<String> roleUuidSet = new HashSet<>(userRoleUuidList);
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
@@ -83,9 +80,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                 roleUuidSet.addAll(teamRoleUuidList);
             }
         }
-        List<String> roleUuidList = new ArrayList<>(roleUuidSet);
-        authenticationInfoVo.setRoleUuidList(roleUuidList);
-        return authenticationInfoVo;
+        return new AuthenticationInfoVo(userUuid, teamUuidList, new ArrayList<>(roleUuidSet));
     }
 
     /**
@@ -95,8 +90,6 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList){
-        AuthenticationInfoVo authenticationInfoVo = new AuthenticationInfoVo();
-        authenticationInfoVo.setUserUuidList(userUuidList);
         Set<String> teamUuidSet = new HashSet<>();
         Set<String> roleUuidSet = new HashSet<>();
         for (String userUuid : userUuidList) {
@@ -126,8 +119,6 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                 }
             }
         }
-        authenticationInfoVo.setTeamUuidList(new ArrayList<>(teamUuidSet));
-        authenticationInfoVo.setRoleUuidList(new ArrayList<>(roleUuidSet));
-        return authenticationInfoVo;
+        return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), new ArrayList<>(roleUuidSet));
     }
 }

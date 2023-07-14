@@ -40,7 +40,7 @@ public class TenantInitManager extends ModuleInitializedListenerBase {
     private final static List<ITenantInit> tenantInitList = new ArrayList<>();
 
     public static List<ITenantInit> getTenantInitList() {
-        return tenantInitList;
+        return tenantInitList.stream().sorted(Comparator.comparing(ITenantInit::sort)).collect(Collectors.toList());
     }
 
     @Override

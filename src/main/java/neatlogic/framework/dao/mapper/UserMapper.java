@@ -199,6 +199,8 @@ public interface UserMapper {
 
     int updateUserPasswordActive(String userUuid);
 
+    int updateAllUserPassword(String password);
+
     int updateUser(UserVo userVo);
 
     int updateUserActive(UserVo userVo);

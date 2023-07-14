@@ -36,8 +36,10 @@ public class TenantVo extends BasePageVo {
         BUILDING("building", "基础数据"),
         BUILT("built", "已完成"),
         DDL("ddl", "ddl"),
+        DDL_DEMO_DATA("ddldemo_data", "ddl demo data"),
         DML("dml", "dml"),
         DML_DEMO("dmldemo", "dml demo"),
+        DML_DEMO_DATA("dmldemo_data", "dml demo data"),
         MONGODB("mongodb", "mongodb"),
         ERROR("error", "异常");
 

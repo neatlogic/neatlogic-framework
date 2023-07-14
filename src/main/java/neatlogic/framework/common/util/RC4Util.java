@@ -142,4 +142,8 @@ public class RC4Util {
         }
         return ret;
     }
+
+    public static void main(String[] args) {
+        System.out.println(RC4Util.encrypt("123456Ab"));
+    }
 }

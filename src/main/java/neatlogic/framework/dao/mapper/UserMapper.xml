@@ -1303,6 +1303,12 @@ limitations under the License.
         WHERE `user_uuid` = #{userUuid}
     </update>
 
+    <update id="updateAllUserPassword" parameterType="java.lang.String">
+        UPDATE
+            `user_password`
+        SET `password` = #{value}
+    </update>
+
     <update id="updateUserActive" parameterType="neatlogic.framework.dto.UserVo">
         UPDATE `user`
         SET `is_active` = #{isActive}

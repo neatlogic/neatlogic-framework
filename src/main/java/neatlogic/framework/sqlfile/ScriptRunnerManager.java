@@ -145,7 +145,18 @@ public class ScriptRunnerManager {
             }
             runner.closeConnection();
             if (CollectionUtils.isNotEmpty(currentRunSqlMd5List)) {
-                tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, currentRunSqlMd5List, 1);
+                List<String> hasRunSqlMd5ListTmp = new ArrayList<>();
+                for (int i = 0; i < currentRunSqlMd5List.size(); i++) {
+                    if (i != 0 && i % 200 == 0) {
+                        tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, 1);
+                        hasRunSqlMd5ListTmp.clear();
+                    } else {
+                        hasRunSqlMd5ListTmp.add(currentRunSqlMd5List.get(i));
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(hasRunSqlMd5ListTmp)) {
+                    tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, 1);
+                }
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex.getMessage(), ex);

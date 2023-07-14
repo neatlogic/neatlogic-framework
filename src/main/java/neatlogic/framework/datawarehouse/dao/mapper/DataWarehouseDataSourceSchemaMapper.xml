@@ -58,8 +58,7 @@ limitations under the License.
             USING BTREE,
         </if>
         PRIMARY KEY (`id`) USING BTREE
-        ) ENGINE = INNODB
-        DEFAULT CHARSET = utf8mb4
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
     </insert>
 
     <delete id="deleteDataSourceTable" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceVo">

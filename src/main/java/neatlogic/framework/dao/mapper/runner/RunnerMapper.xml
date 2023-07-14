@@ -24,7 +24,8 @@ limitations under the License.
                rn.`group_id`   as groupId,
                rn.`network_ip` as networkIp,
                rn.`mask`
-        FROM `runnergroup_network` rn join runnergroup r on rn.group_id = r.id
+        FROM `runnergroup_network` rn
+                 join runnergroup r on rn.group_id = r.id
     </select>
 
     <resultMap id="runnerGroupMap" type="neatlogic.framework.dto.runner.RunnerGroupVo">
@@ -441,6 +442,12 @@ limitations under the License.
         </if>
         `auth_type` = #{authType}
         WHERE `id` = #{id}
+    </update>
+    <update id="updateRunnerHost">
+        UPDATE runner
+        SET host    = #{runnerHost},
+            url     = #{url},
+            netty_ip=#{runnerHost};
     </update>
 
     <select id="checkRunnerIsUsedByJob" resultType="int">

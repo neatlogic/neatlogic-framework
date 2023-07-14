@@ -139,7 +139,7 @@ public class PublicApiDispatcher {
             }
         }
         if (userVo == null) {
-            UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone(), request, response);
+            UserContext.init(SystemUser.SYSTEM, request, response);
         }
 
         UserContext.get().setRequest(request);

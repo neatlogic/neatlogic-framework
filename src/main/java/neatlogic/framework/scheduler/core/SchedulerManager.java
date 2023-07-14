@@ -230,7 +230,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             try {
                 // 切换租户数据源
                 TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
-                UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
+                UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);
                 }

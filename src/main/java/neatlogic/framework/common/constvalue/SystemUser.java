@@ -17,6 +17,7 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
@@ -24,6 +25,8 @@ import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * @ClassName: SystemUser
@@ -39,11 +42,13 @@ public enum SystemUser {
     private final String userUuid;
     private final I18n userName;
     private final String timezone = "+8:00";
+    private final AuthenticationInfoVo authenticationInfoVo;
 
     SystemUser(String userId, String userUuid, I18n userName) {
         this.userId = userId;
         this.userUuid = userUuid;
         this.userName = userName;
+        this.authenticationInfoVo = new AuthenticationInfoVo(userUuid, new ArrayList<>(), new ArrayList<>());
     }
 
     public String getUserId() {
@@ -78,6 +83,10 @@ public enum SystemUser {
             logger.error(e.getMessage(), e);
         }
         return userVo;
+    }
+
+    public AuthenticationInfoVo getAuthenticationInfoVo() {
+        return authenticationInfoVo;
     }
 
     public static String getUserName(String userUuid) {

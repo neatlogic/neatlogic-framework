@@ -106,16 +106,16 @@ public class UserContext implements Serializable {
         return context;
     }
 
-    public static UserContext init(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        return init(userVo, null, timezone, request, response);
-    }
-
     public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
         return init(userVo, authenticationInfoVo, timezone, null, null);
     }
 
-    public static UserContext init(UserVo userVo, String timezone) {
-        return init(userVo, null, timezone, null, null);
+    public static UserContext init(SystemUser systemUser) {
+        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), null, null);
+    }
+
+    public static UserContext init(SystemUser systemUser, HttpServletRequest request, HttpServletResponse response) {
+        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), request, response);
     }
 
     public String getTimezone() {

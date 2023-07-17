@@ -220,6 +220,19 @@ public class UserContext implements Serializable {
         this.authenticationInfoVo = authenticationInfoVo;
     }
 
+    public List<String> getTeamUuidList() {
+        if (this.authenticationInfoVo != null) {
+            return this.authenticationInfoVo.getTeamUuidList();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> getRoleUuidList() {
+        if (this.authenticationInfoVo != null) {
+            return this.authenticationInfoVo.getRoleUuidList();
+        }
+        return new ArrayList<>();
+    }
     /**
      * 获取用户的所有user、role、team的uuid列表
      * 用于sql校验数据权限

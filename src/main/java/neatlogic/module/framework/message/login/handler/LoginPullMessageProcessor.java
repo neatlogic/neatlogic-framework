@@ -25,7 +25,6 @@ import neatlogic.framework.message.core.MessageHandlerFactory;
 import neatlogic.framework.message.dao.mapper.MessageMapper;
 import neatlogic.framework.message.dto.MessageHandlerVo;
 import neatlogic.framework.message.dto.MessageSearchVo;
-import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +37,6 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
     @Resource
     private MessageMapper messageMapper;
-    @Resource
-    private AuthenticationInfoService authenticationInfoService;
 
     @Override
     protected void myLoginAfterInitialization() {
@@ -61,7 +58,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
         searchVo.setPageSize(1000);
         searchVo.setUserUuid(UserContext.get().getUserUuid(true));
-        AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(UserContext.get().getUserUuid(true));
+        AuthenticationInfoVo authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
         searchVo.setRoleUuidList(authenticationInfoVo.getRoleUuidList());
         searchVo.setTeamUuidList(authenticationInfoVo.getTeamUuidList());
 

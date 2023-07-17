@@ -222,7 +222,7 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+            UserContext.init(SystemUser.ANONYMOUS, request, response);
         }
         JSONObject returnObj = new JSONObject();
         try {
@@ -258,7 +258,7 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+                UserContext.init(SystemUser.ANONYMOUS, request, response);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -369,7 +369,7 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+            UserContext.init(SystemUser.ANONYMOUS, request, response);
         }
         JSONObject returnObj = new JSONObject();
         try {
@@ -417,7 +417,7 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+                UserContext.init(SystemUser.ANONYMOUS, request, response);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -530,7 +530,7 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS.getUserVo(), SystemUser.ANONYMOUS.getTimezone(), request, response);
+            UserContext.init(SystemUser.ANONYMOUS, request, response);
         }
         JSONObject returnObj = new JSONObject();
         try {

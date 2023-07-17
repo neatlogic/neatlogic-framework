@@ -147,7 +147,7 @@ public abstract class JobBase implements IJob {
         String tenantUuid = jobObject.getTenantUuid();
         // 从job组名中获取租户uuid,切换到租户的数据源
         TenantContext.init(tenantUuid).setUseDefaultDatasource(false);
-        UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
+        UserContext.init(SystemUser.SYSTEM);
         // 检查作业是否需要重新加载
         IJob jobHandler = SchedulerManager.getHandler(this.getClassName());
         if (jobHandler == null) {

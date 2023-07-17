@@ -27,6 +27,7 @@ import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.integration.AuthenticateException;
@@ -47,6 +48,7 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
+import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -81,6 +83,9 @@ public class PublicApiDispatcher {
 
     @Resource
     UserMapper userMapper;
+
+    @Resource
+    private AuthenticationInfoService authenticationInfoService;
 
     private static final Map<Integer, String> errorMap = new HashMap<>();
 
@@ -129,11 +134,12 @@ public class PublicApiDispatcher {
             if (userTmpVo != null) {
                 userVo = userTmpVo;
                 userVo.setAuthorization(authorization);
-                UserContext.init(userVo, timezone, request, response);
+                AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             }
         }
         if (userVo == null) {
-            UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getTimezone());
+            UserContext.init(SystemUser.SYSTEM, request, response);
         }
 
         UserContext.get().setRequest(request);

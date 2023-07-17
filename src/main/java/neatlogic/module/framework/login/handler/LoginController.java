@@ -28,6 +28,7 @@ import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.UserVo;
@@ -42,6 +43,7 @@ import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
+import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.service.TenantService;
 import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.Md5Util;
@@ -79,6 +81,9 @@ public class LoginController {
 
     @Resource
     private LoginService loginService;
+
+    @Resource
+    private AuthenticationInfoService authenticationInfoService;
 
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
@@ -145,7 +150,8 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    UserContext.init(checkUserVo, timezone, request, response);
+                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                    UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
                     }

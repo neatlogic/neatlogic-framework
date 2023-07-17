@@ -177,16 +177,16 @@ public class UserContext implements Serializable {
         this.userUuid = userUuid;
     }
 
-    public List<String> getTeamUuidList() {
+    public List<String> getRoleUuidList() {
         if (this.authenticationInfoVo != null) {
-            return this.authenticationInfoVo.getTeamUuidList();
+            return this.authenticationInfoVo.getRoleUuidList();
         }
         return new ArrayList<>();
     }
 
-    public List<String> getRoleUuidList() {
+    public List<String> getTeamUuidList() {
         if (this.authenticationInfoVo != null) {
-            return this.authenticationInfoVo.getRoleUuidList();
+            return this.authenticationInfoVo.getTeamUuidList();
         }
         return new ArrayList<>();
     }

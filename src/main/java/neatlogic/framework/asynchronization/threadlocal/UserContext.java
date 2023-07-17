@@ -126,20 +126,6 @@ public class UserContext implements Serializable {
         this.timezone = timezone;
     }
 
-    public List<String> getTeamUuidList() {
-        if (this.authenticationInfoVo != null) {
-            return this.authenticationInfoVo.getTeamUuidList();
-        }
-        return new ArrayList<>();
-    }
-
-    public List<String> getRoleUuidList() {
-        if (this.authenticationInfoVo != null) {
-            return this.authenticationInfoVo.getRoleUuidList();
-        }
-        return new ArrayList<>();
-    }
-
     private UserContext() {
 
     }
@@ -189,6 +175,20 @@ public class UserContext implements Serializable {
 
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
+    }
+
+    public List<String> getTeamUuidList() {
+        if (this.authenticationInfoVo != null) {
+            return this.authenticationInfoVo.getTeamUuidList();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> getRoleUuidList() {
+        if (this.authenticationInfoVo != null) {
+            return this.authenticationInfoVo.getRoleUuidList();
+        }
+        return new ArrayList<>();
     }
 
     public String getTenant() {

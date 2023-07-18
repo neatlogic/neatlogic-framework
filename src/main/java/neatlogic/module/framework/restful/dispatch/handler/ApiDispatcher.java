@@ -27,6 +27,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
@@ -262,6 +263,13 @@ public class ApiDispatcher {
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(526);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {
@@ -333,6 +341,13 @@ public class ApiDispatcher {
             if (ex.getParam() != null) {
                 returnObj.put("Param", ex.getParam());
             }
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(526);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
             response.setStatus(523);
             if (logger.isWarnEnabled()) {

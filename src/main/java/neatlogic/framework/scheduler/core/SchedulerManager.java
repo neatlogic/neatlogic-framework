@@ -26,8 +26,10 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
+import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RootComponent
 public class SchedulerManager extends ModuleInitializedListenerBase {
@@ -207,8 +210,16 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 publicJobClassList.add(jobClassVo);
             }
         }
-        for (TenantVo tenantVo : tenantList) {
-            CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
+        if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
+            for (TenantVo tenantVo : tenantList) {
+                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
+                if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
+                    CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
+                    System.out.println("⚡[" + tenantVo.getName() + "]Loading Scheduled Job");
+                }
+            }
         }
         // TODO 这里要增加清理job_status的逻辑
     }

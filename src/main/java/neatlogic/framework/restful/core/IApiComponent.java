@@ -62,7 +62,11 @@ public interface IApiComponent {
      * @return 配置json
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getConfig();
+    default String getConfig() {
+        return null;
+    }
+
+    ;
 
     /**
      * 是否需要审计

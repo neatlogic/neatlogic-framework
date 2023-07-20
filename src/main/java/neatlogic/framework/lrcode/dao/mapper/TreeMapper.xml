@@ -100,20 +100,29 @@
         UPDATE `${tableName}`
         set `lft` = `lft` + #{step}
         WHERE `lft` &gt;= #{minCode}
+        <if test="condition != null">
+            and ${condition}
+        </if>
     </update>
 
     <update id="batchUpdateTreeNodeRightCode">
         UPDATE `${tableName}`
         set `rht` = `rht` + #{step}
         WHERE `rht` &gt;= #{minCode}
+        <if test="condition != null">
+            and ${condition}
+        </if>
     </update>
 
     <update id="batchUpdateTreeNodeLeftRightCodeByLeftRightCode">
         UPDATE `${tableName}`
         SET `lft` = `lft` + #{step},
-            `rht` = `rht` + #{step}
+        `rht` = `rht` + #{step}
         WHERE `lft` &gt;= #{lft}
-          AND `rht` &lt;= #{rht}
+        AND `rht` &lt;= #{rht}
+        <if test="condition != null">
+            and ${condition}
+        </if>
     </update>
 
     <select id="checkTreeNodeIsExistsByLeftRightCode" resultType="int" useCache="false">

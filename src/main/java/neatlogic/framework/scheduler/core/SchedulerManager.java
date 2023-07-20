@@ -217,7 +217,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
                 if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
                     CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
-                    System.out.println("⚡[" + tenantVo.getName() + "]Loading Scheduled Job Of " + context.getModuleId());
+                    System.out.println("⚡[" + tenantVo.getName() + "]Start to load schedule job of " + context.getModuleId());
                 }
             }
         }

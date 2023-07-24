@@ -46,6 +46,8 @@ public interface UserMapper {
 
     UserVo getUserByUserId(String userId);
 
+    UserVo getUserById(Long id);
+
     UserVo getUserByUuid(String uuid);
 
     UserVo getUserSimpleInfoByUuid(String uuid);
@@ -235,7 +237,7 @@ public interface UserMapper {
 
     int deleteUserTitleByName(String name);
 
-    int bacthDeleteUserTeam(@Param("userUuidlist")List<String> userUuidlist,@Param("source")String source);
+    int bacthDeleteUserTeam(@Param("userUuidlist") List<String> userUuidlist, @Param("source") String source);
 
     int searchUserCountByAuth(UserVo vo);
 

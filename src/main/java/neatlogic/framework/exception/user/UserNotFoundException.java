@@ -23,4 +23,8 @@ public class UserNotFoundException extends ApiRuntimeException {
     public UserNotFoundException(String userid) {
         super("用户“{0}”不存在", userid);
     }
+
+    public UserNotFoundException(Long id) {
+        super("用户“{0}”不存在", id);
+    }
 }

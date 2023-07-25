@@ -560,7 +560,7 @@ public class Config {
             // logger.error(e.getMessage(), e);
         }
         if (value == null && isRequired) {
-            throw new RuntimeException();
+            throw new RuntimeException(String.format("%s is not exist",keyName));
         }
         return value;
     }

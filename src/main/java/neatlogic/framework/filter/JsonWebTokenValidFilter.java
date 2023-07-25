@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.Objects;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     // private ServletContext context;

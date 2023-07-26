@@ -535,7 +535,7 @@ public class Config {
             LDAP_SERVER_URL = prop.getProperty("ldap.server.url", "");
             LDAP_USER_DN = prop.getProperty("ldap.user.dn", "");
 
-            AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "");
+            AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "499922b4317c251c2ce525f7b83e3d94");
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

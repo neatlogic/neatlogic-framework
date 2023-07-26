@@ -7,6 +7,9 @@ package codedriver.framework.auth.label;
 
 import codedriver.framework.auth.core.AuthBase;
 
+import java.util.Collections;
+import java.util.List;
+
 public class INTERFACE_MODIFY extends AuthBase {
 
 	@Override
@@ -27,5 +30,10 @@ public class INTERFACE_MODIFY extends AuthBase {
 	@Override
 	public Integer getSort() {
 		return 10;
+	}
+
+	@Override
+	public List<Class<? extends AuthBase>> getIncludeAuths(){
+		return Collections.singletonList(API_AUDIT_VIEW.class);
 	}
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.framework.service;
 
 import neatlogic.framework.common.constvalue.GroupSearch;
+import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
@@ -179,5 +180,19 @@ public class UserServiceImpl implements UserService {
             }
         }
         return teamUuidSet;
+    }
+
+    /**
+     * 根据用户userId获取用户token
+     * @param userId 用户userId
+     * @return
+     */
+    @Override
+    public String getUserTokenByUserId(String userId) {
+        if (Objects.equals(userId, SystemUser.AUTOEXEC.getUserId())) {
+            return SystemUser.AUTOEXEC.getToken();
+        } else {
+            return userMapper.getUserTokenByUserId(userId);
+        }
     }
 }

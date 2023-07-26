@@ -16,7 +16,6 @@
 
 package neatlogic.module.framework.filter.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.hmac.HeaderIrregularException;
@@ -24,6 +23,7 @@ import neatlogic.framework.exception.hmac.HeaderNotFoundException;
 import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.exception.user.UserTokenNotFoundException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.service.UserService;
 import neatlogic.framework.util.SHA256Util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
@@ -42,6 +42,9 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private UserService userService;
 
     @Override
     public String getType() {
@@ -77,15 +80,13 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         }
 
         UserVo userVo = userMapper.getUserByUserId(user);
-
         if (userVo == null) {
             throw new UserNotFoundException(user);
         }
-        String token = userMapper.getUserTokenByUserId(user);
+        String token = userService.getUserTokenByUserId(user);
         if (StringUtils.isBlank(token)) {
             throw new UserTokenNotFoundException(user);
         }
-
 
         InputStream input = request.getInputStream();
         //System.out.println(request.getContentType());

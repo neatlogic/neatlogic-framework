@@ -61,7 +61,14 @@ public interface UserService {
     /**
      * 根据用户userId获取用户token
      * @param userId 用户userId
-     * @return
+     * @return token
      */
-    String getUserTokenByUserId(String userId);
+    String getUserTokenByUserUuid(String userId);
+
+    /**
+     * 根据用户userId获取用户token
+     * @param userId 用户userId
+     * @return userVo
+     */
+    UserVo getUserByUserUuid(String userId);
 }

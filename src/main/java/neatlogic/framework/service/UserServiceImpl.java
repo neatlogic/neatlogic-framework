@@ -26,6 +26,7 @@ import neatlogic.framework.dto.RoleUserVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.dto.UserVo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -184,15 +185,33 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 根据用户userId获取用户token
-     * @param userId 用户userId
-     * @return
+     *
+     * @param userUuid 用户userUuid
+     * @return token
      */
     @Override
-    public String getUserTokenByUserId(String userId) {
-        if (Objects.equals(userId, SystemUser.AUTOEXEC.getUserId())) {
-            return SystemUser.AUTOEXEC.getToken();
-        } else {
-            return userMapper.getUserTokenByUserId(userId);
+    public String getUserTokenByUserUuid(String userUuid) {
+        String token = SystemUser.getUserTokenByUserUuid(userUuid);
+        if (StringUtils.isBlank(token)) {
+            token = userMapper.getUserTokenByUserUuid(userUuid);
         }
+        return token;
     }
+
+
+    /**
+     * 根据用户
+     *
+     * @param userUuid 用户userUuid
+     * @return userVo
+     */
+    @Override
+    public UserVo getUserByUserUuid(String userUuid) {
+        UserVo user = SystemUser.getUserVoByUserUuid(userUuid);
+        if (user == null) {
+            user = userMapper.getUserByUserUuid(userUuid);
+        }
+        return user;
+    }
+
 }

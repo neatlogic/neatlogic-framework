@@ -107,4 +107,22 @@ public enum SystemUser {
         }
         return "";
     }
+
+    public static UserVo getUserVoByUserUuid(String userUuid){
+        for (SystemUser user : values()) {
+            if (user.getUserUuid().equals(userUuid)) {
+                return user.getUserVo();
+            }
+        }
+        return null;
+    }
+
+    public static String getUserTokenByUserUuid(String userUuid){
+        for (SystemUser user : values()) {
+            if (user.getUserUuid().equals(userUuid)) {
+                return user.getToken();
+            }
+        }
+        return null;
+    }
 }

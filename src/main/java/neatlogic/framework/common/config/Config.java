@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import neatlogic.framework.common.RootConfiguration;
 import neatlogic.framework.util.$;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -472,11 +473,11 @@ public class Config {
             Properties prop = new Properties();
             if (StringUtils.isNotBlank(configInfo)) {
                 prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-                System.out.println("⚡Start to load config from Nacos...");
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
             } else {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
-                System.out.println("⚡Start to load config from config.properties...");
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
             }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
@@ -567,7 +568,7 @@ public class Config {
             // logger.error(e.getMessage(), e);
         }
         if (value == null && isRequired) {
-            throw new RuntimeException(String.format("%s is not exist",keyName));
+            throw new RuntimeException(String.format("%s is not exist", keyName));
         }
         return value;
     }

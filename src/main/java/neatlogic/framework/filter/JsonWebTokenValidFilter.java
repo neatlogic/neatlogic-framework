@@ -156,7 +156,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     }
                     redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
                 } else {
-                    response.setStatus(522);
+                    response.setStatus(527);
                     redirectObj.put("Status", "FAILED");
                     redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
                     logger.warn("======= login error: 会话已超时或已被终止，请重新登录");

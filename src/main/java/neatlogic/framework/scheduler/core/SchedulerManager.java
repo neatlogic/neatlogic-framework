@@ -28,7 +28,11 @@ import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
-import neatlogic.framework.scheduler.dto.*;
+import neatlogic.framework.scheduler.dto.JobClassVo;
+import neatlogic.framework.scheduler.dto.JobLockVo;
+import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.dto.JobStatusVo;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
@@ -217,7 +221,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
                 if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
                     CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
-                    System.out.println("⚡[" + tenantVo.getName() + "]Start to load schedule job of " + context.getModuleId());
+                    System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startloadschedulejob", context.getModuleId()));
                 }
             }
         }

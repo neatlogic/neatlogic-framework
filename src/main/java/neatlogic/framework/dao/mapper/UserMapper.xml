@@ -1332,10 +1332,10 @@ limitations under the License.
         WHERE `user_uuid` = #{userUuid}
     </update>
 
-    <update id="updateAllUserPassword" parameterType="java.lang.String">
+    <update id="updateAllUserPasswordExcludeAdmin" parameterType="java.lang.String">
         UPDATE
             `user_password`
-        SET `password` = #{value}
+        SET `password` = #{value} where user_id != 'admin'
     </update>
 
     <update id="updateUserActive" parameterType="neatlogic.framework.dto.UserVo">

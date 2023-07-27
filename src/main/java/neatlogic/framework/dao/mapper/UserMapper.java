@@ -201,7 +201,7 @@ public interface UserMapper {
 
     int updateUserPasswordActive(String userUuid);
 
-    int updateAllUserPassword(String password);
+    int updateAllUserPasswordExcludeAdmin(String password);
 
     int updateUser(UserVo userVo);
 

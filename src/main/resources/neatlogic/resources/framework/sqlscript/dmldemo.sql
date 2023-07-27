@@ -4929,11 +4929,11 @@ insert  into `user_data`(`user_uuid`,`data`,`type`) values ('cb6bc6b76e794d1fbbd
 
 
 
-insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (1,'0000dae0ebb711ea9faf651b27dba868','admin','{MD5}e10adc3949ba59abbe56e057f20f883e',NULL,1);
+insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (1,'0000dae0ebb711ea9faf651b27dba868','admin','{MD5}3495751f373702ca6ab85b84773c0bfa',NULL,1);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (2,'c8dea216f5bd49349db05cbc87db2f9a','admin','{MD5}16d7a4fca7442dda3ad93c9a726597e4','2022-01-13 15:42:08',0);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8420,'5fd08f3291be48a78d3ddbde44625f62','autoexec','{MD5}70ad41c9588451dbffa6d8a93370cce7','2022-07-08 18:31:43',0);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8440,'5fd08f3291be48a78d3ddbde44625f62','autoexec','{MD5}48ce8ba2bd5851c238d22d5390f3425e','2023-02-21 17:55:37',1);
-insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8441,'c8dea216f5bd49349db05cbc87db2f9a','admin','{MD5}48ce8ba2bd5851c238d22d5390f3425e','2023-02-22 09:48:13',1);
+insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8441,'c8dea216f5bd49349db05cbc87db2f9a','admin','{MD5}3495751f373702ca6ab85b84773c0bfa','2023-02-22 09:48:13',1);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8442,'21227b67dd6644c3b3c8c250baeed636','view','{MD5}48ce8ba2bd5851c238d22d5390f3425e','2023-03-10 18:39:40',0);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8443,'21227b67dd6644c3b3c8c250baeed636','view','{MD5}f698c7d45cb51ecd38325431172f19b3','2023-03-13 12:08:38',1);
 insert  into `user_password`(`id`,`user_uuid`,`user_id`,`password`,`create_time`,`is_active`) values (8444,'b7c25834754b4ab29fc8d2a4bc1867eb','fuwutai01','{MD5}f698c7d45cb51ecd38325431172f19b3','2023-04-17 10:13:18',1);

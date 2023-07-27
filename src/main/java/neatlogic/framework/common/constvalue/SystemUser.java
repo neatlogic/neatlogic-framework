@@ -17,6 +17,7 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * @ClassName: SystemUser
@@ -34,7 +36,8 @@ import java.util.ArrayList;
  */
 public enum SystemUser {
     SYSTEM("system", "system", new I18n("系统")),
-    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户"));
+    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户")),
+    AUTOEXEC("autoexec", "autoexec", new I18n("自动化用户"));
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 
@@ -67,6 +70,13 @@ public enum SystemUser {
         return timezone;
     }
 
+    public String getToken() {
+        if (Objects.equals(userId, AUTOEXEC.getUserId())) {
+            return Config.AUTOEXEC_TOKEN();
+        }
+        return null;
+    }
+
     public UserVo getUserVo() {
         UserVo userVo = new UserVo();
         userVo.setUuid(userUuid);
@@ -96,5 +106,23 @@ public enum SystemUser {
             }
         }
         return "";
+    }
+
+    public static UserVo getUserVoByUserUuid(String userUuid){
+        for (SystemUser user : values()) {
+            if (user.getUserUuid().equals(userUuid)) {
+                return user.getUserVo();
+            }
+        }
+        return null;
+    }
+
+    public static String getUserTokenByUserUuid(String userUuid){
+        for (SystemUser user : values()) {
+            if (user.getUserUuid().equals(userUuid)) {
+                return user.getToken();
+            }
+        }
+        return null;
     }
 }

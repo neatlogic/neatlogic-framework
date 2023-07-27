@@ -16,7 +16,6 @@
 
 package neatlogic.module.framework.filter.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.hmac.HeaderIrregularException;
@@ -24,6 +23,7 @@ import neatlogic.framework.exception.hmac.HeaderNotFoundException;
 import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.exception.user.UserTokenNotFoundException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.service.UserService;
 import neatlogic.framework.util.SHA256Util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
@@ -42,6 +42,9 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private UserService userService;
 
     @Override
     public String getType() {
@@ -71,21 +74,19 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         if (StringUtils.isBlank(authorization)) {
             throw new HeaderIrregularException("Authorization");
         }
-        String user = request.getHeader("x-access-key");
-        if (StringUtils.isBlank(user)) {
+        String userUuid = request.getHeader("x-access-key");
+        if (StringUtils.isBlank(userUuid)) {
             throw new HeaderNotFoundException("x-access-key");
         }
 
-        UserVo userVo = userMapper.getUserByUserId(user);
-
+        UserVo userVo = userService.getUserByUserUuid(userUuid);
         if (userVo == null) {
-            throw new UserNotFoundException(user);
+            throw new UserNotFoundException(userUuid);
         }
-        String token = userMapper.getUserTokenByUserId(user);
+        String token = userService.getUserTokenByUserUuid(userUuid);
         if (StringUtils.isBlank(token)) {
-            throw new UserTokenNotFoundException(user);
+            throw new UserTokenNotFoundException(userUuid);
         }
-
 
         InputStream input = request.getInputStream();
         //System.out.println(request.getContentType());
@@ -104,7 +105,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         }
 
         String queryString = StringUtils.isNotBlank(request.getQueryString()) ? "?" + request.getQueryString() : StringUtils.EMPTY;
-        String sign = user + "#" + request.getRequestURI() + queryString + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
+        String sign = userUuid + "#" + request.getRequestURI() + queryString + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
         String result = SHA256Util.encrypt(token, sign);
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;

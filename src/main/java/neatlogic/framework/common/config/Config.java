@@ -122,6 +122,8 @@ public class Config {
 
     private static String LDAP_USER_DN;//ldap userDn格式
 
+    private static String AUTOEXEC_TOKEN;// autoexec用户的token
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -385,6 +387,9 @@ public class Config {
         return LDAP_USER_DN;
     }
 
+    public static String AUTOEXEC_TOKEN() {
+        return AUTOEXEC_TOKEN;
+    }
     private void initConfigFile() {
         try {
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
@@ -530,6 +535,8 @@ public class Config {
 
             LDAP_SERVER_URL = prop.getProperty("ldap.server.url", "");
             LDAP_USER_DN = prop.getProperty("ldap.user.dn", "");
+
+            AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "499922b4317c251c2ce525f7b83e3d94");
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

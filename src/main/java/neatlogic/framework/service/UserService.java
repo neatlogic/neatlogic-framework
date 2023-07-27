@@ -58,4 +58,17 @@ public interface UserService {
      */
     Set<String> getTeamUuidSetByRoleUuid(String roleUuid);
 
+    /**
+     * 根据用户userId获取用户token
+     * @param userId 用户userId
+     * @return token
+     */
+    String getUserTokenByUserUuid(String userId);
+
+    /**
+     * 根据用户userId获取用户token
+     * @param userId 用户userId
+     * @return userVo
+     */
+    UserVo getUserByUserUuid(String userId);
 }

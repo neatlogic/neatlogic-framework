@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Consumer;
@@ -42,6 +43,9 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
 
         String path = data.getString("path");
         String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
+        File file = new File(dataHome);
+        dataHome = file.getPath();
+
         if (path.startsWith(dataHome)) {
             path = "${home}" + path.substring(dataHome.length());
         }

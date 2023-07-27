@@ -17,7 +17,6 @@
 package neatlogic.framework.service;
 
 import neatlogic.framework.common.RootComponent;
-import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
@@ -26,7 +25,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author linbq
@@ -54,10 +56,6 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid){
-        if (Objects.equals(userUuid, SystemUser.AUTOEXEC.getUserUuid())) {
-            List<String> roleUuidList = roleMapper.getRoleUuidByName("R_ADMIN");
-            return new AuthenticationInfoVo(SystemUser.AUTOEXEC.getUserUuid(), new ArrayList<>(), roleUuidList);
-        }
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
         Set<String> roleUuidSet = new HashSet<>(userRoleUuidList);

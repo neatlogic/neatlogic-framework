@@ -28,6 +28,7 @@ import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,10 +121,10 @@ public class StartupManager extends ModuleInitializedListenerBase {
 
                                     int i = startup.executeForCurrentTenant();
                                     if (i != -999) {
-                                        System.out.println("⚡[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is completed.");
+                                        System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.successload"));
                                     }
                                 } catch (Exception ex) {
-                                    System.out.println("⚡[" + tenantVo.getName() + "]Startup Job:" + startup.getName() + " is failed.");
+                                    System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.failedload"));
                                     logger.error(ex.getMessage(), ex);
                                 }
                             }
@@ -134,10 +135,10 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             try {
                                 int i = startup.executeForAllTenant();
                                 if (i != -999) {
-                                    System.out.println("⚡[All Tenant]Startup Job:" + startup.getName() + " is completed.");
+                                    System.out.println("⚡[All Tenant]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.successload"));
                                 }
                             } catch (Exception ex) {
-                                System.out.println("⚡[All Tenant]Startup Job:" + startup.getName() + " is failed.");
+                                System.out.println("⚡[All Tenant]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.failedload"));
                                 logger.error(ex.getMessage(), ex);
                             }
                         }

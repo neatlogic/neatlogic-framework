@@ -193,7 +193,7 @@ public class FormTable implements TemplateMethodModelEx {
                 return dataObj.toString();
             }
         });
-        // 帐号
+        // 账号
         map.put("formaccounts", dataObj -> {
             if (dataObj instanceof JSONObject) {
                 JSONObject tableObj = (JSONObject) dataObj;
@@ -232,7 +232,8 @@ public class FormTable implements TemplateMethodModelEx {
     }
 
     /**
-     * 生成表格，表单的帐号、配置项修改、表格选择等组件需要用到表格
+     * 生成表格，表单的账号、配置项修改、表格选择等组件需要用到表格
+     *
      * @param tableObj
      * @return
      */

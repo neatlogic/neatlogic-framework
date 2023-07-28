@@ -121,7 +121,7 @@ limitations under the License.
                a.`user_info`      as userInfo,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
-        WHERE a.`user_uuid` = #{value}
+        WHERE a.`uuid` = #{value}
     </select>
 
     <resultMap id="userInfoMap" type="neatlogic.framework.dto.UserVo">

@@ -1,5 +1,6 @@
 package codedriver.framework.file.dto;
 
+import codedriver.framework.exception.file.FilePathIllegalException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -25,26 +26,23 @@ public class AuditFilePathVo {
                 }
             }
         }
-//        int startIndex = 0;
-//        int offset = 0;
-//        int serverId = 0;
         String startIndexStr = paramMap.get("startIndex");
         if (StringUtils.isNotBlank(startIndexStr)) {
             startIndex = Integer.parseInt(startIndexStr);
         } else {
-            startIndex = null;
+            throw new FilePathIllegalException(filePath);
         }
         String offsetStr = paramMap.get("offset");
         if (StringUtils.isNotBlank(offsetStr)) {
             offset = Integer.parseInt(offsetStr);
         } else {
-            offset = null;
+            throw new FilePathIllegalException(filePath);
         }
         String serverIdStr = paramMap.get("serverId");
         if (StringUtils.isNotBlank(serverIdStr)) {
             serverId = Integer.parseInt(serverIdStr);
         } else {
-            serverId = null;
+            throw new FilePathIllegalException(filePath);
         }
     }
 

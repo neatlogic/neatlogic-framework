@@ -109,7 +109,7 @@ public class UserGroupHandler implements IGroupSearchHandler {
             //移动端临时屏蔽这两个字段，表单也会用到这个接口
             if(!Objects.equals(DeviceType.MOBILE.getValue(),CommonUtil.getDevice())) {
                 userTmp.put("pinyin", userVo.getPinyin());
-                userTmp.put("team", String.join("/", userVo.getTeamNameList()));
+                userTmp.put("team", String.join(",", userVo.getTeamNameList()));// TODO 分隔符改成前端设置
             }
             userTmp.put("avatar", userVo.getAvatar());
             userTmp.put("vipLevel", userVo.getVipLevel());

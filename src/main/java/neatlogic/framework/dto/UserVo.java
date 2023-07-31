@@ -253,7 +253,7 @@ public class UserVo extends BasePageVo implements Serializable {
     }
 
     public List<String> getTeamNameList() {
-        if (CollectionUtils.isNotEmpty(teamList)) {
+        if (CollectionUtils.isEmpty(teamNameList) && CollectionUtils.isNotEmpty(teamList)) {
             List<String> arrayList = new ArrayList<>();
             for (TeamVo teamVo : teamList) {
                 arrayList.add(teamVo.getName());

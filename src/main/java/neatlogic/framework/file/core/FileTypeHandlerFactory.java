@@ -54,6 +54,23 @@ public class FileTypeHandlerFactory extends ModuleInitializedListenerBase {
 		return returnProcessStepHandlerList;
 	}
 
+	public static FileTypeVo getActiveFileTypeHandlerByType(String type) {
+		TenantContext tenantContext = TenantContext.get();
+		List<ModuleVo> moduleList = tenantContext.getActiveModuleList();
+		List<FileTypeVo> returnProcessStepHandlerList = new ArrayList<>();
+		for (FileTypeVo fileTypeHandler : fileTypeList) {
+			for (ModuleVo moduleVo : moduleList) {
+				if (moduleVo.getId().equalsIgnoreCase(fileTypeHandler.getModuleId())) {
+					if(fileTypeHandler.getName().equalsIgnoreCase(type)) {
+						return fileTypeHandler;
+					}
+					break;
+				}
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void onInitialized(NeatLogicWebApplicationContext context) {
 		Map<String, IFileTypeHandler> myMap = context.getBeansOfType(IFileTypeHandler.class);

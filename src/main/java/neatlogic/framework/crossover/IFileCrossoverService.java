@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public interface IFileCrossoverService extends ICrossoverService {
     void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
@@ -45,4 +46,39 @@ public interface IFileCrossoverService extends ICrossoverService {
      * @return 文件vo
      */
     FileVo saveFile(MultipartFile multipartFile, String type, FileTypeVo fileTypeConfigVo, JSONObject paramObj) throws Exception;
+    /**
+     * 读取服务器本地文件内容
+     * @param path 路径
+     * @param startIndex 开始下标
+     * @param offset 读取内容字节数
+     * @return 文件内容
+     */
+    JSONObject readLocalFile(String path, int startIndex, int offset);
+
+    /**
+     * 读取其他服务器文件内容
+     * @param paramObj 入参
+     * @param serverId 服务器ID
+     * @return 文件内容
+     */
+    JSONObject readRemoteFile(JSONObject paramObj, Integer serverId);
+
+    /**
+     * 下载当前服务器文件
+     * @param path
+     * @param startIndex
+     * @param offset
+     * @param response
+     */
+    void downloadLocalFile(String path, int startIndex, int offset, HttpServletResponse response);
+
+    /**
+     * 下载另一个服务器文件
+     * @param paramObj
+     * @param serverId
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    void downloadRemoteFile(JSONObject paramObj, Integer serverId, HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

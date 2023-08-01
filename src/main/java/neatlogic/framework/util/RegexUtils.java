@@ -83,7 +83,9 @@ public final class RegexUtils {
      * markdown文件中的图片链接和跳转链接语法格式匹配
      */
     public static final String MARKDOWN_LINK = "markdown_link";
-
+    /**
+     * 配置文件中变量server.host的格式
+     */
     public static final String SERVER_HOST = "server_host";
 
     public static final Map<String, Pattern> regexPatternMap = new HashMap<String, Pattern>() {

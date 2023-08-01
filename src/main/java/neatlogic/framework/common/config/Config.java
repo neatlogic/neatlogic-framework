@@ -443,8 +443,7 @@ public class Config {
             Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
             Matcher matcher = pattern.matcher(SERVER_HOST);
             if (!matcher.matches()) {
-                System.out.println(SERVER_HOST);
-                throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中server.host变量值不符格式要求");
+                throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求");
             }
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");

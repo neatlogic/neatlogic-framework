@@ -83,6 +83,10 @@ public final class RegexUtils {
      * markdown文件中的图片链接和跳转链接语法格式匹配
      */
     public static final String MARKDOWN_LINK = "markdown_link";
+    /**
+     * 配置文件中变量server.host的格式
+     */
+    public static final String SERVER_HOST = "server_host";
 
     public static final Map<String, Pattern> regexPatternMap = new HashMap<String, Pattern>() {
         private static final long serialVersionUID = -960685874597441494L;
@@ -112,6 +116,7 @@ public final class RegexUtils {
             put(IP, Pattern.compile("^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$"));
             put(PORT, Pattern.compile("^(6553[0-5]{1}|655[0-2]{1}[0-9]{1}|65[0-4]{1}[0-9]{0,2}|6[0-4]{1}[0-9]{0,3}|[0-5]*[0-9]{0,4})$"));
             put(URL, Pattern.compile("^((https|http|ftp|rtsp|mms)?:\\/\\/)[^\\s]+$"));
+            put(SERVER_HOST, Pattern.compile("^((http|https)://)([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})((:6553[0-5]{1})|(:655[0-2]{1}[0-9]{1})|(:65[0-4]{1}[0-9]{0,2})|(:6[0-4]{1}[0-9]{0,3})|(:[0-5]*[0-9]{0,4})){1}$"));
         }
     };
 

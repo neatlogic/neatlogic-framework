@@ -23,6 +23,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import neatlogic.framework.common.RootConfiguration;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.RegexUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @DependsOn({"i18nManager", "messageSourceAccessor"})
 @RootConfiguration
@@ -437,6 +440,11 @@ public class Config {
 
         try {
             SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
+            Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
+            Matcher matcher = pattern.matcher(SERVER_HOST);
+            if (!matcher.matches()) {
+                throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求");
+            }
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");

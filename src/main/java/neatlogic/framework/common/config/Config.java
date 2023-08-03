@@ -440,15 +440,16 @@ public class Config {
 
         try {
             SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
-            Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
-            Matcher matcher = pattern.matcher(SERVER_HOST);
-            if (!matcher.matches()) {
-                throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求");
-            }
         } catch (Exception ex) {
             logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
             System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
             throw ex;
+        }
+
+        Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
+        Matcher matcher = pattern.matcher(SERVER_HOST);
+        if (!matcher.matches()) {
+            throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求，格式为“(http|https)://IP地址:端口”");
         }
     }
 

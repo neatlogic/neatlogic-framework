@@ -10,7 +10,8 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`from_address` AS `fromAddress`
+		`from_address` AS `fromAddress`,
+		`ssl_enable` AS `sslEnable`
 		FROM `mail_server`
 		limit 1
 	</select>
@@ -24,7 +25,8 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`from_address` AS `fromAddress`
+		`from_address` AS `fromAddress`,
+		`ssl_enable` AS `sslEnable`
 		FROM `mail_server`
 		WHERE `uuid` = #{uuid}
 	</select>
@@ -49,7 +51,8 @@
 		`username` as `userName`,
 		`password`,
 		`domain`,
-		`from_address` AS `fromAddress`
+		`from_address` AS `fromAddress`,
+		`ssl_enable` AS `sslEnable`
 		FROM `mail_server`
 		<where>
 			<if test="keyword != null and keyword != ''">
@@ -76,6 +79,7 @@
 	  `host`,
 	  `port`,
 	  `from_address`,
+	  `ssl_enable`,
 	  `username`,
 	  `password`,
 	  `domain`
@@ -87,6 +91,7 @@
 	    #{host},
 	    #{port},
 	    #{fromAddress},
+	    #{sslEnable},
 	    #{userName},
 	    #{password},
 	    #{domain}

@@ -121,10 +121,10 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
                 toUserSet.addAll(userVoList);
             }
         }
-        if (CollectionUtils.isEmpty(toUserSet)) {
+        if (CollectionUtils.isEmpty(toUserSet) && CollectionUtils.isEmpty(notifyVo.getToEmailList())) {
             throw new NotifyNoReceiverException();
         }
-        Set<String> toEmailSet = new HashSet<>();
+        Set<String> toEmailSet = new HashSet<>(notifyVo.getToEmailList());
         for (UserVo user : toUserSet) {
             if (StringUtils.isNotBlank(user.getEmail())) {
                 toEmailSet.add(user.getEmail());
@@ -147,6 +147,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         props.setProperty("mail.smtp.host", mailServerVo.getHost());
         props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
         props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());

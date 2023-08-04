@@ -90,8 +90,6 @@ public class NotifyVo {
      */
     private NotifyPolicyVo callerNotifyPolicyVo;
 
-    private List<String> toEmailList;
-
     private NotifyVo(Builder builder) {
         this.triggerType = builder.triggerType;
         this.notifyPolicyHandler = builder.notifyPolicyHandler;
@@ -111,7 +109,6 @@ public class NotifyVo {
         } catch (Exception e) {
             this.appendError(e.getMessage());
         }
-        this.toEmailList = builder.toEmailList;
     }
 
     public String getTitle() {
@@ -246,10 +243,6 @@ public class NotifyVo {
         this.callerNotifyPolicyVo = callerNotifyPolicyVo;
     }
 
-    public List<String> getToEmailList() {
-        return toEmailList;
-    }
-
     public static class Builder {
         // 可选参数
         private String templateContent;
@@ -264,7 +257,6 @@ public class NotifyVo {
         private Class<? extends IMessageHandler> messageHandlerClass;
         private String notifyPolicyHandler;
         private Date fcd = new Date();
-        private List<String> toEmailList = new ArrayList<>();
 
         public Builder() {
 
@@ -341,12 +333,6 @@ public class NotifyVo {
         public Builder addFileList(List<FileVo> fileList) {
             if (CollectionUtils.isNotEmpty(fileList)) {
                 this.fileList.addAll(fileList);
-            }
-            return this;
-        }
-        public Builder addToEmail(String toEmail) {
-            if (StringUtils.isNotBlank(toEmail)) {
-                this.toEmailList.add(toEmail);
             }
             return this;
         }

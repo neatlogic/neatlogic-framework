@@ -85,6 +85,7 @@ public class EmailUtil {
             Properties props = new Properties();
             props.setProperty("mail.smtp.host", mailServerVo.getHost());
             props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
+            props.put("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
             props.put("mail.smtp.auth", "true");
             Session session = Session.getInstance(props, new Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -109,6 +110,14 @@ public class EmailUtil {
             MimeMultipart multipart = new MimeMultipart();
             /** 设置邮件正文 */
             if (StringUtils.isNotBlank(content)) {
+                content = "<html>" +
+                        "<head>" +
+                        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
+                        "<style type=\"text/css\">" +
+                        "</style>" +
+                        "</head><body>" +
+                        content +
+                        "</body></html>";
                 MimeBodyPart text = new MimeBodyPart();
                 text.setContent(content, "text/html;charset=UTF-8");
                 multipart.addBodyPart(text);

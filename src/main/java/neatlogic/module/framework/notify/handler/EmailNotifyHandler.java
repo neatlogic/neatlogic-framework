@@ -18,9 +18,7 @@ package neatlogic.module.framework.notify.handler;
 
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.common.util.FileUtil;
-import neatlogic.framework.dao.mapper.MailServerMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.MailServerVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.notify.core.NotifyHandlerBase;
@@ -29,6 +27,7 @@ import neatlogic.framework.notify.dto.NotifyVo;
 import neatlogic.framework.notify.exception.EmailServerNotFoundException;
 import neatlogic.framework.notify.exception.NotifyNoReceiverException;
 import neatlogic.framework.service.UserService;
+import neatlogic.framework.util.EmailUtil;
 import neatlogic.module.framework.notify.exception.ExceptionNotifyThread;
 import neatlogic.module.framework.notify.exception.ExceptionNotifyTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
@@ -37,12 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.annotation.Resource;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.mail.util.ByteArrayDataSource;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,9 +57,6 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
 
     @Resource
     private UserService userService;
-
-    @Resource
-    private MailServerMapper mailServerMapper;
 
     @Override
     public boolean myExecute(NotifyVo notifyVo) {
@@ -99,11 +90,6 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
     }
 
     private void sendEmail(NotifyVo notifyVo) throws Exception {
-        MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
-        if (mailServerVo == null || StringUtils.isBlank(mailServerVo.getHost()) || mailServerVo.getPort() == null) {
-            throw new EmailServerNotFoundException();
-        }
-
         Set<UserVo> toUserSet = new HashSet<>();
         if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
             List<UserVo> userVoList = userMapper.getUserByUserUuidList(notifyVo.getToUserUuidList());
@@ -142,61 +128,24 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
                 notifyVo.setFromUserEmail(userVo.getEmail());
             }
         }
-        /* 开启邮箱服务器连接会话 */
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.host", mailServerVo.getHost());
-        props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
-        props.put("mail.smtp.auth", "true");
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
-            }
-        });
 
-        MimeMessage msg = new MimeMessage(session);
-        if (StringUtils.isNotBlank(notifyVo.getFromUserEmail())) {
-            msg.setFrom(new InternetAddress(notifyVo.getFromUserEmail(), notifyVo.getFromUser()));
-        } else if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
-            msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
-        }
-
-        /* 设置收件人 */
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(String.join(",", toEmailSet), false));
-        /* 设置邮件标题 */
-        msg.setSubject(clearStringHTML(notifyVo.getTitle()));
-        msg.setSentDate(new Date());
-
-        MimeMultipart multipart = new MimeMultipart();
-        /* 设置邮件正文 */
-        String sb = "<html>" +
-                "<head>" +
-                "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
-                "<style type=\"text/css\">" +
-                "</style>" +
-                "</head><body>" +
-                notifyVo.getContent() +
-                "</body></html>";
-        MimeBodyPart text = new MimeBodyPart();
-        text.setContent(sb, "text/html;charset=UTF-8");
-        multipart.addBodyPart(text);
-        /* 设置附件 */
+        Map<String, InputStream> attachmentMap = new HashMap<>();
         List<FileVo> fileList = notifyVo.getFileList();
         if (CollectionUtils.isNotEmpty(fileList)) {
-            for (FileVo vo : fileList) {
-                InputStream stream = FileUtil.getData(vo.getPath());
+            for (FileVo fileVo : fileList) {
+                InputStream stream = FileUtil.getData(fileVo.getPath());
                 if (stream != null) {
-                    MimeBodyPart messageBodyPart = new MimeBodyPart();
-                    DataSource dataSource = new ByteArrayDataSource(stream, "application/octet-stream");
-                    DataHandler dataHandler = new DataHandler(dataSource);
-                    messageBodyPart.setDataHandler(dataHandler);
-                    messageBodyPart.setFileName(MimeUtility.encodeText(vo.getName()));
-                    multipart.addBodyPart(messageBodyPart);
+                    attachmentMap.put(fileVo.getName(), stream);
                 }
             }
         }
-        msg.setContent(multipart);
-        /* 发送邮件 */
-        Transport.send(msg);
+        EmailUtil.sendEmailWithFile(
+                clearStringHTML(notifyVo.getTitle()),
+                notifyVo.getContent(),
+                String.join(",", toEmailSet),
+                null,
+                attachmentMap
+                );
     }
 
     private String clearStringHTML(String sourceContent) {

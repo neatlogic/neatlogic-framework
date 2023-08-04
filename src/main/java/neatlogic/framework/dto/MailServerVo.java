@@ -17,30 +17,33 @@ import neatlogic.framework.restful.annotation.EntityField;
  **/
 public class MailServerVo extends BasePageVo {
 	
-	@EntityField(name = "uuid", type = ApiParamType.STRING)
+	@EntityField(name = "common.uuid", type = ApiParamType.STRING)
     private String uuid;
 	
-	@EntityField(name = "名称", type = ApiParamType.STRING)
+	@EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
 	
-	@EntityField(name = "smtp端口", type = ApiParamType.INTEGER)
+	@EntityField(name = "term.framework.smptport", type = ApiParamType.INTEGER)
     private Integer port;
 	
-	@EntityField(name = "smtp主机", type = ApiParamType.STRING)
+	@EntityField(name = "term.framework.smpthost", type = ApiParamType.STRING)
     private String host;
 	
-	@EntityField(name = "用户名", type = ApiParamType.STRING)
+	@EntityField(name = "common.username", type = ApiParamType.STRING)
     private String userName;
 	
-	@EntityField(name = "密码", type = ApiParamType.STRING)
+	@EntityField(name = "common.password", type = ApiParamType.STRING)
     private String password;
 	
-	@EntityField(name = "域名", type = ApiParamType.STRING)
+	@EntityField(name = "term.framework.domain", type = ApiParamType.STRING)
     private String domain;
 	
-	@EntityField(name = "邮箱地址", type = ApiParamType.EMAIL)
+	@EntityField(name = "common.mailaddress", type = ApiParamType.EMAIL)
     private String fromAddress;
-    
+
+	@EntityField(name = "term.framework.smptsslenable", type = ApiParamType.STRING)
+    private String sslEnable;
+
     public String getUuid() {
     	if(StringUtils.isBlank(uuid)) {
     		uuid = UUID.randomUUID().toString().replace("-", "");
@@ -106,5 +109,13 @@ public class MailServerVo extends BasePageVo {
 
     public void setFromAddress(String fromAddress) {
         this.fromAddress = fromAddress;
+    }
+
+    public String getSslEnable() {
+        return sslEnable;
+    }
+
+    public void setSslEnable(String sslEnable) {
+        this.sslEnable = sslEnable;
     }
 }

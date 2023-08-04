@@ -28,7 +28,7 @@ limitations under the License.
     <select id="getUserTokenByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
         select token
         from `user`
-        where user_uuid = #{value}
+        where uuid = #{value}
     </select>
 
 

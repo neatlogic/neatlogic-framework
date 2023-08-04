@@ -139,7 +139,6 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
                 }
             }
         }
-        System.out.println("aaaaa");
         EmailUtil.sendEmailWithFile(
                 clearStringHTML(notifyVo.getTitle()),
                 notifyVo.getContent(),

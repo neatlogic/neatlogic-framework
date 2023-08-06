@@ -18,25 +18,24 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
-public class MAIL_SERVER_MODIFY extends AuthBase {
+public class NOTIFY_CONFIG_MODIFY extends AuthBase {
+    @Override
+    public String getAuthDisplayName() {
+        return "通知配置管理权限";
+    }
 
-	@Override
-	public String getAuthDisplayName() {
-		return "邮件服务器管理权限";
-	}
+    @Override
+    public String getAuthIntroduction() {
+        return "对通知配置进行修改";
+    }
 
-	@Override
-	public String getAuthIntroduction() {
-		return "对邮件服务器进行添加、修改和删除";
-	}
+    @Override
+    public String getAuthGroup() {
+        return "framework";
+    }
 
-	@Override
-	public String getAuthGroup() {
-		return "framework";
-	}
-
-	@Override
-	public Integer getSort() {
-		return 11;
-	}
+    @Override
+    public Integer getSort() {
+        return 99;
+    }
 }

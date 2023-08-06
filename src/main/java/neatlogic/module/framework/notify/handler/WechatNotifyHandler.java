@@ -19,7 +19,9 @@ package neatlogic.module.framework.notify.handler;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dao.mapper.WechatMapper;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.WechatVo;
 import neatlogic.framework.notify.core.NotifyHandlerBase;
 import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.notify.dto.NotifyVo;
@@ -55,6 +57,9 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private WechatMapper wechatMapper;
 
     @Override
     public String getName() {
@@ -108,7 +113,8 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
 
         String content = notifyVo.getContent();
         String toUser = "";
-        WechatUtil.AccessToken accessToken = WechatUtil.getAccessToken();
+        WechatVo wechatVo = wechatMapper.getWechat();
+        WechatUtil.AccessToken accessToken = WechatUtil.getAccessToken(wechatVo.getCorpId(), wechatVo.getCorpSecret());
         int index = 0 ;
         for (UserVo user : toUserSet) {
             if (index == toUserSet.size() - 1) {
@@ -118,8 +124,8 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
             }
             index ++ ;
         }
-        JSONObject data = WechatUtil.getTextCardMsg(toUser , notifyVo.getTitle() , content );
-        WechatUtil.sendMessage(accessToken.getToken(), data);
+        JSONObject data = WechatUtil.getTextCardMsg(toUser , notifyVo.getTitle() , content , wechatVo.getCorpId());
+        WechatUtil.sendMessage(accessToken.getToken(), data, wechatVo.getAgentId());
     }
 
 }

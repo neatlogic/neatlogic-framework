@@ -176,18 +176,7 @@ public class MatrixViewSqlBuilder {
      *
      * @return 创建视图语句
      */
-    public String getCreateViewSql() {
-        try {
-            if (StringUtils.isBlank(viewName)) {
-                throw new MatrixViewNameEmptyException();
-            }
-            return "CREATE OR REPLACE VIEW " + TenantContext.get().getDataDbName() + "." + viewName + " AS " + sql;
-
-        } catch (ApiRuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new MatrixViewSqlIrregularException(ex);
-        }
+    public String getSql() {
+        return this.sql;
     }
-
 }

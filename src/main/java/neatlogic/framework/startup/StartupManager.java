@@ -19,9 +19,11 @@ package neatlogic.framework.startup;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
@@ -115,6 +117,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                         TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                        UserContext.init(SystemUser.SYSTEM);
                         if (CollectionUtils.isNotEmpty(list)) {
                             for (IStartup startup : list) {
                                 try {

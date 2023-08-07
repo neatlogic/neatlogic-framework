@@ -150,10 +150,13 @@ public class GlobalLockManager {
                 //获取所有该key的锁和未上锁的队列 for update
                 globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
-                //获取对应uuid队列中下一个lockId notify
-                GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
-                if (nextGlobalLockVo != null) {
-                    GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo, paramJson);
+                //只有释放已经获得锁的才notify
+                if(globalLockVo.getIsLock() == 1) {
+                    //获取对应uuid队列中下一个lockId notify
+                    GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
+                    if (nextGlobalLockVo != null) {
+                        GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).doNotify(nextGlobalLockVo, paramJson);
+                    }
                 }
                 TransactionUtil.commitTx(transactionStatus);
             } catch (Exception ex) {

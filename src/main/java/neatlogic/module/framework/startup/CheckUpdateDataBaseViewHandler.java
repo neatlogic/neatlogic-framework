@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class CheckUpdateDataBaseViewHandler extends StartupBase {
     @Override
     public String getName() {
-        return "检查视图是否存在，不存在则创建，存在则更新";
+        return "nmfs.checkupdatedatabaseviewhandler.getname";
     }
 
     @Override

@@ -1401,7 +1401,7 @@ CREATE TABLE IF NOT EXISTS `documentonline_config` (
   `menu` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单路由',
   `anchor_point` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '锚点',
   PRIMARY KEY (`file_path`,`module_group`,`menu`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='在线帮助文档配置表';
 
 -- ----------------------------
 -- Table structure for database_view_info

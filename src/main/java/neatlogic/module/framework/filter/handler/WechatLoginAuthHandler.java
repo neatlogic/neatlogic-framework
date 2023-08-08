@@ -16,14 +16,16 @@ limitations under the License.
 
 package neatlogic.module.framework.filter.handler;
 
-import neatlogic.framework.common.config.Config;
-import neatlogic.framework.dao.mapper.WechatMapper;
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.WechatVo;
+import neatlogic.framework.exception.wechat.WechatAuthenticationInformationNotFoundException;
 import neatlogic.framework.exception.wechat.WechatGetAccessTokenFailedException;
 import neatlogic.framework.exception.wechat.WechatGetCodeFailedException;
 import neatlogic.framework.exception.wechat.WechatGetUserIdFailedException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.util.WechatUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ import java.io.IOException;
 public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Resource
-    private WechatMapper wechatMapper;
+    private NotifyConfigMapper notifyConfigMapper;
 
     @Override
     public String getType() {
@@ -51,7 +53,11 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
         String access_token;
         logger.info("---> code:" + code);
         if (StringUtils.isNotBlank(code) && !"authdeny".equals(code)) {
-            WechatVo wechatVo = wechatMapper.getWechat();
+            String config = notifyConfigMapper.getConfigByType(NotifyHandlerType.WECHAT.getValue());
+            if (StringUtils.isBlank(config)) {
+                throw new WechatAuthenticationInformationNotFoundException();
+            }
+            WechatVo wechatVo = JSONObject.parseObject(config, WechatVo.class);
             access_token = WechatUtil.getAccessToken(wechatVo.getCorpId(), wechatVo.getCorpSecret()).getToken();
             logger.info("---> access_token:" + access_token);
             if (StringUtils.isNotBlank(access_token)) {

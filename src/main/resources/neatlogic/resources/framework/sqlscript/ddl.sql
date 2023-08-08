@@ -664,22 +664,6 @@ CREATE TABLE IF NOT EXISTS `login_failed_count` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='登录失败次数';
 
 -- ----------------------------
--- Table structure for mail_server
--- ----------------------------
-CREATE TABLE IF NOT EXISTS `mail_server` (
-  `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
-  `host` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'host',
-  `ssl_enable` enum('true','false') COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否使用SSL',
-  `port` int NOT NULL COMMENT '端口',
-  `from_address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '邮箱地址',
-  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户名',
-  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
-  `domain` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '域名',
-  PRIMARY KEY (`uuid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='邮件服务器表';
-
--- ----------------------------
 -- Table structure for matrix
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `matrix` (
@@ -1415,13 +1399,12 @@ CREATE TABLE IF NOT EXISTS `database_view_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='视图信息表';
 
 -- ----------------------------
--- Table structure for wechat
+-- Table structure for notify_config
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS `wechat` (
-  `corp_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企业ID（前往"我的企业"菜单获取）',
-  `corp_secret` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '应用的凭证密钥（前往"应用管理"找到目标应用获取）',
-  `agent_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '企业应用ID (前往"应用管理"找到目标应用获取）',
-  PRIMARY KEY (`corp_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='企业微信认证信息表';
+CREATE TABLE IF NOT EXISTS `notify_config` (
+  `type` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '通知类型',
+  `config` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置',
+  PRIMARY KEY (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='通知配置表';
 
 SET FOREIGN_KEY_CHECKS = 1;

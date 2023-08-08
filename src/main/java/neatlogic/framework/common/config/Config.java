@@ -102,9 +102,9 @@ public class Config {
     private static String RUNNER_CONTEXT;//runner地址
 
     //wechat
-    private static String WECHAT_CORP_ID;//企业Id（前往"我的企业"菜单获取）
-    private static String WECHAT_APP_SECRET;//应用的凭证密钥（前往"应用管理"找到目标应用获取）
-    private static String WECHAT_APP_AGENT_ID;//企业应用ID (前往"应用管理"找到目标应用获取）
+//    private static String WECHAT_CORP_ID;//企业Id（前往"我的企业"菜单获取）
+//    private static String WECHAT_APP_SECRET;//应用的凭证密钥（前往"应用管理"找到目标应用获取）
+//    private static String WECHAT_APP_AGENT_ID;//企业应用ID (前往"应用管理"找到目标应用获取）
     private static String WECHAT_ACCESS_TOKEN_URL;//获取企业微信token链接
     private static String WECHAT_USERINFO_URL;//获取企业微信user链接
 
@@ -334,17 +334,17 @@ public class Config {
         return WECHAT_USERINFO_URL;
     }
 
-    public static String WECHAT_CORP_ID() {
-        return WECHAT_CORP_ID;
-    }
-
-    public static String WECHAT_APP_SECRET() {
-        return WECHAT_APP_SECRET;
-    }
-
-    public static String WECHAT_APP_AGENT_ID() {
-        return WECHAT_APP_AGENT_ID;
-    }
+//    public static String WECHAT_CORP_ID() {
+//        return WECHAT_CORP_ID;
+//    }
+//
+//    public static String WECHAT_APP_SECRET() {
+//        return WECHAT_APP_SECRET;
+//    }
+//
+//    public static String WECHAT_APP_AGENT_ID() {
+//        return WECHAT_APP_AGENT_ID;
+//    }
 
     public static String WECHAT_SEND_MESSAGE_URL() {
         return WECHAT_SEND_MESSAGE_URL;
@@ -527,9 +527,9 @@ public class Config {
             WECHAT_ACCESS_TOKEN_URL = prop.getProperty("wechat.access.token.url", "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=CorpID&corpsecret=SECRET");
             WECHAT_USERINFO_URL = prop.getProperty("wechat.userinfo.url", "https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=ACCESS_TOKEN&code=CODE&agentid=AGENTID");
             WECHAT_SEND_MESSAGE_URL = prop.getProperty("wechat.send.message.url", "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=ACCESS_TOKEN");
-            WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
-            WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
-            WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
+//            WECHAT_CORP_ID = prop.getProperty("wechat.corp.id");
+//            WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
+//            WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
 
             LICENSE_PK = prop.getProperty("license.pk");
             LICENSE = prop.getProperty("license");

@@ -60,7 +60,7 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
                 if (StringUtils.isNotBlank(userId)) {
                     return userMapper.getUserByUserId(userId);
                 } else {
-                    throw new WechatGetUserIdFailedException(String.format("wechat get userId is %s ; code : %s   access_token : %s  appId : %s", userId, code, access_token, Config.WECHAT_APP_AGENT_ID()));
+                    throw new WechatGetUserIdFailedException(String.format("wechat get userId is %s ; code : %s   access_token : %s  appId : %s", userId, code, access_token, wechatVo.getAgentId()));
                 }
             } else {
                 throw new WechatGetAccessTokenFailedException("access_token could not be null!");

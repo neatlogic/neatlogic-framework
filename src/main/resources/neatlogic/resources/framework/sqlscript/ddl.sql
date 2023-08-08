@@ -1392,12 +1392,26 @@ CREATE TABLE IF NOT EXISTS `worktime_range` (
   PRIMARY KEY (`worktime_uuid`,`start_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='服务窗口时间段范围表';
 
+-- ----------------------------
+-- Table structure for documentonline_config
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS `documentonline_config` (
   `file_path` varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文档路径',
   `module_group` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块组标识',
   `menu` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '菜单路由',
   `anchor_point` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '锚点',
   PRIMARY KEY (`file_path`,`module_group`,`menu`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='在线帮助文档配置表';
+
+-- ----------------------------
+-- Table structure for database_view_info
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `database_view_info` (
+  `view_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '视图名称',
+  `md5` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'MD5',
+  `lcu` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人',
+  `lcd` timestamp(3) NOT NULL COMMENT '修改时间',
+  PRIMARY KEY (`view_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='视图信息表';
 
 SET FOREIGN_KEY_CHECKS = 1;

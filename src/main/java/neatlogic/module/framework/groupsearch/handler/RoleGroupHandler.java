@@ -16,13 +16,13 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
 import neatlogic.framework.service.RoleService;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class RoleGroupHandler implements IGroupSearchHandler {
+public class RoleGroupHandler implements IGroupSearchHandler<RoleVo> {
     @Autowired
     private RoleMapper roleMapper;
 
@@ -50,9 +50,8 @@ public class RoleGroupHandler implements IGroupSearchHandler {
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> search(JSONObject jsonObj) {
+    public List<RoleVo> search(JSONObject jsonObj) {
         //总显示选项个数
         Integer total = jsonObj.getInteger("total");
         if (total == null) {
@@ -80,12 +79,11 @@ public class RoleGroupHandler implements IGroupSearchHandler {
         }
         roleList = roleMapper.searchRole(roleVo);
         roleService.setRoleTeamCountAndRoleUserCount(roleList);
-        return (List<T>) roleList;
+        return roleList;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> reload(JSONObject jsonObj) {
+    public List<RoleVo> reload(JSONObject jsonObj) {
         List<RoleVo> roleList = new ArrayList<RoleVo>();
         List<String> roleUuidList = new ArrayList<String>();
         for (Object value : jsonObj.getJSONArray("valueList")) {
@@ -93,22 +91,22 @@ public class RoleGroupHandler implements IGroupSearchHandler {
                 roleUuidList.add(value.toString().replace(getHeader(), ""));
             }
         }
-        if (roleUuidList.size() > 0) {
+        if (!roleUuidList.isEmpty()) {
             roleList = roleMapper.getRoleByUuidList(roleUuidList);
         }
-        return (List<T>) roleList;
+        return roleList;
     }
 
     @Override
-    public <T> JSONObject repack(List<T> roleList) {
+    public JSONObject repack(List<RoleVo> roleList) {
         JSONObject roleObj = new JSONObject();
         roleObj.put("value", "role");
         roleObj.put("text", "角色");
         JSONArray roleArray = new JSONArray();
-        for (T role : roleList) {
+        for (RoleVo role : roleList) {
             JSONObject roleTmp = new JSONObject();
-            roleTmp.put("value", getHeader() + ((RoleVo) role).getUuid());
-            roleTmp.put("text", ((RoleVo) role).getName());
+            roleTmp.put("value", getHeader() + role.getUuid());
+            roleTmp.put("text", role.getName());
             roleArray.add(roleTmp);
         }
         roleObj.put("sort", getSort());

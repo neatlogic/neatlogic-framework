@@ -1,21 +1,23 @@
 /*
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package neatlogic.module.framework.groupsearch.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.util.CommonUtil;
@@ -24,22 +26,20 @@ import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.RoleTeamVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TeamGroupHandler implements IGroupSearchHandler {
-    @Autowired
+public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
+    @Resource
     private TeamMapper teamMapper;
-    @Autowired
+    @Resource
     private RoleMapper roleMapper;
 
     @Override
@@ -52,9 +52,8 @@ public class TeamGroupHandler implements IGroupSearchHandler {
         return getName() + "#";
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> search(JSONObject jsonObj) {
+    public List<TeamVo> search(JSONObject jsonObj) {
         //总显示选项个数
         Integer total = jsonObj.getInteger("total");
         if (total == null) {
@@ -99,12 +98,11 @@ public class TeamGroupHandler implements IGroupSearchHandler {
         }
         teamList = teamMapper.searchTeam(teamVo);
         setFullPathAndParentName(teamList);
-        return (List<T>) teamList;
+        return teamList;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> reload(JSONObject jsonObj) {
+    public List<TeamVo> reload(JSONObject jsonObj) {
         List<TeamVo> teamList = new ArrayList<TeamVo>();
         List<String> teamUuidList = new ArrayList<String>();
         for (Object value : jsonObj.getJSONArray("valueList")) {
@@ -112,31 +110,31 @@ public class TeamGroupHandler implements IGroupSearchHandler {
                 teamUuidList.add(value.toString().replace(getHeader(), ""));
             }
         }
-        if (teamUuidList.size() > 0) {
+        if (!teamUuidList.isEmpty()) {
             teamList = teamMapper.getTeamByUuidList(teamUuidList);
             setFullPathAndParentName(teamList);
         }
-        return (List<T>) teamList;
+        return teamList;
     }
 
     @Override
-    public <T> JSONObject repack(List<T> teamList) {
+    public JSONObject repack(List<TeamVo> teamList) {
         JSONObject teamObj = new JSONObject();
         teamObj.put("value", "team");
         teamObj.put("text", "分组");
         JSONArray teamArray = new JSONArray();
-        for (T team : teamList) {
+        for (TeamVo team : teamList) {
             JSONObject teamTmp = new JSONObject();
-            teamTmp.put("value", getHeader() + ((TeamVo) team).getUuid());
+            teamTmp.put("value", getHeader() + team.getUuid());
             if (DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())) {
-                teamTmp.put("text", StringUtils.isNotBlank(((TeamVo) team).getParentName())
-                        ? ((TeamVo) team).getName() + "(" + ((TeamVo) team).getParentName() + ")"
-                        : ((TeamVo) team).getName());
+                teamTmp.put("text", StringUtils.isNotBlank(team.getParentName())
+                        ? team.getName() + "(" + team.getParentName() + ")"
+                        : team.getName());
             } else {
-                teamTmp.put("text", ((TeamVo) team).getName());
+                teamTmp.put("text", team.getName());
             }
-            teamTmp.put("fullPath", ((TeamVo) team).getFullPath());
-            teamTmp.put("parentPathList", ((TeamVo) team).getParentPathList());
+            teamTmp.put("fullPath", team.getFullPath());
+            teamTmp.put("parentPathList", team.getParentPathList());
             teamArray.add(teamTmp);
         }
         teamObj.put("sort", getSort());
@@ -164,7 +162,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
     private void setFullPathAndParentName(List<TeamVo> teamList) {
         if (CollectionUtils.isNotEmpty(teamList)) {
             List<TeamVo> nameRepeatedCount = teamMapper.getRepeatTeamNameByNameList(teamList.stream().map(TeamVo::getName).collect(Collectors.toList()));
-            if(CollectionUtils.isNotEmpty(nameRepeatedCount)) {
+            if (CollectionUtils.isNotEmpty(nameRepeatedCount)) {
                 Map<String, Integer> map = nameRepeatedCount.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getNameRepeatCount));
                 for (TeamVo team : teamList) {
                     List<TeamVo> ancestorsAndSelf = teamMapper.getAncestorsAndSelfByLftRht(team.getLft(), team.getRht(), null);
@@ -190,10 +188,4 @@ public class TeamGroupHandler implements IGroupSearchHandler {
         }
     }
 
-    public static void main(String[] args) {
-        TeamVo a = new TeamVo();
-        a.setName("test");
-        List<TeamVo> teamList = Arrays.asList(a);
-        Map<String, Integer> map = teamList.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getNameRepeatCount));
-    }
 }

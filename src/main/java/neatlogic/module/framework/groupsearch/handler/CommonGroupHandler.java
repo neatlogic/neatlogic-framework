@@ -16,19 +16,20 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.UserType;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
-public class CommonGroupHandler implements IGroupSearchHandler {
+public class CommonGroupHandler implements IGroupSearchHandler<String> {
     @Override
     public String getName() {
         return GroupSearch.COMMON.getValue();
@@ -39,9 +40,8 @@ public class CommonGroupHandler implements IGroupSearchHandler {
         return GroupSearch.COMMON.getValuePlugin();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> search(JSONObject jsonObj) {
+    public List<String> search(JSONObject jsonObj) {
         List<Object> includeList = jsonObj.getJSONArray("includeList");
         if (CollectionUtils.isEmpty(includeList)) {
             includeList = new ArrayList<>();
@@ -53,31 +53,30 @@ public class CommonGroupHandler implements IGroupSearchHandler {
                 userTypeList.add(s.getValue());
             }
         }
-        return (List<T>) userTypeList;
+        return userTypeList;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> reload(JSONObject jsonObj) {
+    public List<String> reload(JSONObject jsonObj) {
         List<String> userTypeList = new ArrayList<String>();
-        for(Object value :jsonObj.getJSONArray("valueList")) {
-            if(value.toString().startsWith(getHeader())){
+        for (Object value : jsonObj.getJSONArray("valueList")) {
+            if (value.toString().startsWith(getHeader())) {
                 userTypeList.add(value.toString().replace(getHeader(), ""));
             }
         }
-        return (List<T>) userTypeList;
+        return userTypeList;
     }
 
     @Override
-    public <T> JSONObject repack(List<T> userTypeList) {
+    public JSONObject repack(List<String> userTypeList) {
         JSONObject userTypeObj = new JSONObject();
         userTypeObj.put("value", "common");
         userTypeObj.put("text", "公共");
         JSONArray userTypeArray = new JSONArray();
-        for(T userType : userTypeList) {
+        for (String userType : userTypeList) {
             JSONObject userTypeTmp = new JSONObject();
-            userTypeTmp.put("value", getHeader()+userType);
-            userTypeTmp.put("text", UserType.getText(userType.toString()));
+            userTypeTmp.put("value", getHeader() + userType);
+            userTypeTmp.put("text", UserType.getText(userType));
             userTypeArray.add(userTypeTmp);
         }
         userTypeObj.put("sort", getSort());

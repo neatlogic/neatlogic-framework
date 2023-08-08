@@ -21,11 +21,11 @@ import neatlogic.framework.restful.annotation.EntityField;
 
 public class WechatVo {
 
-    @EntityField(name = "企业ID", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.corpid", type = ApiParamType.STRING)
     private String corpId;
-    @EntityField(name = "企业密钥", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.corpsecret", type = ApiParamType.STRING)
     private String corpSecret;
-    @EntityField(name = "企业应用ID", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.agentid", type = ApiParamType.STRING)
     private String agentId;
 
     public String getCorpId() {

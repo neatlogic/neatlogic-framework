@@ -21,12 +21,12 @@ import neatlogic.framework.auth.core.AuthBase;
 public class NOTIFY_CONFIG_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {
-        return "通知配置管理权限";
+        return "nfal.notify_config_modify.getauthdisplayname";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "对通知配置进行修改";
+        return "nfal.notify_config_modify.getauthintroduction";
     }
 
     @Override

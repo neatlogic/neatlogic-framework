@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package neatlogic.framework.auth.label;
+package neatlogic.framework.exception.wechat;
 
-import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class MAIL_SERVER_MODIFY extends AuthBase {
+public class WechatAuthenticationInformationNotFoundException extends ApiRuntimeException {
 
-	@Override
-	public String getAuthDisplayName() {
-		return "邮件服务器管理权限";
-	}
+    private static final long serialVersionUID = -8159240081628731716L;
 
-	@Override
-	public String getAuthIntroduction() {
-		return "对邮件服务器进行添加、修改和删除";
-	}
-
-	@Override
-	public String getAuthGroup() {
-		return "framework";
-	}
-
-	@Override
-	public Integer getSort() {
-		return 11;
-	}
+    public WechatAuthenticationInformationNotFoundException() {
+        super("nfew.wechatauthenticationinformationnotfoundexception.wechatauthenticationinformationnotfoundexception");
+    }
 }

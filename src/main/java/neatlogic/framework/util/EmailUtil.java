@@ -1,8 +1,10 @@
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.MimeType;
-import neatlogic.framework.dao.mapper.MailServerMapper;
+import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.MailServerVo;
+import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.notify.exception.EmailSendException;
 import neatlogic.framework.notify.exception.EmailServerNotFoundException;
 import org.apache.commons.collections4.MapUtils;
@@ -26,11 +28,11 @@ import java.util.Properties;
 @Component
 public class EmailUtil {
     static Logger logger = LoggerFactory.getLogger(EmailUtil.class);
-    private static MailServerMapper mailServerMapper;
+    private static NotifyConfigMapper notifyConfigMapper;
 
     @Autowired
-    public void setMailServerMapper(MailServerMapper _mailServerMapper) {
-        mailServerMapper = _mailServerMapper;
+    public void setNotifyConfigMapper(NotifyConfigMapper _notifyConfigMapper) {
+        notifyConfigMapper = _notifyConfigMapper;
     }
 
     /**
@@ -66,7 +68,11 @@ public class EmailUtil {
      * @param attachmentMap 附件(key:文件名;value:流)，根据附件名后缀自动匹配MimeType，如果没有后缀名或未匹配到MimeType，则默认为application/octet-stream
      */
     public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
-        MailServerVo mailServerVo = mailServerMapper.getActiveMailServer();
+        String config = notifyConfigMapper.getConfigByType(NotifyHandlerType.EMAIL.getValue());
+        if (StringUtils.isBlank(config)) {
+            throw new EmailServerNotFoundException();
+        }
+        MailServerVo mailServerVo = JSONObject.parseObject(config, MailServerVo.class);
         sendEmailWithFile(title, content, to, cc, attachmentMap, mailServerVo);
     }
 

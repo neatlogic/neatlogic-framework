@@ -18,8 +18,11 @@ package neatlogic.module.framework.notify.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
+import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.WechatVo;
+import neatlogic.framework.exception.wechat.WechatAuthenticationInformationNotFoundException;
 import neatlogic.framework.notify.core.NotifyHandlerBase;
 import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.notify.dto.NotifyVo;
@@ -29,6 +32,7 @@ import neatlogic.framework.util.WechatUtil;
 import neatlogic.module.framework.notify.exception.ExceptionNotifyThread;
 import neatlogic.module.framework.notify.exception.ExceptionNotifyTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -55,6 +59,9 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private NotifyConfigMapper notifyConfigMapper;
 
     @Override
     public String getName() {
@@ -108,7 +115,12 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
 
         String content = notifyVo.getContent();
         String toUser = "";
-        WechatUtil.AccessToken accessToken = WechatUtil.getAccessToken();
+        String config = notifyConfigMapper.getConfigByType(NotifyHandlerType.WECHAT.getValue());
+        if (StringUtils.isBlank(config)) {
+            throw new WechatAuthenticationInformationNotFoundException();
+        }
+        WechatVo wechatVo = JSONObject.parseObject(config, WechatVo.class);
+        WechatUtil.AccessToken accessToken = WechatUtil.getAccessToken(wechatVo.getCorpId(), wechatVo.getCorpSecret());
         int index = 0 ;
         for (UserVo user : toUserSet) {
             if (index == toUserSet.size() - 1) {
@@ -118,8 +130,8 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
             }
             index ++ ;
         }
-        JSONObject data = WechatUtil.getTextCardMsg(toUser , notifyVo.getTitle() , content );
-        WechatUtil.sendMessage(accessToken.getToken(), data);
+        JSONObject data = WechatUtil.getTextCardMsg(toUser , notifyVo.getTitle() , content , wechatVo.getCorpId());
+        WechatUtil.sendMessage(accessToken.getToken(), data, wechatVo.getAgentId());
     }
 
 }

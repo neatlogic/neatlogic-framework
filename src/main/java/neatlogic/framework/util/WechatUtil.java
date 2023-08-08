@@ -74,11 +74,11 @@ public class WechatUtil {
         return accessToken;
     }
 
-    public static AccessToken getAccessToken() {
-        String corpID = Config.WECHAT_CORP_ID();
-        String appSecret = Config.WECHAT_APP_SECRET();
-        return getAccessToken(corpID , appSecret);
-    }
+//    public static AccessToken getAccessToken() {
+//        String corpID = Config.WECHAT_CORP_ID();
+//        String appSecret = Config.WECHAT_APP_SECRET();
+//        return getAccessToken(corpID , appSecret);
+//    }
 
     /**
      * 根据code获取成员信息
@@ -115,15 +115,16 @@ public class WechatUtil {
      * @param toUser 发送用户
      * @param title  卡片标题
      * @param content 卡片内容
+     * @param corpID 企业ID
      * @return
      */
-    public static JSONObject getTextCardMsg(String toUser , String title , String content ){
+    public static JSONObject getTextCardMsg(String toUser , String title , String content, String corpID){
         String forwardURL = "";
         content = content.trim();
         //插件个性化跳转url，存放模板内插件内部处理
         if(content.indexOf("@link:") > -1 ){
             forwardURL = content.substring(content.lastIndexOf("@link:")+6 , content.length());
-            String corpID = Config.WECHAT_CORP_ID();
+//            String corpID = Config.WECHAT_CORP_ID();
             forwardURL = forwardURL.replace("CorpID", corpID);
             content = content.substring(0 ,content.lastIndexOf("@link:")-1);
         }
@@ -160,12 +161,13 @@ public class WechatUtil {
      * 发送消息
      * @param access_token
      * @param data
+     * @param agentId
      * @return
      */
-    public static int sendMessage(String access_token, JSONObject data) {
+    public static int sendMessage(String access_token, JSONObject data, String agentId) {
         int result = 0;
         String messageUrl = Config.WECHAT_SEND_MESSAGE_URL();
-        data.put("agentid",  Config.WECHAT_APP_AGENT_ID());
+        data.put("agentid",  agentId);
         messageUrl = messageUrl.replace("ACCESS_TOKEN", access_token);
 
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.post(messageUrl).setPayload(data.toJSONString()).sendRequest();

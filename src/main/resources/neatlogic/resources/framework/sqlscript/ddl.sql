@@ -1406,7 +1406,7 @@ CREATE TABLE IF NOT EXISTS `documentonline_config` (
 -- ----------------------------
 -- Table structure for database_view_info
 -- ----------------------------
-CREATE TABLE `database_view_info` (
+CREATE TABLE IF NOT EXISTS `database_view_info` (
   `view_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '视图名称',
   `md5` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'MD5',
   `lcu` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '修改人',

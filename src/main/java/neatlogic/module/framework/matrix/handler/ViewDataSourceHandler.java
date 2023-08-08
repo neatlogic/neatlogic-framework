@@ -17,9 +17,12 @@ limitations under the License.
 package neatlogic.module.framework.matrix.handler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.common.util.FileUtil;
+import neatlogic.framework.dao.mapper.DataBaseViewInfoMapper;
 import neatlogic.framework.dao.mapper.SchemaMapper;
+import neatlogic.framework.dto.DataBaseViewInfoVo;
 import neatlogic.framework.exception.database.DataBaseNotFoundException;
 import neatlogic.framework.exception.file.FileNotFoundException;
 import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
@@ -36,6 +39,7 @@ import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.*;
 import neatlogic.framework.matrix.view.MatrixViewSqlBuilder;
 import neatlogic.framework.transaction.core.EscapeTransactionJob;
+import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.TableResultUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -68,6 +72,9 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
     private SchemaMapper schemaMapper;
+
+    @Resource
+    private DataBaseViewInfoMapper dataBaseViewInfoMapper;
 
     @Override
     public String getHandler() {
@@ -476,7 +483,8 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();
         MatrixViewSqlBuilder viewBuilder = new MatrixViewSqlBuilder(xml);
 //        viewBuilder.setCiId(ciVo.getId());
-        viewBuilder.setViewName("matrix_" + matrixUuid);
+        String viewName = "matrix_" + matrixUuid;
+        viewBuilder.setViewName(viewName);
         if (viewBuilder.valid()) {
             //测试一下语句是否能正常执行
             try {
@@ -502,12 +510,29 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     matrixAttributeVo.setIsRequired(0);
                     matrixAttributeList.add(matrixAttributeVo);
                 }
+                String selectSql = viewBuilder.getSql();
+                String md5 = Md5Util.encryptMD5(selectSql);
+                String tableType = schemaMapper.checkTableOrViewIsExists(TenantContext.get().getDataDbName(), viewName);
+                if (tableType != null) {
+                    if (Objects.equals(tableType, "SYSTEM VIEW")) {
+                        return matrixAttributeList;
+                    } else if (Objects.equals(tableType, "VIEW")) {
+                        DataBaseViewInfoVo dataBaseViewInfoVo = dataBaseViewInfoMapper.getDataBaseViewInfoByViewName(viewName);
+                        if (dataBaseViewInfoVo != null) {
+                            if (Objects.equals(md5, dataBaseViewInfoVo.getMd5())) {
+                                // md5相同就不用更新视图了
+                                return matrixAttributeList;
+                            }
+                        }
+                    }
+                }
                 EscapeTransactionJob.State s = new EscapeTransactionJob(() -> {
                     if (schemaMapper.checkSchemaIsExists(TenantContext.get().getDataDbName()) > 0) {
-                        //创建配置项表
-//                        String viewSql = viewBuilder.getCreateViewSql();
-//                        System.out.println(viewSql);
-                        schemaMapper.insertView(viewBuilder.getCreateViewSql());
+                        if (Objects.equals(tableType, "BASE TABLE")) {
+                            schemaMapper.deleteTable(TenantContext.get().getDataDbName() + "." + viewName);
+                        }
+                        String sql = "CREATE OR REPLACE VIEW " + TenantContext.get().getDataDbName() + "." + viewName + " AS " + selectSql;
+                        schemaMapper.insertView(sql);
                     } else {
                         throw new DataBaseNotFoundException();
                     }
@@ -515,6 +540,11 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                 if (!s.isSucceed()) {
                     throw new MatrixViewCreateSchemaException(matrixName);
                 }
+                DataBaseViewInfoVo dataBaseViewInfoVo = new DataBaseViewInfoVo();
+                dataBaseViewInfoVo.setViewName(viewName);
+                dataBaseViewInfoVo.setMd5(md5);
+                dataBaseViewInfoVo.setLcu(UserContext.get().getUserUuid());
+                dataBaseViewInfoMapper.insertDataBaseViewInfo(dataBaseViewInfoVo);
             }
         }
         return matrixAttributeList;

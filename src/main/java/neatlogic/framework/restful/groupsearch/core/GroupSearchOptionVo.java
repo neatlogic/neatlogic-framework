@@ -16,19 +16,30 @@
 
 package neatlogic.framework.restful.groupsearch.core;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.restful.annotation.EntityField;
+
 import java.util.List;
 
 public class GroupSearchOptionVo {
 
+    @EntityField(name = "common.value", type = ApiParamType.STRING)
     private String value;
+    @EntityField(name = "common.text", type = ApiParamType.STRING)
     private String text;
     // 用户类型特有字段
+    @EntityField(name = "term.framework.pinyin", type = ApiParamType.STRING)
     private String pinyin;
+    @EntityField(name = "common.group", type = ApiParamType.STRING)
     private String team;
+    @EntityField(name = "common.avatar", type = ApiParamType.STRING)
     private String avatar;
+    @EntityField(name = "term.framework.user.viplevel", type = ApiParamType.ENUM)
     private Integer vipLevel;
     // 分组类型特有字段
+    @EntityField(name = "term.framework.team.fullpath", type = ApiParamType.STRING)
     private String fullPath;
+    @EntityField(name = "term.framework.team.parentpathlist", type = ApiParamType.JSONARRAY)
     private List<String> parentPathList;
 
     public String getValue() {

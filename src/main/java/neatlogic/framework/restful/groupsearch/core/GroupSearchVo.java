@@ -23,21 +23,21 @@ import java.util.List;
 
 public class GroupSearchVo {
 
-    @EntityField(name = "关键字", type = ApiParamType.STRING)
+    @EntityField(name = "common.keyword", type = ApiParamType.STRING)
     private String keyword;
-    @EntityField(name = "用于回显的参数列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.defaultvaluelist", type = ApiParamType.JSONARRAY)
     private List<String> valueList;
-    @EntityField(name = "用于过滤回显参数", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.excludelist", type = ApiParamType.JSONARRAY)
     private List<String> excludeList;
-    @EntityField(name = "用于需要回显参数", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.includelist", type = ApiParamType.JSONARRAY)
     private List<String> includeList;
-    @EntityField(name = "限制接口返回类型", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.grouplist", type = ApiParamType.JSONARRAY)
     private List<String> groupList;
-    @EntityField(name = "限制接口option范围", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.rangelist", type = ApiParamType.JSONARRAY)
     private List<String> rangeList;
-    @EntityField(name = "共展示数量", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.rownum", type = ApiParamType.INTEGER)
     private Integer total;
-    @EntityField(name = "项目ID", type = ApiParamType.LONG)
+    @EntityField(name = "term.rdm.projectid", type = ApiParamType.LONG)
     private Long projectId;
 
     public String getKeyword() {

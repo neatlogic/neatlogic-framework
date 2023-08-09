@@ -16,20 +16,24 @@
 
 package neatlogic.framework.restful.groupsearch.core;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.restful.annotation.EntityField;
+
 import java.util.List;
 
 public class GroupSearchGroupVo {
 
+    @EntityField(name = "common.index", type = ApiParamType.INTEGER)
     private Integer index;
-
+    @EntityField(name = "common.islimit", type = ApiParamType.BOOLEAN)
     private Boolean isLimit;
-
+    @EntityField(name = "common.hasmore", type = ApiParamType.BOOLEAN)
     private Boolean isMore;
-
+    @EntityField(name = "common.sort", type = ApiParamType.INTEGER)
     private Integer sort;
-
+    @EntityField(name = "common.value", type = ApiParamType.STRING)
     private String value;
-
+    @EntityField(name = "common.text", type = ApiParamType.STRING)
     private String text;
 
     private List<GroupSearchOptionVo> dataList;

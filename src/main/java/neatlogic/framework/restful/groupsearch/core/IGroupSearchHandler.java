@@ -36,9 +36,9 @@ public interface IGroupSearchHandler<E> {
      */
     Boolean isLimit();
 
-    List<E> search(JSONObject jsonObj);
+    List<E> search(GroupSearchVo groupSearchVo);
 
-    List<E> reload(JSONObject jsonObj);
+    List<E> reload(GroupSearchVo groupSearchVo);
 
-    JSONObject repack(List<E> dataList);
+    GroupSearchGroupVo repack(List<E> dataList);
 }

@@ -32,7 +32,7 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             if (handler.isLimit()) {
                 groupCount++;
             }
-            List<Object> dataList = null;
+            List<GroupSearchOptionVo> dataList = null;
             boolean isMore = true;
 //            if (!jsonObj.containsKey("valueList") || jsonObj.getJSONArray("valueList").isEmpty()) {
             if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
@@ -65,15 +65,21 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
 //            resultObj.put("isLimit", handler.isLimit());
 //            resultObj.put("isMore", isMore);
 //            resultArray.add(resultObj);
-            GroupSearchGroupVo groupSearchGroupVo = handler.repack(dataList);
+//            GroupSearchGroupVo groupSearchGroupVo = handler.repack(dataList);
+            GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
+            groupSearchGroupVo.setValue(handler.getName());
+            groupSearchGroupVo.setText(handler.getLabel());
+            groupSearchGroupVo.setSort(handler.getSort());
             //过滤 excludeList
             if (CollectionUtils.isNotEmpty(excludeList)) {
-                List<GroupSearchOptionVo> groupSearchOptionList = groupSearchGroupVo.getDataList();
+//                List<GroupSearchOptionVo> groupSearchOptionList = groupSearchGroupVo.getDataList();
                 for (String exclude : excludeList) {
-                    groupSearchOptionList = groupSearchOptionList.stream().filter(data -> !(data.getValue().equalsIgnoreCase(exclude))).collect(Collectors.toList());
+//                    groupSearchOptionList = groupSearchOptionList.stream().filter(data -> !(data.getValue().equalsIgnoreCase(exclude))).collect(Collectors.toList());
+                    dataList = dataList.stream().filter(data -> !(data.getValue().equalsIgnoreCase(exclude))).collect(Collectors.toList());
                 }
-                groupSearchGroupVo.setDataList(groupSearchOptionList);
+//                groupSearchGroupVo.setDataList(groupSearchOptionList);
             }
+            groupSearchGroupVo.setDataList(dataList);
             if (handler.isLimit()) {
                 groupSearchGroupVo.setIndex(0);
             } else {

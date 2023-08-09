@@ -25,10 +25,10 @@ import java.util.List;
 
 
 public enum GroupSearch implements IEnum {
-    USER("user", new I18n("用户类型")),
-    TEAM("team", new I18n("组类型")),
-    ROLE("role", new I18n("角色类型")),
-    COMMON("common", new I18n("公共类型"));
+    USER("user", new I18n("用户")),
+    TEAM("team", new I18n("分组")),
+    ROLE("role", new I18n("角色")),
+    COMMON("common", new I18n("公共"));
 
     private final String value;
     private final I18n text;

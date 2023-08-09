@@ -26,6 +26,7 @@ import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.RoleTeamVo;
 import neatlogic.framework.dto.TeamVo;
+import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchGroupVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
@@ -40,7 +41,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
+public class TeamGroupHandler implements IGroupSearchHandler {
     @Resource
     private TeamMapper teamMapper;
     @Resource
@@ -52,12 +53,17 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
     }
 
     @Override
+    public String getLabel() {
+        return GroupSearch.TEAM.getText();
+    }
+
+    @Override
     public String getHeader() {
         return getName() + "#";
     }
 
     @Override
-    public List<TeamVo> search(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
 //        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
@@ -112,11 +118,11 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
         }
         teamList = teamMapper.searchTeam(teamVo);
         setFullPathAndParentName(teamList);
-        return teamList;
+        return convertGroupSearchOption(teamList);
     }
 
     @Override
-    public List<TeamVo> reload(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<TeamVo> teamList = new ArrayList<TeamVo>();
         List<String> teamUuidList = new ArrayList<String>();
 //        for (Object value : jsonObj.getJSONArray("valueList")) {
@@ -133,10 +139,28 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
             teamList = teamMapper.getTeamByUuidList(teamUuidList);
             setFullPathAndParentName(teamList);
         }
-        return teamList;
+        return convertGroupSearchOption(teamList);
     }
 
-    @Override
+    private List<GroupSearchOptionVo> convertGroupSearchOption(List<TeamVo> teamList) {
+        List<GroupSearchOptionVo> dataList = new ArrayList<>();
+        for (TeamVo team : teamList) {
+            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+            groupSearchOptionVo.setValue(getHeader() + team.getUuid());
+            if (DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())) {
+                groupSearchOptionVo.setText(StringUtils.isNotBlank(team.getParentName())
+                        ? team.getName() + "(" + team.getParentName() + ")"
+                        : team.getName());
+            } else {
+                groupSearchOptionVo.setText(team.getName());
+            }
+            groupSearchOptionVo.setFullPath(team.getFullPath());
+            groupSearchOptionVo.setParentPathList(team.getParentPathList());
+            dataList.add(groupSearchOptionVo);
+        }
+        return dataList;
+    }
+//    @Override
     public GroupSearchGroupVo repack(List<TeamVo> teamList) {
         GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
         groupSearchGroupVo.setValue("team");

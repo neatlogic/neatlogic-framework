@@ -32,10 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CommonGroupHandler implements IGroupSearchHandler<String> {
+public class CommonGroupHandler implements IGroupSearchHandler {
     @Override
     public String getName() {
         return GroupSearch.COMMON.getValue();
+    }
+
+    @Override
+    public String getLabel() {
+        return GroupSearch.COMMON.getText();
     }
 
     @Override
@@ -44,7 +49,7 @@ public class CommonGroupHandler implements IGroupSearchHandler<String> {
     }
 
     @Override
-    public List<String> search(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
 //        List<Object> includeList = jsonObj.getJSONArray("includeList");
 //        if (CollectionUtils.isEmpty(includeList)) {
 //            includeList = new ArrayList<>();
@@ -54,21 +59,27 @@ public class CommonGroupHandler implements IGroupSearchHandler<String> {
         if (CollectionUtils.isEmpty(includeStrList)) {
             includeStrList = new ArrayList<>();
         }
-        List<String> userTypeList = new ArrayList<>();
+        List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
         for (UserType s : UserType.values()) {
             if ((s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue())) && s.getText().contains(groupSearchVo.getKeyword())) {
-                userTypeList.add(s.getValue());
+                GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+                groupSearchOptionVo.setValue(s.getValue());
+                groupSearchOptionVo.setText(s.getText());
+                groupSearchOptionList.add(groupSearchOptionVo);
             }
         }
-        return userTypeList;
+        return groupSearchOptionList;
     }
 
     @Override
-    public List<String> reload(GroupSearchVo groupSearchVo) {
-        List<String> userTypeList = new ArrayList<String>();
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
+        List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
         for (String value : groupSearchVo.getValueList()) {
             if (value.startsWith(getHeader())) {
-                userTypeList.add(value.replace(getHeader(), StringUtils.EMPTY));
+                value = value.replace(getHeader(), StringUtils.EMPTY);
+                GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+                groupSearchOptionVo.setValue(value);
+                groupSearchOptionVo.setText(UserType.getText(value));
             }
         }
 //        for (Object value : jsonObj.getJSONArray("valueList")) {
@@ -76,10 +87,10 @@ public class CommonGroupHandler implements IGroupSearchHandler<String> {
 //                userTypeList.add(value.toString().replace(getHeader(), ""));
 //            }
 //        }
-        return userTypeList;
+        return groupSearchOptionList;
     }
 
-    @Override
+//    @Override
     public GroupSearchGroupVo repack(List<String> userTypeList) {
         GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
         groupSearchGroupVo.setValue("common");

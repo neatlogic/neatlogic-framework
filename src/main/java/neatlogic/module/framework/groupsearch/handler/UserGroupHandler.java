@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class UserGroupHandler implements IGroupSearchHandler<UserVo> {
+public class UserGroupHandler implements IGroupSearchHandler {
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -52,12 +52,17 @@ public class UserGroupHandler implements IGroupSearchHandler<UserVo> {
     }
 
     @Override
+    public String getLabel() {
+        return GroupSearch.USER.getText();
+    }
+
+    @Override
     public String getHeader() {
         return GroupSearch.USER.getValuePlugin();
     }
 
     @Override
-    public List<UserVo> search(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
 //        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
@@ -83,11 +88,11 @@ public class UserGroupHandler implements IGroupSearchHandler<UserVo> {
             userService.getUserByRangeList(userVo, rangeList);
         }
         userList = userMapper.searchUser(userVo);
-        return userList;
+        return convertGroupSearchOption(userList);
     }
 
     @Override
-    public List<UserVo> reload(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<UserVo> userList = new ArrayList<>();
         List<String> userUuidList = new ArrayList<>();
 //        List<String> valueList = JSONObject.parseArray(jsonObj.getJSONArray("valueList").toJSONString(), String.class);
@@ -104,10 +109,28 @@ public class UserGroupHandler implements IGroupSearchHandler<UserVo> {
         if (!userUuidList.isEmpty()) {
             userList = userMapper.getUserByUserUuidList(userUuidList);
         }
-        return userList;
+        return convertGroupSearchOption(userList);
     }
 
-    @Override
+    private List<GroupSearchOptionVo> convertGroupSearchOption(List<UserVo> userList) {
+        List<GroupSearchOptionVo> dataList = new ArrayList<>();
+        for (UserVo userVo : userList) {
+            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+            groupSearchOptionVo.setValue(getHeader() + userVo.getUuid());
+            groupSearchOptionVo.setText(userVo.getUserName() + "(" + userVo.getUserId() + ")");
+            //移动端临时屏蔽这两个字段，表单也会用到这个接口
+            if (!Objects.equals(DeviceType.MOBILE.getValue(), CommonUtil.getDevice())) {
+                groupSearchOptionVo.setPinyin(userVo.getPinyin());
+                groupSearchOptionVo.setTeam(String.join(",", userVo.getTeamNameList()));// TODO 分隔符改成前端设置
+            }
+            groupSearchOptionVo.setAvatar(userVo.getAvatar());
+            groupSearchOptionVo.setVipLevel(userVo.getVipLevel());
+            dataList.add(groupSearchOptionVo);
+        }
+        return dataList;
+    }
+
+//    @Override
     public GroupSearchGroupVo repack(List<UserVo> userList) {
         GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
         groupSearchGroupVo.setValue("user");

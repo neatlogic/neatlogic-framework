@@ -22,6 +22,7 @@ import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.UserType;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dto.RoleVo;
+import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchGroupVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class RoleGroupHandler implements IGroupSearchHandler<RoleVo> {
+public class RoleGroupHandler implements IGroupSearchHandler {
     @Autowired
     private RoleMapper roleMapper;
 
@@ -50,13 +51,18 @@ public class RoleGroupHandler implements IGroupSearchHandler<RoleVo> {
     }
 
     @Override
+    public String getLabel() {
+        return GroupSearch.ROLE.getText();
+    }
+
+    @Override
     public String getHeader() {
         return getName() + "#";
     }
 
 
     @Override
-    public List<RoleVo> search(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
 //        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
@@ -92,11 +98,11 @@ public class RoleGroupHandler implements IGroupSearchHandler<RoleVo> {
         }
         roleList = roleMapper.searchRole(roleVo);
         roleService.setRoleTeamCountAndRoleUserCount(roleList);
-        return roleList;
+        return convertGroupSearchOption(roleList);
     }
 
     @Override
-    public List<RoleVo> reload(GroupSearchVo groupSearchVo) {
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<RoleVo> roleList = new ArrayList<RoleVo>();
         List<String> roleUuidList = new ArrayList<String>();
 //        for (Object value : jsonObj.getJSONArray("valueList")) {
@@ -112,10 +118,21 @@ public class RoleGroupHandler implements IGroupSearchHandler<RoleVo> {
         if (!roleUuidList.isEmpty()) {
             roleList = roleMapper.getRoleByUuidList(roleUuidList);
         }
-        return roleList;
+        return convertGroupSearchOption(roleList);
     }
 
-    @Override
+    private List<GroupSearchOptionVo> convertGroupSearchOption(List<RoleVo> roleList) {
+        List<GroupSearchOptionVo> dataList = new ArrayList<>();
+        for (RoleVo role : roleList) {
+            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+            groupSearchOptionVo.setValue(getHeader() + role.getUuid());
+            groupSearchOptionVo.setText(role.getName());
+            dataList.add(groupSearchOptionVo);
+        }
+        return dataList;
+    }
+
+//    @Override
     public GroupSearchGroupVo repack(List<RoleVo> roleList) {
         GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
         groupSearchGroupVo.setValue("role");

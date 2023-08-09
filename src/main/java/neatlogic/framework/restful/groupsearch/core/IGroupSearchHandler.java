@@ -20,8 +20,10 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
-public interface IGroupSearchHandler<E> {
+public interface IGroupSearchHandler {
     String getName();
+
+    String getLabel();
 
     default String getHeader() {
         return getName() + "#";
@@ -36,9 +38,9 @@ public interface IGroupSearchHandler<E> {
      */
     Boolean isLimit();
 
-    List<E> search(GroupSearchVo groupSearchVo);
+    List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo);
 
-    List<E> reload(GroupSearchVo groupSearchVo);
+    List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo);
 
-    GroupSearchGroupVo repack(List<E> dataList);
+//    GroupSearchGroupVo repack(List<E> dataList);
 }

@@ -16,11 +16,8 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.UserType;
-import neatlogic.framework.restful.groupsearch.core.GroupSearchGroupVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
@@ -50,11 +47,6 @@ public class CommonGroupHandler implements IGroupSearchHandler {
 
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
-//        List<Object> includeList = jsonObj.getJSONArray("includeList");
-//        if (CollectionUtils.isEmpty(includeList)) {
-//            includeList = new ArrayList<>();
-//        }
-//        List<String> includeStrList = includeList.stream().map(Object::toString).collect(Collectors.toList());
         List<String> includeStrList = groupSearchVo.getIncludeList();
         if (CollectionUtils.isEmpty(includeStrList)) {
             includeStrList = new ArrayList<>();
@@ -82,42 +74,7 @@ public class CommonGroupHandler implements IGroupSearchHandler {
                 groupSearchOptionVo.setText(UserType.getText(value));
             }
         }
-//        for (Object value : jsonObj.getJSONArray("valueList")) {
-//            if (value.toString().startsWith(getHeader())) {
-//                userTypeList.add(value.toString().replace(getHeader(), ""));
-//            }
-//        }
         return groupSearchOptionList;
-    }
-
-//    @Override
-    public GroupSearchGroupVo repack(List<String> userTypeList) {
-        GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
-        groupSearchGroupVo.setValue("common");
-        groupSearchGroupVo.setText("公共");
-        groupSearchGroupVo.setSort(getSort());
-        List<GroupSearchOptionVo> dataList = new ArrayList<>();
-        for (String userType : userTypeList) {
-            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-            groupSearchOptionVo.setValue(getHeader() + userType);
-            groupSearchOptionVo.setText(UserType.getText(userType));
-            dataList.add(groupSearchOptionVo);
-        }
-        groupSearchGroupVo.setDataList(dataList);
-        return groupSearchGroupVo;
-//        JSONObject userTypeObj = new JSONObject();
-//        userTypeObj.put("value", "common");
-//        userTypeObj.put("text", "公共");
-//        JSONArray userTypeArray = new JSONArray();
-//        for (String userType : userTypeList) {
-//            JSONObject userTypeTmp = new JSONObject();
-//            userTypeTmp.put("value", getHeader() + userType);
-//            userTypeTmp.put("text", UserType.getText(userType));
-//            userTypeArray.add(userTypeTmp);
-//        }
-//        userTypeObj.put("sort", getSort());
-//        userTypeObj.put("dataList", userTypeArray);
-//        return userTypeObj;
     }
 
     @Override

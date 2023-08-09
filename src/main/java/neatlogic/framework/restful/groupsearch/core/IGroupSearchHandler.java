@@ -16,8 +16,6 @@
 
 package neatlogic.framework.restful.groupsearch.core;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.List;
 
 public interface IGroupSearchHandler {
@@ -41,6 +39,4 @@ public interface IGroupSearchHandler {
     List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo);
 
     List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo);
-
-//    GroupSearchGroupVo repack(List<E> dataList);
 }

@@ -16,11 +16,8 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.constvalue.UserType;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
@@ -37,7 +34,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class UserGroupHandler implements IGroupSearchHandler {
@@ -64,7 +60,6 @@ public class UserGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-//        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
         if (total == null) {
             total = 18;
@@ -76,13 +71,8 @@ public class UserGroupHandler implements IGroupSearchHandler {
         userVo.setCurrentPage(1);
         userVo.setIsActive(1);
         userVo.setIsDelete(0);
-//        userVo.setKeyword(jsonObj.getString("keyword"));
         userVo.setKeyword(groupSearchVo.getKeyword());
         //如果存在rangeList 则需要过滤option
-//        JSONArray rangeList = jsonObj.getJSONArray("rangeList");
-//        if (CollectionUtils.isNotEmpty(rangeList)) {
-//            userService.getUserByRangeList(userVo, rangeList.stream().map(Object::toString).collect(Collectors.toList()));
-//        }
         List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             userService.getUserByRangeList(userVo, rangeList);
@@ -95,12 +85,6 @@ public class UserGroupHandler implements IGroupSearchHandler {
     public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<UserVo> userList = new ArrayList<>();
         List<String> userUuidList = new ArrayList<>();
-//        List<String> valueList = JSONObject.parseArray(jsonObj.getJSONArray("valueList").toJSONString(), String.class);
-//        for (Object value : valueList) {
-//            if (value.toString().startsWith(getHeader())) {
-//                userUuidList.add(value.toString().replace(getHeader(), ""));
-//            }
-//        }
         for (String value : groupSearchVo.getValueList()) {
             if (value.startsWith(getHeader())) {
                 userUuidList.add(value.replace(getHeader(), StringUtils.EMPTY));
@@ -128,52 +112,6 @@ public class UserGroupHandler implements IGroupSearchHandler {
             dataList.add(groupSearchOptionVo);
         }
         return dataList;
-    }
-
-//    @Override
-    public GroupSearchGroupVo repack(List<UserVo> userList) {
-        GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
-        groupSearchGroupVo.setValue("user");
-        groupSearchGroupVo.setText("用户");
-        groupSearchGroupVo.setSort(getSort());
-        List<GroupSearchOptionVo> dataList = new ArrayList<>();
-        for (UserVo userVo : userList) {
-            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-            groupSearchOptionVo.setValue(getHeader() + userVo.getUuid());
-            groupSearchOptionVo.setText(userVo.getUserName() + "(" + userVo.getUserId() + ")");
-            //移动端临时屏蔽这两个字段，表单也会用到这个接口
-            if (!Objects.equals(DeviceType.MOBILE.getValue(), CommonUtil.getDevice())) {
-                groupSearchOptionVo.setPinyin(userVo.getPinyin());
-                groupSearchOptionVo.setTeam(String.join(",", userVo.getTeamNameList()));// TODO 分隔符改成前端设置
-            }
-            groupSearchOptionVo.setAvatar(userVo.getAvatar());
-            groupSearchOptionVo.setVipLevel(userVo.getVipLevel());
-            dataList.add(groupSearchOptionVo);
-        }
-        groupSearchGroupVo.setDataList(dataList);
-        return groupSearchGroupVo;
-//        JSONObject userObj = new JSONObject();
-//        userObj.put("value", "user");
-//        userObj.put("text", "用户");
-//        JSONArray userArray = new JSONArray();
-//
-//        for (UserVo userVo : userList) {
-//            JSONObject userTmp = new JSONObject();
-//            userTmp.put("value", getHeader() + userVo.getUuid());
-//            userTmp.put("text", userVo.getUserName() + "(" + userVo.getUserId() + ")");
-////			userTmp.put("userInfo", ((UserVo) user).getUserInfo());
-//            //移动端临时屏蔽这两个字段，表单也会用到这个接口
-//            if (!Objects.equals(DeviceType.MOBILE.getValue(), CommonUtil.getDevice())) {
-//                userTmp.put("pinyin", userVo.getPinyin());
-//                userTmp.put("team", String.join(",", userVo.getTeamNameList()));// TODO 分隔符改成前端设置
-//            }
-//            userTmp.put("avatar", userVo.getAvatar());
-//            userTmp.put("vipLevel", userVo.getVipLevel());
-//            userArray.add(userTmp);
-//        }
-//        userObj.put("sort", getSort());
-//        userObj.put("dataList", userArray);
-//        return userObj;
     }
 
     @Override

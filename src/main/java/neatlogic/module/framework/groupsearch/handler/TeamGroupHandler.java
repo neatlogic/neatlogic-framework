@@ -16,17 +16,13 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.constvalue.UserType;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.RoleTeamVo;
 import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchGroupVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
@@ -65,7 +61,6 @@ public class TeamGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-//        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
         if (total == null) {
             total = 18;
@@ -75,23 +70,14 @@ public class TeamGroupHandler implements IGroupSearchHandler {
         teamVo.setNeedPage(true);
         teamVo.setPageSize(total);
         teamVo.setCurrentPage(1);
-//        teamVo.setKeyword(jsonObj.getString("keyword"));
         teamVo.setKeyword(groupSearchVo.getKeyword());
         teamVo.setIsDelete(0);
         //如果存在rangeList 则需要过滤option
-//        List<Object> rangeList = jsonObj.getJSONArray("rangeList");
         List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             List<String> roleList = new ArrayList<>();
             Set<String> teamSet = new HashSet<>();
             Set<String> parentTeamSet = new HashSet<>();
-//            rangeList.forEach(r -> {
-//                if (r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())) {
-//                    roleList.add(GroupSearch.removePrefix(r.toString()));
-//                } else if (r.toString().startsWith(GroupSearch.TEAM.getValuePlugin())) {
-//                    teamSet.add(GroupSearch.removePrefix(r.toString()));
-//                }
-//            });
             rangeList.forEach(r -> {
                 if (r.startsWith(GroupSearch.ROLE.getValuePlugin())) {
                     roleList.add(GroupSearch.removePrefix(r));
@@ -125,11 +111,6 @@ public class TeamGroupHandler implements IGroupSearchHandler {
     public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<TeamVo> teamList = new ArrayList<TeamVo>();
         List<String> teamUuidList = new ArrayList<String>();
-//        for (Object value : jsonObj.getJSONArray("valueList")) {
-//            if (value.toString().startsWith(getHeader())) {
-//                teamUuidList.add(value.toString().replace(getHeader(), ""));
-//            }
-//        }
         for (String value : groupSearchVo.getValueList()) {
             if (value.startsWith(getHeader())) {
                 teamUuidList.add(value.replace(getHeader(), StringUtils.EMPTY));
@@ -159,51 +140,6 @@ public class TeamGroupHandler implements IGroupSearchHandler {
             dataList.add(groupSearchOptionVo);
         }
         return dataList;
-    }
-//    @Override
-    public GroupSearchGroupVo repack(List<TeamVo> teamList) {
-        GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
-        groupSearchGroupVo.setValue("team");
-        groupSearchGroupVo.setText("分组");
-        groupSearchGroupVo.setSort(getSort());
-        List<GroupSearchOptionVo> dataList = new ArrayList<>();
-        for (TeamVo team : teamList) {
-            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-            groupSearchOptionVo.setValue(getHeader() + team.getUuid());
-            if (DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())) {
-                groupSearchOptionVo.setText(StringUtils.isNotBlank(team.getParentName())
-                        ? team.getName() + "(" + team.getParentName() + ")"
-                        : team.getName());
-            } else {
-                groupSearchOptionVo.setText(team.getName());
-            }
-            groupSearchOptionVo.setFullPath(team.getFullPath());
-            groupSearchOptionVo.setParentPathList(team.getParentPathList());
-            dataList.add(groupSearchOptionVo);
-        }
-        groupSearchGroupVo.setDataList(dataList);
-        return groupSearchGroupVo;
-//        JSONObject teamObj = new JSONObject();
-//        teamObj.put("value", "team");
-//        teamObj.put("text", "分组");
-//        JSONArray teamArray = new JSONArray();
-//        for (TeamVo team : teamList) {
-//            JSONObject teamTmp = new JSONObject();
-//            teamTmp.put("value", getHeader() + team.getUuid());
-//            if (DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())) {
-//                teamTmp.put("text", StringUtils.isNotBlank(team.getParentName())
-//                        ? team.getName() + "(" + team.getParentName() + ")"
-//                        : team.getName());
-//            } else {
-//                teamTmp.put("text", team.getName());
-//            }
-//            teamTmp.put("fullPath", team.getFullPath());
-//            teamTmp.put("parentPathList", team.getParentPathList());
-//            teamArray.add(teamTmp);
-//        }
-//        teamObj.put("sort", getSort());
-//        teamObj.put("dataList", teamArray);
-//        return teamObj;
     }
 
     @Override

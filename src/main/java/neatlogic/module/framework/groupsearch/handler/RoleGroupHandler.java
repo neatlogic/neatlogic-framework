@@ -16,13 +16,9 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.constvalue.UserType;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dto.RoleVo;
-import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchGroupVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
@@ -64,7 +60,6 @@ public class RoleGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-//        Integer total = jsonObj.getInteger("total");
         Integer total = groupSearchVo.getTotal();
         if (total == null) {
             total = 18;
@@ -74,18 +69,11 @@ public class RoleGroupHandler implements IGroupSearchHandler {
         roleVo.setNeedPage(true);
         roleVo.setPageSize(total);
         roleVo.setCurrentPage(1);
-//        roleVo.setKeyword(jsonObj.getString("keyword"));
         roleVo.setKeyword(groupSearchVo.getKeyword());
         //如果存在rangeList 则需要过滤option
-//        List<Object> rangeList = jsonObj.getJSONArray("rangeList");
         List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             List<String> roleUuidList = new ArrayList<>();
-//            rangeList.forEach(r -> {
-//                if (r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())) {
-//                    roleUuidList.add(GroupSearch.removePrefix(r.toString()));
-//                }
-//            });
             rangeList.forEach(r -> {
                 if (r.startsWith(GroupSearch.ROLE.getValuePlugin())) {
                     roleUuidList.add(GroupSearch.removePrefix(r));
@@ -105,11 +93,6 @@ public class RoleGroupHandler implements IGroupSearchHandler {
     public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<RoleVo> roleList = new ArrayList<RoleVo>();
         List<String> roleUuidList = new ArrayList<String>();
-//        for (Object value : jsonObj.getJSONArray("valueList")) {
-//            if (value.toString().startsWith(getHeader())) {
-//                roleUuidList.add(value.toString().replace(getHeader(), ""));
-//            }
-//        }
         for (String value : groupSearchVo.getValueList()) {
             if (value.startsWith(getHeader())) {
                 roleUuidList.add(value.replace(getHeader(), StringUtils.EMPTY));
@@ -130,36 +113,6 @@ public class RoleGroupHandler implements IGroupSearchHandler {
             dataList.add(groupSearchOptionVo);
         }
         return dataList;
-    }
-
-//    @Override
-    public GroupSearchGroupVo repack(List<RoleVo> roleList) {
-        GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
-        groupSearchGroupVo.setValue("role");
-        groupSearchGroupVo.setText("角色");
-        groupSearchGroupVo.setSort(getSort());
-        List<GroupSearchOptionVo> dataList = new ArrayList<>();
-        for (RoleVo role : roleList) {
-            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-            groupSearchOptionVo.setValue(getHeader() + role.getUuid());
-            groupSearchOptionVo.setText(role.getName());
-            dataList.add(groupSearchOptionVo);
-        }
-        groupSearchGroupVo.setDataList(dataList);
-        return groupSearchGroupVo;
-//        JSONObject roleObj = new JSONObject();
-//        roleObj.put("value", "role");
-//        roleObj.put("text", "角色");
-//        JSONArray roleArray = new JSONArray();
-//        for (RoleVo role : roleList) {
-//            JSONObject roleTmp = new JSONObject();
-//            roleTmp.put("value", getHeader() + role.getUuid());
-//            roleTmp.put("text", role.getName());
-//            roleArray.add(roleTmp);
-//        }
-//        roleObj.put("sort", getSort());
-//        roleObj.put("dataList", roleArray);
-//        return roleObj;
     }
 
     @Override

@@ -1,3 +1,19 @@
+/*
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
@@ -24,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class NotifyPolicyUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
 
     /**
      * @param notifyPolicyVo       通知策略信息
@@ -56,10 +72,10 @@ public class NotifyPolicyUtil {
             return;
         }
         NotifyTriggerVo triggerVo = null;
-        /** 触发动作列表 **/
+        /* 触发动作列表 **/
         List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
         for (NotifyTriggerVo trigger : triggerList) {
-            /** 找到要触发类型对应的信息 **/
+            /* 找到要触发类型对应的信息 **/
             if (notifyTriggerType.getTrigger().equals(trigger.getTrigger())) {
                 triggerVo = trigger;
                 break;
@@ -68,7 +84,7 @@ public class NotifyPolicyUtil {
         if (triggerVo == null) {
             return;
         }
-        /** 通知列表 **/
+        /* 通知列表 **/
         List<NotifyTriggerNotifyVo> notifyList = triggerVo.getNotifyList();
         if (CollectionUtils.isEmpty(notifyList)) {
             return;
@@ -79,9 +95,9 @@ public class NotifyPolicyUtil {
         }
         List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
         List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
-        /** 注入流程作业信息 不够将来再补充 **/
+        /* 注入流程作业信息 不够将来再补充 **/
         JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
-        /** 模板列表 **/
+        /* 模板列表 **/
         List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
         Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
         for (NotifyTriggerNotifyVo notifyObj : notifyList) {

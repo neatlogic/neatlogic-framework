@@ -1,10 +1,7 @@
 package neatlogic.framework.service;
 
 import neatlogic.framework.restful.groupsearch.core.*;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,12 +12,9 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
 
     @Override
     public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearchVo) {
-//        List<Object> groupList = jsonObj.getJSONArray("groupList");
-//        List<Object> excludeList = jsonObj.getJSONArray("excludeList");
         List<String> groupList = groupSearchVo.getGroupList();
         List<String> excludeList = groupSearchVo.getGroupList();
         int groupCount = 0;
-//        JSONArray resultArray = new JSONArray();
         List<GroupSearchGroupVo> resultArray = new ArrayList<>();
         Map<String, IGroupSearchHandler> handlerMap = GroupSearchHandlerFactory.getComponentMap();
         for (Map.Entry<String, IGroupSearchHandler> handlerEntry : handlerMap.entrySet()) {
@@ -34,50 +28,25 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             }
             List<GroupSearchOptionVo> dataList = null;
             boolean isMore = true;
-//            if (!jsonObj.containsKey("valueList") || jsonObj.getJSONArray("valueList").isEmpty()) {
             if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
                 dataList = handler.search(groupSearchVo);
             } else {
                 isMore = false;
-//                if (jsonObj.containsKey("valueList") && !jsonObj.getJSONArray("valueList").isEmpty()) {
                 if (CollectionUtils.isNotEmpty(groupSearchVo.getValueList())) {
                     dataList = handler.reload(groupSearchVo);
                 } else {
                     return resultArray;
                 }
             }
-//            JSONObject resultObj = handler.repack(dataList);
-//            //过滤 excludeList
-//            dataList = resultObj.getJSONArray("dataList");
-//            if (excludeList != null && !excludeList.isEmpty()) {
-//                for (Object exclude : excludeList) {
-//                    dataList = dataList.stream().filter(data -> !(JSONObject.parseObject(JSONObject.toJSONString(data)).getString("value").equalsIgnoreCase(exclude.toString()))).collect(Collectors.toList());
-//                }
-//            }
-//
-//
-//            resultObj.put("dataList", dataList);
-//            if (handler.isLimit()) {
-//                resultObj.put("index", 0);
-//            } else {
-//                resultObj.put("index", dataList.size());
-//            }
-//            resultObj.put("isLimit", handler.isLimit());
-//            resultObj.put("isMore", isMore);
-//            resultArray.add(resultObj);
-//            GroupSearchGroupVo groupSearchGroupVo = handler.repack(dataList);
             GroupSearchGroupVo groupSearchGroupVo = new GroupSearchGroupVo();
             groupSearchGroupVo.setValue(handler.getName());
             groupSearchGroupVo.setText(handler.getLabel());
             groupSearchGroupVo.setSort(handler.getSort());
             //过滤 excludeList
             if (CollectionUtils.isNotEmpty(excludeList)) {
-//                List<GroupSearchOptionVo> groupSearchOptionList = groupSearchGroupVo.getDataList();
                 for (String exclude : excludeList) {
-//                    groupSearchOptionList = groupSearchOptionList.stream().filter(data -> !(data.getValue().equalsIgnoreCase(exclude))).collect(Collectors.toList());
                     dataList = dataList.stream().filter(data -> !(data.getValue().equalsIgnoreCase(exclude))).collect(Collectors.toList());
                 }
-//                groupSearchGroupVo.setDataList(groupSearchOptionList);
             }
             groupSearchGroupVo.setDataList(dataList);
             if (handler.isLimit()) {
@@ -90,7 +59,6 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             resultArray.add(groupSearchGroupVo);
         }
         //排序
-//        resultArray.sort(Comparator.comparing(obj -> ((JSONObject) obj).getInteger("sort")));
         resultArray.sort(Comparator.comparing(GroupSearchGroupVo::getSort));
         //如果是搜索模式
         if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
@@ -107,31 +75,6 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             HashSet<String> set = new HashSet<>();
             out:
             while (totalTmp < total) {
-//                for (Object ob : resultArray) {
-//                    if (((JSONObject) ob).getBoolean("isLimit")) {
-//                        JSONArray dataList = ((JSONObject) ob).getJSONArray("dataList");
-//                        if (i < dataList.size()) {
-//                            int index = ((JSONObject) ob).getInteger("index");
-//                            ((JSONObject) ob).put("index", ++index);
-//                            //判断是否还有多余项
-//                            if (dataList.size() == index) {
-//                                ((JSONObject) ob).put("isMore", false);
-//                                total++;
-//                            }
-//                            dataList.get(i);
-//                            if (totalTmp < (total - 1)) {
-//                                totalTmp++;
-//                            } else {
-//                                break out;
-//                            }
-//
-//                        } else {
-//                            set.add(((JSONObject) ob).getString("value"));
-//                        }
-//                    } else {
-//                        ((JSONObject) ob).put("isMore", false);
-//                    }
-//                }
                 for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
                     if (groupSearchGroupVo.getIsLimit()) {
                         List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
@@ -163,15 +106,6 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
                 i++;
             }
             //则根据index删掉多余数据
-//            for (Object ob : resultArray) {
-//                JSONArray dataList = ((JSONObject) ob).getJSONArray("dataList");
-//                if (CollectionUtils.isEmpty(dataList)) {
-//                    ((JSONObject) ob).put("isMore", false);
-//                } else {
-//                    int index = ((JSONObject) ob).getInteger("index");
-//                    ((JSONObject) ob).put("dataList", dataList.subList(0, index));
-//                }
-//            }
             for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
                 List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
                 if (CollectionUtils.isEmpty(dataList)) {

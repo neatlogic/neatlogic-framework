@@ -44,7 +44,8 @@ public class DocumentOnlineDirectoryVo implements Serializable {
     private List<DocumentOnlineDirectoryVo> children = new ArrayList<>();
     @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
     private final List<DocumentOnlineConfigVo> configList = new ArrayList<>();
-
+    @EntityField(name = "common.prefix", type = ApiParamType.STRING)
+    private String prefix;
     private boolean allowAddChild = true;
 
     public DocumentOnlineDirectoryVo(String name, boolean isFile) {
@@ -52,13 +53,15 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         this.isFile = isFile;
     }
 
-    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList) {
+    public DocumentOnlineDirectoryVo(String prefix, String name, boolean isFile, List<String> upwardNameList) {
+        this.prefix = prefix;
         this.name = name;
         this.isFile = isFile;
         this.upwardNameList.addAll(upwardNameList);
     }
 
-    public DocumentOnlineDirectoryVo(String name, boolean isFile, List<String> upwardNameList, String filePath, List<DocumentOnlineConfigVo> configList) {
+    public DocumentOnlineDirectoryVo(String prefix, String name, boolean isFile, List<String> upwardNameList, String filePath, List<DocumentOnlineConfigVo> configList) {
+        this.prefix = prefix;
         this.name = name;
         this.isFile = isFile;
         this.upwardNameList.addAll(upwardNameList);
@@ -84,6 +87,10 @@ public class DocumentOnlineDirectoryVo implements Serializable {
 
     public List<DocumentOnlineDirectoryVo> getChildren() {
         return new ArrayList<>(children);
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     public boolean addChild(DocumentOnlineDirectoryVo child) {

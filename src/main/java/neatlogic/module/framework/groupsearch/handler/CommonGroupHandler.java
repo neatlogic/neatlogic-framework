@@ -55,7 +55,7 @@ public class CommonGroupHandler implements IGroupSearchHandler {
         for (UserType s : UserType.values()) {
             if ((s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue())) && s.getText().contains(groupSearchVo.getKeyword())) {
                 GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-                groupSearchOptionVo.setValue(s.getValue());
+                groupSearchOptionVo.setValue(getHeader() + s.getValue());
                 groupSearchOptionVo.setText(s.getText());
                 groupSearchOptionList.add(groupSearchOptionVo);
             }
@@ -70,7 +70,7 @@ public class CommonGroupHandler implements IGroupSearchHandler {
             if (value.startsWith(getHeader())) {
                 value = value.replace(getHeader(), StringUtils.EMPTY);
                 GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
-                groupSearchOptionVo.setValue(value);
+                groupSearchOptionVo.setValue(getHeader() + value);
                 groupSearchOptionVo.setText(UserType.getText(value));
             }
         }

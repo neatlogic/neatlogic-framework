@@ -16,12 +16,12 @@
 
 package neatlogic.framework.restful.groupsearch.core;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.List;
 
-public interface IGroupSearchHandler<E> {
+public interface IGroupSearchHandler {
     String getName();
+
+    String getLabel();
 
     default String getHeader() {
         return getName() + "#";
@@ -36,9 +36,7 @@ public interface IGroupSearchHandler<E> {
      */
     Boolean isLimit();
 
-    List<E> search(JSONObject jsonObj);
+    List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo);
 
-    List<E> reload(JSONObject jsonObj);
-
-    JSONObject repack(List<E> dataList);
+    List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo);
 }

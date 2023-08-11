@@ -16,23 +16,28 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.UserType;
+import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
+import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class CommonGroupHandler implements IGroupSearchHandler<String> {
+public class CommonGroupHandler implements IGroupSearchHandler {
     @Override
     public String getName() {
         return GroupSearch.COMMON.getValue();
+    }
+
+    @Override
+    public String getLabel() {
+        return GroupSearch.COMMON.getText();
     }
 
     @Override
@@ -41,47 +46,35 @@ public class CommonGroupHandler implements IGroupSearchHandler<String> {
     }
 
     @Override
-    public List<String> search(JSONObject jsonObj) {
-        List<Object> includeList = jsonObj.getJSONArray("includeList");
-        if (CollectionUtils.isEmpty(includeList)) {
-            includeList = new ArrayList<>();
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
+        List<String> includeStrList = groupSearchVo.getIncludeList();
+        if (CollectionUtils.isEmpty(includeStrList)) {
+            includeStrList = new ArrayList<>();
         }
-        List<String> includeStrList = includeList.stream().map(Object::toString).collect(Collectors.toList());
-        List<String> userTypeList = new ArrayList<>();
+        List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
         for (UserType s : UserType.values()) {
-            if ((s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue())) && s.getText().contains(jsonObj.getString("keyword"))) {
-                userTypeList.add(s.getValue());
+            if ((s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue())) && s.getText().contains(groupSearchVo.getKeyword())) {
+                GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+                groupSearchOptionVo.setValue(s.getValue());
+                groupSearchOptionVo.setText(s.getText());
+                groupSearchOptionList.add(groupSearchOptionVo);
             }
         }
-        return userTypeList;
+        return groupSearchOptionList;
     }
 
     @Override
-    public List<String> reload(JSONObject jsonObj) {
-        List<String> userTypeList = new ArrayList<String>();
-        for (Object value : jsonObj.getJSONArray("valueList")) {
-            if (value.toString().startsWith(getHeader())) {
-                userTypeList.add(value.toString().replace(getHeader(), ""));
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
+        List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
+        for (String value : groupSearchVo.getValueList()) {
+            if (value.startsWith(getHeader())) {
+                value = value.replace(getHeader(), StringUtils.EMPTY);
+                GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+                groupSearchOptionVo.setValue(value);
+                groupSearchOptionVo.setText(UserType.getText(value));
             }
         }
-        return userTypeList;
-    }
-
-    @Override
-    public JSONObject repack(List<String> userTypeList) {
-        JSONObject userTypeObj = new JSONObject();
-        userTypeObj.put("value", "common");
-        userTypeObj.put("text", "公共");
-        JSONArray userTypeArray = new JSONArray();
-        for (String userType : userTypeList) {
-            JSONObject userTypeTmp = new JSONObject();
-            userTypeTmp.put("value", getHeader() + userType);
-            userTypeTmp.put("text", UserType.getText(userType));
-            userTypeArray.add(userTypeTmp);
-        }
-        userTypeObj.put("sort", getSort());
-        userTypeObj.put("dataList", userTypeArray);
-        return userTypeObj;
+        return groupSearchOptionList;
     }
 
     @Override

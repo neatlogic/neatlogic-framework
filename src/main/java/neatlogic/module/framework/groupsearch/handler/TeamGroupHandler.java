@@ -16,8 +16,6 @@
 
 package neatlogic.module.framework.groupsearch.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.util.CommonUtil;
@@ -25,6 +23,8 @@ import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.RoleTeamVo;
 import neatlogic.framework.dto.TeamVo;
+import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
+import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -36,7 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
+public class TeamGroupHandler implements IGroupSearchHandler {
     @Resource
     private TeamMapper teamMapper;
     @Resource
@@ -48,14 +48,19 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
     }
 
     @Override
+    public String getLabel() {
+        return GroupSearch.TEAM.getText();
+    }
+
+    @Override
     public String getHeader() {
         return getName() + "#";
     }
 
     @Override
-    public List<TeamVo> search(JSONObject jsonObj) {
+    public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-        Integer total = jsonObj.getInteger("total");
+        Integer total = groupSearchVo.getTotal();
         if (total == null) {
             total = 18;
         }
@@ -64,19 +69,19 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
         teamVo.setNeedPage(true);
         teamVo.setPageSize(total);
         teamVo.setCurrentPage(1);
-        teamVo.setKeyword(jsonObj.getString("keyword"));
+        teamVo.setKeyword(groupSearchVo.getKeyword());
         teamVo.setIsDelete(0);
         //如果存在rangeList 则需要过滤option
-        List<Object> rangeList = jsonObj.getJSONArray("rangeList");
+        List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             List<String> roleList = new ArrayList<>();
             Set<String> teamSet = new HashSet<>();
             Set<String> parentTeamSet = new HashSet<>();
             rangeList.forEach(r -> {
-                if (r.toString().startsWith(GroupSearch.ROLE.getValuePlugin())) {
-                    roleList.add(GroupSearch.removePrefix(r.toString()));
-                } else if (r.toString().startsWith(GroupSearch.TEAM.getValuePlugin())) {
-                    teamSet.add(GroupSearch.removePrefix(r.toString()));
+                if (r.startsWith(GroupSearch.ROLE.getValuePlugin())) {
+                    roleList.add(GroupSearch.removePrefix(r));
+                } else if (r.startsWith(GroupSearch.TEAM.getValuePlugin())) {
+                    teamSet.add(GroupSearch.removePrefix(r));
                 }
             });
             if (CollectionUtils.isNotEmpty(roleList)) {
@@ -98,48 +103,42 @@ public class TeamGroupHandler implements IGroupSearchHandler<TeamVo> {
         }
         teamList = teamMapper.searchTeam(teamVo);
         setFullPathAndParentName(teamList);
-        return teamList;
+        return convertGroupSearchOption(teamList);
     }
 
     @Override
-    public List<TeamVo> reload(JSONObject jsonObj) {
+    public List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo) {
         List<TeamVo> teamList = new ArrayList<TeamVo>();
         List<String> teamUuidList = new ArrayList<String>();
-        for (Object value : jsonObj.getJSONArray("valueList")) {
-            if (value.toString().startsWith(getHeader())) {
-                teamUuidList.add(value.toString().replace(getHeader(), ""));
+        for (String value : groupSearchVo.getValueList()) {
+            if (value.startsWith(getHeader())) {
+                teamUuidList.add(value.replace(getHeader(), StringUtils.EMPTY));
             }
         }
         if (!teamUuidList.isEmpty()) {
             teamList = teamMapper.getTeamByUuidList(teamUuidList);
             setFullPathAndParentName(teamList);
         }
-        return teamList;
+        return convertGroupSearchOption(teamList);
     }
 
-    @Override
-    public JSONObject repack(List<TeamVo> teamList) {
-        JSONObject teamObj = new JSONObject();
-        teamObj.put("value", "team");
-        teamObj.put("text", "分组");
-        JSONArray teamArray = new JSONArray();
+    private List<GroupSearchOptionVo> convertGroupSearchOption(List<TeamVo> teamList) {
+        List<GroupSearchOptionVo> dataList = new ArrayList<>();
         for (TeamVo team : teamList) {
-            JSONObject teamTmp = new JSONObject();
-            teamTmp.put("value", getHeader() + team.getUuid());
+            GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
+            groupSearchOptionVo.setValue(getHeader() + team.getUuid());
             if (DeviceType.MOBILE.getValue().equals(CommonUtil.getDevice())) {
-                teamTmp.put("text", StringUtils.isNotBlank(team.getParentName())
+                groupSearchOptionVo.setText(StringUtils.isNotBlank(team.getParentName())
                         ? team.getName() + "(" + team.getParentName() + ")"
                         : team.getName());
             } else {
-                teamTmp.put("text", team.getName());
+                groupSearchOptionVo.setText(team.getName());
             }
-            teamTmp.put("fullPath", team.getFullPath());
-            teamTmp.put("parentPathList", team.getParentPathList());
-            teamArray.add(teamTmp);
+            groupSearchOptionVo.setFullPath(team.getFullPath());
+            groupSearchOptionVo.setParentPathList(team.getParentPathList());
+            dataList.add(groupSearchOptionVo);
         }
-        teamObj.put("sort", getSort());
-        teamObj.put("dataList", teamArray);
-        return teamObj;
+        return dataList;
     }
 
     @Override

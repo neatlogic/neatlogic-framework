@@ -147,6 +147,13 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             Resource[] mdResources = resolver.getResources("classpath*:" + classpathRoot + "**/*.md");
             for (Resource resource : mdResources) {
                 String filename = resource.getFilename().substring(0, resource.getFilename().length() - 3);
+                int index = filename.indexOf(".");
+                if (index != -1) {
+                    String sort = filename.substring(0, index);
+                    if (StringUtils.isNumeric(sort)) {
+                        filename = filename.substring(index + 1);
+                    }
+                }
                 String path = resource.getURL().getPath();
                 int separatorIndex = path.indexOf("!/");
                 String filePath = path.substring(separatorIndex + 2);
@@ -254,11 +261,20 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 isFile = true;
                 name = name.substring(0, name.length() - 3);
             }
+            String prefix = null;
+            int index = name.indexOf(".");
+            if (index != -1) {
+                String sort = name.substring(0, index);
+                if (StringUtils.isNumeric(sort)) {
+                    prefix = name.substring(0, index + 1);
+                    name = name.substring(index + 1);
+                }
+            }
             nameList.add(name);
             if (isFile) {
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(name, true, upwardNameList, filePath, configList);
+                DocumentOnlineDirectoryVo child = new DocumentOnlineDirectoryVo(prefix, name, true, upwardNameList, filePath, configList);
                 parent.addChild(child);
                 return child;
             }
@@ -272,7 +288,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             if (child == null) {
                 List<String> upwardNameList = new LinkedList<>(nameList);
                 upwardNameList.remove(0);
-                child = new DocumentOnlineDirectoryVo(name, false, upwardNameList);
+                child = new DocumentOnlineDirectoryVo(prefix, name, false, upwardNameList);
                 parent.addChild(child);
             }
             parent = child;

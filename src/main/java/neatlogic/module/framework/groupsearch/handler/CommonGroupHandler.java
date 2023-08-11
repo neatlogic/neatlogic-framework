@@ -72,6 +72,7 @@ public class CommonGroupHandler implements IGroupSearchHandler {
                 GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
                 groupSearchOptionVo.setValue(getHeader() + value);
                 groupSearchOptionVo.setText(UserType.getText(value));
+                groupSearchOptionList.add(groupSearchOptionVo);
             }
         }
         return groupSearchOptionList;

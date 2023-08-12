@@ -16,12 +16,12 @@
 
 package neatlogic.framework.datawarehouse.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -32,19 +32,19 @@ import java.util.Optional;
 public class DataSourceDataVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
-    @EntityField(name = "数据源id", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcedatavo.entityfield.name.datasourceid", type = ApiParamType.LONG)
     private Long dataSourceId;
-    @EntityField(name = "字段列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.fieldlist", type = ApiParamType.JSONARRAY)
     private List<DataSourceFieldVo> fieldList;
-    @EntityField(name = "有效时间，单位分钟", type = ApiParamType.INTEGER)
+    @EntityField(name = "nfdd.datasourcedatavo.entityfield.name.expiremin", type = ApiParamType.INTEGER)
     private Integer expireMinute;
-    @EntityField(name = "添加日期", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcedatavo.entityfield.name.inserttime", type = ApiParamType.LONG)
     private Date insertTime;
-    @EntityField(name = "过期日期", type = ApiParamType.LONG)
+    @EntityField(name = "nfd.licensevo.entityfield.name.expirationdate", type = ApiParamType.LONG)
     private Date expireTime;
-    @EntityField(name = "条件列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfdd.datasourcedatavo.entityfield.name.conditionlist", type = ApiParamType.JSONARRAY)
     private List<DataSourceFieldVo> conditionList;
-    @EntityField(name = "是否过期", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isexpired", type = ApiParamType.INTEGER)
     private Integer isExpired = 0;
     @JSONField(serialize = false)
     private List<DataSourceFieldSortVo> sortList;//排序设置
@@ -67,6 +67,7 @@ public class DataSourceDataVo extends BasePageVo {
         }
         return null;
     }
+
 
     public int getLimit() {
         return limit;

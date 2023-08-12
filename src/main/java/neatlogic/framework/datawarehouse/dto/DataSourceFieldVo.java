@@ -27,6 +27,7 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -61,6 +62,8 @@ public class DataSourceFieldVo extends BasePageVo {
     private String configStr;
     @JSONField(serialize = false)
     private Object value;//值,作为条件
+    @JSONField(serialize = false)
+    private JSONObject presetData;//预设值
 
     @Override
     public boolean equals(Object o) {
@@ -68,6 +71,14 @@ public class DataSourceFieldVo extends BasePageVo {
         if (o == null || getClass() != o.getClass()) return false;
         DataSourceFieldVo that = (DataSourceFieldVo) o;
         return name.equals(that.name) && type.equals(that.type);
+    }
+
+    public JSONObject getPresetData() {
+        return presetData;
+    }
+
+    public void setPresetData(JSONObject presetData) {
+        this.presetData = presetData;
     }
 
     public String getAggregate() {
@@ -112,6 +123,16 @@ public class DataSourceFieldVo extends BasePageVo {
         if (StringUtils.isNotBlank(this.inputType)) {
             IDatasourceConditionHandler handler = DatasourceConditionHandlerFactory.getHandler(this.inputType);
             if (handler != null) {
+                if (this.value != null) {
+                    if (this.value.toString().startsWith("#{") && this.value.toString().endsWith("}")) {
+                        String key = StringUtils.substringBetween(this.value.toString(), "#{", "}");
+                        if (MapUtils.isNotEmpty(this.presetData)) {
+                            this.value = this.presetData.get(key);
+                        } else {
+                            this.value = null;
+                        }
+                    }
+                }
                 return handler.getExpression(this.id, this.value);
             }
         }

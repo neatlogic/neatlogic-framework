@@ -16,15 +16,17 @@
 
 package neatlogic.framework.datawarehouse.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.datawarehouse.enums.ExpireUnit;
 import neatlogic.framework.datawarehouse.enums.Mode;
 import neatlogic.framework.datawarehouse.enums.Status;
+import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,43 +37,48 @@ import java.util.Optional;
 public class DataSourceVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
-    @EntityField(name = "唯一标识", type = ApiParamType.STRING)
+    @EntityField(name = "common.uniquename", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String label;
-    @EntityField(name = "说明", type = ApiParamType.STRING)
+    @EntityField(name = "common.description", type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "xml配置", type = ApiParamType.STRING)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.xml", type = ApiParamType.STRING)
     private String xml;
-    @EntityField(name = "定时策略", type = ApiParamType.STRING)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.cron", type = ApiParamType.STRING)
     private String cronExpression;
-    @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isactive", type = ApiParamType.INTEGER)
     private Integer isActive;
-    @EntityField(name = "查询超时时间，单位：秒", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.querytimeout", type = ApiParamType.LONG)
     private Integer queryTimeout;
-    @EntityField(name = "配置文件id", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.fileid", type = ApiParamType.LONG)
     private Long fileId;
-    @EntityField(name = "状态", type = ApiParamType.ENUM, member = Status.class)
+    @EntityField(name = "common.status", type = ApiParamType.ENUM, member = Status.class)
     private String status;
-    @EntityField(name = "同步模式", type = ApiParamType.ENUM, member = Mode.class)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.mode", type = ApiParamType.ENUM, member = Mode.class)
     private String mode;
-    @EntityField(name = "数据量", type = ApiParamType.INTEGER)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.datacount", type = ApiParamType.INTEGER)
     private Integer dataCount;
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.moduleid", type = ApiParamType.STRING)
+    private String moduleId;
+
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.modulename", type = ApiParamType.STRING)
+    private String moduleName;
     @JSONField(serialize = false)
     private Integer expireMinute;//所有过期时间都转换成分钟
-    @EntityField(name = "有效时间数值", type = ApiParamType.INTEGER)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.expireunit", type = ApiParamType.INTEGER)
     private Integer expireCount;
-    @EntityField(name = "有效时间单位", type = ApiParamType.ENUM, member = ExpireUnit.class)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.expireunit", type = ApiParamType.ENUM, member = ExpireUnit.class)
     private String expireUnit;
-    @EntityField(name = "字段列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.fieldlist", type = ApiParamType.JSONARRAY)
     private List<DataSourceFieldVo> fieldList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
-    @EntityField(name = "数据连接id", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.connectionid", type = ApiParamType.LONG)
     private Long connectionId;
     @JSONField(serialize = false)//数据列表
     private List<DataSourceDataVo> dataList;
-    @EntityField(name = "参数列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.paramlist", type = ApiParamType.JSONARRAY)
     private List<DataSourceParamVo> paramList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
-    @EntityField(name = "数据库类型", type = ApiParamType.STRING)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.dbtype", type = ApiParamType.STRING)
     private String dbType;
 
 
@@ -102,6 +109,24 @@ public class DataSourceVo extends BasePageVo {
             this.paramList = new ArrayList<>();
         }
         this.paramList.addAll(paramList);
+    }
+
+    public String getModuleName() {
+        if (StringUtils.isNotBlank(moduleId) && StringUtils.isBlank(moduleName)) {
+            ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(moduleId);
+            if (groupVo != null) {
+                moduleName = groupVo.getGroupName();
+            }
+        }
+        return moduleName;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 
     public void addParam(DataSourceParamVo param) {

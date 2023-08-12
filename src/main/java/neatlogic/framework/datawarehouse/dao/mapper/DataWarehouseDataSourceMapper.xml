@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+  ~ Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
@@ -46,6 +46,7 @@ limitations under the License.
         <result column="cronExpression" property="cronExpression"/>
         <result column="mode" property="mode"/>
         <result column="xml" property="xml"/>
+        <result column="moduleId" property="moduleId"/>
         <result column="status" property="status"/>
         <result column="expireCount" property="expireCount"/>
         <result column="expireUnit" property="expireUnit"/>
@@ -101,6 +102,7 @@ limitations under the License.
                a.cron_expression as cronExpression,
                a.is_active       as isActive,
                a.status          as status,
+               a.module_id as moduleId,
                a.data_count      as dataCount,
                a.db_type         as dbType,
                b.id              as fieldId,
@@ -146,6 +148,9 @@ limitations under the License.
                 or `label` like concat('%', #{keyword}, '%')
                 or `description` like concat('%' ,#{keyword},'%'))
             </if>
+            <if test="moduleId != null and moduleId != ''">
+                and module_id = #{moduleId}
+            </if>
             <if test="isActive != null">
                 and is_active = #{isActive}
             </if>
@@ -161,6 +166,7 @@ limitations under the License.
         description,
         mode,
         status,
+        module_id as moduleId,
         data_count AS dataCount,
         expire_count as expireCount,
         expire_unit as expireUnit,
@@ -185,6 +191,7 @@ limitations under the License.
             data_count      = #{dataCount},
             cron_expression = #{cronExpression},
             mode            = #{mode},
+            module_id = #{moduleId},
             expire_count    = #{expireCount},
             expire_unit     = #{expireUnit},
             is_active       = #{isActive},
@@ -219,6 +226,7 @@ limitations under the License.
                                               description,
                                               cron_expression,
                                               mode,
+                                              module_id,
                                               expire_count,
                                               expire_unit,
                                               xml,
@@ -230,6 +238,7 @@ limitations under the License.
                 #{description},
                 #{cronExpression},
                 #{mode},
+                #{moduleId},
                 #{expireCount},
                 #{expireUnit},
                 #{xml,typeHandler=CompressHandler},
@@ -250,14 +259,14 @@ limitations under the License.
                b.id   as fieldId,
                b.name as fieldName
         from datawarehouse_datasource a
-        left join datawarehouse_datasource_field b on a.id = b.datasource_id
+                 left join datawarehouse_datasource_field b on a.id = b.datasource_id
         where a.id = #{value}
     </select>
 
     <select id="getDataSourceListByNameList" parameterType="java.util.List" resultMap="dataSourceResultMap">
         select a.id,
         a.`name`,
-        b.id   as fieldId,
+        b.id as fieldId,
         b.name as fieldName
         from datawarehouse_datasource a
         left join datawarehouse_datasource_field b on a.id = b.datasource_id
@@ -299,18 +308,18 @@ limitations under the License.
     <update id="updateDataSourceField" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceFieldVo">
         update datawarehouse_datasource_field
         set
-            <if test="isCondition != null">
-                is_condition = #{isCondition},
-            </if>
-            <if test="inputType != null">
-                input_type = #{inputType},
-            </if>
-            <if test="configStr != null">
-                config = #{configStr},
-            </if>
-            label  = #{label},
-            is_key = #{isKey},
-            aggregate = #{aggregate}
+        <if test="isCondition != null">
+            is_condition = #{isCondition},
+        </if>
+        <if test="inputType != null">
+            input_type = #{inputType},
+        </if>
+        <if test="configStr != null">
+            config = #{configStr},
+        </if>
+        label = #{label},
+        is_key = #{isKey},
+        aggregate = #{aggregate}
         where id = #{id}
     </update>
 
@@ -345,7 +354,7 @@ limitations under the License.
 
     <insert id="batchInsertDataSourceParam" parameterType="java.util.List">
         insert into datawarehouse_datasource_param
-            (id, datasource_id, name, label, default_value)
+        (id, datasource_id, name, label, default_value)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.id}, #{item.dataSourceId}, #{item.name}, #{item.label}, #{item.defaultValue})
@@ -364,8 +373,7 @@ limitations under the License.
          is_key,
          is_condition,
          input_type,
-         config
-         )
+         config)
         values (#{id},
                 #{dataSourceId},
                 #{name},
@@ -375,36 +383,35 @@ limitations under the License.
                 #{isKey},
                 #{isCondition},
                 #{inputType},
-                #{configStr}
-                )
+                #{configStr})
     </insert>
 
     <insert id="batchInsertDataSourceField" parameterType="java.util.List">
         insert into datawarehouse_datasource_field
         (id,
-         datasource_id,
-         name,
-         label,
-         type,
-         aggregate,
-         is_key,
-         is_condition,
-         input_type,
-         config
+        datasource_id,
+        name,
+        label,
+        type,
+        aggregate,
+        is_key,
+        is_condition,
+        input_type,
+        config
         )
         values
         <foreach collection="list" item="item" separator=",">
             (
-                #{item.id},
-                #{item.dataSourceId},
-                #{item.name},
-                #{item.label},
-                #{item.type},
-                #{item.aggregate},
-                #{item.isKey},
-                #{item.isCondition},
-                #{item.inputType},
-                #{item.configStr}
+            #{item.id},
+            #{item.dataSourceId},
+            #{item.name},
+            #{item.label},
+            #{item.type},
+            #{item.aggregate},
+            #{item.isKey},
+            #{item.isCondition},
+            #{item.inputType},
+            #{item.configStr}
             )
         </foreach>
     </insert>

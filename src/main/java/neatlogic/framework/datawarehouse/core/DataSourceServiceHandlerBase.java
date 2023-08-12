@@ -1,17 +1,17 @@
 /*
-Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ * Copyright(c) 2023 NeatLogic Co., Ltd. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package neatlogic.framework.datawarehouse.core;
@@ -245,7 +245,6 @@ public abstract class DataSourceServiceHandlerBase implements IDataSourceService
                         try {
                             BigDecimal v = new BigDecimal(0);
                             BigDecimal v2 = new BigDecimal(aggregateMap.get(key).toString()).setScale(4, RoundingMode.HALF_UP);
-                            ;
                             if (aggregateField.getAggregate().equals(AggregateType.COUNT.getValue())) {
                                 v = new BigDecimal(1).setScale(4, RoundingMode.HALF_UP);
                             } else if (aggregateField.getAggregate().equals(AggregateType.SUM.getValue())) {

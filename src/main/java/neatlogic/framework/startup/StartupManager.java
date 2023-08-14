@@ -133,6 +133,8 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                     }
+                    //还原默认数据库neatlogic
+                    TenantContext.get().setUseDefaultDatasource(true);
                     if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             try {

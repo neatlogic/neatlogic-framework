@@ -1,14 +1,11 @@
 package neatlogic.framework.dto;
 
-import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.UUID;
 
 /**
  * @program: neatlogic
@@ -42,7 +39,7 @@ public class MailServerVo extends BasePageVo {
     private String fromAddress;
 
 	@EntityField(name = "term.framework.smptsslenable", type = ApiParamType.STRING)
-    private String sslEnable;
+    private String sslEnable = "false";
 
     public String getUuid() {
     	if(StringUtils.isBlank(uuid)) {

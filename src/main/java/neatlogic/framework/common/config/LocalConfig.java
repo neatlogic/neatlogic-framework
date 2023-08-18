@@ -46,15 +46,9 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
     private Properties properties;
     private ConfigurableEnvironment environment;
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = (ConfigurableEnvironment) environment;
-    }
+    public static final Map<String, Object> dbConfigMap = new HashMap<>();
 
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        MutablePropertySources propertySources = environment.getPropertySources();
-        Map<String, Object> paramMap = new HashMap<>();
+    static {
         Properties prop = new Properties();
         String configInfo = null;
         try {
@@ -75,26 +69,37 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
             }
-            paramMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
-            paramMap.put("db.url", prop.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
-            paramMap.put("db.username", prop.getProperty("db.username", "username"));
-            paramMap.put("db.password", prop.getProperty("db.password", "password"));
-            paramMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
-            paramMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
-            paramMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
-            paramMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));
-            paramMap.put("conn.initialSize", prop.getProperty("conn.initialSize", "4"));
+
+            dbConfigMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
+            dbConfigMap.put("db.url", prop.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
+            dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
+            dbConfigMap.put("db.password", prop.getProperty("db.password", "password"));
+            dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
+            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
+            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
+            dbConfigMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));
+            dbConfigMap.put("conn.initialSize", prop.getProperty("conn.initialSize", "4"));
             String mongoHost = prop.getProperty("mongo.host", "localhost:27017");
             String mongoUser = prop.getProperty("mongo.username", "root");
             String mongoPwd = prop.getProperty("mongo.password", "root");
             String mongoDb = prop.getProperty("mongo.database", "admin");
             mongoPwd = RC4Util.decrypt(mongoPwd);
-            paramMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
-            paramMap.put("jms.url", prop.getProperty("jms.url", "tcp://localhost:8161"));
-            propertySources.addLast(new MapPropertySource("localconfig", paramMap));
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            dbConfigMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
+            dbConfigMap.put("jms.url", prop.getProperty("jms.url", "tcp://localhost:8161"));
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = (ConfigurableEnvironment) environment;
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        MutablePropertySources propertySources = environment.getPropertySources();
+        propertySources.addLast(new MapPropertySource("localconfig", dbConfigMap));
     }
 
     @Override

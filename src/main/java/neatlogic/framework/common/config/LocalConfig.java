@@ -56,16 +56,22 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
         MutablePropertySources propertySources = environment.getPropertySources();
         Map<String, Object> paramMap = new HashMap<>();
         Properties prop = new Properties();
+        String configInfo = null;
         try {
             Properties properties = new Properties();
-            properties.put("serverAddr", System.getProperty("nacos.home"));
-            properties.put("namespace", System.getProperty("nacos.namespace"));
+            String serverAddr = System.getProperty("nacos.home");
+            String namespace = System.getProperty("nacos.namespace");
+            if (StringUtils.isNotBlank(serverAddr) && StringUtils.isNotBlank(namespace)) {
+                properties.put("serverAddr", System.getProperty("nacos.home"));
+                properties.put("namespace", System.getProperty("nacos.namespace"));
+                ConfigService configService = NacosFactory.createConfigService(properties);
+                configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
+                if (StringUtils.isNotBlank(configInfo)) {
+                    prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                }
+            }
 
-            ConfigService configService = NacosFactory.createConfigService(properties);
-            String configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
-            if (StringUtils.isNotBlank(configInfo)) {
-                prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-            } else {
+            if (StringUtils.isBlank(configInfo)) {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
             }

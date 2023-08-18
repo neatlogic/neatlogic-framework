@@ -148,6 +148,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                     }
+                    TenantContext.get().setUseDefaultDatasource(false);
                 }
             });
         }

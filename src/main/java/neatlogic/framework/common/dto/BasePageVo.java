@@ -73,8 +73,18 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private Integer expectOffsetRowNum;
 
+    @EntityField(name = "最大分页", type = ApiParamType.INTEGER)
+    private int maxPageSize = 100;
 
     public BasePageVo() {
+    }
+
+    public int getMaxPageSize() {
+        return maxPageSize;
+    }
+
+    public void setMaxPageSize(int maxPageSize) {
+        this.maxPageSize = Math.max(20, maxPageSize);
     }
 
     public Integer getRowNum() {
@@ -114,7 +124,7 @@ public class BasePageVo implements Serializable {
     public Integer getPageSize() {
         if (pageRange == null) {
             if (!this.needPage) {
-                pageSize = 100;
+                pageSize = maxPageSize;
             }
             return pageSize;
         } else {
@@ -124,7 +134,7 @@ public class BasePageVo implements Serializable {
 
     public void setPageSize(Integer pageSize) {
         if (pageSize != null && pageSize > 0) {
-            this.pageSize = Math.min(100, pageSize);//pagesize最大100
+            this.pageSize = Math.min(maxPageSize, pageSize);
         }
     }
 

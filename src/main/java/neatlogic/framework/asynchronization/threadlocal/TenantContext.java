@@ -153,7 +153,7 @@ public class TenantContext implements Serializable {
 
     /**
      * 切换数据库
-     * 注意：不能在事务场景使用改方法，否则会切库失败
+     * 注意：不能在事务场景使用此方法，否则会切库失败
      * @param useDefaultDatasource true 使用neatlogic 库 ，false 还原使用租户库
      */
     public void setUseDefaultDatasource(Boolean useDefaultDatasource) {

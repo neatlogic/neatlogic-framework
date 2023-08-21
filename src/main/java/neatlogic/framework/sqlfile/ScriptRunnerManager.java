@@ -229,12 +229,15 @@ public class ScriptRunnerManager {
                 String sqlMd5 = Md5Util.encryptMD5(line);
                 if (!hasRunSqlMd5List.contains(sqlMd5)) {
                     runner.runScript(new StringReader(line));
-                    insertTenantModuleDmlSql(tenant.getUuid(), moduleId, sqlMd5, neatlogicConn);
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                        logger.error(String.format(I18nUtils.getStaticMessage("nfes.dmlsqlexecuteexception.dmlsqlexecuteexception"), tenant.getName(), moduleId, line));
-                        System.exit(1);
+                        String error = "ERROR: " + String.format(I18nUtils.getStaticMessage("nfes.dmlsqlexecuteexception.dmlsqlexecuteexception"), tenant.getName(), moduleId, line);
+                        logger.error(error);
+                        System.out.println(error);
+                        errStrWriter.getBuffer().setLength(0);
+                    } else {
+                        insertTenantModuleDmlSql(tenant.getUuid(), moduleId, sqlMd5, neatlogicConn);
+                        hasRunSqlMd5List.add(sqlMd5);
                     }
-                    hasRunSqlMd5List.add(sqlMd5);
                 }
             }
         } catch (Exception ex) {

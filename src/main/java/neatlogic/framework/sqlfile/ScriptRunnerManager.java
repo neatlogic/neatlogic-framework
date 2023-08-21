@@ -225,7 +225,7 @@ public class ScriptRunnerManager {
                 if (StringUtils.isBlank(line.trim())) {
                     continue;
                 }
-                // 如果没有执行过改sql，则执行该 SQL 语句
+                // 如果没有执行过该sql，则执行
                 String sqlMd5 = Md5Util.encryptMD5(line);
                 if (!hasRunSqlMd5List.contains(sqlMd5)) {
                     runner.runScript(new StringReader(line));

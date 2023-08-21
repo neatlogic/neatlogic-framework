@@ -22,7 +22,6 @@ import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.DatasourceMapper;
 import neatlogic.framework.dto.DatasourceVo;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -32,7 +31,7 @@ import java.util.Map;
 
 @RootComponent
 public class DatasourceManager {
-    @Autowired
+    @Resource
     private DatasourceMapper datasourceMapper;
 
     private static NeatLogicRoutingDataSource datasource;

@@ -19,8 +19,12 @@ package neatlogic.framework.bootstrap;
 import neatlogic.framework.asynchronization.thread.ModuleInitApplicationListener;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.DatasourceVo;
+import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
+import neatlogic.framework.util.JdbcUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -36,7 +40,15 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.sql.DataSource;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModuleInitializer implements WebApplicationInitializer {
     static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
@@ -52,6 +64,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 "/_/ |_/ \\___/ \\__,_/ \\__//_____/\\____/ \\__, //_/ \\___/   /____/(_)\\____/  \n" +
                 "                                      /____/                             \n" +
                 "===========================================================================");
+
+        initDmlSql(resolver);
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
             for (Resource resource : resources) {
@@ -121,5 +135,84 @@ public class ModuleInitializer implements WebApplicationInitializer {
             }
         }
 
+    }
+
+    /**
+     * 执行模块的dml
+     */
+    private void initDmlSql(ResourcePatternResolver resolver) {
+        try {
+            Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
+            List<TenantVo> activeTenantList = getActiveTenantList();
+            for (TenantVo tenantVo : activeTenantList) {
+                System.out.printf((I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n", tenantVo.getName());
+                for (Resource resource : resources) {
+                    SAXReader reader = new SAXReader();
+                    Document document = reader.read(resource.getURL());
+                    Element rootE = document.getRootElement();
+                    Element neatlogicE = rootE.element("module");
+                    String moduleId = neatlogicE.attributeValue("id");
+                    String moduleName = neatlogicE.attributeValue("name");
+                    //System.out.println("⚡初始化 " + moduleId + "[" + I18nUtils.getStaticMessage(moduleName) + "] dml");
+                    Resource dmlResource = null;
+
+                    Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/sqlscript/dml.sql");
+                    if (dmlResources.length == 1) {
+                        dmlResource = dmlResources[0];
+                        Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
+                        ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleId, scriptReader, false);
+
+                    }
+                }
+            }
+        } catch (IOException | DocumentException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 获取所有激活租户
+     *
+     * @return 激活的租户
+     */
+    private List<TenantVo> getActiveTenantList() {
+        List<TenantVo> activeTenantList = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement tenantStatement = null;
+        ResultSet tenantResultSet = null;
+        try {
+            DataSource datasource = JdbcUtil.getNeatlogicDataSource();
+            try {
+                connection = datasource.getConnection();
+            } catch (Exception exception) {
+                System.out.println("ERROR: "+I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                System.exit(1);
+            }
+            String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active = 1 ";
+            tenantStatement = connection.prepareStatement(tenantSql);
+            tenantResultSet = tenantStatement.executeQuery();
+            while (tenantResultSet.next()) {
+                TenantVo tenantVo = new TenantVo();
+                tenantVo.setUuid(tenantResultSet.getString("uuid"));
+                tenantVo.setName(tenantResultSet.getString("name"));
+                DatasourceVo datasourceVo = new DatasourceVo();
+                datasourceVo.setUrl(tenantResultSet.getString("url"));
+                datasourceVo.setUsername(tenantResultSet.getString("username"));
+                datasourceVo.setPasswordCipher(tenantResultSet.getString("password"));
+                datasourceVo.setDriver(tenantResultSet.getString("driver"));
+                datasourceVo.setHost(tenantResultSet.getString("host"));
+                datasourceVo.setPort(tenantResultSet.getInt("port"));
+                tenantVo.setDatasource(datasourceVo);
+                activeTenantList.add(tenantVo);
+            }
+            //System.out.println("激活的租户:" + activeTenantList.stream().map(o -> o.getName() + "[" + o.getUuid() + "]").collect(Collectors.joining("、")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            JdbcUtil.closeConnection(connection);
+            JdbcUtil.closeStatement(tenantStatement);
+            JdbcUtil.closeResultSet(tenantResultSet);
+        }
+        return activeTenantList;
     }
 }

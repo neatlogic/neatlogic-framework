@@ -49,13 +49,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class ModuleInitializer implements WebApplicationInitializer {
     static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
-
-    private static final String CONFIG_FILE = "config.properties";
-    private Properties properties;
 
     @Override
     public void onStartup(ServletContext context) throws ServletException {

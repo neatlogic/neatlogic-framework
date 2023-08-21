@@ -16,7 +16,7 @@ public class JdbcUtil {
     private static final String CONFIG_FILE = "config.properties";
     private Properties properties;
 
-    private static DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    private static final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
     static {
         dataSource.setDriverClassName(LocalConfig.dbConfigMap.get("db.driverClassName").toString());
@@ -71,10 +71,5 @@ public class JdbcUtil {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println(System.currentTimeMillis());
     }
 }

@@ -21,6 +21,7 @@ import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.store.mysql.DatasourceManager;
 import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
+import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
@@ -184,15 +185,18 @@ public class ScriptRunnerManager {
      * @param tenant       租户
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
-     * @param logWriter    日志
-     * @param errWriter    错误日志
      * @param isDataDb     是否data库
      */
-    public static void runScriptOnceWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, Boolean isDataDb) {
+    public static void runScriptOnceWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, Boolean isDataDb) {
+        StringWriter logStrWriter = new StringWriter();
+        PrintWriter logWriter = new PrintWriter(logStrWriter);
+        StringWriter errStrWriter = new StringWriter();
+        PrintWriter errWriter = new PrintWriter(errStrWriter);
         PreparedStatement sqlMd5Statement = null;
         ResultSet sqlMd5ResultSet = null;
         Connection conn = null;
         Connection neatlogicConn = null;
+        ScriptRunner runner = null;
         try {
             List<String> hasRunSqlMd5List = new ArrayList<>();
             DataSource neatlogicDatasource = JdbcUtil.getNeatlogicDataSource();
@@ -204,15 +208,14 @@ public class ScriptRunnerManager {
             while (sqlMd5ResultSet.next()) {
                 hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_uuid"));
             }
-            List<String> currentRunSqlMd5List = new ArrayList<>();
             BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
             try {
                 conn = JdbcUtil.getNeatlogicDataSource(tenant, isDataDb).getConnection();
-            }catch (Exception exception){
-                System.out.println("租户:"+tenant.getName()+"["+tenant.getName()+"] 连接不上,请确认neatlogic库的datasource该租户的数据是否正确后重启");
+            } catch (Exception exception) {
+                System.out.println("租户:" + tenant.getName() + "[" + tenant.getName() + "] 连接不上,请确认neatlogic库的datasource该租户的数据是否正确后重启");
                 System.exit(1);
             }
-            ScriptRunner runner = new ScriptRunner(conn);
+            runner = new ScriptRunner(conn);
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errWriter);
             runner.setSendFullScript(false);
@@ -226,30 +229,21 @@ public class ScriptRunnerManager {
                 String sqlMd5 = Md5Util.encryptMD5(line);
                 if (!hasRunSqlMd5List.contains(sqlMd5)) {
                     runner.runScript(new StringReader(line));
-                    currentRunSqlMd5List.add(sqlMd5);
+                    insertTenantModuleDmlSql(tenant.getUuid(), moduleId, sqlMd5, neatlogicConn);
+                    if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                        logger.error(String.format(I18nUtils.getStaticMessage("nfes.dmlsqlexecuteexception.dmlsqlexecuteexception"), tenant.getName(), moduleId, line));
+                        System.exit(1);
+                    }
                     hasRunSqlMd5List.add(sqlMd5);
                 }
             }
-            runner.closeConnection();
-            if (CollectionUtils.isNotEmpty(currentRunSqlMd5List)) {
-                List<String> hasRunSqlMd5ListTmp = new ArrayList<>();
-                for (int i = 0; i < currentRunSqlMd5List.size(); i++) {
-                    if (i != 0 && i % 200 == 0) {
-                        insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, neatlogicConn);
-                        hasRunSqlMd5ListTmp.clear();
-                    } else {
-                        hasRunSqlMd5ListTmp.add(currentRunSqlMd5List.get(i));
-                    }
-                }
-                if (CollectionUtils.isNotEmpty(hasRunSqlMd5ListTmp)) {
-                    insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, neatlogicConn);
-                }
-            }
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            logger.error(String.format("租户%s初始化dml失败", tenant.getName()));
+            logger.error(ex.getMessage(), ex);
         } finally {
+            if (runner != null) {
+                runner.closeConnection();
+            }
             JdbcUtil.closeConnection(conn);
             JdbcUtil.closeConnection(neatlogicConn);
             JdbcUtil.closeResultSet(sqlMd5ResultSet);
@@ -257,18 +251,13 @@ public class ScriptRunnerManager {
         }
     }
 
-    private static void insertTenantModuleDmlSql(String tenantUuid, String moduleId, List<String> hasRunSqlMd5ListTmp, Connection neatlogicConn) throws SQLException {
+    private static void insertTenantModuleDmlSql(String tenantUuid, String moduleId, String md5, Connection neatlogicConn) throws SQLException {
         String sql = "insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`fcd`) VALUES (?,?,?,?,now())";
         PreparedStatement statement = neatlogicConn.prepareStatement(sql);
-        for (String md5 : hasRunSqlMd5ListTmp) {
-            // 设置批量插入的参数
-            statement.setString(1, tenantUuid);
-            statement.setString(2, moduleId);
-            statement.setString(3, md5);
-            statement.setInt(4, 1);
-            statement.addBatch();
-        }
-        // 执行批量插入操作
-        statement.executeBatch();
+        statement.setString(1, tenantUuid);
+        statement.setString(2, moduleId);
+        statement.setString(3, md5);
+        statement.setInt(4, 1);
+        statement.execute();
     }
 }

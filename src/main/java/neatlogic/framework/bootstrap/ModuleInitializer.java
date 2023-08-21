@@ -41,14 +41,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class ModuleInitializer implements WebApplicationInitializer {
     static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
@@ -68,7 +69,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 "                                      /____/                             \n" +
                 "===========================================================================");
 
-        List<TenantVo> activeTenantList = getActiveTenantList();
+        initDmlSql(resolver);
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
             for (Resource resource : resources) {
@@ -88,26 +89,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 groupName = neatlogicE.attributeValue("groupName");
                 groupSort = neatlogicE.attributeValue("groupSort");
                 groupDescription = neatlogicE.attributeValue("groupDescription");
-
-                //执行这个模块的dml
-                Resource dmlResource = null;
-                Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/sqlscript/dml.sql");
-                if (dmlResources.length == 1) {
-                    dmlResource = dmlResources[0];
-                    for (TenantVo tenantVo : activeTenantList) {
-                        StringWriter logStrWriter = new StringWriter();
-                        PrintWriter logWriter = new PrintWriter(logStrWriter);
-                        StringWriter errStrWriter = new StringWriter();
-                        PrintWriter errWriter = new PrintWriter(errStrWriter);
-                        try {
-                            Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
-                            ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleId, scriptReader, logWriter, errWriter, false);
-                        } catch (Exception ex) {
-                            logger.error(ex.getMessage(), ex);
-                            logger.error(errStrWriter.toString());
-                        }
-                    }
-                }
 
                 if (StringUtils.isNotBlank(moduleId)) {
                     System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule", moduleId));
@@ -161,6 +142,39 @@ public class ModuleInitializer implements WebApplicationInitializer {
     }
 
     /**
+     * 执行模块的dml
+     */
+    private void initDmlSql(ResourcePatternResolver resolver) {
+        try {
+            Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
+            List<TenantVo> activeTenantList = getActiveTenantList();
+            for (TenantVo tenantVo : activeTenantList) {
+                System.out.printf((I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n", tenantVo.getName());
+                for (Resource resource : resources) {
+                    SAXReader reader = new SAXReader();
+                    Document document = reader.read(resource.getURL());
+                    Element rootE = document.getRootElement();
+                    Element neatlogicE = rootE.element("module");
+                    String moduleId = neatlogicE.attributeValue("id");
+                    String moduleName = neatlogicE.attributeValue("name");
+                    //System.out.println("⚡初始化 " + moduleId + "[" + I18nUtils.getStaticMessage(moduleName) + "] dml");
+                    Resource dmlResource = null;
+
+                    Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/sqlscript/dml.sql");
+                    if (dmlResources.length == 1) {
+                        dmlResource = dmlResources[0];
+                        Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
+                        ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleId, scriptReader, false);
+
+                    }
+                }
+            }
+        } catch (IOException | DocumentException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+
+    /**
      * 获取所有激活租户
      *
      * @return 激活的租户
@@ -190,7 +204,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 tenantVo.setDatasource(datasourceVo);
                 activeTenantList.add(tenantVo);
             }
-            System.out.println("激活的租户:" + activeTenantList.stream().map(o -> o.getName() + "[" + o.getUuid() + "]").collect(Collectors.joining("、")));
+            //System.out.println("激活的租户:" + activeTenantList.stream().map(o -> o.getName() + "[" + o.getUuid() + "]").collect(Collectors.joining("、")));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

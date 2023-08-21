@@ -182,7 +182,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
         ResultSet tenantResultSet = null;
         try {
             DataSource datasource = JdbcUtil.getNeatlogicDataSource();
-            connection = datasource.getConnection();
+            try {
+                connection = datasource.getConnection();
+            } catch (Exception exception) {
+                System.out.println("ERROR: "+I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                System.exit(1);
+            }
             String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active = 1 ";
             tenantStatement = connection.prepareStatement(tenantSql);
             tenantResultSet = tenantStatement.executeQuery();

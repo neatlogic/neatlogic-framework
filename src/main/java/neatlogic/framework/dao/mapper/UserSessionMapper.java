@@ -45,9 +45,12 @@ public interface UserSessionMapper {
             @Param("pageSize") Integer pageSize
     );
 
+    int getUserSessionCountByDate(String limitDate);
+
     int insertUserSession(String userUuid);
 
     int updateUserSession(String userUuid);
 
     int deleteUserSessionByUserUuid(String userUuid);
+
 }

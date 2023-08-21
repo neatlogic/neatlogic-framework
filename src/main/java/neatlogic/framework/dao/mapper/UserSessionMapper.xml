@@ -131,6 +131,10 @@ limitations under the License.
                  JOIN `user_session` b ON b.`user_uuid` = a.`uuid` AND b.`visit_time` &gt; #{sessionTime}
         limit #{startNum},#{pageSize}
     </select>
+    <select id="getUserSessionCountByDate" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `user_session` b where b.`visit_time` &gt;= #{value}
+    </select>
 
     <insert id="insertUserSession" parameterType="java.lang.String">
         INSERT INTO `user_session` (`user_uuid`, `visit_time`)

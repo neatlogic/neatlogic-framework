@@ -7,6 +7,12 @@
         WHERE id = #{value} FOR
         UPDATE
     </select>
+    <select id="getMysqlLock" resultType="java.lang.Integer">
+        SELECT GET_LOCK(#{key}, #{waitSecond});
+    </select>
+    <select id="releaseMysqlLock" resultType="java.lang.Integer">
+        SELECT RELEASE_LOCK(#{value});
+    </select>
 
 
     <insert id="insertLock" parameterType="java.lang.String">

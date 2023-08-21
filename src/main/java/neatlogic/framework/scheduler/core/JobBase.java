@@ -22,6 +22,7 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.scheduler.annotation.Prop;
 import neatlogic.framework.scheduler.annotation.Param;
@@ -145,6 +146,10 @@ public abstract class JobBase implements IJob {
         String jobName = jobKey.getName();
         String jobGroup = jobKey.getGroup();
         String tenantUuid = jobObject.getTenantUuid();
+        //如果租户不存在则不执行该租户的作业
+        if(!TenantUtil.hasTenant(tenantUuid)){
+            return;
+        }
         // 从job组名中获取租户uuid,切换到租户的数据源
         TenantContext.init(tenantUuid).setUseDefaultDatasource(false);
         UserContext.init(SystemUser.SYSTEM);

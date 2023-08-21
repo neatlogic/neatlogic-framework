@@ -217,6 +217,24 @@ public class TimeUtil {
         return TimeUtil.convertDateToString(calendar.getTime(), TimeUtil.FMT_yyyy_MM_dd);
     }
 
+    /**
+     * 跳过周末找n天前的日期
+     * @param date 日期
+     * @param day 减的天数
+     * @return 日期字符串
+     */
+    public static String descDateByWorkDay(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        for (int i = 0; i < day; i++) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            if (checkHoliday(calendar)) {
+                i--;
+            }
+        }
+        return TimeUtil.convertDateToString(calendar.getTime(), TimeUtil.FMT_yyyy_MM_dd);
+    }
+
     public static boolean checkHoliday(Calendar calendar) {
         //判断日期是否是周六周日
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {

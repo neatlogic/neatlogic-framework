@@ -19,6 +19,7 @@ package neatlogic.framework.common.config;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,12 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 
             if (StringUtils.isBlank(configInfo)) {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
-                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                try {
+                    prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                } catch (Exception ex) {
+                    System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfe.confignotfoundexception.confignotfoundexception"));
+                    System.exit(1);
+                }
             }
 
             dbConfigMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));

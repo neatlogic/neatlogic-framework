@@ -75,10 +75,10 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
             dbConfigMap.put("db.password", prop.getProperty("db.password", "password"));
             dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
-            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
-            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
-            dbConfigMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));
-            dbConfigMap.put("conn.initialSize", prop.getProperty("conn.initialSize", "4"));
+//            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
+//            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
+//            dbConfigMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));
+//            dbConfigMap.put("conn.initialSize", prop.getProperty("conn.initialSize", "4"));
             String mongoHost = prop.getProperty("mongo.host", "localhost:27017");
             String mongoUser = prop.getProperty("mongo.username", "root");
             String mongoPwd = prop.getProperty("mongo.password", "root");

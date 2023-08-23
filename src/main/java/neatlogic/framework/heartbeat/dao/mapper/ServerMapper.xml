@@ -2,68 +2,83 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.heartbeat.dao.mapper.ServerMapper">
 
-	<select id="getInactivatedServer" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+	<select id="getInactivatedServerIdList" resultType="java.lang.Integer">
 		SELECT
-		scl.`host`, scl.`server_id` AS serverId, scl.`status`
-		FROM server_status scl
-		JOIN server_counter scot ON scot.`to_server_id`=scl.`server_id` AND scot.`from_server_id`=#{currentServerId} AND scot.`counter` >= #{threshold}
-		WHERE scl.`status`='startup'
+			`to_server_id`
+		FROM `server_counter`
+		WHERE `from_server_id`=#{fromServerId}
+		  AND `counter` >= #{threshold}
 	</select>
 
-	<select id="getServerByStatus" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+	<select id="getServerByServerId" parameterType="java.lang.Integer" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
-		scl.`host`, scl.`server_id` AS serverId,scl.`status`
-		FROM server_status scl
-		WHERE scl.`status`=#{status}
-	</select>
-
-	<select id="getServerByServerId" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
-		SELECT
-		scl.`host`, scl.`server_id` AS serverId,scl.`status`
-		FROM server_status scl
-		WHERE scl.`server_id`=#{serverId}
+		`host`, `server_id` AS serverId, `status`
+		FROM server_status
+		WHERE `server_id` = #{serverId}
 		FOR UPDATE
 	</select>
 
-	<select id="getServerCounterIncreaseByFromServerId" resultType="neatlogic.framework.heartbeat.dto.ServerCounterVo">
+	<select id="getAllServerList" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
 		SELECT
-		${fromServerId} AS fromServerId, scl.`server_id` AS toServerId, IFNULL(sco.`counter` + 1, 1) AS counter
-		FROM `server_status` scl
-		LEFT JOIN `server_counter` sco ON sco.`to_server_id`=scl.`server_id` AND sco.`from_server_id`=#{fromServerId}
-		WHERE scl.`status`='startup' AND scl.`server_id` != #{fromServerId}
+			`host`,
+			`server_id` AS serverId,
+			`status`,
+			`heartbeat_rate` AS heartbeatRate,
+			`heartbeat_threshold` AS heartbeatThreshold,
+			`heartbeat_time` AS heartbeatTime,
+			`fcu`,
+			`fcd`,
+			`lcu`,
+			`lcd`
+		FROM `server_status`
 	</select>
 
-	<update id="updateServerByServerId">
-		UPDATE server_status
+	<update id="updateServerByServerId" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+		UPDATE `server_status`
 		SET
-			status = #{status}
-		WHERE server_id = #{serverId}
+			`status` = #{status}
+		WHERE `server_id` = #{serverId}
 	</update>
 
-	<update id="resetCounterByToServerId">
-		UPDATE server_counter
+	<update id="updateServerHostByServerId" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+		UPDATE `server_status`
 		SET
-		counter=0
-		WHERE to_server_id=#{toServerId}
+			`host` = #{host}
+		WHERE `server_id` = #{serverId}
 	</update>
 
-	<update id="updateServerCounterIncrementByOneByFromServerId" parameterType="java.lang.Integer">
-		UPDATE `server_counter` SET `counter` = `counter` + 1 WHERE `from_server_id` = #{value};
+	<update id="resetCounterByToServerId" parameterType="java.lang.Integer">
+		UPDATE `server_counter`
+		SET
+		`counter`=0
+		WHERE `to_server_id` = #{value}
 	</update>
 
-	<insert id="insertServer">
-		INSERT INTO server_status(host, server_id, status)
-		VALUES(#{host}, #{serverId}, #{status})
+	<update id="updateServerHeartbeatTimeByServerId" parameterType="java.lang.Integer">
+		UPDATE `server_status`
+		SET `heartbeat_time` = NOW(3)
+		WHERE `server_id` = #{value}
+	</update>
+
+	<insert id="insertServer" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+		INSERT INTO server_status(`server_id`, `status`, `heartbeat_rate`, `heartbeat_threshold`, `heartbeat_time`, `fcu`, `fcd`)
+		VALUES(#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{fcu}, NOW(3))
 		ON DUPLICATE KEY UPDATE
-		host = #{host},
-		status = #{status}
+		`status` = #{status},
+		`heartbeat_rate` = #{heartbeatRate},
+		`heartbeat_threshold` = #{heartbeatThreshold},
+		`heartbeat_time` = NOW(3),
+		`lcu` = #{lcu},
+		`lcd` = NOW(3)
 	</insert>
 
-	<insert id="replaceServerCounter">
-		REPLACE INTO server_counter(from_server_id, to_server_id, counter) VALUES(#{fromServerId}, #{toServerId}, #{counter})
+	<insert id="insertServerCounter" parameterType="neatlogic.framework.heartbeat.dto.ServerCounterVo">
+		INSERT INTO server_counter(`from_server_id`, `to_server_id`, `counter`)
+		VALUES(#{fromServerId}, #{toServerId}, #{counter})
+		ON DUPLICATE KEY UPDATE `counter` = `counter` + 1
 	</insert>
 
-	<delete id="deleteCounterByServerId">
-		DELETE FROM server_counter WHERE from_server_id=#{serverId} OR to_server_id=#{serverId}
+	<delete id="deleteCounterByToServerId" parameterType="java.lang.Integer">
+		DELETE FROM `server_counter` WHERE `to_server_id` = #{value}
 	</delete>
 </mapper>

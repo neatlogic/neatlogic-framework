@@ -48,12 +48,16 @@ public class CommonGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         List<String> includeStrList = groupSearchVo.getIncludeList();
+        List<String> excludeStrList = groupSearchVo.getExcludeList();
         if (CollectionUtils.isEmpty(includeStrList)) {
             includeStrList = new ArrayList<>();
         }
+        if (CollectionUtils.isEmpty(excludeStrList)) {
+            excludeStrList = new ArrayList<>();
+        }
         List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
         for (UserType s : UserType.values()) {
-            if ((s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue())) && s.getText().contains(groupSearchVo.getKeyword())) {
+            if ((!excludeStrList.contains(getHeader() + s.getValue()) && (s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue()))) && s.getText().contains(groupSearchVo.getKeyword())) {
                 GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
                 groupSearchOptionVo.setValue(getHeader() + s.getValue());
                 groupSearchOptionVo.setText(s.getText());

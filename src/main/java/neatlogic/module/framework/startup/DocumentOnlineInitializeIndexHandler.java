@@ -44,6 +44,7 @@ import org.springframework.stereotype.Component;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -58,7 +59,6 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     private DocumentOnlineMapper documentOnlineMapper;
     /**
      * 在线帮助文档根目录
-     *
      */
     public final static String DIRECTORY_ROOT = "documentonline";
     /**
@@ -82,7 +82,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     }
 
     @Override
-    public int executeForAllTenant() throws Exception {
+    public int executeForAllTenant() {
         IndexWriter indexWriter = null;
         try {
             // 先查询出数据库中数据
@@ -194,11 +194,14 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw e;
         } finally {
             // 8.释放资源
             if (indexWriter != null) {
-                indexWriter.close();
+                try {
+                    indexWriter.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
             // 禁止添加子节点
             DOCUMENT_ONLINE_DIRECTORY_ROOT.noAllowedAddChild();
@@ -213,6 +216,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     /**
      * 根据文件路径找到documentonline-mapping.json配置文件设置的映射信息
+     *
      * @param filePath 文件路径
      * @return 映射信息
      */
@@ -246,6 +250,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
     /**
      * 构建在线帮助文档目录
+     *
      * @param root
      * @param filePath
      */

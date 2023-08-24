@@ -232,7 +232,7 @@ public class ScriptRunnerManager {
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
                         String error = "ERROR: " + String.format(I18nUtils.getStaticMessage("nfes.dmlsqlexecuteexception.dmlsqlexecuteexception"), tenant.getName(), moduleId, line);
                         logger.error(error);
-                        System.out.println(error);
+                        //System.out.println(error);
                         errStrWriter.getBuffer().setLength(0);
                     } else {
                         insertTenantModuleDmlSql(tenant.getUuid(), moduleId, sqlMd5, neatlogicConn);

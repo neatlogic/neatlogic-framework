@@ -122,13 +122,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     } else {
                         sr.setLoadOnStartup(2);
                     }
-                    System.out.println("  ✅" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
+                    System.out.println("  ✓" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
                 }
             }
         } catch (IOException | DocumentException ex) {
             ModuleInitApplicationListener.getModuleinitphaser().arrive();
             if (moduleId != null) {
-                System.out.println("  ❎" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
+                System.out.println("  ✖" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
             }
             logger.error(ex.getMessage(), ex);
         }
@@ -164,7 +164,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
 
                     }
                 }
-                System.out.println("  ✔" + tenantVo.getName());
+                System.out.println("  ✓" + tenantVo.getName());
             }
         } catch (IOException | DocumentException ex) {
             if (StringUtils.isNotBlank(currentTenant)) {

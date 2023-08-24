@@ -215,13 +215,14 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             }
         }
         if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
+            System.out.println("⚡" + $.t("common.startloadschedulejob", context.getModuleId()));
             for (TenantVo tenantVo : tenantList) {
                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
                 TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
                 if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
                     CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
-                    System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startloadschedulejob", context.getModuleId()));
+                    System.out.println("  ✓" + tenantVo.getName());
                 }
             }
         }

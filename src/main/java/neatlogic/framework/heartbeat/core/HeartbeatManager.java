@@ -22,19 +22,18 @@ import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
+import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +53,13 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         // 服务器重启时，先重置与自己相关的数据
         getServerLock(Config.SCHEDULE_SERVER_ID);
         // 重新插入一条服务器信息
-        ServerClusterVo server = new ServerClusterVo(Config.SERVER_HOST, Config.SCHEDULE_SERVER_ID, ServerClusterVo.STARTUP);
+        ServerClusterVo server = new ServerClusterVo();
+        server.setServerId(Config.SCHEDULE_SERVER_ID);
+        server.setStatus(ServerClusterVo.STARTUP);
+        server.setFcu(SystemUser.SYSTEM.getUserUuid());
+        server.setLcu(SystemUser.SYSTEM.getUserUuid());
+        server.setHeartbeatRate(Config.SERVER_HEARTBEAT_RATE());
+        server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         serverMapper.insertServer(server);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
@@ -66,19 +71,32 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             protected void execute() {
                 try {
                     // 查找故障服务器
-                    List<ServerClusterVo> list = serverMapper.getInactivatedServer(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
-                    for (ServerClusterVo server : list) {
-                        if (getServerLock(server.getServerId())) {
+                    List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
+                    for (Integer serverId : serverIdList) {
+                        if (getServerLock(serverId)) {
                             // 如果抢到锁，开始处理
                             for (IHeartbreakHandler observer : set) {
-                                CachedThreadPool.execute(new HeartbreakHandlerThread(observer, server.getServerId()));
+                                CachedThreadPool.execute(new HeartbreakHandlerThread(observer, serverId));
                             }
                         }
                     }
                     // 将自己的计数器清零
                     serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
                     // 查出正常服务器及计数器加一后的值
-                    serverMapper.updateServerCounterIncrementByOneByFromServerId(Config.SCHEDULE_SERVER_ID);
+                    List<ServerClusterVo> serverList = serverMapper.getAllServerList();
+                    for (ServerClusterVo serverClusterVo : serverList) {
+                        if (Objects.equals(serverClusterVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
+                            continue;
+                        }
+                        if (Objects.equals(serverClusterVo.getStatus(), ServerClusterVo.STARTUP)) {
+                            ServerCounterVo serverCounterVo = new ServerCounterVo();
+                            serverCounterVo.setFromServerId(Config.SCHEDULE_SERVER_ID);
+                            serverCounterVo.setToServerId(serverClusterVo.getServerId());
+                            serverCounterVo.setCounter(1);
+                            serverMapper.insertServerCounter(serverCounterVo);
+                        }
+                    }
+                    serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
@@ -100,6 +118,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             if (serverVo != null) {
                 if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
                     serverVo.setStatus(ServerClusterVo.STOP);
+                    serverVo.setFcu(SystemUser.SYSTEM.getUserUuid());
+                    serverVo.setLcu(SystemUser.SYSTEM.getUserUuid());
                     serverMapper.updateServerByServerId(serverVo);
                     returnVal = true;
                 }
@@ -111,7 +131,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         }
         if (returnVal) {
             // `server_counter`是内存表，不支持事务，不能与其他支持事务的表在同个事务里更新数据
-            serverMapper.deleteCounterByServerId(serverId);
+            serverMapper.deleteCounterByToServerId(serverId);
         }
         return returnVal;
     }

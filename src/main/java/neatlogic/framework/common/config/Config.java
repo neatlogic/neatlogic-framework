@@ -48,7 +48,7 @@ public class Config {
     private static final String SERVER_ID_FILE = "serverid.conf";
 
     public static int SCHEDULE_SERVER_ID;
-    public static String SERVER_HOST;
+//    public static String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
     private static String JWT_SECRET = "neatlogic#neatlogic$secret";
@@ -438,19 +438,19 @@ public class Config {
             throw ex;
         }
 
-        try {
-            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
-        } catch (Exception ex) {
-            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-            throw ex;
-        }
-
-        Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
-        Matcher matcher = pattern.matcher(SERVER_HOST);
-        if (!matcher.matches()) {
-            throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求，格式为“(http|https)://IP地址:端口”");
-        }
+//        try {
+//            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
+//        } catch (Exception ex) {
+//            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
+//            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
+//            throw ex;
+//        }
+//
+//        Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
+//        Matcher matcher = pattern.matcher(SERVER_HOST);
+//        if (!matcher.matches()) {
+//            throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求，格式为“(http|https)://IP地址:端口”");
+//        }
     }
 
     @PostConstruct

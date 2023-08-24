@@ -57,6 +57,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext context) throws ServletException {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         String moduleId = null;
+        String moduleName = null;
         System.out.println("    _   __              __   __                  _          _____    ____ \n" +
                 "   / | / /___   ____ _ / /_ / /   ____   ____ _ (_)_____   |__  /   / __ \\\n" +
                 "  /  |/ // _ \\ / __ `// __// /   / __ \\ / __ `// // ___/    /_ <   / / / /\n" +
@@ -68,6 +69,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
         initDmlSql(resolver);
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
+            System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             for (Resource resource : resources) {
                 String path = resource.getURL().getPath();
                 path = path.substring(path.indexOf("!") + 1);
@@ -76,7 +78,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 Element rootE = document.getRootElement();
                 Element neatlogicE = rootE.element("module");
                 // Element nameE = rootE.element("name");
-                String moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
+                String urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
                 moduleId = neatlogicE.attributeValue("id");
                 moduleName = neatlogicE.attributeValue("name");
                 urlMapping = neatlogicE.attributeValue("urlMapping");
@@ -87,7 +89,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 groupDescription = neatlogicE.attributeValue("groupDescription");
 
                 if (StringUtils.isNotBlank(moduleId)) {
-                    System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule", moduleId));
                     version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
                     NeatLogicWebApplicationContext appContext = new NeatLogicWebApplicationContext();
                     appContext.setConfigLocation("classpath*:" + path);
@@ -121,18 +122,15 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     } else {
                         sr.setLoadOnStartup(2);
                     }
-
-
+                    System.out.println("  ✓" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
                 }
             }
         } catch (IOException | DocumentException ex) {
             ModuleInitApplicationListener.getModuleinitphaser().arrive();
             if (moduleId != null) {
-                logger.error("初始化模块：" + moduleId + "失败", ex);
-                System.out.println("failed to initialize module " + moduleId + ", please check error log");
-            } else {
-                logger.error(ex.getMessage(), ex);
+                System.out.println("  ✖" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
             }
+            logger.error(ex.getMessage(), ex);
         }
 
     }
@@ -141,11 +139,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 执行模块的dml
      */
     private void initDmlSql(ResourcePatternResolver resolver) {
+        String currentTenant = "";
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
             List<TenantVo> activeTenantList = getActiveTenantList();
+            System.out.printf("⚡" + (I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n");
             for (TenantVo tenantVo : activeTenantList) {
-                System.out.printf((I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n", tenantVo.getName());
+                currentTenant = tenantVo.getName();
                 for (Resource resource : resources) {
                     SAXReader reader = new SAXReader();
                     Document document = reader.read(resource.getURL());
@@ -153,7 +153,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     Element neatlogicE = rootE.element("module");
                     String moduleId = neatlogicE.attributeValue("id");
                     String moduleName = neatlogicE.attributeValue("name");
-                    //System.out.println("⚡初始化 " + moduleId + "[" + I18nUtils.getStaticMessage(moduleName) + "] dml");
+
                     Resource dmlResource = null;
 
                     Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/sqlscript/dml.sql");
@@ -164,8 +164,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
 
                     }
                 }
+                System.out.println("  ✓" + tenantVo.getName());
             }
         } catch (IOException | DocumentException ex) {
+            if (StringUtils.isNotBlank(currentTenant)) {
+                System.out.println("  ✖" + currentTenant);
+            }
             logger.error(ex.getMessage(), ex);
         }
     }
@@ -185,7 +189,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                System.out.println("ERROR: "+I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
                 System.exit(1);
             }
             String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active = 1 ";

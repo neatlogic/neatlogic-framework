@@ -35,7 +35,7 @@ public interface IStartup {
     /*
     只执行一次，晚于executeForTenant执行
      */
-    default int executeForAllTenant() throws Exception {
+    default int executeForAllTenant() {
         //返回-999代表没有任何执行逻辑
         return -999;
     }

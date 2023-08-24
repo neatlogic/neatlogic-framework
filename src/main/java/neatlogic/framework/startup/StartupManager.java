@@ -75,27 +75,25 @@ public class StartupManager extends ModuleInitializedListenerBase {
             CachedThreadPool.execute(new NeatLogicThread("STARTUP-RUNNER") {
                 @Override
                 protected void execute() {
-                    for (TenantVo tenantVo : tenantList) {
-                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                        List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
-                        //只有拥有当前模块权限的的租户才会执行startup
-                        if (!groupList.contains(moduleVo.getGroup())) {
-                            continue;
-                        }
+                    if (CollectionUtils.isNotEmpty(list)) {
+                        for (IStartup startup : list) {
+                            for (TenantVo tenantVo : tenantList) {
+                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                                List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+                                List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
+                                //只有拥有当前模块权限的的租户才会执行startup
+                                if (!groupList.contains(moduleVo.getGroup())) {
+                                    continue;
+                                }
 
-                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                        UserContext.init(SystemUser.SYSTEM);
-                        if (CollectionUtils.isNotEmpty(list)) {
-                            for (IStartup startup : list) {
+                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                                UserContext.init(SystemUser.SYSTEM);
                                 try {
-
                                     int i = startup.executeForCurrentTenant();
                                     if (i != -999) {
-                                        System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.successload"));
+                                        System.out.println("⚡" + $.t("common.startloadstartupjob", $.t(startup.getName()), tenantVo.getName()));
                                     }
                                 } catch (Exception ex) {
-                                    System.out.println("⚡[" + tenantVo.getName() + "]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.failedload"));
                                     logger.error(ex.getMessage(), ex);
                                 }
                             }
@@ -108,10 +106,9 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             try {
                                 int i = startup.executeForAllTenant();
                                 if (i != -999) {
-                                    System.out.println("⚡[All Tenant]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.successload"));
+                                    System.out.println("⚡" + $.t("common.startloadstartupjob", $.t(startup.getName()), "All Tenant"));
                                 }
                             } catch (Exception ex) {
-                                System.out.println("⚡[All Tenant]" + $.t("common.startupjob") + " " + $.t(startup.getName()) + " " + $.t("common.failedload"));
                                 logger.error(ex.getMessage(), ex);
                             }
                         }

@@ -1,8 +1,10 @@
 package neatlogic.framework.heartbeat.dto;
 
-import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.common.dto.BaseEditorVo;
 
-public class ServerClusterVo extends BasePageVo{
+import java.util.Date;
+
+public class ServerClusterVo extends BaseEditorVo {
 
 	public final static String STARTUP = "startup";
 	public final static String STOP = "stop";
@@ -10,18 +12,10 @@ public class ServerClusterVo extends BasePageVo{
 	private String host;
 	private Integer serverId;
 	private String status;
-	
-	public ServerClusterVo() {
-	}
-	public ServerClusterVo(Integer serverId, String status) {
-		this.serverId = serverId;
-		this.status = status;
-	}
-	public ServerClusterVo(String host, Integer serverId, String status) {
-		this.host = host;
-		this.serverId = serverId;
-		this.status = status;
-	}
+	private Integer heartbeatRate;
+	private Integer heartbeatThreshold;
+	private Date heartbeatTime;
+
 	public String getHost() {
 		return host;
 	}
@@ -39,5 +33,29 @@ public class ServerClusterVo extends BasePageVo{
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Integer getHeartbeatRate() {
+		return heartbeatRate;
+	}
+
+	public void setHeartbeatRate(Integer heartbeatRate) {
+		this.heartbeatRate = heartbeatRate;
+	}
+
+	public Integer getHeartbeatThreshold() {
+		return heartbeatThreshold;
+	}
+
+	public void setHeartbeatThreshold(Integer heartbeatThreshold) {
+		this.heartbeatThreshold = heartbeatThreshold;
+	}
+
+	public Date getHeartbeatTime() {
+		return heartbeatTime;
+	}
+
+	public void setHeartbeatTime(Date heartbeatTime) {
+		this.heartbeatTime = heartbeatTime;
 	}
 }

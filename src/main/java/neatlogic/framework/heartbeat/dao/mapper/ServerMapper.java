@@ -9,21 +9,25 @@ import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 
 public interface ServerMapper {
 	//SELECT
-	List<ServerClusterVo> getInactivatedServer(@Param("currentServerId")int currentServerId, @Param("threshold")int threshold);
-	List<ServerClusterVo> getServerByStatus(String status);
+	List<Integer> getInactivatedServerIdList(@Param("fromServerId")int fromServerId, @Param("threshold")int threshold);
+
 	ServerClusterVo getServerByServerId(Integer serverId);
-	List<ServerCounterVo> getServerCounterIncreaseByFromServerId(Integer fromServerId);
+
+	List<ServerClusterVo> getAllServerList();
 	//UPDATE
 	int updateServerByServerId(ServerClusterVo server);
 
+	int updateServerHostByServerId(ServerClusterVo serverClusterVo);
+
 	int resetCounterByToServerId(int toServerId);
 
-	int updateServerCounterIncrementByOneByFromServerId(Integer fromServerId);
+	int updateServerHeartbeatTimeByServerId(int scheduleServerId);
 	
 	//INSERT
 	int insertServer(ServerClusterVo server);
-	int replaceServerCounter(ServerCounterVo serverCounter);
+
+	int insertServerCounter(ServerCounterVo serverCounter);
 	
 	//DELETE
-	int deleteCounterByServerId(int serverId);
+	int deleteCounterByToServerId(int serverId);
 }

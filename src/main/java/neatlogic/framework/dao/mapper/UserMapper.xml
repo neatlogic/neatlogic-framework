@@ -1204,7 +1204,6 @@ limitations under the License.
                             `pinyin`,
                             `is_active`,
                             `user_info`,
-                            `is_super_admin`,
                             `vip_level`)
         VALUES (#{id},
                 #{uuid},
@@ -1215,7 +1214,6 @@ limitations under the License.
                 #{pinyin},
                 #{isActive},
                 #{userInfo},
-                #{isSuperAdmin},
                 #{vipLevel})
     </insert>
 
@@ -1338,9 +1336,6 @@ limitations under the License.
         </if>
         <if test="vipLevel != null">
             `vip_level` = #{vipLevel},
-        </if>
-        <if test="isSuperAdmin != null">
-            `is_super_admin` = #{isSuperAdmin},
         </if>
         `pinyin` = #{pinyin}
         WHERE `uuid` = #{uuid}
@@ -1487,16 +1482,6 @@ limitations under the License.
         set `token` = #{token}
         where uuid = #{uuid}
     </update>
-    <update id="updateSuperAdminByUuidList">
-        update user set is_super_admin = #{isSuperAdmin} where uuid
-        in
-        <foreach collection="userUuidList" item="value" separator="," open="(" close=")">
-            #{value}
-        </foreach>
-    </update>
-    <update id="updateDelSuperAdmin">
-        update user
-        set is_super_admin = 0
-    </update>
+
 </mapper>
 

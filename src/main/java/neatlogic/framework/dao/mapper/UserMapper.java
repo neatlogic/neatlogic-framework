@@ -249,9 +249,5 @@ public interface UserMapper {
 
     void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
 
-    void updateSuperAdminByUuidList(@Param("userUuidList") List<String> userUuidList, @Param("isSuperAdmin") Integer isSuperAdmin);
-
-    void updateDelSuperAdmin();
-
     void deleteUserDataByUserUuid(String userUuid);
 }

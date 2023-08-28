@@ -23,7 +23,6 @@ import com.alibaba.nacos.api.exception.NacosException;
 import neatlogic.framework.common.RootConfiguration;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18nUtils;
-import neatlogic.framework.util.RegexUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -33,10 +32,11 @@ import org.springframework.context.annotation.DependsOn;
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @DependsOn({"i18nManager", "messageSourceAccessor"})
 @RootConfiguration
@@ -48,7 +48,7 @@ public class Config {
     private static final String SERVER_ID_FILE = "serverid.conf";
 
     public static int SCHEDULE_SERVER_ID;
-//    public static String SERVER_HOST;
+    //    public static String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
     private static String JWT_SECRET = "neatlogic#neatlogic$secret";
@@ -110,7 +110,7 @@ public class Config {
 
     private static String WECHAT_SEND_MESSAGE_URL; //推送企业微信通知链接
 
-    private static String LICENSE_PK; //license公钥
+    private static final String LICENSE_PK = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHfhFEod4K3VlDdF0zGFLeavGyokUt/Njczl/4yAwpOvTUNW0x3C4Uc49NjP3Vr8KYYbsXk7DKv+8hoENGfltSzepmPpX4Mu+iclUqyaLbLHoX+rB7SagjiekuG3B1/ADPLsuG6VFkC00yEFkMUmZhU5IVbTTTKEpCtH8bJxa1aQIDAQAB"; //license公钥
 
     private static String LICENSE; //license
 
@@ -393,6 +393,7 @@ public class Config {
     public static String AUTOEXEC_TOKEN() {
         return AUTOEXEC_TOKEN;
     }
+
     private void initConfigFile() {
         try {
             StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
@@ -531,7 +532,7 @@ public class Config {
 //            WECHAT_APP_SECRET = prop.getProperty("wechat.app.secret");
 //            WECHAT_APP_AGENT_ID = prop.getProperty("wechat.app.agent.id");
 
-            LICENSE_PK = prop.getProperty("license.pk");
+            //LICENSE_PK = prop.getProperty("license.pk");
             LICENSE = prop.getProperty("license");
             SUPERADMIN = prop.getProperty("superadmin", "administrator");
             SUPERADMIN_PASSWORD = prop.getProperty("superadmin.password", "RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");

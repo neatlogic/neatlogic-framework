@@ -29,10 +29,7 @@ import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
-import neatlogic.framework.exception.type.ApiNotFoundException;
-import neatlogic.framework.exception.type.ComponentNotFoundException;
-import neatlogic.framework.exception.type.ParamJSONIrregularException;
-import neatlogic.framework.exception.type.PermissionDeniedException;
+import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
@@ -330,7 +327,11 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
-
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(550);
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -398,6 +399,11 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(550);
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -456,6 +462,11 @@ public class ApiDispatcher {
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(550);
+            logger.error(ex.getMessage());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
@@ -530,6 +541,11 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(550);
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
             response.setStatus(520);
             if (logger.isWarnEnabled()) {
@@ -591,6 +607,11 @@ public class ApiDispatcher {
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(550);
+            logger.error(ex.getMessage());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {

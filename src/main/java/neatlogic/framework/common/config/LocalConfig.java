@@ -79,7 +79,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             dbConfigMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
             dbConfigMap.put("db.url", prop.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
             dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
-            dbConfigMap.put("db.password", prop.getProperty("db.password", "password"));
+            dbConfigMap.put("db.password", RC4Util.decrypt(prop.getProperty("db.password", "password")));
             dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
 //            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
 //            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));

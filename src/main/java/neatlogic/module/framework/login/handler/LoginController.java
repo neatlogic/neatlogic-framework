@@ -26,6 +26,7 @@ import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.mapper.LoginMapper;
+import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
@@ -60,12 +61,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 @RequestMapping("/login/")
 public class LoginController {
+    //记录当天(重启)第一次登录时间,用于更新租户最近访问时间
+    public static Set<String> tenantVisitSet = new HashSet<>();
     Logger logger = LoggerFactory.getLogger(LoginController.class);
     @Resource
     private UserMapper userMapper;
@@ -84,6 +86,9 @@ public class LoginController {
 
     @Resource
     private AuthenticationInfoService authenticationInfoService;
+
+    @Resource
+    private TenantMapper tenantMapper;
 
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
@@ -162,6 +167,12 @@ public class LoginController {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
                 userSessionMapper.insertUserSession(checkUserVo.getUuid());
+                //更新租户visitTime
+                TenantContext.get().setUseDefaultDatasource(true);
+                if(!tenantVisitSet.contains(tenant)) {
+                    tenantMapper.updateTenantVisitTime(tenant);
+                    tenantVisitSet.add(tenant);
+                }
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");

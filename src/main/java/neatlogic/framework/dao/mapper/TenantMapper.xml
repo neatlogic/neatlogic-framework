@@ -134,7 +134,8 @@
     <select id="getAllActiveTenant" resultType="neatlogic.framework.dto.TenantVo">
         SELECT t.`uuid`,
                t.`name`,
-               t.`id`
+               t.`id`,
+               t.visit_time as visitTime
         FROM `tenant` t
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
         WHERE t.`is_active` = 1
@@ -158,6 +159,7 @@
                               `is_active`,
                               `expire_date`,
                               `status`,
+                              `fcd`,
                               `description`)
         VALUES (#{id},
                 #{uuid},
@@ -165,6 +167,7 @@
                 #{isActive},
                 #{expireDate},
                 #{status},
+                now(),
                 #{description})
     </insert>
 
@@ -262,6 +265,9 @@
         </if>
         WHERE `tenant_id` = #{tenantId}
         AND `module_id` = #{moduleId}
+    </update>
+    <update id="updateTenantVisitTime">
+        update `tenant` set `visit_time` = now() where `uuid` = #{value}
     </update>
 
     <delete id="deleteTenantModuleGroupByTenantId" parameterType="java.lang.Long">

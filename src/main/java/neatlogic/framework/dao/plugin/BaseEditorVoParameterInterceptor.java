@@ -50,11 +50,11 @@ public class BaseEditorVoParameterInterceptor implements Interceptor {
         }
         BaseEditorVo baseEditorVo = (BaseEditorVo) parameterObject;
         // 如果fcu字段为null，将当前用户uuid赋值给fcu字段
-        if (baseEditorVo.getFcu() == null) {
+        if (baseEditorVo.getFcu() == null && UserContext.get() != null) {
             baseEditorVo.setFcu(UserContext.get().getUserUuid());
         }
         // 如果lcu字段为null，将当前用户uuid赋值给lcu字段
-        if (baseEditorVo.getLcu() == null) {
+        if (baseEditorVo.getLcu() == null && UserContext.get() != null) {
             baseEditorVo.setLcu(UserContext.get().getUserUuid());
         }
         return invocation.proceed();

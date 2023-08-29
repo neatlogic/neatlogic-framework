@@ -223,7 +223,7 @@ public class TimeUtil {
      * @param day 减的天数
      * @return 日期字符串
      */
-    public static String descDateByWorkDay(Date date, int day) {
+    public static String descDateStrByWorkDay(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         for (int i = 0; i < day; i++) {
@@ -233,6 +233,24 @@ public class TimeUtil {
             }
         }
         return TimeUtil.convertDateToString(calendar.getTime(), TimeUtil.FMT_yyyy_MM_dd);
+    }
+
+    /**
+     * 跳过周末找n天前的日期
+     * @param date 日期
+     * @param day 减的天数
+     * @return 日期字符串
+     */
+    public static Date descDateByWorkDay(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        for (int i = 0; i < day; i++) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            if (checkHoliday(calendar)) {
+                i--;
+            }
+        }
+        return calendar.getTime();
     }
 
     public static boolean checkHoliday(Calendar calendar) {

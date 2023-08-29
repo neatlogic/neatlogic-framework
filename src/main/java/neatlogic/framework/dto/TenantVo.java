@@ -18,7 +18,7 @@ package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
-import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class TenantVo extends BasePageVo {
+public class TenantVo extends BaseEditorVo {
     private static final long serialVersionUID = 5037087043421533431L;
 
     public enum Status {
@@ -109,6 +109,9 @@ public class TenantVo extends BasePageVo {
     @JSONField(serialize = false)
     @EntityField(name = "超级管理员 租户创建时使用", type = ApiParamType.JSONOBJECT)
     private UserVo superAdmin;
+
+    @EntityField(name = "访问时间", type = ApiParamType.LONG)
+    private Date visitTime;
 
     public TenantVo() {
         this.setPageSize(20);
@@ -243,5 +246,13 @@ public class TenantVo extends BasePageVo {
 
     public void setSuperAdmin(UserVo superAdmin) {
         this.superAdmin = superAdmin;
+    }
+
+    public Date getVisitTime() {
+        return visitTime;
+    }
+
+    public void setVisitTime(Date visitTime) {
+        this.visitTime = visitTime;
     }
 }

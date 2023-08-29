@@ -56,6 +56,8 @@ public interface TenantMapper {
 
     int updateTenantModule(TenantModuleVo tenantModuleVo);
 
+    int updateTenantVisitTime(String tenant);
+
     int checkTenantUuidIsExists(TenantVo tenantVo);
 
     int deleteTenantModuleGroupByTenantId(Long tenantId);

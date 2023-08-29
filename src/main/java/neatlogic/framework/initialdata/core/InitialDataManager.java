@@ -23,7 +23,6 @@ import neatlogic.framework.exception.module.TableIsNotEmptyException;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
@@ -194,13 +190,13 @@ public class InitialDataManager {
             String[] tables = moduleTableMap.get(moduleId);
             if (tables != null && tables.length > 0) {
                 //加入checksum文件
-                InputStream checksumIs = new StringInputStream(Md5Util.encryptMD5(moduleId), "utf-8");
+                InputStream checksumIs = new ByteArrayInputStream(Md5Util.encryptMD5(moduleId).getBytes(StandardCharsets.UTF_8));
                 zos.putNextEntry(new ZipEntry("checksum"));
                 IOUtils.copy(checksumIs, zos);
                 zos.closeEntry();
                 for (String table : tables) {
                     List<String> sqlList = exportTable(table);
-                    InputStream is = new StringInputStream(String.join("", sqlList), "utf-8");
+                    InputStream is = new ByteArrayInputStream(String.join("", sqlList).getBytes(StandardCharsets.UTF_8));
                     zos.putNextEntry(new ZipEntry(table + ".sql"));
                     IOUtils.copy(is, zos);
                     zos.closeEntry();

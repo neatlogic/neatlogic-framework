@@ -108,19 +108,19 @@ public enum SystemUser {
         return "";
     }
 
-    public static UserVo getUserVoByUserUuid(String userUuid){
-        for (SystemUser user : values()) {
-            if (user.getUserUuid().equals(userUuid)) {
-                return user.getUserVo();
+    public static UserVo getUserVoByUser(String user){
+        for (SystemUser systemUser : values()) {
+            if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
+                return systemUser.getUserVo();
             }
         }
         return null;
     }
 
-    public static String getUserTokenByUserUuid(String userUuid){
-        for (SystemUser user : values()) {
-            if (user.getUserUuid().equals(userUuid)) {
-                return user.getToken();
+    public static String getUserTokenByUser(String user){
+        for (SystemUser systemUser : values()) {
+            if (systemUser.getUserUuid().equals(user)|| systemUser.getUserId().equals(user)) {
+                return systemUser.getToken();
             }
         }
         return null;

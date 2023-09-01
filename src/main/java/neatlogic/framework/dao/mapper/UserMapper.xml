@@ -25,10 +25,10 @@ limitations under the License.
         where user_id = #{value}
     </select>
 
-    <select id="getUserTokenByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="getUserTokenByUser" parameterType="java.lang.String" resultType="java.lang.String">
         select token
         from `user`
-        where uuid = #{value}
+        where uuid = #{value} or user_id = #{value}
     </select>
 
 
@@ -122,6 +122,22 @@ limitations under the License.
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
         WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserByUser" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="true">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      as isActive,
+               a.`user_info`      as userInfo,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        WHERE a.`uuid` = #{value} or a.`user_id` = #{value}
     </select>
 
     <resultMap id="userInfoMap" type="neatlogic.framework.dto.UserVo">

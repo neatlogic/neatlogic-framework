@@ -186,14 +186,14 @@ public class UserServiceImpl implements UserService {
     /**
      * 根据用户userId获取用户token
      *
-     * @param userUuid 用户userUuid
+     * @param user 用户userUuid | userId
      * @return token
      */
     @Override
-    public String getUserTokenByUserUuid(String userUuid) {
-        String token = SystemUser.getUserTokenByUserUuid(userUuid);
+    public String getUserTokenByUser(String user) {
+        String token = SystemUser.getUserTokenByUser(user);
         if (StringUtils.isBlank(token)) {
-            token = userMapper.getUserTokenByUserUuid(userUuid);
+            token = userMapper.getUserTokenByUser(user);
         }
         return token;
     }
@@ -202,16 +202,16 @@ public class UserServiceImpl implements UserService {
     /**
      * 根据用户
      *
-     * @param userUuid 用户userUuid
+     * @param user 用户userUuid
      * @return userVo
      */
     @Override
-    public UserVo getUserByUserUuid(String userUuid) {
-        UserVo user = SystemUser.getUserVoByUserUuid(userUuid);
-        if (user == null) {
-            user = userMapper.getUserByUserUuid(userUuid);
+    public UserVo getUserByUser(String user) {
+        UserVo userVo = SystemUser.getUserVoByUser(user);
+        if (userVo == null) {
+            userVo = userMapper.getUserByUser(user);
         }
-        return user;
+        return userVo;
     }
 
 }

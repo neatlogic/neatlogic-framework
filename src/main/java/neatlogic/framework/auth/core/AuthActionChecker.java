@@ -99,7 +99,7 @@ public class AuthActionChecker {
             return true;
         }
         //系统用户无需鉴权
-        if (SystemUser.getUserTokenByUserUuid(userUuid) != null) {
+        if (SystemUser.getUserTokenByUser(userUuid) != null) {
             return true;
         }
         //超级管理员无需鉴权

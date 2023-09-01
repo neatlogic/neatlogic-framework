@@ -24,7 +24,7 @@ import java.util.List;
 public interface UserMapper {
     String getUserTokenByUserId(String userId);
 
-    String getUserTokenByUserUuid(String userId);
+    String getUserTokenByUser(String userId);
 
 
     int checkUserAuthorityIsExists(@Param("userUuid") String userUuid, @Param("authList") List<String> authList);
@@ -49,6 +49,8 @@ public interface UserMapper {
     UserVo getUserByUserId(String userId);
 
     UserVo getUserByUserUuid(String userId);
+
+    UserVo getUserByUser(String user);
 
     UserVo getUserById(Long id);
 

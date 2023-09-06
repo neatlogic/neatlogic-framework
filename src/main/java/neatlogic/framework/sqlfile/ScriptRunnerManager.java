@@ -212,7 +212,7 @@ public class ScriptRunnerManager {
             try {
                 conn = JdbcUtil.getNeatlogicDataSource(tenant, isDataDb).getConnection();
             } catch (Exception exception) {
-                System.out.println("租户:" + tenant.getName() + "[" + tenant.getName() + "] 连接不上,请确认neatlogic库的datasource该租户的数据是否正确后重启");
+                System.out.println(I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect",tenant.getUuid()));
                 System.exit(1);
             }
             runner = new ScriptRunner(conn);

@@ -21,7 +21,6 @@ import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import neatlogic.framework.common.RootConfiguration;
-import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
@@ -434,8 +433,8 @@ public class Config {
             }
             SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
         } catch (Exception ex) {
-            logger.error($.t("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
-            System.out.println($.t("【配置文件初始化失败】请在“{0}”中配置服务器id，确保每个节点的id不一样。(注意只需要在“{0}”填具体数字，如：1)", SERVER_ID_FILE));
+            logger.error("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
+            System.out.println("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
             throw ex;
         }
 

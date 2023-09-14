@@ -18,11 +18,11 @@ package neatlogic.framework.importexport.exception;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class ImportExportHandlerNotFoundException extends ApiRuntimeException {
+public class ImportExportTypeInconsistencyException extends ApiRuntimeException {
 
-    private static final long serialVersionUID = 8277880771507304406L;
+    private static final long serialVersionUID = 8277880771507304466L;
 
-    public ImportExportHandlerNotFoundException(String type) {
-        super("导入导出处理器：{0}找不到", type);
+    public ImportExportTypeInconsistencyException(String sourceType, String targetType) {
+        super("导入类型与目标类型不一致，不能将{0}类型的数据导入到{1}类型中", sourceType, targetType);
     }
 }

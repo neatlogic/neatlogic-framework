@@ -22,6 +22,7 @@ import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
 
 import java.util.List;
+import java.util.zip.ZipOutputStream;
 
 public interface ImportExportHandler {
     ImportExportHandlerType getType();
@@ -30,5 +31,5 @@ public interface ImportExportHandler {
 
     Long importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList);
 
-    ImportExportVo exportData(Object primaryKey, List<ImportExportVo> dependencyList);
+    ImportExportVo exportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream);
 }

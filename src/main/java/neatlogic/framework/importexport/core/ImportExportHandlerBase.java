@@ -16,14 +16,22 @@
 
 package neatlogic.framework.importexport.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.importexport.dto.*;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public abstract class ImportExportHandlerBase implements ImportExportHandler {
+
+    private static Logger logger = LoggerFactory.getLogger(ImportExportHandlerBase.class);
 
     @Override
     public List<ImportDependencyTypeVo> checkDependencyList(List<ImportExportBaseInfoVo> dependencyBaseInfoList) {
@@ -64,27 +72,34 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
     }
 
     @Override
-    public ImportExportVo exportData(Object primaryKey, List<ImportExportVo> dependencyList) {
-        for (ImportExportVo importExportVo : dependencyList) {
+    public ImportExportVo exportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
+        for (ImportExportBaseInfoVo importExportVo : dependencyList) {
             if (Objects.equals(importExportVo.getPrimaryKey(), primaryKey) && Objects.equals(importExportVo.getType(), this.getType().getValue())) {
                 return null;
             }
         }
-        ImportExportVo importExportVo = myExportData(primaryKey, dependencyList);
+        ImportExportVo importExportVo = myExportData(primaryKey, dependencyList, zipOutputStream);
         importExportVo.setType(this.getType().getValue());
         return importExportVo;
     }
 
-    protected abstract ImportExportVo myExportData(Object primaryKey, List<ImportExportVo> dependencyList);
+    protected abstract ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream);
 
-    protected void doExportData(ImportExportHandlerType type, Object primaryKey, List<ImportExportVo> dependencyList) {
+    protected void doExportData(ImportExportHandlerType type, Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(type.getValue());
         if (importExportHandler == null) {
             throw new ImportExportHandlerNotFoundException(type.getText());
         }
-        ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList);
+        ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
-            dependencyList.add(importExportVo);
+            dependencyList.add(new ImportExportBaseInfoVo(importExportVo.getType(), importExportVo.getPrimaryKey(), importExportVo.getName()));
+            try {
+                zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
+                zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));
+                zipOutputStream.closeEntry();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 

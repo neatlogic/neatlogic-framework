@@ -16,23 +16,32 @@
 
 package neatlogic.module.framework.importexport.handler;
 
+import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.exception.file.FileNotFoundException;
 import neatlogic.framework.file.dao.mapper.FileMapper;
 import neatlogic.framework.file.dto.FileVo;
+import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
 import neatlogic.framework.importexport.core.ImportExportHandlerBase;
 import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
-import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class FileImportExportHandler extends ImportExportHandlerBase {
 
+    private Logger logger = LoggerFactory.getLogger(FileImportExportHandler.class);
     @Resource
     private FileMapper fileMapper;
 
@@ -57,11 +66,37 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
     }
 
     @Override
-    protected ImportExportVo myExportData(Object primaryKey, List<ImportExportVo> dependencyList) {
+    protected ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         Long id = (Long) primaryKey;
         FileVo fileVo = fileMapper.getFileById(id);
         if (fileVo == null) {
             throw new FileNotFoundException(id);
+        }
+        InputStream in = null;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+            in = FileUtil.getData(fileVo.getPath());
+            if (in != null) {
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) != -1) {
+                    out.write(buf, 0, len);
+                }
+                zipOutputStream.putNextEntry(new ZipEntry("attachment-folder/" + fileVo.getId() + "/" + fileVo.getName()));
+                zipOutputStream.write(out.toByteArray());
+                zipOutputStream.closeEntry();
+                in.close();
+                out.reset();
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         ImportExportVo importExportVo = new ImportExportVo(this.getType().getValue(), primaryKey, fileVo.getName());
         importExportVo.setDataWithObject(fileVo);

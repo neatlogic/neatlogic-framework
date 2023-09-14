@@ -37,11 +37,12 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -87,7 +88,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     }
 
-    public static JSONObject importData(InputStream inputStream, String type, String userSelection) {
+    public static JSONObject importData(MultipartFile multipartFile, String targetType, String userSelection) {
         boolean checkAll = false;
         List<ImportDependencyTypeVo> typeList = new ArrayList<>();
 //        System.out.println("userSelection = " + userSelection);
@@ -104,7 +105,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         byte[] buf = new byte[1024];
         // 第一次遍历压缩包，检查是否有依赖项需要询问用户是否导入
         if (StringUtils.isBlank(userSelection)) {
-            try (ZipInputStream zipIs = new ZipInputStream(inputStream);
+            try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());
                  ByteArrayOutputStream out = new ByteArrayOutputStream()
             ) {
                 ZipEntry zipEntry = null;
@@ -127,8 +128,8 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                             out.write(buf, 0, len);
                         }
                         ImportExportVo mainImportExportVo = JSONObject.parseObject(new String(out.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
-                        if (!Objects.equals(mainImportExportVo.getType(), type)) {
-                            throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), type);
+                        if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
+                            throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
                         }
                         List<ImportExportBaseInfoVo> dependencyBaseInfoList = mainImportExportVo.getDependencyBaseInfoList();
                         if (CollectionUtils.isNotEmpty(dependencyBaseInfoList) && StringUtils.isBlank(userSelection)) {
@@ -148,14 +149,14 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
         }
         List<ImportExportPrimaryChangeVo> primaryChangeList = new ArrayList<>();
         Map<Long, FileVo> fileMap = new HashMap<>();
         // 第二次遍历压缩包，导入dependency-folder/{primaryKey}.json和{primaryKey}.json文件
-        try (ZipInputStream zipIs = new ZipInputStream(inputStream);
+        try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());
              ByteArrayOutputStream out = new ByteArrayOutputStream()
         ) {
             ZipEntry zipEntry = null;
@@ -207,11 +208,11 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                     importExportHandler.importData(importExportVo, primaryChangeList);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
         // 第三次遍历压缩包，导入attachment-folder/{primaryKey}/xxx文件
-        try (ZipInputStream zipIs = new ZipInputStream(inputStream);
+        try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());
              ByteArrayOutputStream out = new ByteArrayOutputStream()
         ) {
             ZipEntry zipEntry = null;

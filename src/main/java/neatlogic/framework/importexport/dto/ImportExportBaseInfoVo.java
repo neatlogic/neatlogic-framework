@@ -28,6 +28,11 @@ public class ImportExportBaseInfoVo implements Serializable {
     public ImportExportBaseInfoVo() {
     }
 
+    public ImportExportBaseInfoVo(String type, Object primaryKey) {
+        this.type = type;
+        this.primaryKey = primaryKey;
+    }
+
     public ImportExportBaseInfoVo(String type, Object primaryKey, String name) {
         this.type = type;
         this.primaryKey = primaryKey;

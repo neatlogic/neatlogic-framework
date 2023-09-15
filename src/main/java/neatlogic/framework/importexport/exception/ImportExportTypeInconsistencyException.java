@@ -23,6 +23,6 @@ public class ImportExportTypeInconsistencyException extends ApiRuntimeException 
     private static final long serialVersionUID = 8277880771507304466L;
 
     public ImportExportTypeInconsistencyException(String sourceType, String targetType) {
-        super("导入类型与目标类型不一致，不能将{0}类型的数据导入到{1}类型中", sourceType, targetType);
+        super("nfie.importexporttypeinconsistencyexception.importexporttypeinconsistencyexception", sourceType, targetType);
     }
 }

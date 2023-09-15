@@ -23,6 +23,6 @@ public class ImportExportHandlerNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 8277880771507304406L;
 
     public ImportExportHandlerNotFoundException(String type) {
-        super("导入导出处理器：{0}找不到", type);
+        super("nfie.importexporthandlernotfoundexception.importexporthandlernotfoundexception", type);
     }
 }

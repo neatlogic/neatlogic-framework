@@ -23,6 +23,6 @@ public class ImportNoAuthException extends ApiRuntimeException {
     private static final long serialVersionUID = 8277881771507304406L;
 
     public ImportNoAuthException() {
-        super("没有导入权限");
+        super("nfie.importnoauthexception.importnoauthexception");
     }
 }

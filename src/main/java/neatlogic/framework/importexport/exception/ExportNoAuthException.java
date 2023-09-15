@@ -23,6 +23,6 @@ public class ExportNoAuthException extends ApiRuntimeException {
     private static final long serialVersionUID = 8277882771507304406L;
 
     public ExportNoAuthException() {
-        super("没有导出权限");
+        super("nfie.exportnoauthexception.exportnoauthexception");
     }
 }

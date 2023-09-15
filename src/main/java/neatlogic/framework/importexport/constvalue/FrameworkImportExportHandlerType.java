@@ -19,7 +19,7 @@ package neatlogic.framework.importexport.constvalue;
 import neatlogic.framework.importexport.core.ImportExportHandlerType;
 
 public enum FrameworkImportExportHandlerType implements ImportExportHandlerType {
-    FILE("file", "附件"),
+    FILE("file", "common.attachment"),
     ;
 
     private String value;

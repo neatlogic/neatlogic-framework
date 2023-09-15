@@ -75,12 +75,21 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
     public ImportExportVo exportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         for (ImportExportBaseInfoVo importExportVo : dependencyList) {
             if (Objects.equals(importExportVo.getPrimaryKey(), primaryKey) && Objects.equals(importExportVo.getType(), this.getType().getValue())) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(importExportVo.getType() + "类型的主键为" + importExportVo.getPrimaryKey() + "的数据已经导出");
+                }
                 return null;
             }
         }
+        ImportExportBaseInfoVo dependency = new ImportExportBaseInfoVo(this.getType().getValue(), primaryKey);
+        dependencyList.add(dependency);
         ImportExportVo importExportVo = myExportData(primaryKey, dependencyList, zipOutputStream);
-        importExportVo.setType(this.getType().getValue());
-        return importExportVo;
+        if (importExportVo != null) {
+            importExportVo.setType(this.getType().getValue());
+            dependency.setName(importExportVo.getName());
+            return importExportVo;
+        }
+        return null;
     }
 
     protected abstract ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream);
@@ -92,7 +101,9 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         }
         ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
-            dependencyList.add(new ImportExportBaseInfoVo(importExportVo.getType(), importExportVo.getPrimaryKey(), importExportVo.getName()));
+            if (logger.isWarnEnabled()) {
+                logger.warn("导出数据：" + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
+            }
             try {
                 zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
                 zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));

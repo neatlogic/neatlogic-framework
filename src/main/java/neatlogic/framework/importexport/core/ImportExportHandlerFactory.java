@@ -30,6 +30,7 @@ import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerT
 import neatlogic.framework.importexport.dto.*;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import neatlogic.framework.importexport.exception.ImportExportTypeInconsistencyException;
+import neatlogic.framework.importexport.exception.ImportNoAuthException;
 import neatlogic.module.framework.file.handler.LocalFileSystemHandler;
 import neatlogic.module.framework.file.handler.MinioFileSystemHandler;
 import org.apache.commons.collections4.CollectionUtils;
@@ -128,15 +129,18 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                             out.write(buf, 0, len);
                         }
                         ImportExportVo mainImportExportVo = JSONObject.parseObject(new String(out.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
+                        ImportExportHandler importExportHandler = getHandler(mainImportExportVo.getType());
+                        if (importExportHandler == null) {
+                            throw new ImportExportHandlerNotFoundException(mainImportExportVo.getType());
+                        }
+                        if (!importExportHandler.checkImportAuth(mainImportExportVo)) {
+                            throw new ImportNoAuthException();
+                        }
                         if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
                             throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
                         }
                         List<ImportExportBaseInfoVo> dependencyBaseInfoList = mainImportExportVo.getDependencyBaseInfoList();
                         if (CollectionUtils.isNotEmpty(dependencyBaseInfoList) && StringUtils.isBlank(userSelection)) {
-                            ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(mainImportExportVo.getType());
-                            if (importExportHandler == null) {
-                                throw new ImportExportHandlerNotFoundException(mainImportExportVo.getType());
-                            }
                             List<ImportDependencyTypeVo> importDependencyTypeList = importExportHandler.checkDependencyList(dependencyBaseInfoList);
                             if (CollectionUtils.isNotEmpty(importDependencyTypeList)) {
                                 JSONObject resultObj = new JSONObject();
@@ -178,16 +182,22 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         flag = check(typeList, dependencyVo.getType(), dependencyVo.getPrimaryKey());
                     }
                     if (flag) {
-                        ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(dependencyVo.getType());
+                        ImportExportHandler importExportHandler = getHandler(dependencyVo.getType());
                         if (importExportHandler == null) {
                             throw new ImportExportHandlerNotFoundException(dependencyVo.getType());
                         }
                         Object oldPrimaryKey = dependencyVo.getPrimaryKey();
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("导入数据：" + dependencyVo.getType() + "-" + dependencyVo.getName() + "-" + dependencyVo.getPrimaryKey());
+                        }
                         Long newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
                         if (!Objects.equals(oldPrimaryKey, newPrimaryKey)) {
+                            if (logger.isWarnEnabled()) {
+                                logger.warn("oldPrimaryKey = " + oldPrimaryKey + ",newPrimaryKey = " + newPrimaryKey);
+                            }
                             primaryChangeList.add(new ImportExportPrimaryChangeVo(dependencyVo.getType(), oldPrimaryKey, newPrimaryKey));
                         }
-                        if (Objects.equals(dependencyVo.getType(), "file")) {
+                        if (Objects.equals(dependencyVo.getType(), FrameworkImportExportHandlerType.FILE.getValue())) {
                             FileVo fileVo = dependencyVo.getData().toJavaObject(FileVo.class);
                             fileMap.put(fileVo.getId(), fileVo);
                         }
@@ -201,7 +211,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         out.write(buf, 0, len);
                     }
                     ImportExportVo importExportVo = JSONObject.parseObject(new String(out.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
-                    ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(importExportVo.getType());
+                    ImportExportHandler importExportHandler = getHandler(importExportVo.getType());
                     if (importExportHandler == null) {
                         throw new ImportExportHandlerNotFoundException(importExportVo.getType());
                     }

@@ -51,6 +51,16 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
     }
 
     @Override
+    public boolean checkImportAuth(ImportExportVo importExportVo) {
+        return true;
+    }
+
+    @Override
+    public boolean checkExportAuth(Object primaryKey) {
+        return true;
+    }
+
+    @Override
     public boolean checkIsExists(ImportExportBaseInfoVo importExportBaseInfoVo) {
         return fileMapper.getFileById((Long) importExportBaseInfoVo.getPrimaryKey()) != null;
     }
@@ -86,6 +96,9 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
                 zipOutputStream.closeEntry();
                 in.close();
                 out.reset();
+            }
+            if (logger.isWarnEnabled()) {
+                logger.warn("导出文件：" + fileVo.getName());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

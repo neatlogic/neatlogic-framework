@@ -21,6 +21,7 @@ import neatlogic.framework.importexport.dto.*;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,11 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
             ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(dependencyBaseInfoVo.getType());
             if (importExportHandler == null) {
                 throw new ImportExportHandlerNotFoundException(dependencyBaseInfoVo.getType());
+            }
+            if (StringUtils.isBlank(dependencyBaseInfoVo.getName())) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("依赖对象" + JSONObject.toJSONString(dependencyBaseInfoVo) + "的名称为空");
+                }
             }
             if (importExportHandler.checkIsExists(dependencyBaseInfoVo)) {
                 ImportDependencyTypeVo importDependencyTypeVo = importDependencyTypeMap.get(dependencyBaseInfoVo.getType());
@@ -73,20 +79,9 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
 
     @Override
     public ImportExportVo exportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
-        for (ImportExportBaseInfoVo importExportVo : dependencyList) {
-            if (Objects.equals(importExportVo.getPrimaryKey(), primaryKey) && Objects.equals(importExportVo.getType(), this.getType().getValue())) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(importExportVo.getType() + "类型的主键为" + importExportVo.getPrimaryKey() + "的数据已经导出");
-                }
-                return null;
-            }
-        }
-        ImportExportBaseInfoVo dependency = new ImportExportBaseInfoVo(this.getType().getValue(), primaryKey);
-        dependencyList.add(dependency);
         ImportExportVo importExportVo = myExportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
             importExportVo.setType(this.getType().getValue());
-            dependency.setName(importExportVo.getName());
             return importExportVo;
         }
         return null;
@@ -99,11 +94,22 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         if (importExportHandler == null) {
             throw new ImportExportHandlerNotFoundException(type.getText());
         }
+        for (ImportExportBaseInfoVo importExportVo : dependencyList) {
+            if (Objects.equals(importExportVo.getPrimaryKey(), primaryKey) && Objects.equals(importExportVo.getType(), type.getValue())) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(importExportVo.getType() + "类型的主键为" + importExportVo.getPrimaryKey() + "的数据已经导出");
+                }
+                return;
+            }
+        }
+        ImportExportBaseInfoVo dependencyVo = new ImportExportBaseInfoVo(type.getValue(), primaryKey);
+        dependencyList.add(dependencyVo);
         ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
             if (logger.isWarnEnabled()) {
                 logger.warn("导出数据：" + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
             }
+            dependencyVo.setName(importExportVo.getName());
             try {
                 zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
                 zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));

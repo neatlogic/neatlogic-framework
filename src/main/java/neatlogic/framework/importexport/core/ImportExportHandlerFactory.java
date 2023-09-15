@@ -186,7 +186,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         if (logger.isWarnEnabled()) {
                             logger.warn("导入数据：" + dependencyVo.getType() + "-" + dependencyVo.getName() + "-" + dependencyVo.getPrimaryKey());
                         }
-                        Long newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
+                        Object newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
                         if (!Objects.equals(oldPrimaryKey, newPrimaryKey)) {
                             if (logger.isWarnEnabled()) {
                                 logger.warn("oldPrimaryKey = " + oldPrimaryKey + ",newPrimaryKey = " + newPrimaryKey);

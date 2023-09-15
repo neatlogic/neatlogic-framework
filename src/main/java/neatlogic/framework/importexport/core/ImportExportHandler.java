@@ -66,7 +66,7 @@ public interface ImportExportHandler {
      * @param primaryChangeList 导入依赖对象中主键发生改变的主键映射对象列表
      * @return
      */
-    Long importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList);
+    Object importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList);
 
     /**
      * 导出数据

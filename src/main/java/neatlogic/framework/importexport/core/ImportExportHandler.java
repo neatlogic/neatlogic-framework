@@ -25,8 +25,15 @@ import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 public interface ImportExportHandler {
+
     ImportExportHandlerType getType();
+
+    boolean checkImportAuth(ImportExportVo importExportVo);
+
+    boolean checkExportAuth(Object primaryKey);
+
     boolean checkIsExists(ImportExportBaseInfoVo importExportBaseInfoVo);
+
     List<ImportDependencyTypeVo> checkDependencyList(List<ImportExportBaseInfoVo> dependencyBaseInfoList);
 
     Long importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList);

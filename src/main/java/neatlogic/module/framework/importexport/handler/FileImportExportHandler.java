@@ -98,7 +98,7 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
                 out.reset();
             }
             if (logger.isWarnEnabled()) {
-                logger.warn("导出文件：" + fileVo.getName());
+                logger.warn("export file: " + fileVo.getName());
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -47,7 +47,7 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
             }
             if (StringUtils.isBlank(dependencyBaseInfoVo.getName())) {
                 if (logger.isWarnEnabled()) {
-                    logger.warn("依赖对象" + JSONObject.toJSONString(dependencyBaseInfoVo) + "的名称为空");
+                    logger.warn("The name of the dependency object " + JSONObject.toJSONString(dependencyBaseInfoVo) + " is null");
                 }
             }
             if (importExportHandler.checkIsExists(dependencyBaseInfoVo)) {
@@ -97,7 +97,7 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         for (ImportExportBaseInfoVo importExportVo : dependencyList) {
             if (Objects.equals(importExportVo.getPrimaryKey(), primaryKey) && Objects.equals(importExportVo.getType(), type.getValue())) {
                 if (logger.isWarnEnabled()) {
-                    logger.warn(importExportVo.getType() + "类型的主键为" + importExportVo.getPrimaryKey() + "的数据已经导出");
+                    logger.warn("The data of type " + importExportVo.getType() + " whose primary key is " + importExportVo.getPrimaryKey() + " has been exported");
                 }
                 return;
             }
@@ -107,7 +107,7 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
             if (logger.isWarnEnabled()) {
-                logger.warn("导出数据：" + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
+                logger.warn("export data: " + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
             }
             dependencyVo.setName(importExportVo.getName());
             try {

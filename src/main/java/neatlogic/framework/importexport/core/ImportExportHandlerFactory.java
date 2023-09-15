@@ -92,7 +92,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
     public static JSONObject importData(MultipartFile multipartFile, String targetType, String userSelection) {
         boolean checkAll = false;
         List<ImportDependencyTypeVo> typeList = new ArrayList<>();
-//        System.out.println("userSelection = " + userSelection);
         if (StringUtils.isNotBlank(userSelection)) {
             JSONObject userSelectionObj = JSONObject.parseObject(userSelection);
             if (MapUtils.isNotEmpty(userSelectionObj)) {
@@ -123,7 +122,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         continue;
                     }
                     if (zipEntry.getName().endsWith(".json")) {
-                        System.out.println("zipEntryName0 = " + zipEntryName);
                         int len;
                         while ((len = zipIs.read(buf)) != -1) {
                             out.write(buf, 0, len);
@@ -146,7 +144,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                                 JSONObject resultObj = new JSONObject();
                                 resultObj.put("checkedAll", false);
                                 resultObj.put("typeList", importDependencyTypeList);
-                                System.out.println("resultObj = " + resultObj);
                                 return resultObj;
                             }
                             checkAll = true;
@@ -171,7 +168,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                 out.reset();
                 String zipEntryName = zipEntry.getName();
                 if (zipEntryName.startsWith("dependency-folder/")) {
-                    System.out.println("zipEntryName1 = " + zipEntryName);
                     int len;
                     while ((len = zipIs.read(buf)) != -1) {
                         out.write(buf, 0, len);
@@ -205,7 +201,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                 } else if (zipEntryName.startsWith("attachment-folder/")) {
                     continue;
                 } else {
-                    System.out.println("zipEntryName1 = " + zipEntryName);
                     int len;
                     while ((len = zipIs.read(buf)) != -1) {
                         out.write(buf, 0, len);
@@ -233,7 +228,6 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                 out.reset();
                 String zipEntryName = zipEntry.getName();
                 if (zipEntryName.startsWith("attachment-folder/")) {
-                    System.out.println("zipEntryName2 = " + zipEntryName);
                     String tenantUuid = TenantContext.get().getTenantUuid();
                     int beginIndex = zipEntryName.indexOf("/");
                     int endIndex = zipEntryName.indexOf("/", beginIndex + 1);

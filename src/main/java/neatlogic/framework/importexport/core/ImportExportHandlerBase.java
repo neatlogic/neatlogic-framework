@@ -33,7 +33,11 @@ import java.util.zip.ZipOutputStream;
 public abstract class ImportExportHandlerBase implements ImportExportHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ImportExportHandlerBase.class);
-
+    /**
+     * 检查导入依赖列表中的对象是否已经存在，存在则需要让用户决定是否覆盖
+     * @param dependencyBaseInfoList
+     * @return
+     */
     @Override
     public List<ImportDependencyTypeVo> checkDependencyList(List<ImportExportBaseInfoVo> dependencyBaseInfoList) {
         if (CollectionUtils.isEmpty(dependencyBaseInfoList)) {
@@ -76,7 +80,13 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         }
         return null;
     }
-
+    /**
+     * 导出数据
+     * @param primaryKey 导出对象主键
+     * @param dependencyList 导出对象依赖列表
+     * @param zipOutputStream 压缩输出流
+     * @return
+     */
     @Override
     public ImportExportVo exportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         ImportExportVo importExportVo = myExportData(primaryKey, dependencyList, zipOutputStream);
@@ -87,8 +97,22 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         return null;
     }
 
+    /**
+     * 导出数据
+     * @param primaryKey 导出对象主键
+     * @param dependencyList 导出对象依赖列表
+     * @param zipOutputStream 压缩输出流
+     * @return
+     */
     protected abstract ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream);
 
+    /**
+     * 导出依赖对象数据
+     * @param type
+     * @param primaryKey
+     * @param dependencyList
+     * @param zipOutputStream
+     */
     protected void doExportData(ImportExportHandlerType type, Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(type.getValue());
         if (importExportHandler == null) {
@@ -120,6 +144,13 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         }
     }
 
+    /**
+     * 获取新的primary，如果返回结果为null，说明primary没有变化
+     * @param type
+     * @param oldPrimary
+     * @param primaryChangeList
+     * @return
+     */
     protected Object getNewPrimaryKey(ImportExportHandlerType type, Object oldPrimary, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         for (ImportExportPrimaryChangeVo primaryChangeVo : primaryChangeList) {
             if (Objects.equals(primaryChangeVo.getType(), type.getValue()) && Objects.equals(primaryChangeVo.getOldPrimaryKey(), oldPrimary)) {

@@ -89,6 +89,13 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     }
 
+    /**
+     * 导入数据
+     * @param multipartFile 文件信息
+     * @param targetType    导入目标类型
+     * @param userSelection 用户选择的依赖导入选项
+     * @return
+     */
     public static JSONObject importData(MultipartFile multipartFile, String targetType, String userSelection) {
         boolean checkAll = false;
         List<ImportDependencyTypeVo> typeList = new ArrayList<>();
@@ -275,7 +282,13 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         return null;
     }
 
-
+    /**
+     * 获取新的primary，如果返回结果为null，说明primary没有变化
+     * @param type
+     * @param oldPrimary
+     * @param primaryChangeList
+     * @return
+     */
     private static Object getNewPrimaryKey(String type, Object oldPrimary, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         for (ImportExportPrimaryChangeVo primaryChangeVo : primaryChangeList) {
             if (Objects.equals(primaryChangeVo.getType(), type) && Objects.equals(primaryChangeVo.getOldPrimaryKey(), oldPrimary)) {
@@ -285,6 +298,13 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         return null;
     }
 
+    /**
+     * 检查是否需要导入数据
+     * @param typeList
+     * @param type
+     * @param primaryKey
+     * @return
+     */
     private static boolean check(List<ImportDependencyTypeVo> typeList, String type, Object primaryKey) {
         for (ImportDependencyTypeVo typeVo : typeList) {
             if (Objects.equals(typeVo.getValue(), type)) {

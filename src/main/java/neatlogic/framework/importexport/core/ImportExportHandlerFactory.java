@@ -173,30 +173,33 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         out.write(buf, 0, len);
                     }
                     ImportExportVo dependencyVo = JSONObject.parseObject(new String(out.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
+                    ImportExportHandler importExportHandler = getHandler(dependencyVo.getType());
+                    if (importExportHandler == null) {
+                        throw new ImportExportHandlerNotFoundException(dependencyVo.getType());
+                    }
+                    Object oldPrimaryKey = dependencyVo.getPrimaryKey();
                     boolean flag = true;
                     if (!checkAll) {
-                        flag = check(typeList, dependencyVo.getType(), dependencyVo.getPrimaryKey());
+                        flag = check(typeList, dependencyVo.getType(), oldPrimaryKey);
                     }
+                    Object newPrimaryKey = null;
                     if (flag) {
-                        ImportExportHandler importExportHandler = getHandler(dependencyVo.getType());
-                        if (importExportHandler == null) {
-                            throw new ImportExportHandlerNotFoundException(dependencyVo.getType());
-                        }
-                        Object oldPrimaryKey = dependencyVo.getPrimaryKey();
                         if (logger.isWarnEnabled()) {
-                            logger.warn("import data: " + dependencyVo.getType() + "-" + dependencyVo.getName() + "-" + dependencyVo.getPrimaryKey());
+                            logger.warn("import data: " + dependencyVo.getType() + "-" + dependencyVo.getName() + "-" + oldPrimaryKey);
                         }
-                        Object newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
-                        if (!Objects.equals(oldPrimaryKey, newPrimaryKey)) {
-                            if (logger.isWarnEnabled()) {
-                                logger.warn("oldPrimaryKey = " + oldPrimaryKey + ",newPrimaryKey = " + newPrimaryKey);
-                            }
-                            primaryChangeList.add(new ImportExportPrimaryChangeVo(dependencyVo.getType(), oldPrimaryKey, newPrimaryKey));
-                        }
+                        newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
                         if (Objects.equals(dependencyVo.getType(), FrameworkImportExportHandlerType.FILE.getValue())) {
                             FileVo fileVo = dependencyVo.getData().toJavaObject(FileVo.class);
                             fileMap.put(fileVo.getId(), fileVo);
                         }
+                    } else {
+                        newPrimaryKey = importExportHandler.getPrimaryByName(dependencyVo);
+                    }
+                    if (!Objects.equals(oldPrimaryKey, newPrimaryKey)) {
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("oldPrimaryKey = " + oldPrimaryKey + ",newPrimaryKey = " + newPrimaryKey);
+                        }
+                        primaryChangeList.add(new ImportExportPrimaryChangeVo(dependencyVo.getType(), oldPrimaryKey, newPrimaryKey));
                     }
                 } else if (zipEntryName.startsWith("attachment-folder/")) {
                     continue;

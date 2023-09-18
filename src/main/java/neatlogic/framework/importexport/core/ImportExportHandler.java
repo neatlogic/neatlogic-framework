@@ -54,6 +54,13 @@ public interface ImportExportHandler {
     boolean checkIsExists(ImportExportBaseInfoVo importExportBaseInfoVo);
 
     /**
+     * 通过名称判断依赖对象存在，如果用户选择不导入新的依赖对象时，需要通过名称查出primary值
+     * @param importExportVo
+     * @return
+     */
+    Object getPrimaryByName(ImportExportVo importExportVo);
+
+    /**
      * 检查导入依赖列表中的对象是否已经存在，存在则需要让用户决定是否覆盖
      * @param dependencyBaseInfoList
      * @return

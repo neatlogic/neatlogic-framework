@@ -66,6 +66,11 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
     }
 
     @Override
+    public Object getPrimaryByName(ImportExportVo importExportVo) {
+        return importExportVo.getPrimaryKey();
+    }
+
+    @Override
     public Long importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         FileVo fileVo = importExportVo.getData().toJavaObject(FileVo.class);
         if (fileMapper.getFileById(fileVo.getId()) != null) {

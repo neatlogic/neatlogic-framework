@@ -17,6 +17,7 @@
 package neatlogic.framework.importexport.constvalue;
 
 import neatlogic.framework.importexport.core.ImportExportHandlerType;
+import neatlogic.framework.util.$;
 
 public enum FrameworkImportExportHandlerType implements ImportExportHandlerType {
     FILE("file", "common.attachment"),
@@ -36,6 +37,6 @@ public enum FrameworkImportExportHandlerType implements ImportExportHandlerType 
 
     @Override
     public String getText() {
-        return this.text;
+        return $.t(this.text);
     }
 }

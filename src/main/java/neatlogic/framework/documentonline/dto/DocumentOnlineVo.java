@@ -38,6 +38,8 @@ public class DocumentOnlineVo implements Serializable {
     private String anchorPoint;
     @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
     private List<DocumentOnlineConfigVo> configList;
+    @EntityField(name = "common.prefix", type = ApiParamType.STRING)
+    private Integer prefix;
 
     public String getFileName() {
         return fileName;
@@ -85,5 +87,13 @@ public class DocumentOnlineVo implements Serializable {
 
     public void setConfigList(List<DocumentOnlineConfigVo> configList) {
         this.configList = configList;
+    }
+
+    public Integer getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(Integer prefix) {
+        this.prefix = prefix;
     }
 }

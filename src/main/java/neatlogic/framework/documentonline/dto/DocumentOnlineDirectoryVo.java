@@ -45,7 +45,7 @@ public class DocumentOnlineDirectoryVo implements Serializable {
     @EntityField(name = "common.configlist", type = ApiParamType.JSONARRAY)
     private final List<DocumentOnlineConfigVo> configList = new ArrayList<>();
     @EntityField(name = "common.prefix", type = ApiParamType.STRING)
-    private String prefix;
+    private Integer prefix;
     private boolean allowAddChild = true;
 
     public DocumentOnlineDirectoryVo(String name, boolean isFile) {
@@ -53,14 +53,14 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         this.isFile = isFile;
     }
 
-    public DocumentOnlineDirectoryVo(String prefix, String name, boolean isFile, List<String> upwardNameList) {
+    public DocumentOnlineDirectoryVo(Integer prefix, String name, boolean isFile, List<String> upwardNameList) {
         this.prefix = prefix;
         this.name = name;
         this.isFile = isFile;
         this.upwardNameList.addAll(upwardNameList);
     }
 
-    public DocumentOnlineDirectoryVo(String prefix, String name, boolean isFile, List<String> upwardNameList, String filePath, List<DocumentOnlineConfigVo> configList) {
+    public DocumentOnlineDirectoryVo(Integer prefix, String name, boolean isFile, List<String> upwardNameList, String filePath, List<DocumentOnlineConfigVo> configList) {
         this.prefix = prefix;
         this.name = name;
         this.isFile = isFile;
@@ -89,7 +89,7 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         return new ArrayList<>(children);
     }
 
-    public String getPrefix() {
+    public Integer getPrefix() {
         return prefix;
     }
 
@@ -106,6 +106,17 @@ public class DocumentOnlineDirectoryVo implements Serializable {
         for (DocumentOnlineDirectoryVo child : children) {
             child.noAllowedAddChild();
         }
+        children.sort((o1, o2) -> {
+            if (o1.getPrefix() != null && o2.getPrefix() != null) {
+                return Integer.compare(o1.getPrefix(), o2.getPrefix());
+            } else if (o1.getPrefix() != null && o2.getPrefix() == null) {
+                return -1;
+            } else if (o1.getPrefix() == null && o2.getPrefix() != null) {
+                return 1;
+            } else {
+                return String.CASE_INSENSITIVE_ORDER.compare(o1.getName(), o2.getName());
+            }
+        });
     }
 
     public List<DocumentOnlineConfigVo> getConfigList() {

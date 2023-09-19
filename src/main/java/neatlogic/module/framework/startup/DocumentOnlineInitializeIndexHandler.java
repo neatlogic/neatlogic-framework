@@ -266,12 +266,12 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 isFile = true;
                 name = name.substring(0, name.length() - 3);
             }
-            String prefix = null;
+            Integer prefix = null;
             int index = name.indexOf(".");
             if (index != -1) {
                 String sort = name.substring(0, index);
                 if (StringUtils.isNumeric(sort)) {
-                    prefix = name.substring(0, index + 1);
+                    prefix = Integer.valueOf(sort);
                     name = name.substring(index + 1);
                 }
             }

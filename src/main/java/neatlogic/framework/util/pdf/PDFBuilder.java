@@ -15,10 +15,7 @@
  */
 package neatlogic.framework.util.pdf;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.lowagie.text.PageSize;
 
@@ -123,6 +120,26 @@ public class PDFBuilder {
 
             //添加表格
             document.add(table);
+            return this;
+        }
+
+        /**
+         * 添加章节
+         * @param chapter
+         * @return
+         * @throws DocumentException
+         */
+        public Builder addCharter(Chapter chapter) throws DocumentException {
+            document.add(chapter);
+            return this;
+        }
+
+        /**
+         * 重新开始一页
+         * @return
+         */
+        public Builder newPage() {
+            document.newPage();
             return this;
         }
 

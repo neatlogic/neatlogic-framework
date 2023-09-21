@@ -43,6 +43,7 @@ public class TableBuilder {
         //new PdfPTable必填入参， 将表格分成几等份
         this.table = new PdfPTable(cellNum);
         this.cellNum = cellNum;
+        this.table.setSpacingBefore(5);
     }
 
     public TableBuilder addCell(Paragraph paragraph) {
@@ -104,6 +105,16 @@ public class TableBuilder {
      */
     public TableBuilder setWidthPercentage(float widthPercentage) {
         table.setWidthPercentage(widthPercentage);
+        return this;
+    }
+
+    /**
+     * 设置表格margin
+     * @param spacingBefore
+     * @return
+     */
+    public TableBuilder setSpacingBefore(float spacingBefore) {
+        table.setSpacingBefore(spacingBefore);
         return this;
     }
 

@@ -137,7 +137,17 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
 
             if (hasTenant && userVo != null && isUnExpired) {
-                filterChain.doFilter(cachedRequest, response);
+                //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
+                try {
+                    filterChain.doFilter(cachedRequest, response);
+                }catch (Exception ex){
+                    logger.error(ex.getMessage(), ex);
+                    response.setStatus(520);
+                    redirectObj.put("Status", "ERROR");
+                    redirectObj.put("Message", ex.getMessage());
+                    response.setContentType(Config.RESPONSE_TYPE_JSON);
+                    response.getWriter().print(redirectObj.toJSONString());
+                }
             } else {
                 if (!hasTenant) {
                     response.setStatus(521);

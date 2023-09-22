@@ -31,6 +31,7 @@
 					<include>**/*.xml</include>
 					<include>META-INF/**</include>
 					<include>**/*.xml</include>
+					<include>**/*.json</include>
 				</includes>
 			</resource>
 			<resource>

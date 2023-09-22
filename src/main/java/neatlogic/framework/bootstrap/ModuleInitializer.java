@@ -25,6 +25,8 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
+import neatlogic.framework.util.TimeUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -48,7 +50,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class ModuleInitializer implements WebApplicationInitializer {
     static Logger logger = LoggerFactory.getLogger(ModuleInitializer.class);
@@ -65,7 +69,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 "/_/ |_/ \\___/ \\__,_/ \\__//_____/\\____/ \\__, //_/ \\___/   /____/(_)\\____/  \n" +
                 "                                      /____/                             \n" +
                 "===========================================================================");
-
+        checkChangeLog(resolver);
         initDmlSql(resolver);
         try {
             Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
@@ -161,7 +165,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
                         dmlResource = dmlResources[0];
                         Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
                         ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleId, scriptReader, false);
-
                     }
                 }
                 System.out.println("  ✓" + tenantVo.getName());
@@ -218,5 +221,36 @@ public class ModuleInitializer implements WebApplicationInitializer {
             JdbcUtil.closeResultSet(tenantResultSet);
         }
         return activeTenantList;
+    }
+
+    /**
+     * 检查版本日志定义是否规范
+     */
+    private void checkChangeLog(ResourcePatternResolver resolver) {
+        try {
+            List<String> errorList = new ArrayList<>();
+            Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/*/changelog/*/");
+            for (Resource resource : resources) {
+                //目前
+                String fileName = resource.getURL().getPath().substring(0, resource.getURL().getPath().lastIndexOf("/"));
+                fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                if (!Objects.equals("changelog", fileName) && StringUtils.isNotBlank(fileName)) {
+                    Date date = TimeUtil.convertStringToDate(fileName, TimeUtil.YYYY_MM_DD);
+                    if (date == null) {
+                        String path = resource.getURL().getPath();
+                        path = path.substring(path.indexOf("!") + 1);
+                        errorList.add(path);
+                    }
+                }
+            }
+            if (CollectionUtils.isNotEmpty(errorList)) {
+                for (String path : errorList) {
+                    System.out.println(I18nUtils.getStaticMessage("版本日志:{0} ,changelog下文件夹名需按{1}格式命名", path, TimeUtil.YYYY_MM_DD));
+                }
+                System.exit(1);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
     }
 }

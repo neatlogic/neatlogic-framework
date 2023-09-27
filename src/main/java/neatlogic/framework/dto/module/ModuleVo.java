@@ -78,6 +78,9 @@ public class ModuleVo {
     public String getName() {
         return $.t(name);
     }
+    public String getNameWithoutTranslate() {
+        return name;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -117,6 +120,10 @@ public class ModuleVo {
 
     public String getGroupName() {
         return $.t(groupName);
+    }
+
+    public String getGroupNameWithoutTranslate() {
+        return groupName;
     }
 
     public void setGroupName(String groupName) {

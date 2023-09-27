@@ -232,9 +232,10 @@ public class ScriptRunnerManager {
                     runner.runScript(new StringReader(line));
                     TenantModuleDmlSqlVo tenantModuleDmlSqlVo;
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                        String error = "ERROR: " + I18nUtils.getStaticMessage("nfes.dmlsqlexecuteexception.dmlsqlexecuteexception", tenant.getName(), moduleId, line);
-                        logger.error(error);
-                        //System.out.println(error);
+                        String error = "  ✖" + tenant.getName() + "·" + moduleId+"."+type+": "+line;
+                        //logger.error(error);
+                        System.out.println(error);
+                        System.exit(1);
                         tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
                         errStrWriter.getBuffer().setLength(0);
                     } else {

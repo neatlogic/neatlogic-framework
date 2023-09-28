@@ -22,6 +22,7 @@ import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
@@ -30,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
@@ -44,7 +44,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,12 +69,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 "/_/ |_/ \\___/ \\__,_/ \\__//_____/\\____/ \\__, //_/ \\___/   /____/(_)\\____/  \n" +
                 "                                      /____/                             \n" +
                 "===========================================================================");
-        List<ModuleVo> moduleListFromServletContext = getModuleListByServletContext(resolver);
-        List<TenantVo> activeTenantList = getActiveTenantList();
-        initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
-        updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
         ModuleVo module = null;
         try {
+            List<ModuleVo> moduleListFromServletContext = getModuleListByServletContext(resolver);
+            List<TenantVo> activeTenantList = getActiveTenantList();
+            initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
+            updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             for (ModuleVo moduleFromServletContext : moduleListFromServletContext) {
                 module = moduleFromServletContext;
@@ -97,50 +100,48 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 }
                 System.out.println("  ✓" + module.getId() + "·" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()));
             }
+        } catch (RuntimeException ex) {
+            System.out.println(ex.getMessage());
+            System.exit(1);
         } catch (Exception ex) {
-            ModuleInitApplicationListener.getModuleinitphaser().arrive();
+            if (ModuleInitApplicationListener.getModuleinitphaser().getRegisteredParties() > 0) {
+                ModuleInitApplicationListener.getModuleinitphaser().arriveAndDeregister();
+            }
+            logger.error(ex.getMessage(), ex);
+        } finally {
             if (module != null) {
                 System.out.println("  ✖" + module.getId() + "·" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()));
             }
-            logger.error(ex.getMessage(), ex);
         }
     }
 
     /**
      * 根据每个模块的servlet context 获取模块列表
      */
-    private List<ModuleVo> getModuleListByServletContext(ResourcePatternResolver resolver) {
+    private List<ModuleVo> getModuleListByServletContext(ResourcePatternResolver resolver) throws Exception {
         String moduleId = null;
         String moduleName = null;
         List<ModuleVo> moduleVoList = new ArrayList<>();
-        try {
-            Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
-            for (Resource resource : resources) {
-                String path = resource.getURL().getPath();
-                path = path.substring(path.indexOf("!") + 1);
-                SAXReader reader = new SAXReader();
-                Document document = reader.read(resource.getURL());
-                Element rootE = document.getRootElement();
-                Element neatlogicE = rootE.element("module");
-                // Element nameE = rootE.element("name");
-                String urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
-                moduleId = neatlogicE.attributeValue("id");
-                moduleName = neatlogicE.attributeValue("name");
-                urlMapping = neatlogicE.attributeValue("urlMapping");
-                moduleDescription = neatlogicE.attributeValue("description");
-                group = neatlogicE.attributeValue("group");
-                groupName = neatlogicE.attributeValue("groupName");
-                groupSort = neatlogicE.attributeValue("groupSort");
-                groupDescription = neatlogicE.attributeValue("groupDescription");
-                version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
-                moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path));
-            }
-        } catch (IOException | DocumentException ex) {
-            if (moduleId != null) {
-                System.out.println("  ✖" + moduleId + "·" + I18nUtils.getStaticMessage(moduleName));
-            }
-            logger.error(ex.getMessage(), ex);
-            System.exit(1);
+        Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
+        for (Resource resource : resources) {
+            String path = resource.getURL().getPath();
+            path = path.substring(path.indexOf("!") + 1);
+            SAXReader reader = new SAXReader();
+            Document document = reader.read(resource.getURL());
+            Element rootE = document.getRootElement();
+            Element neatlogicE = rootE.element("module");
+            // Element nameE = rootE.element("name");
+            String urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
+            moduleId = neatlogicE.attributeValue("id");
+            moduleName = neatlogicE.attributeValue("name");
+            urlMapping = neatlogicE.attributeValue("urlMapping");
+            moduleDescription = neatlogicE.attributeValue("description");
+            group = neatlogicE.attributeValue("group");
+            groupName = neatlogicE.attributeValue("groupName");
+            groupSort = neatlogicE.attributeValue("groupSort");
+            groupDescription = neatlogicE.attributeValue("groupDescription");
+            version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
+            moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path));
         }
         return moduleVoList;
     }
@@ -148,36 +149,27 @@ public class ModuleInitializer implements WebApplicationInitializer {
     /**
      * 执行模块的dml
      */
-    private void initDmlSql(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList) {
-        String currentTenant = "";
-        try {
-            System.out.printf("⚡" + (I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n");
-            for (TenantVo tenantVo : activeTenantList) {
-                currentTenant = tenantVo.getName();
-                for (ModuleVo moduleVo : moduleVoList) {
-                    Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleVo.getId() + "/sqlscript/dml.sql");
-                    if (dmlResources.length == 1) {
-                        Resource dmlResource = dmlResources[0];
-                        Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
-                        ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleVo.getId(), scriptReader, false, "sqlscript·dml");
-                    }
+    private void initDmlSql(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList) throws Exception {
+        System.out.printf("⚡" + (I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n");
+        for (TenantVo tenantVo : activeTenantList) {
+            for (ModuleVo moduleVo : moduleVoList) {
+                Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleVo.getId() + "/sqlscript/dml.sql");
+                if (dmlResources.length == 1) {
+                    Resource dmlResource = dmlResources[0];
+                    Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
+                    ScriptRunnerManager.runScriptOnceWithJdbc(tenantVo, moduleVo.getId(), scriptReader, false, "sqlscript·dml");
                 }
-                System.out.println("  ✓" + tenantVo.getName());
             }
-        } catch (IOException ex) {
-            if (StringUtils.isNotBlank(currentTenant)) {
-                System.out.println("  ✖" + currentTenant);
-            }
-            logger.error(ex.getMessage(), ex);
+            System.out.println("  ✓" + tenantVo.getName());
         }
     }
 
     /**
-     * 获取所有激活租户
+     * 从数据库查询所有激活租户
      *
      * @return 激活的租户
      */
-    private List<TenantVo> getActiveTenantList() {
+    private List<TenantVo> getActiveTenantList() throws Exception {
         List<TenantVo> activeTenantList = new ArrayList<>();
         Connection connection = null;
         PreparedStatement tenantStatement = null;
@@ -187,8 +179,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
-                System.exit(1);
+                throw new ApiRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
             }
             String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active = 1 ";
             tenantStatement = connection.prepareStatement(tenantSql);
@@ -207,9 +198,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 tenantVo.setDatasource(datasourceVo);
                 activeTenantList.add(tenantVo);
             }
-            //System.out.println("激活的租户:" + activeTenantList.stream().map(o -> o.getName() + "[" + o.getUuid() + "]").collect(Collectors.joining("、")));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(connection);
             JdbcUtil.closeStatement(tenantStatement);
@@ -224,7 +214,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * @param activeTenantList 激活的租户
      * @return 激活租户对应的模块版本
      */
-    private Map<String, Map<String, String>> getTenantModuleVersionMap(List<TenantVo> activeTenantList) {
+    private Map<String, Map<String, String>> getTenantModuleVersionMap(List<TenantVo> activeTenantList) throws Exception {
         Connection connection = null;
         PreparedStatement tenantGroupStatement = null;
         ResultSet tenantGroupResultSet = null;
@@ -234,8 +224,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
-                System.exit(1);
+                throw new ApiRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
             }
             String tenantGroupSql = "SELECT a.* FROM tenant_module a where a.tenant_uuid in (?) ";
 
@@ -246,8 +235,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
             while (tenantGroupResultSet.next()) {
                 tenantModuleGroupMap.computeIfAbsent(tenantGroupResultSet.getString("tenant_uuid"), k -> new HashMap<>()).put(tenantGroupResultSet.getString("module_id"), tenantGroupResultSet.getString("version"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(connection);
             JdbcUtil.closeStatement(tenantGroupStatement);
@@ -259,108 +248,104 @@ public class ModuleInitializer implements WebApplicationInitializer {
     /**
      * 检查并更新数据库ddl和dml版本
      */
-    private void updateChangeLogVersion(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList) {
+    private void updateChangeLogVersion(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList) throws Exception {
         System.out.println("⚡" + "开始初始化版本更新...");
-        try {
-            List<String> errorList = new ArrayList<>();
-            Map<String, List<String>> moduleVersionListMap = new HashMap<>();
-            // 定义日期格式
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD);
-            // 定义比较器
-            Comparator<String> fileNameComparator = Comparator.comparing((String fileName) -> LocalDate.parse(fileName, formatter)).reversed();
-            //获取最新版本
-            Map<String, String> moduleLatestVersionMap = new HashMap<>();
-            //检查changelog下合法版本
-            Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/*/changelog/*/");
-            for (Resource resource : resources) {
-                //目前
-                String fileName = resource.getURL().getPath().substring(0, resource.getURL().getPath().lastIndexOf("/"));
-                String version = fileName.substring(fileName.lastIndexOf("/") + 1);
-                if (!Objects.equals("changelog", version) && StringUtils.isNotBlank(version)) {
-                    String path = resource.getURL().getPath();
-                    path = path.substring(path.indexOf("!") + 1);
-                    if (StringUtils.isNotBlank(path)) {
-                        String moduleId = path.split("/")[3];
-                        if (version.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                            moduleVersionListMap.computeIfAbsent(moduleId, k -> new ArrayList<>()).add(version);
-                        } else {
-                            errorList.add(path);
-                        }
+        List<String> errorList = new ArrayList<>();
+        Map<String, List<String>> moduleVersionListMap = new HashMap<>();
+        // 定义日期格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD);
+        // 定义比较器
+        Comparator<String> fileNameComparator = Comparator.comparing((String fileName) -> LocalDate.parse(fileName, formatter)).reversed();
+        //获取最新版本
+        Map<String, String> moduleLatestVersionMap = new HashMap<>();
+        //检查changelog下合法版本
+        Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/*/changelog/*/");
+        for (Resource resource : resources) {
+            //目前
+            String fileName = resource.getURL().getPath().substring(0, resource.getURL().getPath().lastIndexOf("/"));
+            String version = fileName.substring(fileName.lastIndexOf("/") + 1);
+            if (!Objects.equals("changelog", version) && StringUtils.isNotBlank(version)) {
+                String path = resource.getURL().getPath();
+                path = path.substring(path.indexOf("!") + 1);
+                if (StringUtils.isNotBlank(path)) {
+                    String moduleId = path.split("/")[3];
+                    if (version.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                        moduleVersionListMap.computeIfAbsent(moduleId, k -> new ArrayList<>()).add(version);
+                    } else {
+                        errorList.add(path);
                     }
                 }
             }
-            if (CollectionUtils.isNotEmpty(errorList)) {
-                for (String path : errorList) {
-                    System.out.println(I18nUtils.getStaticMessage("nfb.moduleinitializer.checkchangelog.invalid", path, TimeUtil.YYYY_MM_DD));
-                }
-                System.exit(1);
+        }
+        if (CollectionUtils.isNotEmpty(errorList)) {
+            for (String path : errorList) {
+                System.out.println(I18nUtils.getStaticMessage("nfb.moduleinitializer.checkchangelog.invalid", path, TimeUtil.YYYY_MM_DD));
             }
-            //获取模块最新版本
-            if (MapUtils.isNotEmpty(moduleVersionListMap)) {
-                for (Map.Entry<String, List<String>> entry : moduleVersionListMap.entrySet()) {
-                    entry.getValue().sort(fileNameComparator);
-                    moduleLatestVersionMap.put(entry.getKey(), entry.getValue().get(0));
-                }
+            System.exit(1);
+        }
+        //获取模块最新版本
+        if (MapUtils.isNotEmpty(moduleVersionListMap)) {
+            for (Map.Entry<String, List<String>> entry : moduleVersionListMap.entrySet()) {
+                entry.getValue().sort(fileNameComparator);
+                moduleLatestVersionMap.put(entry.getKey(), entry.getValue().get(0));
             }
+        }
 
-            Map<String, Map<String, String>> tenantModuleVersionMap = getTenantModuleVersionMap(activeTenantList);
-            //循环需要执行的所有模块当前版本
-            for (TenantVo activeTenant : activeTenantList) {
-                Map<String, String> moduleVersionMap = tenantModuleVersionMap.get(activeTenant.getUuid());
-                if (tenantModuleVersionMap.containsKey(activeTenant.getUuid())) {
-                    for (ModuleVo moduleVo : moduleVoList) {
-                        String moduleId = moduleVo.getId();
-                        String latestVersion = moduleLatestVersionMap.get(moduleId);
-                        //第一次启用基线。 即该租户该模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
-                        if (!moduleVersionMap.containsKey(moduleId) || StringUtils.isBlank(moduleVersionMap.get(moduleId)) || moduleVersionMap.get(moduleId) == null) {
-                            if (StringUtils.isBlank(latestVersion)) {
-                                //其他没有最新版本日志的模块则选择昨天作为最新版本，为了后续自动更新版本
-                                latestVersion = TimeUtil.descDateStr(new Date(), 1, TimeUtil.YYYY_MM_DD);
-                            }
-                            insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
-                            //如果模块版本小于最新版本，则执行sql并更新为最新版本
-                        } else if (StringUtils.isNotBlank(latestVersion) && LocalDate.parse(latestVersion).toEpochDay() > LocalDate.parse(moduleVersionMap.get(moduleId)).toEpochDay()) {
-                            Resource ddlResource = null;
-                            Resource[] ddlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dll.sql");
-                            if (ddlResources.length == 1) {
-                                StringWriter logStrWriter = new StringWriter();
-                                PrintWriter logWriter = new PrintWriter(logStrWriter);
-                                StringWriter errStrWriter = new StringWriter();
-                                PrintWriter errWriter = new PrintWriter(errStrWriter);
-                                ddlResource = ddlResources[0];
-                                Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
-                                ScriptRunnerManager.runScriptWithJdbc(activeTenant, moduleId, scriptReader, logWriter, errWriter, false);
-                                if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                                    System.out.println("  ✖" + activeTenant.getName() + "·" + moduleId+"."+latestVersion);
-                                    System.out.println(errStrWriter);
-                                    System.exit(1);
-                                }
-                            }
-                            Resource dmlResource;
-                            Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dml.sql");
-                            if (dmlResources.length == 1) {
-                                dmlResource = dmlResources[0];
-                                Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
-                                ScriptRunnerManager.runScriptOnceWithJdbc(activeTenant, moduleId, scriptReader, false, "changelog·"+latestVersion+"·dml");
-                            }
-                            insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
-                            System.out.println("  ✓" + activeTenant.getName() + "·" + moduleId);
-                        }
-                    }
-                } else {
-                    //第一次启用基线。 即该租户所有模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
-                    for (ModuleVo moduleVo : moduleVoList) {
-                        String latestVersion = moduleLatestVersionMap.get(moduleVo.getId());
+        Map<String, Map<String, String>> tenantModuleVersionMap = getTenantModuleVersionMap(activeTenantList);
+        //循环需要执行的所有模块当前版本
+        for (TenantVo activeTenant : activeTenantList) {
+            Map<String, String> moduleVersionMap = tenantModuleVersionMap.get(activeTenant.getUuid());
+            if (tenantModuleVersionMap.containsKey(activeTenant.getUuid())) {
+                for (ModuleVo moduleVo : moduleVoList) {
+                    String moduleId = moduleVo.getId();
+                    String latestVersion = moduleLatestVersionMap.get(moduleId);
+                    //第一次启用基线。 即该租户该模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
+                    if (!moduleVersionMap.containsKey(moduleId) || StringUtils.isBlank(moduleVersionMap.get(moduleId)) || moduleVersionMap.get(moduleId) == null) {
                         if (StringUtils.isBlank(latestVersion)) {
                             //其他没有最新版本日志的模块则选择昨天作为最新版本，为了后续自动更新版本
                             latestVersion = TimeUtil.descDateStr(new Date(), 1, TimeUtil.YYYY_MM_DD);
                         }
-                        insertTenantModuleVersionSql(activeTenant.getUuid(), moduleVo.getId(), latestVersion);
+                        insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
+                        //如果模块版本小于最新版本，则执行sql并更新为最新版本
+                    } else if (StringUtils.isNotBlank(latestVersion) && LocalDate.parse(latestVersion).toEpochDay() > LocalDate.parse(moduleVersionMap.get(moduleId)).toEpochDay()) {
+                        Resource ddlResource = null;
+                        Resource[] ddlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dll.sql");
+                        if (ddlResources.length == 1) {
+                            StringWriter logStrWriter = new StringWriter();
+                            PrintWriter logWriter = new PrintWriter(logStrWriter);
+                            StringWriter errStrWriter = new StringWriter();
+                            PrintWriter errWriter = new PrintWriter(errStrWriter);
+                            ddlResource = ddlResources[0];
+                            Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
+                            ScriptRunnerManager.runScriptWithJdbc(activeTenant, moduleId, scriptReader, logWriter, errWriter, false);
+                            if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                                System.out.println("  ✖" + activeTenant.getName() + "·" + moduleId + "." + latestVersion + "·dll: ");
+                                System.out.println(errStrWriter);
+                                System.exit(1);
+                            }
+                        }
+                        Resource dmlResource;
+                        Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dml.sql");
+                        if (dmlResources.length == 1) {
+                            dmlResource = dmlResources[0];
+                            Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
+                            ScriptRunnerManager.runScriptOnceWithJdbc(activeTenant, moduleId, scriptReader, false, "changelog·" + latestVersion + "·dml");
+                        }
+                        insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
+                        System.out.println("  ✓" + activeTenant.getName() + "·" + moduleId);
                     }
                 }
+            } else {
+                //第一次启用基线。 即该租户所有模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
+                for (ModuleVo moduleVo : moduleVoList) {
+                    String latestVersion = moduleLatestVersionMap.get(moduleVo.getId());
+                    if (StringUtils.isBlank(latestVersion)) {
+                        //其他没有最新版本日志的模块则选择昨天作为最新版本，为了后续自动更新版本
+                        latestVersion = TimeUtil.descDateStr(new Date(), 1, TimeUtil.YYYY_MM_DD);
+                    }
+                    insertTenantModuleVersionSql(activeTenant.getUuid(), moduleVo.getId(), latestVersion);
+                }
             }
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
         }
     }
 
@@ -380,8 +365,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             statement.setString(4, version);
             statement.execute();
         } catch (Exception ex) {
-            logger.error(String.format("租户%s初始化更新版本失败", tenantUuid));
-            logger.error(ex.getMessage(), ex);
+            throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(neatlogicConn);
             JdbcUtil.closeStatement(statement);

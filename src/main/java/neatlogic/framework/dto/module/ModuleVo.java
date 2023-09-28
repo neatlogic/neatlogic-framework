@@ -49,7 +49,7 @@ public class ModuleVo {
 
     @EntityField(name = "classpath", type = ApiParamType.STRING)
     private String path;
-
+    public ModuleVo() {}
     public ModuleVo(String id,String name,String urlMapping, String moduleDescription, String version, String group, String groupName, String groupSort, String groupDescription,String path) {
         this.id = id;
         this.name = name;

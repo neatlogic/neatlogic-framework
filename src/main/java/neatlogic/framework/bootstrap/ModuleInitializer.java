@@ -254,8 +254,10 @@ public class ModuleInitializer implements WebApplicationInitializer {
         Map<String, List<String>> moduleVersionListMap = new HashMap<>();
         // 定义日期格式
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD);
-        // 定义比较器
-        Comparator<String> fileNameComparator = Comparator.comparing((String fileName) -> LocalDate.parse(fileName, formatter)).reversed();
+        // 定义倒序比较器
+        Comparator<String> fileNameComparatorReversed = Comparator.comparing((String fileName) -> LocalDate.parse(fileName, formatter)).reversed();
+        // 定义正序比较器
+        Comparator<String> fileNameComparator = Comparator.comparing((String fileName) -> LocalDate.parse(fileName, formatter));
         //获取最新版本
         Map<String, String> moduleLatestVersionMap = new HashMap<>();
         //检查changelog下合法版本
@@ -286,7 +288,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
         //获取模块最新版本
         if (MapUtils.isNotEmpty(moduleVersionListMap)) {
             for (Map.Entry<String, List<String>> entry : moduleVersionListMap.entrySet()) {
-                entry.getValue().sort(fileNameComparator);
+                entry.getValue().sort(fileNameComparatorReversed);
                 moduleLatestVersionMap.put(entry.getKey(), entry.getValue().get(0));
             }
         }
@@ -307,32 +309,41 @@ public class ModuleInitializer implements WebApplicationInitializer {
                         }
                         insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
                         //如果模块版本小于最新版本，则执行sql并更新为最新版本
-                    } else if (StringUtils.isNotBlank(latestVersion) && LocalDate.parse(latestVersion).toEpochDay() > LocalDate.parse(moduleVersionMap.get(moduleId)).toEpochDay()) {
-                        Resource ddlResource = null;
-                        Resource[] ddlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dll.sql");
-                        if (ddlResources.length == 1) {
-                            StringWriter logStrWriter = new StringWriter();
-                            PrintWriter logWriter = new PrintWriter(logStrWriter);
-                            StringWriter errStrWriter = new StringWriter();
-                            PrintWriter errWriter = new PrintWriter(errStrWriter);
-                            ddlResource = ddlResources[0];
-                            Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
-                            ScriptRunnerManager.runScriptWithJdbc(activeTenant, moduleId, scriptReader, logWriter, errWriter, false);
-                            if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                                System.out.println("  ✖" + activeTenant.getName() + "·" + moduleId + "." + latestVersion + "·dll: ");
-                                System.out.println(errStrWriter);
-                                System.exit(1);
+                    } else {
+                        //循环执行所有
+                        List<String> versionList = moduleVersionListMap.get(moduleId);
+                        if(CollectionUtils.isNotEmpty(versionList)) {
+                            versionList.sort(fileNameComparator);
+                            for (String version : versionList) {
+                                if (LocalDate.parse(version).toEpochDay() > LocalDate.parse(moduleVersionMap.get(moduleId)).toEpochDay()) {
+                                    Resource ddlResource = null;
+                                    Resource[] ddlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + version + "/dll.sql");
+                                    if (ddlResources.length == 1) {
+                                        StringWriter logStrWriter = new StringWriter();
+                                        PrintWriter logWriter = new PrintWriter(logStrWriter);
+                                        StringWriter errStrWriter = new StringWriter();
+                                        PrintWriter errWriter = new PrintWriter(errStrWriter);
+                                        ddlResource = ddlResources[0];
+                                        Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
+                                        ScriptRunnerManager.runScriptWithJdbc(activeTenant, moduleId, scriptReader, logWriter, errWriter, false);
+                                        if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                                            System.out.println("  ✖" + activeTenant.getName() + "·" + moduleId + "." + version + "·dll: ");
+                                            System.out.println(errStrWriter);
+                                            System.exit(1);
+                                        }
+                                    }
+                                    Resource dmlResource;
+                                    Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + version + "/dml.sql");
+                                    if (dmlResources.length == 1) {
+                                        dmlResource = dmlResources[0];
+                                        Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
+                                        ScriptRunnerManager.runScriptOnceWithJdbc(activeTenant, moduleId, scriptReader, false, "changelog·" + version + "·dml");
+                                    }
+                                    insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, version);
+                                    System.out.println("  ✓" + activeTenant.getName() + "·" + moduleId);
+                                }
                             }
                         }
-                        Resource dmlResource;
-                        Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + latestVersion + "/dml.sql");
-                        if (dmlResources.length == 1) {
-                            dmlResource = dmlResources[0];
-                            Reader scriptReader = new InputStreamReader(dmlResource.getInputStream());
-                            ScriptRunnerManager.runScriptOnceWithJdbc(activeTenant, moduleId, scriptReader, false, "changelog·" + latestVersion + "·dml");
-                        }
-                        insertTenantModuleVersionSql(activeTenant.getUuid(), moduleId, latestVersion);
-                        System.out.println("  ✓" + activeTenant.getName() + "·" + moduleId);
                     }
                 }
             } else {

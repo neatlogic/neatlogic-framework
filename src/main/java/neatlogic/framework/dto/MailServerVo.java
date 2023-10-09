@@ -13,38 +13,40 @@ import java.util.UUID;
  * @create: 2019-12-09 16:47
  **/
 public class MailServerVo extends BasePageVo {
-	
-	@EntityField(name = "common.uuid", type = ApiParamType.STRING)
+
+    private static final long serialVersionUID = 6550790567158161414L;
+
+    @EntityField(name = "common.uuid", type = ApiParamType.STRING)
     private String uuid;
-	
-	@EntityField(name = "common.name", type = ApiParamType.STRING)
+
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
-	
-	@EntityField(name = "term.framework.smptport", type = ApiParamType.INTEGER)
+
+    @EntityField(name = "term.framework.smptport", type = ApiParamType.INTEGER)
     private Integer port;
-	
-	@EntityField(name = "term.framework.smpthost", type = ApiParamType.STRING)
+
+    @EntityField(name = "term.framework.smpthost", type = ApiParamType.STRING)
     private String host;
-	
-	@EntityField(name = "common.username", type = ApiParamType.STRING)
+
+    @EntityField(name = "common.username", type = ApiParamType.STRING)
     private String userName;
-	
-	@EntityField(name = "common.password", type = ApiParamType.STRING)
+
+    @EntityField(name = "common.password", type = ApiParamType.STRING)
     private String password;
-	
-	@EntityField(name = "term.framework.domain", type = ApiParamType.STRING)
-    private String domain;
-	
-	@EntityField(name = "common.mailaddress", type = ApiParamType.EMAIL)
+
+    @EntityField(name = "common.mailaddress", type = ApiParamType.EMAIL)
     private String fromAddress;
 
-	@EntityField(name = "term.framework.smptsslenable", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.smptsslenable", type = ApiParamType.STRING)
     private String sslEnable = "false";
 
+    @EntityField(name = "common.homeurl", type = ApiParamType.STRING)
+    private String homeUrl;
+
     public String getUuid() {
-    	if(StringUtils.isBlank(uuid)) {
-    		uuid = UUID.randomUUID().toString().replace("-", "");
-    	}
+        if (StringUtils.isBlank(uuid)) {
+            uuid = UUID.randomUUID().toString().replace("-", "");
+        }
         return uuid;
     }
 
@@ -92,14 +94,6 @@ public class MailServerVo extends BasePageVo {
         this.password = password;
     }
 
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
     public String getFromAddress() {
         return fromAddress;
     }
@@ -114,5 +108,13 @@ public class MailServerVo extends BasePageVo {
 
     public void setSslEnable(String sslEnable) {
         this.sslEnable = sslEnable;
+    }
+
+    public String getHomeUrl() {
+        return homeUrl;
+    }
+
+    public void setHomeUrl(String homeUrl) {
+        this.homeUrl = homeUrl;
     }
 }

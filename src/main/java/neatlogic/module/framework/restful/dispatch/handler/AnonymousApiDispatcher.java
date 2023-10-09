@@ -455,13 +455,13 @@ public class AnonymousApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        String tenant = request.getHeader("tenant");
+        String tenant;
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
             JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
             token = resultObj.getString("token");
-//            tenant = resultObj.getString("tenant");
+            tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
         } else {
             tokenHasEncrypted = false;
@@ -603,13 +603,13 @@ public class AnonymousApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        String tenant = request.getHeader("tenant");
+        String tenant;
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
             JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
             token = resultObj.getString("token");
-//            tenant = resultObj.getString("tenant");
+            tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
         } else {
             tokenHasEncrypted = false;

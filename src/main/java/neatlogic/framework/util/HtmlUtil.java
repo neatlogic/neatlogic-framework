@@ -1,5 +1,6 @@
 package neatlogic.framework.util;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.UrlInfoVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -115,7 +116,7 @@ public class HtmlUtil {
         return resultList;
     }
 
-    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList) {
+    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList, String homeUrl) {
         if (CollectionUtils.isEmpty(urlInfoVoList)) {
             return content;
         }
@@ -134,7 +135,7 @@ public class HtmlUtil {
             for (int i = fromIndex; i < urlInfoVo.getBeginIndex(); i++) {
                 stringBuilder.append(content.charAt(i));
             }
-            stringBuilder.append(urlInfoVo.getTarget());
+            stringBuilder.append(homeUrl + "/" + TenantContext.get().getTenantUuid() + "/" + urlInfoVo.getTarget());
             fromIndex = urlInfoVo.getEndIndex();
         }
         for (int i = fromIndex; i < content.length(); i++) {

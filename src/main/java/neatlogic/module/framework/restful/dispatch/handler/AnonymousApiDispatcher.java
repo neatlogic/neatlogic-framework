@@ -392,27 +392,14 @@ public class AnonymousApiDispatcher {
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        String tenant;
+        String tenant = request.getHeader("tenant");
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
             JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
             token = resultObj.getString("token");
-            tenant = resultObj.getString("tenant");
+//            tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
-//            String decryptData = RC4Util.decrypt(token);
-//            String[] split = decryptData.split("\\?", 2);
-//            token = split[0].substring(0, split[0].lastIndexOf("/"));
-//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-//            if (split.length == 2) {
-//                String[] params = split[1].split("&");
-//                for (String param : params) {
-//                    String[] array = param.split("=", 2);
-//                    if (array.length == 2) {
-//                        paramObj.put(array[0], array[1]);
-//                    }
-//                }
-//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;
@@ -553,27 +540,14 @@ public class AnonymousApiDispatcher {
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
-        String tenant;
+        String tenant = request.getHeader("tenant");
         boolean tokenHasEncrypted = true;
         JSONObject paramObj = new JSONObject();
         if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
             JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
             token = resultObj.getString("token");
-            tenant = resultObj.getString("tenant");
+//            tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
-//            String decryptData = RC4Util.decrypt(token);
-//            String[] split = decryptData.split("\\?", 2);
-//            token = split[0].substring(0, split[0].lastIndexOf("/"));
-//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-//            if (split.length == 2) {
-//                String[] params = split[1].split("&");
-//                for (String param : params) {
-//                    String[] array = param.split("=", 2);
-//                    if (array.length == 2) {
-//                        paramObj.put(array[0], array[1]);
-//                    }
-//                }
-//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;

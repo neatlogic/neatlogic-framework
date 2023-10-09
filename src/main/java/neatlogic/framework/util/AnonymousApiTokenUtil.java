@@ -18,6 +18,7 @@ package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,18 +38,16 @@ public class AnonymousApiTokenUtil {
         fromIndex += 4;
         int endIndex = path.indexOf("/", fromIndex) + 1;
         String token = path.substring(endIndex);
-//        String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
-//        String backEndUrl = Config.BACK_END_URL();
-//        if(StringUtils.isNotBlank(backEndUrl)) {
-//            if (!backEndUrl.endsWith("/")) {
-//                backEndUrl += "/";
-//            }
-//        } else {
-//            backEndUrl = "";
-//        }
-//        String target = backEndUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
-        String encryptedData = RC4Util.encrypt(token + "?" + queryString);
-        String target = "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
+        String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
+        String backEndUrl = Config.BACK_END_URL();
+        if(StringUtils.isNotBlank(backEndUrl)) {
+            if (!backEndUrl.endsWith("/")) {
+                backEndUrl += "/";
+            }
+        } else {
+            backEndUrl = "";
+        }
+        String target = backEndUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
         return target;
     }
 
@@ -56,9 +55,8 @@ public class AnonymousApiTokenUtil {
         JSONObject resultObj = new JSONObject();
         String decryptData = RC4Util.decrypt(token);
         String[] split = decryptData.split("\\?", 2);
-        token = split[0];
-//        token = split[0].substring(0, split[0].lastIndexOf("/"));
-//        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+        token = split[0].substring(0, split[0].lastIndexOf("/"));
+        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
         JSONObject paramObj = new JSONObject();
         if (split.length == 2) {
             String[] params = split[1].split("&");
@@ -70,7 +68,7 @@ public class AnonymousApiTokenUtil {
             }
         }
         resultObj.put("token", token);
-//        resultObj.put("tenant", tenant);
+        resultObj.put("tenant", tenant);
         resultObj.put("paramObj", paramObj);
         return resultObj;
     }

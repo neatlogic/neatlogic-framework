@@ -124,7 +124,10 @@ public class HtmlUtil {
         int targetTotalLength = 0;
         for (UrlInfoVo urlInfo : urlInfoVoList) {
             String source = urlInfo.getSource();
-            String target = AnonymousApiTokenUtil.encrypt(source);
+            //source = api/binary/image/download?id=314907690737664
+//            String target = AnonymousApiTokenUtil.encrypt(source);
+            String[] split = source.split("/", 2);
+            String target = "anonymous/" + split[0] + "/t/" + TenantContext.get().getTenantUuid() + "/" + split[1];
             urlInfo.setTarget(target);
             sourceTotalLength += source.length();
             targetTotalLength += target.length();

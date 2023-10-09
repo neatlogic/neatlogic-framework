@@ -200,7 +200,7 @@ public class ScriptRunnerManager {
             try {
                 conn = JdbcUtil.getNeatlogicDataSource(tenant, isDataDb).getConnection();
             } catch (Exception exception) {
-                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect"));
+                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenant.getUuid()));
             }
             runner = new ScriptRunner(conn);
             runner.setLogWriter(logWriter);
@@ -245,6 +245,14 @@ public class ScriptRunnerManager {
         }
     }
 
+    /**
+     * 执行sql
+     *
+     * @param scriptReader 脚本读取
+     */
+    public static void runScriptWithJdbc(Reader scriptReader, String version, DataSource dataSource) throws Exception {
+        runScriptWithJdbc(null, "framework", scriptReader, version, dataSource);
+    }
 
     /**
      * 执行sql
@@ -252,14 +260,16 @@ public class ScriptRunnerManager {
      * @param tenant       租户
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
-     * @param logWriter    日志
-     * @param errWriter    错误日志
      */
-    public static void runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) throws Exception {
+    public static void runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource) throws Exception {
         Connection conn = null;
         ScriptRunner runner = null;
+        StringWriter logStrWriter = new StringWriter();
+        PrintWriter logWriter = new PrintWriter(logStrWriter);
+        StringWriter errStrWriter = new StringWriter();
+        PrintWriter errWriter = new PrintWriter(errStrWriter);
         try {
-            conn = JdbcUtil.getNeatlogicDataSource(tenant, isDataDb).getConnection();
+            conn = dataSource.getConnection();
             runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
             runner.setAutoCommit(true);
@@ -270,6 +280,17 @@ public class ScriptRunnerManager {
             runner.setErrorLogWriter(errWriter);
             runner.setDelimiter(";");
             runner.runScript(scriptReader);
+            if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                String error;
+                if (tenant == null) {
+                    error = "  ✖" + moduleId + "." + version + "·neatlogic_dll: " + errStrWriter;
+                } else {
+                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·tenant_dll: " + errStrWriter;
+                }
+                throw new RuntimeException(error);
+            }
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex);
         } catch (SQLException ex) {
             throw new Exception(ex);
         } finally {

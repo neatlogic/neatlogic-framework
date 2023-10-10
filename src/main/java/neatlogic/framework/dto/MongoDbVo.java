@@ -16,7 +16,10 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
@@ -30,6 +33,10 @@ public class MongoDbVo {
     private String passwordPlain;
     private String passwordCipher;
     private String option;
+
+    @JSONField(serialize = false)
+    @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.STRING)
+    private String authConfig;
 
     public MongoDbVo() {
 
@@ -132,5 +139,11 @@ public class MongoDbVo {
         this.host = host;
     }
 
+    public String getAuthConfig() {
+        return authConfig;
+    }
 
+    public void setAuthConfig(String authConfig) {
+        this.authConfig = authConfig;
+    }
 }

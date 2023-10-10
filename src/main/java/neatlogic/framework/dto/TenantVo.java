@@ -16,6 +16,7 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
@@ -24,6 +25,7 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.SnowflakeUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -103,6 +105,9 @@ public class TenantVo extends BaseEditorVo {
     private MongoDbVo mongodb;
     @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.JSONOBJECT)
     private MongoDbVo authMongodb;
+    @JSONField(serialize = false)
+    @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.STRING)
+    private String authConfig;
     @EntityField(name = "common.datasource", type = ApiParamType.JSONOBJECT)
     private DatasourceVo datasource;
     @EntityField(name = "nfd.tenantvo.islocaldb", type = ApiParamType.JSONOBJECT)
@@ -114,6 +119,7 @@ public class TenantVo extends BaseEditorVo {
 
     @EntityField(name = "nfd.tenantvo.visittime", type = ApiParamType.LONG)
     private Date visitTime;
+
 
     public TenantVo() {
         this.setPageSize(20);
@@ -226,6 +232,28 @@ public class TenantVo extends BaseEditorVo {
         this.mongodb = mongodb;
     }
 
+    public MongoDbVo getAuthMongodb() {
+        if (this.authMongodb == null && StringUtils.isNotBlank(authConfig)) {
+            this.authMongodb = JSONObject.parseObject(authConfig, MongoDbVo.class);
+        }
+        return authMongodb;
+    }
+
+    public void setAuthMongodb(MongoDbVo authMongodb) {
+        this.authMongodb = authMongodb;
+    }
+
+    public String getAuthConfig() {
+        if (StringUtils.isBlank(authConfig) && authMongodb != null) {
+            authConfig = JSONObject.toJSONString(authMongodb);
+        }
+        return authConfig;
+    }
+
+    public void setAuthConfig(String authConfig) {
+        this.authConfig = authConfig;
+    }
+
     public DatasourceVo getDatasource() {
         return datasource;
     }
@@ -258,11 +286,4 @@ public class TenantVo extends BaseEditorVo {
         this.visitTime = visitTime;
     }
 
-    public MongoDbVo getAuthMongodb() {
-        return authMongodb;
-    }
-
-    public void setAuthMongodb(MongoDbVo authMongodb) {
-        this.authMongodb = authMongodb;
-    }
 }

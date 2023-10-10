@@ -35,35 +35,35 @@ public class TenantAuditVo extends BasePageVo {
 
 	@EntityField(name = "id", type = ApiParamType.LONG)
 	private Long id;
-	@EntityField(name = "分组id", type = ApiParamType.LONG)
+	@EntityField(name = "nmmat.tenantauditgetapi.input.groupid", type = ApiParamType.LONG)
 	private Long groupId;
-	@EntityField(name = "租户id", type = ApiParamType.LONG)
-	private Long tenantId;
-	@EntityField(name = "模块id", type = ApiParamType.STRING)
+	@EntityField(name = "common.tenantuuid", type = ApiParamType.STRING)
+	private String tenantUuid;
+	@EntityField(name = "term.cmdb.moduleid", type = ApiParamType.STRING)
 	private String moduleId;
-	@EntityField(name = "模块名称", type = ApiParamType.STRING)
+	@EntityField(name = "common.module.name", type = ApiParamType.STRING)
 	private String moduleName;
-	@EntityField(name = "模块分组", type = ApiParamType.STRING)
+	@EntityField(name = "common.module.group", type = ApiParamType.STRING)
 	private String moduleGroup;
-	@EntityField(name = "模块分组名称", type = ApiParamType.STRING)
+	@EntityField(name = "common.module.groupname", type = ApiParamType.STRING)
 	private String moduleGroupName;
-	@EntityField(name = "版本序号", type = ApiParamType.STRING)
+	@EntityField(name = "nfd.tenantauditvo.sqltype", type = ApiParamType.STRING)
 	private String sqlType;
-	@EntityField(name = "开始时间", type = ApiParamType.LONG)
+	@EntityField(name = "common.starttime", type = ApiParamType.LONG)
 	private Date startTime;
-	@EntityField(name = "结束时间", type = ApiParamType.LONG)
+	@EntityField(name = "common.endtime", type = ApiParamType.LONG)
 	private Date endTime;
-	@EntityField(name = "耗时（毫秒）", type = ApiParamType.LONG)
+	@EntityField(name = "nfd.tenantauditvo.timecost", type = ApiParamType.LONG)
 	private Long timeCost;
-	@EntityField(name = "状态", type = ApiParamType.STRING)
+	@EntityField(name = "common.status", type = ApiParamType.STRING)
 	private String status;
-	@EntityField(name = "日志内容", type = ApiParamType.STRING)
+	@EntityField(name = "nfd.tenantauditvo.result", type = ApiParamType.STRING)
 	private String result;
-	@EntityField(name = "异常内容", type = ApiParamType.STRING)
+	@EntityField(name = "nfd.tenantauditvo.error", type = ApiParamType.STRING)
 	private String error;
-	@EntityField(name = "日志内容hash", type = ApiParamType.STRING)
+	@EntityField(name = "nfd.tenantauditvo.resulthash", type = ApiParamType.STRING)
 	private String resultHash;
-	@EntityField(name = "异常内容hash", type = ApiParamType.STRING)
+	@EntityField(name = "nfd.tenantauditvo.errorhash", type = ApiParamType.STRING)
 	private String errorHash;
 
 	public String getStatus() {
@@ -147,12 +147,12 @@ public class TenantAuditVo extends BasePageVo {
 		this.errorHash = errorHash;
 	}
 
-	public Long getTenantId() {
-		return tenantId;
+	public String getTenantUuid() {
+		return tenantUuid;
 	}
 
-	public void setTenantId(Long tenantId) {
-		this.tenantId = tenantId;
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
 	}
 
 	public Long getTimeCost() {

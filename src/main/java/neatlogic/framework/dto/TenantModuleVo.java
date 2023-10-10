@@ -7,25 +7,25 @@ import java.util.Date;
 
 public class TenantModuleVo {
 
-	@EntityField(name = "租户id", type = ApiParamType.LONG)
-	private Long tenantId;
-	@EntityField(name = "模块id", type = ApiParamType.STRING)
+	@EntityField(name = "common.tenantuuid", type = ApiParamType.LONG)
+	private String tenantUuid;
+	@EntityField(name = "term.cmdb.moduleid", type = ApiParamType.STRING)
 	private String moduleId;
-	@EntityField(name = "ddl执行状态,1:成功 0:失败", type = ApiParamType.INTEGER)
+	@EntityField(name = "nfd.tenantmodulevo.ddlstatus", type = ApiParamType.INTEGER)
 	private Integer ddlStatus;
-	@EntityField(name = "dml执行状态,1:成功 0:失败", type = ApiParamType.INTEGER)
+	@EntityField(name = "nfd.tenantmodulevo.dmlstatus", type = ApiParamType.INTEGER)
 	private Integer dmlStatus;
-	@EntityField(name = "添加日期", type = ApiParamType.LONG)
+	@EntityField(name = "common.createdate", type = ApiParamType.LONG)
 	private Date fcd;
-	@EntityField(name = "更新日期", type = ApiParamType.LONG)
+	@EntityField(name = "common.editdate", type = ApiParamType.LONG)
 	private Date lcd;
 
-	public Long getTenantId() {
-		return tenantId;
+	public String getTenantUuid() {
+		return tenantUuid;
 	}
 
-	public void setTenantId(Long tenantId) {
-		this.tenantId = tenantId;
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
 	}
 
 	public String getModuleId() {

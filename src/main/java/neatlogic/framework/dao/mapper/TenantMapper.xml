@@ -8,28 +8,28 @@
         WHERE `hash` = #{value}
     </select>
 
-    <select id="getTenantModuleGroupByTenantId" parameterType="java.lang.Long"
+    <select id="getTenantModuleGroupByTenantUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.TenantModuleGroupVo">
         SELECT `tenant_id`    as tenantId,
                `tenant_uuid`  as tenantUuid,
                `module_group` AS moduleGroup
         FROM `tenant_modulegroup`
-        WHERE tenant_id = #{value}
+        WHERE tenant_uuid = #{value}
     </select>
 
-    <select id="getTenantModuleByTenantId" parameterType="java.lang.Long"
+    <select id="getTenantModuleByTenantUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.TenantModuleVo">
-        SELECT `tenant_id`  AS tenantId,
+        SELECT
                `module_id`  as moduleId,
                `ddl_status` as ddlStatus,
                `dml_status` as dmlStatus
         FROM `tenant_module`
-        WHERE tenant_id = #{value}
+        WHERE tenant_uuid = #{value}
     </select>
 
     <sql id="searchTenantAuditCondition">
         <where>
-            tenant_id = #{tenantId}
+            tenant_uuid = #{tenantUuid}
             <if test="groupId != null">
                 AND group_id = #{groupId}
             </if>
@@ -41,7 +41,7 @@
         SELECT
         `id`,
         `group_id` AS groupId,
-        `tenant_id` as tenantId,
+        `tenant_uuid` as tenantUuid,
         `module_id` as moduleId,
         `module_group` as moduleGroup,
         `sql_type` as sqlType,
@@ -140,10 +140,10 @@
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
         WHERE t.`is_active` = 1
     </select>
-    <select id="getTenantAuditMaxGroupIdByTenantId" resultType="java.lang.Long">
+    <select id="getTenantAuditMaxGroupIdByTenantUuid" resultType="java.lang.Long">
         select max(group_id)
         from tenant_audit
-        where tenant_id = #{value}
+        where tenant_uuid = #{value}
     </select>
     <select id="getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId" resultType="java.lang.String">
         select sql_uuid
@@ -178,7 +178,7 @@
 
     <insert id="insertTenantAudit" parameterType="neatlogic.framework.dto.TenantAuditVo">
         INSERT INTO `tenant_audit` (`id`,
-                                    `tenant_id`,
+                                    `tenant_uuid`,
                                     `group_id`,
                                     `start_time`,
                                     `module_id`,
@@ -186,7 +186,7 @@
                                     `sql_type`,
                                     `status`)
         VALUES (#{id},
-                #{tenantId},
+                #{tenantUuid},
                 #{groupId},
                 NOW(3),
                 #{moduleId},
@@ -201,12 +201,12 @@
     </insert>
 
     <insert id="insertTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
-        INSERT IGNORE INTO `tenant_module` (`tenant_id`,
+        INSERT IGNORE INTO `tenant_module` (`tenant_uuid`,
                                             `module_id`,
                                             `fcd`)
-        VALUES (#{tenantModule.tenantId},
+        VALUES (#{tenantModule.tenantUuid},
                 #{tenantModule.moduleId},
-                NOW(3))
+                #{updateTag})
     </insert>
     <insert id="insertTenantModuleDmlSql">
         insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`fcd`)
@@ -263,7 +263,7 @@
         <if test="dmlStatus != null">
             ,`dml_status` = #{dmlStatus}
         </if>
-        WHERE `tenant_id` = #{tenantId}
+        WHERE `tenant_uuid` = #{tenantUuid}
         AND `module_id` = #{moduleId}
     </update>
     <update id="updateTenantVisitTime">

@@ -20,9 +20,9 @@ public interface TenantMapper {
 
     List<TenantVo> searchTenant(TenantVo tenantVo);
 
-    List<TenantModuleGroupVo> getTenantModuleGroupByTenantId(Long tenantId);
+    List<TenantModuleGroupVo> getTenantModuleGroupByTenantUuid(String tenantUuid);
 
-    List<TenantModuleVo> getTenantModuleByTenantId(Long tenantId);
+    List<TenantModuleVo> getTenantModuleByTenantUuid(String tenantUuid);
 
     TenantVo getTenantByUuid(String tenantUuid);
 
@@ -30,7 +30,7 @@ public interface TenantMapper {
 
     List<TenantVo> getAllActiveTenant();
 
-    Long getTenantAuditMaxGroupIdByTenantId(Long tenantId);
+    Long getTenantAuditMaxGroupIdByTenantUuid(String tenantUuid);
 
     List<String> getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId);
 

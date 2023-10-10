@@ -388,6 +388,69 @@ public class AnonymousApiDispatcher {
         }
     }
 
+    @RequestMapping(value = "/t/{tenant}/binary/**", method = RequestMethod.GET)
+    public void dispatcherForGetBinary(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject paramObj = new JSONObject();
+        boolean tokenHasEncrypted = false;
+        Enumeration<String> paraNames = request.getParameterNames();
+        while (paraNames.hasMoreElements()) {
+            String p = paraNames.nextElement();
+            String[] vs = request.getParameterValues(p);
+            if (vs.length > 1) {
+                paramObj.put(p, vs);
+            } else {
+                paramObj.put(p, request.getParameter(p));
+            }
+        }
+        JSONObject returnObj = new JSONObject();
+        try {
+            if (TenantUtil.hasTenant(tenant)) {
+                TenantContext.init();
+                TenantContext.get().switchTenant(tenant);
+                UserContext.init(SystemUser.ANONYMOUS, request, response);
+            } else {
+                throw new TenantNotFoundException(tenant);
+            }
+
+            doIt(request, response, token, tokenHasEncrypted, ApiType.BINARY, paramObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(524);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(520);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(523);
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(500);
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            response.getWriter().print(returnObj.toJSONString());
+        }
+    }
+
     @RequestMapping(value = "/rest/**", method = RequestMethod.GET)
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -400,19 +463,6 @@ public class AnonymousApiDispatcher {
             token = resultObj.getString("token");
             tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
-//            String decryptData = RC4Util.decrypt(token);
-//            String[] split = decryptData.split("\\?", 2);
-//            token = split[0].substring(0, split[0].lastIndexOf("/"));
-//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-//            if (split.length == 2) {
-//                String[] params = split[1].split("&");
-//                for (String param : params) {
-//                    String[] array = param.split("=", 2);
-//                    if (array.length == 2) {
-//                        paramObj.put(array[0], array[1]);
-//                    }
-//                }
-//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;
@@ -561,19 +611,6 @@ public class AnonymousApiDispatcher {
             token = resultObj.getString("token");
             tenant = resultObj.getString("tenant");
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
-//            String decryptData = RC4Util.decrypt(token);
-//            String[] split = decryptData.split("\\?", 2);
-//            token = split[0].substring(0, split[0].lastIndexOf("/"));
-//            tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
-//            if (split.length == 2) {
-//                String[] params = split[1].split("&");
-//                for (String param : params) {
-//                    String[] array = param.split("=", 2);
-//                    if (array.length == 2) {
-//                        paramObj.put(array[0], array[1]);
-//                    }
-//                }
-//            }
         } else {
             tokenHasEncrypted = false;
             String originToken = token;

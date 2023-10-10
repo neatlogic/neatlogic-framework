@@ -1,5 +1,6 @@
 package neatlogic.framework.util;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.UrlInfoVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -115,7 +116,7 @@ public class HtmlUtil {
         return resultList;
     }
 
-    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList) {
+    public static String urlReplace(String content, List<UrlInfoVo> urlInfoVoList, String homeUrl) {
         if (CollectionUtils.isEmpty(urlInfoVoList)) {
             return content;
         }
@@ -123,7 +124,10 @@ public class HtmlUtil {
         int targetTotalLength = 0;
         for (UrlInfoVo urlInfo : urlInfoVoList) {
             String source = urlInfo.getSource();
-            String target = AnonymousApiTokenUtil.encrypt(source);
+            //source = api/binary/image/download?id=314907690737664
+//            String target = AnonymousApiTokenUtil.encrypt(source);
+            String[] split = source.split("/", 2);
+            String target = "anonymous/" + split[0] + "/t/" + TenantContext.get().getTenantUuid() + "/" + split[1];
             urlInfo.setTarget(target);
             sourceTotalLength += source.length();
             targetTotalLength += target.length();
@@ -134,7 +138,7 @@ public class HtmlUtil {
             for (int i = fromIndex; i < urlInfoVo.getBeginIndex(); i++) {
                 stringBuilder.append(content.charAt(i));
             }
-            stringBuilder.append(urlInfoVo.getTarget());
+            stringBuilder.append(homeUrl + "/" + TenantContext.get().getTenantUuid() + "/" + urlInfoVo.getTarget());
             fromIndex = urlInfoVo.getEndIndex();
         }
         for (int i = fromIndex; i < content.length(); i++) {

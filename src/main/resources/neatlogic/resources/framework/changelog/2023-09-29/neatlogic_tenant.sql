@@ -3,3 +3,4 @@ CREATE TABLE  IF NOT EXISTS  `api_access_count` (
   `count` int DEFAULT NULL COMMENT '访问次数',
   PRIMARY KEY (`token`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='接口访问次数表';
+

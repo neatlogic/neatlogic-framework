@@ -250,8 +250,8 @@ public class ScriptRunnerManager {
      *
      * @param scriptReader 脚本读取
      */
-    public static void runScriptWithJdbc(Reader scriptReader, String version, DataSource dataSource) throws Exception {
-        runScriptWithJdbc(null, "framework", scriptReader, version, dataSource);
+    public static void runScriptWithJdbc(Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
+        runScriptWithJdbc(null, "framework", scriptReader, version, dataSource, sqlFile);
     }
 
     /**
@@ -261,7 +261,7 @@ public class ScriptRunnerManager {
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
      */
-    public static void runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource) throws Exception {
+    public static void runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
         Connection conn = null;
         ScriptRunner runner = null;
         StringWriter logStrWriter = new StringWriter();
@@ -283,9 +283,9 @@ public class ScriptRunnerManager {
             if (StringUtils.isNotBlank(errStrWriter.toString())) {
                 String error;
                 if (tenant == null) {
-                    error = "  ✖" + moduleId + "." + version + "·neatlogic_dll: " + errStrWriter;
+                    error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
                 } else {
-                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·tenant_dll: " + errStrWriter;
+                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
                 }
                 throw new RuntimeException(error);
             }

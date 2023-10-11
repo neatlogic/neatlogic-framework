@@ -18,6 +18,7 @@ package neatlogic.framework.sqlfile;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dao.mapper.TenantMapper;
+import neatlogic.framework.dto.ChangelogAuditVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.store.mysql.DatasourceManager;
@@ -41,6 +42,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class ScriptRunnerManager {
@@ -82,7 +84,8 @@ public class ScriptRunnerManager {
             runner.setDelimiter(";");
             runner.runScript(scriptReader);
             runner.closeConnection();
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
+            logger.error("执行ddl sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             try {
@@ -151,10 +154,9 @@ public class ScriptRunnerManager {
                     tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, 1);
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
+            logger.error("执行dml sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             try {
                 if (conn != null) {
@@ -233,6 +235,7 @@ public class ScriptRunnerManager {
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
         } catch (Exception ex) {
+            logger.error("通过jdbc执行dml sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             if (runner != null) {
@@ -268,7 +271,22 @@ public class ScriptRunnerManager {
         PrintWriter logWriter = new PrintWriter(logStrWriter);
         StringWriter errStrWriter = new StringWriter();
         PrintWriter errWriter = new PrintWriter(errStrWriter);
+        PreparedStatement sqlMd5Statement;
+        Connection neatlogicConn;
+        ResultSet sqlMd5ResultSet;
+        String tenantUuid = tenant == null ? "0" : tenant.getUuid(); //主库用0表示
         try {
+            BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
+            List<String> hasRunSqlMd5List = new ArrayList<>();
+            DataSource neatlogicDatasource = JdbcUtil.getNeatlogicDataSource();
+            neatlogicConn = neatlogicDatasource.getConnection();
+            sqlMd5Statement = neatlogicConn.prepareStatement("select sql_hash from changelog_audit where tenant_uuid = ? and `module_id` = ?");
+            sqlMd5Statement.setString(1, tenantUuid);
+            sqlMd5Statement.setString(2, moduleId);
+            sqlMd5ResultSet = sqlMd5Statement.executeQuery();
+            while (sqlMd5ResultSet.next()) {
+                hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_uuid"));
+            }
             conn = dataSource.getConnection();
             runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
@@ -279,19 +297,58 @@ public class ScriptRunnerManager {
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errWriter);
             runner.setDelimiter(";");
-            runner.runScript(scriptReader);
-            if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                String error;
-                if (tenant == null) {
-                    error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
-                } else {
-                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+            String line;
+            boolean isCreateTableStart = false;//用于标识
+            StringBuilder sqlSb = new StringBuilder();
+            while ((line = scriptBufferedReader.readLine()) != null) {
+                if (StringUtils.isBlank(line.trim())) {
+                    continue;
                 }
-                throw new RuntimeException(error);
+
+                if(!isCreateTableStart){
+                    if(line.trim().toLowerCase(Locale.ROOT).startsWith("create table")){
+                        isCreateTableStart = true;
+                        sqlSb.append(line);
+                        continue;
+                    }
+                }else{
+                    if(line.trim().endsWith(";")){
+                        isCreateTableStart = false;
+                    }else{
+                        sqlSb.append(line);
+                        continue;
+                    }
+                }
+                sqlSb.append(line);
+                String sql = sqlSb.toString();
+                sqlSb.setLength(0);
+                // 如果没有执行过该sql，则执行
+                String sqlHash = Md5Util.encryptMD5(sql);
+                if (!hasRunSqlMd5List.contains(sqlHash)) {
+                    runner.runScript(new StringReader(sql));
+                    ChangelogAuditVo changelogAuditVo;
+                    if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                        String error;
+                        if (tenant == null) {
+                            error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                        } else {
+                            error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                        }
+                        //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
+                        //errStrWriter.getBuffer().setLength(0);
+                        throw new RuntimeException(error);
+                    } else {
+                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version);
+                        hasRunSqlMd5List.add(sqlHash);
+                    }
+                    insertChangelogAudit(changelogAuditVo, neatlogicConn);
+                    insertChangelogAuditDetail(sqlHash, sql, neatlogicConn);
+                }
             }
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
+            logger.error("通过jdbc执行sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             try {
@@ -304,6 +361,51 @@ public class ScriptRunnerManager {
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
+        }
+    }
+
+    /**
+     * 记录租户changelog记录
+     *
+     * @param changelogAuditVo changelog记录
+     * @param neatlogicConn    连接neatlogic库 connection
+     */
+    private static void insertChangelogAudit(ChangelogAuditVo changelogAuditVo, Connection neatlogicConn) throws Exception {
+        PreparedStatement statement = null;
+        try {
+            String sql = "insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`fcd`) VALUES (?,?,?,?,now())";
+            statement = neatlogicConn.prepareStatement(sql);
+            statement.setString(1, changelogAuditVo.getTenantUuid());
+            statement.setString(2, changelogAuditVo.getModuleId());
+            statement.setString(3, changelogAuditVo.getSqlHash());
+            statement.setString(5, changelogAuditVo.getVersion());
+            statement.execute();
+        } catch (Exception ex) {
+            throw new Exception(ex);
+        } finally {
+            JdbcUtil.closeStatement(statement);
+        }
+    }
+
+
+    /**
+     * 记录changelog sql语句
+     *
+     * @param hash          sql的哈希唯一值
+     * @param sql           sql语句
+     * @param neatlogicConn 连接neatlogic库 connection
+     */
+    private static void insertChangelogAuditDetail(String hash, String sql, Connection neatlogicConn) throws Exception {
+        PreparedStatement statement = null;
+        try {
+            statement = neatlogicConn.prepareStatement("insert ignore into `changelog_audit_detail` (`hash`,`sql`) VALUES (?,?) ");
+            statement.setString(1, hash);
+            statement.setString(2, sql);
+            statement.execute();
+        } catch (Exception ex) {
+            throw new Exception(ex);
+        } finally {
+            JdbcUtil.closeStatement(statement);
         }
     }
 
@@ -344,7 +446,7 @@ public class ScriptRunnerManager {
     private static void insertTenantModuleDmlSqlDetail(String md5, String dmlSql, Connection neatlogicConn) throws Exception {
         PreparedStatement statement = null;
         try {
-            String sql = "insert ignore into `tenant_module_dmlsql_detail` (`sql_uuid`,`content`) VALUES (?,?) ";
+            String sql = "insert ignore into `tenant_module_dmlsql_detail` (`hash`,`sql`) VALUES (?,?) ";
             statement = neatlogicConn.prepareStatement(sql);
             statement.setString(1, md5);
             statement.setString(2, dmlSql);

@@ -189,6 +189,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 activeTenantList.add(tenantVo);
             }
         } catch (Exception ex) {
+            logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(connection);
@@ -234,6 +235,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 tenantModuleGroupMap.computeIfAbsent(tenantGroupResultSet.getString("tenant_uuid"), k -> new HashMap<>()).put(tenantGroupResultSet.getString("module_id"), tenantGroupResultSet.getString("version"));
             }
         } catch (Exception ex) {
+            logger.error("获取激活租户的对应模块版本时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(connection);
@@ -339,6 +341,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 return versionResultSet.getString("version");
             }
         } catch (Exception ex) {
+            logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(connection);
@@ -435,22 +438,16 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入租户模块信息
      */
     private void insertTenantModuleVersionSql(String tenantUuid, String moduleId, String version) throws Exception {
-        PreparedStatement statement = null;
-        java.sql.Connection neatlogicConn = null;
-        try {
-            String sql = "insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()";
-            neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
-            statement = neatlogicConn.prepareStatement(sql);
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+             PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
             statement.setString(1, tenantUuid);
             statement.setString(2, moduleId);
             statement.setString(3, version);
             statement.setString(4, version);
             statement.execute();
         } catch (Exception ex) {
+            logger.error("插入租户模块信息时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
-        } finally {
-            JdbcUtil.closeConnection(neatlogicConn);
-            JdbcUtil.closeStatement(statement);
         }
     }
 
@@ -458,19 +455,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入neatlogic版本
      */
     private void insertNeatLogicVersion(String version) throws Exception {
-        PreparedStatement statement = null;
-        java.sql.Connection neatlogicConn = null;
-        try {
-            String sql = "insert into `version` (`version`,`fcd`,`lcd`) VALUES (?,now(),now())";
-            neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
-            statement = neatlogicConn.prepareStatement(sql);
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+             PreparedStatement statement = neatlogicConn.prepareStatement("insert into `version` (`version`,`fcd`,`lcd`) VALUES (?,now(),now())")) {
             statement.setString(1, version);
             statement.execute();
         } catch (Exception ex) {
+            logger.error("插入neatlogic版本时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
-        } finally {
-            JdbcUtil.closeConnection(neatlogicConn);
-            JdbcUtil.closeStatement(statement);
         }
     }
 
@@ -478,20 +469,14 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 更新neatlogic版本
      */
     private void updateNeatLogicVersion(String oldVersion, String version) throws Exception {
-        PreparedStatement statement = null;
-        java.sql.Connection neatlogicConn = null;
-        try {
-            String sql = "update version set version = ?,lcd = now() where version = ?";
-            neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
-            statement = neatlogicConn.prepareStatement(sql);
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+             PreparedStatement statement = neatlogicConn.prepareStatement("UPDATE version SET version = ?, lcd = NOW() WHERE version = ?")) {
             statement.setString(1, version);
             statement.setString(2, oldVersion);
             statement.execute();
         } catch (Exception ex) {
+            logger.error("更新neatlogic版本时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
-        } finally {
-            JdbcUtil.closeConnection(neatlogicConn);
-            JdbcUtil.closeStatement(statement);
         }
     }
 }

@@ -84,4 +84,9 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
         }
         return resultList;
     }
+
+    @Override
+    public int getSort() {
+        return 2;
+    }
 }

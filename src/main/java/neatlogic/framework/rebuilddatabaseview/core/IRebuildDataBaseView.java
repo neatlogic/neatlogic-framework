@@ -29,4 +29,6 @@ public interface IRebuildDataBaseView {
     String getDescription();
 
     List<ViewStatusInfo> execute();
+
+    int getSort();
 }

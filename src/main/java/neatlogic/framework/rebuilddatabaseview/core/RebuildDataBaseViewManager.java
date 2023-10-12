@@ -20,10 +20,7 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RootComponent
 public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
@@ -45,8 +42,10 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
 
     public static List<ViewStatusInfo> execute() {
         List<ViewStatusInfo> resultList = new ArrayList<>();
-        for (Map.Entry<String, IRebuildDataBaseView> entry : map.entrySet()) {
-            resultList.addAll(entry.getValue().execute());
+        List<IRebuildDataBaseView> list = new ArrayList<>(map.values());
+        list.sort(Comparator.comparing(IRebuildDataBaseView::getSort));
+        for (IRebuildDataBaseView rebuildDataBaseView : list) {
+            resultList.addAll(rebuildDataBaseView.execute());
         }
         return resultList;
     }

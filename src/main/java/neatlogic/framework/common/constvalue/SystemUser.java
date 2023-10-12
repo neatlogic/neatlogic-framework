@@ -82,7 +82,7 @@ public enum SystemUser {
         userVo.setUuid(userUuid);
         userVo.setUserId(userId);
         userVo.setUserName(getUserName());
-        userVo.setTenant(TenantContext.get().getTenantUuid());
+        userVo.setTenant(TenantContext.get() != null?TenantContext.get().getTenantUuid():null);
         userVo.setIsDelete(0);
         userVo.setIsActive(1);
         try {

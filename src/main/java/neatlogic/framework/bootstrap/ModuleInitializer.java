@@ -301,7 +301,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 String version = fileName.substring(fileName.lastIndexOf("/") + 1);
                 int versionTmp = Integer.parseInt((version.replace("-", StringUtils.EMPTY) + "00").substring(0, 10));
                 int currentVersionTmp = Integer.parseInt((currentVersion.replace("-", StringUtils.EMPTY) + "00").substring(0, 10));
-                if (versionTmp > currentVersionTmp) {
+                if (versionTmp >= currentVersionTmp) {
                     versionList.add(version);
                 }
             }
@@ -362,6 +362,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * @throws Exception 异常
      */
     private void updateTenantDatabase(ResourcePatternResolver resolver, Map<String, List<String>> moduleVersionListMap, List<TenantVo> allTenantList, List<ModuleVo> moduleVoList) throws Exception {
+        boolean isError = false;
+
         // 定义倒序比较器
         Comparator<String> fileNameComparatorReversed = Comparator.reverseOrder();
         // 定义正序比较器
@@ -400,12 +402,15 @@ public class ModuleInitializer implements WebApplicationInitializer {
                             for (String version : versionList) {
                                 int versionTmp = Integer.parseInt((version.replace("-", StringUtils.EMPTY) + "00").substring(0, 10));
                                 int currentVersionTmp = Integer.parseInt((moduleVersionMap.get(moduleId).replace("-", StringUtils.EMPTY) + "00").substring(0, 10));
-                                if (versionTmp > currentVersionTmp) {
+                                if (versionTmp >= currentVersionTmp) {
                                     Resource[] ddlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + version + "/neatlogic_tenant.sql");
                                     if (ddlResources.length == 1) {
                                         Resource ddlResource = ddlResources[0];
                                         Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
-                                        ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicDataSource(tenant, false), "neatlogic_tenant.sql");
+                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicDataSource(tenant, false), "neatlogic_tenant.sql");
+                                        if(isErrorTmp){
+                                            isError = true;
+                                        }
                                     }
                                     /*Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/changelog/" + version + "/tenant_dml.sql");
                                     if (dmlResources.length == 1) {
@@ -431,6 +436,9 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     insertTenantModuleVersionSql(tenant.getUuid(), moduleVo.getId(), latestVersion);
                 }
             }
+        }
+        if(isError){
+            System.exit(1);
         }
     }
 

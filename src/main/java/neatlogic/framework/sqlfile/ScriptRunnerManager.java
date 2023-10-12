@@ -264,7 +264,7 @@ public class ScriptRunnerManager {
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
      */
-    public static void runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
+    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
         Connection conn = null;
         ScriptRunner runner = null;
         StringWriter logStrWriter = new StringWriter();
@@ -275,17 +275,18 @@ public class ScriptRunnerManager {
         Connection neatlogicConn;
         ResultSet sqlMd5ResultSet;
         String tenantUuid = tenant == null ? "0" : tenant.getUuid(); //主库用0表示
+        boolean isError = false;
         try {
             BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
             List<String> hasRunSqlMd5List = new ArrayList<>();
             DataSource neatlogicDatasource = JdbcUtil.getNeatlogicDataSource();
             neatlogicConn = neatlogicDatasource.getConnection();
-            sqlMd5Statement = neatlogicConn.prepareStatement("select sql_hash from changelog_audit where tenant_uuid = ? and `module_id` = ?");
+            sqlMd5Statement = neatlogicConn.prepareStatement("select sql_hash from changelog_audit where tenant_uuid = ? and `module_id` = ? and (`sql_status` = 1 or `ignored` = 1) ");
             sqlMd5Statement.setString(1, tenantUuid);
             sqlMd5Statement.setString(2, moduleId);
             sqlMd5ResultSet = sqlMd5Statement.executeQuery();
             while (sqlMd5ResultSet.next()) {
-                hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_uuid"));
+                hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_hash"));
             }
             conn = dataSource.getConnection();
             runner = new ScriptRunner(conn);
@@ -298,26 +299,14 @@ public class ScriptRunnerManager {
             runner.setErrorLogWriter(errWriter);
             runner.setDelimiter(";");
             String line;
-            boolean isCreateTableStart = false;//用于标识
             StringBuilder sqlSb = new StringBuilder();
             while ((line = scriptBufferedReader.readLine()) != null) {
                 if (StringUtils.isBlank(line.trim())) {
                     continue;
                 }
-
-                if(!isCreateTableStart){
-                    if(line.trim().toLowerCase(Locale.ROOT).startsWith("create table")){
-                        isCreateTableStart = true;
-                        sqlSb.append(line);
-                        continue;
-                    }
-                }else{
-                    if(line.trim().endsWith(";")){
-                        isCreateTableStart = false;
-                    }else{
-                        sqlSb.append(line);
-                        continue;
-                    }
+                if (!line.trim().toLowerCase(Locale.ROOT).endsWith(";")) {
+                    sqlSb.append(line);
+                    continue;
                 }
                 sqlSb.append(line);
                 String sql = sqlSb.toString();
@@ -335,14 +324,18 @@ public class ScriptRunnerManager {
                             error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
                         }
                         //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                        //errStrWriter.getBuffer().setLength(0);
-                        throw new RuntimeException(error);
-                    } else {
-                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version);
+                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0);
+                        insertChangelogAudit(changelogAuditVo, neatlogicConn);
+                        insertChangelogAuditDetail(sqlHash, sql, neatlogicConn);
+                        System.out.println(error);
+                        errStrWriter.getBuffer().setLength(0);
+                        isError = true;
+                    }else {
+                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
                         hasRunSqlMd5List.add(sqlHash);
+                        insertChangelogAudit(changelogAuditVo, neatlogicConn);
+                        insertChangelogAuditDetail(sqlHash, sql, neatlogicConn);
                     }
-                    insertChangelogAudit(changelogAuditVo, neatlogicConn);
-                    insertChangelogAuditDetail(sqlHash, sql, neatlogicConn);
                 }
             }
         } catch (RuntimeException ex) {
@@ -361,7 +354,9 @@ public class ScriptRunnerManager {
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
+
         }
+        return isError;
     }
 
     /**
@@ -373,12 +368,16 @@ public class ScriptRunnerManager {
     private static void insertChangelogAudit(ChangelogAuditVo changelogAuditVo, Connection neatlogicConn) throws Exception {
         PreparedStatement statement = null;
         try {
-            String sql = "insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`fcd`) VALUES (?,?,?,?,now())";
+            String sql = "insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`error_msg`,`sql_status`,`lcd`) VALUES (?,?,?,?,?,?,now()) ON DUPLICATE KEY UPDATE `error_msg` = ?,`sql_status` = ?, `lcd` = now() ";
             statement = neatlogicConn.prepareStatement(sql);
             statement.setString(1, changelogAuditVo.getTenantUuid());
             statement.setString(2, changelogAuditVo.getModuleId());
             statement.setString(3, changelogAuditVo.getSqlHash());
-            statement.setString(5, changelogAuditVo.getVersion());
+            statement.setString(4, changelogAuditVo.getVersion());
+            statement.setString(5, changelogAuditVo.getErrorMsg());
+            statement.setInt(6, changelogAuditVo.getSqlStatus());
+            statement.setString(7, changelogAuditVo.getErrorMsg());
+            statement.setInt(8, changelogAuditVo.getSqlStatus());
             statement.execute();
         } catch (Exception ex) {
             throw new Exception(ex);

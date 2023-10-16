@@ -645,12 +645,16 @@ limitations under the License.
         WHERE `user_uuid` = #{value}
     </select>
 
-    <select id="getTeamUuidbyUpwardNamePath" parameterType="java.util.List" resultType="neatlogic.framework.dto.TeamVo">
+    <!--<select id="getTeamUuidbyUpwardNamePath" parameterType="java.util.List" resultType="neatlogic.framework.dto.TeamVo">
         SELECT  upward_name_path AS upwardNamePath ,`uuid` FROM `team`
         WHERE upward_name_path in
         <foreach collection="list" item="namePath" open="(" separator="," close=")">
             #{namePath}
         </foreach>
+    </select>-->
+
+    <select id="getTeamUuidbyUpwardNamePath" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT `uuid` FROM `team` WHERE `upward_name_path` = #{value}
     </select>
 
     <insert id="insertTeam" parameterType="neatlogic.framework.dto.TeamVo">
@@ -678,6 +682,35 @@ limitations under the License.
                 0,
                 #{source},
                 NOW())
+    </insert>
+
+    <insert id="insertTeamForLdap" parameterType="neatlogic.framework.dto.TeamVo">
+        INSERT INTO `team` (`id`,
+                            `uuid`,
+                            `name`,
+                            `parent_uuid`,
+                            `upward_uuid_path`,
+                            `upward_name_path`,
+                            `is_delete`,
+                            `source`,
+                            `lcd`)
+        VALUES (#{id},
+                #{uuid},
+                #{name},
+                #{parentUuid},
+                #{upwardUuidPath},
+                #{upwardNamePath},
+                0,
+                #{source},
+                #{lcd})
+        on DUPLICATE KEY UPDATE
+             `name` = #{name},
+             `parent_uuid` = #{parentUuid},
+             `upward_uuid_path` = #{upwardUuidPath},
+             `upward_name_path` = #{upwardNamePath},
+             `is_delete` = 0,
+             `source` = #{source},
+             `lcd` = #{lcd}
     </insert>
 
     <insert id="batchSaveTeam" parameterType="java.util.List">
@@ -864,12 +897,13 @@ limitations under the License.
         SET d.`upward_name_path` = c.`upward_name_path`
     </update>
 
-    <update id="updateTeamIsDeleteBySource" parameterType="java.lang.String">
+    <update id="updateTeamIsDeleteBySourceAndLcd" parameterType="java.util.Map">
         UPDATE
             `team`
         SET
             `is_delete` = 1
-        WHERE `source` = #{value}  AND UNIX_TIMESTAMP(`lcd`) &lt; UNIX_TIMESTAMP(DATE_FORMAT(NOW(),'%Y-%m-%d'))
+        WHERE `source` = #{source}
+          AND (`lcd` &lt; #{lcd} OR `lcd` IS NULL)
     </update>
 
     <!--	<delete id="deleteTeamByLeftRightCode">-->

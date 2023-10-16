@@ -16,13 +16,13 @@
 
 package neatlogic.framework.dto;
 
-import neatlogic.framework.common.constvalue.ApiParamType;
-import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.restful.annotation.EntityField;
-import neatlogic.framework.util.SnowflakeUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.common.constvalue.GroupSearch;
+import neatlogic.framework.common.dto.BaseEditorVo;
+import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.SnowflakeUtil;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -37,7 +37,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserVo extends BasePageVo implements Serializable {
+public class UserVo extends BaseEditorVo implements Serializable {
 
     private static final long serialVersionUID = 3670529362145832083L;
     private Long id;
@@ -128,6 +128,7 @@ public class UserVo extends BasePageVo implements Serializable {
 
     @EntityField(name = "是否超级管理员", type = ApiParamType.BOOLEAN)
     private Boolean isSuperAdmin;
+    private String source;
 
     public UserVo() {
 
@@ -577,5 +578,13 @@ public class UserVo extends BasePageVo implements Serializable {
 
     public void setIsSuperAdmin(Boolean isSuperAdmin) {
         this.isSuperAdmin = isSuperAdmin;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

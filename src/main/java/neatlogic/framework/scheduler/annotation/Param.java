@@ -13,4 +13,5 @@ public @interface Param {
     String description() default "";
     boolean required() default true;
     int sort() default  0;
+    String help() default "";
 }

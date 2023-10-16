@@ -2,18 +2,28 @@ package neatlogic.framework.scheduler.dto;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.SnowflakeUtil;
 
 public class JobPropVo {
 	
-	@EntityField(name = "属性id", type = ApiParamType.STRING)
+	@EntityField(name = "common.id", type = ApiParamType.STRING)
 	private Long id;
-	@EntityField(name = "定时作业uuid", type = ApiParamType.STRING)
+	@EntityField(name = "common.jobuuid", type = ApiParamType.STRING)
 	private String jobUuid;
-	@EntityField(name = "属性名", type = ApiParamType.STRING)
+	@EntityField(name = "common.name", type = ApiParamType.STRING)
 	private String name;
-	@EntityField(name = "属性值", type = ApiParamType.STRING)
+	@EntityField(name = "common.value", type = ApiParamType.STRING)
 	private String value;
-	
+	@EntityField(name = "common.datatype", type = ApiParamType.STRING)
+	private String dataType;
+	@EntityField(name = "common.description", type = ApiParamType.STRING)
+	private String description;
+	@EntityField(name = "common.isrequired", type = ApiParamType.BOOLEAN)
+	private Boolean required;
+	@EntityField(name = "common.sort", type = ApiParamType.INTEGER)
+	private Integer sort;
+	@EntityField(name = "common.help", type = ApiParamType.STRING)
+	private String help;
 	public JobPropVo() {
 		
 	}
@@ -31,6 +41,9 @@ public class JobPropVo {
 	}
 
 	public Long getId() {
+		if (id == null) {
+			id = SnowflakeUtil.uniqueLong();
+		}
 		return id;
 	}
 	public void setId(Long id) {
@@ -53,5 +66,45 @@ public class JobPropVo {
 	}
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Boolean getRequired() {
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	public String getHelp() {
+		return help;
+	}
+
+	public void setHelp(String help) {
+		this.help = help;
 	}
 }

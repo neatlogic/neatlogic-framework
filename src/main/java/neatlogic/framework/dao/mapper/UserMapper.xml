@@ -1247,7 +1247,7 @@ limitations under the License.
     </insert>
 
     <insert id="insertUserTeam">
-        INSERT INTO `user_team` (`team_uuid`, `user_uuid`)
+        INSERT ignore INTO `user_team` (`team_uuid`, `user_uuid`)
         VALUES (#{teamUuid}, #{userUuid})
     </insert>
 
@@ -1276,7 +1276,7 @@ limitations under the License.
         VALUES (#{id}, #{name});
     </insert>
 
-    <insert id="batchInsertUser" parameterType="java.util.List">
+    <!--<insert id="batchInsertUser" parameterType="java.util.List">
         insert into `user` (
         `id`,
         `uuid`,
@@ -1307,9 +1307,52 @@ limitations under the License.
         email=values(email),
         phone=values(phone),
         pinyin=values(pinyin)
+    </insert>-->
+
+    <insert id="insertUserForLdap" parameterType="neatlogic.framework.dto.UserVo">
+        insert into `user` (
+        `id`,
+        `uuid`,
+        `user_id`,
+        `user_name`,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active`,
+        `source`,
+        `fcu`,
+        `fcd`,
+        `lcu`,
+        `lcd`
+        ) values
+        (
+            #{id},
+            #{uuid},
+            #{userId},
+            #{userName},
+            #{email},
+            #{phone},
+            #{pinyin},
+            #{isActive},
+            #{source},
+            #{fcu},
+            NOW(3),
+            #{lcu},
+            #{lcd}
+        )
+        ON DUPLICATE KEY UPDATE
+        `user_id` = #{userId},
+        `user_name` = #{userName},
+        `email` = #{email},
+        `phone` = #{phone},
+        `pinyin` = #{pinyin},
+        `is_active` = #{isActive},
+        `source` = #{source},
+        `lcu` = #{lcu},
+        `lcd` = #{lcd}
     </insert>
 
-    <insert id="batchInsertUserTeam" parameterType="java.util.List">
+    <!--<insert id="batchInsertUserTeam" parameterType="java.util.List">
         INSERT INTO `user_team` (
         `team_uuid`,
         `user_uuid`
@@ -1324,7 +1367,7 @@ limitations under the License.
         on DUPLICATE KEY UPDATE
         team_uuid=values(team_uuid),
         user_uuid=values(user_uuid)
-    </insert>
+    </insert>-->
 
     <insert id="batchInsertUserRole" parameterType="java.util.List">
         INSERT ignore INTO `user_role` (
@@ -1411,6 +1454,14 @@ limitations under the License.
         WHERE `uuid` = #{value}
     </update>
 
+    <update id="updateUserIsDeletedBySourceAndLcd">
+        UPDATE `user`
+        SET `is_delete` = 1,
+            `is_active` = 0
+        WHERE `source` = #{source}
+        AND (`lcd` &lt; #{lcd} OR `lcd` IS NULL)
+    </update>
+
     <update id="updateUserIsNotDeletedByUuid" parameterType="java.lang.String">
         UPDATE `user`
         SET `is_delete` = 0
@@ -1480,13 +1531,19 @@ limitations under the License.
         WHERE `name` = #{value};
     </delete>
 
-    <delete id="bacthDeleteUserTeam" parameterType="java.util.List">
-        DELETE a.* FROM `user_team`  a JOIN `team` b ON a.team_uuid = b.uuid
+    <!--<delete id="bacthDeleteUserTeam" parameterType="java.util.List">
+        DELETE a FROM `user_team`  a JOIN `team` b ON a.team_uuid = b.uuid
         WHERE b.source = #{source}
         AND `user_uuid` IN
         <foreach collection="userUuidlist" item="value" separator="," open="(" close=")">
             #{value}
         </foreach>
+    </delete>-->
+
+    <delete id="bacthDeleteUserTeamByUserUuid" parameterType="java.util.Map">
+        DELETE a FROM `user_team`  a JOIN `team` b ON a.team_uuid = b.uuid
+        WHERE b.source = #{source}
+        AND `user_uuid` = #{userUuid}
     </delete>
 
     <delete id="deleteUserDataByUserUuid" parameterType="java.lang.String">

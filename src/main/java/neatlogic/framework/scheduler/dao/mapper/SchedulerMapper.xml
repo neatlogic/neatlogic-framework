@@ -367,7 +367,7 @@ limitations under the License.
     </update>
 
     <insert id="insertJobAuditDetail">
-        INSERT
+        INSERT IGNORE
         INTO schedule_job_audit_detail (hash, content)
         values (#{hash},
                 #{content,typeHandler=CompressHandler})

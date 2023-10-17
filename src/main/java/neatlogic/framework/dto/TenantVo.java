@@ -16,6 +16,7 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
@@ -24,6 +25,7 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.SnowflakeUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,15 +35,15 @@ public class TenantVo extends BaseEditorVo {
     private static final long serialVersionUID = 5037087043421533431L;
 
     public enum Status {
-        BUILDING("building", "基础数据"),
-        BUILT("built", "已完成"),
+        BUILDING("building", "nfdt.status.building"),
+        BUILT("built", "nfdt.status.built"),
         DDL("ddl", "ddl"),
         DDL_DEMO_DATA("ddldemo_data", "ddl demo data"),
         DML("dml", "dml"),
         DML_DEMO("dmldemo", "dml demo"),
         DML_DEMO_DATA("dmldemo_data", "dml demo data"),
         MONGODB("mongodb", "mongodb"),
-        ERROR("error", "异常");
+        ERROR("error", "nfdt.status.error");
 
         private String value;
         private String text;
@@ -81,37 +83,43 @@ public class TenantVo extends BaseEditorVo {
     private Long id;
     @EntityField(name = "uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "是否激活", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isactive", type = ApiParamType.INTEGER)
     private Integer isActive;
-    @EntityField(name = "描述", type = ApiParamType.STRING)
+    @EntityField(name = "common.description", type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "有效期限", type = ApiParamType.LONG)
+    @EntityField(name = "nfd.tenantvo.expiredate", type = ApiParamType.LONG)
     private Date expireDate;
-    @EntityField(name = "激活模块", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfd.tenantvo.modulelist", type = ApiParamType.JSONARRAY)
     private List<ModuleVo> moduleList;
-    @EntityField(name = "激活模块分组", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfd.tenantvo.modulegrouplist", type = ApiParamType.JSONARRAY)
     private List<ModuleGroupVo> moduleGroupList;
-    @EntityField(name = "状态", type = ApiParamType.STRING)
+    @EntityField(name = "common.status", type = ApiParamType.STRING)
     private String status;
-    @EntityField(name = "超级管理员", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.superadmin", type = ApiParamType.JSONARRAY)
     private List<String> superAdminList;
-    @EntityField(name = "异常信息", type = ApiParamType.STRING)
+    @EntityField(name = "common.errormsg", type = ApiParamType.STRING)
     private String errorMsg;
-    @EntityField(name = "租户mongodb", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfd.tenantvo.mongodb", type = ApiParamType.JSONOBJECT)
     private MongoDbVo mongodb;
-    @EntityField(name = "数据库数据源", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.JSONOBJECT)
+    private MongoDbVo authMongodb;
+    @JSONField(serialize = false)
+    @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.STRING)
+    private String authConfig;
+    @EntityField(name = "common.datasource", type = ApiParamType.JSONOBJECT)
     private DatasourceVo datasource;
-    @EntityField(name = "数据库数据源", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfd.tenantvo.islocaldb", type = ApiParamType.JSONOBJECT)
     private boolean isLocalDb = true;
 
     @JSONField(serialize = false)
-    @EntityField(name = "超级管理员 租户创建时使用", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfd.tenantvo.superadmin", type = ApiParamType.JSONOBJECT)
     private UserVo superAdmin;
 
-    @EntityField(name = "访问时间", type = ApiParamType.LONG)
+    @EntityField(name = "nfd.tenantvo.visittime", type = ApiParamType.LONG)
     private Date visitTime;
+
 
     public TenantVo() {
         this.setPageSize(20);
@@ -224,6 +232,28 @@ public class TenantVo extends BaseEditorVo {
         this.mongodb = mongodb;
     }
 
+    public MongoDbVo getAuthMongodb() {
+        if (this.authMongodb == null && StringUtils.isNotBlank(authConfig)) {
+            this.authMongodb = JSONObject.parseObject(authConfig, MongoDbVo.class);
+        }
+        return authMongodb;
+    }
+
+    public void setAuthMongodb(MongoDbVo authMongodb) {
+        this.authMongodb = authMongodb;
+    }
+
+    public String getAuthConfig() {
+        if (StringUtils.isBlank(authConfig) && authMongodb != null) {
+            authConfig = JSONObject.toJSONString(authMongodb);
+        }
+        return authConfig;
+    }
+
+    public void setAuthConfig(String authConfig) {
+        this.authConfig = authConfig;
+    }
+
     public DatasourceVo getDatasource() {
         return datasource;
     }
@@ -255,4 +285,5 @@ public class TenantVo extends BaseEditorVo {
     public void setVisitTime(Date visitTime) {
         this.visitTime = visitTime;
     }
+
 }

@@ -27,6 +27,18 @@ public class TenantModuleGroupVo {
     @EntityField(name = "模块组", type = ApiParamType.STRING)
     private String moduleGroup;
 
+    @EntityField(name = "版本", type = ApiParamType.STRING)
+    private String version;
+
+    public TenantModuleGroupVo() {
+
+    }
+
+    public TenantModuleGroupVo(String moduleGroup, String version) {
+        this.moduleGroup = moduleGroup;
+        this.version = version;
+    }
+
     public Long getTenantId() {
         return tenantId;
     }
@@ -49,5 +61,13 @@ public class TenantModuleGroupVo {
 
     public void setModuleGroup(String moduleGroup) {
         this.moduleGroup = moduleGroup;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

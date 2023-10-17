@@ -192,8 +192,9 @@ public class TimeUtil {
 
     /**
      * 获取n天后的时间,返回long类型
+     *
      * @param date 时间
-     * @param day 天数
+     * @param day  天数
      * @return n天后的时间
      */
     public static Long getAddDateLongByDay(Date date, int day) {
@@ -219,8 +220,9 @@ public class TimeUtil {
 
     /**
      * 跳过周末找n天前的日期
+     *
      * @param date 日期
-     * @param day 减的天数
+     * @param day  减的天数
      * @return 日期字符串
      */
     public static String descDateStrByWorkDay(Date date, int day) {
@@ -237,8 +239,9 @@ public class TimeUtil {
 
     /**
      * 跳过周末找n天前的日期
+     *
      * @param date 日期
-     * @param day 减的天数
+     * @param day  减的天数
      * @return 日期字符串
      */
     public static Date descDateByWorkDay(Date date, int day) {
@@ -251,6 +254,22 @@ public class TimeUtil {
             }
         }
         return calendar.getTime();
+    }
+
+    /**
+     * 找n天前的日期
+     *
+     * @param date 日期
+     * @param day  减的天数
+     * @return 日期字符串
+     */
+    public static String descDateStr(Date date, int day,String format) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        for (int i = 0; i < day; i++) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        return convertDateToString(calendar.getTime(), format);
     }
 
     public static boolean checkHoliday(Calendar calendar) {
@@ -919,10 +938,11 @@ public class TimeUtil {
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.HOURS，separator=" "， 返回值为3天 2小时
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.MINUTES，separator=" "， 返回值为3天 2小时 4分钟
      * 例如入参milliseconds = 266646000，unitCount=4，minTimeUnit=TimeUnit.SECONDS，separator="-"， 返回值为3天-2小时-4分钟-6秒
+     *
      * @param milliseconds 毫秒数
-     * @param unitCount 结果显示最多单位个数
-     * @param minTimeUnit 结果显示最小单位
-     * @param separator 两个单位之间的连接符
+     * @param unitCount    结果显示最多单位个数
+     * @param minTimeUnit  结果显示最小单位
+     * @param separator    两个单位之间的连接符
      * @return
      */
     public static String millisecondsFormat(Long milliseconds, int unitCount, TimeUnit minTimeUnit, String separator) {

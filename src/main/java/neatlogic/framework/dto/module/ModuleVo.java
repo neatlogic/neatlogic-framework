@@ -44,6 +44,26 @@ public class ModuleVo {
     @EntityField(name = "闭源uuid", type = ApiParamType.STRING)
     private String closedSourceUniqueKey;
 
+    @EntityField(name = "闭源uuid", type = ApiParamType.STRING)
+    private String urlMapping;
+
+    @EntityField(name = "classpath", type = ApiParamType.STRING)
+    private String path;
+    public ModuleVo() {}
+    public ModuleVo(String id,String name,String urlMapping, String moduleDescription, String version, String group, String groupName, String groupSort, String groupDescription,String path) {
+        this.id = id;
+        this.name = name;
+        this.urlMapping = urlMapping;
+        this.description = moduleDescription;
+        this.version = version;
+        this.group = group;
+        this.groupName = groupName;
+        this.groupSort = Integer.parseInt(groupSort);
+        this.groupDescription = groupDescription;
+        this.path = path;
+    }
+
+
     public boolean getHasInitialData() {
         if (hasInitialData == null && StringUtils.isNotBlank(this.id)) {
             hasInitialData = InitialDataManager.hasInitialData(this.id);
@@ -57,6 +77,9 @@ public class ModuleVo {
 
     public String getName() {
         return $.t(name);
+    }
+    public String getNameWithoutTranslate() {
+        return name;
     }
 
     public void setName(String name) {
@@ -99,6 +122,10 @@ public class ModuleVo {
         return $.t(groupName);
     }
 
+    public String getGroupNameWithoutTranslate() {
+        return groupName;
+    }
+
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
@@ -125,5 +152,21 @@ public class ModuleVo {
 
     public void setClosedSourceUniqueKey(String closedSourceUniqueKey) {
         this.closedSourceUniqueKey = closedSourceUniqueKey;
+    }
+
+    public String getUrlMapping() {
+        return urlMapping;
+    }
+
+    public void setUrlMapping(String urlMapping) {
+        this.urlMapping = urlMapping;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

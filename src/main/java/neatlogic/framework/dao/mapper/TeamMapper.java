@@ -6,8 +6,8 @@ import neatlogic.framework.dto.TeamUserVo;
 import neatlogic.framework.dto.TeamVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface TeamMapper {
     TeamVo getTeam(TeamVo teamVo);
@@ -108,13 +108,15 @@ public interface TeamMapper {
 
     List<TeamUserTitleVo> getTeamUserTitleListByUserUuid(String userUuid);
 
-    List<TeamVo> getTeamUuidbyUpwardNamePath(@Param("list") List<String> list);
-
+//    List<TeamVo> getTeamUuidbyUpwardNamePath(@Param("list") List<String> list);
+    String getTeamUuidbyUpwardNamePath(String upwardNamePath);
     int checkTitleIsReferenceByTitleId(Long id);
 
 //	 int deleteTeamByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
     int insertTeam(TeamVo teamVo);
+
+    void insertTeamForLdap(TeamVo teamVo);
 
     int batchSaveTeam(@Param("list")List teamList);
 
@@ -136,7 +138,8 @@ public interface TeamMapper {
 
 //	 int batchUpdateTeamRightCode(@Param("minCode")Integer minCode, @Param("step") int step);
 
-    int updateTeamIsDeleteBySource(String source);
+    int updateTeamIsDeleteBySourceAndLcd(@Param("source") String source, @Param("lcd") Date lcd);
+
     int batchUpdateTeamLeftRightCodeByLeftRightCode(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step);
 
     int updateUpwardUuidPathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
@@ -156,5 +159,4 @@ public interface TeamMapper {
     int deleteTeamUserTitleByTeamUuidAndTitle(@Param("teamUuid") String teamUuid, @Param("titleId") Long titleId);
 
     int deleteTeamUserTitleByTeamUuid(String uuid);
-
 }

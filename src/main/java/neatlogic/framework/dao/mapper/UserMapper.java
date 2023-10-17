@@ -19,6 +19,7 @@ package neatlogic.framework.dao.mapper;
 import neatlogic.framework.dto.*;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface UserMapper {
@@ -199,9 +200,11 @@ public interface UserMapper {
 
     int insertUserTitle(UserTitleVo userTitleVo);
 
-    int batchInsertUser(List<UserVo> list);
+//    int batchInsertUser(List<UserVo> list);
 
-    int batchInsertUserTeam(List<TeamUserVo> list);
+    int insertUserForLdap(UserVo userVo);
+
+//    int batchInsertUserTeam(List<TeamUserVo> list);
 
     int batchInsertUserRole(List<RoleUserVo> list);
 
@@ -223,6 +226,8 @@ public interface UserMapper {
 
     int updateUserIsDeletedByUuid(String uuid);
 
+    int updateUserIsDeletedBySourceAndLcd(@Param("source") String source, @Param("lcd") Date lcd);
+
     int updateUserIsNotDeletedByUuid(String uuid);
 
     int deleteUserPasswordByLimit(@Param("userUuid") String userUuid, @Param("idList") List<Long> idList);
@@ -243,7 +248,9 @@ public interface UserMapper {
 
     int deleteUserTitleByName(String name);
 
-    int bacthDeleteUserTeam(@Param("userUuidlist") List<String> userUuidlist, @Param("source") String source);
+//    int bacthDeleteUserTeam(@Param("userUuidlist") List<String> userUuidlist, @Param("source") String source);
+
+    int bacthDeleteUserTeamByUserUuid(@Param("userUuid") String userUuid, @Param("source") String source);
 
     int searchUserCountByAuth(UserVo vo);
 

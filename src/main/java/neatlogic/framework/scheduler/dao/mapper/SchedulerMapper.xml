@@ -302,7 +302,7 @@ limitations under the License.
             `schedule_job_audit` a
         WHERE a.job_uuid = #{jobUuid}
           AND a.`status` = #{status}
-        ORDER BY a.end_time
+        ORDER BY a.end_time DESC
         LIMIT 1
     </select>
 
@@ -367,7 +367,7 @@ limitations under the License.
     </update>
 
     <insert id="insertJobAuditDetail">
-        INSERT
+        INSERT IGNORE
         INTO schedule_job_audit_detail (hash, content)
         values (#{hash},
                 #{content,typeHandler=CompressHandler})

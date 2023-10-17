@@ -1,11 +1,11 @@
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TeamVo extends BasePageVo implements Serializable {
+public class TeamVo extends BaseEditorVo implements Serializable {
 	
 	public static final String ROOT_PARENTUUID = "-1";
 	public static final String ROOT_UUID = "0";

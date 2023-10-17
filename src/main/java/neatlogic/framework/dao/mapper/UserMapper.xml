@@ -1349,7 +1349,7 @@ limitations under the License.
         `phone` = #{phone},
         `pinyin` = #{pinyin},
         `is_active` = #{isActive},
-        `is_delete` = 1,
+        `is_delete` = 0,
         `source` = #{source},
         `lcu` = #{lcu},
         `lcd` = #{lcd}

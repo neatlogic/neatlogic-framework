@@ -1319,6 +1319,7 @@ limitations under the License.
         `phone`,
         `pinyin`,
         `is_active`,
+        `is_delete`,
         `source`,
         `fcu`,
         `fcd`,
@@ -1334,6 +1335,7 @@ limitations under the License.
             #{phone},
             #{pinyin},
             #{isActive},
+            0,
             #{source},
             #{fcu},
             NOW(3),
@@ -1347,6 +1349,7 @@ limitations under the License.
         `phone` = #{phone},
         `pinyin` = #{pinyin},
         `is_active` = #{isActive},
+        `is_delete` = 0,
         `source` = #{source},
         `lcu` = #{lcu},
         `lcd` = #{lcd}

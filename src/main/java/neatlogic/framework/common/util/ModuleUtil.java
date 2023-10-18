@@ -30,8 +30,19 @@ public class ModuleUtil {
     private static final List<ModuleVo> moduleList = new ArrayList<>();
     private static final Map<String, ModuleVo> moduleMap = new HashMap<>();
 
+    //没有通过License验证的商业模块id
+    private static final Set<String> invalidatedModuleSet = new HashSet<>();
+
     public static List<ModuleVo> getAllModuleList() {
         return moduleList;
+    }
+
+    public static void addInvalidatedModule(String moduleId) {
+        invalidatedModuleSet.add(moduleId);
+    }
+
+    public static boolean isModuleInvalidated(String moduleId) {
+        return invalidatedModuleSet.contains(moduleId);
     }
 
     public static List<ModuleGroupVo> getAllModuleGroupList() {

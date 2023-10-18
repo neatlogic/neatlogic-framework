@@ -49,8 +49,15 @@ public class ModuleVo {
 
     @EntityField(name = "classpath", type = ApiParamType.STRING)
     private String path;
-    public ModuleVo() {}
-    public ModuleVo(String id,String name,String urlMapping, String moduleDescription, String version, String group, String groupName, String groupSort, String groupDescription,String path) {
+    @EntityField(name = "父模块", type = ApiParamType.STRING)
+    private String parent;
+    @EntityField(name = "是否商业模块", type = ApiParamType.BOOLEAN)
+    private boolean isCommercial;
+
+    public ModuleVo() {
+    }
+
+    public ModuleVo(String id, String name, String urlMapping, String moduleDescription, String version, String group, String groupName, String groupSort, String groupDescription, String path, String parent, boolean isCommercial) {
         this.id = id;
         this.name = name;
         this.urlMapping = urlMapping;
@@ -61,6 +68,8 @@ public class ModuleVo {
         this.groupSort = Integer.parseInt(groupSort);
         this.groupDescription = groupDescription;
         this.path = path;
+        this.parent = parent;
+        this.isCommercial = isCommercial;
     }
 
 
@@ -71,6 +80,18 @@ public class ModuleVo {
         return hasInitialData;
     }
 
+    public void setHasInitialData(Boolean hasInitialData) {
+        this.hasInitialData = hasInitialData;
+    }
+
+    public boolean isCommercial() {
+        return isCommercial;
+    }
+
+    public void setCommercial(boolean commercial) {
+        isCommercial = commercial;
+    }
+
     public void setHasInitialData(boolean hasInitialData) {
         this.hasInitialData = hasInitialData;
     }
@@ -78,6 +99,7 @@ public class ModuleVo {
     public String getName() {
         return $.t(name);
     }
+
     public String getNameWithoutTranslate() {
         return name;
     }
@@ -168,5 +190,13 @@ public class ModuleVo {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 }

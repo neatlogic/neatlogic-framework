@@ -66,7 +66,10 @@ public class ModuleInitializer implements WebApplicationInitializer {
             initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
             updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
-            for (ModuleVo moduleFromServletContext : moduleListFromServletContext) {
+            List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
+            List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());
+            Set<String> successLoadedParentSet = new HashSet<>();
+            for (ModuleVo moduleFromServletContext : parentModuleList) {
                 module = moduleFromServletContext;
                 NeatLogicWebApplicationContext appContext = new NeatLogicWebApplicationContext();
                 appContext.setConfigLocation("classpath*:" + module.getPath());
@@ -75,6 +78,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 appContext.setModuleName(module.getNameWithoutTranslate());
                 appContext.setGroupName(module.getGroupNameWithoutTranslate());
                 appContext.setGroup(module.getGroup());
+
                 ModuleUtil.addModule(module);
                 ServletRegistration.Dynamic sr = context.addServlet(module.getId() + "[" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()) + "] " + module.getVersion(), new NeatLogicDispatcherServlet(module, appContext));
                 if (StringUtils.isNotBlank(module.getUrlMapping())) {
@@ -89,6 +93,17 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     sr.setLoadOnStartup(2);
                 }
                 System.out.println("  ✓" + module.getId() + "·" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()));
+                successLoadedParentSet.add(module.getId());
+                module = null;
+            }
+            for (ModuleVo childModule : childModuleList) {
+                if (successLoadedParentSet.contains(childModule.getParent())) {
+                    ModuleUtil.addModule(childModule);
+                    if (!childModule.isCommercial()) {
+                        //商业模块需要通过license校验后自行打印成功加载信息
+                        System.out.println("  ✓" + childModule.getId() + "·" + I18nUtils.getStaticMessage(childModule.getNameWithoutTranslate()));
+                    }
+                }
             }
         } catch (RuntimeException ex) {
             System.out.println(ex.getMessage());
@@ -109,8 +124,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 根据每个模块的servlet context 获取模块列表
      */
     private List<ModuleVo> getModuleListByServletContext(ResourcePatternResolver resolver) throws Exception {
-        String moduleId = null;
-        String moduleName = null;
         List<ModuleVo> moduleVoList = new ArrayList<>();
         Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
         for (Resource resource : resources) {
@@ -120,8 +133,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
             Document document = reader.read(resource.getURL());
             Element rootE = document.getRootElement();
             Element neatlogicE = rootE.element("module");
-            // Element nameE = rootE.element("name");
-            String urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
+            String parent = neatlogicE.attributeValue("parent");
+            boolean isCommercial = false;
+            if (StringUtils.isNotBlank(neatlogicE.attributeValue("isCommercial"))) {
+                isCommercial = Boolean.parseBoolean(neatlogicE.attributeValue("isCommercial"));
+            }
+            String moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
             moduleId = neatlogicE.attributeValue("id");
             moduleName = neatlogicE.attributeValue("name");
             urlMapping = neatlogicE.attributeValue("urlMapping");
@@ -131,7 +148,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             groupSort = neatlogicE.attributeValue("groupSort");
             groupDescription = neatlogicE.attributeValue("groupDescription");
             version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
-            moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path));
+            moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path, parent, isCommercial));
         }
         return moduleVoList;
     }
@@ -408,7 +425,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                                         Resource ddlResource = ddlResources[0];
                                         Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
                                         boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicDataSource(tenant, false), "neatlogic_tenant.sql");
-                                        if(isErrorTmp){
+                                        if (isErrorTmp) {
                                             isError = true;
                                         }
                                     }
@@ -437,7 +454,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 }
             }
         }
-        if(isError){
+        if (isError) {
             System.exit(1);
         }
     }

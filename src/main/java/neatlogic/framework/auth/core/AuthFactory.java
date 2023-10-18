@@ -38,10 +38,10 @@ public class AuthFactory {
         for (Class<? extends AuthBase> c : authClass) {
             try {
                 //排除抽象类
-                if(!Modifier.isAbstract(c.getModifiers())) {
+                if (!Modifier.isAbstract(c.getModifiers())) {
                     AuthBase authIns = c.newInstance();
                     authMap.put(authIns.getAuthName(), authIns);
-                    if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || !authIns.checkInvalid()) {
+                    if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || ModuleUtil.isModuleInvalidated(authIns.getAuthGroup())) {
                         continue;
                     }
                     if (authGroupMap.containsKey(authIns.getAuthGroup())) {

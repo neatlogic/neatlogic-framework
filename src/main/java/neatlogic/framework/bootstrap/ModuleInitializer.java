@@ -22,7 +22,6 @@ import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
@@ -186,7 +185,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                throw new ApiRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
             }
             String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid";
             tenantStatement = connection.prepareStatement(tenantSql);
@@ -232,7 +231,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                throw new ApiRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
             }
             List<String> activeTenantUuidList = activeTenantList.stream().map(TenantVo::getUuid).collect(Collectors.toList());
             StringBuilder placeholders = new StringBuilder();
@@ -349,7 +348,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             try {
                 connection = datasource.getConnection();
             } catch (Exception exception) {
-                throw new ApiRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
             }
             String versionSql = "SELECT * FROM version limit 1";
             versionStatement = connection.prepareStatement(versionSql);

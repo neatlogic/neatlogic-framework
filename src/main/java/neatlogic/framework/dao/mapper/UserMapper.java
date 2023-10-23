@@ -63,6 +63,8 @@ public interface UserMapper {
 
     List<UserVo> searchUser(UserVo userVo);
 
+    List<UserVo> searchUserForGroupSearch(UserVo userVo);
+
     List<UserVo> searchUserForSelect(UserVo userVo);
 
     List<UserVo> searchUserByAuth(String auth);

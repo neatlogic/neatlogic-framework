@@ -65,18 +65,15 @@ public class UserGroupHandler implements IGroupSearchHandler {
         }
         List<UserVo> userList = new ArrayList<UserVo>();
         UserVo userVo = new UserVo();
-        userVo.setNeedPage(true);
         userVo.setPageSize(total);
         userVo.setCurrentPage(1);
-        userVo.setIsActive(1);
-        userVo.setIsDelete(0);
         userVo.setKeyword(groupSearchVo.getKeyword());
         //如果存在rangeList 则需要过滤option
         List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             userService.getUserByRangeList(userVo, rangeList);
         }
-        userList = userMapper.searchUser(userVo);
+        userList = userMapper.searchUserForGroupSearch(userVo);
         return convertGroupSearchOption(userList);
     }
 

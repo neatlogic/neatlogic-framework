@@ -285,100 +285,124 @@ limitations under the License.
         j.`uuid` as `teamUuid`,
         j.`name` as `teamName`
         FROM (
-        SELECT
-        a.`uuid`
-        FROM
-        `user` a
-        <where>
-            <if test="keyword !=null and keyword != ''">
-                AND
-                (
-                a.user_id LIKE CONCAT(#{keyword}, '%')
-                OR a.user_name LIKE CONCAT(#{keyword}, '%')
-                OR a.email LIKE CONCAT(#{keyword}, '%')
-                )
-            </if>
-            <if test="vipLevel != null">
-                and a.`vip_level` = #{vipLevel}
-            </if>
-            <if test="isActive != null">
-                AND a.`is_active` = #{isActive}
-            </if>
-            <if test="isDelete != null">
-                AND a.`is_delete` = #{isDelete}
-            </if>
+            SELECT
+                DISTINCT a.`uuid`
+            FROM `user` a
             <if test="teamUuid != null and teamUuid != ''">
-                AND EXISTS (select 1 from `user_team` where `user_uuid` = a.`uuid` and `team_uuid` = #{teamUuid})
-            </if>
-            <if test="authGroup != null and authGroup != ''">
-                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth_group` = #{authGroup})
-            </if>
-            <if test="auth != null and auth != ''">
-                AND EXISTS (select 1 from `user_authority` where `user_uuid` = a.`uuid` and `auth` = #{auth})
-                or
-                EXISTS (
-                select 1 from `role_authority` join `user_role` on `role_authority`.`role_uuid` =
-                `user_role`.`role_uuid`
-                where `user_role`.`user_uuid` = a.`uuid` and `role_authority`.`auth` = #{auth}
-                )
+                JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
             </if>
             <if test="roleUuid != null and roleUuid != ''">
-                AND EXISTS (select 1 from `user_role` where `user_uuid` = a.`uuid` and `role_uuid` = #{roleUuid})
+                JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
             </if>
-            <if test="rangeList != null and rangeList.size()>0">
-                and (
-                <if test="userUuidList != null and userUuidList.size()>0">
-                    a.uuid in
-                    <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
-                        #{userUuid}
-                    </foreach>
+            <where>
+                <if test="keyword !=null and keyword != ''">
+                    (a.`user_id` LIKE CONCAT(#{keyword}, '%')
+                    OR a.`user_name` LIKE CONCAT(#{keyword}, '%')
+                    OR a.email LIKE CONCAT(#{keyword}, '%'))
                 </if>
-                <if test="teamUuidList != null and teamUuidList.size()>0">
-                    <if test="userUuidList != null and userUuidList.size()>0">
-                        or
-                    </if>
-                    EXISTS (
-                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
-                    where `user_team`.`user_uuid` = a.`uuid`
-                    and `team`.`uuid` in
-                    <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-                        #{teamUuid}
-                    </foreach>
-                    )
+                <if test="vipLevel != null">
+                    and a.`vip_level` = #{vipLevel}
                 </if>
-                <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
-                    <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
-                        or
-                    </if>
-                    EXISTS (
-                    select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
-                    where `user_team`.`user_uuid` = a.`uuid`
-                    and
-                    <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
-                        `team`.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
-                    </foreach>
-                    )
+                <if test="isActive != null">
+                    AND a.`is_active` = #{isActive}
                 </if>
-                )
+                <if test="isDelete != null">
+                    AND a.`is_delete` = #{isDelete}
+                </if>
+                <if test="teamUuid != null and teamUuid != ''">
+                    AND b.`team_uuid` = #{teamUuid}
+                </if>
+                <if test="roleUuid != null and roleUuid != ''">
+                    AND d.`role_uuid` = #{roleUuid}
+                </if>
+            </where>
+            <if test="keyword !=null and keyword != ''">
+                ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
             </if>
-        </where>
-        <if test="keyword !=null and keyword != ''">
-            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
-        </if>
-        <if test="needPage == true">
-            LIMIT #{startNum}, #{pageSize}
-        </if>
+            <if test="needPage == true">
+                LIMIT #{startNum}, #{pageSize}
+            </if>
         ) g
         JOIN `user` k ON g.`uuid` = k.`uuid`
         LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
         LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
         LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
         LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
-        ORDER BY
+    </select>
+
+    <select id="searchUserForGroupSearch" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+        SELECT
+        k.`id`,
+        k.`uuid`,
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        k.`user_info` as `userInfo`,
+        k.`vip_level` as `vipLevel`,
+        k.`is_super_admin` as isSuperAdmin,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
+        FROM (
+        SELECT
+            a.`uuid`
+        FROM `user` a
+        WHERE a.`is_active` = 1
+        AND a.`is_delete` = 0
         <if test="keyword !=null and keyword != ''">
-            length(k.`user_id`) asc, length(k.`user_name`) asc,
+            AND
+            (
+            a.user_id LIKE CONCAT(#{keyword}, '%')
+            OR a.user_name LIKE CONCAT(#{keyword}, '%')
+            OR a.email LIKE CONCAT(#{keyword}, '%')
+            )
         </if>
-        k.`id` DESC
+        <if test="rangeList != null and rangeList.size()>0">
+            and (
+            <if test="userUuidList != null and userUuidList.size()>0">
+                a.uuid in
+                <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                    #{userUuid}
+                </foreach>
+            </if>
+            <if test="teamUuidList != null and teamUuidList.size()>0">
+                <if test="userUuidList != null and userUuidList.size()>0">
+                    or
+                </if>
+                EXISTS (
+                select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                where `user_team`.`user_uuid` = a.`uuid`
+                and `team`.`uuid` in
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+                )
+            </if>
+            <if test="parentTeamUuidList != null and parentTeamUuidList.size()>0">
+                <if test="userUuidList != null and userUuidList.size()>0 or teamUuidList != null and teamUuidList.size()>0">
+                    or
+                </if>
+                EXISTS (
+                select 1 from `team` join `user_team` on `team`.`uuid` = `user_team`.`team_uuid`
+                where `user_team`.`user_uuid` = a.`uuid`
+                and
+                <foreach collection="parentTeamUuidList" item="parentTeamUuid" open="(" separator=" or " close=")">
+                    `team`.`upward_uuid_path` LIKE CONCAT('%',#{parentTeamUuid},'%')
+                </foreach>
+                )
+            </if>
+            )
+        </if>
+        <if test="keyword !=null and keyword != ''">
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+        ) g
+        JOIN `user` k ON g.`uuid` = k.`uuid`
+        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
+        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
     </select>
 
     <select id="searchUserForSelect" parameterType="neatlogic.framework.dto.UserVo"
@@ -517,30 +541,20 @@ limitations under the License.
 
     <select id="searchUserCount" parameterType="neatlogic.framework.dto.UserVo" resultType="int" useCache="false">
         SELECT
-        <if test="(teamUuid != null and teamUuid != '') or (authGroup != null and authGroup != '') or (auth != null and auth != '') or (roleUuid != null and roleUuid != '')">
             count(DISTINCT (a.`uuid`))
-        </if>
-        <if test="(teamUuid == null or teamUuid == '') and (authGroup == null or authGroup == '') and (auth == null or auth == '') and (roleUuid == null or roleUuid == '')">
-            count(a.`uuid`)
-        </if>
         FROM `user` a
         <if test="teamUuid != null and teamUuid != ''">
-            LEFT JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+            JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
         </if>
-
-        <if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
-            LEFT JOIN `user_authority` c ON a.`uuid` = c.`user_uuid`
-        </if>
-
         <if test="roleUuid != null and roleUuid != ''">
-            LEFT JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
+            JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
         </if>
         <where>
             <if test="keyword !=null and keyword != ''">
                 (a.`user_id` LIKE CONCAT(#{keyword}, '%')
-                OR a.`user_name` LIKE CONCAT(#{keyword}, '%'))
+                OR a.`user_name` LIKE CONCAT(#{keyword}, '%')
+                OR a.email LIKE CONCAT(#{keyword}, '%'))
             </if>
-
             <if test="vipLevel != null">
                 and a.`vip_level` = #{vipLevel}
             </if>
@@ -552,19 +566,9 @@ limitations under the License.
             <if test="isDelete != null">
                 AND a.`is_delete` = #{isDelete}
             </if>
-
             <if test="teamUuid != null and teamUuid != ''">
                 AND b.`team_uuid` = #{teamUuid}
             </if>
-
-            <if test="authGroup != null and authGroup != ''">
-                AND c.`auth_group` = #{authGroup}
-            </if>
-
-            <if test="auth != null and auth != ''">
-                AND c.`auth` = #{auth}
-            </if>
-
             <if test="roleUuid != null and roleUuid != ''">
                 AND d.`role_uuid` = #{roleUuid}
             </if>

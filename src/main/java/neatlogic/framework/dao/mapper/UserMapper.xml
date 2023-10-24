@@ -286,7 +286,7 @@ limitations under the License.
         j.`name` as `teamName`
         FROM (
             SELECT
-                DISTINCT a.`uuid`
+                DISTINCT a.`uuid`, a.`user_id`, a.`user_name`, a.`id`
             FROM `user` a
             <if test="teamUuid != null and teamUuid != ''">
                 JOIN `user_team` b ON a.`uuid` = b.`user_uuid`

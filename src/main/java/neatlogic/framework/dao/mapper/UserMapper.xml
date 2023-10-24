@@ -266,68 +266,71 @@ limitations under the License.
         WHERE a.`vip_level` != 0
     </select>
 
-    <select id="searchUser" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+    <select id="searchUserUuidList" parameterType="neatlogic.framework.dto.UserVo" resultType="java.lang.String" useCache="false">
         SELECT
-        k.`id`,
-        k.`uuid`,
-        k.`user_id` as `userId`,
-        k.`user_name` as `userName`,
-        k.`email`,
-        k.`phone`,
-        k.`pinyin`,
-        k.`is_active` as `isActive`,
-        k.`user_info` as `userInfo`,
-        k.`vip_level` as `vipLevel`,
-        k.`is_super_admin` as isSuperAdmin,
-        h.`role_uuid` as `roleUuid`,
-        r.`name` as `roleName`,
-        r.`description`,
-        j.`uuid` as `teamUuid`,
-        j.`name` as `teamName`
-        FROM (
-            SELECT
-                DISTINCT a.`uuid`
-            FROM `user` a
+            a.`uuid`
+        FROM `user` a
+        <if test="teamUuid != null and teamUuid != ''">
+            JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+        </if>
+        <if test="roleUuid != null and roleUuid != ''">
+            JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
+        </if>
+        <where>
+            <if test="keyword !=null and keyword != ''">
+                (a.`user_id` LIKE CONCAT(#{keyword}, '%')
+                OR a.`user_name` LIKE CONCAT(#{keyword}, '%')
+                OR a.email LIKE CONCAT(#{keyword}, '%'))
+            </if>
+            <if test="vipLevel != null">
+                and a.`vip_level` = #{vipLevel}
+            </if>
+            <if test="isActive != null">
+                AND a.`is_active` = #{isActive}
+            </if>
+            <if test="isDelete != null">
+                AND a.`is_delete` = #{isDelete}
+            </if>
             <if test="teamUuid != null and teamUuid != ''">
-                JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
+                AND b.`team_uuid` = #{teamUuid}
             </if>
             <if test="roleUuid != null and roleUuid != ''">
-                JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
+                AND d.`role_uuid` = #{roleUuid}
             </if>
-            <where>
-                <if test="keyword !=null and keyword != ''">
-                    (a.`user_id` LIKE CONCAT(#{keyword}, '%')
-                    OR a.`user_name` LIKE CONCAT(#{keyword}, '%')
-                    OR a.email LIKE CONCAT(#{keyword}, '%'))
-                </if>
-                <if test="vipLevel != null">
-                    and a.`vip_level` = #{vipLevel}
-                </if>
-                <if test="isActive != null">
-                    AND a.`is_active` = #{isActive}
-                </if>
-                <if test="isDelete != null">
-                    AND a.`is_delete` = #{isDelete}
-                </if>
-                <if test="teamUuid != null and teamUuid != ''">
-                    AND b.`team_uuid` = #{teamUuid}
-                </if>
-                <if test="roleUuid != null and roleUuid != ''">
-                    AND d.`role_uuid` = #{roleUuid}
-                </if>
-            </where>
-            <if test="keyword !=null and keyword != ''">
-                ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
-            </if>
-            <if test="needPage == true">
-                LIMIT #{startNum}, #{pageSize}
-            </if>
-        ) g
-        JOIN `user` k ON g.`uuid` = k.`uuid`
-        LEFT JOIN `user_role` h ON g.uuid = h.`user_uuid`
-        LEFT JOIN `user_team` i ON g.`uuid` = i.`user_uuid`
-        LEFT JOIN `team` j ON i.`team_uuid` = j.`uuid`
-        LEFT JOIN `role` r ON h.`role_uuid` = r.`uuid`
+        </where>
+        GROUP BY a.`uuid`
+        <if test="keyword !=null and keyword != ''">
+            ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+    <select id="searchUserDetailInfoByUuidList" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`user_id` as `userId`,
+        a.`user_name` as `userName`,
+        a.`email`,
+        a.`phone`,
+        a.`pinyin`,
+        a.`is_active` as `isActive`,
+        a.`user_info` as `userInfo`,
+        a.`vip_level` as `vipLevel`,
+        a.`is_super_admin` as isSuperAdmin,
+        e.`uuid` as `roleUuid`,
+        e.`name` as `roleName`,
+        e.`description`,
+        d.`uuid` as `teamUuid`,
+        d.`name` as `teamName`
+        FROM `user` a
+        LEFT JOIN `user_role` b ON a.uuid = b.`user_uuid`
+        LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
+        LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+        LEFT JOIN `role` e ON b.`role_uuid` = e.`uuid`
+        where a.`uuid` in
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
     </select>
 
     <select id="searchUserForGroupSearch" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">

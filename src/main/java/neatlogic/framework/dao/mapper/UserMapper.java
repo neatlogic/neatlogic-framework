@@ -61,7 +61,7 @@ public interface UserMapper {
 
     List<UserVo> getUserByMail(String value);
 
-    List<String> searchUserBaseInfo(UserVo userVo);
+    List<String> searchUserUuidList(UserVo userVo);
 
     List<UserVo> searchUserDetailInfoByUuidList(List<String> uuidList);
 

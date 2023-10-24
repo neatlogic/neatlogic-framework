@@ -266,9 +266,9 @@ limitations under the License.
         WHERE a.`vip_level` != 0
     </select>
 
-    <select id="searchUserBaseInfo" parameterType="neatlogic.framework.dto.UserVo" resultType="neatlogic.framework.dto.UserVo" useCache="false">
+    <select id="searchUserUuidList" parameterType="neatlogic.framework.dto.UserVo" resultType="java.lang.String" useCache="false">
         SELECT
-        DISTINCT a.`uuid`, a.`user_id`, a.`user_name`, a.`id`
+            a.`uuid`
         FROM `user` a
         <if test="teamUuid != null and teamUuid != ''">
             JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
@@ -298,6 +298,7 @@ limitations under the License.
                 AND d.`role_uuid` = #{roleUuid}
             </if>
         </where>
+        GROUP BY a.`uuid`
         <if test="keyword !=null and keyword != ''">
             ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
         </if>

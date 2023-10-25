@@ -263,7 +263,7 @@ public class TimeUtil {
      * @param day  减的天数
      * @return 日期字符串
      */
-    public static String descDateStr(Date date, int day,String format) {
+    public static String descDateStr(Date date, int day, String format) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         for (int i = 0; i < day; i++) {
@@ -864,21 +864,22 @@ public class TimeUtil {
     }
 
     /**
+     * 根据前端date插件入参，获取startTime 和 endTime
+     *
      * @param dateConfig 前端date插件入参
      * @return 包含转化后的starttime 和 endtime
      * @author lvzk
-     * @description 根据前端date插件入参，获取startTime 和 endTime
      * @since 2020年11月6日
      */
     public static JSONObject getStartTimeAndEndTimeByDateJson(JSONObject dateConfig) {
         JSONObject json = new JSONObject();
-        String startTime;
-        String endTime;
+        String startTime = null;
+        String endTime = null;
         SimpleDateFormat format = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
         if (dateConfig.containsKey("startTime")) {
             startTime = format.format(new Date(dateConfig.getLong("startTime")));
             endTime = format.format(new Date(dateConfig.getLong("endTime")));
-        } else {
+        } else if (dateConfig.containsKey("timeRange")) {
             startTime = TimeUtil.timeTransfer(dateConfig.getInteger("timeRange"), dateConfig.getString("timeUnit"));
             endTime = TimeUtil.timeNow();
         }

@@ -106,7 +106,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
             }
         }
         ApiVo apiVo = null;
-        if(api != null) {
+        if (api != null) {
             apiVo = api.clone();
             apiVo.setName($.t(apiVo.getName()));
             apiVo.setHandlerName($.t(apiVo.getHandlerName()));
@@ -384,6 +384,10 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
             }
 
             //System.out.println(clazz.getSimpleName());
+            //跳过匿名接口
+            if(component instanceof  IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
+               return;
+            }
             if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);
                 AuthActions authActions = clazz.getAnnotation(AuthActions.class);
@@ -401,12 +405,12 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static List<ApiVo> getTenantActiveApiList() throws CloneNotSupportedException {
         List<String> activeModuleIdList = TenantContext.get().getActiveModuleList().stream().map(ModuleVo::getId).collect(Collectors.toList());
-        List<ApiVo> apiVoList =  apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
+        List<ApiVo> apiVoList = apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());
         List<ApiVo> clonedList = new ArrayList<>();
         for (ApiVo apiVo : apiVoList) {
             clonedList.add(apiVo.clone());
         }
-        clonedList.forEach(a->{
+        clonedList.forEach(a -> {
             a.setName($.t(a.getName()));
             a.setHandlerName($.t(a.getHandlerName()));
         });

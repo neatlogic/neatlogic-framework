@@ -23,6 +23,7 @@ import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
 
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public class NeatLogicCache implements Cache {
@@ -108,6 +109,14 @@ public class NeatLogicCache implements Cache {
      */
     @Override
     public void putObject(Object key, Object value) {
+        if (value == null) {
+            return;
+        }
+        if (value instanceof List) {
+            if (((List) value).size() == 0) {
+                return;
+            }
+        }
         getCache().put(new Element(key, value));
     }
 

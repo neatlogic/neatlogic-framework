@@ -62,8 +62,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
         try {
             List<ModuleVo> moduleListFromServletContext = getModuleListByServletContext(resolver);
             List<TenantVo> activeTenantList = getAllTenantList();
-            initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
             updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
+            initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
             List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());

@@ -220,9 +220,12 @@ public class ScriptRunnerManager {
                     runner.runScript(new StringReader(line));
                     TenantModuleDmlSqlVo tenantModuleDmlSqlVo;
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                        String error = "  ✖" + tenant.getName() + "·" + moduleId + "." + type + ": " + line;
+                        String error = "  ✖" + tenant.getName() + "·" + moduleId + "." + type + ": " + errStrWriter;
                         //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
                         //errStrWriter.getBuffer().setLength(0);
+                        if (StringUtils.isNotBlank(type) && type.endsWith("dml")) {
+                            error += I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.failed");
+                        }
                         throw new RuntimeException(error);
                     } else {
                         tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, type);
@@ -330,7 +333,7 @@ public class ScriptRunnerManager {
                         System.out.println(error);
                         errStrWriter.getBuffer().setLength(0);
                         isError = true;
-                    }else {
+                    } else {
                         changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
                         hasRunSqlMd5List.add(sqlHash);
                         insertChangelogAudit(changelogAuditVo, neatlogicConn);

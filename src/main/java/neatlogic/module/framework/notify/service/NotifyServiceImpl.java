@@ -17,17 +17,24 @@
 package neatlogic.module.framework.notify.service;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.notify.core.INotifyPolicyHandler;
+import neatlogic.framework.notify.core.NotifyPolicyHandlerFactory;
 import neatlogic.framework.notify.crossover.INotifyServiceCrossoverService;
 import neatlogic.framework.notify.dao.mapper.NotifyMapper;
 import neatlogic.framework.notify.dto.InvokeNotifyPolicyConfigVo;
+import neatlogic.framework.notify.dto.NotifyPolicyHandlerVo;
 import neatlogic.framework.notify.dto.NotifyPolicyVo;
+import neatlogic.framework.notify.exception.NotifyPolicyHandlerNotFoundException;
 import neatlogic.framework.notify.exception.NotifyPolicyNotFoundException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossoverService {
@@ -49,7 +56,7 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         }
         String handler = clazz.getName();
         invokeNotifyPolicyConfigVo.setHandler(handler);
-        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
+        return doRegulateNotifyPolicyConfig(invokeNotifyPolicyConfigVo);
     }
 
     @Override
@@ -59,10 +66,10 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         }
         String handler = clazz.getName();
         invokeNotifyPolicyConfigVo.setHandler(handler);
-        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
+        return doRegulateNotifyPolicyConfig(invokeNotifyPolicyConfigVo);
     }
 
-    private InvokeNotifyPolicyConfigVo regulateNotifyPolicyConfig2(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo) {
+    private InvokeNotifyPolicyConfigVo doRegulateNotifyPolicyConfig(InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo) {
         NotifyPolicyVo notifyPolicyVo = null;
         if (invokeNotifyPolicyConfigVo.getIsCustom() == 1) {
             if (invokeNotifyPolicyConfigVo.getPolicyId() != null) {
@@ -77,6 +84,22 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         } else {
             invokeNotifyPolicyConfigVo.setPolicyId(notifyPolicyVo.getId());
             invokeNotifyPolicyConfigVo.setPolicyName(notifyPolicyVo.getName());
+            INotifyPolicyHandler notifyPolicyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyVo.getHandler());
+            if (notifyPolicyHandler == null) {
+                throw new NotifyPolicyHandlerNotFoundException(notifyPolicyVo.getHandler());
+            }
+            String moduleGroupName = "";
+            List<NotifyPolicyHandlerVo> notifyPolicyHandlerList = NotifyPolicyHandlerFactory.getNotifyPolicyHandlerList();
+            for (NotifyPolicyHandlerVo notifyPolicyHandlerVo : notifyPolicyHandlerList) {
+                if (Objects.equals(notifyPolicyHandlerVo.getHandler(), notifyPolicyVo.getHandler())) {
+                    ModuleGroupVo moduleGroupVo = ModuleUtil.getModuleGroup(notifyPolicyHandlerVo.getModuleGroup());
+                    if (moduleGroupVo != null) {
+                        moduleGroupName = moduleGroupVo.getGroupName();
+                    }
+                }
+            }
+            String handlerName = notifyPolicyHandler.getName();
+            invokeNotifyPolicyConfigVo.setPolicyPath(moduleGroupName + "/" + handlerName + "/" + notifyPolicyVo.getName());
         }
         return invokeNotifyPolicyConfigVo;
     }
@@ -108,7 +131,7 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         if (StringUtils.isBlank(handler)) {
             return null;
         }
-        return regulateNotifyPolicyConfig2(invokeNotifyPolicyConfigVo);
+        return doRegulateNotifyPolicyConfig(invokeNotifyPolicyConfigVo);
     }
 
     /**

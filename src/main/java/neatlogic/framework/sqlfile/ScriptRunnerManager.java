@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -189,8 +188,7 @@ public class ScriptRunnerManager {
         ScriptRunner runner = null;
         try {
             List<String> hasRunSqlMd5List = new ArrayList<>();
-            DataSource neatlogicDatasource = JdbcUtil.getNeatlogicDataSource();
-            neatlogicConn = neatlogicDatasource.getConnection();
+            neatlogicConn = JdbcUtil.getNeatlogicConnection();
             sqlMd5Statement = neatlogicConn.prepareStatement("select sql_uuid from tenant_module_dmlsql where tenant_uuid = ? and `module_id` = ? and `sql_status` = 1");
             sqlMd5Statement.setString(1, tenant.getUuid());
             sqlMd5Statement.setString(2, moduleId);
@@ -199,11 +197,7 @@ public class ScriptRunnerManager {
                 hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_uuid"));
             }
             BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
-            try {
-                conn = JdbcUtil.getNeatlogicDataSource(tenant, isDataDb).getConnection();
-            } catch (Exception exception) {
-                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenant.getUuid()));
-            }
+            conn = JdbcUtil.getNeatlogicTenantConnection(tenant, isDataDb);
             runner = new ScriptRunner(conn);
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errWriter);
@@ -256,8 +250,8 @@ public class ScriptRunnerManager {
      *
      * @param scriptReader 脚本读取
      */
-    public static void runScriptWithJdbc(Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
-        runScriptWithJdbc(null, "framework", scriptReader, version, dataSource, sqlFile);
+    public static void runScriptWithJdbc(Reader scriptReader, String version, Connection connection, String sqlFile) throws Exception {
+        runScriptWithJdbc(null, "framework", scriptReader, version, connection, sqlFile);
     }
 
     /**
@@ -267,8 +261,7 @@ public class ScriptRunnerManager {
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
      */
-    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, DataSource dataSource, String sqlFile) throws Exception {
-        Connection conn = null;
+    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, Connection conn, String sqlFile) throws Exception {
         ScriptRunner runner = null;
         StringWriter logStrWriter = new StringWriter();
         PrintWriter logWriter = new PrintWriter(logStrWriter);
@@ -282,8 +275,7 @@ public class ScriptRunnerManager {
         try {
             BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
             List<String> hasRunSqlMd5List = new ArrayList<>();
-            DataSource neatlogicDatasource = JdbcUtil.getNeatlogicDataSource();
-            neatlogicConn = neatlogicDatasource.getConnection();
+            neatlogicConn = JdbcUtil.getNeatlogicConnection();
             sqlMd5Statement = neatlogicConn.prepareStatement("select sql_hash from changelog_audit where tenant_uuid = ? and `module_id` = ? and (`sql_status` = 1 or `ignored` = 1) ");
             sqlMd5Statement.setString(1, tenantUuid);
             sqlMd5Statement.setString(2, moduleId);
@@ -291,7 +283,6 @@ public class ScriptRunnerManager {
             while (sqlMd5ResultSet.next()) {
                 hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_hash"));
             }
-            conn = dataSource.getConnection();
             runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
             runner.setAutoCommit(true);

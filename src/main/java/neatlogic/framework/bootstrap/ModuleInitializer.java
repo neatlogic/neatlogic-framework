@@ -42,7 +42,6 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import javax.sql.DataSource;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
@@ -177,18 +176,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
      */
     private List<TenantVo> getAllTenantList() throws Exception {
         List<TenantVo> activeTenantList = new ArrayList<>();
-        Connection connection = null;
+        Connection neatlogicConn = null;
         PreparedStatement tenantStatement = null;
         ResultSet tenantResultSet = null;
         try {
-            DataSource datasource = JdbcUtil.getNeatlogicDataSource();
-            try {
-                connection = datasource.getConnection();
-            } catch (Exception exception) {
-                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
-            }
+            neatlogicConn = JdbcUtil.getNeatlogicConnection();
             String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid";
-            tenantStatement = connection.prepareStatement(tenantSql);
+            tenantStatement = neatlogicConn.prepareStatement(tenantSql);
             tenantResultSet = tenantStatement.executeQuery();
             while (tenantResultSet.next()) {
                 TenantVo tenantVo = new TenantVo();
@@ -208,7 +202,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            JdbcUtil.closeConnection(connection);
+            JdbcUtil.closeConnection(neatlogicConn);
             JdbcUtil.closeStatement(tenantStatement);
             JdbcUtil.closeResultSet(tenantResultSet);
         }
@@ -222,17 +216,12 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * @return 激活租户对应的模块版本
      */
     private Map<String, Map<String, String>> getTenantModuleVersionMap(List<TenantVo> activeTenantList) throws Exception {
-        Connection connection = null;
+        Connection neatlogicConn = null;
         PreparedStatement tenantGroupStatement = null;
         ResultSet tenantGroupResultSet = null;
         Map<String, Map<String, String>> tenantModuleGroupMap = new HashMap<>();
         try {
-            DataSource datasource = JdbcUtil.getNeatlogicDataSource();
-            try {
-                connection = datasource.getConnection();
-            } catch (Exception exception) {
-                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
-            }
+            neatlogicConn = JdbcUtil.getNeatlogicConnection();
             List<String> activeTenantUuidList = activeTenantList.stream().map(TenantVo::getUuid).collect(Collectors.toList());
             StringBuilder placeholders = new StringBuilder();
             for (int i = 0; i < activeTenantUuidList.size(); i++) {
@@ -242,7 +231,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 }
             }
             String tenantGroupSql = "SELECT a.* FROM tenant_module a where a.tenant_uuid in (" + placeholders + ") ";
-            tenantGroupStatement = connection.prepareStatement(tenantGroupSql);
+            tenantGroupStatement = neatlogicConn.prepareStatement(tenantGroupSql);
             for (int i = 1; i <= activeTenantUuidList.size(); i++) {
                 tenantGroupStatement.setString(i, activeTenantUuidList.get(i - 1));
             }
@@ -254,7 +243,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             logger.error("获取激活租户的对应模块版本时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            JdbcUtil.closeConnection(connection);
+            JdbcUtil.closeConnection(neatlogicConn);
             JdbcUtil.closeStatement(tenantGroupStatement);
             JdbcUtil.closeResultSet(tenantGroupResultSet);
         }
@@ -327,7 +316,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             for (String version : versionList) {
                 Resource[] resourceDlls = resolver.getResources("classpath*:neatlogic/resources/framework/changelog/" + version + "/neatlogic.sql");
                 Reader scriptReader = new InputStreamReader(resourceDlls[0].getInputStream());
-                ScriptRunnerManager.runScriptWithJdbc(scriptReader, version, JdbcUtil.getNeatlogicDataSource(), "neatlogic.sql");
+                ScriptRunnerManager.runScriptWithJdbc(scriptReader, version, JdbcUtil.getNeatlogicConnection(), "neatlogic.sql");
                 updateNeatLogicVersion(currentVersion, version);
                 currentVersion = version;
             }
@@ -340,18 +329,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * @return 激活的租户
      */
     private String getNeatlogicVersion() throws Exception {
-        Connection connection = null;
+        Connection neatlogicConn = null;
         PreparedStatement versionStatement = null;
         ResultSet versionResultSet = null;
         try {
-            DataSource datasource = JdbcUtil.getNeatlogicDataSource();
-            try {
-                connection = datasource.getConnection();
-            } catch (Exception exception) {
-                throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
-            }
+            neatlogicConn = JdbcUtil.getNeatlogicConnection();
             String versionSql = "SELECT * FROM version limit 1";
-            versionStatement = connection.prepareStatement(versionSql);
+            versionStatement = neatlogicConn.prepareStatement(versionSql);
             versionResultSet = versionStatement.executeQuery();
             if (versionResultSet.next()) {
                 return versionResultSet.getString("version");
@@ -360,7 +344,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            JdbcUtil.closeConnection(connection);
+            JdbcUtil.closeConnection(neatlogicConn);
             JdbcUtil.closeStatement(versionStatement);
             JdbcUtil.closeResultSet(versionResultSet);
         }
@@ -423,7 +407,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                                     if (ddlResources.length == 1) {
                                         Resource ddlResource = ddlResources[0];
                                         Reader scriptReader = new InputStreamReader(ddlResource.getInputStream());
-                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicDataSource(tenant, false), "neatlogic_tenant.sql");
+                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicTenantConnection(tenant, false), "neatlogic_tenant.sql");
                                         if (isErrorTmp) {
                                             isError = true;
                                         }
@@ -462,7 +446,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入租户模块信息
      */
     private void insertTenantModuleVersionSql(String tenantUuid, String moduleId, String version) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection();
              PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
             statement.setString(1, tenantUuid);
             statement.setString(2, moduleId);
@@ -479,7 +463,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入neatlogic版本
      */
     private void insertNeatLogicVersion(String version) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection();
              PreparedStatement statement = neatlogicConn.prepareStatement("insert into `version` (`version`,`fcd`,`lcd`) VALUES (?,now(),now())")) {
             statement.setString(1, version);
             statement.execute();
@@ -493,7 +477,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 更新neatlogic版本
      */
     private void updateNeatLogicVersion(String oldVersion, String version) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicDataSource().getConnection();
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection();
              PreparedStatement statement = neatlogicConn.prepareStatement("UPDATE version SET version = ?, lcd = NOW() WHERE version = ?")) {
             statement.setString(1, version);
             statement.setString(2, oldVersion);

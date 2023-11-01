@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class JdbcUtil {
@@ -25,11 +27,18 @@ public class JdbcUtil {
         dataSource.setPassword(LocalConfig.dbConfigMap.get("db.password").toString());
     }
 
-    public static DataSource getNeatlogicDataSource() {
-        return dataSource;
+    public static Connection getNeatlogicConnection() {
+        Connection connection;
+        try {
+            connection = dataSource.getConnection();
+        } catch (Exception exception) {
+            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb"));
+        }
+        return connection;
     }
 
-    public static DataSource getNeatlogicDataSource(TenantVo tenantVo, boolean isData) {
+    public static Connection getNeatlogicTenantConnection(TenantVo tenantVo, boolean isData) {
+        Connection connection;
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(tenantVo.getDatasource().getDriver());
         String url = tenantVo.getDatasource().getUrl();
@@ -39,7 +48,12 @@ public class JdbcUtil {
         dataSource.setUrl(url);
         dataSource.setUsername(tenantVo.getDatasource().getUsername());
         dataSource.setPassword(tenantVo.getDatasource().getPasswordPlain());
-        return dataSource;
+        try {
+            connection = dataSource.getConnection();
+        } catch (Exception exception) {
+            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenantVo.getUuid()));
+        }
+        return connection;
     }
 
 

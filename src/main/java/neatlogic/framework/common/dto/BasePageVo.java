@@ -74,6 +74,7 @@ public class BasePageVo implements Serializable {
     private Integer expectOffsetRowNum;
 
     @EntityField(name = "最大分页", type = ApiParamType.INTEGER)
+    @JSONField(serialize = false)
     private int maxPageSize = 100;
 
     public BasePageVo() {

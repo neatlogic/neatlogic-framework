@@ -65,7 +65,7 @@ public interface TreeMapper {
      * @Returns:java.lang.Object
      **/
 //    public Object checkLeafNodeLeftRightCodeAreNotContinuous(@Param("tableName")String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey);
-    public List<TreeNodeVo> getTreeNodeListByParentId(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("parentIdValue") Object parentIdValue, @Param("condition") String condition);
+    public List<TreeNodeVo> getTreeNodeListByParentId(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("parentIdValue") Object parentIdValue, @Param("condition") String condition, @Param("sortKey") String sortKey);
 
     public int updateTreeNodeLeftRightCodeById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue, @Param("lft") int lft, @Param("rht") int rht);
 

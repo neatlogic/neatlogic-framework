@@ -17,32 +17,40 @@
 package neatlogic.framework.rebuilddatabaseview.core;
 
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.dto.module.ModuleVo;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
 
 @RootComponent
 public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
 
-    private final static Map<String, IRebuildDataBaseView> map = new HashMap<>();
-
-    public static IRebuildDataBaseView getHandler(String handler) {
-        return map.get(handler);
-    }
+    private final static Map<String, List<IRebuildDataBaseView>> moduleGroup2HandlerListMap = new HashMap<>();
 
     @Override
     protected void onInitialized(NeatLogicWebApplicationContext context) {
         Map<String, IRebuildDataBaseView> myMap = context.getBeansOfType(IRebuildDataBaseView.class);
         for (Map.Entry<String, IRebuildDataBaseView> entry : myMap.entrySet()) {
             IRebuildDataBaseView bean = entry.getValue();
-            map.put(bean.getHandler(), bean);
+            moduleGroup2HandlerListMap.computeIfAbsent(context.getGroup(), key -> new ArrayList<>()).add(bean);
         }
     }
 
     public static List<ViewStatusInfo> execute() {
+        List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
         List<ViewStatusInfo> resultList = new ArrayList<>();
-        List<IRebuildDataBaseView> list = new ArrayList<>(map.values());
+        List<IRebuildDataBaseView> list = new ArrayList<>();
+        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+        for (ModuleGroupVo moduleGroupVo : activeModuleGroupList) {
+            List<IRebuildDataBaseView> handlerList = moduleGroup2HandlerListMap.get(moduleGroupVo.getGroup());
+            if (CollectionUtils.isNotEmpty(handlerList)) {
+                list.addAll(handlerList);
+            }
+        }
         list.sort(Comparator.comparing(IRebuildDataBaseView::getSort));
         for (IRebuildDataBaseView rebuildDataBaseView : list) {
             resultList.addAll(rebuildDataBaseView.execute());

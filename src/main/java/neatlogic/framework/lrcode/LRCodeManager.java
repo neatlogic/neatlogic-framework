@@ -212,24 +212,32 @@ public class LRCodeManager {
         treeMapper.batchUpdateTreeNodeRightCode(tableName, treeNodeVo.getLft(), -step, condition);
     }
 
+    public static void rebuildLeftRightCodeOrderBySortKey(String tableName, String idKey, String parentIdKey, String sortKey) {
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, null, sortKey);
+    }
+
+    public static void rebuildLeftRightCodeOrderBySortKey(String tableName, String idKey, String parentIdKey, String condition, String sortKey) {
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, condition, sortKey);
+    }
+
     public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey) {
-        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, null);
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, null, null);
     }
 
     public static void rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, String condition) {
-        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, condition);
+        rebuildLeftRightCode(tableName, idKey, parentIdKey, null, 1, condition, null);
     }
 
 
-    private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft, String condition) {
-        List<TreeNodeVo> catalogList = treeMapper.getTreeNodeListByParentId(tableName, idKey, parentIdKey, parentIdValue, condition);
+    private static Integer rebuildLeftRightCode(String tableName, String idKey, String parentIdKey, Object parentIdValue, int parentLft, String condition, String sortKey) {
+        List<TreeNodeVo> catalogList = treeMapper.getTreeNodeListByParentId(tableName, idKey, parentIdKey, parentIdValue, condition, sortKey);
         for (TreeNodeVo catalog : catalogList) {
             if (catalog.getChildrenCount() == 0) {
                 treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, catalog.getIdValue(), parentLft + 1, parentLft + 2);
                 parentLft += 2;
             } else {
                 int lft = parentLft + 1;
-                parentLft = rebuildLeftRightCode(tableName, idKey, parentIdKey, catalog.getIdValue(), lft, condition);
+                parentLft = rebuildLeftRightCode(tableName, idKey, parentIdKey, catalog.getIdValue(), lft, condition, sortKey);
                 treeMapper.updateTreeNodeLeftRightCodeById(tableName, idKey, catalog.getIdValue(), lft, parentLft + 1);
                 parentLft += 1;
             }

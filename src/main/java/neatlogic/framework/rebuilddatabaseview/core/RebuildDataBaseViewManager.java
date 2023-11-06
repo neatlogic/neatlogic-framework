@@ -21,7 +21,6 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.module.ModuleGroupVo;
-import neatlogic.framework.dto.module.ModuleVo;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
@@ -41,7 +40,6 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
     }
 
     public static List<ViewStatusInfo> execute() {
-        List<ModuleVo> activeModuleList = TenantContext.get().getActiveModuleList();
         List<ViewStatusInfo> resultList = new ArrayList<>();
         List<IRebuildDataBaseView> list = new ArrayList<>();
         List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();

@@ -72,9 +72,14 @@
         <if test="condition != null">
             and ${condition}
         </if>
-        <if test="sortKey != null and sortKey != ''">
-        ORDER BY a.`${sortKey}`
-        </if>
+        <choose>
+            <when test="sortKey != null and sortKey != ''">
+                ORDER BY a.`${sortKey}`
+            </when>
+            <otherwise>
+                ORDER BY a.`lft`, a.`${idKey}`
+            </otherwise>
+        </choose>
     </select>
 
     <update id="updateTreeNodeLeftRightCodeById">

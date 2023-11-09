@@ -37,7 +37,6 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
         }
         try {
             databaseId = getDatabaseName(dataSource);
-            System.out.println("databaseId = " + databaseId);
         } catch (Exception e) {
             LogHolder.log.error("Could not get a databaseId from dataSource", e);
         }
@@ -46,7 +45,6 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
 
     private String getDatabaseName(DataSource dataSource) throws SQLException {
         String productName = getDatabaseProductName(dataSource);
-        System.out.println("productName = " + productName);
         if (this.properties != null) {
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
                 if (productName.contains((String) property.getKey())) {

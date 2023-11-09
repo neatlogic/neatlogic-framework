@@ -99,6 +99,17 @@
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="neatlogic.framework.**.mapper"/>
     </bean>
+
+    <bean id="neatLogicDatabaseIdProvider" class="neatlogic.framework.dao.plugin.NeatLogicDatabaseIdProvider">
+        <property name="properties">
+            <props>
+                <prop key="MySQL">mysql</prop>
+                <prop key="OceanBase">oceanbase</prop>
+                <prop key="TiDB">tidb</prop>
+            </props>
+        </property>
+    </bean>
+
     <!-- 创建SqlSessionFactory，同时指定数据源 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="configLocation" value="classpath:neatlogic/framework/dao/config/mybatis-config.xml"/>
@@ -108,6 +119,7 @@
                 <value>classpath*:neatlogic/framework/**/mapper/*.xml</value>
             </list>
         </property>
+        <property name="databaseIdProvider" ref="neatLogicDatabaseIdProvider"/>
     </bean>
 
     <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>

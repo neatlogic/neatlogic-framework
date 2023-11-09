@@ -51,6 +51,7 @@
 				</value>
 			</list>
 		</property>
+		<property name="databaseIdProvider" ref="neatLogicDatabaseIdProvider"/>
 	</bean>
 	<!-- 启动Api方法拦截器 -->
 	<!-- <bean id="AuthApiInterceptor" class="neatlogic.framework.auth.core.AuthInterceptor"/> <aop:config proxy-target-class="true"> <aop:pointcut id="apiAction" expression="execution(* neatlogic.**.myDoService(..))"/> <aop:advisor advice-ref="AuthApiInterceptor" pointcut-ref="apiAction"/> </aop:config> -->

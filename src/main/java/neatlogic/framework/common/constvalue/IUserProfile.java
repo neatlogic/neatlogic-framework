@@ -1,11 +1,11 @@
 package neatlogic.framework.common.constvalue;
 
-import neatlogic.framework.dto.UserProfileVo;
+import java.util.List;
 
 public interface IUserProfile {
-
-	UserProfileVo getUserProfile();
-
+	String getValue();
+	String getText();
+	List<IUserProfileOperate> getProfileOperateList();
 	String getModuleId();
 	
 }

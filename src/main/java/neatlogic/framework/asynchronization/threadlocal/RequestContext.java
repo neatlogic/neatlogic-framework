@@ -16,16 +16,14 @@
 
 package neatlogic.framework.asynchronization.threadlocal;
 
+import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 保存请求信息
@@ -44,6 +42,8 @@ public class RequestContext implements Serializable {
     private Double tenantRate;
     //语言
     Locale locale;
+    //收集该请求执行的sql语句
+    private List<SqlAuditVo> sqlAuditList = Collections.synchronizedList(new ArrayList<>());
 
     public String getUrl() {
         return url;
@@ -101,11 +101,24 @@ public class RequestContext implements Serializable {
         this.locale = locale;
     }
 
+    public List<SqlAuditVo> getSqlAuditList() {
+        return sqlAuditList;
+    }
+
+    public void setSqlAuditList(List<SqlAuditVo> sqlAuditList) {
+        this.sqlAuditList = sqlAuditList;
+    }
+
+    public void addSqlAudit(SqlAuditVo sqlAuditVo) {
+        sqlAuditList.add(sqlAuditVo);
+    }
+
     public static RequestContext init(RequestContext _requestContext) {
         RequestContext context = new RequestContext();
         if (_requestContext != null) {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
+            context.setSqlAuditList(_requestContext.getSqlAuditList());
         }
         instance.set(context);
         return context;

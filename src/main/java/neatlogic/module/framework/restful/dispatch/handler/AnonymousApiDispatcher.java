@@ -42,6 +42,7 @@ import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.util.AnonymousApiTokenUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -139,6 +140,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endTime - startTime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
                             returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                         }
@@ -165,6 +167,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
                             returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                         }
@@ -191,6 +194,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
                             returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                         }

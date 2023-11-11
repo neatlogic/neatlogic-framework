@@ -43,6 +43,7 @@ import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.framework.util.mongodb.IJsonSerializer;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reflections.Reflections;
@@ -162,6 +163,7 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                             if (restComponent.disableReturnCircularReferenceDetect()) {
                                 returnObj.put("_disableDetect", true);
                             }
@@ -191,6 +193,7 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                             if (restComponent.disableReturnCircularReferenceDetect()) {
                                 returnObj.put("_disableDetect", true);
                             }
@@ -216,6 +219,7 @@ public class ApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                             if (restComponent.disableReturnCircularReferenceDetect()) {
                                 returnObj.put("_disableDetect", true);
                             }

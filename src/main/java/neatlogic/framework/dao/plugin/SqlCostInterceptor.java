@@ -16,6 +16,7 @@
 
 package neatlogic.framework.dao.plugin;
 
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
@@ -117,7 +118,6 @@ public class SqlCostInterceptor implements Interceptor {
                     //System.out.println("#############################SQL INTERCEPTOR###############################");
                     //System.out.println("id:" + sqlId);
                     //System.out.println(sql);
-
                     sqlAuditVo.setSql(sql);
                     sqlAuditVo.setId(sqlId);
                 }
@@ -139,6 +139,10 @@ public class SqlCostInterceptor implements Interceptor {
                 }
             }
             SqlAuditManager.addSqlAudit(sqlAuditVo);
+            RequestContext requestContext =RequestContext.get();
+            if (requestContext != null) {
+                requestContext.addSqlAudit(sqlAuditVo);
+            }
             //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
             //System.out.println("###########################################################################");
         }

@@ -17,31 +17,29 @@
 package neatlogic.framework.userprofile;
 
 import neatlogic.framework.common.constvalue.IUserProfile;
-import neatlogic.framework.dto.UserProfileVo;
 import org.reflections.Reflections;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class UserProfileFactory {
-	private static final Map<String, UserProfileVo> userProfileMap = new HashMap<>();
 
+	private static final Map<String, List<IUserProfile>> moduleId2UserProfileListMap = new HashMap<>();
 	static {
 		Reflections reflections = new Reflections("neatlogic");
 		Set<Class<? extends IUserProfile>> userProfileClass = reflections.getSubTypesOf(IUserProfile.class);
 		for (Class<? extends IUserProfile> c : userProfileClass) {
 			try {
-				Object[] objects = c.getEnumConstants();
-				UserProfileVo userProfileVo = (UserProfileVo) c.getMethod("getUserProfile").invoke(objects[0]);
-				userProfileMap.put(userProfileVo.getModuleId(), userProfileVo);
+				IUserProfile[] objects = c.getEnumConstants();
+				for (IUserProfile userProfile : objects) {
+					moduleId2UserProfileListMap.computeIfAbsent(userProfile.getModuleId(), key -> new ArrayList<>()).add(userProfile);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	public static Map<String,UserProfileVo> getUserProfileMap() {
-		return userProfileMap;
+
+	public static List<IUserProfile> getUserProfileListByModuleId(String moduleId) {
+		return moduleId2UserProfileListMap.get(moduleId);
 	}
-	
 }

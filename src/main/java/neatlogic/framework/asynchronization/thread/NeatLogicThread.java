@@ -17,6 +17,7 @@
 package neatlogic.framework.asynchronization.thread;
 
 import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.cache.threadlocal.CacheContext;
@@ -30,6 +31,7 @@ public abstract class NeatLogicThread implements Runnable {
     protected UserContext userContext;
     protected TenantContext tenantContext;
     protected InputFromContext inputFromContext;
+    protected RequestContext requestContext;
     private String threadName;
     private boolean isUnique = false;
 
@@ -50,6 +52,7 @@ public abstract class NeatLogicThread implements Runnable {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();
         inputFromContext = InputFromContext.get();
+        requestContext = RequestContext.get();
         this.threadName = _threadName;
     }
 
@@ -57,6 +60,7 @@ public abstract class NeatLogicThread implements Runnable {
         userContext = UserContext.get();
         tenantContext = TenantContext.get();
         inputFromContext = InputFromContext.get();
+        requestContext = RequestContext.get();
         this.threadName = _threadName;
         this.isUnique = _isUnique;
     }
@@ -66,6 +70,7 @@ public abstract class NeatLogicThread implements Runnable {
         TenantContext.init(tenantContext);
         UserContext.init(userContext);
         InputFromContext.init(inputFromContext);
+        RequestContext.init(requestContext);
         try {
             String oldThreadName = Thread.currentThread().getName();
             if (StringUtils.isNotBlank(threadName)) {
@@ -89,6 +94,9 @@ public abstract class NeatLogicThread implements Runnable {
             }
             if (InputFromContext.get() != null) {
                 InputFromContext.get().release();
+            }
+            if (RequestContext.get() != null) {
+                RequestContext.get().release();
             }
             CacheContext.release();
         }

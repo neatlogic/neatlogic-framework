@@ -44,6 +44,13 @@ import java.util.Properties;
 public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, PriorityOrdered {
     static Logger logger = LoggerFactory.getLogger(LocalConfig.class);
     private static final String CONFIG_FILE = "config.properties";
+
+    private static  String propertiesFrom;
+
+    public static String getPropertiesFrom() {
+        return propertiesFrom;
+    }
+
     private Properties properties;
     private ConfigurableEnvironment environment;
 
@@ -64,6 +71,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
                 if (StringUtils.isNotBlank(configInfo)) {
                     prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
                     System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos", System.getProperty("nacos.home"), System.getProperty("nacos.namespace")));
+                    propertiesFrom = "Nacos";
                 }
             }
 
@@ -72,6 +80,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
                 try {
                     prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
                     System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
+                    propertiesFrom = "config.properties";
                 } catch (Exception ex) {
                     System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfe.confignotfoundexception.confignotfoundexception"));
                     System.exit(1);

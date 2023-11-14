@@ -19,6 +19,8 @@ public class TenantModuleVo {
 	private Date fcd;
 	@EntityField(name = "common.editdate", type = ApiParamType.LONG)
 	private Date lcd;
+	@EntityField(name = "term.deploy.version", type = ApiParamType.STRING)
+	private String version;
 
 	public String getTenantUuid() {
 		return tenantUuid;
@@ -66,5 +68,13 @@ public class TenantModuleVo {
 
 	public void setDmlStatus(Integer dmlStatus) {
 		this.dmlStatus = dmlStatus;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 }

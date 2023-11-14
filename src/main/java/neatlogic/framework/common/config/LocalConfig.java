@@ -63,6 +63,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
                 configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
                 if (StringUtils.isNotBlank(configInfo)) {
                     prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                    System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos", System.getProperty("nacos.home"), System.getProperty("nacos.namespace")));
                 }
             }
 
@@ -70,6 +71,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 try {
                     prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                    System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
                 } catch (Exception ex) {
                     System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfe.confignotfoundexception.confignotfoundexception"));
                     System.exit(1);

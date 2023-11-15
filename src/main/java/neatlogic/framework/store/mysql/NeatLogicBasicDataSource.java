@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
@@ -35,11 +36,12 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         Connection conn = super.getConnection();
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         try (Statement statement = conn.createStatement()) {
-            // TODO oceanbase数据库不支持optimizer_search_depth和join_buffer_size变量，暂时屏蔽
-//            //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
-//            statement.execute("SET SESSION optimizer_search_depth = 5");
-//            //设置join_buffer为16M，提升BNL性能
-//            statement.execute("SET SESSION join_buffer_size = 16777216");
+            if (Objects.equals(DatasourceManager.getDatabaseId(), DatabaseVendor.MYSQL.getAlias())) {
+                //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
+                statement.execute("SET SESSION optimizer_search_depth = 5");
+                //设置join_buffer为16M，提升BNL性能
+                statement.execute("SET SESSION join_buffer_size = 16777216");
+            }
             if (UserContext.get() != null) {
                 String timezone = UserContext.get().getTimezone();
                 if (StringUtils.isNotBlank(timezone)) {

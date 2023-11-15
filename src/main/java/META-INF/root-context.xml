@@ -100,15 +100,7 @@
         <property name="basePackage" value="neatlogic.framework.**.mapper"/>
     </bean>
 
-    <bean id="neatLogicDatabaseIdProvider" class="neatlogic.framework.dao.plugin.NeatLogicDatabaseIdProvider">
-        <property name="properties">
-            <props>
-                <prop key="MySQL">mysql</prop>
-                <prop key="OceanBase">oceanbase</prop>
-                <prop key="TiDB">tidb</prop>
-            </props>
-        </property>
-    </bean>
+    <bean id="neatLogicDatabaseIdProvider" class="neatlogic.framework.dao.plugin.NeatLogicDatabaseIdProvider"/>
 
     <!-- 创建SqlSessionFactory，同时指定数据源 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

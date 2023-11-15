@@ -36,6 +36,19 @@ public class DatasourceManager {
 
     private static NeatLogicRoutingDataSource datasource;
 
+    // 数据库厂商，mysql、oceanbase、tidb
+    private static String databaseId;
+
+    public static void setDatabaseId(String _databaseId) {
+        if (databaseId == null) {
+            databaseId = _databaseId;
+        }
+    }
+
+    public static String getDatabaseId() {
+        return databaseId;
+    }
+
     @Resource
     public void setDataSource(NeatLogicRoutingDataSource _datasource) {
         datasource = _datasource;

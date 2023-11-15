@@ -31,6 +31,9 @@ public class ModuleVo {
     private String description;
     @EntityField(name = "模块版本", type = ApiParamType.STRING)
     private String version;
+
+    @EntityField(name = "模块changelog版本", type = ApiParamType.STRING)
+    private String changelogVersion;
     @EntityField(name = "模块分组", type = ApiParamType.STRING)
     private String group;
     @EntityField(name = "分组名称", type = ApiParamType.STRING)
@@ -198,5 +201,13 @@ public class ModuleVo {
 
     public void setParent(String parent) {
         this.parent = parent;
+    }
+
+    public String getChangelogVersion() {
+        return changelogVersion;
+    }
+
+    public void setChangelogVersion(String changelogVersion) {
+        this.changelogVersion = changelogVersion;
     }
 }

@@ -22,7 +22,8 @@
         SELECT
                `module_id`  as moduleId,
                `ddl_status` as ddlStatus,
-               `dml_status` as dmlStatus
+               `dml_status` as dmlStatus,
+               `version`
         FROM `tenant_module`
         WHERE tenant_uuid = #{value}
     </select>

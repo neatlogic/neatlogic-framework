@@ -7,18 +7,18 @@ public enum DatabaseVendor {
     ;
 
     String name;
-    String alias;
+    String databaseId;
 
-    DatabaseVendor(String name, String alias) {
+    DatabaseVendor(String name, String databaseId) {
         this.name = name;
-        this.alias = alias;
+        this.databaseId = databaseId;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getAlias() {
-        return alias;
+    public String getDatabaseId() {
+        return databaseId;
     }
 }

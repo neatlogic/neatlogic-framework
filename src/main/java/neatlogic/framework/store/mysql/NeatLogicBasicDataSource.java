@@ -36,7 +36,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         Connection conn = super.getConnection();
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         try (Statement statement = conn.createStatement()) {
-            if (Objects.equals(DatasourceManager.getDatabaseId(), DatabaseVendor.MYSQL.getAlias())) {
+            if (Objects.equals(DatasourceManager.getDatabaseId(), DatabaseVendor.MYSQL.getDatabaseId())) {
                 //设置mysql join顺序优化器最大深度是5,避免大SQL分析时间过慢
                 statement.execute("SET SESSION optimizer_search_depth = 5");
                 //设置join_buffer为16M，提升BNL性能

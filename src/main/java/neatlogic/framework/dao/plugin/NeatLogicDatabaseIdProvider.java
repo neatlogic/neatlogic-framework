@@ -38,7 +38,7 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
     private String getDatabaseName(DataSource dataSource) throws SQLException {
         DatabaseVendor vendor = getDatabaseVendor(dataSource);
         if (vendor != null) {
-            return vendor.getAlias();
+            return vendor.getDatabaseId();
         }
         return null;
     }

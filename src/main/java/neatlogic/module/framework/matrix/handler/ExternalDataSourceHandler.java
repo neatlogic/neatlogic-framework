@@ -16,7 +16,9 @@ limitations under the License.
 
 package neatlogic.module.framework.matrix.handler;
 
-import neatlogic.framework.common.constvalue.Expression;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.integration.IntegrationHandlerNotFoundException;
@@ -33,15 +35,11 @@ import neatlogic.framework.matrix.constvalue.MatrixType;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
 import neatlogic.framework.matrix.dto.*;
-import neatlogic.framework.matrix.exception.MatrixAttributeNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixExternalAccessException;
 import neatlogic.framework.matrix.exception.MatrixExternalNotFoundException;
 import neatlogic.framework.util.ExcelUtil;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.module.framework.integration.handler.FrameworkRequestFrom;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -357,114 +355,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo) {
-        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
-        if (externalVo == null) {
-            throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
-        }
-        IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(externalVo.getIntegrationUuid());
-        IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
-        if (handler == null) {
-            throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
-        }
-
-        List<Map<String, JSONObject>> resultList = new ArrayList<>();
-        List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
-        if (CollectionUtils.isNotEmpty(matrixAttributeList)) {
-            List<String> attributeList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-            List<String> columnList = dataVo.getColumnList();
-            for (String column : columnList) {
-                if (!attributeList.contains(column)) {
-                    throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), column);
-                }
-            }
-            JSONObject paramObj = integrationVo.getParamObj();
-
-            JSONArray defaultValue = dataVo.getDefaultValue();
-            if (CollectionUtils.isNotEmpty(defaultValue)) {
-                for (String value : defaultValue.toJavaList(String.class)) {
-                    if (value.contains(SELECT_COMPOSE_JOINER)) {
-                        String[] split = value.split(SELECT_COMPOSE_JOINER);
-                        //当下拉框配置的值和显示文字列为同一列时，value值是这样的20210101&=&20210101，split数组第一和第二个元素相同，这时需要去重
-                        List<String> splitList = new ArrayList<>();
-                        for (String str : split) {
-                            if (!splitList.contains(str)) {
-                                splitList.add(str);
-                            }
-                        }
-                        List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-                        int min = Math.min(splitList.size(), columnList.size());
-                        for (int i = 0; i < min; i++) {
-                            String column = columnList.get(i);
-                            if (StringUtils.isNotBlank(column)) {
-                                MatrixColumnVo matrixColumnVo = new MatrixColumnVo(column, splitList.get(i));
-                                matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
-                                sourceColumnList.add(matrixColumnVo);
-                            }
-                        }
-                        paramObj.put("sourceColumnList", sourceColumnList);
-                        IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-                        if (StringUtils.isNotBlank(resultVo.getError())) {
-                            logger.error(resultVo.getError());
-                            throw new MatrixExternalAccessException(integrationVo.getName());
-                        }
-                        JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
-                        if (MapUtils.isNotEmpty(transformedResult)) {
-                            Integer rowNum = transformedResult.getInteger("rowNum");
-                            dataVo.setRowNum(rowNum);
-                            JSONArray tbodyArray = transformedResult.getJSONArray("tbodyList");
-                            resultList.addAll(getExternalDataTbodyList(matrixAttributeList, tbodyArray, columnList));
-                        }
-                    }
-                }
-                deduplicateData(columnList, resultList);
-            } else {
-                List<String> exsited = new ArrayList<>();
-                if (!mergeFilterListAndSourceColumnList(dataVo)) {
-                    return resultList;
-                }
-                List<MatrixColumnVo> sourceColumnList = dataVo.getSourceColumnList();
-                String keywordColumn = dataVo.getKeywordColumn();
-                if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
-                    paramObj.put("keyword", dataVo.getKeyword());
-                    if (!attributeList.contains(keywordColumn)) {
-                        throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
-                    }
-                    MatrixColumnVo matrixColumnVo = new MatrixColumnVo();
-                    matrixColumnVo.setColumn(keywordColumn);
-                    matrixColumnVo.setExpression(Expression.LIKE.getExpression());
-                    List<String> valueList = new ArrayList<>();
-                    valueList.add(dataVo.getKeyword());
-                    matrixColumnVo.setValueList(valueList);
-                    sourceColumnList.add(matrixColumnVo);
-                }
-                //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
-                paramObj.put("currentPage", dataVo.getCurrentPage());
-                paramObj.put("pageSize", dataVo.getPageSize());
-                paramObj.put("sourceColumnList", sourceColumnList);
-                IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-                if (StringUtils.isNotBlank(resultVo.getError())) {
-                    logger.error(resultVo.getError());
-                    throw new MatrixExternalAccessException(integrationVo.getName());
-                }
-                JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
-                if (MapUtils.isNotEmpty(transformedResult)) {
-                    Integer rowNum = transformedResult.getInteger("rowNum");
-                    dataVo.setRowNum(rowNum);
-                    JSONArray tbodyArray = transformedResult.getJSONArray("tbodyList");
-                    List<Map<String, JSONObject>> list = getExternalDataTbodyList(matrixAttributeList, tbodyArray, columnList);
-                    if (CollectionUtils.isEmpty(list)) {
-                        return resultList;
-                    }
-                    deduplicateData(columnList, exsited, list);
-                    resultList.addAll(list);
-                }
-            }
-        }
-        return resultList;
-    }
-
-    @Override
     protected List<Map<String, JSONObject>> mySearchTableDataNew(MatrixDataVo dataVo) {
         MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
         if (externalVo == null) {
@@ -502,7 +392,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
-                if (!Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
+                if (textFieldFilter != null && !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
                     filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
                 }
 //                dataVo.setFilterList(filterList);

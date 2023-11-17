@@ -16,7 +16,8 @@ limitations under the License.
 
 package neatlogic.module.framework.matrix.handler;
 
-import neatlogic.framework.common.constvalue.Expression;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
@@ -30,10 +31,7 @@ import neatlogic.framework.matrix.core.IMatrixPrivateDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
 import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dto.*;
-import neatlogic.framework.matrix.exception.MatrixAttributeNotFoundException;
 import neatlogic.framework.util.TableResultUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -136,104 +134,6 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo) {
-        List<Map<String, JSONObject>> resultList = new ArrayList<>();
-        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
-        List<MatrixAttributeVo> attributeList = matrixPrivateDataSourceHandler.getAttributeList();
-        if (CollectionUtils.isEmpty(attributeList)) {
-            return resultList;
-        }
-        Map<String, MatrixAttributeVo> matrixAttributeMap = new HashMap<>();
-        for (MatrixAttributeVo matrixAttributeVo : attributeList) {
-            matrixAttributeMap.put(matrixAttributeVo.getUuid(), matrixAttributeVo);
-        }
-        List<String> columnList = dataVo.getColumnList();
-        for (String column : columnList) {
-            if (!matrixAttributeMap.containsKey(column)) {
-                throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), column);
-            }
-        }
-        JSONArray defaultValue = dataVo.getDefaultValue();
-        if (CollectionUtils.isNotEmpty(defaultValue)) {
-            for (String value : defaultValue.toJavaList(String.class)) {
-                if (value.contains(SELECT_COMPOSE_JOINER)) {
-                    List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-                    String[] split = value.split(SELECT_COMPOSE_JOINER);
-                    if (StringUtils.isNotBlank(columnList.get(0))) {
-                        MatrixColumnVo matrixColumnVo = new MatrixColumnVo(columnList.get(0), split[0]);
-                        matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
-                        sourceColumnList.add(matrixColumnVo);
-                    }
-                    String keywordColumn = null;
-                    if (columnList.size() >= 2) {
-                        keywordColumn = columnList.get(1);
-                    } else {
-                        keywordColumn = columnList.get(0);
-                    }
-                    MatrixAttributeVo matrixAttribute = matrixAttributeMap.get(keywordColumn);
-                    if (matrixAttribute == null) {
-                        throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
-                    }
-                    MatrixColumnVo matrixColumnVo = new MatrixColumnVo(keywordColumn, split[1]);
-                    matrixColumnVo.setExpression(Expression.EQUAL.getExpression());
-                    sourceColumnList.add(matrixColumnVo);
-                    dataVo.setSourceColumnList(sourceColumnList);
-                    List<Map<String, String>> dataMapList = matrixPrivateDataSourceHandler.searchTableData(dataVo);
-                    if (CollectionUtils.isNotEmpty(dataMapList)) {
-                        //对dataMapList去重
-                        List<Map<String, String>> distinctList = new ArrayList<>();
-                        for (Map<String, String> dataMap : dataMapList) {
-                            if(distinctList.contains(dataMap)){
-                                continue;
-                            }
-                            distinctList.add(dataMap);
-                            Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-                            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                                String attributeUuid = entry.getKey();
-                                resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
-                            }
-                            resultList.add(resultMap);
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!mergeFilterListAndSourceColumnList(dataVo)) {
-                return resultList;
-            }
-            String keywordColumn = dataVo.getKeywordColumn();
-            String keyword = dataVo.getKeyword();
-            if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
-                MatrixAttributeVo matrixAttribute = matrixAttributeMap.get(keywordColumn);
-                if (matrixAttribute == null) {
-                    throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
-                }
-                dataVo.setAttrType(matrixAttribute.getType());
-                dataVo.setKeywordExpression(Expression.LIKE.getExpression());
-            }
-            //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
-            List<Map<String, String>> dataMapList = matrixPrivateDataSourceHandler.searchTableData(dataVo);
-            if (CollectionUtils.isEmpty(dataMapList)) {
-                return resultList;
-            }
-            List<Map<String, String>> distinctList = new ArrayList<>(100);
-            for (Map<String, String> dataMap : dataMapList) {
-                if(distinctList.contains(dataMap)){
-                    continue;
-                }
-                distinctList.add(dataMap);
-                Map<String, JSONObject> resultMap = new HashMap<>(dataMap.size());
-                for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                    String attributeUuid = entry.getKey();
-                    resultMap.put(attributeUuid, matrixAttributeValueHandle(matrixAttributeMap.get(attributeUuid), entry.getValue()));
-                }
-                resultList.add(resultMap);
-            }
-        }
-        return resultList;
-    }
-
-    @Override
     protected List<Map<String, JSONObject>> mySearchTableDataNew(MatrixDataVo dataVo) {
         List<Map<String, JSONObject>> resultList = new ArrayList<>();
         IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
@@ -249,7 +149,7 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
-                if (!Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
+                if (textFieldFilter != null && !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
                     filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
                 }
                 dataVo.setFilterList(filterList);

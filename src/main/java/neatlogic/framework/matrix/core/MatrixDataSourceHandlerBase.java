@@ -16,19 +16,18 @@ limitations under the License.
 
 package neatlogic.framework.matrix.core;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.ExportFileType;
 import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
 import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.exception.file.FileTypeNotSupportToExportException;
-import neatlogic.framework.exception.type.ParamIrregularException;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.MatrixAttributeNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixReferencedCannotBeDeletedException;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -45,10 +44,6 @@ import java.util.stream.Collectors;
  * @since 2021/11/5 10:26
  **/
 public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHandler {
-    /**
-     * 下拉列表value和text列的组合连接符
-     **/
-    protected final static String SELECT_COMPOSE_JOINER = "&=&";
 
     protected static MatrixMapper matrixMapper;
 
@@ -179,45 +174,6 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     }
 
     protected abstract JSONObject myTableDataSearch(MatrixDataVo dataVo);
-
-    @Override
-    public List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo) {
-        List<String> columnList = dataVo.getColumnList();
-        if (CollectionUtils.isEmpty(columnList)) {
-            throw new ParamIrregularException("columnList");
-        }
-        /** 属性集合去重 **/
-        List<String> distinctColumList = new ArrayList<>();
-        for (String column : columnList) {
-            if (!distinctColumList.contains(column)) {
-                distinctColumList.add(column);
-            }
-        }
-        columnList = distinctColumList;
-        dataVo.setColumnList(distinctColumList);
-        List<Map<String, JSONObject>> resultList = myTableColumnDataSearch(dataVo);
-        if (columnList.size() >= 2) {
-            for (Map<String, JSONObject> resultObj : resultList) {
-                JSONObject firstObj = resultObj.get(columnList.get(0));
-                String firstValue = firstObj.getString("value");
-                String firstText = firstObj.getString("text");
-                JSONObject secondObj = resultObj.get(columnList.get(1));
-                String secondText = secondObj.getString("text");
-                secondObj.put("compose", secondText + "(" + firstText + ")");
-                firstObj.put("compose", firstValue + SELECT_COMPOSE_JOINER + secondText);
-            }
-        } else if (columnList.size() == 1) {
-            for (Map<String, JSONObject> resultObj : resultList) {
-                JSONObject firstObj = resultObj.get(columnList.get(0));
-                String firstValue = firstObj.getString("value");
-                String firstText = firstObj.getString("text");
-                firstObj.put("compose", firstValue + SELECT_COMPOSE_JOINER + firstText);
-            }
-        }
-        return resultList;
-    }
-
-    protected abstract List<Map<String, JSONObject>> myTableColumnDataSearch(MatrixDataVo dataVo);
 
     @Override
     public List<Map<String, JSONObject>> searchTableDataNew(MatrixDataVo dataVo) {
@@ -354,45 +310,5 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
             sourceColumnList.add(sourceColumn);
         }
         return true;
-    }
-
-    /**
-     * 删除重复数据
-     * @param columnList
-     * @param resultList
-     * @return
-     */
-    protected void deduplicateData(List<String> columnList, List<Map<String, JSONObject>> resultList) {
-        List<String> exsited = new ArrayList<>();
-        deduplicateData(columnList, exsited, resultList);
-    }
-
-    /**
-     * 删除重复数据
-     * @param columnList
-     * @param exsited
-     * @param resultList
-     * @return
-     */
-    protected void deduplicateData(List<String> columnList, List<String> exsited, List<Map<String, JSONObject>> resultList) {
-        String firstColumn = columnList.get(0);
-        String secondColumn = columnList.get(0);
-        if (columnList.size() >= 2) {
-            secondColumn = columnList.get(1);
-        }
-        Iterator<Map<String, JSONObject>> iterator = resultList.iterator();
-        while (iterator.hasNext()) {
-            Map<String, JSONObject> resultObj = iterator.next();
-            JSONObject firstObj = resultObj.get(firstColumn);
-            JSONObject secondObj = resultObj.get(secondColumn);
-            String firstValue = firstObj.getString("value");
-            String secondText = secondObj.getString("text");
-            String compose = firstValue + SELECT_COMPOSE_JOINER + secondText;
-            if (exsited.contains(compose)) {
-                iterator.remove();
-            } else {
-                exsited.add(compose);
-            }
-        }
     }
 }

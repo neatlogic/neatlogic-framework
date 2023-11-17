@@ -16,18 +16,15 @@ limitations under the License.
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
-import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.form.attribute.core.FormHandlerBase;
-import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -55,7 +52,24 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     public Object conversionDataType(Object source, String attributeLabel) {
-        return convertToString(source, attributeLabel);
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof JSONObject) {
+            return source;
+        } else if (source instanceof String) {
+            String sourceStr = (String) source;
+            if (sourceStr.startsWith("{") && sourceStr.endsWith("}")) {
+                try {
+                    return JSONObject.parseObject(sourceStr);
+                } catch (Exception e) {
+                    throw new AttributeValidException(attributeLabel);
+                }
+            } else {
+                return source;
+            }
+        }
+        throw new AttributeValidException(attributeLabel);
     }
 
     @Override
@@ -73,11 +87,6 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-//        String value = (String) attributeDataVo.getDataObj();
-//        if (StringUtils.isNotBlank(value)) {
-//            return getTextOrValue(value, configObj, ConversionType.TOTEXT.getValue());
-//        }
-//        return value;
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");
         if (CollectionUtils.isNotEmpty(textArray)) {
@@ -100,42 +109,6 @@ public class RadioHandler extends FormHandlerBase {
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
         return formService.textConversionValueForSelectHandler(text, config);
-//        Object result = null;
-//        if (CollectionUtils.isNotEmpty(values)) {
-//            result = getTextOrValue(values.get(0), config, ConversionType.TOVALUE.getValue());
-//        }
-//        return result;
-    }
-
-    private Object getTextOrValue(String value, JSONObject configObj, String conversionType) {
-        Object result = null;
-        String dataSource = configObj.getString("dataSource");
-        if ("static".equals(dataSource)) {
-            List<ValueTextVo> dataList = JSON.parseArray(configObj.getString("dataList"), ValueTextVo.class);
-            if (CollectionUtils.isNotEmpty(dataList)) {
-                for (ValueTextVo data : dataList) {
-                    if (ConversionType.TOTEXT.getValue().equals(conversionType) && value.equals(data.getValue())) {
-                        result = data.getText();
-                        break;
-                    } else if (ConversionType.TOVALUE.getValue().equals(conversionType) && value.equals(data.getText())) {
-                        result = data.getValue();
-                        break;
-                    }
-                }
-            }
-        } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-            if (ConversionType.TOTEXT.getValue().equals(conversionType) && value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                result = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1];
-            } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
-                String matrixUuid = configObj.getString("matrixUuid");
-                ValueTextVo mapping = JSON.toJavaObject(configObj.getJSONObject("mapping"), ValueTextVo.class);
-                if (StringUtils.isNotBlank(matrixUuid) && StringUtils.isNotBlank(value)
-                        && mapping != null) {
-                    result = getValue(matrixUuid, mapping, value);
-                }
-            }
-        }
-        return result;
     }
 
     @Override

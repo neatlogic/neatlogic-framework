@@ -19,6 +19,7 @@ package neatlogic.module.framework.form.attribute.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -108,7 +109,11 @@ public class RadioHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-        return formService.textConversionValueForSelectHandler(text, config);
+        List<ValueTextVo> list = formService.textConversionValueForSelectHandler(text, config);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.get(0);
+        }
+        return null;
     }
 
     @Override

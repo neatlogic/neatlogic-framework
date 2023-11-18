@@ -16,20 +16,18 @@ limitations under the License.
 
 package neatlogic.module.framework.form.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
-import neatlogic.framework.common.util.RC4Util;
-import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
-import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeMatrixVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.form.exception.FormAttributeHandlerNotFoundException;
 import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
@@ -40,8 +38,6 @@ import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundExcep
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
 import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
 import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -232,9 +228,10 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     }
 
     @Override
-    public Object textConversionValueForSelectHandler(Object text, JSONObject config) {
+    public List<ValueTextVo> textConversionValueForSelectHandler(Object text, JSONObject config) {
+        List<ValueTextVo> valueList = new ArrayList<>();
         if (text == null) {
-            return null;
+            return valueList;
         }
         String dataSource = config.getString("dataSource");
         if ("static".equals(dataSource)) {
@@ -247,17 +244,19 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (text instanceof String) {
                 String textStr = (String) text;
                 Object value = valueTextMap.get(textStr);
-                return value;
+                if (value != null) {
+                    valueList.add(new ValueTextVo(value, textStr));
+                }
+                return valueList;
             }  else if (text instanceof List) {
                 List<String> textList = (List) text;
                 if (CollectionUtils.isEmpty(textList)) {
-                    return textList;
+                    return valueList;
                 }
-                List<Object> valueList = new ArrayList<>();
                 for (String textStr : textList) {
                     Object value = valueTextMap.get(textStr);
                     if (value != null) {
-                        valueList.add(value);
+                        valueList.add(new ValueTextVo(value, textStr));
                     }
                 }
                 return valueList;
@@ -265,32 +264,38 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         } else if ("matrix".equals(dataSource)) {
             String matrixUuid = config.getString("matrixUuid");
             if (StringUtils.isBlank(matrixUuid)) {
-                return null;
+                return valueList;
             }
             JSONObject mappingObj = config.getJSONObject("mapping");
             if (MapUtils.isEmpty(mappingObj)) {
-                return null;
+                return valueList;
             }
             ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
+            System.out.println("13");
             if (text instanceof String) {
                 String textStr = (String) text;
                 if (Objects.equals(mapping.getText(), mapping.getValue())) {
-                    return textStr + IFormAttributeHandler.SELECT_COMPOSE_JOINER + textStr;
+                    valueList.add(new ValueTextVo(textStr, textStr));
+                    return valueList;
                 }
-                return getValue(matrixUuid, mapping, textStr);
+                String value = getValue(matrixUuid, mapping, textStr);
+                if (value != null) {
+                    valueList.add(new ValueTextVo(value, textStr));
+                }
+                return valueList;
             }  else if (text instanceof List) {
                 List<String> textList = (List) text;
                 if (CollectionUtils.isEmpty(textList)) {
-                    return textList;
+                    return valueList;
                 }
-                List<Object> valueList = new ArrayList<>();
                 for (String textStr : textList) {
                     if (Objects.equals(mapping.getText(), mapping.getValue())) {
-                        valueList.add(textStr + IFormAttributeHandler.SELECT_COMPOSE_JOINER + textStr);
-                    }
-                    Object value = getValue(matrixUuid, mapping, textStr);
-                    if (value != null) {
-                        valueList.add(value);
+                        valueList.add(new ValueTextVo(textStr, textStr));
+                    } else {
+                        String value = getValue(matrixUuid, mapping, textStr);
+                        if (value != null) {
+                            valueList.add(new ValueTextVo(value, textStr));
+                        }
                     }
                 }
                 return valueList;
@@ -353,14 +358,44 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (dataObj instanceof JSONArray) {
                 JSONArray valueArray = (JSONArray) dataObj;
                 if (CollectionUtils.isNotEmpty(valueArray)) {
-                    valueList = valueArray.toJavaList(String.class);
-                    for (String value : valueList) {
-                        String text = valueTextMap.get(value);
-                        if (text != null) {
-                            textList.add(text);
+//                    valueList = valueArray.toJavaList(String.class);
+                    for (Object valueObj : valueArray) {
+                        if (valueObj instanceof JSONObject) {
+                            JSONObject jsonObj = (JSONObject) valueObj;
+                            String value = jsonObj.getString("value");
+                            if (value != null) {
+                                valueList.add(value);
+                            }
+                            String text = jsonObj.getString("text");
+                            if (text != null) {
+                                textList.add(text);
+                            } else {
+                                if (value != null) {
+                                    textList.add(value);
+                                }
+                            }
                         } else {
-                            textList.add(value);
+                            String text = valueTextMap.get(valueObj);
+                            if (text != null) {
+                                textList.add(text);
+                            } else {
+                                textList.add(valueObj.toString());
+                            }
                         }
+                    }
+                }
+            } else if (dataObj instanceof JSONObject) {
+                JSONObject jsonObj = (JSONObject) dataObj;
+                String value = jsonObj.getString("value");
+                if (value != null) {
+                    valueList.add(value);
+                }
+                String text = jsonObj.getString("text");
+                if (text != null) {
+                    textList.add(text);
+                } else {
+                    if (value != null) {
+                        textList.add(value);
                     }
                 }
             } else {
@@ -374,25 +409,43 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 }
             }
         } else {// 其他，如动态数据源
+            System.out.println("14");
             if (dataObj instanceof JSONArray) {
                 JSONArray valueArray = (JSONArray) dataObj;
                 if (CollectionUtils.isNotEmpty(valueArray)) {
-                    valueList = valueArray.toJavaList(String.class);
-                    for (String key : valueList) {
-                        if (key.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                            textList.add(key.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
+                    for (int i = 0; i < valueArray.size(); i++) {
+                        Object obj = valueArray.get(i);
+                        if (obj instanceof JSONObject) {
+                            JSONObject jsonObj = (JSONObject) obj;
+                            String value = jsonObj.getString("value");
+                            if (value != null) {
+                                valueList.add(value);
+                            }
+                            String text = jsonObj.getString("text");
+                            if (text != null) {
+                                textList.add(text);
+                            }
                         } else {
-                            textList.add(key);
+                            String value = obj.toString();
+                            valueList.add(value);
+                            textList.add(value);
                         }
                     }
                 }
+            } else if (dataObj instanceof JSONObject) {
+                JSONObject jsonObj = (JSONObject) dataObj;
+                String value = jsonObj.getString("value");
+                if (value != null) {
+                    valueList.add(value);
+                }
+                String text = jsonObj.getString("text");
+                if (text != null) {
+                    textList.add(text);
+                }
             } else {
                 String value = dataObj.toString();
-                if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                    textList.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                } else {
-                    textList.add(value);
-                }
+                valueList.add(value);
+                textList.add(value);
             }
         }
         resultObj.put("valueList", valueList);
@@ -458,7 +511,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     JSONObject textObj = tbody.get(textField);
                     if (Objects.equals(text, textObj.getString("text"))) {
                         JSONObject valueObj = tbody.get(valueField);
-                        return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + text;
+                        System.out.println("15");
+                        return valueObj.getString("value");
                     }
                 }
                 if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {

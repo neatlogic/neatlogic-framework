@@ -19,6 +19,7 @@ package neatlogic.module.framework.form.attribute.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -202,20 +203,15 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-        Object value = formService.textConversionValueForSelectHandler(text, config);
-        if (value == null) {
+        List<ValueTextVo> list = formService.textConversionValueForSelectHandler(text, config);
+        if (CollectionUtils.isEmpty(list)) {
             return null;
-        }
-        if (value instanceof List) {
-            return value;
         }
         boolean isMultiple = config.getBooleanValue("isMultiple");
         if (isMultiple) {
-            List<Object> list = new ArrayList<>();
-            list.add(value);
             return list;
         }
-        return value;
+        return list.get(0);
 //        Object result = null;
 //        if (CollectionUtils.isNotEmpty(values)) {
 //            boolean isMultiple = config.getBooleanValue("isMultiple");

@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.form.service;
 
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import com.alibaba.fastjson.JSONObject;
@@ -38,7 +39,7 @@ public interface FormService {
      */
     JSONArray staticListPasswordEncrypt(JSONArray data, JSONObject config);
 
-    Object textConversionValueForSelectHandler(Object text, JSONObject config);
+    List<ValueTextVo> textConversionValueForSelectHandler(Object text, JSONObject config);
 
     /**
      * 校验表单数据有效性，并针对特殊组件数据进行相应处理，如密码类型组件对数据进行加密处理

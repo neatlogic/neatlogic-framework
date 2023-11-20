@@ -385,13 +385,11 @@ public class ModuleInitializer implements WebApplicationInitializer {
             if (tenantModuleVersionMap.containsKey(tenant.getUuid())) {
                 for (ModuleVo moduleVo : moduleVoList) {
                     String moduleId = moduleVo.getId();
-                    String latestVersion = moduleLatestVersionMap.get(moduleId);
+                    //String latestVersion = moduleLatestVersionMap.get(moduleId); //
                     //第一次启用基线。 即该租户该模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
                     if (!moduleVersionMap.containsKey(moduleId) || StringUtils.isBlank(moduleVersionMap.get(moduleId)) || moduleVersionMap.get(moduleId) == null) {
-                        if (StringUtils.isBlank(latestVersion)) {
-                            //其他没有最新版本日志的模块则选择昨天作为最新版本，为了后续自动更新版本
-                            latestVersion = TimeUtil.descDateStr(new Date(), 1, TimeUtil.YYYY_MM_DD);
-                        }
+                        //选择当天作为最新版本，为了后续自动更新版本
+                        String latestVersion = TimeUtil.convertDateToString(new Date(), TimeUtil.YYYY_MM_DD);
                         insertTenantModuleVersionSql(tenant.getUuid(), moduleId, latestVersion);
                         //如果模块版本小于最新版本，则执行sql并更新为最新版本
                     } else {
@@ -428,11 +426,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
             } else {
                 //第一次启用基线。 即该租户所有模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
                 for (ModuleVo moduleVo : moduleVoList) {
-                    String latestVersion = moduleLatestVersionMap.get(moduleVo.getId());
-                    if (StringUtils.isBlank(latestVersion)) {
-                        //其他没有最新版本日志的模块则选择昨天作为最新版本，为了后续自动更新版本
-                        latestVersion = TimeUtil.descDateStr(new Date(), 1, TimeUtil.YYYY_MM_DD);
-                    }
+                    //选择当天作为最新版本，为了后续自动更新版本
+                    String latestVersion = TimeUtil.convertDateToString(new Date(), TimeUtil.YYYY_MM_DD);
                     insertTenantModuleVersionSql(tenant.getUuid(), moduleVo.getId(), latestVersion);
                 }
             }

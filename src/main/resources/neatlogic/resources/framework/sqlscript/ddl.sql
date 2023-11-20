@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `discovery_conf_combop` (
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `file` (
   `id` bigint NOT NULL COMMENT 'id',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件名称',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '文件名称',
   `size` bigint NOT NULL COMMENT '文件大小',
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '所属用户，引用user的user_uuid',
   `upload_time` timestamp(3) NULL DEFAULT NULL COMMENT '创建时间',
@@ -1252,8 +1252,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`uuid`) USING BTREE,
   UNIQUE KEY `user_id_idx` (`user_id`) USING BTREE,
   KEY `id` (`id`) USING BTREE,
-  KEY `email` (`email`) USING BTREE,
-  KEY `idx_user_name` (`user_name`) USING BTREE
+  KEY `email` (`email`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户信息表';
 
 -- ----------------------------
@@ -1404,5 +1403,21 @@ CREATE TABLE IF NOT EXISTS `notify_config` (
   `config` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置',
   PRIMARY KEY (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='通知配置表';
+
+-- ----------------------------
+-- Table structure for mail_server
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `mail_server`  (
+  `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键id',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '名称',
+  `host` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'host',
+  `ssl_enable` enum('true','false') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '是否使用SSL',
+  `port` int NOT NULL COMMENT '端口',
+  `from_address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱地址',
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户名',
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
+  `domain` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '域名',
+  PRIMARY KEY (`uuid`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '邮件服务器表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -432,24 +432,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-        List<MatrixAttributeVo> attributeVoList = attributeMapper.getMatrixAttributeByMatrixUuid(dataVo.getMatrixUuid());
-        if (CollectionUtils.isNotEmpty(attributeVoList)) {
-            List<String> columnList = attributeVoList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-            dataVo.setColumnList(columnList);
-            if (dataVo.getNeedPage()) {
-                int rowNum = matrixDataMapper.getDynamicTableDataCount(dataVo);
-                dataVo.setRowNum(rowNum);
-            }
-            List<Map<String, String>> dataList = matrixDataMapper.searchDynamicTableData(dataVo);
-            List<Map<String, JSONObject>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
-            JSONArray theadList = getTheadList(attributeVoList);
-            return TableResultUtil.getResult(theadList, tbodyList, dataVo);
-        }
-        return new JSONObject();
-    }
-
-    @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         JSONObject returnObj = new JSONObject();
         List<MatrixAttributeVo> matrixAttributeList = attributeMapper.getMatrixAttributeByMatrixUuid(dataVo.getMatrixUuid());

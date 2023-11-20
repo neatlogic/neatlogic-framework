@@ -249,29 +249,6 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-        MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());
-        if (matrixViewVo == null) {
-            throw new MatrixViewNotFoundException(dataVo.getMatrixUuid());
-        }
-        JSONArray attributeList = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
-        if (CollectionUtils.isNotEmpty(attributeList)) {
-            List<MatrixAttributeVo> attributeVoList = attributeList.toJavaList(MatrixAttributeVo.class);
-            List<String> columnList = attributeVoList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-            dataVo.setColumnList(columnList);
-            if (dataVo.getNeedPage()) {
-                int rowNum = matrixViewDataMapper.getDynamicTableDataCount(dataVo);
-                dataVo.setRowNum(rowNum);
-            }
-            List<Map<String, String>> dataList = matrixViewDataMapper.searchDynamicTableData(dataVo);
-            List<Map<String, JSONObject>> tbodyList = matrixTableDataValueHandle(dataList);
-            JSONArray theadList = getTheadList(attributeVoList);
-            return TableResultUtil.getResult(theadList, tbodyList, dataVo);
-        }
-        return new JSONObject();
-    }
-
-    @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         JSONObject returnObj = new JSONObject();
         MatrixViewVo matrixViewVo = matrixMapper.getMatrixViewByMatrixUuid(dataVo.getMatrixUuid());

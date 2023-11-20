@@ -29,15 +29,17 @@ import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.service.IFormCrossoverService;
+import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
-import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
+import neatlogic.framework.matrix.dto.MatrixDefaultValueFilterVo;
+import neatlogic.framework.matrix.dto.MatrixKeywordFilterVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
-import neatlogic.framework.matrix.exception.MatrixNotFoundException;
 import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
 import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
+import neatlogic.module.framework.matrix.service.MatrixService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +56,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     private FormMapper formMapper;
 
     @Resource
-    private MatrixMapper matrixMapper;
+    private MatrixService matrixService;
 
     /**
      * 保存表单属性与其他功能的引用关系
@@ -410,6 +412,15 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             }
         } else {// 其他，如动态数据源
             System.out.println("14");
+            String matrixUuid = configObj.getString("matrixUuid");
+            if (StringUtils.isBlank(matrixUuid)) {
+                return resultObj;
+            }
+            JSONObject mappingObj = configObj.getJSONObject("mapping");
+            if (MapUtils.isEmpty(mappingObj)) {
+                return resultObj;
+            }
+            ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
             if (dataObj instanceof JSONArray) {
                 JSONArray valueArray = (JSONArray) dataObj;
                 if (CollectionUtils.isNotEmpty(valueArray)) {
@@ -424,11 +435,18 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                             String text = jsonObj.getString("text");
                             if (text != null) {
                                 textList.add(text);
+                            } else {
+                                textList.add(value);
                             }
                         } else {
                             String value = obj.toString();
                             valueList.add(value);
-                            textList.add(value);
+                            String text = getText(matrixUuid, mapping, value);
+                            if (text != null) {
+                                textList.add(text);
+                            } else {
+                                textList.add(value);
+                            }
                         }
                     }
                 }
@@ -441,11 +459,18 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 String text = jsonObj.getString("text");
                 if (text != null) {
                     textList.add(text);
+                } else {
+                    textList.add(value);
                 }
             } else {
                 String value = dataObj.toString();
                 valueList.add(value);
-                textList.add(value);
+                String text = getText(matrixUuid, mapping, value);
+                if (text != null) {
+                    textList.add(text);
+                } else {
+                    textList.add(value);
+                }
             }
         }
         resultObj.put("valueList", valueList);
@@ -487,10 +512,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             return text;
         }
         try {
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
-            if (matrixVo == null) {
-                throw new MatrixNotFoundException(matrixUuid);
-            }
+            MatrixVo matrixVo = matrixService.getMatrixByUuid(matrixUuid);
             IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
             if (matrixDataSourceHandler == null) {
                 throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
@@ -513,6 +535,51 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                         JSONObject valueObj = tbody.get(valueField);
                         System.out.println("15");
                         return valueObj.getString("value");
+                    }
+                }
+                if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {
+                    break;
+                }
+                dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getText(String matrixUuid, ValueTextVo mapping, String value) {
+        if (StringUtils.isBlank(value)) {
+            return value;
+        }
+        try {
+            MatrixVo matrixVo = matrixService.getMatrixByUuid(matrixUuid);
+            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+            if (matrixDataSourceHandler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
+            String valueField = (String) mapping.getValue();
+            String textField = mapping.getText();
+            MatrixDataVo dataVo = new MatrixDataVo();
+            dataVo.setMatrixUuid(matrixUuid);
+            List<String> columnList = new ArrayList<>();
+            columnList.add((String) mapping.getValue());
+            columnList.add(mapping.getText());
+            dataVo.setColumnList(columnList);
+            List<MatrixDefaultValueFilterVo> defaultValueFilterList = new ArrayList<>();
+            MatrixDefaultValueFilterVo matrixDefaultValueFilterVo = new MatrixDefaultValueFilterVo(
+                    new MatrixKeywordFilterVo(valueField, SearchExpression.EQ.getExpression(), value)
+            );
+            defaultValueFilterList.add(matrixDefaultValueFilterVo);
+            dataVo.setDefaultValueFilterList(defaultValueFilterList);
+            for (int i = 0; i < 10; i++) {
+                List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
+                for (Map<String, JSONObject> tbody : tbodyList) {
+                    JSONObject valueObj = tbody.get(valueField);
+                    if (Objects.equals(value, valueObj.getString("value"))) {
+                        JSONObject textObj = tbody.get(textField);
+                        System.out.println("15");
+                        return textObj.getString("text");
                     }
                 }
                 if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {

@@ -162,13 +162,6 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myExportAttribute(MatrixVo matrixVo);
 
     @Override
-    public JSONObject getTableData(MatrixDataVo dataVo) {
-        return myGetTableData(dataVo);
-    }
-
-    protected abstract JSONObject myGetTableData(MatrixDataVo dataVo);
-
-    @Override
     public JSONObject searchTableData(MatrixDataVo dataVo) {
         return myTableDataSearch(dataVo);
     }

@@ -48,6 +48,8 @@ public interface IFormCrossoverService extends ICrossoverService {
      */
     void formAttributeValueValid(FormVersionVo formVersionVo, JSONArray formAttributeDataList) throws AttributeValidException;
 
+    JSONObject getMyDetailedDataForSelectHandler(AttributeDataVo attributeDataVo, JSONObject configObj);
+
     /**
      * 判断是否修改了表单数据
      * @param formAttributeList 表单属性列表

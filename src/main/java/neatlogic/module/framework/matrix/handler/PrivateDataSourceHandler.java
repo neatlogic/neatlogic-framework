@@ -111,16 +111,6 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     }
 
     @Override
-    protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
-        List<MatrixAttributeVo> attributeVoList = matrixPrivateDataSourceHandler.getAttributeList();
-        List<Map<String, String>> dataList = matrixPrivateDataSourceHandler.searchTableData(dataVo);
-        List<Map<String, Object>> tbodyList = matrixTableDataValueHandle(attributeVoList, dataList);
-        JSONArray theadList = getTheadList(attributeVoList);
-        return TableResultUtil.getResult(theadList, tbodyList, dataVo);
-    }
-
-    @Override
     protected JSONObject myTableDataSearch(MatrixDataVo dataVo) {
         IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(dataVo.getMatrixUuid());
         List<MatrixAttributeVo> attributeVoList = matrixPrivateDataSourceHandler.getAttributeList();

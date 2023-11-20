@@ -53,7 +53,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author linbq
@@ -188,58 +187,6 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myExportAttribute(MatrixVo matrixVo) {
         return null;
-    }
-
-    @Override
-    protected JSONObject myGetTableData(MatrixDataVo dataVo) {
-
-        MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(dataVo.getMatrixUuid());
-        if (externalVo == null) {
-            throw new MatrixExternalNotFoundException(dataVo.getMatrixUuid());
-        }
-        IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(externalVo.getIntegrationUuid());
-        if (integrationVo == null) {
-            throw new IntegrationNotFoundException(externalVo.getIntegrationUuid());
-        }
-        IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
-        if (handler == null) {
-            throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
-        }
-
-        JSONObject paramObj = integrationVo.getParamObj();
-        paramObj.put("keyword", dataVo.getKeyword());
-        paramObj.put("currentPage", dataVo.getCurrentPage());
-        paramObj.put("pageSize", dataVo.getPageSize());
-        IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
-        if (StringUtils.isNotBlank(resultVo.getError())) {
-            logger.error(resultVo.getError());
-            throw new MatrixExternalAccessException(integrationVo.getName());
-        }
-        handler.validate(resultVo);
-        JSONObject returnObj = new JSONObject();
-        JSONObject transformedResult = JSONObject.parseObject(resultVo.getTransformedResult());
-        Integer rowNum = transformedResult.getInteger("rowNum");
-        dataVo.setRowNum(rowNum);
-        returnObj.put("currentPage", transformedResult.get("currentPage"));
-        returnObj.put("pageSize", transformedResult.get("pageSize"));
-        returnObj.put("pageCount", transformedResult.get("pageCount"));
-        returnObj.put("rowNum", rowNum);
-
-        List<MatrixAttributeVo> matrixAttributeList = getExternalMatrixAttributeList(dataVo.getMatrixUuid(), integrationVo);
-        List<String> columnList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-        JSONArray theadList = getTheadList(dataVo.getMatrixUuid(), matrixAttributeList, columnList);
-//        JSONArray theadList = transformedResult.getJSONArray("theadList");
-        returnObj.put("theadList", theadList);
-//        for (int i = 0; i < theadList.size(); i++) {
-//            JSONObject theadObj = theadList.getJSONObject(i);
-//            String key = theadObj.getString("key");
-//            if (StringUtils.isNotBlank(key)) {
-//                columnList.add(key);
-//            }
-//        }
-        JSONArray tbodyArray = transformedResult.getJSONArray("tbodyList");
-        returnObj.put("tbodyList", getExternalDataTbodyList(matrixAttributeList, tbodyArray, columnList));
-        return returnObj;
     }
 
     @Override

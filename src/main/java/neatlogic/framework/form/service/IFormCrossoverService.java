@@ -60,4 +60,6 @@ public interface IFormCrossoverService extends ICrossoverService {
     boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
                                List<? extends AttributeDataVo> newFormAttributeDataList,
                                List<? extends AttributeDataVo> oldFormAttributeDataList);
+
+    Object getFormSelectAttributeValueByOriginalValue(Object originalValue);
 }

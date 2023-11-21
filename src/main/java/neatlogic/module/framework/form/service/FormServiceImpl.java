@@ -507,6 +507,34 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return isModified;
     }
 
+    @Override
+    public Object getFormSelectAttributeValueByOriginalValue(Object originalValue) {
+        if (originalValue == null) {
+            return null;
+        }
+        if (originalValue instanceof JSONArray) {
+            JSONArray valueList = new JSONArray();
+            JSONArray originalValueArray = (JSONArray) originalValue;
+            for (int i = 0; i < originalValueArray.size(); i++) {
+                Object originalValueObject = originalValueArray.get(i);
+                if (originalValueObject instanceof JSONObject) {
+                    JSONObject originalValueObj = (JSONObject) originalValueObject;
+                    Object value = originalValueObj.get("value");
+                    if (value != null) {
+                        valueList.add(value);
+                    }
+                } else {
+                    valueList.add(originalValueObject);
+                }
+            }
+            return valueList;
+        } else if (originalValue instanceof JSONObject) {
+            JSONObject originalValueObj = (JSONObject) originalValue;
+            return originalValueObj.get("value");
+        }
+        return originalValue;
+    }
+
     private String getValue(String matrixUuid, ValueTextVo mapping, String text) {
         if (StringUtils.isBlank(text)) {
             return text;

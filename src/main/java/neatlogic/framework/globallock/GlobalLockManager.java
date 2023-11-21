@@ -55,8 +55,8 @@ public class GlobalLockManager {
      */
     public static void insertLock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
-        globalLockMapper.insertLock(globalLockVo);
         try {
+            globalLockMapper.insertLock(globalLockVo);
             //获取所有该key的锁和未上锁的队列 for update
             List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁

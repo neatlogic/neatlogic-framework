@@ -32,14 +32,16 @@ import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
+import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
+import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixDefaultValueFilterVo;
 import neatlogic.framework.matrix.dto.MatrixKeywordFilterVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
+import neatlogic.framework.matrix.exception.MatrixNotFoundException;
 import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
 import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
-import neatlogic.module.framework.matrix.service.MatrixService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +58,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     private FormMapper formMapper;
 
     @Resource
-    private MatrixService matrixService;
+    private MatrixMapper matrixMapper;
 
     /**
      * 保存表单属性与其他功能的引用关系
@@ -273,7 +275,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 return valueList;
             }
             ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
-            System.out.println("13");
             if (text instanceof String) {
                 String textStr = (String) text;
                 if (Objects.equals(mapping.getText(), mapping.getValue())) {
@@ -411,7 +412,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 }
             }
         } else {// 其他，如动态数据源
-            System.out.println("14");
             String matrixUuid = configObj.getString("matrixUuid");
             if (StringUtils.isBlank(matrixUuid)) {
                 return resultObj;
@@ -540,7 +540,13 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             return text;
         }
         try {
-            MatrixVo matrixVo = matrixService.getMatrixByUuid(matrixUuid);
+            MatrixVo matrixVo = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(matrixUuid);
+            if (matrixVo == null) {
+                matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+                if (matrixVo == null) {
+                    throw new MatrixNotFoundException(matrixUuid);
+                }
+            }
             IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
             if (matrixDataSourceHandler == null) {
                 throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
@@ -561,7 +567,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     JSONObject textObj = tbody.get(textField);
                     if (Objects.equals(text, textObj.getString("text"))) {
                         JSONObject valueObj = tbody.get(valueField);
-                        System.out.println("15");
                         return valueObj.getString("value");
                     }
                 }
@@ -581,7 +586,13 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             return value;
         }
         try {
-            MatrixVo matrixVo = matrixService.getMatrixByUuid(matrixUuid);
+            MatrixVo matrixVo = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(matrixUuid);
+            if (matrixVo == null) {
+                matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+                if (matrixVo == null) {
+                    throw new MatrixNotFoundException(matrixUuid);
+                }
+            }
             IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
             if (matrixDataSourceHandler == null) {
                 throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
@@ -607,7 +618,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     JSONObject valueObj = tbody.get(valueField);
                     if (Objects.equals(value, valueObj.getString("value"))) {
                         JSONObject textObj = tbody.get(textField);
-                        System.out.println("15");
                         return textObj.getString("text");
                     }
                 }

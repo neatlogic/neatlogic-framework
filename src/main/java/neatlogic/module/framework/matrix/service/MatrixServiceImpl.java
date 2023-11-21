@@ -1,7 +1,5 @@
 package neatlogic.module.framework.matrix.service;
 
-import neatlogic.framework.matrix.constvalue.MatrixType;
-import neatlogic.framework.matrix.core.IMatrixPrivateDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.MatrixVo;
@@ -22,13 +20,8 @@ public class MatrixServiceImpl implements MatrixService {
         if (matrixVo != null) {
             return matrixVo;
         }
-        IMatrixPrivateDataSourceHandler matrixPrivateDataSourceHandler = MatrixPrivateDataSourceHandlerFactory.getHandler(uuid);
-        if (matrixPrivateDataSourceHandler != null) {
-            matrixVo = new MatrixVo();
-            matrixVo.setUuid(uuid);
-            matrixVo.setName(matrixPrivateDataSourceHandler.getName());
-            matrixVo.setLabel(matrixPrivateDataSourceHandler.getLabel());
-            matrixVo.setType(MatrixType.PRIVATE.getValue());
+        matrixVo = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(uuid);
+        if (matrixVo != null) {
             return matrixVo;
         }
         throw new MatrixNotFoundException(uuid);

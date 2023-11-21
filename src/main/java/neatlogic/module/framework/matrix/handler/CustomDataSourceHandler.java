@@ -473,14 +473,16 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
                 List<MatrixFilterVo> filterList = new ArrayList<>();
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
-                filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                if (valueFieldFilter != null) {
+                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
                 if (textFieldFilter != null) {
                     MatrixAttributeVo attributeVo = matrixAttributeMap.get(textFieldFilter.getUuid());
                     if (MatrixAttributeType.SELECT.getValue().equals(attributeVo.getType())) {
                         List<String> valueList = getSelectTypeValueList(attributeVo, textFieldFilter.getValue(), SearchExpression.EQ);
                         if (CollectionUtils.isNotEmpty(valueList)) {
-                            filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), SearchExpression.LI.getExpression(), valueList));
+                            filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), SearchExpression.EQ.getExpression(), valueList));
                         } else {
                             return resultList;
                         }

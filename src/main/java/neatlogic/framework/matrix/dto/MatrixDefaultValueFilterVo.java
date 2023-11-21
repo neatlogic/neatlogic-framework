@@ -2,11 +2,7 @@ package neatlogic.framework.matrix.dto;
 
 public class MatrixDefaultValueFilterVo {
     private final MatrixKeywordFilterVo valueFieldFilter;
-    private MatrixKeywordFilterVo textFieldFilter;
-
-    public MatrixDefaultValueFilterVo(MatrixKeywordFilterVo valueFieldFilter) {
-        this.valueFieldFilter = valueFieldFilter;
-    }
+    private final MatrixKeywordFilterVo textFieldFilter;
 
     public MatrixDefaultValueFilterVo(MatrixKeywordFilterVo valueFieldFilter, MatrixKeywordFilterVo textFieldFilter) {
         this.valueFieldFilter = valueFieldFilter;

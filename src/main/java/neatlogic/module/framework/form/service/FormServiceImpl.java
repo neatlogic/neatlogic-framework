@@ -596,7 +596,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             dataVo.setColumnList(columnList);
             List<MatrixDefaultValueFilterVo> defaultValueFilterList = new ArrayList<>();
             MatrixDefaultValueFilterVo matrixDefaultValueFilterVo = new MatrixDefaultValueFilterVo(
-                    new MatrixKeywordFilterVo(valueField, SearchExpression.EQ.getExpression(), value)
+                    new MatrixKeywordFilterVo(valueField, SearchExpression.EQ.getExpression(), value),
+                    null
             );
             defaultValueFilterList.add(matrixDefaultValueFilterVo);
             dataVo.setDefaultValueFilterList(defaultValueFilterList);

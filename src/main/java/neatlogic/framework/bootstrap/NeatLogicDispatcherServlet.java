@@ -19,6 +19,7 @@ package neatlogic.framework.bootstrap;
 import neatlogic.framework.asynchronization.thread.ModuleInitApplicationListener;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.util.I18nUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -39,6 +40,7 @@ public class NeatLogicDispatcherServlet extends DispatcherServlet {
             super.init(config);
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
+            System.out.println("  ✖" + moduleVo.getId() + I18nUtils.getStaticMessage("nfb.neatlogicdispatcherservlet.init.error") + ": " + t.getMessage());
             //如果模块加载异常则删除模块信息
             ModuleUtil.removeModule(moduleVo);
         } finally {

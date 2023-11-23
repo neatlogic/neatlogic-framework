@@ -16,18 +16,15 @@ limitations under the License.
 
 package neatlogic.framework.form.dto;
 
-import java.util.*;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.dto.BaseEditorVo;
-import com.alibaba.fastjson.JSONPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.*;
 
 public class FormVersionVo extends BaseEditorVo {
     private static final long serialVersionUID = 8345592242508980127L;
@@ -142,9 +139,14 @@ public class FormVersionVo extends BaseEditorVo {
                             attributeInlineMap.put(uuid, uuidList);
                         }
                     }
+                    String defaultSceneUuid = this.formConfig.getString("defaultSceneUuid");
+                    if (StringUtils.isBlank(sceneUuid) && StringUtils.isNotBlank(defaultSceneUuid)) {
+                        sceneUuid = defaultSceneUuid;
+                    }
+                    String mainSceneUuid = this.formConfig.getString("uuid");
                     // 场景列表
                     JSONArray sceneList = this.formConfig.getJSONArray("sceneList");
-                    if (StringUtils.isBlank(sceneUuid) || CollectionUtils.isEmpty(sceneList)) {
+                    if (Objects.equals(mainSceneUuid, sceneUuid) || StringUtils.isBlank(sceneUuid) || CollectionUtils.isEmpty(sceneList)) {
                         // 如果场景UUID为空或者场景列表为空，则返回默认场景组件列表
                         formAttributeList = defaultSceneFormAttributeList;
                         return formAttributeList;

@@ -27,7 +27,7 @@ public class RunnerConnectRefusedException extends ApiRuntimeException {
     }
 
     public RunnerConnectRefusedException(String uk) {
-        super("Runner '{0}' connect failed", uk);
+        super("nfer.runnerconnectrefusedexception.runnerconnectrefusedexceptiona", uk );
     }
 
 }

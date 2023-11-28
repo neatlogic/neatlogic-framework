@@ -30,6 +30,8 @@ public interface IntegrationMapper {
 
     IntegrationVo getIntegrationByUuid(String uuid);
 
+    IntegrationVo getIntegrationByName(String name);
+
     int checkIntegrationExists(String uuid);
 
     List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);

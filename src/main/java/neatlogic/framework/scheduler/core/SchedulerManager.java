@@ -20,20 +20,16 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
-import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
-import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.JobClassVo;
 import neatlogic.framework.scheduler.dto.JobLockVo;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobStatusVo;
-import neatlogic.framework.util.$;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -42,7 +38,6 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RootComponent
 public class SchedulerManager extends ModuleInitializedListenerBase {
@@ -214,18 +209,18 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 publicJobClassList.add(jobClassVo);
             }
         }
-        if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
-            System.out.println("⚡" + $.t("common.startloadschedulejob", context.getModuleId()));
-            for (TenantVo tenantVo : tenantList) {
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
-                List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
-                if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
-                    CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
-                    System.out.println("  ✓" + tenantVo.getName());
-                }
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
+//            System.out.println("⚡" + $.t("common.startloadschedulejob", context.getModuleId()));
+//            for (TenantVo tenantVo : tenantList) {
+//                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+//                List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+//                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
+//                if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
+//                    CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
+//                    System.out.println("  ✓" + tenantVo.getName());
+//                }
+//            }
+//        }
         // TODO 这里要增加清理job_status的逻辑
     }
 

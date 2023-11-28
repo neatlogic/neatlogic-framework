@@ -87,6 +87,21 @@ limitations under the License.
 		uuid = #{value}
 	</select>
 
+	<select id="getIntegrationByName" parameterType="java.lang.String" resultType="neatlogic.framework.integration.dto.IntegrationVo">
+		SELECT
+			`uuid`,
+			`name`,
+			`url`,
+			`handler`,
+			`method`,
+			is_active AS isActive,
+			`config`
+		FROM
+			`integration`
+		WHERE
+			`name` = #{value}
+	</select>
+
 	<select id="checkIntegrationExists" parameterType="java.lang.String" resultType="int">
 		SELECT COUNT(`uuid`) FROM `integration` WHERE `uuid` = #{value}
 	</select>
@@ -246,6 +261,14 @@ limitations under the License.
 		NOW(3),
 		#{fcu}
 		)
+		ON DUPLICATE KEY UPDATE
+		 `name` = #{name},
+		 `url` = #{url},
+		 `handler` = #{handler},
+		 `method` = #{method},
+		 `config` = #{configStr},
+		 `lcd` = NOW(3),
+		 `lcu` = #{lcu}
 	</insert>
 
 	<insert id="insertIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo">

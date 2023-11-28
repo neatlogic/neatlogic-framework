@@ -47,6 +47,8 @@ public interface FormMapper {
 
     FormVo getFormByUuid(String formUuid);
 
+    FormVo getFormByName(String formName);
+
     FormVersionVo getFormVersionByUuid(String formVersionUuid);
 
     List<FormVersionVo> getFormVersionByFormUuid(String formUuid);

@@ -420,7 +420,7 @@ public class TableInputerHandler extends FormHandlerBase {
         "value": [
             {
                 "266abb12741f49218c6d6a6d1e89e131": "1",
-                "c2090bb8472d482eb8eaece9864c08f6": "6&=&许*航",
+                "c2090bb8472d482eb8eaece9864c08f6": {"value": "6", "text": "许*航"},
                 "3805bbf114414604b6a514c6287b51f0": "3",
                 "3c33ca77c2f148f4af50bf7f98715a38": "2023-03-02",
                 "cad032ca2175424eb815586694a8f17d": "文本1",
@@ -428,10 +428,10 @@ public class TableInputerHandler extends FormHandlerBase {
                 "bbc47193be544403a79f31e5529a93f4": "文本域1",
                 "_selected": false,
                 "75ed2187390d4c4ea37dab180f6fee00": [
-                    "6&=&金融同业部-同业业务中心"
+                    {"value": "6", "text": "金融同业部-同业业务中心"}
                 ],
                 "516fdf5d27e54fc2a8b7cf66bd02c8b9": [
-                    "3333&=&薛*源"
+                    {"value": "3333", "text": "薛*源"}
                 ],
                 "d2e965358f264cee926fe00b5caec36c": [
                     {
@@ -448,7 +448,7 @@ public class TableInputerHandler extends FormHandlerBase {
             },
             {
                 "266abb12741f49218c6d6a6d1e89e131": "1",
-                "c2090bb8472d482eb8eaece9864c08f6": "6&=&许*航",
+                "c2090bb8472d482eb8eaece9864c08f6": {"value": "6", "text": "许*航"},
                 "3805bbf114414604b6a514c6287b51f0": "3",
                 "3c33ca77c2f148f4af50bf7f98715a38": "2023-03-02",
                 "cad032ca2175424eb815586694a8f17d": "文本1",
@@ -456,10 +456,10 @@ public class TableInputerHandler extends FormHandlerBase {
                 "bbc47193be544403a79f31e5529a93f4": "文本域1",
                 "_selected": false,
                 "75ed2187390d4c4ea37dab180f6fee00": [
-                    "6&=&金融同业部-同业业务中心"
+                    {"value": "6", "text": "金融同业部-同业业务中心"}
                 ],
                 "516fdf5d27e54fc2a8b7cf66bd02c8b9": [
-                    "3333&=&薛*源"
+                    {"value": "3333", "text": "薛*源"}
                 ],
                 "d2e965358f264cee926fe00b5caec36c": [
                     {

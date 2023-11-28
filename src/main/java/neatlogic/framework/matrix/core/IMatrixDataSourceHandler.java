@@ -138,23 +138,7 @@ public interface IMatrixDataSourceHandler {
      * @param dataVo
      * @return
      */
-    JSONObject getTableData(MatrixDataVo dataVo);
-
-    /**
-     * 查询矩阵表格数据
-     *
-     * @param dataVo
-     * @return
-     */
     JSONObject searchTableData(MatrixDataVo dataVo);
-
-    /**
-     * 查询矩阵表格某列数据
-     *
-     * @param dataVo
-     * @return
-     */
-    List<Map<String, JSONObject>> searchTableColumnData(MatrixDataVo dataVo);
 
     /**
      * 查询矩阵表格某列数据

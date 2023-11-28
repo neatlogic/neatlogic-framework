@@ -32,10 +32,6 @@ import java.util.List;
  * @Description: 表单组件接口，新增表单组件必须实现此接口
  */
 public interface IFormAttributeHandler {
-    /**
-     * 下拉列表value和text列的组合连接符
-     **/
-    String SELECT_COMPOSE_JOINER = "&=&";
 
     /**
      * @param @return

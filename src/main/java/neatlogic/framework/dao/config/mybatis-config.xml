@@ -26,6 +26,7 @@ limitations under the License.
     <typeHandlers>
         <typeHandler jdbcType="LONGVARCHAR" javaType="String"
                      handler="neatlogic.framework.dao.plugin.CompressHandler"/>
+        <typeHandler handler="neatlogic.framework.dao.plugin.LocalDateTimeTypeHandler"/>
     </typeHandlers>
     <plugins>
         <!-- <plugin interceptor="neatlogic.framework.dao.plugin.BusinessGroupInterceptor"/>-->

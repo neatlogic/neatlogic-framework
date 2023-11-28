@@ -297,7 +297,7 @@ public class TableSelectorHandler extends FormHandlerBase {
             "b67e647f6fd049e59cc903fb678c7291": "2022-09-24 00:00:00",
             "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_3",
             "688dfb6ec05147098cf8e34a1141ad58": [
-                "6&=&许*航"
+                {"value": "6", "text": "许*航"}
             ],
             "uuid": "1b0661a40da3478c9be344c99db2ffb0"
         },
@@ -312,7 +312,7 @@ public class TableSelectorHandler extends FormHandlerBase {
             "b67e647f6fd049e59cc903fb678c7291": "2022-12-13 00:00:00",
             "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_2",
             "688dfb6ec05147098cf8e34a1141ad58": [
-                "3333&=&薛*源"
+                {"value": "3333", "text": "薛*源"}
             ],
             "uuid": "8eed18cdbcb34691b379d1b5fc1e3b0f"
         },
@@ -327,8 +327,8 @@ public class TableSelectorHandler extends FormHandlerBase {
             "b67e647f6fd049e59cc903fb678c7291": "2023-02-10 00:00:00",
             "147321ac250d48ed9cff09516f47bd8f": "扩展属性_1_1",
             "688dfb6ec05147098cf8e34a1141ad58": [
-                "3&=&冉ss",
-                "6&=&许*航"
+                {"value": "3", "text": "冉ss"},
+                {"value": "6", "text": "许*航"}
             ],
             "uuid": "c8bc60ca9ec740d7a8808753ab504bab"
         }
@@ -342,7 +342,7 @@ public class TableSelectorHandler extends FormHandlerBase {
                 "e00fc42fca5d4f5e831d296ed68b3ff1": "0093a20ff182675fee7b6f821b874488",
                 "14a67eabc2584d4da19c561c26ed0f3a": "金融市场总部",
                 "c95435c411884f149e8e22a6e67ab1ec": [
-                    "6&=&许*航"
+                    {"value": "6", "text": "许*航"}
                 ],
                 "a22002af151b4da589bc390f3ad164f5": "2",
                 "579c9de2986d48738cc0ecafab2f43d3": "a2",
@@ -357,7 +357,7 @@ public class TableSelectorHandler extends FormHandlerBase {
                 "e00fc42fca5d4f5e831d296ed68b3ff1": "薛*源",
                 "14a67eabc2584d4da19c561c26ed0f3a": "纪律监督室",
                 "c95435c411884f149e8e22a6e67ab1ec": [
-                    "3&=&冉ss"
+                    {"value": "3", "text": "冉ss"}
                 ],
                 "a22002af151b4da589bc390f3ad164f5": "3333",
                 "579c9de2986d48738cc0ecafab2f43d3": "a2",

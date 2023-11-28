@@ -16,18 +16,16 @@
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.form.attribute.core.FormHandlerBase;
-import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class SelectHandler extends FormHandlerBase {
@@ -74,19 +71,27 @@ public class SelectHandler extends FormHandlerBase {
         if (source == null) {
             return null;
         }
-        if (source instanceof String) {
+        if (source instanceof JSONObject) {
+            return source;
+        } else if (source instanceof JSONArray) {
+            return source;
+        } else if (source instanceof String) {
             String sourceStr = (String) source;
-            if (sourceStr.startsWith("[") && sourceStr.endsWith("]")) {
+            if (sourceStr.startsWith("{") && sourceStr.endsWith("}")) {
                 try {
-                    return JSONObject.parseArray((String) source);
+                    return JSONObject.parseObject(sourceStr);
+                } catch (Exception e) {
+                    throw new AttributeValidException(attributeLabel);
+                }
+            } else if (sourceStr.startsWith("[") && sourceStr.endsWith("]")) {
+                try {
+                    return JSONObject.parseArray(sourceStr);
                 } catch (Exception e) {
                     throw new AttributeValidException(attributeLabel);
                 }
             } else {
                 return source;
             }
-        } else if (source instanceof JSONArray) {
-            return source;
         }
         throw new AttributeValidException(attributeLabel);
     }
@@ -198,20 +203,15 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-        Object value = formService.textConversionValueForSelectHandler(text, config);
-        if (value == null) {
+        List<ValueTextVo> list = formService.textConversionValueForSelectHandler(text, config);
+        if (CollectionUtils.isEmpty(list)) {
             return null;
-        }
-        if (value instanceof List) {
-            return value;
         }
         boolean isMultiple = config.getBooleanValue("isMultiple");
         if (isMultiple) {
-            List<Object> list = new ArrayList<>();
-            list.add(value);
             return list;
         }
-        return value;
+        return list.get(0);
 //        Object result = null;
 //        if (CollectionUtils.isNotEmpty(values)) {
 //            boolean isMultiple = config.getBooleanValue("isMultiple");
@@ -313,16 +313,34 @@ public class SelectHandler extends FormHandlerBase {
     @Override
     protected List<String> myIndexFieldContentList(String data) {
         List<String> contentList = new ArrayList<>();
-        if (data.startsWith("[") && data.endsWith("]")) {
+        if (data.startsWith("{") && data.endsWith("}")) {
+            JSONObject jsonObj = JSONObject.parseObject(data);
+            String value = jsonObj.getString("value");
+            contentList.add(value);
+            String text = jsonObj.getString("text");
+            if (StringUtils.isNotBlank(text)) {
+                contentList.add(text);
+            }
+        } else if (data.startsWith("[") && data.endsWith("]")) {
             JSONArray jsonArray = JSONArray.parseArray(data);
             for (Object obj : jsonArray) {
                 if (obj != null) {
-                    contentList.addAll(Arrays.asList(obj.toString().split("&=&")));
+                    if (obj instanceof JSONObject) {
+                        JSONObject jsonObj = (JSONObject) obj;
+                        String value = jsonObj.getString("value");
+                        contentList.add(value);
+                        String text = jsonObj.getString("text");
+                        if (StringUtils.isNotBlank(text)) {
+                            contentList.add(text);
+                        }
+                    } else {
+                        contentList.add(obj.toString());
+                    }
                 }
             }
             return JSONObject.parseArray(jsonArray.toJSONString(), String.class);
         } else {
-            contentList.addAll(Arrays.asList(data.split("&=&")));
+            contentList.add(data);
         }
         return contentList;
     }

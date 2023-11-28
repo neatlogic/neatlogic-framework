@@ -18,23 +18,16 @@ package neatlogic.framework.form.attribute.core;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
-import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
-import neatlogic.framework.matrix.dto.MatrixDataVo;
-import neatlogic.framework.matrix.dto.MatrixVo;
-import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
-import neatlogic.framework.matrix.exception.MatrixNotFoundException;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAttributeDataConversionHandler {
 
@@ -70,67 +63,6 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
     @Override
     public final String getType() {
         return "form";
-    }
-
-    protected String getValue(String matrixUuid, ValueTextVo mapping, String value) {
-        if (StringUtils.isBlank(value)) {
-            return value;
-        }
-        try {
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
-            if (matrixVo == null) {
-                throw new MatrixNotFoundException(matrixUuid);
-            }
-            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
-            if (matrixDataSourceHandler == null) {
-                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
-            }
-            String valueField = (String) mapping.getValue();
-            String textField = mapping.getText();
-            MatrixDataVo dataVo = new MatrixDataVo();
-            dataVo.setMatrixUuid(matrixUuid);
-            List<String> columnList = new ArrayList<>();
-            columnList.add((String) mapping.getValue());
-            columnList.add(mapping.getText());
-            dataVo.setColumnList(columnList);
-            dataVo.setKeyword(value);
-            dataVo.setKeywordColumn(textField);
-            for (int i = 0; i < 10; i++) {
-                List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
-                for (Map<String, JSONObject> tbody : tbodyList) {
-                    JSONObject textObj = tbody.get(textField);
-                    if (Objects.equals(value, textObj.getString("text"))) {
-                        JSONObject valueObj = tbody.get(valueField);
-                        return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + value;
-                    }
-                }
-                if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {
-                    break;
-                }
-                dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
-            }
-//            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
-//            for (Map<String, JSONObject> firstObj : tbodyList) {
-//                JSONObject valueObj = firstObj.get(mapping.getValue());
-//                /** 当text与value字段相同时，不同类型的矩阵字段，拼接value的逻辑不同，下拉、用户、组、角色，按uuid&=&text拼接，其余按value&=&value拼接 **/
-//                if (mapping.getValue().equals(mapping.getText())
-//                        && (GroupSearch.USER.getValue().equals(valueObj.getString("type"))
-//                        || GroupSearch.ROLE.getValue().equals(valueObj.getString("type"))
-//                        || GroupSearch.TEAM.getValue().equals(valueObj.getString("type"))
-//                        || FormHandlerType.SELECT.toString().equals(valueObj.getString("type")))
-//                        && value.equals(valueObj.getString("text"))) {
-//                    return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + valueObj.getString("text");
-//                } else if (mapping.getValue().equals(mapping.getText()) && value.equals(valueObj.getString("text"))) {
-//                    return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + valueObj.getString("value");
-//                }
-//                if (valueObj.getString("compose").contains(value)) {
-//                    return valueObj.getString("compose");
-//                }
-//            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override

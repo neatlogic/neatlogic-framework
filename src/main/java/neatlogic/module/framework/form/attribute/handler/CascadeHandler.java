@@ -16,25 +16,15 @@ limitations under the License.
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
-import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
-import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
-import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
-import neatlogic.framework.matrix.dto.MatrixColumnVo;
-import neatlogic.framework.matrix.dto.MatrixDataVo;
-import neatlogic.framework.matrix.dto.MatrixVo;
-import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
-import neatlogic.framework.matrix.exception.MatrixNotFoundException;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -106,131 +96,8 @@ public class CascadeHandler extends FormHandlerBase {
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
         return text;
-//        Object result = null;
-//        if (CollectionUtils.isNotEmpty(values)) {
-//            result = getTextOrValue(config, values, ConversionType.TOVALUE.getValue());
-//        }
-//        return result;
     }
 
-    private Object getTextOrValue(JSONObject configObj, List<String> valueList, String conversionType) {
-        List<String> result = new ArrayList<>();
-        String dataSource = configObj.getString("dataSource");
-        if ("static".equals(dataSource)) {
-            JSONArray dataList = configObj.getJSONArray("dataList");
-            for (String value : valueList) {
-                for (int i = 0; i < dataList.size(); i++) {
-                    JSONObject dataObject = dataList.getJSONObject(i);
-                    if (ConversionType.TOTEXT.getValue().equals(conversionType) && Objects.equals(dataObject.getString("value"), value)) {
-                        result.add(dataObject.getString("text"));
-                        dataList = dataObject.getJSONArray("children");
-                        break;
-                    } else if (ConversionType.TOVALUE.getValue().equals(conversionType) && Objects.equals(dataObject.getString("text"), value)) {
-                        result.add(dataObject.getString("value"));
-                        dataList = dataObject.getJSONArray("children");
-                        break;
-                    }
-                }
-            }
-        } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-            String matrixUuid = configObj.getString("matrixUuid");
-            List<ValueTextVo> mappingList =
-                    JSON.parseArray(JSON.toJSONString(configObj.getJSONArray("mapping")), ValueTextVo.class);
-            if (StringUtils.isNotBlank(matrixUuid) && CollectionUtils.isNotEmpty(valueList)
-                    && CollectionUtils.isNotEmpty(mappingList)) {
-                if (valueList.size() > 0 && mappingList.size() > 0) {
-                    if (ConversionType.TOTEXT.getValue().equals(conversionType)) {
-                        List<MatrixColumnVo> sourceColumnList = new ArrayList<>();
-                        result.add(getText(matrixUuid, mappingList.get(0), valueList.get(0), sourceColumnList));
-                        if (valueList.size() > 1 && mappingList.size() > 1) {
-                            result.add(getText(matrixUuid, mappingList.get(1), valueList.get(1), sourceColumnList));
-                            if (valueList.size() > 2 && mappingList.size() > 2) {
-                                result.add(getText(matrixUuid, mappingList.get(2), valueList.get(2), sourceColumnList));
-                            }
-                        }
-                    } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
-                        result.add(getValueForCascade(matrixUuid, mappingList.get(0), valueList.get(0)));
-                        if (valueList.size() > 1 && mappingList.size() > 1) {
-                            result.add(getValueForCascade(matrixUuid, mappingList.get(1), valueList.get(1)));
-                            if (valueList.size() > 2 && mappingList.size() > 2) {
-                                result.add(getValueForCascade(matrixUuid, mappingList.get(2), valueList.get(2)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    private String getText(String matrixUuid, ValueTextVo mapping, String value, List<MatrixColumnVo> sourceColumnList) {
-        if (StringUtils.isBlank(value)) {
-            return value;
-        }
-        String[] split = value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER);
-        try {
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
-            if (matrixVo == null) {
-                throw new MatrixNotFoundException(matrixUuid);
-            }
-            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
-            if (matrixDataSourceHandler == null) {
-                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
-            }
-            MatrixDataVo dataVo = new MatrixDataVo();
-            dataVo.setMatrixUuid(matrixUuid);
-            List<String> columnList = new ArrayList<>();
-            columnList.add((String) mapping.getValue());
-            columnList.add(mapping.getText());
-            dataVo.setColumnList(columnList);
-            sourceColumnList.add(new MatrixColumnVo((String) mapping.getValue(), split[0]));
-            sourceColumnList.add(new MatrixColumnVo(mapping.getText(), split[1]));
-            dataVo.setSourceColumnList(sourceColumnList);
-            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
-            for (Map<String, JSONObject> firstObj : tbodyList) {
-                JSONObject textObj = firstObj.get(mapping.getText());
-                if (Objects.equals(textObj.getString("value"), split[1])) {
-                    return textObj.getString("text");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return split[1];
-    }
-
-    private String getValueForCascade(String matrixUuid, ValueTextVo mapping, String value) {
-        if (StringUtils.isBlank(value)) {
-            return value;
-        }
-        try {
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
-            if (matrixVo == null) {
-                throw new MatrixNotFoundException(matrixUuid);
-            }
-            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
-            if (matrixDataSourceHandler == null) {
-                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
-            }
-            MatrixDataVo dataVo = new MatrixDataVo();
-            dataVo.setMatrixUuid(matrixUuid);
-            List<String> columnList = new ArrayList<>();
-            columnList.add((String) mapping.getValue());
-            columnList.add(mapping.getText());
-            dataVo.setColumnList(columnList);
-            List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableColumnData(dataVo);
-            for (Map<String, JSONObject> firstObj : tbodyList) {
-                JSONObject valueObj = firstObj.get(mapping.getValue());
-                if (valueObj.getString("compose").contains(value)) {
-                    JSONObject textObj = firstObj.get(mapping.getText());
-                    return valueObj.getString("value") + IFormAttributeHandler.SELECT_COMPOSE_JOINER + textObj.getString("value");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
     public String getIcon() {

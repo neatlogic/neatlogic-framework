@@ -16,18 +16,16 @@ limitations under the License.
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
-import neatlogic.framework.form.attribute.core.FormHandlerBase;
-import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class CheckboxHandler extends FormHandlerBase {
@@ -74,12 +71,6 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     public Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj) {
-//        List<String> valueList = JSON.parseArray(JSON.toJSONString(attributeDataVo.getDataObj()), String.class);
-//        if (CollectionUtils.isNotEmpty(valueList)) {
-//            return getTextOrValue(configObj, valueList, ConversionType.TOTEXT.getValue());
-//        } else {
-//            return valueList;
-//        }
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");
         if (CollectionUtils.isNotEmpty(textArray)) {
@@ -101,70 +92,11 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-        Object value = formService.textConversionValueForSelectHandler(text, config);
-        if (value == null) {
+        List<ValueTextVo> list = formService.textConversionValueForSelectHandler(text, config);
+        if (CollectionUtils.isEmpty(list)) {
             return null;
         }
-        if (value instanceof List) {
-            return value;
-        }
-        List<Object> list = new ArrayList<>();
-        list.add(value);
         return list;
-//        Object result = null;
-//        if (CollectionUtils.isNotEmpty(values)) {
-//            result = getTextOrValue(config, values, ConversionType.TOVALUE.getValue());
-//        }
-//        return result;
-    }
-
-    private Object getTextOrValue(JSONObject configObj, List<String> valueList, String conversionType) {
-        List<String> result = new ArrayList<>();
-        String dataSource = configObj.getString("dataSource");
-        if ("static".equals(dataSource)) {
-            Map<Object, String> valueTextMap = new HashMap<>();
-            List<ValueTextVo> dataList =
-                    JSON.parseArray(JSON.toJSONString(configObj.getJSONArray("dataList")), ValueTextVo.class);
-            if (CollectionUtils.isNotEmpty(dataList)) {
-                for (ValueTextVo data : dataList) {
-                    valueTextMap.put(data.getValue(), data.getText());
-                }
-            }
-            if (ConversionType.TOTEXT.getValue().equals(conversionType)) {
-                for (String value : valueList) {
-                    String text = valueTextMap.get(value);
-                    if (text != null) {
-                        result.add(text);
-                    } else {
-                        result.add(value);
-                    }
-                }
-            } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
-                for (String value : valueList) {
-                    result.add(valueTextMap.get(value));
-                }
-            }
-        } else if ("matrix".equals(dataSource)) {// 其他，如动态数据源
-            if (ConversionType.TOTEXT.getValue().equals(conversionType)) {
-                for (String value : valueList) {
-                    if (value.contains(IFormAttributeHandler.SELECT_COMPOSE_JOINER)) {
-                        result.add(value.split(IFormAttributeHandler.SELECT_COMPOSE_JOINER)[1]);
-                    } else {
-                        result.add(value);
-                    }
-                }
-            } else if (ConversionType.TOVALUE.getValue().equals(conversionType)) {
-                String matrixUuid = configObj.getString("matrixUuid");
-                ValueTextVo mapping = JSON.toJavaObject(configObj.getJSONObject("mapping"), ValueTextVo.class);
-                if (StringUtils.isNotBlank(matrixUuid) && CollectionUtils.isNotEmpty(valueList)
-                        && mapping != null) {
-                    for (String value : valueList) {
-                        result.add(getValue(matrixUuid, mapping, value));
-                    }
-                }
-            }
-        }
-        return result;
     }
 
     @Override

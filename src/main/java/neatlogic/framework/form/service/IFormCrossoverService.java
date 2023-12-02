@@ -62,4 +62,12 @@ public interface IFormCrossoverService extends ICrossoverService {
                                List<? extends AttributeDataVo> oldFormAttributeDataList);
 
     Object getFormSelectAttributeValueByOriginalValue(Object originalValue);
+
+    /**
+     * 获取表单组件类型
+     * @param attributeUuid 属性唯一标识
+     * @param formConfig 表单版本配置信息
+     * @return
+     */
+    String getFormAttributeHandler(String attributeUuid, String formConfig);
 }

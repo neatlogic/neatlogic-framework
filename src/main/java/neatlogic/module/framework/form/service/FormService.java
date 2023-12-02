@@ -61,4 +61,32 @@ public interface FormService {
     boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
                                List<? extends AttributeDataVo> newFormAttributeDataList,
                                List<? extends AttributeDataVo> oldFormAttributeDataList);
+
+    /**
+     * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
+     * @param formConfig
+     * @return
+     */
+    List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig);
+
+    /**
+     * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
+     * @param formConfig
+     * @return
+     */
+    List<FormAttributeVo> getAllFormAttributeList(String formConfig);
+    /**
+     * 获取表单组件类型
+     * @param attributeUuid 属性唯一标识
+     * @param formConfig 表单版本配置信息
+     * @return
+     */
+    String getFormAttributeHandler(String attributeUuid, JSONObject formConfig);
+    /**
+     * 获取表单组件类型
+     * @param attributeUuid 属性唯一标识
+     * @param formConfig 表单版本配置信息
+     * @return
+     */
+    String getFormAttributeHandler(String attributeUuid, String formConfig);
 }

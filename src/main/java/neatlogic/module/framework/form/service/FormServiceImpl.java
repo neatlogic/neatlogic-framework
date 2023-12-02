@@ -22,6 +22,7 @@ import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
+import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeMatrixVo;
@@ -630,5 +631,124 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig) {
+        JSONArray tableList = formConfig.getJSONArray("tableList");
+        return getAllFormAttributeList(tableList);
+    }
+
+    @Override
+    public List<FormAttributeVo> getAllFormAttributeList(String formConfig) {
+        return getAllFormAttributeList(JSONObject.parseObject(formConfig));
+    }
+
+    @Override
+    public String getFormAttributeHandler(String attributeUuid, JSONObject formConfig) {
+        List<FormAttributeVo> formAttributeList = getAllFormAttributeList(formConfig);
+        for (FormAttributeVo formAttributeVo : formAttributeList) {
+            if (Objects.equals(formAttributeVo.getUuid(), attributeUuid)) {
+                return formAttributeVo.getHandler();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getFormAttributeHandler(String attributeUuid, String formConfig) {
+        return getFormAttributeHandler(attributeUuid, JSONObject.parseObject(formConfig));
+    }
+
+    private List<FormAttributeVo> getAllFormAttributeList(JSONArray tableList) {
+        List<FormAttributeVo> resultList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(tableList)) {
+            return resultList;
+        }
+        for (int i = 0; i < tableList.size(); i++) {
+            JSONObject cellObj = tableList.getJSONObject(i);
+            if (MapUtils.isEmpty(cellObj)) {
+                continue;
+            }
+            JSONObject componentObj = cellObj.getJSONObject("component");
+            if (MapUtils.isEmpty(componentObj)) {
+                continue;
+            }
+            // 标签组件不能改变值，不放入组件列表里
+            String handler = componentObj.getString("handler");
+            if (Objects.equals(FormHandler.FORMLABEL.getHandler(), handler)) {
+                continue;
+            }
+            resultList.add(createFormAttribute(componentObj));
+            if (Objects.equals(FormHandler.FORMTABLEINPUTER.getHandler(), handler)) {
+                JSONObject config = componentObj.getJSONObject("config");
+                JSONArray dataConfigList = config.getJSONArray("dataConfig");
+                for (int j = 0; j < dataConfigList.size(); j++) {
+                    JSONObject dataObj = dataConfigList.getJSONObject(j);
+                    resultList.add(createFormAttribute(dataObj));
+                    if (Objects.equals("formtable", dataObj.getString("handler"))) {
+                        JSONObject config2 = dataObj.getJSONObject("config");
+                        JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
+                        for (int k = 0; k < dataConfigList2.size(); k++) {
+                            JSONObject dataObj2 = dataConfigList2.getJSONObject(k);
+                            resultList.add(createFormAttribute(dataObj2));
+                        }
+                    }
+                }
+            } else if (Objects.equals(FormHandler.FORMTABLESELECTOR.getHandler(), handler)) {
+                JSONObject config = componentObj.getJSONObject("config");
+                JSONArray dataConfigList = config.getJSONArray("dataConfig");
+                for (int j = 0; j < dataConfigList.size(); j++) {
+                    JSONObject dataObj = dataConfigList.getJSONObject(j);
+                    resultList.add(createFormAttribute(dataObj));
+                }
+            } else if (Objects.equals(FormHandler.FORMSUBASSEMBLY.getHandler(), handler)) {
+                JSONObject formData = componentObj.getJSONObject("formData");
+                JSONObject formConfig = formData.getJSONObject("formConfig");
+                JSONArray tableList2 = formConfig.getJSONArray("tableList");
+                resultList.addAll(getAllFormAttributeList(tableList2));
+            } else if (Objects.equals(FormHandler.FORMTAB.getHandler(), handler) || Objects.equals(FormHandler.FORMCOLLAPSE.getHandler(), handler)) {
+                JSONArray componentArray = componentObj.getJSONArray("component");
+                if (CollectionUtils.isNotEmpty(componentArray)) {
+                    for (int j = 0; j < componentArray.size(); j++) {
+                        JSONObject component = componentArray.getJSONObject(j);
+                        if (MapUtils.isNotEmpty(component)) {
+                            FormAttributeVo formAttribute = createFormAttribute(component);
+                            if (formAttribute != null) {
+                                resultList.add(formAttribute);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private FormAttributeVo createFormAttribute(JSONObject componentObj) {
+        String uuid = componentObj.getString("uuid");
+        if (StringUtils.isBlank(uuid)) {
+            return null;
+        }
+        String handler = componentObj.getString("handler");
+        if (StringUtils.isBlank(handler)) {
+            return null;
+        }
+        FormAttributeVo formAttributeVo = new FormAttributeVo();
+        formAttributeVo.setUuid(uuid);
+        formAttributeVo.setHandler(handler);
+        String label = componentObj.getString("label");
+        formAttributeVo.setLabel(label);
+        String type = componentObj.getString("type");
+        formAttributeVo.setType(type);
+        JSONObject config = componentObj.getJSONObject("config");
+        if (MapUtils.isNotEmpty(config)) {
+            boolean isRequired = config.getBooleanValue("isRequired");
+            formAttributeVo.setRequired(isRequired);
+            String defaultValue = config.getString("defaultValue");
+            formAttributeVo.setData(defaultValue);
+            formAttributeVo.setConfig(config.toJSONString());
+        }
+        return formAttributeVo;
     }
 }

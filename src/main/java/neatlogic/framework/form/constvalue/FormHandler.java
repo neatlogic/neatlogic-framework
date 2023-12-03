@@ -16,38 +16,38 @@ limitations under the License.
 
 package neatlogic.framework.form.constvalue;
 
-import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
-
 public enum FormHandler implements IFormHandler {
-    FORMLABEL("formlabel", new I18n("标签")),
-    FORMCASCADER("formcascader", new I18n("级联下拉框")),
-    FORMCHECKBOX("formcheckbox", new I18n("复选框")),
-    FORMDATE("formdate", new I18n("日期")),
-    FORMDIVIDER("formdivider", new I18n("分割线")),
-    FORMTABLESELECTOR("formtableselector", new I18n("表格选择组件")),
-    FORMCKEDITOR("formckeditor", new I18n("富文本框")),
-    FORMLINK("formlink", new I18n("链接")),
-    FORMPRIORITY("formpriority", new I18n("修改优先级")),
-    FORMRADIO("formradio", new I18n("单选框")),
-    FORMSELECT("formselect", new I18n("下拉框")),
-    FORMTABLEINPUTER("formtableinputer", new I18n("表格输入组件")),
-    FORMTEXTAREA("formtextarea", new I18n("文本域")),
-    FORMTEXT("formtext", new I18n("文本框")),
-    FORMNUMBER("formnumber", new I18n("数字")),
-    FORMPASSWORD("formpassword", new I18n("密码")),
-    FORMTIME("formtime", new I18n("时间")),
-    FORMTREESELECT("formtreeselect", new I18n("下拉树组件")),
-    FORMUPLOAD("formupload", new I18n("附件上传")),
-    FORMUSERSELECT("formuserselect", new I18n("用户选择器")),
-    FORMCUBE("formcube", new I18n("矩阵选择")),
-    FORMRATE("formrate", new I18n("评分")),
+    FORMLABEL("formlabel", "标签"),
+    FORMCASCADER("formcascader", "级联下拉框"),
+    FORMCHECKBOX("formcheckbox", "复选框"),
+    FORMDATE("formdate", "日期"),
+    FORMDIVIDER("formdivider", "分割线"),
+    FORMTABLESELECTOR("formtableselector", "表格选择组件"),
+    FORMCKEDITOR("formckeditor", "富文本框"),
+    FORMLINK("formlink", "链接"),
+    FORMPRIORITY("formpriority", "修改优先级"),
+    FORMRADIO("formradio", "单选框"),
+    FORMSELECT("formselect", "下拉框"),
+    FORMTABLEINPUTER("formtableinputer", "表格输入组件"),
+    FORMTEXTAREA("formtextarea", "文本域"),
+    FORMTEXT("formtext", "文本框"),
+    FORMNUMBER("formnumber", "数字"),
+    FORMPASSWORD("formpassword", "密码"),
+    FORMTIME("formtime", "时间"),
+    FORMTREESELECT("formtreeselect", "下拉树组件"),
+    FORMUPLOAD("formupload", "附件上传"),
+    FORMUSERSELECT("formuserselect", "用户选择器"),
+    FORMCUBE("formcube", "矩阵选择"),
+    FORMRATE("formrate", "评分"),
+    FORMTAB("formtab", "选项卡"),
+    FORMCOLLAPSE("formcollapse", "折叠面板"),
+    FORMSUBASSEMBLY("formsubassembly", "子表单"),
     ;
 
     private final String handler;
-    private final I18n handlerName;
+    private final String handlerName;
 
-    FormHandler(String handler, I18n handlerName) {
+    FormHandler(String handler, String handlerName) {
         this.handler = handler;
         this.handlerName = handlerName;
     }
@@ -59,6 +59,6 @@ public enum FormHandler implements IFormHandler {
 
     @Override
     public String getHandlerName() {
-        return $.t(handlerName.toString());
+        return handlerName;
     }
 }

@@ -198,13 +198,13 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 tenantVo.setDatasource(datasourceVo);
                 activeTenantList.add(tenantVo);
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            JdbcUtil.closeConnection(neatlogicConn);
-            JdbcUtil.closeStatement(tenantStatement);
             JdbcUtil.closeResultSet(tenantResultSet);
+            JdbcUtil.closeStatement(tenantStatement);
+            JdbcUtil.closeConnection(neatlogicConn);
         }
         return activeTenantList;
     }
@@ -342,6 +342,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             }
         } catch (Exception ex) {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
+            System.out.println("从数据库查询所有激活租户时发生异常: " + ex.getMessage());
             throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(neatlogicConn);

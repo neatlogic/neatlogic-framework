@@ -40,10 +40,10 @@ public class AuthFactory {
                 //排除抽象类
                 if (!Modifier.isAbstract(c.getModifiers())) {
                     AuthBase authIns = c.newInstance();
-                    authMap.put(authIns.getAuthName(), authIns);
                     if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || ModuleUtil.isModuleInvalidated(authIns.getAuthGroup())) {
                         continue;
                     }
+                    authMap.put(authIns.getAuthName(), authIns);
                     if (authGroupMap.containsKey(authIns.getAuthGroup())) {
                         authGroupMap.get(authIns.getAuthGroup()).add(authIns);
                     } else {

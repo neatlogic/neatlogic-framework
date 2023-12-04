@@ -39,7 +39,6 @@ import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.tenant.TenantUnActiveException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
-import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
@@ -100,9 +99,6 @@ public class LoginController {
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
-            if(StringUtils.isBlank(userId)){
-                throw new UserNotFoundException(userId);
-            }
             String password = jsonObj.getString("password");
             String authType = "default";
             if (StringUtils.isNotBlank(jsonObj.getString("authType"))) {
@@ -159,7 +155,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
+                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -170,7 +166,7 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid(),JSONObject.toJSONString(UserContext.get().getAuthenticationInfoVo()));
+                userSessionMapper.insertUserSession(checkUserVo.getUuid());
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
                 if(!tenantVisitSet.contains(tenant)) {

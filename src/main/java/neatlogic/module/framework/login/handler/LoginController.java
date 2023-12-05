@@ -39,6 +39,7 @@ import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.tenant.TenantUnActiveException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
+import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
@@ -99,6 +100,9 @@ public class LoginController {
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
+            if(StringUtils.isBlank(userId)){
+                throw new UserNotFoundException(userId);
+            }
             String password = jsonObj.getString("password");
             String authType = "default";
             if (StringUtils.isNotBlank(jsonObj.getString("authType"))) {

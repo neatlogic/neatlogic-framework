@@ -28,6 +28,7 @@ public interface UserSessionMapper {
     int getAllOnlineUserCount(Date sessionTime);
 
     List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
+
     int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
             @Param("userUuidList") List<String> userUuidList,
             @Param("teamUuidList") List<String> teamUuidList,
@@ -47,7 +48,7 @@ public interface UserSessionMapper {
 
     int getUserSessionCountByDate(String limitDate);
 
-    int insertUserSession(String userUuid);
+    int insertUserSession(@Param("userUuid") String userUuid, @Param("authInfo") String authInfo);
 
     int updateUserSession(String userUuid);
 

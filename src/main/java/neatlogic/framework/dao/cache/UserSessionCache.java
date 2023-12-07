@@ -27,8 +27,8 @@ public class UserSessionCache {
 		return CACHE_MANAGER.getEhcache("UserSessionCache");
 	}
 
-	public static void addItem(String tenant, String userUuid) {
-		getCache().put(new Element(tenant + ":" + userUuid, userUuid));
+	public static void addItem(String tenant, String userUuid, Object item) {
+		getCache().put(new Element(tenant + ":" + userUuid, item));
 	}
 
 	public static Object getItem(String tenant, String userUuid) {

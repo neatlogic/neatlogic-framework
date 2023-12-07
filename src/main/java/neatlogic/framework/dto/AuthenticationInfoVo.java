@@ -56,7 +56,9 @@ public class AuthenticationInfoVo {
         }
         return false;
     }
+    public AuthenticationInfoVo() {
 
+    }
     public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList) {
         this.userUuid = userUuid;
         this.teamUuidList.addAll(teamUuidList);
@@ -88,4 +90,6 @@ public class AuthenticationInfoVo {
     public List<String> getRoleUuidList() {
         return roleUuidList;
     }
+
+    
 }

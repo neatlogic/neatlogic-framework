@@ -1,0 +1,1 @@
+ALTER TABLE `user_session` ADD COLUMN `auth_info` varchar(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户角色分组信息' AFTER `visit_time`;

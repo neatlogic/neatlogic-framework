@@ -25,10 +25,11 @@ import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
-import org.apache.commons.collections4.CollectionUtils;
+import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +56,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     protected static RoleMapper roleMapper;
 
-    protected  static LoginMapper loginMapper;
+    protected static LoginMapper loginMapper;
 
     protected static UserSessionMapper userSessionMapper;
+
+    protected static AuthenticationInfoService authenticationInfoService;
 
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
@@ -79,6 +82,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         userSessionMapper = _userSessionMapper;
     }
 
+    @Autowired
+    public void setAuthenticationInfoService(AuthenticationInfoService _authenticationInfoService) {
+        authenticationInfoService = _authenticationInfoService;
+    }
+
     @Override
     public UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String tenant = request.getHeader("tenant");
@@ -87,13 +95,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (userVo != null && StringUtils.isBlank(userVo.getUuid())) {
             userVo = null;
         }
-        //如果认证cookie为null 构建并设置response 认证 cookie
+        //如果认证cookie为null,说明不是通过登录页登录，而是通过第三方认证接口认证。第一次认证通过后需构建并设置response 认证 cookie
         if (userVo != null && StringUtils.isBlank(userVo.getCookieAuthorization())) {
             logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));//TODO 是否可以去掉，得排查后续用到的逻辑，换成使用authenticationInfoVo
-            userSessionMapper.insertUserSession(userVo.getUuid());
+            //userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));//TODO 是否可以去掉，得排查后续用到的逻辑，换成使用authenticationInfoVo
+            AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+            userSessionMapper.insertUserSession(userVo.getUuid(), JSONObject.toJSONString(authenticationInfoVo));
         }
         return userVo;
     }
@@ -118,9 +127,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         jwtBodyObj.put("username", checkUserVo.getUserName());
         jwtBodyObj.put("tenant", checkUserVo.getTenant());
         jwtBodyObj.put("isSuperAdmin", checkUserVo.getIsSuperAdmin());
-        if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
-            jwtBodyObj.put("rolelist", checkUserVo.getRoleUuidList());
-        }
+//        if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
+//            jwtBodyObj.put("rolelist", checkUserVo.getRoleUuidList());
+//        }
 
         String jwthead = Base64.getUrlEncoder().encodeToString(jwtHeadObj.toJSONString().getBytes());
         String jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
@@ -180,9 +189,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String logout() {
-        UserSessionCache.removeItem(TenantContext.get().getTenantUuid(),UserContext.get().getUserUuid(true));
+        UserSessionCache.removeItem(TenantContext.get().getTenantUuid(), UserContext.get().getUserUuid(true));
         userSessionMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
-        String url = null ;
+        String url = null;
         try {
             url = myLogout();
         } catch (IOException e) {
@@ -199,7 +208,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public String directUrl() {
         String directUrl = myDirectUrl();
-        if(StringUtils.isBlank(directUrl)){
+        if (StringUtils.isBlank(directUrl)) {
             directUrl = Config.DIRECT_URL();
         }
         return directUrl;
@@ -211,7 +220,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public UserVo login(UserVo userVo, JSONObject resultJson) {
-        UserVo checkUserVo = myLogin(userVo , resultJson);
+        UserVo checkUserVo = myLogin(userVo, resultJson);
         LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
         if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
             int failedCount = 1;
@@ -228,7 +237,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return checkUserVo;
     }
 
-    public UserVo myLogin(UserVo userVo, JSONObject resultJson){
-        return null ;
-    };
+    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
+        return null;
+    }
 }

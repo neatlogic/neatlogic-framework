@@ -101,7 +101,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 logger.warn("======= defaultLoginAuth: ");
                 //先按 default 认证，不存在才根据具体 AuthType 认证用户
                 userVo = defaultLoginAuth.auth(cachedRequest, response);
-                AuthenticationInfoVo authenticationInfoVo = null;
                 if (userVo == null) {
                     //获取认证插件名,优先使用请求方指定的认证
                     String authTypeHeader = request.getHeader("AuthType");
@@ -117,22 +116,16 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                             userVo = loginAuth.auth(cachedRequest, response);
                             if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                                 logger.warn("======= userUuid: " + userVo.getUuid());
-                                authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                                isUnExpired = userExpirationValid(userVo, timezone, request, response);
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                                     loginPostProcessor.loginAfterInitialization();
                                 }
                             }
                         }
                     }
-                }
-                if (userVo != null) {
-                    if (authenticationInfoVo == null) {
-                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                        UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
-                        logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
-                    }
-                    isUnExpired = userExpirationValid();
+                } else {
+                    isUnExpired = userExpirationValid(userVo, timezone, request, response);
+                    logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
                 }
             }
 
@@ -140,7 +133,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 try {
                     filterChain.doFilter(cachedRequest, response);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
                     response.setStatus(520);
                     redirectObj.put("Status", "ERROR");
@@ -203,11 +196,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     /**
      * 校验用户登录超时
+     *
+     * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid() {
-        String userUuid = UserContext.get().getUserUuid();
+    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+        String userUuid = userVo.getUuid();
         String tenant = TenantContext.get().getTenantUuid();
-        if (UserSessionCache.getItem(tenant, userUuid) == null) {
+        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(tenant, userUuid);
+        if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByUserUuid(userUuid);
             if (null != userSessionVo) {
                 Date visitTime = userSessionVo.getSessionTime();
@@ -216,12 +212,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
                     userSessionMapper.updateUserSession(userUuid);
-                    UserSessionCache.addItem(tenant, userUuid);
+                    authenticationInfo = userSessionVo.getAuthInfo();
+                    UserSessionCache.addItem(tenant, userUuid, authenticationInfo);
+                    UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return true;
                 }
                 userSessionMapper.deleteUserSessionByUserUuid(userUuid);
             }
         } else {
+            UserContext.init(userVo, authenticationInfo, timezone, request, response);
             return true;
         }
         return false;

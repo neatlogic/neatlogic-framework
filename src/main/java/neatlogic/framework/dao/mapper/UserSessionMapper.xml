@@ -21,7 +21,7 @@ limitations under the License.
 
     <select id="getUserSessionByUserUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
-        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime
+        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime,`auth_info` as authInfoStr
         FROM `user_session`
         WHERE `user_uuid` = #{value}
     </select>
@@ -137,8 +137,8 @@ limitations under the License.
     </select>
 
     <insert id="insertUserSession" parameterType="java.lang.String">
-        INSERT INTO `user_session` (`user_uuid`, `visit_time`)
-        VALUES (#{userUuid}, NOW(3))
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`,`auth_info`)
+        VALUES (#{userUuid}, NOW(3), #{authInfo})
         ON DUPLICATE KEY
             UPDATE `visit_time` = NOW(3)
     </insert>

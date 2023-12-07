@@ -159,7 +159,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -170,7 +170,7 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid());
+                userSessionMapper.insertUserSession(checkUserVo.getUuid(),JSONObject.toJSONString(UserContext.get().getAuthenticationInfoVo()));
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
                 if(!tenantVisitSet.contains(tenant)) {

@@ -130,6 +130,10 @@ public class UserVo extends BaseEditorVo implements Serializable {
     private Boolean isSuperAdmin;
     private String source;
 
+    @JSONField(serialize = false)
+    @EntityField(name = "jwtVo", type = ApiParamType.BOOLEAN)
+    private JwtVo jwtVo;
+
     public UserVo() {
 
     }
@@ -586,5 +590,13 @@ public class UserVo extends BaseEditorVo implements Serializable {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public JwtVo getJwtVo() {
+        return jwtVo;
+    }
+
+    public void setJwtVo(JwtVo jwtVo) {
+        this.jwtVo = jwtVo;
     }
 }

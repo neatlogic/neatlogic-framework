@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserSessionMapper {
-    UserSessionVo getUserSessionByUserUuid(String userUuid);
+    UserSessionVo getUserSessionByTokenHash(String userUuid);
 
     int getAllOnlineUserCount(Date sessionTime);
 
@@ -48,10 +48,10 @@ public interface UserSessionMapper {
 
     int getUserSessionCountByDate(String limitDate);
 
-    int insertUserSession(@Param("userUuid") String userUuid, @Param("authInfo") String authInfo);
+    int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfo") String authInfo);
 
-    int updateUserSession(String userUuid);
+    int updateUserSession(String tokenHash);
 
-    int deleteUserSessionByUserUuid(String userUuid);
+    int deleteUserSessionByTokenHash(String tokenHash);
 
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.filter.handler;
 
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import com.alibaba.fastjson.JSONArray;
@@ -96,6 +97,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                 String jwt = authorization.substring(7);
                 String[] jwtParts = jwt.split("\\.");
                 if (jwtParts.length == 3) {
+                    userVo.setJwtVo(new JwtVo(jwtParts));
                     SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
                     Mac mac;
                     try {

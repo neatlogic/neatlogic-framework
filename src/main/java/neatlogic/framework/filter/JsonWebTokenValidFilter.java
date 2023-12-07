@@ -202,22 +202,22 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         String userUuid = userVo.getUuid();
         String tenant = TenantContext.get().getTenantUuid();
-        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(tenant, userUuid);
+        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(userVo.getJwtVo().getTokenHash());
         if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
-            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByUserUuid(userUuid);
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
             if (null != userSessionVo) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();
                 int expire = Config.USER_EXPIRETIME();
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
-                    userSessionMapper.updateUserSession(userUuid);
+                    userSessionMapper.updateUserSession(userVo.getJwtVo().getTokenHash());
                     authenticationInfo = userSessionVo.getAuthInfo();
-                    UserSessionCache.addItem(tenant, userUuid, authenticationInfo);
+                    UserSessionCache.addItem(userVo.getJwtVo().getTokenHash(), authenticationInfo);
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return true;
                 }
-                userSessionMapper.deleteUserSessionByUserUuid(userUuid);
+                userSessionMapper.deleteUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
             }
         } else {
             UserContext.init(userVo, authenticationInfo, timezone, request, response);

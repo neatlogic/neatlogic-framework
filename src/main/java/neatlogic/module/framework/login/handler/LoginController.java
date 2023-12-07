@@ -100,7 +100,7 @@ public class LoginController {
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
-            if(StringUtils.isBlank(userId)){
+            if (StringUtils.isBlank(userId)) {
                 throw new UserNotFoundException(userId);
             }
             String password = jsonObj.getString("password");
@@ -159,7 +159,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
+                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid(), request.getHeader("Env"));
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -169,15 +169,15 @@ public class LoginController {
 
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid(),JSONObject.toJSONString(UserContext.get().getAuthenticationInfoVo()));
+                userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(UserContext.get().getAuthenticationInfoVo()));
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
-                if(!tenantVisitSet.contains(tenant)) {
+                if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);
                     tenantVisitSet.add(tenant);
                 }
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());

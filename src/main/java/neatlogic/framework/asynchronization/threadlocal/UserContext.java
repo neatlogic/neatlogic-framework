@@ -50,6 +50,8 @@ public class UserContext implements Serializable {
     //是否超级管理员
     private Boolean isSuperAdmin = false;
 
+    private String tokenHash;
+
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
         if (_userContext != null) {
@@ -102,6 +104,9 @@ public class UserContext implements Serializable {
         context.setResponse(response);
         context.setTimezone(timezone);
         context.setAuthenticationInfoVo(authenticationInfoVo);
+        if(userVo.getJwtVo() != null) {
+            context.setTokenHash(userVo.getJwtVo().getTokenHash());
+        }
         instance.set(context);
         return context;
     }
@@ -259,8 +264,16 @@ public class UserContext implements Serializable {
     }
 
     public void setIsSuperAdmin(Boolean isSuperAdmin) {
-        if(isSuperAdmin != null) {
+        if (isSuperAdmin != null) {
             this.isSuperAdmin = isSuperAdmin;
         }
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
     }
 }

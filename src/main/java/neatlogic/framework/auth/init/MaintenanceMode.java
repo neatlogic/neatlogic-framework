@@ -25,6 +25,7 @@ import neatlogic.framework.auth.label.USER_MODIFY;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.util.I18nUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,9 +59,9 @@ public class MaintenanceMode {
      **/
     public static UserVo getMaintenanceUser() {
         UserVo userVo = new UserVo();
-        userVo.setUuid(Config.SUPERADMIN());
-        userVo.setUserId(Config.SUPERADMIN());
-        userVo.setUserName("厂商维护人员");
+        userVo.setUuid(Config.MAINTENANCE());
+        userVo.setUserId(Config.MAINTENANCE());
+        userVo.setUserName(I18nUtils.getStaticMessage("nfai.maintenancemode.getmaintenanceuser"));
         userVo.setIsActive(1);
         userVo.setIsDelete(0);
         userVo.setVipLevel(0);

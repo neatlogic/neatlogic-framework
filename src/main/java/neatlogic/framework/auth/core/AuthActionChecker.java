@@ -95,7 +95,7 @@ public class AuthActionChecker {
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         //维护模式下且是维护用户 || ,指定权限无需鉴权
-        if (Config.ENABLE_SUPERADMIN() && userUuid.equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+        if (Config.ENABLE_MAINTENANCE() && userUuid.equals(Config.MAINTENANCE()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
             return true;
         }
         //系统用户无需鉴权

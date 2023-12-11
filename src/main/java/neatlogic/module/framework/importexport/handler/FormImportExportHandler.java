@@ -2,9 +2,12 @@ package neatlogic.module.framework.importexport.handler;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
+import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
+import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.dto.FormVo;
 import neatlogic.framework.form.exception.FormActiveVersionNotFoundExcepiton;
@@ -16,6 +19,8 @@ import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
+import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
+import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,33 +70,91 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
 
     @Override
     public Object getPrimaryByName(ImportExportVo importExportVo) {
-        FormVo form = formMapper.getFormByName(importExportVo.getName());
-        if (form == null) {
-            throw new FormNotFoundException(importExportVo.getName());
+        FormVo form = formMapper.getFormByUuid((String) importExportVo.getPrimaryKey());
+        if (form != null) {
+            return form.getUuid();
         }
-        return form.getUuid();
+        form = formMapper.getFormByName(importExportVo.getName());
+        if (form != null) {
+            return form.getUuid();
+        }
+        throw new FormNotFoundException(importExportVo.getName());
     }
 
     @Override
     public Object importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         FormVersionVo formVersion = importExportVo.getData().toJavaObject(FormVersionVo.class);
+        // 处理表单基本信息
         FormVo form = new FormVo();
-        if (formMapper.getFormByUuid(formVersion.getFormUuid()) != null) {
-            form.setUuid(formVersion.getFormUuid());
-        } else {
-            FormVo oldForm = formMapper.getFormByName(formVersion.getFormName());
+        form.setUuid(formVersion.getFormUuid());
+        form.setName(formVersion.getFormName());
+        form.setIsActive(1);
+        form.setFcu(UserContext.get().getUserUuid());
+        FormVo oldForm = formMapper.getFormByUuid(formVersion.getFormUuid());
+        if (oldForm == null) {
+            oldForm = formMapper.getFormByName(formVersion.getFormName());
             if (oldForm != null) {
                 form.setUuid(oldForm.getUuid());
             }
         }
-        form.setName(formVersion.getFormName());
-        if (formMapper.getFormVersionByUuid(formVersion.getUuid()) != null) {
-            form.setCurrentVersionUuid(formVersion.getUuid());
+        if (oldForm != null) {
+            if (Objects.equals(oldForm.getIsActive(), 1) || Objects.equals(oldForm.getName(), form.getName())) {
+                formMapper.updateForm(form);
+            }
+        } else {
+            formMapper.insertForm(form);
         }
+
         importHandle(formVersion, primaryChangeList);
-        form.setFormConfig(formVersion.getFormConfig());
+
+        // 处理表单版本
+        formVersion.setFormUuid(form.getUuid());
+        formVersion.setIsActive(0);
+        FormVersionVo oldFormVersion = formMapper.getFormVersionByUuid(formVersion.getUuid());
+        if (oldFormVersion != null) {
+            // 删除依赖
+            formMapper.deleteFormAttributeMatrixByFormVersionUuid(oldFormVersion.getUuid());
+            List<FormAttributeVo> formAttributeList = oldFormVersion.getFormAttributeList();
+            if (CollectionUtils.isNotEmpty(formAttributeList)) {
+                for (FormAttributeVo formAttributeVo : formAttributeList) {
+                    DependencyManager.delete(MatrixAttr2FormAttrDependencyHandler.class, formAttributeVo.getUuid());
+                    DependencyManager.delete(Integration2FormAttrDependencyHandler.class, formAttributeVo.getUuid());
+                }
+            }
+            formMapper.updateFormVersion(formVersion);
+        } else {
+            Integer version = formMapper.getMaxVersionByFormUuid(form.getUuid());
+            if (version == null) {
+                version = 1;
+            } else {
+                version += 1;
+            }
+            formVersion.setVersion(version);
+            formMapper.insertFormVersion(formVersion);
+        }
+
         IFormCrossoverService formCrossoverService = CrossoverServiceFactory.getApi(IFormCrossoverService.class);
-        formCrossoverService.saveForm(form);
+        // 插入依赖
+        List<FormAttributeVo> formAttributeList = formVersion.getFormAttributeList();
+        for (FormAttributeVo formAttributeVo : formAttributeList) {
+            formCrossoverService.saveDependency(formAttributeVo);
+        }
+        // 激活版本
+        FormVersionVo oldActiveFormVersion = formMapper.getActionFormVersionByFormUuid(form.getUuid());
+        if (oldActiveFormVersion != null) {
+            formMapper.resetFormVersionIsActiveByFormUuid(formVersion.getFormUuid());
+        }
+        FormVersionVo updateIsActive = new FormVersionVo();
+        updateIsActive.setUuid(formVersion.getUuid());
+        //将当前版本设置为激活版本
+        updateIsActive.setIsActive(1);
+        formMapper.updateFormVersion(updateIsActive);
+        formMapper.deleteFormAttributeByFormUuid(formVersion.getFormUuid());
+        if (CollectionUtils.isNotEmpty(formAttributeList)) {
+            for (FormAttributeVo formAttributeVo : formAttributeList) {
+                formMapper.insertFormAttribute(formAttributeVo);
+            }
+        }
         return form.getUuid();
     }
 
@@ -109,7 +172,7 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
     protected ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         String uuid = (String) primaryKey;
         FormVo form = formMapper.getFormByUuid(uuid);
-        if (form != null) {
+        if (form == null) {
             throw new FormNotFoundException(uuid);
         }
         FormVersionVo formVersion = formMapper.getActionFormVersionByFormUuid(uuid);
@@ -215,7 +278,19 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
             JSONArray dataConfig = config.getJSONArray("dataConfig");
             for (int i = 0; i < dataConfig.size(); i++) {
                 JSONObject dataObj = dataConfig.getJSONObject(i);
-                componentHandle(action, dataObj, dependencyList, zipOutputStream, primaryChangeList);
+                if (Objects.equals(dataObj.getString("handler"), "formtable")) {
+                    JSONObject config1 = dataObj.getJSONObject("config");
+                    if (MapUtils.isEmpty(config1)) {
+                        continue;
+                    }
+                    JSONArray dataConfig1 = config1.getJSONArray("dataConfig");
+                    for (int j = 0; j < dataConfig1.size(); j++) {
+                        JSONObject dataObj1 = dataConfig1.getJSONObject(j);
+                        componentHandle(action, dataObj1, dependencyList, zipOutputStream, primaryChangeList);
+                    }
+                } else {
+                    componentHandle(action, dataObj, dependencyList, zipOutputStream, primaryChangeList);
+                }
             }
         } else if (Objects.equals(handler, FormHandler.FORMTAB.getHandler()) || Objects.equals(handler, FormHandler.FORMCOLLAPSE.getHandler())) {
             // 选项卡、折叠面板

@@ -261,14 +261,6 @@ limitations under the License.
 		NOW(3),
 		#{fcu}
 		)
-		ON DUPLICATE KEY UPDATE
-		 `name` = #{name},
-		 `url` = #{url},
-		 `handler` = #{handler},
-		 `method` = #{method},
-		 `config` = #{configStr},
-		 `lcd` = NOW(3),
-		 `lcu` = #{lcu}
 	</insert>
 
 	<insert id="insertIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo">

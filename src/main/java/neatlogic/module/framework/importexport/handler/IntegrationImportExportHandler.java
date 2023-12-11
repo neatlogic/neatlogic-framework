@@ -1,5 +1,6 @@
 package neatlogic.module.framework.importexport.handler;
 
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.exception.integration.IntegrationNotFoundException;
 import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
 import neatlogic.framework.importexport.core.ImportExportHandlerBase;
@@ -56,12 +57,15 @@ public class IntegrationImportExportHandler extends ImportExportHandlerBase {
         IntegrationVo oldIntegration = integrationMapper.getIntegrationByName(importExportVo.getName());
         if (oldIntegration != null) {
             integration.setUuid(oldIntegration.getUuid());
+            integration.setLcu(UserContext.get().getUserUuid());
+            integrationMapper.updateIntegration(integration);
         } else {
             if (integrationMapper.getIntegrationByUuid(integration.getUuid()) != null) {
                 integration.setUuid(null);
             }
+            integration.setFcu(UserContext.get().getUserUuid());
+            integrationMapper.insertIntegration(integration);
         }
-        integrationMapper.insertIntegration(integration);
         return integration.getUuid();
     }
 

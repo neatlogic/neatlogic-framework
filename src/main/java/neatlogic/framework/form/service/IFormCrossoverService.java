@@ -17,12 +17,11 @@ limitations under the License.
 package neatlogic.framework.form.service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.crossover.ICrossoverService;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.FormVersionVo;
-import neatlogic.framework.form.dto.FormVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 
 import java.util.List;
@@ -71,11 +70,4 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @return
      */
     String getFormAttributeHandler(String attributeUuid, String formConfig);
-
-    /**
-     * 保存表单
-     * @param formVo
-     * @return
-     */
-    JSONObject saveForm(FormVo formVo);
 }

@@ -121,6 +121,7 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
                     DependencyManager.delete(Integration2FormAttrDependencyHandler.class, formAttributeVo.getUuid());
                 }
             }
+            formVersion.setLcu(UserContext.get().getUserUuid());
             formMapper.updateFormVersion(formVersion);
         } else {
             Integer version = formMapper.getMaxVersionByFormUuid(form.getUuid());
@@ -130,6 +131,7 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
                 version += 1;
             }
             formVersion.setVersion(version);
+            formVersion.setFcu(UserContext.get().getUserUuid());
             formMapper.insertFormVersion(formVersion);
         }
 

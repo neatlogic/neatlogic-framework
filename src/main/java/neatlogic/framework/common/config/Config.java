@@ -88,9 +88,9 @@ public class Config {
     private static int NEW_MESSAGE_EXPIRED_DAY;
     private static int HISTORY_MESSAGE_EXPIRED_DAY;
 
-    private static Boolean ENABLE_SUPERADMIN;//是否激活超级管理员，超级管理员用户名是administrator，是虚拟用户，免密登录，拥有管理员权限，可以授权给其他真实用户
-    private static String SUPERADMIN;//超级管理员账号
-    private static String SUPERADMIN_PASSWORD;//超级管理员密码
+    private static Boolean ENABLE_MAINTENANCE;//是否激活运维用户，是虚拟用户，用于只有在系统不存在用户，出厂时使用，可以新增用户、角色、分组和授权
+    private static String MAINTENANCE;//运维用户，默认是 administrator
+    private static String MAINTENANCE_PASSWORD;//运维用户密码
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
@@ -155,14 +155,14 @@ public class Config {
             ENABLE_INTERFACE_VERIFY = false;
         }
 
-        if (StringUtils.isNotBlank(System.getProperty("enableSuperAdmin"))) {
+        if (StringUtils.isNotBlank(System.getProperty("enableMaintenance"))) {
             try {
-                ENABLE_SUPERADMIN = Boolean.valueOf(System.getProperty("enableSuperAdmin"));
+                ENABLE_MAINTENANCE = Boolean.valueOf(System.getProperty("enableMaintenance"));
             } catch (Exception ex) {
-                ENABLE_SUPERADMIN = false;
+                ENABLE_MAINTENANCE = false;
             }
         } else {
-            ENABLE_SUPERADMIN = false;
+            ENABLE_MAINTENANCE = false;
         }
 
     }
@@ -293,8 +293,8 @@ public class Config {
         return ENABLE_INTERFACE_VERIFY;
     }
 
-    public static boolean ENABLE_SUPERADMIN() {
-        return ENABLE_SUPERADMIN;
+    public static boolean ENABLE_MAINTENANCE() {
+        return ENABLE_MAINTENANCE;
     }
 
     public static boolean ENABLE_NO_SECRET() {
@@ -357,12 +357,12 @@ public class Config {
         return LICENSE;
     }
 
-    public static String SUPERADMIN() {
-        return SUPERADMIN;
+    public static String MAINTENANCE() {
+        return MAINTENANCE;
     }
 
-    public static String SUPERADMIN_PASSWORD() {
-        return SUPERADMIN_PASSWORD;
+    public static String MAINTENANCE_PASSWORD() {
+        return MAINTENANCE_PASSWORD;
     }
 
     public static String DIRECT_URL() {
@@ -533,8 +533,8 @@ public class Config {
 
             //LICENSE_PK = prop.getProperty("license.pk");
             LICENSE = prop.getProperty("license");
-            SUPERADMIN = prop.getProperty("superadmin", "administrator");
-            SUPERADMIN_PASSWORD = prop.getProperty("superadmin.password", "RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
+            MAINTENANCE = prop.getProperty("maintenance", "administrator");
+            MAINTENANCE_PASSWORD = prop.getProperty("maintenance.password", "RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
 
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");

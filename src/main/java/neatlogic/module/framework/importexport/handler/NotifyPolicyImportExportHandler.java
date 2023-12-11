@@ -60,7 +60,7 @@ public class NotifyPolicyImportExportHandler extends ImportExportHandlerBase {
     public Object importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         NotifyPolicyVo notifyPolicy = importExportVo.getData().toJavaObject(NotifyPolicyVo.class);
         NotifyPolicyVo oldNotifyPolicy = getNotifyPolicyByName(importExportVo.getName());
-        if (notifyPolicy != null) {
+        if (oldNotifyPolicy != null) {
             notifyPolicy.setId(oldNotifyPolicy.getId());
             notifyPolicy.setLcu(UserContext.get().getUserUuid(true));
             notifyMapper.updateNotifyPolicyById(notifyPolicy);

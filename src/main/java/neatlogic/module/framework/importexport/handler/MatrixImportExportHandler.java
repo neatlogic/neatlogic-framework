@@ -42,27 +42,31 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
 
     @Override
     public boolean checkIsExists(ImportExportBaseInfoVo importExportBaseInfoVo) {
-        return matrixMapper.getMatrixByLabel(importExportBaseInfoVo.getName()) != null;
+        return matrixMapper.getMatrixByLabel(importExportBaseInfoVo.getName()) != null
+                || matrixMapper.getMatrixByUuid((String) importExportBaseInfoVo.getPrimaryKey()) != null;
     }
 
     @Override
     public Object getPrimaryByName(ImportExportVo importExportVo) {
-        MatrixVo matrix = matrixMapper.getMatrixByLabel(importExportVo.getName());
-        if (matrix == null) {
-            throw new MatrixNotFoundException(importExportVo.getName());
+        MatrixVo matrix = matrixMapper.getMatrixByUuid((String) importExportVo.getPrimaryKey());
+        if (matrix != null) {
+            return matrix.getUuid();
         }
-        return matrix.getUuid();
+        matrix = matrixMapper.getMatrixByLabel(importExportVo.getName());
+        if (matrix != null) {
+            return matrix.getUuid();
+        }
+        throw new MatrixNotFoundException(importExportVo.getName());
     }
 
     @Override
     public Object importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         MatrixVo matrix = importExportVo.getData().toJavaObject(MatrixVo.class);
-        MatrixVo oldMatrix = matrixMapper.getMatrixByLabel(importExportVo.getName());
-        if (oldMatrix != null) {
-            matrix.setUuid(oldMatrix.getUuid());
-        } else {
-            if (matrixMapper.getMatrixByUuid(matrix.getUuid()) != null) {
-                matrix.setUuid(null);
+        MatrixVo oldMatrix = matrixMapper.getMatrixByUuid(matrix.getUuid());
+        if (oldMatrix == null) {
+            oldMatrix = matrixMapper.getMatrixByLabel(importExportVo.getName());
+            if (oldMatrix != null) {
+                matrix.setUuid(oldMatrix.getUuid());
             }
         }
         IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrix.getType());

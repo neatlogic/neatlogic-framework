@@ -102,7 +102,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         if (StringUtils.isNotBlank(userSelection)) {
             JSONObject userSelectionObj = JSONObject.parseObject(userSelection);
             if (MapUtils.isNotEmpty(userSelectionObj)) {
-                checkAll = userSelectionObj.getBooleanValue("checkAll");
+                checkAll = userSelectionObj.getBooleanValue("checkedAll");
                 JSONArray typeArray = userSelectionObj.getJSONArray("typeList");
                 if (CollectionUtils.isNotEmpty(typeArray)) {
                     typeList = typeArray.toJavaList(ImportDependencyTypeVo.class);
@@ -144,16 +144,29 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
                             throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
                         }
+                        boolean alreadyExists = false;
+                        JSONObject resultObj = new JSONObject();
+                        ImportExportBaseInfoVo mainImportExportBaseInfoVo = new ImportExportBaseInfoVo(mainImportExportVo.getType(), mainImportExportVo.getPrimaryKey(), mainImportExportVo.getName());
+                        if (importExportHandler.checkIsExists(mainImportExportBaseInfoVo)) {
+                            mainImportExportBaseInfoVo.setType(importExportHandler.getType().getText());
+                            resultObj.put("alreadyExists", mainImportExportBaseInfoVo);
+                            alreadyExists = true;
+                        }
                         List<ImportExportBaseInfoVo> dependencyBaseInfoList = mainImportExportVo.getDependencyBaseInfoList();
                         if (CollectionUtils.isNotEmpty(dependencyBaseInfoList) && StringUtils.isBlank(userSelection)) {
                             List<ImportDependencyTypeVo> importDependencyTypeList = importExportHandler.checkDependencyList(dependencyBaseInfoList);
                             if (CollectionUtils.isNotEmpty(importDependencyTypeList)) {
-                                JSONObject resultObj = new JSONObject();
                                 resultObj.put("checkedAll", false);
                                 resultObj.put("typeList", importDependencyTypeList);
                                 return resultObj;
+                            } else {
+                                checkAll = true;
+                                resultObj.put("checkedAll", true);
+                                resultObj.put("typeList", new ArrayList<>());
                             }
-                            checkAll = true;
+                        }
+                        if (alreadyExists) {
+                            return resultObj;
                         }
                     }
                 }

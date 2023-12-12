@@ -212,6 +212,14 @@ limitations under the License.
         WHERE `uuid` = #{value}
     </select>
 
+    <select id="getFormByName" parameterType="java.lang.String" resultType="neatlogic.framework.form.dto.FormVo">
+        SELECT `uuid`,
+               `name`,
+               `is_active` AS isActive
+        FROM `form`
+        WHERE `name` = #{value}
+    </select>
+
     <select id="getFormVersionByFormUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.form.dto.FormVersionVo">
         SELECT `uuid`,

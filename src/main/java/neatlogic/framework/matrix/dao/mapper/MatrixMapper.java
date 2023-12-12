@@ -13,6 +13,8 @@ public interface MatrixMapper {
 
     MatrixVo getMatrixByUuid(String uuid);
 
+    MatrixVo getMatrixByLabel(String label);
+
     int checkMatrixIsExists(String uuid);
 
     int checkMatrixNameIsRepeat(MatrixVo matrixVo);

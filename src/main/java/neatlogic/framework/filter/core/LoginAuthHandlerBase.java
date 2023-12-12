@@ -117,7 +117,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      */
     public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
         Long tokenCreateTime = System.currentTimeMillis();
-        JwtVo jwtVo = new JwtVo(checkUserVo);
+        JwtVo jwtVo = new JwtVo(checkUserVo,tokenCreateTime);
         SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
         Mac mac;
         mac = Mac.getInstance("HmacSHA1");
@@ -135,7 +135,6 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         bos.close();
         jwtVo.setCc(cc);
         jwtVo.setJwtsign(jwtsign);
-        jwtVo.setTokenCreateTime(tokenCreateTime);
         return jwtVo;
     }
 

@@ -21,7 +21,7 @@ limitations under the License.
 
     <select id="getUserSessionByTokenHash" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
-        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime,`auth_info` as authInfoStr
+        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime,`auth_info` as authInfoStr,`token_create_time` as tokenCreateTime
         FROM `user_session`
         WHERE `token_hash` = #{value}
     </select>
@@ -140,7 +140,7 @@ limitations under the License.
         INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
         VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
         ON DUPLICATE KEY
-            UPDATE `visit_time` = NOW(3), `auth_info` = #{authInfo}
+            UPDATE `visit_time` = NOW(3), `auth_info` = #{authInfo}, `token_create_time` = #{tokenCreateTime}
     </insert>
 
     <update id="updateUserSession" parameterType="java.lang.String">

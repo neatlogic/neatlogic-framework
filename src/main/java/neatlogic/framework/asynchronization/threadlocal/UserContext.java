@@ -52,6 +52,8 @@ public class UserContext implements Serializable {
 
     private String tokenHash;
 
+    private String env;
+
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
         if (_userContext != null) {
@@ -104,8 +106,9 @@ public class UserContext implements Serializable {
         context.setResponse(response);
         context.setTimezone(timezone);
         context.setAuthenticationInfoVo(authenticationInfoVo);
-        if(userVo.getJwtVo() != null) {
+        if (userVo.getJwtVo() != null) {
             context.setTokenHash(userVo.getJwtVo().getTokenHash());
+            context.setEnv(userVo.getJwtVo().getEnv());
         }
         instance.set(context);
         return context;
@@ -275,5 +278,13 @@ public class UserContext implements Serializable {
 
     public void setTokenHash(String tokenHash) {
         this.tokenHash = tokenHash;
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
     }
 }

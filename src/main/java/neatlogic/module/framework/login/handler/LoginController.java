@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -174,6 +175,8 @@ public class LoginController {
             }
 
             if (checkUserVo != null) {
+                //初始化request上下文
+                RequestContext.init(request, request.getRequestURI(), response);
                 checkUserVo.setTenant(tenant);
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 String AuthenticationInfoStr = null;

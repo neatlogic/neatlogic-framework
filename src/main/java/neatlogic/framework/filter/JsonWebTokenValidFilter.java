@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.Objects;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     // private ServletContext context;
@@ -200,12 +201,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @return 不超时返回权限信息，否则返回null
      */
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        String userUuid = userVo.getUuid();
-        String tenant = TenantContext.get().getTenantUuid();
         AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(userVo.getJwtVo().getTokenHash());
         if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
-            if (null != userSessionVo) {
+            if (null != userSessionVo && Objects.equals(userSessionVo.getTokenCreateTime(), userVo.getJwtVo().getTokenCreateTime())) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();
                 int expire = Config.USER_EXPIRETIME();

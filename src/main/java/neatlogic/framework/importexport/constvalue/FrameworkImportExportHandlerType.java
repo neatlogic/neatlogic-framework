@@ -20,7 +20,13 @@ import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.util.$;
 
 public enum FrameworkImportExportHandlerType implements ImportExportHandlerType {
-    FILE("file", "common.attachment"),
+    FILE("file", "附件"),
+    INTEGRATION("integration", "集成"),
+    FORM("form", "表单"),
+    MATRIX("matrix", "矩阵"),
+    NOTIFY_POLICY("notifyPolicy", "通知策略"),
+    CMDB_CI("cmdbCi", "配置项模型"),
+    AUTOEXEC_COMBOP("autoexecCombop", "组合工具"),
     ;
 
     private String value;

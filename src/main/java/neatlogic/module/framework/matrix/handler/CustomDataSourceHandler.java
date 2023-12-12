@@ -117,6 +117,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 attributeVo.setUuid(targetAttributeUuid);
                 attributeMapper.insertMatrixAttribute(attributeVo);
             }
+            sourceColumnList.add("sort");
+            targetColumnList.add("sort");
             attributeMapper.createMatrixDynamicTable(attributeVoList, targetUuid);
             //数据拷贝
             matrixDataMapper.insertDynamicTableDataForCopy(sourceUuid, sourceColumnList, targetUuid, targetColumnList);

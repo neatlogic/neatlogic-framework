@@ -33,6 +33,9 @@ import java.util.zip.ZipOutputStream;
 public abstract class ImportExportHandlerBase implements ImportExportHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ImportExportHandlerBase.class);
+
+    protected final String IMPORT = "import";
+    protected final String EXPORT = "export";
     /**
      * 检查导入依赖列表中的对象是否已经存在，存在则需要让用户决定是否覆盖
      * @param dependencyBaseInfoList

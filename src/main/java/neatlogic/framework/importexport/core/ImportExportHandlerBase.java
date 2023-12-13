@@ -137,12 +137,14 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
                 logger.warn("export data: " + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
             }
             dependencyVo.setName(importExportVo.getName());
-            try {
-                zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
-                zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));
-                zipOutputStream.closeEntry();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+            if (zipOutputStream != null) {
+                try {
+                    zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
+                    zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));
+                    zipOutputStream.closeEntry();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
     }

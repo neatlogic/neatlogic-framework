@@ -22,8 +22,12 @@ import neatlogic.framework.exception.util.javascript.ValueContainException;
 import neatlogic.framework.exception.util.javascript.ValueIsNullException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class notlike {
+    private final static Logger logger = LoggerFactory.getLogger(notlike.class);
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
@@ -35,7 +39,8 @@ public class notlike {
                     if (!dataValue.contains(conditionValue)) {
                         return true;
                     } else {
-                        throw new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                        logger.error(new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                        return false;
                     }
                 } else {
                     for (int i = 0; i < conditionValueList.size(); i++) {
@@ -44,7 +49,8 @@ public class notlike {
                             return true;
                         }
                     }
-                    throw new ApiRuntimeException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                    logger.error(new ApiRuntimeException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                    return false;
                 }
             } else if (dataValueList.size() > conditionValueList.size()) {
                 for (int i = 0; i < conditionValueList.size(); i++) {
@@ -53,13 +59,15 @@ public class notlike {
                         return true;
                     }
                 }
-                throw new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                logger.error(new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                return false;
             } else {
                 return true;
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
-                throw new ValueIsNullException(prefix);
+                logger.error(new ValueIsNullException(prefix).getMessage());
+                return false;
             } else {
                 return true;
             }

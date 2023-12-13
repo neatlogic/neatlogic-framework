@@ -22,10 +22,14 @@ import neatlogic.framework.exception.util.javascript.ValueIsNotEqualException;
 import neatlogic.framework.exception.util.javascript.ValueNeedNullException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 public class equal {
+    private final static Logger logger = LoggerFactory.getLogger(equal.class);
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
@@ -33,17 +37,21 @@ public class equal {
                 dataValueList.sort(Comparator.comparing(Object::toString));
                 conditionValueList.sort(Comparator.comparing(Object::toString));
                 if (!dataValueList.toString().equals(conditionValueList.toString())) {
-                    throw new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                    logger.error(new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                    return false;
                 }
                 return true;
             } else {
-                throw new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                logger.error(new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                return false;
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                throw new ValueConNotNullException(prefix, getValue(conditionValueList));
+                logger.error(new ValueConNotNullException(prefix, getValue(conditionValueList)).getMessage());
+                return false;
             } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
-                throw new ValueNeedNullException(prefix);
+                logger.error(new ValueNeedNullException(prefix).getMessage());
+                return false;
             }
             return true;
         }

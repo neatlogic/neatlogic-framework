@@ -167,6 +167,35 @@ limitations under the License.
 
     <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
         SELECT a.`id`,
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        e.`password`,
+        a.`pinyin`,
+        a.`is_active` AS isActive,
+        a.`is_delete` AS isDelete,
+        a.`user_info` AS userInfo,
+        a.`vip_level` AS vipLevel,
+        b.`role_uuid` AS roleUuid,
+        r.`name` AS roleName,
+        r.`description`,
+        c.`team_uuid` AS teamUuid,
+        d.`name` AS teamName,
+        d.`upward_name_path` AS upwardNamePath,
+        a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
+        LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
+        LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
+        LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
+        LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
+        WHERE a.`uuid` = #{value}
+    </select>
+
+    <select id="getUserByUuidAndEnv" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+        SELECT a.`id`,
                a.`uuid`,
                a.`user_id`          AS userId,
                a.`user_name`        AS userName,
@@ -191,7 +220,10 @@ limitations under the License.
                  LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
                  LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
                  LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
-        WHERE a.`uuid` = #{value}
+        WHERE a.`uuid` = #{uuid}
+          AND (r.`env` = #{env}
+            or r.`env` is null)
+
     </select>
 
     <select id="getUserById" parameterType="java.lang.Long" resultMap="userInfoMap" useCache="false">
@@ -467,7 +499,13 @@ limitations under the License.
     </select>
 
     <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
-        <if test="userUuidList != null and userUuidList.size() > 0 and roleUuidList!= null and roleUuidList.size() > 0">
+        SELECT
+        `auth_group` AS authGroup,
+        `auth`
+        FROM `user_authority`
+        WHERE `user_uuid` = #{authenticationInfoVo.userUuid}
+        <if test="authenticationInfoVo.roleUuidList!= null and authenticationInfoVo.roleUuidList.size() > 0">
+            UNION
             SELECT
             ra.`auth_group` AS authGroup,
             ra.`auth`
@@ -476,13 +514,15 @@ limitations under the License.
                 JOIN `role` r on ra.role_uuid = r.uuid
             </if>
             <if test="env != null and env != ''">
-                AND r.`env` = #{env}
+                AND r.`env` = #{env} or  r.`env` is null
             </if>
+            WHERE ra.`role_uuid` in
+            <foreach collection="authenticationInfoVo.roleUuidList" open="(" close=")" separator="," item="roleUuid">
+                #{roleUuid}
+            </foreach>
         </if>
-        <if test="userUuidList != null and userUuidList.size() > 0 and roleUuidList!= null and roleUuidList.size() > 0">
+        <if test="authenticationInfoVo.userUuidList != null and authenticationInfoVo.userUuidList.size() > 0">
             UNION
-        </if>
-        <if test="userUuidList != null and userUuidList.size() > 0">
             SELECT
             `auth_group` AS authGroup,
             `auth`
@@ -491,9 +531,6 @@ limitations under the License.
             <foreach collection="userUuidList" open="(" close=")" separator="," item="userUuid">
                 #{userUuid}
             </foreach>
-        </if>
-        <if test="userUuidList != null and userUuidList.size() > 0 and roleUuidList!= null and roleUuidList.size() > 0">
-            UNION
         </if>
     </select>
 

@@ -52,7 +52,7 @@ public class UserContext implements Serializable {
 
     private String tokenHash;
 
-    private String env;
+    private String env = null;
 
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();

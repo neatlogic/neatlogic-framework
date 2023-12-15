@@ -140,9 +140,9 @@ public class LoginController {
             if (Config.ENABLE_MAINTENANCE() && Config.MAINTENANCE().equals(userVo.getUserId())) {
                 String maintenancePassword = Config.MAINTENANCE_PASSWORD();
                 maintenancePassword = RC4Util.decrypt(maintenancePassword);
-                if(Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(),"md5")) {
+                if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "md5")) {
                     maintenancePassword = "{MD5}" + Md5Util.encryptMD5(maintenancePassword);
-                }else if(Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(),"base64")){
+                } else if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "base64")) {
                     maintenancePassword = "{BS}" + new String(Base64.getEncoder().encode(maintenancePassword.getBytes()));
                 }
                 if (password.equals(maintenancePassword)) {
@@ -166,7 +166,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
+                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid(), request.getHeader("Env"));
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();

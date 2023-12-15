@@ -55,7 +55,9 @@ public interface UserMapper {
 
     UserVo getUserById(Long id);
 
-    UserVo getUserByUuid(String uuid);
+    UserVo getUserByUuidAndEnv(@Param("uuid") String uuid, @Param("env") String env);
+
+    UserVo getUserByUuid(@Param("uuid") String uuid);
 
     UserVo getUserSimpleInfoByUuid(String uuid);
 

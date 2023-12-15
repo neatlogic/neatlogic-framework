@@ -21,10 +21,14 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueIsEqualException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 public class notequal {
+    private final static Logger logger = LoggerFactory.getLogger(notequal.class);
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
@@ -34,7 +38,8 @@ public class notequal {
                 if (!dataValueList.toString().equals(conditionValueList.toString())) {
                     return true;
                 } else {
-                    throw new ValueIsEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                    logger.error(new ValueIsEqualException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                    return false;
                 }
             } else {
                 return true;
@@ -44,7 +49,8 @@ public class notequal {
         } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
             return true;
         } else {
-            throw new ApiRuntimeException(prefix);
+            logger.error(new ApiRuntimeException(prefix).getMessage());
+            return false;
         }
     }
 

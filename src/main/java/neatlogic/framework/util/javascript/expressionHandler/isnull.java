@@ -20,13 +20,18 @@ import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.exception.util.javascript.ValueNeedNullException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class isnull {
+    private final static Logger logger = LoggerFactory.getLogger(isnull.class);
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
 
         if (CollectionUtils.isNotEmpty(dataValueList)) {
-            throw new ValueNeedNullException(prefix);
+            logger.error(new ValueNeedNullException(prefix).getMessage());
+            return false;
         }
         return true;
     }

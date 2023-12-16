@@ -103,7 +103,7 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
         if (Objects.equals(matrix.getType(), "external")) {
             doExportData(FrameworkImportExportHandlerType.INTEGRATION, matrixVo.getIntegrationUuid(), dependencyList, zipOutputStream);
         } else if (Objects.equals(matrix.getType(), "cmdbci")) {
-            doExportData(FrameworkImportExportHandlerType.CMDB_CI, matrixVo.getId(), dependencyList, zipOutputStream);
+            doExportData(FrameworkImportExportHandlerType.CMDB_CI, matrixVo.getCiId(), dependencyList, zipOutputStream);
         }
         ImportExportVo importExportVo = new ImportExportVo(this.getType().getValue(), primaryKey, matrixVo.getLabel());
         importExportVo.setDataWithObject(matrixVo);

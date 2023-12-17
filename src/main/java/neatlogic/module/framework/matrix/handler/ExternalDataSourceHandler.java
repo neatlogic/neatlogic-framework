@@ -341,7 +341,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                     filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
                 }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
-                if (textFieldFilter != null && !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid())) {
+                if (textFieldFilter != null && (valueFieldFilter == null || !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid()))) {
                     filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
                 }
 //                dataVo.setFilterList(filterList);

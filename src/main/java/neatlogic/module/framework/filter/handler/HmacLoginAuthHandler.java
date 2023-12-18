@@ -113,4 +113,11 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         return null;
     }
 
+
+    @Override
+    public boolean isValidTokenCreateTime(){
+        //hmac认证用于其他系统直接调用后台认证，无需更新tokenCreateTime，否则可能会导致同个用户浏览器登录失效。
+        return false;
+    }
+
 }

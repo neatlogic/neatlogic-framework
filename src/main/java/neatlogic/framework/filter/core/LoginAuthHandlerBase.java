@@ -100,7 +100,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
             AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid(), request.getHeader("Env"));
-            userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+            if(isValidTokenCreateTime()) {
+                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+            }else{
+                jwtVo.setValidTokenCreateTime(isValidTokenCreateTime());
+                if(UserSessionCache.getItem(jwtVo.getTokenHash()) == null) {
+                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+                }
+            }
             userVo.setJwtVo(jwtVo);
         }
         return userVo;
@@ -218,5 +225,10 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
         return null;
+    }
+
+    @Override
+    public boolean isValidTokenCreateTime(){
+        return true;
     }
 }

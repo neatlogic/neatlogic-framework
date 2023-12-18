@@ -143,6 +143,13 @@ limitations under the License.
             UPDATE `visit_time` = NOW(3), `auth_info` = #{authInfo}, `token_create_time` = #{tokenCreateTime}
     </insert>
 
+    <insert id="insertUserSessionWithoutTokenCreateTime">
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
+        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
+        ON DUPLICATE KEY
+            UPDATE `visit_time` = NOW(3)
+    </insert>
+
     <update id="updateUserSession" parameterType="java.lang.String">
         UPDATE `user_session`
         set `visit_time` = now(3)

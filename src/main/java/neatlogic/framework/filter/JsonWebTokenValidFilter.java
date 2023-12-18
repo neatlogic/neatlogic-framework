@@ -25,6 +25,7 @@ import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
@@ -44,7 +45,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.Objects;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     // private ServletContext context;
@@ -118,8 +118,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                             if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                                 logger.warn("======= userUuid: " + userVo.getUuid());
                                 isUnExpired = userExpirationValid(userVo, timezone, request, response);
-                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                                    loginPostProcessor.loginAfterInitialization();
+                                if(isUnExpired) {
+                                    for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                                        loginPostProcessor.loginAfterInitialization();
+                                    }
                                 }
                             }
                         }
@@ -201,22 +203,24 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @return 不超时返回权限信息，否则返回null
      */
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(userVo.getJwtVo().getTokenHash());
+        JwtVo jwt = userVo.getJwtVo();
+        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(jwt.getTokenHash());
+        UserSessionCache.removeItem(jwt.getTokenHash());
         if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
-            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
-            if (null != userSessionVo && Objects.equals(userSessionVo.getTokenCreateTime(), userVo.getJwtVo().getTokenCreateTime())) {
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
+            if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
                 Date visitTime = userSessionVo.getSessionTime();
                 Date now = new Date();
                 int expire = Config.USER_EXPIRETIME();
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
-                    userSessionMapper.updateUserSession(userVo.getJwtVo().getTokenHash());
+                    userSessionMapper.updateUserSession(jwt.getTokenHash());
                     authenticationInfo = userSessionVo.getAuthInfo();
-                    UserSessionCache.addItem(userVo.getJwtVo().getTokenHash(), authenticationInfo);
+                    UserSessionCache.addItem(jwt.getTokenHash(), authenticationInfo);
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return true;
                 }
-                userSessionMapper.deleteUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
+                userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
         } else {
             UserContext.init(userVo, authenticationInfo, timezone, request, response);

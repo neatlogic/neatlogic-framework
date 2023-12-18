@@ -2,6 +2,7 @@ package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.Md5Util;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 
 public class JwtVo {
     private String cc;
@@ -17,6 +19,9 @@ public class JwtVo {
     private String jwtsign;
     @EntityField(name = "创建时间", type = ApiParamType.STRING)
     private Long tokenCreateTime;
+
+    @EntityField(name = "是否校验tokenCreateTime", type = ApiParamType.STRING)
+    private boolean isValidTokenCreateTime = true;
 
     @EntityField(name = "token哈希", type = ApiParamType.STRING)
     private String tokenHash;
@@ -96,20 +101,34 @@ public class JwtVo {
     }
 
     public String getTokenHash() {
-        String jwtBody = new String(Base64.getUrlDecoder().decode(getJwtbody()), StandardCharsets.UTF_8);
-        JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-        JSONObject tokenJson = new JSONObject();
-        tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
-        tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
-        if (jwtBodyObj.containsKey("env")) {
-            tokenJson.put("env", jwtBodyObj.getString("env"));
+        if (StringUtils.isBlank(tokenHash)) {
+            String jwtBody = new String(Base64.getUrlDecoder().decode(getJwtbody()), StandardCharsets.UTF_8);
+            JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+            JSONObject tokenJson = new JSONObject();
+            tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
+            tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
+            if (jwtBodyObj.containsKey("env")) {
+                tokenJson.put("env", jwtBodyObj.getString("env"));
+            }
+            tokenHash = Md5Util.encryptMD5(tokenJson.toJSONString());
         }
-        return Md5Util.encryptMD5(tokenJson.toJSONString());
+        return tokenHash;
     }
 
     public String getEnv() {
         String jwtBody = new String(Base64.getUrlDecoder().decode(getJwtbody()), StandardCharsets.UTF_8);
         JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
         return jwtBodyObj.getString("env");
+    }
+
+    public void setValidTokenCreateTime(boolean validTokenCreateTime) {
+        isValidTokenCreateTime = validTokenCreateTime;
+    }
+
+    public boolean validTokenCreateTime(Long userSessionTokenCreateTime) {
+        if (Config.ENABLE_NO_SECRET() || !isValidTokenCreateTime) {
+            return true;
+        }
+        return Objects.equals(userSessionTokenCreateTime, getTokenCreateTime());
     }
 }

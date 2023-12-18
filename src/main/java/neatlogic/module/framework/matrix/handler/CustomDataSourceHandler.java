@@ -486,7 +486,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (CollectionUtils.isNotEmpty(valueList)) {
                             filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), SearchExpression.EQ.getExpression(), valueList));
                         } else {
-                            return resultList;
+                            continue;
                         }
                         dataVo.setKeyword(null);
                     } else {

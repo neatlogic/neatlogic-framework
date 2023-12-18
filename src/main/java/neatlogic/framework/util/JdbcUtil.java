@@ -32,7 +32,7 @@ public class JdbcUtil {
         try {
             connection = dataSource.getConnection();
         } catch (Exception exception) {
-            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb",LocalConfig.getPropertiesFrom()));
+            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb",LocalConfig.getPropertiesFrom()),exception);
         }
         return connection;
     }

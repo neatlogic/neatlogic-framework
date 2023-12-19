@@ -20,14 +20,11 @@ import neatlogic.framework.common.constvalue.IEnum;
 import java.util.List;
 
 public enum ExtraMenuType implements IEnum {
-    DIRECTORY("目录", 0), MENU("菜单", 1);
+    DIRECTORY(0), MENU(1);
 
     private int type;
 
-    private String name;
-
-    ExtraMenuType(String _name, int _type) {
-        this.name = _name;
+    ExtraMenuType(int _type) {
         this.type = _type;
     }
 
@@ -38,19 +35,11 @@ public enum ExtraMenuType implements IEnum {
             array.add(new JSONObject() {
                 {
                     this.put("value", typeEnum.getType());
-                    this.put("text", typeEnum.getName());
+                    this.put("text", typeEnum.name());
                 }
             });
         }
         return array;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public int getType() {

@@ -32,7 +32,7 @@ import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
-import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -47,11 +47,8 @@ import java.net.URLDecoder;
 import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
-    // private ServletContext context;
     @Resource
     private UserSessionMapper userSessionMapper;
-    @Resource
-    private AuthenticationInfoService authenticationInfoService;
 
     /**
      * Default constructor.
@@ -72,9 +69,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
         boolean isUnExpired = false;
-        boolean hasTenant = false;
         UserVo userVo = null;
-        JSONObject redirectObj = new JSONObject();
         String authType = "default";
         ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
         ILoginAuthHandler loginAuth = defaultLoginAuth;
@@ -91,98 +86,123 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
         //判断租户
         try {
-            //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ start");
             String tenant = request.getHeader("Tenant");
             //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
             HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
-            if (TenantUtil.hasTenant(tenant)) {
-                hasTenant = true;
-                TenantContext.init();
-                TenantContext.get().switchTenant(tenant);
-                logger.warn("======= defaultLoginAuth: ");
-                //先按 default 认证，不存在才根据具体 AuthType 认证用户
-                userVo = defaultLoginAuth.auth(cachedRequest, response);
-                if (userVo == null) {
-                    //获取认证插件名,优先使用请求方指定的认证
-                    String authTypeHeader = request.getHeader("AuthType");
-                    if (StringUtils.isNotBlank(authTypeHeader)) {
-                        authType = authTypeHeader;
-                    } else {
-                        authType = Config.LOGIN_AUTH_TYPE();
-                    }
-                    logger.info("AuthType: " + authType);
-                    if (StringUtils.isNotBlank(authType)) {
-                        loginAuth = LoginAuthFactory.getLoginAuth(authType);
-                        if (loginAuth != null) {
-                            userVo = loginAuth.auth(cachedRequest, response);
-                            if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                                logger.warn("======= userUuid: " + userVo.getUuid());
-                                isUnExpired = userExpirationValid(userVo, timezone, request, response);
-                                if(isUnExpired) {
-                                    for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                                        loginPostProcessor.loginAfterInitialization();
-                                    }
+            if (!TenantUtil.hasTenant(tenant)) {
+                returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenant), 521, response, loginAuth.directUrl());
+                return;
+            }
+            TenantContext.init();
+            TenantContext.get().switchTenant(tenant);
+            logger.warn("======= defaultLoginAuth: ");
+            //先按 default 认证，不存在才根据具体 AuthType 认证用户
+            userVo = defaultLoginAuth.auth(cachedRequest, response);
+            if (userVo == null) {
+                //获取认证插件名,优先使用请求方指定的认证
+                String authTypeHeader = request.getHeader("AuthType");
+                if (StringUtils.isNotBlank(authTypeHeader)) {
+                    authType = authTypeHeader;
+                } else {
+                    authType = Config.LOGIN_AUTH_TYPE();
+                }
+                logger.info("AuthType: " + authType);
+                if (StringUtils.isNotBlank(authType)) {
+                    loginAuth = LoginAuthFactory.getLoginAuth(authType);
+                    if (loginAuth != null) {
+                        userVo = loginAuth.auth(cachedRequest, response);
+                        if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
+                            logger.warn("======= getUser succeed: " + userVo.getUuid());
+                            isUnExpired = userExpirationValid(userVo, timezone, request, response);
+                            if (isUnExpired) {
+                                for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                                    loginPostProcessor.loginAfterInitialization();
                                 }
                             }
+                        } else {
+                            returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailed", loginAuth.getType()), 523, response, loginAuth.directUrl());
+                            return;
                         }
+                    } else {
+                        returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authtypeinvalid", authType), 522, response, defaultLoginAuth.directUrl());
+                        return;
                     }
                 } else {
-                    isUnExpired = userExpirationValid(userVo, timezone, request, response);
-                    logger.warn("======= getAuthenticationInfoService succeed: " + userVo.getUuid());
-                }
-            }
-
-            if (hasTenant && userVo != null && isUnExpired) {
-                //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
-                try {
-                    filterChain.doFilter(cachedRequest, response);
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                    response.setStatus(520);
-                    redirectObj.put("Status", "ERROR");
-                    redirectObj.put("Message", ex.getMessage());
-                    response.setContentType(Config.RESPONSE_TYPE_JSON);
-                    response.getWriter().print(redirectObj.toJSONString());
+                    returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailed", loginAuth.getType()), 523, response, defaultLoginAuth.directUrl());
+                    return;
                 }
             } else {
-                if (!hasTenant) {
-                    response.setStatus(521);
-                    redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "租户 '" + tenant + "' 不存在或已被禁用");
-                    logger.warn("======= login error: 租户 '" + tenant + "' 不存在或已被禁用");
-                } else if (userVo == null) {
-                    response.setStatus(522);
-                    redirectObj.put("Status", "FAILED");
-                    if (loginAuth == null) {
-                        redirectObj.put("Message", "找不到认证方式 '" + authType + "'");
-                        logger.warn("======= login error: 找不到认证方式 '" + authType + "'");
-                    } else {
-                        redirectObj.put("Message", "认证失败(" + loginAuth.getType() + ")，请重新登录");
-                        logger.warn("======= login error: 通过" + loginAuth.getType() + "认证失败，请重新登录");
-                    }
-                    redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
-                } else {
-                    response.setStatus(527);
-                    redirectObj.put("Status", "FAILED");
-                    redirectObj.put("Message", "会话已超时或已被终止，请重新登录");
-                    logger.warn("======= login error: 会话已超时或已被终止，请重新登录");
-                    redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
-                }
-                removeAuthCookie(response);
-                response.setContentType(Config.RESPONSE_TYPE_JSON);
-                response.getWriter().print(redirectObj.toJSONString());
+                logger.warn("======= getUser succeed: " + userVo.getUuid());
+                isUnExpired = userExpirationValid(userVo, timezone, request, response);
+            }
+
+            //回话超时
+            if (!isUnExpired) {
+                returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.unexpired"), 527, response, loginAuth.directUrl());
+                return;
+            } else {
+                logger.warn("======= is Expired");
+            }
+
+            try {
+                filterChain.doFilter(cachedRequest, response);
+            } catch (Exception ex) {
+                //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
+                logger.error(ex.getMessage(), ex);
+                returnErrorResponseJson(ex.getMessage(), 520, response, false);
             }
         } catch (Exception ex) {
-            logger.error("认证失败", ex);
-            response.setStatus(522);
-            redirectObj.put("Status", "FAILED");
-            redirectObj.put("Message", ex.getMessage());
-            redirectObj.put("DirectUrl", loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
-            removeAuthCookie(response);
-            response.setContentType(Config.RESPONSE_TYPE_JSON);
-            response.getWriter().print(redirectObj.toJSONString());
+            logger.error($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailederrorlog"), ex);
+            returnErrorResponseJson(ex.getMessage(), 524, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
         }
-        //logger.info("requestUrl:"+request.getRequestURI()+" ------------------------------------------------ end");
+    }
+
+    /**
+     * 返回异常JSON
+     *
+     * @param message      异常信息
+     * @param responseCode 异常码
+     * @param response     相应
+     * @param directUrl    前端跳转url
+     * @throws IOException 异常
+     */
+    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, boolean isRemoveCookie, String directUrl) throws IOException {
+        JSONObject redirectObj = new JSONObject();
+        redirectObj.put("Status", "FAILED");
+        redirectObj.put("Message", message);
+        logger.warn("======login error:" + message);
+        response.setStatus(responseCode);
+        redirectObj.put("DirectUrl", directUrl);
+        if (isRemoveCookie) {
+            removeAuthCookie(response);
+        }
+        response.setContentType(Config.RESPONSE_TYPE_JSON);
+        response.getWriter().print(redirectObj.toJSONString());
+    }
+
+    /**
+     * 返回异常JSON
+     *
+     * @param message      异常信息
+     * @param responseCode 异常码
+     * @param response     相应
+     * @param directUrl    前端跳转url
+     * @throws IOException 异常
+     */
+    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, String directUrl) throws IOException {
+        returnErrorResponseJson(message, responseCode, response, true, directUrl);
+    }
+
+    /**
+     * 返回异常JSON
+     *
+     * @param message      异常信息
+     * @param responseCode 异常码
+     * @param response     相应
+     * @throws IOException 异常
+     */
+    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, boolean isRemoveCookie) throws IOException {
+        returnErrorResponseJson(message, responseCode, response, isRemoveCookie, null);
     }
 
     /**
@@ -205,7 +225,6 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         JwtVo jwt = userVo.getJwtVo();
         AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(jwt.getTokenHash());
-        UserSessionCache.removeItem(jwt.getTokenHash());
         if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
             if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {

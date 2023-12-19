@@ -126,7 +126,8 @@ limitations under the License.
         SELECT `id`,
                `uuid`,
                `name`,
-               `description`
+               `description`,
+               `env`
         FROM `role`
         WHERE `uuid` = #{value}
     </select>

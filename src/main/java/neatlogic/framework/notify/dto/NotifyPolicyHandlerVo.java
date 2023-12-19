@@ -20,6 +20,7 @@ package neatlogic.framework.notify.dto;
  * @author linbq
  * @since 2021/7/23 15:30
  **/
+@Deprecated
 public class NotifyPolicyHandlerVo implements Cloneable{
     private String handler;
     private String name;

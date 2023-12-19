@@ -509,10 +509,7 @@ limitations under the License.
             ra.`auth`
             FROM `role_authority` ra
             <if test="env != null and env != ''">
-                JOIN `role` r on ra.role_uuid = r.uuid
-            </if>
-            <if test="env != null and env != ''">
-                AND r.`env` = #{env} or  r.`env` is null
+                JOIN `role` r on ra.role_uuid = r.uuid AND (r.`env` = #{env} or r.`env` is null)
             </if>
             WHERE ra.`role_uuid` in
             <foreach collection="authenticationInfoVo.roleUuidList" open="(" close=")" separator="," item="roleUuid">

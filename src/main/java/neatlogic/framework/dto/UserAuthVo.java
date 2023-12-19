@@ -24,6 +24,9 @@ public class UserAuthVo extends BasePageVo implements Serializable {
     @EntityField(name = "权限名", type = ApiParamType.STRING)
     private String authName;
 
+    @EntityField(name = "环境", type = ApiParamType.STRING)
+    private String env;
+
 
     public UserAuthVo() {
 
@@ -31,6 +34,9 @@ public class UserAuthVo extends BasePageVo implements Serializable {
 
     public UserAuthVo(String _userUuid) {
         this.userUuid = _userUuid;
+        if (UserContext.get() != null) {
+            this.env = UserContext.get().getEnv();
+        }
     }
 
     public UserAuthVo(String _userUuid, String _auth) {
@@ -84,4 +90,11 @@ public class UserAuthVo extends BasePageVo implements Serializable {
         return authName;
     }
 
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
 }

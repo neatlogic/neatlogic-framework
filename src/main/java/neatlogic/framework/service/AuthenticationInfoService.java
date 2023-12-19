@@ -28,15 +28,33 @@ public interface AuthenticationInfoService {
 
     /**
      * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuid
-     * @return
+     *
+     * @param userUuid 用户uuid
      */
     AuthenticationInfoVo getAuthenticationInfo(String userUuid);
 
+
+    /**
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     *
+     * @param userUuid 用户uuid
+     * @param env 环境
+     */
+    AuthenticationInfoVo getAuthenticationInfo(String userUuid, String env);
+
     /**
      * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuidList
-     * @return
+     *
+     * @param userUuidList 用户uuid列表
      */
     AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList);
+
+
+    /**
+     * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
+     *
+     * @param userUuidList 用户uuid列表
+     * @param env 环境
+     */
+    AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList, String env);
 }

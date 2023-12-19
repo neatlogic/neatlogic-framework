@@ -15,6 +15,9 @@ public class UserSessionVo {
     @EntityField(name = "权限", type = ApiParamType.STRING)
     private AuthenticationInfoVo authInfo;
 
+    @EntityField(name = "token创建时间", type = ApiParamType.LONG)
+    private Long tokenCreateTime;
+
     public UserSessionVo(String userUuid, Date sessionTime) {
         this.userUuid = userUuid;
         this.sessionTime = sessionTime;
@@ -53,5 +56,13 @@ public class UserSessionVo {
 
     public void setAuthInfoStr(String authInfoStr) {
         this.authInfoStr = authInfoStr;
+    }
+
+    public Long getTokenCreateTime() {
+        return tokenCreateTime;
+    }
+
+    public void setTokenCreateTime(Long tokenCreateTime) {
+        this.tokenCreateTime = tokenCreateTime;
     }
 }

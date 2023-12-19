@@ -51,19 +51,40 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
 
     /**
      * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuid
-     * @return
+     *
+     * @param userUuid 用户uuid
      */
     @Override
-    public AuthenticationInfoVo getAuthenticationInfo(String userUuid){
+    public AuthenticationInfoVo getAuthenticationInfo(String userUuid) {
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
         Set<String> roleUuidSet = new HashSet<>(userRoleUuidList);
+        getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet, null);
+        return new AuthenticationInfoVo(userUuid, teamUuidList, new ArrayList<>(roleUuidSet));
+    }
+
+
+    @Override
+    public AuthenticationInfoVo getAuthenticationInfo(String userUuid, String env) {
+        List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
+        List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuidAndEnv(userUuid, env);
+        Set<String> roleUuidSet = new HashSet<>(userRoleUuidList);
+        getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet, env);
+        return new AuthenticationInfoVo(userUuid, teamUuidList, new ArrayList<>(roleUuidSet));
+    }
+
+    /**
+     * 补充teamUuidList roleUuidSet
+     *
+     * @param teamUuidList 组uuid列表
+     * @param roleUuidSet  角色uuid列表
+     */
+    private void getTeamUuidListAndRoleUuidList(List<String> teamUuidList, Set<String> roleUuidSet, String env) {
         if (CollectionUtils.isNotEmpty(teamUuidList)) {
-            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
+            List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndEnv(teamUuidList, env);
             roleUuidSet.addAll(teamRoleUuidList);
             Set<String> upwardUuidSet = new HashSet<>();
-            List<TeamVo> teamList =  teamMapper.getTeamByUuidList(teamUuidList);
+            List<TeamVo> teamList = teamMapper.getTeamByUuidList(teamUuidList);
             for (TeamVo teamVo : teamList) {
                 String upwardUuidPath = teamVo.getUpwardUuidPath();
                 if (StringUtils.isNotBlank(upwardUuidPath)) {
@@ -76,20 +97,19 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                 }
             }
             if (CollectionUtils.isNotEmpty(upwardUuidSet)) {
-                teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
+                teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildrenAndEnv(new ArrayList<>(upwardUuidSet), 1, env);
                 roleUuidSet.addAll(teamRoleUuidList);
             }
         }
-        return new AuthenticationInfoVo(userUuid, teamUuidList, new ArrayList<>(roleUuidSet));
     }
 
     /**
      * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuidList
-     * @return
+     *
+     * @param userUuidList 用户uuid列表
      */
     @Override
-    public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList){
+    public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList) {
         Set<String> teamUuidSet = new HashSet<>();
         Set<String> roleUuidSet = new HashSet<>();
         for (String userUuid : userUuidList) {
@@ -97,27 +117,21 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
             teamUuidSet.addAll(teamUuidList);
             List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
             roleUuidSet.addAll(userRoleUuidList);
-            if (CollectionUtils.isNotEmpty(teamUuidList)) {
-                List<String> teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(teamUuidList, null);
-                roleUuidSet.addAll(teamRoleUuidList);
-                Set<String> upwardUuidSet = new HashSet<>();
-                List<TeamVo> teamList =  teamMapper.getTeamByUuidList(teamUuidList);
-                for (TeamVo teamVo : teamList) {
-                    String upwardUuidPath = teamVo.getUpwardUuidPath();
-                    if (StringUtils.isNotBlank(upwardUuidPath)) {
-                        String[] upwardUuidArray = upwardUuidPath.split(",");
-                        for (String upwardUuid : upwardUuidArray) {
-                            if (!upwardUuid.equals(teamVo.getUuid())) {
-                                upwardUuidSet.add(upwardUuid);
-                            }
-                        }
-                    }
-                }
-                if (CollectionUtils.isNotEmpty(upwardUuidSet)) {
-                    teamRoleUuidList = roleMapper.getRoleUuidListByTeamUuidListAndCheckedChildren(new ArrayList<>(upwardUuidSet), 1);
-                    roleUuidSet.addAll(teamRoleUuidList);
-                }
-            }
+            getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet,null);
+        }
+        return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), new ArrayList<>(roleUuidSet));
+    }
+
+    @Override
+    public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList, String env) {
+        Set<String> teamUuidSet = new HashSet<>();
+        Set<String> roleUuidSet = new HashSet<>();
+        for (String userUuid : userUuidList) {
+            List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
+            teamUuidSet.addAll(teamUuidList);
+            List<String> userRoleUuidList = roleMapper.getRoleUuidListByUserUuidAndEnv(userUuid, env);
+            roleUuidSet.addAll(userRoleUuidList);
+            getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet, env);
         }
         return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), new ArrayList<>(roleUuidSet));
     }

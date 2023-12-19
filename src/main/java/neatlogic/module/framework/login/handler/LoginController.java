@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -139,9 +140,9 @@ public class LoginController {
             if (Config.ENABLE_MAINTENANCE() && Config.MAINTENANCE().equals(userVo.getUserId())) {
                 String maintenancePassword = Config.MAINTENANCE_PASSWORD();
                 maintenancePassword = RC4Util.decrypt(maintenancePassword);
-                if(Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(),"md5")) {
+                if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "md5")) {
                     maintenancePassword = "{MD5}" + Md5Util.encryptMD5(maintenancePassword);
-                }else if(Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(),"base64")){
+                } else if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "base64")) {
                     maintenancePassword = "{BS}" + new String(Base64.getEncoder().encode(maintenancePassword.getBytes()));
                 }
                 if (password.equals(maintenancePassword)) {
@@ -165,7 +166,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
+                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid(), request.getHeader("Env"));
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -174,20 +175,22 @@ public class LoginController {
             }
 
             if (checkUserVo != null) {
+                //初始化request上下文
+                RequestContext.init(request, request.getRequestURI(), response);
                 checkUserVo.setTenant(tenant);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 String AuthenticationInfoStr = null;
                 if (authenticationInfoVo != null) {
                     AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
                 }
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid(), AuthenticationInfoStr);
+                userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
                 if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);
                     tenantVisitSet.add(tenant);
                 }
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());

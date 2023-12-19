@@ -35,6 +35,8 @@ public interface RoleMapper {
 
     List<String> getRoleUuidListByUserUuid(String userUuid);
 
+    List<String> getRoleUuidListByUserUuidAndEnv(@Param("userUuid") String userUuid, @Param("env") String env);
+
     List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
     List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
@@ -69,9 +71,11 @@ public interface RoleMapper {
 
     List<RoleTeamVo> getRoleTeamListByRoleUuidList(@Param("list") List<String> roleList);
 
-    List<RoleUserVo> getRoleUserListByRoleUuidList(@Param("list")List<String> roleList);
+    List<RoleUserVo> getRoleUserListByRoleUuidList(@Param("list") List<String> roleList);
 
-    List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
+    List<String> getRoleUuidListByTeamUuidListAndEnv(@Param("teamUuidList") List<String> teamUuidList, @Param("env") String env);
+
+    List<String> getRoleUuidListByTeamUuidListAndCheckedChildrenAndEnv(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren, @Param("env") String env);
 
     /**
      * 根据team的uuid获取当前组的roleList

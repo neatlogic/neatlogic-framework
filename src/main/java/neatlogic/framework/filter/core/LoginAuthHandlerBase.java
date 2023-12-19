@@ -17,7 +17,6 @@
 package neatlogic.framework.filter.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.cache.UserSessionCache;
@@ -100,9 +99,16 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            //userVo.setRoleUuidList(roleMapper.getRoleUuidListByUserUuid(userVo.getUuid()));//TODO 是否可以去掉，得排查后续用到的逻辑，换成使用authenticationInfoVo
-            AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-            userSessionMapper.insertUserSession(userVo.getUuid(), JSONObject.toJSONString(authenticationInfoVo));
+            AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid(), request.getHeader("Env"));
+            if(isValidTokenCreateTime()) {
+                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+            }else{
+                jwtVo.setValidTokenCreateTime(isValidTokenCreateTime());
+                if(UserSessionCache.getItem(jwtVo.getTokenHash()) == null) {
+                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+                }
+            }
+            userVo.setJwtVo(jwtVo);
         }
         return userVo;
     }
@@ -117,33 +123,16 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @throws Exception 异常
      */
     public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
-        JSONObject jwtHeadObj = new JSONObject();
-        jwtHeadObj.put("alg", "HS256");
-        jwtHeadObj.put("typ", "JWT");
-
-        JSONObject jwtBodyObj = new JSONObject();
-        jwtBodyObj.put("useruuid", checkUserVo.getUuid());
-        jwtBodyObj.put("userid", checkUserVo.getUserId());
-        jwtBodyObj.put("username", checkUserVo.getUserName());
-        jwtBodyObj.put("tenant", checkUserVo.getTenant());
-        jwtBodyObj.put("isSuperAdmin", checkUserVo.getIsSuperAdmin());
-//        if (CollectionUtils.isNotEmpty(checkUserVo.getRoleUuidList())) {
-//            jwtBodyObj.put("rolelist", checkUserVo.getRoleUuidList());
-//        }
-
-        String jwthead = Base64.getUrlEncoder().encodeToString(jwtHeadObj.toJSONString().getBytes());
-        String jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
-
+        Long tokenCreateTime = System.currentTimeMillis();
+        JwtVo jwtVo = new JwtVo(checkUserVo,tokenCreateTime);
         SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
         Mac mac;
-
         mac = Mac.getInstance("HmacSHA1");
         mac.init(signingKey);
-        byte[] rawHmac = mac.doFinal((jwthead + "." + jwtbody).getBytes());
+        byte[] rawHmac = mac.doFinal((jwtVo.getJwthead() + "." + jwtVo.getJwtbody()).getBytes());
         String jwtsign = Base64.getUrlEncoder().encodeToString(rawHmac);
-
         // 压缩cookie内容
-        String c = "Bearer_" + jwthead + "." + jwtbody + "." + jwtsign;
+        String c = "Bearer_" + jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtsign;
         checkUserVo.setAuthorization(c);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bos);
@@ -151,10 +140,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         gzipOutputStream.close();
         String cc = Base64.getEncoder().encodeToString(bos.toByteArray());
         bos.close();
-        JwtVo jwtVo = new JwtVo();
         jwtVo.setCc(cc);
-        jwtVo.setJwthead(jwthead);
-        jwtVo.setJwtbody(jwtbody);
         jwtVo.setJwtsign(jwtsign);
         return jwtVo;
     }
@@ -189,9 +175,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String logout() {
-        UserSessionCache.removeItem(TenantContext.get().getTenantUuid(), UserContext.get().getUserUuid(true));
-        userSessionMapper.deleteUserSessionByUserUuid(UserContext.get().getUserUuid(true));
-        String url = null;
+        UserSessionCache.removeItem(UserContext.get().getTokenHash());
+        userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
+        String url;
         try {
             url = myLogout();
         } catch (IOException e) {
@@ -239,5 +225,10 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
         return null;
+    }
+
+    @Override
+    public boolean isValidTokenCreateTime(){
+        return true;
     }
 }

@@ -24,17 +24,15 @@ import neatlogic.framework.notify.core.NotifyPolicyHandlerFactory;
 import neatlogic.framework.notify.crossover.INotifyServiceCrossoverService;
 import neatlogic.framework.notify.dao.mapper.NotifyMapper;
 import neatlogic.framework.notify.dto.InvokeNotifyPolicyConfigVo;
-import neatlogic.framework.notify.dto.NotifyPolicyHandlerVo;
 import neatlogic.framework.notify.dto.NotifyPolicyVo;
 import neatlogic.framework.notify.exception.NotifyPolicyHandlerNotFoundException;
 import neatlogic.framework.notify.exception.NotifyPolicyNotFoundException;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossoverService {
@@ -88,17 +86,16 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
             if (notifyPolicyHandler == null) {
                 throw new NotifyPolicyHandlerNotFoundException(notifyPolicyVo.getHandler());
             }
-            String moduleGroupName = "";
-            List<NotifyPolicyHandlerVo> notifyPolicyHandlerList = NotifyPolicyHandlerFactory.getNotifyPolicyHandlerList();
-            for (NotifyPolicyHandlerVo notifyPolicyHandlerVo : notifyPolicyHandlerList) {
-                if (Objects.equals(notifyPolicyHandlerVo.getHandler(), notifyPolicyVo.getHandler())) {
-                    ModuleGroupVo moduleGroupVo = ModuleUtil.getModuleGroup(notifyPolicyHandlerVo.getModuleGroup());
-                    if (moduleGroupVo != null) {
-                        moduleGroupName = moduleGroupVo.getGroupName();
-                    }
-                }
+            String moduleGroup = NotifyPolicyHandlerFactory.getModuleGroupIdByHandler(notifyPolicyVo.getHandler());
+            if (moduleGroup == null) {
+                throw new NotifyPolicyHandlerNotFoundException(notifyPolicyVo.getHandler());
             }
-            String handlerName = notifyPolicyHandler.getName();
+            String moduleGroupName = "";
+            ModuleGroupVo moduleGroupVo = ModuleUtil.getModuleGroup(moduleGroup);
+            if (moduleGroupVo != null) {
+                moduleGroupName = moduleGroupVo.getGroupName();
+            }
+            String handlerName = $.t(notifyPolicyHandler.getName());
             invokeNotifyPolicyConfigVo.setPolicyPath(moduleGroupName + "/" + handlerName + "/" + notifyPolicyVo.getName());
         }
         return invokeNotifyPolicyConfigVo;

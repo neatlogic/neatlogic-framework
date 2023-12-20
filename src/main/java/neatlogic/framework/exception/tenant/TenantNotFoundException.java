@@ -24,10 +24,10 @@ public class TenantNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1099170784444348169L;
 
     public TenantNotFoundException(String tenant) {
-        super("租户{0}不存在", tenant);
+        super("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenant);
     }
 
     public TenantNotFoundException(Long tenantId) {
-        super("租户{0}不存在", tenantId);
+        super("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenantId);
     }
 }

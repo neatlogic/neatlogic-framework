@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.ReturnJson;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.ThemeMapper;
 import neatlogic.framework.dto.TenantVo;
@@ -55,8 +56,8 @@ public class TenantController {
                 if (tenantVo != null && tenantVo.getIsActive().equals(1)) {
                     TenantUtil.addTenant(tenant);
                 } else {
-                    response.setStatus(521);
-                    ReturnJson.error("租户" + tenant + "不存在或已被禁用", response);
+                    response.setStatus(ResponseCode.TENANT_NOTFOUND.getCode());
+                    ReturnJson.error(ResponseCode.TENANT_NOTFOUND.getMessage(tenant), response);
                     return;//没有租户，后续代码无需执行
                 }
             }

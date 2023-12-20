@@ -21,6 +21,7 @@ import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
@@ -32,7 +33,6 @@ import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
-import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -90,7 +90,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
             HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
             if (!TenantUtil.hasTenant(tenant)) {
-                returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenant), 521, response, loginAuth.directUrl());
+                returnErrorResponseJson(ResponseCode.TENANT_NOTFOUND, response, loginAuth.directUrl(), tenant);
                 return;
             }
             TenantContext.init();
@@ -120,15 +120,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                                 }
                             }
                         } else {
-                            returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailed", loginAuth.getType()), 523, response, loginAuth.directUrl());
+                            returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth.directUrl(), loginAuth.getType());
                             return;
                         }
                     } else {
-                        returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authtypeinvalid", authType), 522, response, defaultLoginAuth.directUrl());
+                        returnErrorResponseJson(ResponseCode.AUTH_TYPE_NOTFOUND, response, defaultLoginAuth.directUrl(), authType);
                         return;
                     }
                 } else {
-                    returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailed", loginAuth.getType()), 523, response, defaultLoginAuth.directUrl());
+                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth.directUrl(), loginAuth.getType());
                     return;
                 }
             } else {
@@ -138,7 +138,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
             //回话超时
             if (!isUnExpired) {
-                returnErrorResponseJson($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.unexpired"), 527, response, loginAuth.directUrl());
+                returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, loginAuth.directUrl());
                 return;
             } else {
                 logger.warn("======= is Expired");
@@ -149,29 +149,35 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             } catch (Exception ex) {
                 //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 logger.error(ex.getMessage(), ex);
-                returnErrorResponseJson(ex.getMessage(), 520, response, false);
+                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, ex.getMessage());
             }
         } catch (Exception ex) {
-            logger.error($.t("nff.jsonwebtokenvalidfilter.dofilterinternal.authfailederrorlog"), ex);
-            returnErrorResponseJson(ex.getMessage(), 524, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl());
+            logger.error(ex.getMessage(), ex);
+            try {
+                returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(),ex.getMessage());
+            } catch (Exception e) {
+                logger.error(ex.getMessage(), ex);
+                throw new RuntimeException(e);
+            }
         }
     }
 
     /**
      * 返回异常JSON
      *
-     * @param message      异常信息
      * @param responseCode 异常码
      * @param response     相应
      * @param directUrl    前端跳转url
+     * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, boolean isRemoveCookie, String directUrl) throws IOException {
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, String directUrl, boolean isRemoveCookie, Object... args) throws Exception {
         JSONObject redirectObj = new JSONObject();
+        String message = responseCode.getMessage(args);
         redirectObj.put("Status", "FAILED");
         redirectObj.put("Message", message);
         logger.warn("======login error:" + message);
-        response.setStatus(responseCode);
+        response.setStatus(responseCode.getCode());
         redirectObj.put("DirectUrl", directUrl);
         if (isRemoveCookie) {
             removeAuthCookie(response);
@@ -183,26 +189,26 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     /**
      * 返回异常JSON
      *
-     * @param message      异常信息
      * @param responseCode 异常码
      * @param response     相应
      * @param directUrl    前端跳转url
+     * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, String directUrl) throws IOException {
-        returnErrorResponseJson(message, responseCode, response, true, directUrl);
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, String directUrl, Object... args) throws Exception {
+        returnErrorResponseJson(responseCode, response, directUrl, true, args);
     }
 
     /**
      * 返回异常JSON
      *
-     * @param message      异常信息
      * @param responseCode 异常码
      * @param response     相应
+     * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(String message, Integer responseCode, HttpServletResponse response, boolean isRemoveCookie) throws IOException {
-        returnErrorResponseJson(message, responseCode, response, isRemoveCookie, null);
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, Object... args) throws Exception {
+        returnErrorResponseJson(responseCode, response, null, isRemoveCookie, args);
     }
 
     /**

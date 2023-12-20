@@ -53,7 +53,7 @@ public interface INotifyPolicyHandler {
      */
     String getAuthName();
 
-    INotifyPolicyHandlerGroup getGroup();
+//    INotifyPolicyHandlerGroup getGroup();
 
     /**
      * 是否公开，默认公开

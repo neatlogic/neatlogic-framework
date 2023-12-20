@@ -7,7 +7,7 @@
 			`tenant_uuid` AS tenantUuid,
 			`database`,
 			`username`,
-			`password` AS passwordPlain,
+			`password` AS passwordCipher,
 			`host`,
 			`option`
 		FROM
@@ -20,7 +20,7 @@
 			`tenant_uuid` AS tenantUuid,
 			`database`,
 			`username`,
-			`password` AS passwordPlain,
+			`password` AS passwordCipher,
 			`host`,
 			`option`
 		FROM

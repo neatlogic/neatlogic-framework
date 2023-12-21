@@ -18,6 +18,9 @@ public class UserSessionVo {
     @EntityField(name = "token创建时间", type = ApiParamType.LONG)
     private Long tokenCreateTime;
 
+    @EntityField(name = "token 哈希", type = ApiParamType.STRING)
+    private String tokenHash;
+
     public UserSessionVo(String userUuid, Date sessionTime) {
         this.userUuid = userUuid;
         this.sessionTime = sessionTime;
@@ -64,5 +67,13 @@ public class UserSessionVo {
 
     public void setTokenCreateTime(Long tokenCreateTime) {
         this.tokenCreateTime = tokenCreateTime;
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
     }
 }

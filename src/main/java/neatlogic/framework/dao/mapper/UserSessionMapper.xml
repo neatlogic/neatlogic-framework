@@ -135,6 +135,11 @@ limitations under the License.
         SELECT count(1)
         FROM `user_session` b where b.`visit_time` &gt;= #{value}
     </select>
+    <select id="getUserSessionByUuid" resultType="neatlogic.framework.dto.UserSessionVo">
+        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime,`auth_info` as authInfoStr,`token_create_time` as tokenCreateTime, `token_hash` as tokenHash
+        FROM `user_session`
+        WHERE `user_uuid` = #{value}
+    </select>
 
     <insert id="insertUserSession">
         INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
@@ -160,6 +165,12 @@ limitations under the License.
         DELETE
         FROM `user_session`
         where `token_hash` = #{value}
+    </delete>
+
+    <delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user_session`
+        where `user_uuid` = #{value}
     </delete>
 
 </mapper>

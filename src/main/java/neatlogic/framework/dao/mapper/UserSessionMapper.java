@@ -25,6 +25,8 @@ import java.util.List;
 public interface UserSessionMapper {
     UserSessionVo getUserSessionByTokenHash(String userUuid);
 
+    List<UserSessionVo> getUserSessionByUuid(String userUuid);
+
     int getAllOnlineUserCount(Date sessionTime);
 
     List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
@@ -55,5 +57,7 @@ public interface UserSessionMapper {
     int updateUserSession(String tokenHash);
 
     int deleteUserSessionByTokenHash(String tokenHash);
+
+    void deleteUserSessionByUserUuid(String userUuid);
 
 }

@@ -4498,7 +4498,7 @@ insert  into `role_authority`(`id`,`role_uuid`,`auth_group`,`auth`) values (886,
 
 
 
-insert  into `runner`(`id`,`name`,`host`,`port`,`url`,`access_key`,`access_secret`,`auth_type`,`public_key`,`private_key`,`group_id`,`netty_ip`,`netty_port`,`is_delete`) values (544678298525696,'local','192.168.1.140',8084,'http://192.168.1.140:8084/autoexecrunner/',NULL,NULL,NULL,NULL,NULL,NULL,'192.168.1.140','8888',0);
+insert  into `runner`(`id`,`name`,`host`,`port`,`url`,`access_key`,`access_secret`,`auth_type`,`public_key`,`private_key`,`group_id`,`netty_ip`,`netty_port`,`is_delete`) values (544678298525696,'local','localhost',8084,'http://localhost:8084/autoexecrunner/',NULL,NULL,NULL,NULL,NULL,NULL,'localhost','8888',0);
 
 
 

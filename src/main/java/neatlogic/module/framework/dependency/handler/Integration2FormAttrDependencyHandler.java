@@ -16,6 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.dependency.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
 import neatlogic.framework.dependency.core.FixedTableDependencyHandlerBase;
@@ -26,11 +27,9 @@ import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.dto.FormVo;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -38,11 +37,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 表单属性引用矩阵属性关系处理器
+ * 表单属性引用集成属性关系处理器
  * @author linbq
  * @since 2022/1/7 15:50
  **/
-@Component
+//@Component
+@Deprecated
 public class Integration2FormAttrDependencyHandler extends FixedTableDependencyHandlerBase {
 
     @Resource

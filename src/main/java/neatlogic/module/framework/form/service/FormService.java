@@ -29,9 +29,15 @@ import java.util.List;
 public interface FormService {
     /**
      * 保存表单属性与其他功能的引用关系
-     * @param formAttributeVo
+     * @param formVersion
      */
-    void saveDependency(FormAttributeVo formAttributeVo);
+    void saveDependency(FormVersionVo formVersion);
+
+    /**
+     * 删除表单属性与其他功能的引用关系
+     * @param formVersion
+     */
+    void deleteDependency(FormVersionVo formVersion);
 
     /**
      * 表格输入组件密码类型加密

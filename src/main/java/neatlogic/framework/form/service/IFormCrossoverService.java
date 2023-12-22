@@ -27,12 +27,17 @@ import neatlogic.framework.form.exception.AttributeValidException;
 import java.util.List;
 
 public interface IFormCrossoverService extends ICrossoverService {
-
     /**
      * 保存表单属性与其他功能的引用关系
-     * @param formAttributeVo
+     * @param formVersion
      */
-    void saveDependency(FormAttributeVo formAttributeVo);
+    void saveDependency(FormVersionVo formVersion);
+
+    /**
+     * 删除表单属性与其他功能的引用关系
+     * @param formVersion
+     */
+    void deleteDependency(FormVersionVo formVersion);
 
     /**
      * 表格输入组件密码类型加密
@@ -62,6 +67,13 @@ public interface IFormCrossoverService extends ICrossoverService {
                                List<? extends AttributeDataVo> oldFormAttributeDataList);
 
     Object getFormSelectAttributeValueByOriginalValue(Object originalValue);
+
+    /**
+     * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
+     * @param formConfig
+     * @return
+     */
+    List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig);
 
     /**
      * 获取表单组件类型

@@ -239,17 +239,6 @@ CREATE TABLE IF NOT EXISTS `form_attribute` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单版本属性';
 
 -- ----------------------------
--- Table structure for form_attribute_matrix
--- ----------------------------
-CREATE TABLE IF NOT EXISTS `form_attribute_matrix` (
-  `form_version_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
-  `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
-  `form_attribute_label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '表单组件名称',
-  `form_attribute_uuid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单组件uuid',
-  PRIMARY KEY (`form_version_uuid`,`matrix_uuid`,`form_attribute_uuid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单属性引用矩阵关系表';
-
--- ----------------------------
 -- Table structure for form_customitem
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `form_customitem` (

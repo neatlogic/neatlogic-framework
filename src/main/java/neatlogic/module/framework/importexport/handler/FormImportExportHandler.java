@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
-import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.FormAttributeVo;
@@ -19,8 +18,6 @@ import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
-import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
-import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,20 +104,14 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
 
         importHandle(formVersion, primaryChangeList);
 
+        IFormCrossoverService formCrossoverService = CrossoverServiceFactory.getApi(IFormCrossoverService.class);
         // 处理表单版本
         formVersion.setFormUuid(form.getUuid());
         formVersion.setIsActive(0);
         FormVersionVo oldFormVersion = formMapper.getFormVersionByUuid(formVersion.getUuid());
         if (oldFormVersion != null) {
             // 删除依赖
-            formMapper.deleteFormAttributeMatrixByFormVersionUuid(oldFormVersion.getUuid());
-            List<FormAttributeVo> formAttributeList = oldFormVersion.getFormAttributeList();
-            if (CollectionUtils.isNotEmpty(formAttributeList)) {
-                for (FormAttributeVo formAttributeVo : formAttributeList) {
-                    DependencyManager.delete(MatrixAttr2FormAttrDependencyHandler.class, formAttributeVo.getUuid());
-                    DependencyManager.delete(Integration2FormAttrDependencyHandler.class, formAttributeVo.getUuid());
-                }
-            }
+            formCrossoverService.deleteDependency(oldFormVersion);
             formVersion.setLcu(UserContext.get().getUserUuid());
             formMapper.updateFormVersion(formVersion);
         } else {
@@ -134,13 +125,9 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
             formVersion.setFcu(UserContext.get().getUserUuid());
             formMapper.insertFormVersion(formVersion);
         }
-
-        IFormCrossoverService formCrossoverService = CrossoverServiceFactory.getApi(IFormCrossoverService.class);
         // 插入依赖
+        formCrossoverService.saveDependency(formVersion);
         List<FormAttributeVo> formAttributeList = formVersion.getFormAttributeList();
-        for (FormAttributeVo formAttributeVo : formAttributeList) {
-            formCrossoverService.saveDependency(formAttributeVo);
-        }
         // 激活版本
         FormVersionVo oldActiveFormVersion = formMapper.getActionFormVersionByFormUuid(form.getUuid());
         if (oldActiveFormVersion != null) {

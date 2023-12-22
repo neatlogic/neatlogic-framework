@@ -23,9 +23,7 @@ import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormHandler;
-import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.AttributeDataVo;
-import neatlogic.framework.form.dto.FormAttributeMatrixVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
@@ -41,7 +39,7 @@ import neatlogic.framework.matrix.dto.MatrixKeywordFilterVo;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
-import neatlogic.module.framework.dependency.handler.Integration2FormAttrDependencyHandler;
+import neatlogic.module.framework.dependency.handler.Matrix2FormAttributeDependencyHandler;
 import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependencyHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -49,71 +47,172 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Resource
-    private FormMapper formMapper;
-
-    @Resource
     private MatrixMapper matrixMapper;
 
-    /**
-     * 保存表单属性与其他功能的引用关系
-     * @param formAttributeVo
-     */
     @Override
-    public void saveDependency(FormAttributeVo formAttributeVo) {
-        String formUuid = formAttributeVo.getFormUuid();
-        String formVersionUuid = formAttributeVo.getFormVersionUuid();
-        IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
-        if (formAttributeHandler == null) {
-//            throw new FormAttributeHandlerNotFoundException(formAttributeVo.getHandler());
+    public void saveDependency(FormVersionVo formVersion) {
+        saveOrDeleteDependency(true, formVersion);
+    }
+
+    @Override
+    public void deleteDependency(FormVersionVo formVersion) {
+        saveOrDeleteDependency(false, formVersion);
+    }
+
+    private void saveOrDeleteDependency(boolean isSave, FormVersionVo formVersion) {
+        JSONObject formConfig = formVersion.getFormConfig();
+        if (MapUtils.isEmpty(formConfig)) {
             return;
         }
-        formAttributeHandler.makeupFormAttribute(formAttributeVo);
-        Set<String> matrixUuidSet = formAttributeVo.getMatrixUuidSet();
-        if (CollectionUtils.isNotEmpty(matrixUuidSet)) {
-            for (String matrixUuid : matrixUuidSet) {
-                FormAttributeMatrixVo formAttributeMatrixVo = new FormAttributeMatrixVo();
-                formAttributeMatrixVo.setMatrixUuid(matrixUuid);
-                formAttributeMatrixVo.setFormVersionUuid(formVersionUuid);
-                formAttributeMatrixVo.setFormAttributeLabel(formAttributeVo.getLabel());
-                formAttributeMatrixVo.setFormAttributeUuid(formAttributeVo.getUuid());
-                formMapper.insertFormAttributeMatrix(formAttributeMatrixVo);
+        String sceneUuid = formConfig.getString("uuid");
+        doSaveOrDeleteDependency(isSave, formVersion.getFormUuid(), formVersion.getUuid(), sceneUuid, formConfig);
+    }
+
+    private void doSaveOrDeleteDependency(boolean isSave, String formUuid, String formVersionUuid, String sceneUuid, JSONObject formConfig) {
+        if (MapUtils.isEmpty(formConfig)) {
+            return;
+        }
+        JSONArray tableList = formConfig.getJSONArray("tableList");
+        if (CollectionUtils.isNotEmpty(tableList)) {
+            for (int i = 0; i < tableList.size(); i++) {
+                JSONObject tableObj = tableList.getJSONObject(i);
+                if (MapUtils.isEmpty(tableObj)) {
+                    continue;
+                }
+                JSONObject component = tableObj.getJSONObject("component");
+                doSaveOrDeleteComponentDependency(isSave, formUuid, formVersionUuid, sceneUuid, component);
+
             }
         }
-
-        Set<String> integrationUuidSet = formAttributeVo.getIntegrationUuidSet();
-        if (CollectionUtils.isNotEmpty(integrationUuidSet)) {
-            JSONObject config = new JSONObject();
-            config.put("formUuid", formUuid);
-            config.put("formVersionUuid", formVersionUuid);
-            config.put("formAttributeUuid", formAttributeVo.getUuid());
-            for (String integrationUuid : integrationUuidSet) {
-                config.put("integrationUuid", integrationUuid);
-                DependencyManager.insert(Integration2FormAttrDependencyHandler.class, integrationUuid, formAttributeVo.getUuid(), config);
+        JSONArray sceneList = formConfig.getJSONArray("sceneList");
+        if (CollectionUtils.isNotEmpty(sceneList)) {
+            for (int i = 0; i < sceneList.size(); i++) {
+                JSONObject sceneObj = sceneList.getJSONObject(i);
+                String sceneUuid2 = sceneObj.getString("uuid");
+                doSaveOrDeleteDependency(isSave, formUuid, formVersionUuid, sceneUuid2, sceneObj);
             }
         }
+    }
 
-        Map<String, Set<String>> matrixUuidAttributeUuidSetMap = formAttributeVo.getMatrixUuidAttributeUuidSetMap();
-        if (MapUtils.isNotEmpty(matrixUuidAttributeUuidSetMap)) {
-            JSONObject config = new JSONObject();
-            config.put("formUuid", formUuid);
-            config.put("formVersionUuid", formVersionUuid);
-            for (Map.Entry<String, Set<String>> entry : matrixUuidAttributeUuidSetMap.entrySet()) {
-                String matrixUuid = entry.getKey();
-                config.put("matrixUuid", matrixUuid);
-                Set<String> attributeUuidSet = entry.getValue();
-                if (CollectionUtils.isNotEmpty(attributeUuidSet)) {
-                    for (String attributeUuid : attributeUuidSet) {
-                        DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, attributeUuid, formAttributeVo.getUuid(), config);
+    private void doSaveOrDeleteComponentDependency(boolean isSave, String formUuid, String formVersionUuid, String sceneUuid, JSONObject component) {
+        if (MapUtils.isEmpty(component)) {
+            return;
+        }
+        Boolean inherit = component.getBoolean("inherit");
+        if (Objects.equals(inherit, true)) {
+            return;
+        }
+        List<String> handlerList = new ArrayList<>();
+        handlerList.add(FormHandler.FORMSELECT.getHandler());
+        handlerList.add(FormHandler.FORMRADIO.getHandler());
+        handlerList.add(FormHandler.FORMCHECKBOX.getHandler());
+        handlerList.add(FormHandler.FORMTABLESELECTOR.getHandler());
+        String handler = component.getString("handler");
+        if (handlerList.contains(handler)) {
+            String uuid = component.getString("uuid");
+            // 单选框、复选框、下拉框、表格选择组件
+            JSONObject config = component.getJSONObject("config");
+            if (MapUtils.isEmpty(config)) {
+                return;
+            }
+            String dataSource = config.getString("dataSource");
+            if (!Objects.equals(dataSource, "matrix")) {
+                return;
+            }
+            String matrixUuid = config.getString("matrixUuid");
+            if (StringUtils.isBlank(matrixUuid)) {
+                return;
+            }
+            if (isSave) {
+                JSONObject dependencyConfig = new JSONObject();
+                dependencyConfig.put("formUuid", formUuid);
+                dependencyConfig.put("formVersionUuid", formVersionUuid);
+                dependencyConfig.put("sceneUuid", sceneUuid);
+                DependencyManager.insert(Matrix2FormAttributeDependencyHandler.class, matrixUuid, uuid, dependencyConfig);
+
+                dependencyConfig.put("matrixUuid", matrixUuid);
+                if (Objects.equals(handler, FormHandler.FORMTABLESELECTOR.getHandler())) {
+                    JSONArray dataConfig = config.getJSONArray("dataConfig");
+                    if (CollectionUtils.isEmpty(dataConfig)) {
+                        return;
+                    }
+                    for (int i = 0; i < dataConfig.size(); i++) {
+                        JSONObject dataObj = dataConfig.getJSONObject(i);
+                        if (MapUtils.isEmpty(dataObj)) {
+                            continue;
+                        }
+                        String columnUuid = dataObj.getString("uuid");
+                        if (StringUtils.isBlank(columnUuid)) {
+                            continue;
+                        }
+                        DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, columnUuid, uuid, dependencyConfig);
+                    }
+                } else {
+                    JSONObject mapping = config.getJSONObject("mapping");
+                    if (MapUtils.isEmpty(mapping)) {
+                        return;
+                    }
+                    String value = mapping.getString("value");
+                    String text = mapping.getString("text");
+                    if (StringUtils.isNotBlank(value)) {
+                        DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, value, uuid, dependencyConfig);
+                    }
+                    if (StringUtils.isNotBlank(text)) {
+                        DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, text, uuid, dependencyConfig);
                     }
                 }
+            } else {
+                DependencyManager.delete(Matrix2FormAttributeDependencyHandler.class, uuid);
+                DependencyManager.delete(MatrixAttr2FormAttrDependencyHandler.class, uuid);
             }
+        } else if (Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler())) {
+            // 表格输入组件
+            JSONObject config = component.getJSONObject("config");
+            if (MapUtils.isEmpty(config)) {
+                return;
+            }
+            JSONArray dataConfig = config.getJSONArray("dataConfig");
+            for (int i = 0; i < dataConfig.size(); i++) {
+                JSONObject dataObj = dataConfig.getJSONObject(i);
+                if (Objects.equals(dataObj.getString("handler"), "formtable")) {
+                    JSONObject config1 = dataObj.getJSONObject("config");
+                    if (MapUtils.isEmpty(config1)) {
+                        continue;
+                    }
+                    JSONArray dataConfig1 = config1.getJSONArray("dataConfig");
+                    for (int j = 0; j < dataConfig1.size(); j++) {
+                        JSONObject dataObj1 = dataConfig1.getJSONObject(j);
+                        doSaveOrDeleteComponentDependency(isSave, formUuid, formVersionUuid, sceneUuid, dataObj1);
+                    }
+                } else {
+                    doSaveOrDeleteComponentDependency(isSave, formUuid, formVersionUuid, sceneUuid, dataObj);
+                }
+            }
+        } else if (Objects.equals(handler, FormHandler.FORMTAB.getHandler()) || Objects.equals(handler, FormHandler.FORMCOLLAPSE.getHandler())) {
+            // 选项卡、折叠面板
+            JSONArray componentArray = component.getJSONArray("component");
+            for (int i = 0; i < componentArray.size(); i++) {
+                JSONObject componentObj = componentArray.getJSONObject(i);
+                doSaveOrDeleteComponentDependency(isSave, formUuid, formVersionUuid, sceneUuid, componentObj);
+            }
+        } else if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+            // 子表单
+            JSONObject formData = component.getJSONObject("formData");
+            if (MapUtils.isEmpty(formData)) {
+                return;
+            }
+            JSONObject formConfig = formData.getJSONObject("formConfig");
+            doSaveOrDeleteDependency(isSave, formUuid, formVersionUuid, sceneUuid, formConfig);
         }
     }
 

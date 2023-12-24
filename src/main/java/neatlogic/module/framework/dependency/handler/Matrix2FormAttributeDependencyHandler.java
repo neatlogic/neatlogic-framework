@@ -57,6 +57,9 @@ public class Matrix2FormAttributeDependencyHandler extends FixedTableDependencyH
         pathList.add(formVersionVo.getVersion().toString());
         String sceneUuid = config.getString("sceneUuid");
         FormAttributeVo formAttribute = formService.getFormAttribute(formVersionVo.getFormConfig(), dependencyVo.getTo(), sceneUuid);
+        if (formAttribute == null) {
+            return null;
+        }
         List<String> parentNameList = new ArrayList<>();
         FormAttributeParentVo parent = formAttribute.getParent();
         while (parent != null) {

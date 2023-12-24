@@ -78,6 +78,8 @@ public class FormAttributeVo implements Serializable {
     @JSONField(serialize = false)
     private Map<String, Set<String>> matrixUuidAttributeUuidSetMap;
 
+    private FormAttributeParentVo parent;
+
     public FormAttributeVo() {
 
     }
@@ -315,5 +317,13 @@ public class FormAttributeVo implements Serializable {
 
     public void setMatrixUuidAttributeUuidSetMap(Map<String, Set<String>> matrixUuidAttributeUuidSetMap) {
         this.matrixUuidAttributeUuidSetMap = matrixUuidAttributeUuidSetMap;
+    }
+
+    public FormAttributeParentVo getParent() {
+        return parent;
+    }
+
+    public void setParent(FormAttributeParentVo parent) {
+        this.parent = parent;
     }
 }

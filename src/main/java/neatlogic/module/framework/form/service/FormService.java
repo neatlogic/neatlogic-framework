@@ -81,6 +81,15 @@ public interface FormService {
      * @return
      */
     List<FormAttributeVo> getAllFormAttributeList(String formConfig);
+
+    /**
+     * 根据表单配置信息，表单组件uuid，场景uuid，获取表单组件信息
+     * @param formConfig
+     * @param attributeUuid
+     * @param sceneUuid
+     * @return
+     */
+    FormAttributeVo getFormAttribute(JSONObject formConfig, String attributeUuid, String sceneUuid);
     /**
      * 获取表单组件类型
      * @param attributeUuid 属性唯一标识

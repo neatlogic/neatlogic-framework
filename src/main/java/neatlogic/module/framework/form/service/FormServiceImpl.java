@@ -24,6 +24,7 @@ import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
+import neatlogic.framework.form.dto.FormAttributeParentVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
@@ -735,12 +736,39 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     @Override
     public List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig) {
         JSONArray tableList = formConfig.getJSONArray("tableList");
-        return getAllFormAttributeList(tableList);
+        return getAllFormAttributeList(tableList, null);
     }
 
     @Override
     public List<FormAttributeVo> getAllFormAttributeList(String formConfig) {
         return getAllFormAttributeList(JSONObject.parseObject(formConfig));
+    }
+
+    @Override
+    public FormAttributeVo getFormAttribute(JSONObject formConfig, String attributeUuid, String sceneUuid) {
+        JSONArray tableList = null;
+        FormAttributeParentVo parent = null;
+        String uuid = formConfig.getString("uuid");
+        if (sceneUuid == null || Objects.equals(sceneUuid, uuid)) {
+            tableList = formConfig.getJSONArray("tableList");
+        } else {
+            JSONArray sceneList = formConfig.getJSONArray("sceneList");
+            for (int i = 0; i < sceneList.size(); i++) {
+                JSONObject sceneObj = sceneList.getJSONObject(i);
+                uuid = sceneObj.getString("uuid");
+                if (Objects.equals(uuid, sceneUuid)) {
+                    tableList = sceneObj.getJSONArray("tableList");
+                    parent = new FormAttributeParentVo(uuid, sceneObj.getString("name"), null);
+                }
+            }
+        }
+        List<FormAttributeVo> formAttributeList = getAllFormAttributeList(tableList, parent);
+        for (FormAttributeVo formAttribute : formAttributeList) {
+            if (Objects.equals(formAttribute.getUuid(), attributeUuid)) {
+                return formAttribute;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -759,7 +787,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return getFormAttributeHandler(attributeUuid, JSONObject.parseObject(formConfig));
     }
 
-    private List<FormAttributeVo> getAllFormAttributeList(JSONArray tableList) {
+    private List<FormAttributeVo> getAllFormAttributeList(JSONArray tableList, FormAttributeParentVo parent) {
         List<FormAttributeVo> resultList = new ArrayList<>();
         if (CollectionUtils.isEmpty(tableList)) {
             return resultList;
@@ -773,50 +801,65 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (MapUtils.isEmpty(componentObj)) {
                 continue;
             }
-            // 标签组件不能改变值，不放入组件列表里
-            String handler = componentObj.getString("handler");
-            if (Objects.equals(FormHandler.FORMLABEL.getHandler(), handler)) {
-                continue;
-            }
-            resultList.add(createFormAttribute(componentObj));
-            if (Objects.equals(FormHandler.FORMTABLEINPUTER.getHandler(), handler)) {
-                JSONObject config = componentObj.getJSONObject("config");
-                JSONArray dataConfigList = config.getJSONArray("dataConfig");
-                for (int j = 0; j < dataConfigList.size(); j++) {
-                    JSONObject dataObj = dataConfigList.getJSONObject(j);
-                    resultList.add(createFormAttribute(dataObj));
-                    if (Objects.equals("formtable", dataObj.getString("handler"))) {
-                        JSONObject config2 = dataObj.getJSONObject("config");
-                        JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
-                        for (int k = 0; k < dataConfigList2.size(); k++) {
-                            JSONObject dataObj2 = dataConfigList2.getJSONObject(k);
-                            resultList.add(createFormAttribute(dataObj2));
-                        }
+            resultList.addAll(getFormAttributeList(componentObj, parent));
+        }
+        return resultList;
+    }
+
+    private List<FormAttributeVo> getFormAttributeList(JSONObject componentObj, FormAttributeParentVo parent) {
+        List<FormAttributeVo> resultList = new ArrayList<>();
+        // 标签组件不能改变值，不放入组件列表里
+        String handler = componentObj.getString("handler");
+        if (Objects.equals(FormHandler.FORMLABEL.getHandler(), handler)) {
+            return resultList;
+        }
+        FormAttributeVo formAttribute = createFormAttribute(componentObj, parent);
+        if (formAttribute != null) {
+            resultList.add(formAttribute);
+        }
+        if (Objects.equals(FormHandler.FORMTABLEINPUTER.getHandler(), handler)) {
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            JSONObject config = componentObj.getJSONObject("config");
+            JSONArray dataConfigList = config.getJSONArray("dataConfig");
+            for (int i = 0; i < dataConfigList.size(); i++) {
+                JSONObject dataObj = dataConfigList.getJSONObject(i);
+                resultList.addAll(getFormAttributeList(dataObj, parent2));
+                if (Objects.equals("formtable", dataObj.getString("handler"))) {
+                    FormAttributeParentVo parent3 = new FormAttributeParentVo(dataObj.getString("uuid"), dataObj.getString("label"), parent2);
+                    JSONObject config2 = dataObj.getJSONObject("config");
+                    JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
+                    for (int j = 0; j < dataConfigList2.size(); j++) {
+                        JSONObject dataObj2 = dataConfigList2.getJSONObject(j);
+                        resultList.addAll(getFormAttributeList(dataObj2, parent3));
                     }
                 }
-            } else if (Objects.equals(FormHandler.FORMTABLESELECTOR.getHandler(), handler)) {
-                JSONObject config = componentObj.getJSONObject("config");
-                JSONArray dataConfigList = config.getJSONArray("dataConfig");
-                for (int j = 0; j < dataConfigList.size(); j++) {
-                    JSONObject dataObj = dataConfigList.getJSONObject(j);
-                    resultList.add(createFormAttribute(dataObj));
-                }
-            } else if (Objects.equals(FormHandler.FORMSUBASSEMBLY.getHandler(), handler)) {
-                JSONObject formData = componentObj.getJSONObject("formData");
+            }
+        } else if (Objects.equals(FormHandler.FORMTABLESELECTOR.getHandler(), handler)) {
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            JSONObject config = componentObj.getJSONObject("config");
+            JSONArray dataConfigList = config.getJSONArray("dataConfig");
+            for (int i = 0; i < dataConfigList.size(); i++) {
+                JSONObject dataObj = dataConfigList.getJSONObject(i);
+                resultList.addAll(getFormAttributeList(dataObj, parent2));
+            }
+        } else if (Objects.equals(FormHandler.FORMSUBASSEMBLY.getHandler(), handler)) {
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            JSONObject formData = componentObj.getJSONObject("formData");
+            if (MapUtils.isNotEmpty(formData)) {
                 JSONObject formConfig = formData.getJSONObject("formConfig");
-                JSONArray tableList2 = formConfig.getJSONArray("tableList");
-                resultList.addAll(getAllFormAttributeList(tableList2));
-            } else if (Objects.equals(FormHandler.FORMTAB.getHandler(), handler) || Objects.equals(FormHandler.FORMCOLLAPSE.getHandler(), handler)) {
-                JSONArray componentArray = componentObj.getJSONArray("component");
-                if (CollectionUtils.isNotEmpty(componentArray)) {
-                    for (int j = 0; j < componentArray.size(); j++) {
-                        JSONObject component = componentArray.getJSONObject(j);
-                        if (MapUtils.isNotEmpty(component)) {
-                            FormAttributeVo formAttribute = createFormAttribute(component);
-                            if (formAttribute != null) {
-                                resultList.add(formAttribute);
-                            }
-                        }
+                if (MapUtils.isNotEmpty(formConfig)) {
+                    JSONArray tableList2 = formConfig.getJSONArray("tableList");
+                    resultList.addAll(getAllFormAttributeList(tableList2, parent2));
+                }
+            }
+        } else if (Objects.equals(FormHandler.FORMTAB.getHandler(), handler) || Objects.equals(FormHandler.FORMCOLLAPSE.getHandler(), handler)) {
+            JSONArray componentArray = componentObj.getJSONArray("component");
+            if (CollectionUtils.isNotEmpty(componentArray)) {
+                FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+                for (int i = 0; i < componentArray.size(); i++) {
+                    JSONObject component = componentArray.getJSONObject(i);
+                    if (MapUtils.isNotEmpty(component)) {
+                        resultList.addAll(getFormAttributeList(component, parent2));
                     }
                 }
             }
@@ -824,7 +867,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return resultList;
     }
 
-    private FormAttributeVo createFormAttribute(JSONObject componentObj) {
+    private FormAttributeVo createFormAttribute(JSONObject componentObj, FormAttributeParentVo parent) {
         String uuid = componentObj.getString("uuid");
         if (StringUtils.isBlank(uuid)) {
             return null;
@@ -848,6 +891,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             formAttributeVo.setData(defaultValue);
             formAttributeVo.setConfig(config.toJSONString());
         }
+        formAttributeVo.setParent(parent);
         return formAttributeVo;
     }
 }

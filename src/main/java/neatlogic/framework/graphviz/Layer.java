@@ -82,7 +82,7 @@ public class Layer {
         private String tooltip;
         private String fontcolor;
 
-        private String fontName = "PingFangSC-Regular";
+        private String fontName = "Times";
 
         public Builder withFontName(String _fontname) {
             this.fontName = _fontname;

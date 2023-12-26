@@ -50,6 +50,7 @@ public class Graphviz {
         str.append("ranksep = 1.1;\n");
         str.append("nodesep=.7;\n");
         str.append("size = \"11,8\";\n");
+        str.append("edge [arrowhead=\"vee\"];\n");
         str.append("rankdir=TB;");
         str.append("newrank=true;");//关键属性，分层和cluster同时生效
         if (layout.getSupportLayer()) {

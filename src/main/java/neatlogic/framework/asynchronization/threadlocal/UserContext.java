@@ -16,13 +16,13 @@
 
 package neatlogic.framework.asynchronization.threadlocal;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.user.NoUserException;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,7 +84,7 @@ public class UserContext implements Serializable {
         context.setTimezone(timezone);
         List<String> roleUuidList = new ArrayList<>();
         JSONArray roleList = jsonObj.getJSONArray("rolelist");
-        if (roleList != null && roleList.size() > 0) {
+        if (roleList != null && !roleList.isEmpty()) {
             for (int i = 0; i < roleList.size(); i++) {
                 roleUuidList.add(roleList.getString(i));
             }

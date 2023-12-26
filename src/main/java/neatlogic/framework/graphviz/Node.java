@@ -99,7 +99,7 @@ public class Node {
         private String image;
         private String icon;
         private int segment;
-        private String fontname = "PingFangSC-Regular";
+        private String fontname = "Times";
 
 
         public Builder(String _id) {

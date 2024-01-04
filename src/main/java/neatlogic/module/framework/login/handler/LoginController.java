@@ -98,6 +98,8 @@ public class LoginController {
         JSONObject returnObj = new JSONObject();
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
+        //初始化request上下文
+        RequestContext.init(request, request.getRequestURI(), response);
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
@@ -166,7 +168,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid(), request.getHeader("Env"));
+                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -175,8 +177,6 @@ public class LoginController {
             }
 
             if (checkUserVo != null) {
-                //初始化request上下文
-                RequestContext.init(request, request.getRequestURI(), response);
                 checkUserVo.setTenant(tenant);
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 String AuthenticationInfoStr = null;

@@ -43,9 +43,9 @@ public class RoleVo extends BasePageVo implements Serializable {
     @EntityField(name = "角色描述",
             type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "环境",
+    @EntityField(name = "生效规则",
             type = ApiParamType.STRING)
-    private String env;
+    private String rule;
     private int userCount;
     private int teamCount;
     private String authGroup;
@@ -178,11 +178,11 @@ public class RoleVo extends BasePageVo implements Serializable {
         this.teamList = teamList;
     }
 
-    public String getEnv() {
-        return env;
+    public String getRule() {
+        return rule;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public void setRule(String rule) {
+        this.rule = rule;
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
  * @author linbq
  * @since 2021/8/2 20:19
  **/
-public class AuthenticationInfoVo {
+public class AuthenticationInfoVo{
     private String userUuid;
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
@@ -90,6 +90,4 @@ public class AuthenticationInfoVo {
     public List<String> getRoleUuidList() {
         return roleUuidList;
     }
-
-    
 }

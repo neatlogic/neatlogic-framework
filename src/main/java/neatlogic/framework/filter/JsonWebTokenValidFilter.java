@@ -64,8 +64,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
         boolean isUnExpired = false;
@@ -154,7 +153,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(),ex.getMessage());
+                returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(), ex.getMessage());
             } catch (Exception e) {
                 logger.error(ex.getMessage(), ex);
                 throw new RuntimeException(e);
@@ -228,10 +227,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) throws CloneNotSupportedException {
         JwtVo jwt = userVo.getJwtVo();
-        AuthenticationInfoVo authenticationInfo = (AuthenticationInfoVo) UserSessionCache.getItem(jwt.getTokenHash());
-        if (authenticationInfo == null || authenticationInfo.getUserUuid() == null) {
+        Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
+        if (authenticationInfoStr == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
             if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
                 Date visitTime = userSessionVo.getSessionTime();
@@ -240,15 +239,16 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
                     userSessionMapper.updateUserSession(jwt.getTokenHash());
-                    authenticationInfo = userSessionVo.getAuthInfo();
-                    UserSessionCache.addItem(jwt.getTokenHash(), authenticationInfo);
+                    AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
+                    UserSessionCache.addItem(jwt.getTokenHash(), userSessionVo.getAuthInfoStr());
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return true;
                 }
                 userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
         } else {
-            UserContext.init(userVo, authenticationInfo, timezone, request, response);
+            AuthenticationInfoVo authenticationInfoVo = JSONObject.toJavaObject(JSONObject.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return true;
         }
         return false;

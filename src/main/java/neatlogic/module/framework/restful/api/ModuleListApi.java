@@ -70,8 +70,7 @@ public class ModuleListApi extends PrivateApiComponentBase {
         Set<String> authGroupSet = new HashSet<String>();
         //获取用户权限
         AuthenticationInfoVo authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
-        String env = UserContext.get().getEnv();
-        List<UserAuthVo> userAuthList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo, env);
+        List<UserAuthVo> userAuthList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
         for (UserAuthVo userAuth : userAuthList) {
             authGroupSet.add(userAuth.getAuthGroup());
         }

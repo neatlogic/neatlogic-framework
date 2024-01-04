@@ -127,7 +127,7 @@ limitations under the License.
                `uuid`,
                `name`,
                `description`,
-               `env`
+               `rule`
         FROM `role`
         WHERE `uuid` = #{value}
     </select>
@@ -147,7 +147,20 @@ limitations under the License.
         `id`,
         `uuid`,
         `name`,
-        `description`
+        `description`,
+        `rule`
+        FROM `role`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getRoleRuleByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `uuid`,
+        `rule`
         FROM `role`
         WHERE `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
@@ -211,9 +224,9 @@ limitations under the License.
     </select>
 
     <select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
-        select `role_uuid`
-        from `user_role`
-        where `user_uuid` = #{value}
+        select ur.`role_uuid`
+        from `user_role` ur join `role` r on ur.`role_uuid` = r.`uuid`
+        where ur.`user_uuid` = #{value}
     </select>
 
     <select id="getRoleTeamListByRoleUuid" resultType="neatlogic.framework.dto.RoleTeamVo">
@@ -256,33 +269,23 @@ limitations under the License.
         </foreach>
     </select>
 
-    <select id="getRoleUuidListByTeamUuidListAndCheckedChildrenAndEnv" resultType="java.lang.String" useCache="false">
-        SELECT tr.`role_uuid` FROM `team_role` tr
-        <if test="env != null and env != ''">
-            left join `role` r on r.uuid= tr.role_uuid
-        </if>
+    <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
+        select tr.`role_uuid`
+        FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
         WHERE tr.`team_uuid` IN
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}
         </foreach>
         AND tr.`checked_children` = #{checkedChildren}
-        <if test="env != null and env != ''">
-            and (r.`env` = #{env} or r.`env` is null )
-        </if>
     </select>
 
-    <select id="getRoleUuidListByTeamUuidListAndEnv" resultType="java.lang.String" useCache="false">
-        SELECT tr.`role_uuid` FROM `team_role` tr
-        <if test="env != null and env != ''">
-            left join `role` r on r.uuid= tr.role_uuid
-        </if>
+    <select id="getRoleUuidListByTeamUuidList" resultType="java.lang.String" useCache="false">
+        select tr.`role_uuid`
+        FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
         WHERE tr.`team_uuid` IN
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}
         </foreach>
-        <if test="env != null and env != ''">
-            and (r.`env` = #{env} or r.`env` is null )
-        </if>
     </select>
 
     <resultMap id="roleTeamMap" type="neatlogic.framework.dto.RoleVo">
@@ -296,7 +299,7 @@ limitations under the License.
         </collection>
     </resultMap>
 
-    <select id="getRoleListByTeamUuidList" resultMap="roleTeamMap">
+    <select id="getRoleListWithTeamByTeamUuidList" resultMap="roleTeamMap">
         SELECT t.uuid as parentTeamUuid,
         t.`name` as parentTeamName,
         tr.role_uuid as roleUuid,
@@ -357,22 +360,10 @@ limitations under the License.
             #{item}
         </foreach>
     </select>
-    <select id="getRoleUuidListByUserUuidAndEnv" resultType="java.lang.String">
-        select ur.`role_uuid`
-        from `user_role` ur
-        <if test="env != null and env != ''">
-            left join `role` r on r.uuid= ur.role_uuid
-        </if>
-        where ur.`user_uuid` = #{userUuid}
-        <if test="env != null and env != ''">
-            and (r.`env` = #{env} or r.`env` is null )
-        </if>
-    </select>
-
 
     <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">
-        INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `env`)
-        VALUES (#{id}, #{uuid}, #{name}, #{description}, #{env})
+        INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `rule`)
+        VALUES (#{id}, #{uuid}, #{name}, #{description}, #{rule})
     </insert>
 
     <insert id="replaceRoleUser" parameterType="neatlogic.framework.dto.RoleUserVo">
@@ -405,7 +396,7 @@ limitations under the License.
         UPDATE `role`
         SET `name`        = #{name},
             `description` = #{description},
-            `env`         = #{env}
+            `rule`         = #{rule}
         WHERE `uuid` = #{uuid}
     </update>
 

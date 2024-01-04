@@ -6,10 +6,12 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.Md5Util;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.Objects;
 
 public class JwtVo {
@@ -26,6 +28,9 @@ public class JwtVo {
     @EntityField(name = "token哈希", type = ApiParamType.STRING)
     private String tokenHash;
 
+    @EntityField(name = "登录认证 请求headers", type = ApiParamType.STRING)
+    JSONObject headers;
+
     public JwtVo() {
 
     }
@@ -39,10 +44,17 @@ public class JwtVo {
         jwtBodyObj.put("isSuperAdmin", checkUserVo.getIsSuperAdmin());
         jwtBodyObj.put("createTime", tokenCreateTime);
         if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
-            String env = RequestContext.get().getRequest().getHeader("Env");
-            if (StringUtils.isNotBlank(env)) {
-                jwtBodyObj.put("env", env);
+            JSONObject headers = new JSONObject();
+            Enumeration<String> envNames = RequestContext.get().getRequest().getHeaderNames();
+            while (envNames != null && envNames.hasMoreElements()) {
+                String key = envNames.nextElement();
+                String value = RequestContext.get().getRequest().getHeader(key);
+                headers.put(key, value);
             }
+            if (MapUtils.isNotEmpty(headers)) {
+                jwtBodyObj.put("headers", headers.toString());
+            }
+            this.headers = headers;
         }
         this.setTokenCreateTime(tokenCreateTime);
         jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
@@ -107,18 +119,12 @@ public class JwtVo {
             JSONObject tokenJson = new JSONObject();
             tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
             tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
-            if (jwtBodyObj.containsKey("env")) {
-                tokenJson.put("env", jwtBodyObj.getString("env"));
+            if (jwtBodyObj.containsKey("headers")) {
+                tokenJson.put("headers", jwtBodyObj.getString("headers"));
             }
             tokenHash = Md5Util.encryptMD5(tokenJson.toJSONString());
         }
         return tokenHash;
-    }
-
-    public String getEnv() {
-        String jwtBody = new String(Base64.getUrlDecoder().decode(getJwtbody()), StandardCharsets.UTF_8);
-        JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
-        return jwtBodyObj.getString("env");
     }
 
     public void setValidTokenCreateTime(boolean validTokenCreateTime) {
@@ -130,5 +136,15 @@ public class JwtVo {
             return true;
         }
         return Objects.equals(userSessionTokenCreateTime, getTokenCreateTime());
+    }
+
+
+    public JSONObject getHeaders() {
+        if (MapUtils.isEmpty(headers) && StringUtils.isNotBlank(jwtbody)) {
+            String jwtBody = new String(Base64.getUrlDecoder().decode(jwtbody), StandardCharsets.UTF_8);
+            JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+            return jwtBodyObj.getJSONObject("headers");
+        }
+        return headers;
     }
 }

@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dto.AuthenticationInfoVo;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.user.NoUserException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -52,7 +53,7 @@ public class UserContext implements Serializable {
 
     private String tokenHash;
 
-    private String env = null;
+    private JwtVo jwtVo;
 
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
@@ -66,6 +67,7 @@ public class UserContext implements Serializable {
             // context.setRequest(_userContext.getRequest());
             // context.setResponse(_userContext.getResponse());
             context.setAuthenticationInfoVo(_userContext.getAuthenticationInfoVo());
+            context.setJwtVo(_userContext.getJwtVo());
             context.setIsSuperAdmin(_userContext.getIsSuperAdmin());
         }
         instance.set(context);
@@ -108,8 +110,8 @@ public class UserContext implements Serializable {
         context.setAuthenticationInfoVo(authenticationInfoVo);
         if (userVo.getJwtVo() != null) {
             context.setTokenHash(userVo.getJwtVo().getTokenHash());
-            context.setEnv(userVo.getJwtVo().getEnv());
         }
+        context.setJwtVo(userVo.getJwtVo());
         instance.set(context);
         return context;
     }
@@ -280,11 +282,11 @@ public class UserContext implements Serializable {
         this.tokenHash = tokenHash;
     }
 
-    public String getEnv() {
-        return env;
+    public JwtVo getJwtVo() {
+        return jwtVo;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public void setJwtVo(JwtVo jwtVo) {
+        this.jwtVo = jwtVo;
     }
 }

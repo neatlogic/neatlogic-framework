@@ -35,8 +35,6 @@ public interface RoleMapper {
 
     List<String> getRoleUuidListByUserUuid(String userUuid);
 
-    List<String> getRoleUuidListByUserUuidAndEnv(@Param("userUuid") String userUuid, @Param("env") String env);
-
     List<ValueTextVo> searchRoleForSelect(RoleVo roleVo);
 
     List<RoleAuthVo> searchRoleAuthByRoleUuid(String roleUuid);
@@ -54,6 +52,8 @@ public interface RoleMapper {
     RoleVo getRoleSimpleInfoByUuid(String uuid);
 
     List<RoleVo> getRoleByUuidList(List<String> uuidList);
+
+    List<RoleVo> getRoleRuleByUuidList(List<String> uuidList);
 
     List<String> getRoleUuidListByUuidList(List<String> uuidList);
 
@@ -73,9 +73,9 @@ public interface RoleMapper {
 
     List<RoleUserVo> getRoleUserListByRoleUuidList(@Param("list") List<String> roleList);
 
-    List<String> getRoleUuidListByTeamUuidListAndEnv(@Param("teamUuidList") List<String> teamUuidList, @Param("env") String env);
+    List<String> getRoleUuidListByTeamUuidList(@Param("teamUuidList") List<String> teamUuidList);
 
-    List<String> getRoleUuidListByTeamUuidListAndCheckedChildrenAndEnv(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren, @Param("env") String env);
+    List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
 
     /**
      * 根据team的uuid获取当前组的roleList
@@ -83,7 +83,7 @@ public interface RoleMapper {
      * @param uuidList
      * @return
      */
-    List<RoleVo> getRoleListByTeamUuidList(List<String> uuidList);
+    List<RoleVo> getRoleListWithTeamByTeamUuidList(List<String> uuidList);
 
     /**
      * 根据team的左右编码查询父分组的并且可穿透的roleList

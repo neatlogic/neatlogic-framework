@@ -95,6 +95,26 @@ public enum SystemUser {
         return userVo;
     }
 
+    public UserVo getUserVo(Boolean isNeedJwt) {
+        UserVo userVo = new UserVo();
+        userVo.setUuid(userUuid);
+        userVo.setUserId(userId);
+        userVo.setUserName(getUserName());
+        userVo.setTenant(TenantContext.get() != null?TenantContext.get().getTenantUuid():null);
+        userVo.setIsDelete(0);
+        userVo.setIsActive(1);
+        if(isNeedJwt) {
+            try {
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(userVo);
+                String authorization = "Bearer_" + jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign();
+                userVo.setAuthorization(authorization);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        return userVo;
+    }
+
     public AuthenticationInfoVo getAuthenticationInfoVo() {
         return authenticationInfoVo;
     }

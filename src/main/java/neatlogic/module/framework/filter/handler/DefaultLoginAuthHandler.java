@@ -16,12 +16,11 @@ limitations under the License.
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -113,9 +112,6 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             userVo.setUserName(jwtBodyObj.getString("username"));
                             userVo.setIsSuperAdmin(jwtBodyObj.getBoolean("isSuperAdmin"));
                             userVo.getJwtVo().setTokenCreateTime(jwtBodyObj.getLong("createTime"));
-                            if(jwtBodyObj.getJSONArray("rolelist") != null) {
-                                userVo.setRoleUuidList(JSONArray.parseArray(jwtBodyObj.getJSONArray("rolelist").toJSONString(),String.class));
-                            }
                             return userVo;
                         }
                     } catch (NoSuchAlgorithmException | InvalidKeyException e) {

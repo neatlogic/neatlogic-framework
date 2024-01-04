@@ -165,63 +165,21 @@ limitations under the License.
         </collection>
     </resultMap>
 
-    <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+    <select id="getUserByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo" useCache="false">
         SELECT a.`id`,
         a.`uuid`,
         a.`user_id` AS userId,
         a.`user_name` AS userName,
         a.`email`,
         a.`phone`,
-        e.`password`,
         a.`pinyin`,
         a.`is_active` AS isActive,
         a.`is_delete` AS isDelete,
         a.`user_info` AS userInfo,
         a.`vip_level` AS vipLevel,
-        b.`role_uuid` AS roleUuid,
-        r.`name` AS roleName,
-        r.`description`,
-        c.`team_uuid` AS teamUuid,
-        d.`name` AS teamName,
-        d.`upward_name_path` AS upwardNamePath,
         a.`is_super_admin` as isSuperAdmin
         FROM `user` a
-        LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-        LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
-        LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
-        LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
-        LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
         WHERE a.`uuid` = #{uuid}
-    </select>
-
-    <select id="getUserByUuidAndEnv" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
-        SELECT a.`id`,
-               a.`uuid`,
-               a.`user_id`          AS userId,
-               a.`user_name`        AS userName,
-               a.`email`,
-               a.`phone`,
-               e.`password`,
-               a.`pinyin`,
-               a.`is_active`        AS isActive,
-               a.`is_delete`        AS isDelete,
-               a.`user_info`        AS userInfo,
-               a.`vip_level`        AS vipLevel,
-               r.`uuid`             AS roleUuid,
-               r.`name`             AS roleName,
-               r.`description`,
-               c.`team_uuid`        AS teamUuid,
-               d.`name`             AS teamName,
-               d.`upward_name_path` AS upwardNamePath,
-               a.`is_super_admin`   as isSuperAdmin
-        FROM `user` a
-                 LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                 LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
-                 LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
-                 LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid` AND (r.`env` = #{env} or r.`env` is null)
-                 LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
-        WHERE a.`uuid` = #{uuid}
-
     </select>
 
     <select id="getUserById" parameterType="java.lang.Long" resultMap="userInfoMap" useCache="false">
@@ -508,9 +466,6 @@ limitations under the License.
             ra.`auth_group` AS authGroup,
             ra.`auth`
             FROM `role_authority` ra
-            <if test="env != null and env != ''">
-                JOIN `role` r on ra.role_uuid = r.uuid AND (r.`env` = #{env} or r.`env` is null)
-            </if>
             WHERE ra.`role_uuid` in
             <foreach collection="authenticationInfoVo.roleUuidList" open="(" close=")" separator="," item="roleUuid">
                 #{roleUuid}

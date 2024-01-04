@@ -99,7 +99,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
             JwtVo jwtVo = buildJwt(userVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid(), request.getHeader("Env"));
+            AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
             if(isValidTokenCreateTime()) {
                 userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
             }else{
@@ -142,6 +142,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         bos.close();
         jwtVo.setCc(cc);
         jwtVo.setJwtsign(jwtsign);
+        checkUserVo.setJwtVo(jwtVo);
         return jwtVo;
     }
 

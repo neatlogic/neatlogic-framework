@@ -9,12 +9,13 @@ import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.Objects;
 
-public class JwtVo {
+public class JwtVo implements Serializable {
     private String cc;
     private String jwthead;
     private String jwtbody;

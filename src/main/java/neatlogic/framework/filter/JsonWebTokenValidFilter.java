@@ -229,6 +229,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      */
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) throws CloneNotSupportedException {
         JwtVo jwt = userVo.getJwtVo();
+        UserSessionCache.removeItem(jwt.getTokenHash());
         Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
         if (authenticationInfoStr == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());

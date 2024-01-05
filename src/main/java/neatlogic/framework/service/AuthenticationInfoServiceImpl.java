@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author linbq
@@ -44,6 +46,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     private TeamMapper teamMapper;
     private RoleMapper roleMapper;
     static Logger logger = LoggerFactory.getLogger(AuthenticationInfoServiceImpl.class);
+    Pattern pattern = Pattern.compile("\\$\\{DATA\\.(.*?)}");
 
     @Resource
     public void setTeamMapper(TeamMapper _teamMapper) {
@@ -69,14 +72,15 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole) {
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         List<String> roleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
+        Set<String> headerSet = new HashSet<>(); //使用到的header
         Set<String> roleUuidSet = new HashSet<>(roleUuidList);
         getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet);
         if (isRuleRole && CollectionUtils.isNotEmpty(roleUuidSet)) {
-            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet));
+            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet);
         } else {
             roleUuidList = new ArrayList<>(roleUuidSet);
         }
-        return new AuthenticationInfoVo(userUuid, teamUuidList, roleUuidList);
+        return new AuthenticationInfoVo(userUuid, teamUuidList, roleUuidList, headerSet);
     }
 
     /**
@@ -118,6 +122,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     public AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList) {
         Set<String> teamUuidSet = new HashSet<>();
         Set<String> roleUuidSet = new HashSet<>();
+        Set<String> headerSet = new HashSet<>(); //使用到的header
         for (String userUuid : userUuidList) {
             List<String> userTeamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
             teamUuidSet.addAll(userTeamUuidList);
@@ -127,16 +132,17 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         }
         List<String> roleUuidList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(roleUuidSet)) {
-            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet));
+            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet);
         }
-        return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), roleUuidList);
+        return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), roleUuidList, headerSet);
     }
 
     /**
      * 去掉不满足规则的角色
+     *
      * @param roleUuidList 角色
      */
-    private List<String> removeInValidRoleUuidList(List<String> roleUuidList) {
+    private List<String> removeInValidRoleUuidList(List<String> roleUuidList, Set<String> headerSet) {
         JSONObject headers = new JSONObject();
         List<String> validRoleUuidList = new ArrayList<>();
         if (UserContext.get() != null) {
@@ -155,6 +161,10 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         for (RoleVo ro : roleVos) {
             String rule = ro.getRule();
             if (StringUtils.isNotBlank(rule)) {
+                Matcher matcher = pattern.matcher(rule);
+                while (matcher.find()) {
+                    headerSet.add(matcher.group(1));
+                }
                 try {
                     rule = FreemarkerUtil.transform(headers, rule);
                     if (RunScriptUtil.runScript(rule)) {

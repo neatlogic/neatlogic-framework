@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class UserContext implements Serializable {
@@ -91,7 +92,7 @@ public class UserContext implements Serializable {
                 roleUuidList.add(roleList.getString(i));
             }
         }
-        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList));
+        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>()));
         instance.set(context);
         return context;
     }
@@ -235,7 +236,7 @@ public class UserContext implements Serializable {
 
     public AuthenticationInfoVo getAuthenticationInfoVo() {
         if (authenticationInfoVo == null) {
-            authenticationInfoVo = new AuthenticationInfoVo(userUuid, new ArrayList<>(), new ArrayList<>());
+            authenticationInfoVo = new AuthenticationInfoVo(userUuid);
         }
         return authenticationInfoVo;
     }

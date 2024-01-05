@@ -52,6 +52,7 @@ import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,7 +150,7 @@ public class LoginController {
                 }
                 if (password.equals(maintenancePassword)) {
                     checkUserVo = MaintenanceMode.getMaintenanceUser();
-                    authenticationInfoVo = new AuthenticationInfoVo(checkUserVo.getUuid(), new ArrayList<>(), new ArrayList<>());
+                    authenticationInfoVo = new AuthenticationInfoVo(checkUserVo.getUuid());
                 }
             } else {
                 if (Config.ENABLE_NO_SECRET()) {
@@ -178,10 +179,13 @@ public class LoginController {
 
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo);
                 String AuthenticationInfoStr = null;
                 if (authenticationInfoVo != null) {
-                    AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                    if(CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())){
+                        authenticationInfoVo.setHeaderSet(null);
+                        AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                    }
                 }
                 // 保存 user 登录访问时间
                 userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);

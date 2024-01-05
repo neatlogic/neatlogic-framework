@@ -29,6 +29,7 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.service.AuthenticationInfoService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,15 +98,22 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         //如果认证cookie为null,说明不是通过登录页登录，而是通过第三方认证接口认证。第一次认证通过后需构建并设置response 认证 cookie
         if (userVo != null && StringUtils.isBlank(userVo.getCookieAuthorization())) {
             logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
-            JwtVo jwtVo = buildJwt(userVo);
-            setResponseAuthCookie(response, request, tenant, jwtVo);
             AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-            if(isValidTokenCreateTime()) {
-                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
-            }else{
+            JwtVo jwtVo = buildJwt(userVo, authenticationInfoVo);
+            setResponseAuthCookie(response, request, tenant, jwtVo);
+            String AuthenticationInfoStr = null;
+            if (authenticationInfoVo != null) {
+                if (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())) {
+                    authenticationInfoVo.setHeaderSet(null);
+                    AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                }
+            }
+            if (isValidTokenCreateTime()) {
+                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
+            } else {
                 jwtVo.setValidTokenCreateTime(isValidTokenCreateTime());
-                if(UserSessionCache.getItem(jwtVo.getTokenHash()) == null) {
-                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), JSONObject.toJSONString(authenticationInfoVo));
+                if (UserSessionCache.getItem(jwtVo.getTokenHash()) == null) {
+                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
                 }
             }
             userVo.setJwtVo(jwtVo);
@@ -122,9 +130,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @return jwt对象
      * @throws Exception 异常
      */
-    public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
+    public static JwtVo buildJwt(UserVo checkUserVo, AuthenticationInfoVo authenticationInfoVo) throws Exception {
         Long tokenCreateTime = System.currentTimeMillis();
-        JwtVo jwtVo = new JwtVo(checkUserVo,tokenCreateTime);
+        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo);
         SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
         Mac mac;
         mac = Mac.getInstance("HmacSHA1");
@@ -144,6 +152,17 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         jwtVo.setJwtsign(jwtsign);
         checkUserVo.setJwtVo(jwtVo);
         return jwtVo;
+    }
+
+    /**
+     * 生成jwt对象
+     *
+     * @param checkUserVo 用户
+     * @return jwt对象
+     * @throws Exception 异常
+     */
+    public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
+        return buildJwt(checkUserVo, new AuthenticationInfoVo());
     }
 
     /**
@@ -229,7 +248,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     @Override
-    public boolean isValidTokenCreateTime(){
+    public boolean isValidTokenCreateTime() {
         return true;
     }
 }

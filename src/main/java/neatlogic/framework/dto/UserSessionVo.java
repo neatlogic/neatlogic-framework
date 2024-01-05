@@ -47,8 +47,12 @@ public class UserSessionVo {
     }
 
     public AuthenticationInfoVo getAuthInfo() {
-        if (authInfo == null && StringUtils.isNotBlank(authInfoStr)) {
-            authInfo = JSONObject.toJavaObject(JSONObject.parseObject(authInfoStr), AuthenticationInfoVo.class);
+        if (authInfo == null) {
+            if (StringUtils.isNotBlank(authInfoStr)) {
+                authInfo = JSONObject.toJavaObject(JSONObject.parseObject(authInfoStr), AuthenticationInfoVo.class);
+            }else{
+                authInfo = new AuthenticationInfoVo(userUuid);
+            }
         }
         return authInfo;
     }

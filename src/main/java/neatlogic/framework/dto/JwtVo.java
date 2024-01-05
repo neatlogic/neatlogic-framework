@@ -6,13 +6,13 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.Md5Util;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Enumeration;
 import java.util.Objects;
 
 public class JwtVo implements Serializable {
@@ -36,7 +36,7 @@ public class JwtVo implements Serializable {
 
     }
 
-    public JwtVo(UserVo checkUserVo, Long tokenCreateTime) {
+    public JwtVo(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo) {
         JSONObject jwtBodyObj = new JSONObject();
         jwtBodyObj.put("useruuid", checkUserVo.getUuid());
         jwtBodyObj.put("userid", checkUserVo.getUserId());
@@ -46,11 +46,13 @@ public class JwtVo implements Serializable {
         jwtBodyObj.put("createTime", tokenCreateTime);
         if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
             JSONObject headers = new JSONObject();
-            Enumeration<String> envNames = RequestContext.get().getRequest().getHeaderNames();
-            while (envNames != null && envNames.hasMoreElements()) {
-                String key = envNames.nextElement();
-                String value = RequestContext.get().getRequest().getHeader(key);
-                headers.put(key, value);
+            if (CollectionUtils.isNotEmpty(authenticationInfoVo.getHeaderSet())) {
+                for (String header : authenticationInfoVo.getHeaderSet()) {
+                    String value = RequestContext.get().getRequest().getHeader(header);
+                    if(value != null) {
+                        headers.put(header, value);
+                    }
+                }
             }
             if (MapUtils.isNotEmpty(headers)) {
                 jwtBodyObj.put("headers", headers.toString());

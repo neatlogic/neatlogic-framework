@@ -27,7 +27,6 @@ import neatlogic.framework.util.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -51,7 +50,7 @@ public enum SystemUser {
         this.userId = userId;
         this.userUuid = userUuid;
         this.userName = userName;
-        this.authenticationInfoVo = new AuthenticationInfoVo(userUuid, new ArrayList<>(), new ArrayList<>());
+        this.authenticationInfoVo = new AuthenticationInfoVo(userUuid);
     }
 
     public String getUserId() {
@@ -82,7 +81,7 @@ public enum SystemUser {
         userVo.setUuid(userUuid);
         userVo.setUserId(userId);
         userVo.setUserName(getUserName());
-        userVo.setTenant(TenantContext.get() != null?TenantContext.get().getTenantUuid():null);
+        userVo.setTenant(TenantContext.get() != null ? TenantContext.get().getTenantUuid() : null);
         userVo.setIsDelete(0);
         userVo.setIsActive(1);
         try {
@@ -100,10 +99,10 @@ public enum SystemUser {
         userVo.setUuid(userUuid);
         userVo.setUserId(userId);
         userVo.setUserName(getUserName());
-        userVo.setTenant(TenantContext.get() != null?TenantContext.get().getTenantUuid():null);
+        userVo.setTenant(TenantContext.get() != null ? TenantContext.get().getTenantUuid() : null);
         userVo.setIsDelete(0);
         userVo.setIsActive(1);
-        if(isNeedJwt) {
+        if (isNeedJwt) {
             try {
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(userVo);
                 String authorization = "Bearer_" + jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign();
@@ -128,7 +127,7 @@ public enum SystemUser {
         return "";
     }
 
-    public static UserVo getUserVoByUser(String user){
+    public static UserVo getUserVoByUser(String user) {
         for (SystemUser systemUser : values()) {
             if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
                 return systemUser.getUserVo();
@@ -137,9 +136,9 @@ public enum SystemUser {
         return null;
     }
 
-    public static String getUserTokenByUser(String user){
+    public static String getUserTokenByUser(String user) {
         for (SystemUser systemUser : values()) {
-            if (systemUser.getUserUuid().equals(user)|| systemUser.getUserId().equals(user)) {
+            if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
                 return systemUser.getToken();
             }
         }

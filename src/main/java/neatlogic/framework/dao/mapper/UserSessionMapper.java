@@ -60,4 +60,6 @@ public interface UserSessionMapper {
 
     void deleteUserSessionByUserUuid(String userUuid);
 
+    int deleteUserSessionByExpireTime(Long expireTime);
+
 }

@@ -179,8 +179,10 @@ public class AuthActionChecker {
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
                     AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
-                    userAuthList.add(new UserAuthVo(auth));
-                    getUserAuthListByAuth(auth, userAuthList);
+                    if (auth != null) {
+                        userAuthList.add(new UserAuthVo(auth));
+                        getUserAuthListByAuth(auth, userAuthList);
+                    }
                 }
             }
         }

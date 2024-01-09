@@ -1,57 +1,71 @@
 package neatlogic.framework.util;
 
 import neatlogic.framework.common.config.LocalConfig;
+import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
-import org.apache.commons.lang3.StringUtils;
+import neatlogic.framework.exception.module.ModuleInitRuntimeException;
+import neatlogic.framework.store.mysql.DatasourceManager;
+import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class JdbcUtil {
     static Logger logger = LoggerFactory.getLogger(JdbcUtil.class);
-    private static final String CONFIG_FILE = "config.properties";
+    private static final Map<Object, Object> datasourceMap = new HashMap<>();
     private Properties properties;
 
-    private static final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    private static final NeatLogicBasicDataSource neatlogicDatasource = new NeatLogicBasicDataSource();
 
     static {
-        dataSource.setDriverClassName(LocalConfig.dbConfigMap.get("db.driverClassName").toString());
-        dataSource.setUrl(LocalConfig.dbConfigMap.get("db.url").toString());
-        dataSource.setUsername(LocalConfig.dbConfigMap.get("db.username").toString());
-        dataSource.setPassword(LocalConfig.dbConfigMap.get("db.password").toString());
+
+        String url = LocalConfig.dbConfigMap.get("db.url").toString();
+        neatlogicDatasource.setJdbcUrl(url);
+        neatlogicDatasource.setDriverClassName(LocalConfig.dbConfigMap.get("db.driverClassName").toString());
+        neatlogicDatasource.setUsername(LocalConfig.dbConfigMap.get("db.username").toString());
+        neatlogicDatasource.setPassword(LocalConfig.dbConfigMap.get("db.password").toString());
+        neatlogicDatasource.setPoolName("HikariCP_neatlogic");
+        DatasourceManager.setDataSourceConfig(neatlogicDatasource);
     }
 
     public static Connection getNeatlogicConnection() {
         Connection connection;
         try {
-            connection = dataSource.getConnection();
+            connection = neatlogicDatasource.getConnection();
         } catch (Exception exception) {
-            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb",LocalConfig.getPropertiesFrom()),exception);
+            throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb", LocalConfig.getPropertiesFrom()), exception);
         }
         return connection;
     }
 
     public static Connection getNeatlogicTenantConnection(TenantVo tenantVo, boolean isData) {
         Connection connection;
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(tenantVo.getDatasource().getDriver());
-        String url = tenantVo.getDatasource().getUrl();
-        url = url.replace("{host}", tenantVo.getDatasource().getHost());
-        url = url.replace("{port}", tenantVo.getDatasource().getPort().toString());
-        url = url.replace("{dbname}", "neatlogic_" + tenantVo.getUuid() + (isData ? "_data" : StringUtils.EMPTY));
-        dataSource.setUrl(url);
-        dataSource.setUsername(tenantVo.getDatasource().getUsername());
-        dataSource.setPassword(tenantVo.getDatasource().getPasswordPlain());
+        NeatLogicBasicDataSource tenantDataSource;
+        if (datasourceMap.containsKey(tenantVo.getUuid())) {
+            tenantDataSource = (NeatLogicBasicDataSource) datasourceMap.get(tenantVo.getUuid());
+        } else {
+            DatasourceVo datasource = new DatasourceVo();
+            datasource.setHost(tenantVo.getDatasource().getHost());
+            datasource.setTenantUuid(tenantVo.getUuid());
+            datasource.setPort(tenantVo.getDatasource().getPort());
+            datasource.setDriver(tenantVo.getDatasource().getDriver());
+            datasource.setUrl(tenantVo.getDatasource().getUrl());
+            datasource.setUsername(tenantVo.getDatasource().getUsername());
+            datasource.setPasswordPlain(tenantVo.getDatasource().getPasswordPlain());
+            tenantDataSource = DatasourceManager.getDataSource(datasource, isData);
+            datasourceMap.put(tenantVo.getUuid(), tenantDataSource);
+        }
         try {
-            connection = dataSource.getConnection();
+            connection = tenantDataSource.getConnection();
         } catch (Exception exception) {
-            throw new RuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenantVo.getUuid()));
+            throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenantVo.getUuid()));
         }
         return connection;
     }
@@ -86,4 +100,5 @@ public class JdbcUtil {
             }
         }
     }
+
 }

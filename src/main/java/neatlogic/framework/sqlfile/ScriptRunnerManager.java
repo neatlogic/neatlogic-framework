@@ -21,6 +21,7 @@ import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.ChangelogAuditVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
 import neatlogic.framework.dto.TenantVo;
+import neatlogic.framework.exception.module.ModuleInitRuntimeException;
 import neatlogic.framework.store.mysql.DatasourceManager;
 import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import neatlogic.framework.util.I18nUtils;
@@ -220,7 +221,7 @@ public class ScriptRunnerManager {
                         if (StringUtils.isNotBlank(type) && type.endsWith("dml")) {
                             error += I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.failed");
                         }
-                        throw new RuntimeException(error);
+                        throw new ModuleInitRuntimeException(error);
                     } else {
                         tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, type);
                         hasRunSqlMd5List.add(sqlMd5);
@@ -229,8 +230,8 @@ public class ScriptRunnerManager {
                     insertTenantModuleDmlSqlDetail(sqlMd5, line, neatlogicConn);
                 }
             }
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(ex);
+        } catch (ModuleInitRuntimeException ex) {
+            throw new ModuleInitRuntimeException(ex);
         } catch (Exception ex) {
             logger.error("通过jdbc执行dml sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
@@ -332,8 +333,8 @@ public class ScriptRunnerManager {
                     }
                 }
             }
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(ex);
+        } catch (ModuleInitRuntimeException ex) {
+            throw new ModuleInitRuntimeException(ex);
         } catch (Exception ex) {
             logger.error("通过jdbc执行sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);

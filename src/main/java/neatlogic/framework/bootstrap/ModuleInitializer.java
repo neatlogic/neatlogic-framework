@@ -22,6 +22,7 @@ import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.exception.module.ModuleInitRuntimeException;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
@@ -103,7 +104,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     }
                 }
             }
-        } catch (RuntimeException ex) {
+        } catch (ModuleInitRuntimeException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
         } catch (Exception ex) {

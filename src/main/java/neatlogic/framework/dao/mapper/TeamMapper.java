@@ -40,6 +40,8 @@ public interface TeamMapper {
 
     List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
 
+    List<TeamVo> getTeamByIdList(List<Long> idList);
+
     List<String> getTeamUuidListByUserUuid(String userUuid);
 
     List<TeamVo> getTeamListByUserUuid(String userUuid);

@@ -682,6 +682,26 @@ limitations under the License.
         ORDER BY `id` DESC
     </select>
 
+    <select id="getUserByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_id` AS userId,
+        `user_name` AS userName,
+        `email`,
+        `phone`,
+        `is_active` AS isActive,
+        `user_info` AS userInfo,
+        `vip_level` AS vipLevel
+        FROM `user`
+        Where `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        ORDER BY `id` DESC
+    </select>
+
     <select id="getUserCountByAuth" resultType="neatlogic.framework.dto.AuthVo" useCache="false">
         SELECT a.`auth`                        as `name`,
                COUNT(DISTINCT (a.`user_uuid`)) as `userCount`

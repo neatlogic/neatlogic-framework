@@ -338,6 +338,25 @@ limitations under the License.
         </foreach>
     </select>
 
+    <select id="getTeamByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `parent_uuid` AS parentUuid,
+        `level`,
+        `lft`,
+        `rht`,
+        `upward_uuid_path` AS upwardUuidPath,
+        `upward_name_path` AS upwardNamePath
+        FROM `team`
+        WHERE `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
             useCache="true">
         SELECT ut.`team_uuid`

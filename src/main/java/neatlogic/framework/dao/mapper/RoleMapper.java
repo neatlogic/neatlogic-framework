@@ -53,6 +53,8 @@ public interface RoleMapper {
 
     List<RoleVo> getRoleByUuidList(List<String> uuidList);
 
+    List<RoleVo> getRoleByIdList(List<Long> idList);
+
     List<RoleVo> getRoleRuleByUuidList(List<String> uuidList);
 
     List<String> getRoleUuidListByUuidList(List<String> uuidList);

@@ -93,6 +93,8 @@ public interface UserMapper {
 
     List<UserVo> getUserByUserUuidList(List<String> userUuidList);
 
+    List<UserVo> getUserByIdList(List<Long> idList);
+
     List<AuthVo> getUserCountByAuth();
 
     List<UserProfileVo> getUserProfileByUserUuidAndModuleId(@Param("userUuid") String userUuid, @Param("moduleId") String moduleId);

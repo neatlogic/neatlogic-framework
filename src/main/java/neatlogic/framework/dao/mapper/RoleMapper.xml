@@ -156,6 +156,21 @@ limitations under the License.
         </foreach>
     </select>
 
+    <select id="getRoleByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `description`,
+        `rule`
+        FROM `role`
+        WHERE `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="getRoleRuleByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
             useCache="false">
         SELECT

@@ -3,7 +3,6 @@ package neatlogic.framework.util;
 import neatlogic.framework.common.config.LocalConfig;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
-import neatlogic.framework.store.mysql.DatasourceManager;
 import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class JdbcUtil {
         neatlogicDatasource.setUsername(LocalConfig.dbConfigMap.get("db.username").toString());
         neatlogicDatasource.setPassword(LocalConfig.dbConfigMap.get("db.password").toString());
         neatlogicDatasource.setPoolName("HikariCP_neatlogicInit");
-        DatasourceManager.setDataSourceConfig(neatlogicDatasource);
+        setDataSourceConfig(neatlogicDatasource);
     }
 
     public static Connection getNeatlogicConnection() {
@@ -40,7 +39,7 @@ public class JdbcUtil {
         try {
             connection = neatlogicDatasource.getConnection();
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            logger.error(exception.getMessage(), exception);
             throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb", LocalConfig.getPropertiesFrom()), exception);
         }
         return connection;
@@ -62,17 +61,37 @@ public class JdbcUtil {
             tenantDataSource.setDriverClassName(tenantVo.getDatasource().getDriver());
             tenantDataSource.setUsername(tenantVo.getDatasource().getUsername());
             tenantDataSource.setPassword(tenantVo.getDatasource().getPasswordPlain());
-            tenantDataSource.setPoolName("HikariCP_"+ (isData ? "DATA_" : StringUtils.EMPTY) + tenantVo.getDatasource().getTenantUuid()+"Init");
-            DatasourceManager.setDataSourceConfig(tenantDataSource);
+            tenantDataSource.setPoolName("HikariCP_" + (isData ? "DATA_" : StringUtils.EMPTY) + tenantVo.getDatasource().getTenantUuid() + "Init");
+            setDataSourceConfig(tenantDataSource);
             datasourceMap.put(tenantVo.getUuid(), tenantDataSource);
         }
         try {
             connection = tenantDataSource.getConnection();
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            logger.error(exception.getMessage(), exception);
             throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenantVo.getUuid()));
         }
         return connection;
+    }
+
+    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource) {
+        dataSource.setMaximumPoolSize(50);
+        //以下是针对Mysql的参数优化
+        //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
+        dataSource.addDataSourceProperty("prepStmtCacheSize", 250);
+        //This is the maximum length of a prepared SQL statement that the driver will cache. The MySQL default is 256. In our experience, especially with ORM frameworks like Hibernate, this default is well below the threshold of generated statement lengths. Our recommended setting is 2048.
+        dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+        //Neither of the above parameters have any effect if the cache is in fact disabled, as it is by default. You must set this parameter to true.
+        dataSource.addDataSourceProperty("cachePrepStmts", true);
+        //Newer versions of MySQL support server-side prepared statements, this can provide a substantial performance boost. Set this property to true.
+        dataSource.addDataSourceProperty("useServerPrepStmts", true);
+        dataSource.addDataSourceProperty("useLocalSessionState", true);
+        dataSource.addDataSourceProperty("rewriteBatchedStatements", true);
+        dataSource.addDataSourceProperty("cacheResultSetMetadata", true);
+        dataSource.addDataSourceProperty("cacheServerConfiguration", true);
+        dataSource.addDataSourceProperty("elideSetAutoCommits", true);
+        dataSource.addDataSourceProperty("maintainTimeStats", false);
+        dataSource.setConnectionTimeout(5000);
     }
 
 
@@ -106,4 +125,10 @@ public class JdbcUtil {
         }
     }
 
+    public static void closeDataSource() {
+        neatlogicDatasource.close();
+        for (Object o : datasourceMap.values()) {
+            ((NeatLogicBasicDataSource) o).close();
+        }
+    }
 }

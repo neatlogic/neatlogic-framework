@@ -19,7 +19,6 @@ package neatlogic.module.framework.form.attribute.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
-import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.attribute.core.FormHandlerBase;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -92,7 +91,7 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     public Object textConversionValue(Object text, JSONObject config) {
-        List<ValueTextVo> list = formService.textConversionValueForSelectHandler(text, config);
+        JSONArray list = formService.textConversionValueForSelectHandler(text, config);
         if (CollectionUtils.isEmpty(list)) {
             return null;
         }

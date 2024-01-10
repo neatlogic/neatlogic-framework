@@ -244,7 +244,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return null;
+        return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
     @Override

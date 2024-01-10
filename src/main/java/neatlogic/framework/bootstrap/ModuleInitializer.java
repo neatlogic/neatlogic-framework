@@ -64,7 +64,6 @@ public class ModuleInitializer implements WebApplicationInitializer {
             List<TenantVo> activeTenantList = getAllTenantList();
             updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
             initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
-            JdbcUtil.closeDataSource();
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
             List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());
@@ -444,8 +443,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入租户模块信息
      */
     private void insertTenantModuleVersionSql(String tenantUuid, String moduleId, String version) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection();
-             PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
             statement.setString(1, tenantUuid);
             statement.setString(2, moduleId);
             statement.setString(3, version);

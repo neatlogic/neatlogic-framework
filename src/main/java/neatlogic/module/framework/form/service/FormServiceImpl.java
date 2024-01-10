@@ -333,8 +333,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     }
 
     @Override
-    public List<ValueTextVo> textConversionValueForSelectHandler(Object text, JSONObject config) {
-        List<ValueTextVo> valueList = new ArrayList<>();
+    public JSONArray textConversionValueForSelectHandler(Object text, JSONObject config) {
+        JSONArray valueList = new JSONArray();
         if (text == null) {
             return valueList;
         }
@@ -350,7 +350,10 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 String textStr = (String) text;
                 Object value = valueTextMap.get(textStr);
                 if (value != null) {
-                    valueList.add(new ValueTextVo(value, textStr));
+                    JSONObject jsonObj = new JSONObject();
+                    jsonObj.put("value", value);
+                    jsonObj.put("text", textStr);
+                    valueList.add(jsonObj);
                 }
                 return valueList;
             }  else if (text instanceof List) {
@@ -361,7 +364,10 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 for (String textStr : textList) {
                     Object value = valueTextMap.get(textStr);
                     if (value != null) {
-                        valueList.add(new ValueTextVo(value, textStr));
+                        JSONObject jsonObj = new JSONObject();
+                        jsonObj.put("value", value);
+                        jsonObj.put("text", textStr);
+                        valueList.add(jsonObj);
                     }
                 }
                 return valueList;
@@ -379,12 +385,18 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (text instanceof String) {
                 String textStr = (String) text;
                 if (Objects.equals(mapping.getText(), mapping.getValue())) {
-                    valueList.add(new ValueTextVo(textStr, textStr));
+                    JSONObject jsonObj = new JSONObject();
+                    jsonObj.put("value", textStr);
+                    jsonObj.put("text", textStr);
+                    valueList.add(jsonObj);
                     return valueList;
                 }
                 String value = getValue(matrixUuid, mapping, textStr);
                 if (value != null) {
-                    valueList.add(new ValueTextVo(value, textStr));
+                    JSONObject jsonObj = new JSONObject();
+                    jsonObj.put("value", value);
+                    jsonObj.put("text", textStr);
+                    valueList.add(jsonObj);
                 }
                 return valueList;
             }  else if (text instanceof List) {
@@ -394,11 +406,17 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 }
                 for (String textStr : textList) {
                     if (Objects.equals(mapping.getText(), mapping.getValue())) {
-                        valueList.add(new ValueTextVo(textStr, textStr));
+                        JSONObject jsonObj = new JSONObject();
+                        jsonObj.put("value", textStr);
+                        jsonObj.put("text", textStr);
+                        valueList.add(jsonObj);
                     } else {
                         String value = getValue(matrixUuid, mapping, textStr);
                         if (value != null) {
-                            valueList.add(new ValueTextVo(value, textStr));
+                            JSONObject jsonObj = new JSONObject();
+                            jsonObj.put("value", value);
+                            jsonObj.put("text", textStr);
+                            valueList.add(jsonObj);
                         }
                     }
                 }

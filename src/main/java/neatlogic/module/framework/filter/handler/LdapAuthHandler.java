@@ -111,4 +111,9 @@ public class LdapAuthHandler extends LoginAuthHandlerBase {
         }
         return checkUserVo;
     }
+
+    @Override
+    public boolean isNeedAuth(){
+        return false;
+    }
 }

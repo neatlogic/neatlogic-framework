@@ -25,6 +25,8 @@ import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.ThemeMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.ThemeVo;
+import neatlogic.framework.filter.core.ILoginAuthHandler;
+import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.TenantService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -74,6 +76,13 @@ public class TenantController {
             //登录插件
             data.put("authType", Config.LOGIN_AUTH_TYPE());
             data.put("encrypt", Config.LOGIN_AUTH_PASSWORD_ENCRYPT());
+
+            if(Config.LOGIN_AUTH_TYPE() != null) {
+                ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
+                if(loginAuth != null) {
+                    data.put("isNeedAuth", loginAuth.isNeedAuth());
+                }
+            }
 
             //单点登录
             if(StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {

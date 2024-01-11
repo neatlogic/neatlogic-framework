@@ -56,4 +56,12 @@ public interface ILoginAuthHandler {
      */
     boolean isValidTokenCreateTime();
 
+    /**
+     *
+     * 是否需要免登录认证。如果需要，则前端页面会在第一个接口请求走myAuth认证后，才请求后续的接口。
+     */
+    default boolean isNeedAuth(){
+        return true;
+    }
+
 }

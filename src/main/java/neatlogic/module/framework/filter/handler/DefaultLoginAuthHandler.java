@@ -46,6 +46,11 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
     }
 
     @Override
+    public boolean isNeedAuth(){
+        return false;
+    }
+
+    @Override
     public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException{
         //获取 authorization，优先获取header的authorization，不存在则从cookie获取authorization
         Cookie[] cookies = request.getCookies();

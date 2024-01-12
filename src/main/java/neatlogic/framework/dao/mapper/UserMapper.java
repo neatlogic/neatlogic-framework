@@ -75,8 +75,6 @@ public interface UserMapper {
 
     List<UserAuthVo> searchUserAllAuthByUserAuth(@Param("authenticationInfoVo") AuthenticationInfoVo authenticationInfoVo);
 
-    List<UserAuthVo> searchUserAllAuthByUserAuthCache(UserAuthVo userAuthVo);
-
     List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
 
     List<Long> getLimitUserPasswordIdList(String userUuid);

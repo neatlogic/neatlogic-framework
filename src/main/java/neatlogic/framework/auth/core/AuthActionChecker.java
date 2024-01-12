@@ -22,7 +22,9 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -34,9 +36,16 @@ public class AuthActionChecker {
 
     private static UserMapper userMapper;
 
+    private static AuthenticationInfoService authenticationInfoService;
+
     @Resource
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
+    }
+
+    @Resource
+    public void setAuthenticationInfoService(AuthenticationInfoService _authenticationInfoService) {
+        authenticationInfoService = _authenticationInfoService;
     }
 
     @SafeVarargs
@@ -110,7 +119,13 @@ public class AuthActionChecker {
             return false;
         }
         //判断从数据库查询的用户权限是否满足
-        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
+        AuthenticationInfoVo authenticationInfoVo;
+        if (UserContext.get() != null) {
+            authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
+        } else {
+            authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userUuid);
+        }
+        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
         List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(contains)) {

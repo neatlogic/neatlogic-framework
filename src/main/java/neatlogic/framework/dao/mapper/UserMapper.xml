@@ -454,7 +454,7 @@ limitations under the License.
         WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
+    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
         SELECT
         `auth_group` AS authGroup,
         `auth`
@@ -481,39 +481,6 @@ limitations under the License.
             <foreach collection="userUuidList" open="(" close=")" separator="," item="userUuid">
                 #{userUuid}
             </foreach>
-        </if>
-    </select>
-
-    <select id="searchUserAllAuthByUserAuthCache" parameterType="neatlogic.framework.dto.UserAuthVo"
-            resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
-        SELECT
-        ra.`auth_group` AS authGroup,
-        ra.`auth`
-        FROM `user_role` ur
-        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
-        WHERE ur.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND ra.`auth` = #{auth}
-        </if>
-        UNION
-        SELECT
-        `auth_group` AS authGroup,
-        `auth`
-        FROM `user_authority`
-        WHERE `user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
-        </if>
-        UNION
-        SELECT
-        c.`auth_group` AS authGroup,
-        c.`auth`
-        FROM `user_team` a
-        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
-        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
-        WHERE a.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
         </if>
     </select>
 

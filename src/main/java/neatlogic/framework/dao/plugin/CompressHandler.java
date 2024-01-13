@@ -27,15 +27,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CompressHandler implements TypeHandler<String> {
+public class CompressHandler implements TypeHandler<String>, NeatLogicTypeHandler<String> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
+
+        ps.setString(i, handleParameter(parameter));
+    }
+
+    @Override
+    public String handleParameter(String parameter) {
         int maxLength = 32000;
         if (Config.ENABLE_GZIP() && StringUtils.isNotBlank(parameter) && parameter.length() > maxLength) {
             parameter = "GZIP:" + GzipUtil.compress(parameter);
         }
-        ps.setString(i, parameter);
+        return parameter;
     }
 
 
@@ -65,5 +71,4 @@ public class CompressHandler implements TypeHandler<String> {
         }
         return v;
     }
-
 }

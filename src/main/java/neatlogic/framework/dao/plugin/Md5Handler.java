@@ -53,11 +53,4 @@ public class Md5Handler implements TypeHandler<Object>, NeatLogicTypeHandler<Obj
     public String getResult(CallableStatement cs, int columnIndex) throws SQLException {
         return cs.getString(columnIndex);
     }
-
-    public static void main(String[] args) {
-        String parameter = "XX集团";
-        String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
-        parameter = DigestUtils.md5DigestAsHex(parameterStr.getBytes());
-        System.out.println("parameter = " + parameter);
-    }
 }

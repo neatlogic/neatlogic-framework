@@ -32,6 +32,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,11 @@ public class SqlCostInterceptor implements Interceptor {
 
     // 封装了一下sql语句，使得结果返回完整xml路径下的sql语句节点id + sql语句
     private static String getSql(Configuration configuration, BoundSql boundSql, String sqlId) {
-        return showSql(configuration, boundSql);
+        String sql = showSql(configuration, boundSql);
+        if (sql.contains("@{DATA_SCHEMA}")) {
+            sql = sql.replace("@{DATA_SCHEMA}", TenantContext.get().getDataDbName());
+        }
+        return sql;
     }
 
     // 如果参数是String，则添加单引号， 如果是日期，则转换为时间格式器并加单引号； 对参数是null和不是null的情况作了处理
@@ -192,12 +197,19 @@ public class SqlCostInterceptor implements Interceptor {
                 MetaObject metaObject = configuration.newMetaObject(parameterObject);
                 for (ParameterMapping parameterMapping : parameterMappings) {
                     String propertyName = parameterMapping.getProperty();
+                    TypeHandler<?> typeHandler = parameterMapping.getTypeHandler();
                     if (metaObject.hasGetter(propertyName)) {
                         Object obj = metaObject.getValue(propertyName);
+                        if (obj != null && typeHandler != null && typeHandler instanceof NeatLogicTypeHandler) {
+                            obj = ((NeatLogicTypeHandler) typeHandler).handleParameter(obj);
+                        }
                         sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
                     } else if (boundSql.hasAdditionalParameter(propertyName)) {
                         // 该分支是动态sql
                         Object obj = boundSql.getAdditionalParameter(propertyName);
+                        if (obj != null && typeHandler != null && typeHandler instanceof NeatLogicTypeHandler) {
+                            obj = ((NeatLogicTypeHandler) typeHandler).handleParameter(obj);
+                        }
                         sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
                     } else {
                         // 打印出缺失，提醒该参数缺失并防止错位

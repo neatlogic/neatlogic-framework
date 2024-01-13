@@ -31,7 +31,6 @@ public class CompressHandler implements TypeHandler<String>, NeatLogicTypeHandle
 
     @Override
     public void setParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
-
         ps.setString(i, handleParameter(parameter));
     }
 

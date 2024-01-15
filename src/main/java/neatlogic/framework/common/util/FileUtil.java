@@ -16,36 +16,50 @@
 
 package neatlogic.framework.common.util;
 
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.file.core.FileStorageMediumFactory;
 import neatlogic.framework.file.core.IFileStorageHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.Objects;
 
 public class FileUtil {
-    //private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
 
     /**
      * 根据storageMediumHandler获取存储介质Handler，从而上传到对应的存储介质中
      *
-     * @param storageMediumHandler 介质控制器
-     * @param tenantUuid           租户uuid
-     * @param inputStream          文件流
-     * @param fileId               文件id
-     * @param contentType          附件类型
-     * @param fileType             附件类型
+     * @param tenantUuid  租户uuid
+     * @param inputStream 文件流
+     * @param fileId      文件id
+     * @param contentType 附件类型
+     * @param fileType    附件类型
      * @return 附件路径
      * @throws Exception 异常
      */
-    public static String saveData(String storageMediumHandler, String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
-        IFileStorageHandler handler = FileStorageMediumFactory.getHandler(storageMediumHandler);
-        if (handler == null) {
-            throw new FileStorageMediumHandlerNotFoundException(storageMediumHandler);
+    public static String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+        IFileStorageHandler handler = null;
+        String filePath = null;
+        try {
+            handler = FileStorageMediumFactory.getHandler(Config.FILE_HANDLER());
+            if (handler == null) {
+                throw new FileStorageMediumHandlerNotFoundException(Config.FILE_HANDLER());
+            }
+            filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            if (!Objects.equals(Config.FILE_HANDLER(), "FILE")) {
+                handler = FileStorageMediumFactory.getHandler("FILE");
+                filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+            }
         }
-        return handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+        return filePath;
     }
 
     /**

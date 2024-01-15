@@ -126,6 +126,8 @@ public class Config {
 
     private static String AUTOEXEC_TOKEN;// autoexec用户的token
 
+    private static String FILE_HANDLER;//文件处理器
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -217,6 +219,10 @@ public class Config {
 
     public static String JMS_URL() {
         return JMS_URL;
+    }
+
+    public static String FILE_HANDLER() {
+        return FILE_HANDLER;
     }
 
     public static String DATA_HOME() {
@@ -509,6 +515,8 @@ public class Config {
             MONGO_DATABASE = prop.getProperty("mongo.database", "neatlogic");
 
             JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
+
+            FILE_HANDLER = prop.getProperty("file.handler","FILE");
 
             MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");

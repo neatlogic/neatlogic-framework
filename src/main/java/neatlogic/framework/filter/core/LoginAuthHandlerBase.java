@@ -93,6 +93,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         UserVo userVo = myAuth(request);
         //如果userVo没有uuid则这个user不合法，直接置null
         if (userVo != null && StringUtils.isBlank(userVo.getUuid())) {
+            logger.error(getType()+" return userVo invalid!! userVo must include uuid");
             userVo = null;
         }
         //如果认证cookie为null,说明不是通过登录页登录，而是通过第三方认证接口认证。第一次认证通过后需构建并设置response 认证 cookie
@@ -121,6 +122,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return userVo;
     }
 
+    /**
+     *  自定义认证，返回的用户对象，必须包含uuid,否则返回的用户无效
+     */
     public abstract UserVo myAuth(HttpServletRequest request) throws Exception;
 
     /**

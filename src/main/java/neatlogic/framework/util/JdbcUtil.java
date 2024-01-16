@@ -39,7 +39,7 @@ public class JdbcUtil {
             // 设置JDBC驱动程序应该抛出异常而不是警告
             props.setProperty("jdbcCompliantTruncation", "true");
             return driver.connect(url, props);
-        } catch (Exception exception) {
+        } catch (Throwable exception) {
             logger.error(exception.getMessage(), exception);
             throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb", LocalConfig.getPropertiesFrom()), exception);
         }
@@ -76,7 +76,7 @@ public class JdbcUtil {
             // 设置JDBC驱动程序应该抛出异常而不是警告
             props.setProperty("jdbcCompliantTruncation", "true");
             return driver.connect(url, props);
-        } catch (Exception exception) {
+        } catch (Throwable exception) {
             logger.error(exception.getMessage(), exception);
             throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.tenantnotconnect", tenantVo.getUuid()));
         }

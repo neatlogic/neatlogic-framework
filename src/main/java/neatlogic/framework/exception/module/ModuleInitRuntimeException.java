@@ -25,7 +25,7 @@ public class ModuleInitRuntimeException extends RuntimeException {
         super(ex);
     }
 
-    public ModuleInitRuntimeException(String msg, Exception ex) {
+    public ModuleInitRuntimeException(String msg, Throwable ex) {
         super(msg, ex);
     }
 }

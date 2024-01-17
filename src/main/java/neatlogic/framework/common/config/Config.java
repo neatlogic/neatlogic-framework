@@ -76,6 +76,11 @@ public class Config {
 
     private static String JMS_URL;
 
+    private static String ALIOSS_URL;
+    private static String ALIOSS_BUCKET;
+    private static String ALIOSS_ACCESSKEY;
+    private static String ALIOSS_SECRETKEY;
+
 
     private static String MINIO_URL;
     private static String MINIO_BUCKET;
@@ -269,6 +274,22 @@ public class Config {
 
     public static int LOGIN_FAILED_TIMES_CAPTCHA() {
         return LOGIN_FAILED_TIMES_CAPTCHA;
+    }
+
+    public static String ALIOSS_URL() {
+        return ALIOSS_URL;
+    }
+
+    public static String ALIOSS_ACCESSKEY() {
+        return ALIOSS_ACCESSKEY;
+    }
+
+    public static String ALIOSS_SECRETKEY() {
+        return ALIOSS_SECRETKEY;
+    }
+
+    public static String ALIOSS_BUCKET() {
+        return ALIOSS_BUCKET;
     }
 
     public static String MINIO_URL() {
@@ -516,6 +537,10 @@ public class Config {
 
             JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
 
+            ALIOSS_URL = prop.getProperty("alioss.url");
+            ALIOSS_ACCESSKEY = prop.getProperty("alioss.accesskey", "aliossadmin");
+            ALIOSS_SECRETKEY = prop.getProperty("alioss.secretkey", "aliossadmin");
+            ALIOSS_BUCKET = prop.getProperty("alioss.bucket", "neatlogic");
             FILE_HANDLER = prop.getProperty("file.handler","FILE");
 
             MINIO_URL = prop.getProperty("minio.url");
